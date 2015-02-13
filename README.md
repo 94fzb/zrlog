@@ -22,7 +22,7 @@
 * 1.下载最新的 war 放在tomcat的webapps （补充 绑定tomcat域名的方法）
 * 2.访问 http://host:port/zrlog/install
 * 3.填写数据，管理员信息，完成安装
-* 4. [程序演示地址](http://demoblog.94fzb.com)
+* 4. [程序演示地址](http://203.195.167.55:8088)
 
 ------------------------------
 联系方式
