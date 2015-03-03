@@ -23,7 +23,7 @@
 					<target>1.6</target>
 					<encoding>UTF-8</encoding>
 					<compilerArguments>
-						<extdirs>src\main\webapp\WEB-INF\lib</extdirs>
+						<extdirs>WebRoot\WEB-INF\lib</extdirs>
 					</compilerArguments>
 				</configuration>
 			</plugin>
