@@ -1,7 +1,7 @@
 ﻿
 #zrlog 使用 JFinal 构建的个人博客程序
 ---
-> blog 虽然慢慢的消失, 但是总有不愿意去用QQ空间,微博,微信等,而是希望有个自己的个人主页,于是就有这个博客程序 
+> blog 虽然慢慢的消失, 但是总有不愿意去用QQ空间,微博,微信等,而是希望有个自己的个人主页,于是就有这个博客程序
 
 ## 部署环境前提
 * 1.jre 版本> 6.0
@@ -21,8 +21,8 @@
 
 * 1.下载最新的 war 放在tomcat的webapps （补充 绑定tomcat域名的方法）
 * 2.访问 http://host:port/zrlog/install
-* 3.填写数据，管理员信息，完成安装
-* 4. [程序演示地址](http://blog.oschina.mopaas.com/)
+* 3.填写数据，管理员信息，完成安装(需要重启)
+* 4. [程序演示地址 http://blog.oschina.mopaas.com](http://blog.oschina.mopaas.com/) 
 
 ------------------------------
 联系方式
