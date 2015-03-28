@@ -28,14 +28,14 @@
 * 程序问题反馈  http://blog.94fzb.com/post/feedback
 
 ## 一些截图
-![编辑页面](http://fz-blog.qiniudn.com/attached/image/20150328/20150328221806_648.jpg?imageView2/2/w/600 "编辑页面")
+![编辑页面](http://fz-blog.qiniudn.com/attached/image/20150328/20150328221806_648.jpg "编辑页面")
 
-![](http://fz-blog.qiniudn.com/attached/image/20150328/20150328222511_459.jpg?imageView2/2/w/600)
+![文章管理](http://fz-blog.qiniudn.com/attached/image/20150328/20150328222511_459.jpg)
 
-![](http://fz-blog.qiniudn.com/attached/image/20150328/20150328222526_340.jpg?imageView2/2/w/600)
+![模板管理](http://fz-blog.qiniudn.com/attached/image/20150328/20150328222526_340.jpg)
 
-![](http://fz-blog.qiniudn.com/attached/image/20150328/20150328222541_30.jpg?imageView2/2/w/600)
+![插件中心](http://fz-blog.qiniudn.com/attached/image/20150328/20150328222541_30.jpg)
 
-![](http://fz-blog.qiniudn.com/attached/image/20150328/20150328222557_275.jpg?imageView2/2/w/600)
+![变更文章页面](http://fz-blog.qiniudn.com/attached/image/20150328/20150328222557_275.jpg)
 
-![前台页面](http://fz-blog.qiniudn.com/attached/image/20150328/20150328222609_521.jpg?imageView2/2/w/600)
+![前台页面](http://fz-blog.qiniudn.com/attached/image/20150328/20150328222609_521.jpg)
