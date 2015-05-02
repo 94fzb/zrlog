@@ -5,6 +5,7 @@
 * 1.jre 版本 >= 1.6
 * 2.tomcat 版本 >=6，jetty > 6
 * 3.mysql
+
 ### 功能
 * 1.实现了的日志，分类，评论，的管理
 * 2.支持插件模式 [如何编写一个zrlog插件 http://blog.94fzb.com:8080/post/175](http://blog.94fzb.com:8080/post/175) 
