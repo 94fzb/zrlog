@@ -8,7 +8,7 @@
 
 ### 功能
 * 1.实现了的日志，分类，评论，的管理
-* 2.支持插件模式 [如何编写一个zrlog插件 http://blog.94fzb.com:8080/post/175](http://blog.94fzb.com:8080/post/175) 
+* 2.支持插件模式 [如何编写一个zrlog插件 http://blog.94fzb.com/post/175](http://blog.94fzb.com/post/175) 
 * 3.后台动态变更前台主题
 * 4.支持第三方评论插件
 * 5.提供 editormd 个主流的富文本编辑器，基本上满足了管理员的编辑
@@ -18,7 +18,7 @@
 * 9.支持数据库定时备份
 
 ### 系统安装
-* 1.下载 [最新 war](http://dl.94fzb.com/release/zrlog.war) 放在tomcat的webapps （补充 绑定tomcat域名的方法）
+* 1.下载 [最新 war](http://dl.94fzb.com/release/zrlog.war) 放在tomcat的webapps
 * 2.访问 http://host:port/zrlog/install
 * 3.填写数据，管理员信息，完成安装
 * 4.[程序演示地址 http://blog.oschina.mopaas.com](http://blog.oschina.mopaas.com/)
