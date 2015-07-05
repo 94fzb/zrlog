@@ -28,14 +28,22 @@
 * 邮件 xchun90@163.com
 * 程序问题反馈  http://blog.94fzb.com/post/feedback
 
-## 一些截图
+### Changelog
+
+#### 1.4 (2015-06-05)
+* 优化后台部分逻辑
+* 加入邮件服务
+* 移出kindeditor相关文件
+
+
+### 一些截图
 ![编辑页面](http://fz-blog.qiniudn.com/attached/image/20150328/20150328221806_648.jpg "编辑页面")
 
 ![文章管理](http://fz-blog.qiniudn.com/attached/image/20150328/20150328222511_459.jpg)
 
 ![模板管理](http://fz-blog.qiniudn.com/attached/image/20150328/20150328222526_340.jpg)
 
-![插件中心](http://fz-blog.qiniudn.com/attached/image/20150328/20150328222541_30.jpg)
+![插件中心](http://fz-blogjfinal.qiniudn.com/attached/image/20150328/20150328222541_30.jpg)
 
 ![变更文章页面](http://fz-blog.qiniudn.com/attached/image/20150328/20150328222557_275.jpg)
 
