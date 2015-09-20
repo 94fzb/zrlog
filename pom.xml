@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>zrlog</groupId>
+	<groupId>com.fzb</groupId>
 	<artifactId>zrlog</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.4.2</version>
 	<packaging>war</packaging>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
@@ -33,6 +33,7 @@
 				<configuration>
 					<warSourceDirectory>WebRoot</warSourceDirectory>
 					<failOnMissingWebXml>false</failOnMissingWebXml>
+					<warName>zrlog</warName>
 				</configuration>
 			</plugin>
 		</plugins>
