@@ -3,27 +3,25 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.fzb</groupId>
 	<artifactId>zrlog</artifactId>
-	<version>1.4.2</version>
+	<version>1.4.3</version>
 	<packaging>war</packaging>
 	<build>
-		<sourceDirectory>src</sourceDirectory>
+		<sourceDirectory>src/main/java</sourceDirectory>
+		<testSourceDirectory>src/test/java</testSourceDirectory>
 		<resources>
 			<resource>
-				<directory>src</directory>
-				<excludes>
-					<exclude>**/*.java</exclude>
-				</excludes>
+				<directory>src/main/resources</directory>
 			</resource>
 		</resources>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
+					<source>1.6</source>
+					<target>1.6</target>
 					<encoding>UTF-8</encoding>
 					<compilerArguments>
-						<extdirs>${basedir}/WebRoot/WEB-INF/lib</extdirs>
+						<extdirs>src/main/webapp/WEB-INF/lib</extdirs>
 					</compilerArguments>
 				</configuration>
 			</plugin>
@@ -31,7 +29,7 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<version>2.3</version>
 				<configuration>
-					<warSourceDirectory>WebRoot</warSourceDirectory>
+					<warSourceDirectory>src/main/webapp</warSourceDirectory>
 					<failOnMissingWebXml>false</failOnMissingWebXml>
 					<warName>zrlog</warName>
 				</configuration>
@@ -39,3 +37,4 @@
 		</plugins>
 	</build>
 </project>
+

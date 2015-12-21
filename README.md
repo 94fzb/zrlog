@@ -11,25 +11,26 @@
 * 2.支持插件模式 [如何编写一个zrlog插件 http://blog.94fzb.com/post/175](http://blog.94fzb.com/post/175) 
 * 3.后台动态变更前台主题
 * 4.支持第三方评论插件
-* 5.提供 editormd 主流的富文本编辑器，基本上满足了管理员的编辑
-* 6.使用ecache缓存公共数据,访问速度更快
+* 5.提供 editormd 主流的富文本编辑器，基本上满足了管理员的编辑需求
+* 6.使用ehcache缓存公共数据,访问速度更快
 * 7.支持页面静态化
 * 8.支持扩展第三方云存储（默认七牛）
 * 9.支持数据库定时备份
 * 10.可发表私有文章
 
 ### 系统安装
-* 1.下载 [最新 war](http://dl.94fzb.com/release/zrlog.war) 放在tomcat的webapps
+* 1.下载 [最新 war](http://dl.94fzb.com/release/zrlog.war) 放在 tomcat的 webapps
 * 2.访问 http://host:port/zrlog/install
 * 3.填写数据，管理员信息，完成安装
-* 4.[程序演示地址 http://blog.oschina.mopaas.com](http://blog.oschina.mopaas.com/)
+* 4.[程序演示地址 http://demo.blog.zrlog.com](http://http://demo.blog.zrlog.com/)
 
 ### 联系方式
-* QQ 交流 504008147
+* QQ交流 504008147
+* QQ群 6399942
 * 邮件 xchun90@163.com
-* 程序问题反馈  http://blog.94fzb.com/post/feedback
+* 对程序有任何问题，欢迎反馈 [http://blog.94fzb.com/post/feedback](http://blog.94fzb.com/post/feedback)
 
-### Changelog
+### ChangeLog
 
 #### 1.4 (2015-06-05)
 * 优化后台部分逻辑
@@ -42,6 +43,9 @@
 * IP 黑名单
 * 文件 html,css,js 支持在线编辑
 
+#### 1.4.3 (2015-12-20)
+* 优化对接多说相关代码（Map -> Bean）
+* 更改 ehcache 默认配置（ehcache内存申请过多，内存较小的主机被杀JVM进程）
 
 ### 一些截图
 

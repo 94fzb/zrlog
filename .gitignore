@@ -3,3 +3,14 @@
 *.war
 *.ear 
 /target
+
+.classpath
+bin
+zrlog.iml
+.idea
+.project
+1.log
+.settings
+target
+hs_err*.log
+src/main/webapp/post
