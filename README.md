@@ -19,7 +19,7 @@
 * 10.可发表私有文章
 
 ### 系统安装
-* 1.下载 [最新 war](http://dl.zlrog.com/release/zrlog.war) 放在 tomcat的 webapps
+* 1.下载 [最新 war](http://dl.zrlog.com/release/zrlog.war) 放在 tomcat的 webapps
 * 2.访问 http://host:port/zrlog/install
 * 3.填写数据，管理员信息，完成安装
 * 4.[程序演示地址 http://demo.blog.zrlog.com](http://demo.blog.zrlog.com/)
