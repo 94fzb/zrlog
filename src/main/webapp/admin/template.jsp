@@ -3,10 +3,10 @@
 <jsp:include page="include/menu.jsp"/>
 						<div class="page-header">
 							<h1>
-								模板
+								主题
 								<small>
 									<i class="icon-double-angle-right"></i>
-									管理模板
+									管理主题
 								</small>
 							</h1>
 						</div>
@@ -15,7 +15,7 @@
 								<table class="table table-striped table-bordered table-hover" id="sample-table-1">
 									<thead>
 										<tr>
-											<th>模板地址</th>
+											<th>主题路径</th>
 											
 											<th class="hidden-480">名称</th>
 
@@ -30,6 +30,7 @@
 
 											<th>版本</th>
 											<th>编辑</th>
+											<th>预览</th>
 											<th>应用</th>
 										</tr>
 									</thead>
@@ -48,18 +49,29 @@
 
 											<td>
 												<div class="visible-md visible-lg hidden-sm hidden-xs btn-group">
-													<a href="${url}/admin/black?menu=1&include=plugins/file/edit&path=${template.template}&editType=主题"><button class="btn btn-xs btn-success">
-														<i class="icon-edit bigger-120"></i>
+													<a href="${url}/admin/black?menu=1&include=plugins/file/edit&path=${template.template}&editType=主题">
+													<button class="btn btn-xs">
+														<i class="icon-pencil bigger-120"></i>
 													</button>
 													</a>
 													 
 												</div>
 											</td>
-											
 											<td>
 												<div class="visible-md visible-lg hidden-sm hidden-xs btn-group">
-													<a href="${url}/admin/website/update?template=${template.template}&resultType=html"><button class="btn btn-xs btn-success">
-														<i class="icon-ok bigger-120"></i>
+													<a target="_blank" href="${url}/admin/template/preview?template=${template.template}&resultType=html">
+													<button class="btn btn-xs btn-primary">
+														<i class="icon-zoom-in bigger-120"></i>
+													</button>
+													</a>
+												</div>
+											</td>
+
+											<td>
+												<div class="visible-md visible-lg hidden-sm hidden-xs btn-group">
+													<a href="${url}/admin/website/update?template=${template.template}&resultType=html">
+													<button class="btn btn-xs btn-success">
+														<i class="icon-wrench bigger-120"></i>
 													</button>
 													</a>
 													 

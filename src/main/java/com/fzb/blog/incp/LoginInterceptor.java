@@ -1,14 +1,14 @@
 package com.fzb.blog.incp;
 
-import com.fzb.blog.controlle.BaseController;
-import com.fzb.blog.controlle.QueryLogController;
+import com.fzb.blog.controller.BaseController;
 import com.fzb.blog.util.InstallUtil;
+import com.jfinal.aop.Invocation;
 import com.jfinal.aop.PrototypeInterceptor;
-import com.jfinal.core.ActionInvocation;
 import com.jfinal.kit.PathKit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,52 +18,21 @@ import java.util.Map;
  */
 public class LoginInterceptor extends PrototypeInterceptor {
 
-    private static final Logger LOGGER = LoggerFactory
-            .getLogger(LoginInterceptor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoginInterceptor.class);
 
-    public void doIntercept(ActionInvocation ai) {
-        try {
-            if (ai.getController() instanceof BaseController) {
-                HttpServletRequest request = ai.getController().getRequest();
-                ai.getController().setAttr("requrl", request.getRequestURL());
-                ((BaseController) ai.getController()).initData();
-            }
-            if (ai.getActionKey().startsWith("/post")
-                    || ai.getActionKey().equals("/")) {
-                visitorPermission(ai);
-            } else if (ai.getActionKey().startsWith("/api")) {
-                apiPermission(ai);
-            } else if (ai.getActionKey().startsWith("/admin")) {
-                adminPermission(ai);
-            } else if (ai.getActionKey().startsWith("/install")) {
-                installPermission(ai);
-            } else {
-                // 其他未知情况也放行
-                ai.invoke();
-            }
-        } catch (Exception e) {
-            LOGGER.error("permission interceptor exception ", e);
-        }
-    }
-
-    private void visitorPermission(ActionInvocation ai) {
+    private void visitorPermission(Invocation ai) {
         ai.invoke();
+        String basePath = getBaseTemplatePath(ai);
         if (ai.getController().getAttr("log") != null) {
-            ai.getController().render(
-                    ((QueryLogController) ai.getController()).getTemplatePath()
-                            + "/detail.jsp");
+            ai.getController().render(basePath + "/detail.jsp");
         } else if (ai.getController().getAttr("data") != null) {
-            ai.getController().render(
-                    ((QueryLogController) ai.getController()).getTemplatePath()
-                            + "/page.jsp");
+            ai.getController().render(basePath + "/page.jsp");
         } else {
-            ai.getController().render(
-                    ((QueryLogController) ai.getController()).getTemplatePath()
-                            + "/index.jsp");
+            ai.getController().render(basePath + "/index.jsp");
         }
     }
 
-    private void apiPermission(ActionInvocation ai) {
+    private void apiPermission(Invocation ai) {
         ai.invoke();
         if (ai.getController().getAttr("log") != null) {
             ai.getController().renderJson(ai.getController().getAttr("log"));
@@ -77,7 +46,7 @@ public class LoginInterceptor extends PrototypeInterceptor {
         }
     }
 
-    private void installPermission(ActionInvocation ai) {
+    private void installPermission(Invocation ai) {
         if (!new InstallUtil(PathKit.getWebRootPath() + "/WEB-INF")
                 .checkInstall()) {
             ai.invoke();
@@ -87,7 +56,8 @@ public class LoginInterceptor extends PrototypeInterceptor {
         }
     }
 
-    private void adminPermission(ActionInvocation ai) {
+    private void adminPermission(Invocation ai) {
+        String basePath = getBaseTemplatePath(ai);
         if (ai.getController().getSession().getAttribute("user") != null) {
             ai.getController().setAttr("user",
                     ai.getController().getSession().getAttribute("user"));
@@ -103,6 +73,42 @@ public class LoginInterceptor extends PrototypeInterceptor {
             ai.getController().redirect(request.getContextPath()
                     + "/admin/login?redirectFrom="
                     + request.getRequestURL() + (request.getQueryString() != null ? "?" + request.getQueryString() : ""));
+        }
+    }
+
+    private String getBaseTemplatePath(Invocation ai) {
+        String basePath = ((BaseController) ai.getController()).getTemplatePath();
+        Cookie[] cookies = ai.getController().getRequest().getCookies();
+        if (cookies != null && cookies.length > 0) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("template") && cookie.getValue().startsWith("/include/templates/")) {
+                    basePath = cookie.getValue();
+                    break;
+                }
+            }
+        }
+        ai.getController().getRequest().setAttribute("template", basePath);
+        return basePath;
+    }
+
+    @Override
+    public void doIntercept(Invocation invocation) {
+        try {
+            if (invocation.getActionKey().startsWith("/post")
+                    || invocation.getActionKey().equals("/")) {
+                visitorPermission(invocation);
+            } else if (invocation.getActionKey().startsWith("/api")) {
+                apiPermission(invocation);
+            } else if (invocation.getActionKey().startsWith("/admin")) {
+                adminPermission(invocation);
+            } else if (invocation.getActionKey().startsWith("/install")) {
+                installPermission(invocation);
+            } else {
+                // 其他未知情况也放行
+                invocation.invoke();
+            }
+        } catch (Exception e) {
+            LOGGER.error("permission interceptor exception ", e);
         }
     }
 }

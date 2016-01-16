@@ -4,6 +4,7 @@
 *.ear 
 /target
 
+*~
 .classpath
 bin
 zrlog.iml
@@ -14,3 +15,6 @@ zrlog.iml
 target
 hs_err*.log
 src/main/webapp/post
+src/main/webapp/attached
+src/main/webapp/WEB-INF/backupSql
+src/main/webapp/WEB-INF/classes

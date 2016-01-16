@@ -28,10 +28,6 @@
 				</div><!-- /.main-content -->
 
 			</div><!-- /.main-container-inner -->
-
-			<a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
-				<i class="icon-double-angle-up icon-only bigger-110"></i>
-			</a>
 		</div><!-- /.main-container -->
 
 		<script src="assets/js/date-time/bootstrap-datepicker.min.js"></script>
@@ -45,7 +41,7 @@
 				
 				jQuery(grid_selector).jqGrid({
 					
-				url:'<%=request.getAttribute("url")%>/admin/tag/queryAll',
+				url:'${url}/admin/tag/queryAll',
 				datatype: "json",
 					colNames:['ID','标签名','计数'],
 					colModel:[
@@ -78,9 +74,9 @@
 						}, 0);
 					},
 			
-					editurl:"<%=request.getAttribute("url")%>/admin/type/oper",//nothing is saved
+					editurl:"${url}/admin/type/oper",//nothing is saved
 					caption: "标签",
-					height:500,
+					height:391,
 			
 					autowidth: true
 			

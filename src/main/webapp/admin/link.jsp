@@ -28,10 +28,6 @@
 				</div><!-- /.main-content -->
 
 			</div><!-- /.main-container-inner -->
-
-			<a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
-				<i class="icon-double-angle-up icon-only bigger-110"></i>
-			</a>
 		</div><!-- /.main-container -->
 
 		<script src="assets/js/date-time/bootstrap-datepicker.min.js"></script>
@@ -45,7 +41,7 @@
 				
 				jQuery(grid_selector).jqGrid({
 					
-				url:'<%=request.getAttribute("url")%>/admin/link/queryAll',
+				url:'${url}/admin/link/queryAll',
 				datatype: "json",
 					colNames:[' ', 'ID','链接','网站名','描述', '排序'],
 					colModel:[
@@ -54,7 +50,7 @@
 							formatoptions:{ 
 								keys:true,
 								delbutton: true,
-						        delOptions: {recreateForm: true, beforeShowForm:beforeDeleteCallback, url: '<%=request.getAttribute("url")%>/admin/link/delete' }
+						        delOptions: {recreateForm: true, beforeShowForm:beforeDeleteCallback, url: '${url}/admin/link/delete' }
 								//delOptions:{recreateForm: true, beforeShowForm:beforeDeleteCallback},
 								//editformbutton:true, editOptions:{recreateForm: true, beforeShowForm:beforeEditCallback}
 							}
@@ -89,9 +85,9 @@
 						}, 0);
 					},
 			
-					editurl:"<%=request.getAttribute("url")%>/admin/link/oper",//nothing is saved
+					editurl:"${url}/admin/link/oper",//nothing is saved
 					caption: "友链管理",
-					height:500,
+					height:391,
 			
 					autowidth: true
 			

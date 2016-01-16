@@ -7,9 +7,9 @@ request.setAttribute("suburl", request.getRequestURL().substring(basePath.length
 %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<link rel="stylesheet" href="${url }/admin/markdown/css/editormd.css" />
+<link rel="stylesheet" href="${url }/admin/markdown/css/editormd.min.css" />
 <link rel="stylesheet" href="${url}/assets/css/jquery.gritter.css" />
-<script src="${url}/admin/markdown/js/editormd.js"></script>
+<script src="${url}/admin/markdown/js/editormd.min.js"></script>
 <script src="${url}/assets/js/jquery.gritter.min.js"></script>
 <script src="${url}/assets/js/bootbox.min.js"></script>
 <script>
@@ -19,7 +19,7 @@ request.setAttribute("suburl", request.getRequestURL().substring(basePath.length
 	$(function(){
 		mdEditor = editormd("editormd", {
 			width: "100%",
-			height: 600,
+			height: 400,
 			path : '${url}/admin/markdown/lib/',
 			codeFold : true,
 			appendMarkdown :$("#markdown").val(),
@@ -80,9 +80,9 @@ request.setAttribute("suburl", request.getRequestURL().substring(basePath.length
 						$("#logId").val(data.logId);
 						$("#alias").val(data.alias);
 					}
-					change=0;
 				});
 			}
+			change = 0;
 		}
 		setInterval(autoSave,1000*6);
 
@@ -163,13 +163,12 @@ request.setAttribute("suburl", request.getRequestURL().substring(basePath.length
 	  </c:forEach>
 	</select>
 	</div>
-	<input id="alias" type="text" class="col-xs-3"  placeholder="请输别名"  name="alias" value="${log.alias}">
-	<input id="gritter-light" checked="" type="checkbox" class="ace ace-switch ace-switch-5" />
+	<input id="alias" type="text" class="col-xs-3"  placeholder="请输入别名"  name="alias" value="${log.alias}">
 	<div class="col-sm-12" style="z-index: 9999">
 		<div id="editormd"></div>
 	</div>
 	<hr/>
-	<input value="${log.keywords}" name="keywords" id="inp" size="60" maxlength="60" /><hr/>
+	<input value="${log.keywords}" class="col-xs-7" type="text" name="keywords" id="inp" size="60" maxlength="60" /><hr/>
 	<div class="tags" id="tag" style="width: 100%">
 	<c:forEach items="${init.tags}" var="tags">
 		<span class="tag">${tags.text}</span>
@@ -221,7 +220,7 @@ request.setAttribute("suburl", request.getRequestURL().substring(basePath.length
 				提交
 			</button>
 			<button class="btn" type="button" id="preview">
-				<i class="icon-undo bigger-110"></i>
+				<i class="icon-zoom-in bigger-110"></i>
 				预览
 			</button>
 		</div>

@@ -17,12 +17,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 							</h1>
 						</div><!-- /.page-header -->
 								 <div class="alert alert-block alert-success">
-									<button data-dismiss="alert" class="close" type="button">
-										<i class="icon-remove"></i>
-									</button>
-
 									<i class="icon-ok green"></i>
-
 									欢迎使用
 									<strong class="green">
 										zrlog 日志管理系统
@@ -53,6 +48,12 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 															运行环境版本
 														</td>
 														<td>${system['java.runtime.version']}</td>
+													</tr>
+													<tr>
+														<td>
+															运行路径
+														</td>
+														<td>${system['zrlog.runtime.path']}</td>
 													</tr>
 													<tr>
 														<td>

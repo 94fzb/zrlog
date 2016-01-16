@@ -31,7 +31,8 @@
 	</c:when>
 	<c:otherwise>
 	<div class="main clearfloat">
-		<section>
+	<div class="breadcrumb"></div>
+	<section>
       <!--[if lt IE 9]>
       <div class="tips not-ie" id="tipsWrap">
         <span class="close" id="clostBtn" title="Close">关闭</span>
@@ -40,28 +41,25 @@
         </div>
         <script>$('#clostBtn').click( function(){ $('#tipsWrap').css('display','none'); } ); </script>
       </div>
-      <![endif]--> 
+      <![endif]-->
         
         <div style="background:rgba(255,255,255,1);">
         <article>
-   <h1 class="post-title">${log.title}</h1>
-
-
-  <div class="meta">
-  <p class="category"><a href="${rurl}post/sort/${log.typeAlias}" rel="tag">${log.typeName}</a> </p>
-  <p class="published">/<time datetime="${log.releaseTime}">&nbsp;${log.releaseTime.year+1900}年${log.releaseTime.month+1}月${log.releaseTime.date}日</time></p>
-  </div>
-  <div class="content">
-  	${log.content }
-  </div>
-  
+   	  <h1 class="post-title">${log.title}</h1>
+	  <div class="meta">
+	  <p class="category"><a href="${rurl}post/sort/${log.typeAlias}" rel="tag">${log.typeName}</a> </p>
+	  <p class="published">/<time datetime="${log.releaseTime}">&nbsp;${log.releaseTime.year+1900}年${log.releaseTime.month+1}月${log.releaseTime.date}日</time></p>
+	  </div>
+	  <div class="content">
+		${log.content }
+	  </div>
   <p style="color:#D4D4D4"> 转载请注明作者和出处(${webs.title})，并添加本页链接。<BR>原文链接:
 							<A title="${log.title }" href="${rurl}post/${log.alias}"><SPAN style="color: rgb(51, 102, 255);" span="">${rurl}post/${log.alias}</SPAN></A></p>
         <div class="pager-nav">
-          <a title="${log.lastLog.title}" href="${rurl }post/${log.lastLog.alias}" rel="prev"><p class="prev">上一篇：${log.lastLog.title}</p></a>
-          <a title="${log.nextLog.title}" href="${rurl }post/${log.nextLog.alias}" rel="next"><p class="next">下一篇：${log.nextLog.title}</p></a>
+          <a title="${log.nextLog.title}" href="${rurl }post/${log.nextLog.alias}"><p class="next">下一篇：${log.nextLog.title}</p></a>
+          <a title="${log.lastLog.title}" href="${rurl }post/${log.lastLog.alias}"><p class="prev">上一篇：${log.lastLog.title}</p></a>
         </div>
-							</article> 
+							</article>
 							 <c:choose>
 							<c:when test="${log.canComment}">
 								<c:choose>

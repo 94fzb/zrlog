@@ -141,35 +141,6 @@
 				</div>
 
 				<div class="form-group">
-					<label for="form-field-1"
-						class="col-sm-3 control-label no-padding-right"> 网站模板 </label>
-
-					<div class="col-sm-9">
-						<select name="template" class="col-xs-10 col-sm-5"
-							id="form-field-1">
-							<%
-								// need JRE1.7
-								/* String webPath=request.getServletContext().getRealPath("/");
-								File[] templates=new File(request.getServletContext().getRealPath("/include/templates/")).listFiles(); */
-								String webPath = request.getRealPath("/");
-								File[] templates = new File(request.getRealPath("/include/templates/")).listFiles();
-
-								String strFile[] = new String[templates.length];
-								for (int i = 0; i < templates.length; i++) {
-									strFile[i] = templates[i].toString().substring(webPath.length() - 1).replace('\\', '/');
-								}
-								request.setAttribute("templates", strFile);
-							%>
-							<c:forEach var="template" items="${templates}">
-								<option value="<c:out value="${template }"/>"
-									<c:if test="${webs.template eq  template}">selected="selected"</c:if>><c:out
-										value="${template }" /></option>
-							</c:forEach>
-						</select>
-					</div>
-				</div>
-
-				<div class="form-group">
 					<label for="form-field-1"class="col-sm-3 control-label no-padding-right"> 静态化文章页 </label>
 
 					<div class="col-sm-9">
@@ -233,7 +204,7 @@
 						class="col-sm-3 control-label no-padding-right"> 端口 </label>
 
 					<div class="col-sm-9">
-						<input maxlength="5" name="mail_port" value="${webs.mail_port }"
+						<input type="text" maxlength="5" name="mail_port" value="${webs.mail_port }"
 							class="col-xs-10 col-sm-5" id="form-field-1">
 					</div>
 				</div>

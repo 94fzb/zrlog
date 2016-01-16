@@ -1,4 +1,5 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getHeader("host")+path+"/";
@@ -10,7 +11,6 @@ request.setAttribute("suburl", request.getRequestURL().substring((basePath+"admi
 <html>
   	<base href="<%=basePath%>">
   	<c:set var="webs" value="${init.webSite}" scope="session"></c:set>
-
 	<head>
 		<meta charset="utf-8" />
 		<title>${webs.title} - 后台管理  ${stitle} </title>
@@ -22,7 +22,6 @@ request.setAttribute("suburl", request.getRequestURL().substring((basePath+"admi
 		<link rel="stylesheet" href="assets/css/ace-skins.min.css" />
 		<link rel="stylesheet" href="assets/css/jquery.gritter.css" />
 		
-		
 		<link rel="shortcut icon" href="${url}/favicon.ico" />
 		<script src="assets/js/jquery-2.0.3.min.js"></script>
 		<script src="assets/js/bootstrap.min.js"></script>
@@ -30,10 +29,8 @@ request.setAttribute("suburl", request.getRequestURL().substring((basePath+"admi
 		<script src="assets/js/ace-elements.min.js"></script>
 		<script src="assets/js/ace.min.js"></script>
 		<script src="assets/js/ace-extra.min.js"></script>
-		
 		<script src="assets/js/jquery.gritter.min.js"></script>
 	</head>
-
 <body>
 		<div class="navbar navbar-default" id="navbar">
 
@@ -41,7 +38,7 @@ request.setAttribute("suburl", request.getRequestURL().substring((basePath+"admi
 				try{ace.settings.check('navbar' , 'fixed')}catch(e){}
 			</script>
 
-			<div class="avbar-container" id="navbar-container">
+			<div class="navbar-container" id="navbar-container">
 				<div class="navbar-header pull-left">
 					<a href="${url}" class="navbar-brand">
 						<small>
@@ -62,23 +59,23 @@ request.setAttribute("suburl", request.getRequestURL().substring((basePath+"admi
 							<ul class="pull-right dropdown-navbar dropdown-menu dropdown-caret dropdown-close">
 								<li class="dropdown-header">
 									<i class="icon-envelope-alt"></i>
-									${session.comments.records}条消息
+									最近${fn:length(session.comments.rows)}条消息
 								</li>
 								<c:forEach items="${session.comments.rows}" var="comment">
 								<li>
-									<a href="#">
-										<img alt="Alex's Avatar" class="msg-photo" src="assets/avatars/avatar.png">
+									<a target="_blank" href="${url}/post/${comment.logId}">
+										<img class="msg-photo" src="${comment.header}">
 										<span class="msg-body">
 											<span class="msg-title">
-												<span class="blue">${comment.userName}</span>
-												<%-- ${comment.userComment} --%>
+												<span class="blue">${comment.userName}:</span>
+												${comment.userComment}
 											</span>
 										</span>
 									</a>
 								</li>
 								</c:forEach>
 								<li>
-									<a href="comment">
+									<a href="${url}/admin/comment">
 										查看所有消息
 										<i class="icon-arrow-right"></i>
 									</a>
@@ -173,7 +170,7 @@ request.setAttribute("suburl", request.getRequestURL().substring((basePath+"admi
 								 
 							</a>
 						</li>
-						<li <c:if test="${'website.jsp'==suburl or 'user.jsp'==suburl or 'template.jsp'==suburl}">class="active open"</c:if>>
+						<li <c:if test="${'website.jsp'==suburl or 'user.jsp'==suburl or 'template.jsp'==suburl or 'template_center.jsp'==suburl}">class="active open"</c:if>>
 							<a href="#" class="dropdown-toggle">
 								<i class="icon-cogs"></i>
 								<span class="menu-text"> 设置  </span>
@@ -182,23 +179,28 @@ request.setAttribute("suburl", request.getRequestURL().substring((basePath+"admi
 							</a>
 
 							<ul class="submenu">
-
-								<li>
+								<li <c:if test="${'user.jsp'==suburl}">class="active"</c:if>>
 									<a href="${url}/admin/user" <c:if test="${'user.jsp'==suburl}">class="active"</c:if>>
 										<i class="icon-double-angle-right"></i>
 										<span class="menu-text">个人信息</span>
 									</a>
 								</li>
-								<li>
+								<li <c:if test="${'website.jsp'==suburl}">class="active"</c:if>>
 									<a href="${url}/admin/website" <c:if test="${'website.jsp'==suburl}">class="active"</c:if>>
 										<i class="icon-double-angle-right"></i>
 										<span class="menu-text">网站设置</span>
 									</a>
 								</li>
-								<li>
+								<li <c:if test="${'template.jsp'==suburl}">class="active"</c:if>>
 									<a href="${url}/admin/template" <c:if test="${'template.jsp'==suburl}">class="active"</c:if>>
 										<i class="icon-double-angle-right"></i>
 										<span class="menu-text">主题设置</span>
+									</a>
+								</li>
+								<li <c:if test="${'template_center.jsp'==suburl}">class="active"</c:if>>
+									<a href="${url}/admin/template_center" <c:if test="${'template.jsp'==suburl}">class="active"</c:if>>
+										<i class="icon-double-angle-right"></i>
+										<span class="menu-text">主题中心</span>
 									</a>
 								</li>
 							</ul>
@@ -211,55 +213,48 @@ request.setAttribute("suburl", request.getRequestURL().substring((basePath+"admi
 								<span class="menu-text">
 									其他
 								</span>
+								<b class="arrow icon-angle-down"></b>
 							</a>
-
 							<ul class="submenu">
-
-								<li>
-									<a href="${url}/admin/type" <c:if test="${'type.jsp'==suburl}">class="active"</c:if>>
+								<li  <c:if test="${'type.jsp'==suburl}">class="active"</c:if>>
+									<a href="${url}/admin/type"  class="dropdown-toggle">
 										<i class="icon-double-angle-right"></i>
 										<span class="menu-text">分类管理</span>
 									</a>
 								</li>
-								<li>
-									<a href="${url}/admin/tag" <c:if test="${'tag.jsp'==suburl}">class="active"</c:if>>
+								<li  <c:if test="${'tag.jsp'==suburl}">class="active"</c:if>>
+									<a href="${url}/admin/tag"  class="dropdown-toggle">
 										<i class="icon-double-angle-right"></i>
 										<span class="menu-text">查看标签</span>
 									</a>
 								</li>
 								<li <c:if test="${'link.jsp'==suburl}">class="active"</c:if>>
-							<a href="${url}/admin/link" class="dropdown-toggle">
-								<i class="icon-double-angle-right"></i>
-								<span class="menu-text"> 链接管理 </span>
-							</a>
-						</li>
-						<li <c:if test="${'plugin.jsp'==suburl}">class="active"</c:if>>
-							<a href="${url}/admin/plugin" class="dropdown-toggle">
-								<i class="icon-double-angle-right"></i>
-								<span class="menu-text"> 插件管理 </span>
-								 
-							</a>
-						</li>
-						<li <c:if test="${'plugin_center.jsp'==suburl}">class="active"</c:if>>
-							<a href="${url}/admin/plugin_center" class="dropdown-toggle">
-								<i class="icon-double-angle-right"></i>
-								<span class="menu-text"> 插件中心 </span>
-								 
-							</a>
-						</li>
-						
-						<li <c:if test="${'nav.jsp'==suburl}">class="active"</c:if>>
-							<a href="${url}/admin/nav" class="dropdown-toggle">
-								<i class="icon-double-angle-right"></i>
-								<span class="menu-text"> 导航栏管理 </span>
+									<a href="${url}/admin/link" class="dropdown-toggle">
+										<i class="icon-double-angle-right"></i>
+										<span class="menu-text"> 链接管理 </span>
+									</a>
+								</li>
+								<li <c:if test="${'plugin.jsp'==suburl}">class="active"</c:if>>
+									<a href="${url}/admin/plugin" class="dropdown-toggle">
+										<i class="icon-double-angle-right"></i>
+										<span class="menu-text"> 插件管理 </span>
+									</a>
+								</li>
+								<li <c:if test="${'plugin_center.jsp'==suburl}">class="active"</c:if>>
+									<a href="${url}/admin/plugin_center" class="dropdown-toggle">
+										<i class="icon-double-angle-right"></i>
+										<span class="menu-text"> 插件中心 </span>
 
-								 
-							</a>
-						</li>
+									</a>
+								</li>
+								<li <c:if test="${'nav.jsp'==suburl}">class="active"</c:if>>
+									<a href="${url}/admin/nav" class="dropdown-toggle">
+										<i class="icon-double-angle-right"></i>
+										<span class="menu-text"> 导航栏管理 </span>
+									</a>
+								</li>
 							</ul>
-						
 						</li>
-						 
 					</ul><!-- /.nav-list -->
 
 					<div class="sidebar-collapse" id="sidebar-collapse">

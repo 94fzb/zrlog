@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.fzb</groupId>
 	<artifactId>zrlog</artifactId>
-	<version>1.4.3</version>
+	<version>1.4.4</version>
 	<packaging>war</packaging>
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
@@ -32,6 +32,7 @@
 					<warSourceDirectory>src/main/webapp</warSourceDirectory>
 					<failOnMissingWebXml>false</failOnMissingWebXml>
 					<warName>zrlog</warName>
+					<packagingExcludes>attached/**,WEB-INF/backupSql/**,post/**</packagingExcludes>
 				</configuration>
 			</plugin>
 		</plugins>

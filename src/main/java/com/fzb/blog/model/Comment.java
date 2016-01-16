@@ -19,7 +19,7 @@ public class Comment extends Model<Comment> {
 
     public Map<String, Object> getCommentsByPage(int page, int pageSize) {
         Map<String, Object> data = new HashMap();
-        String sql = "select commentId as id,userComment,userMail,userHome,userIp,userName,hide,logId from comment limit ?,?";
+        String sql = "select commentId as id,userComment,userMail,userHome,userIp,userName,hide,logId from comment order by commentId desc limit ?,?";
         data.put(
                 "rows",
                 find(sql,
@@ -41,7 +41,7 @@ public class Comment extends Model<Comment> {
 
     public Map<String, Object> noRead(int page, int pageSize) {
         Map<String, Object> data = new HashMap();
-        String sql = "select commentId as id,userComment,userMail,userHome,userIp,userName,hide,logId from comment limit ?,?";
+        String sql = "select commentId as id,userComment,userMail,userHome,userIp,userName,hide,logId from comment order by commentId desc limit ?,?";
         data.put(
                 "rows",
                 find(sql,

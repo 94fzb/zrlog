@@ -1,6 +1,6 @@
 package com.fzb.blog.config;
 
-import com.fzb.blog.controlle.*;
+import com.fzb.blog.controller.*;
 import com.jfinal.config.Routes;
 
 /**

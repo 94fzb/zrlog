@@ -140,6 +140,7 @@ CREATE TABLE `comment` (
   `userName` varchar(64) DEFAULT NULL,
   `logId` int(11) DEFAULT NULL,
   `postId` varchar(128) DEFAULT NULL COMMENT '多说评论使用',
+  `header` varchar(1024) DEFAULT NULL COMMENT '评论者头像',
   PRIMARY KEY (`commentId`),
   UNIQUE KEY `postId` (`postId`),
   KEY `logId` (`logId`),

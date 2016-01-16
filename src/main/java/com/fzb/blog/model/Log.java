@@ -3,6 +3,7 @@ package com.fzb.blog.model;
 import com.fzb.common.util.ParseTools;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Model;
+import org.apache.commons.codec.binary.StringUtils;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -110,16 +111,20 @@ public class Log extends Model<Log> implements Serializable {
         return data;
     }
 
-    public Map<String, Object> queryAll(int page, int pageSize) {
+    public Map<String, Object> queryAll(int page, int pageSize, String keywords) {
         Map<String, Object> data = new HashMap<String, Object>();
-        String sql = "select l.*,t.typeName,l.logId as id,t.alias as typeAlias,u.userName,(select count(commentId) from comment where logId=l.logId ) commentSize from log l inner join user u inner join type t where u.userId=l.userId and t.typeid=l.typeid order by l.logId desc limit ?,?";
+        String searchKeywords = "";
+        if (keywords != null && !"".equals(keywords)) {
+            searchKeywords = " and (l.title like '%" + keywords + "%' or l.content like '%" + keywords + "%' or l.keywords like '%" + keywords + "%')";
+        }
+        String sql = "select l.*,t.typeName,l.logId as id,t.alias as typeAlias,u.userName,(select count(commentId) from comment where logId=l.logId ) commentSize from log l inner join user u inner join type t where u.userId=l.userId" + searchKeywords + " and t.typeid=l.typeid order by l.logId desc limit ?,?";
         data.put(
                 "rows",
                 find(sql,
                         ParseTools.getFirstRecord(page,
                                 pageSize), pageSize));
         fillData(page, pageSize,
-                "from log l inner join user u where u.userId=l.userId ", data,
+                "from log l inner join user u where u.userId=l.userId " + searchKeywords, data,
                 new Object[]{});
         return data;
     }

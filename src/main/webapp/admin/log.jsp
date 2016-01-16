@@ -1,43 +1,51 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@page import="java.net.URLEncoder"%>
+<%
+try{
+String str = new String(request.getParameter("keywords").toString().getBytes("ISO-8859-1"));
+request.setAttribute("keywords", str);
+}
+catch(Exception e){
+
+}
+%>
+
 <jsp:include page="include/menu.jsp"/>
 
 	<link href="assets/css/bootstrap.min.css" rel="stylesheet" />
 	<link rel="stylesheet" href="assets/css/ui.jqgrid.css" />
 	<link rel="stylesheet" href="assets/css/ace.min.css" />
-						<div class="page-header">
-							<h1>
-								文章管理
-								<small>
-									<i class="icon-double-angle-right"></i>
-									查看所有文章
-								</small>
-							</h1>
-						</div><!-- /.page-header -->
-							<div class="col-xs-12 col-sm-8">
-								<div class="input-group">
-									<input type="text" placeholder="Type your query" class="form-control search-query">
-									<span class="input-group-btn">
-										<button class="btn btn-purple btn-sm" type="button">
-											Search
-											<i class="icon-search icon-on-right bigger-110"></i>
-										</button>
-									</span>
-								</div>
-							</div>
-							<div class="col-xs-12">
-								<!-- PAGE CONTENT BEGINS -->
+				<div class="page-header">
+					<h1>
+						文章管理
+						<small>
+							<i class="icon-double-angle-right"></i>
+							查看所有文章
+						</small>
+					</h1>
+					<div class="nav-search" style="padding-top: 7px;">
+							<form class="form-search">
+								<span class="input-icon">
+									<input type="text" name="keywords" value="${keywords}" placeholder="请输入关键字..." class="input-small nav-search-input" autocomplete="off">
+									<i class="icon-search nav-search-icon"></i>
+								</span>
+							</form>
+					</div>
+				</div><!-- /.page-header -->
+				<div class="col-xs-12">
 
-								<table id="grid-table"></table>
+					<!-- PAGE CONTENT BEGINS -->
 
-								<div id="grid-pager"></div>
+					<table id="grid-table"></table>
 
-								<!-- PAGE CONTENT ENDS -->
-							</div><!-- /.col -->
-					</div><!-- /.page-content -->
-				</div><!-- /.main-content -->
+					<div id="grid-pager"></div>
 
-			</div><!-- /.main-container-inner -->
-		</div><!-- /.main-container -->
+					<!-- PAGE CONTENT ENDS -->
+				</div><!-- /.col -->
+			</div><!-- /.page-content -->
+		</div><!-- /.main-content -->
+	</div><!-- /.main-container-inner -->
+</div><!-- /.main-container -->
 		
 		<script type="text/javascript" src="assets/js/zDrag.js"></script>
 		<script type="text/javascript" src="assets/js/zDialog.js"></script>
@@ -56,46 +64,48 @@
 		<script src="assets/js/jqGrid/jquery.jqGrid.min.js"></script>
 		<script src="assets/js/jqGrid/i18n/grid.locale-cn.js"></script>
 		<script type="text/javascript">
-			
+
+			var jqGrid;
+
 			jQuery(function($) {
 				var grid_selector = "#grid-table";
 				var pager_selector = "#grid-pager";
 				
-				jQuery(grid_selector).jqGrid({
+				jqGrid = jQuery(grid_selector).jqGrid({
 					
-				url:'<%=request.getAttribute("url")%>/admin/log/queryAll',
+				url:'${url}/admin/log/queryAll?keywords=${keywords}',
 				datatype: "json",
-					colNames:['编辑','删除','id','标题','关键词', '发布者', '分类','发布时间','查看数','草稿','不公开','浏览'],
+					colNames:['编辑','删除','id','标题','关键词', '发布者', '分类','发布时间','查看数','草稿','私有','浏览'],
 					colModel:[
-						{name:'logId',width:60,index:'logId',formatter:imageFormat},
-						{name:'myac',width:60,index:'',sorttype:"int", editable: true, width:50, fixed:true, sortable:false, resize:false,
+						{name:'logId',width:50,index:'logId',sortable:false,formatter:imageFormat},
+						{name:'myac',width:50,index:'',sorttype:"int", editable: true, width:50, fixed:true, sortable:false, resize:false,
 							 formatter: 'actions',
 						      formatoptions: {
 						       keys: true,
 						       editbutton:false,	
 						       delbutton: true,
-						       delOptions: {recreateForm: true, beforeShowForm:beforeDeleteCallback, url: '<%=request.getAttribute("url")%>/admin/log/delete' }
+						       delOptions: {recreateForm: true, beforeShowForm:beforeDeleteCallback, url: '${url}/admin/log/delete' }
 						      }
 						},      
 						{name:'id',index:'id', width:60, sorttype:"int", editable: true},
 						{name:'title',index:'title',width:220, sortable:false,editable: true,edittype:"textarea", editoptions:{rows:"2",cols:"20"}},
-						{name:'keywords',index:'keywords', width:160,editable: true,editoptions:{size:"20",maxlength:"30"}},
+						{name:'keywords',index:'keywords', width:180,editable: true,editoptions:{size:"20",maxlength:"30"}},
 						{name:'userName',index:'userName', width:60, editable: false},
 						{name:'typeName',index:'typeName', width:90, editable: true,edittype:"select",editoptions:{value:"FE:FedEx;IN:InTime;TN:TNT;AR:ARAMEX"}},
 						
-						{name:'releaseTime',index:'releaseTime',width:120, editable:true, sorttype:"date",unformat: pickDate},
+						{name:'releaseTime',index:'releaseTime',width:130, editable:true, sorttype:"date",unformat: pickDate},
 						{name:'click',index:'click', width:60, editable: false},
-						{name:'rubbish',index:'rubbish', width:60, editable: false},
-						{name:'private',index:'private', width:60, editable: false},
-						{name:'logId',width:60,index:'logId',formatter:viewLog},
-					], 
+						{name:'rubbish',index:'rubbish', width:50, editable: false,formatter:renderRubbish},
+						{name:'private',index:'private', width:50, editable: false,formatter:renderPrivate},
+						{name:'logId',width:50,index:'logId',formatter:viewLog},
+					],
 					viewrecords : true,
 					rowNum:10,
 					rowList:[10,20,30],
 					pager : pager_selector,
 					altRows: true,
 					//toppager: true,
-					editurl:'<%=request.getAttribute("url")%>/admin/log/delete',
+					editurl:'${url}/admin/log/delete',
 					multiselect: true,
 					//multikey: "ctrlKey",
 			        multiboxonly: true,
@@ -112,7 +122,7 @@
 					},
 			
 					caption: "文章管理",
-					height:500,
+					height:391,
 			
 					autowidth: true
 			
@@ -121,10 +131,23 @@
 				//enable search/filter toolbar
 				//jQuery(grid_selector).jqGrid('filterToolbar',{defaultSearch:true,stringResult:true})
 				function imageFormat( cellvalue, options, rowObject ){
-					return '<div style="margin-left:8px;"><div id="jEditButton_2" class="ui-pg-div ui-inline-edit" onmouseout="jQuery(this).removeClass(\'ui-state-hover\')" onmouseover="jQuery(this).addClass(\'ui-state-hover\');" onclick="open2('+rowObject.logId+',\''+rowObject.catalog+'\',\''+rowObject.title.replace("'","")+'\');" style="float: left; cursor: pointer; display: block;" title="" data-original-title="编辑所选记录"><span class="ui-icon ui-icon-pencil"></span></div></div>'
+					return '<div><div id="jEditButton_2" class="ui-pg-div ui-inline-edit" onmouseout="jQuery(this).removeClass(\'ui-state-hover\')" onmouseover="jQuery(this).addClass(\'ui-state-hover\');" onclick="open2('+rowObject.logId+',\''+rowObject.catalog+'\',\''+rowObject.title.replace("'","")+'\');" style="float: left; cursor: pointer; display: block;" title="" data-original-title="编辑所选记录"><span class="ui-icon ui-icon-pencil"></span></div></div>'
 				}
 				function viewLog( cellvalue, options, rowObject ){
 					return '<a target="_blank" href="${url}/admin/log/preview?logId='+rowObject.logId+'"><div id="jEditButton_2" class="ui-pg-div ui-inline-edit" onmouseout="jQuery(this).removeClass(\'ui-state-hover\')" onmouseover="jQuery(this).addClass(\'ui-state-hover\');" style="float: left; cursor: pointer; display: block;" title="" data-original-title="浏览  '+rowObject.title+'"><span class="ui-icon icon-zoom-in blue"></span></div></a>'
+				}
+				function renderPrivate( cellvalue, options, rowObject ){
+					if(rowObject.private){
+						return '是'
+					}
+					return '否'
+				}
+
+				function renderRubbish( cellvalue, options, rowObject ){
+					if(rowObject.rubbish){
+						return '是'
+					}
+					return '否'
 				}
 
 				//switch element when editing inline

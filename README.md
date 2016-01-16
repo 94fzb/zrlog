@@ -19,10 +19,10 @@
 * 10.可发表私有文章
 
 ### 系统安装
-* 1.下载 [最新 war](http://dl.94fzb.com/release/zrlog.war) 放在 tomcat的 webapps
+* 1.下载 [最新 war](http://dl.zlrog.com/release/zrlog.war) 放在 tomcat的 webapps
 * 2.访问 http://host:port/zrlog/install
 * 3.填写数据，管理员信息，完成安装
-* 4.[程序演示地址 http://demo.blog.zrlog.com](http://http://demo.blog.zrlog.com/)
+* 4.[程序演示地址 http://demo.blog.zrlog.com](http://demo.blog.zrlog.com/)
 
 ### 联系方式
 * QQ交流 504008147
@@ -47,13 +47,27 @@
 * 优化对接多说相关代码（Map -> Bean）
 * 更改 ehcache 默认配置（ehcache内存申请过多，内存较小的主机被杀JVM进程）
 
+#### 1.4.4 (2015-1-16)
+* JFinal 升级至 2.1
+* 添加后台检索文章功能
+* 优化编辑文章代码
+* 加入主题预览
+* 修复黑名单无法正确的拦截所有请求的问题
+
+
+### 感谢
+
+* [JFinal](http://jfinal.com) 
+* [Editor.md](https://pandao.github.io/editor.md/)
+* [SheShui.me](http://sheshui.me)
+
 ### 一些截图
 
 ![好看的首页](http://fz-blog.qiniudn.com/attached/image/20150923/20150923233631_700.png)
 
-![文章管理](http://fz-blog.qiniudn.com/attached/image/20150328/20150328222511_459.jpg)
+![文章管理](http:/http://fz-blog.qiniudn.com/attached/image/20160116/20160116100157_993.png)
 
-![模板管理](http://fz-blog.qiniudn.com/attached/image/20150328/20150328222526_340.jpg)
+![模板管理](http://fz-blog.qiniudn.com/attached/image/20160116/20160116100300_115.png)
 
 ![实用的Markdown编辑](http://fz-blog.qiniudn.com/attached/image/20150923/20150923233713_429.png)
 
