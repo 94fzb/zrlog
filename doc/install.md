@@ -77,7 +77,7 @@ export PATH=$JAVA_HOME/bin:$PATH
 
 下载最新的`war`包，同时可以通过下载最新的源码自己通过maven构建war包。
 
-由于网络到处都是采集的，难免源码被人篡改，推荐使用 [http://dl.94fzb.com/release/zrlog.war](http://dl.94fzb.com/release/zrlog.war) 这个地址下载
+由于网络到处都是采集的，难免源码被人篡改，推荐使用 [http://dl.zrlog.com/release/zrlog.war](http://dl.zrlog.com/release/zrlog.war) 这个地址下载
 
 
 * 将.war放到tomcat的webapps目录里面。如果tomcat里面不存在其他的程序，将zrlog.war改为ROOT.war，可以避免输入二级目录zrlog
