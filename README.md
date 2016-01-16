@@ -65,7 +65,7 @@
 
 ![好看的首页](http://fz-blog.qiniudn.com/attached/image/20150923/20150923233631_700.png)
 
-![文章管理](http:/http://fz-blog.qiniudn.com/attached/image/20160116/20160116100157_993.png)
+![文章管理](http://fz-blog.qiniudn.com/attached/image/20160116/20160116100157_993.png)
 
 ![模板管理](http://fz-blog.qiniudn.com/attached/image/20160116/20160116100300_115.png)
 
