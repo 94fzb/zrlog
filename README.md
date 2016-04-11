@@ -6,8 +6,8 @@
 [http://www.zrlog.com](http://www.zrlog.com)    
 
 ### 部署环境前提
-* 1.jre 版本 >= 1.6
-* 2.tomcat 版本 >=6，jetty > 6
+* 1.jre 版本 >= 1.7
+* 2.tomcat 版本 >=7，jetty > 7
 * 3.mysql
 
 ### 功能
