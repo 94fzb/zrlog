@@ -3,26 +3,24 @@ package com.fzb.blog.controller;
 import com.fzb.blog.model.Log;
 import com.fzb.blog.model.Tag;
 import com.fzb.blog.model.User;
+import com.fzb.blog.util.ZrlogUtil;
 import com.fzb.common.util.IOUtil;
 import com.fzb.common.util.ParseTools;
-import com.fzb.io.api.FileManageAPI;
-import com.fzb.io.yunstore.BucketVO;
-import com.fzb.io.yunstore.QiniuBucketManageImpl;
+import com.fzb.common.util.http.HttpUtil;
+import com.fzb.common.util.http.handle.HttpJsonArrayHandle;
 import com.jfinal.kit.PathKit;
+import org.apache.commons.codec.binary.StringUtils;
+import org.apache.log4j.Logger;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Random;
 
 public class ManageLogController extends ManageController {
 
-    public void timeline() {
-        render("/admin/ext/timeline.jsp");
-    }
+    private static Logger LOGGER = Logger.getLogger(ManageLogController.class);
 
     @Override
     public void add() {
@@ -56,14 +54,13 @@ public class ManageLogController extends ManageController {
     }
 
     public void preview() {
-        Integer logId;
         Log log;
-        if (getPara("logId") != null) {
+        if (isNotNullOrNotEmptyStr(getPara("logId"))) {
             log = new Log().getLogByLogIdA(getPara("logId"));
         } else {
             log = getLog();
         }
-        logId = log.getInt("logId");
+        Integer logId = log.getInt("logId");
         log.put("lastLog", Log.dao.getLastLog(logId));
         log.put("nextLog", Log.dao.getNextLog(logId));
         setAttr("log", log.getAttrs());
@@ -118,41 +115,43 @@ public class ManageLogController extends ManageController {
     }
 
     public void upload() {
+        String uploadFieldName = "imgFile";
+
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        String fileExt = getFile("imgFile")
-                .getFileName()
-                .substring(
-                        getFile("imgFile").getFileName().lastIndexOf(".") + 1)
+        String fileExt = getFile().getFileName().substring(
+                getFile(uploadFieldName).getFileName().lastIndexOf(".") + 1)
                 .toLowerCase();
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
-        String url = "/attached/" + getPara("dir") + "/"
+        String uri = "/attached/" + getPara("dir") + "/"
                 + sdf.format(new Date()) + "/" + df.format(new Date()) + "_"
                 + new Random().nextInt(1000) + "." + fileExt;
-        IOUtil.moveOrCopyFile(PathKit.getWebRootPath() + "/attached/"
-                + getFile("imgFile").getFileName(), PathKit.getWebRootPath()
-                + url, true);
-        getData().put("error", 0);
+        String finalFilePath = PathKit.getWebRootPath() + uri;
 
-        // put to cloud
-        String prefix = getStrValueByKey("bucket_type");
-        if (prefix != null) {
-            BucketVO bucket = new BucketVO(
-                    getStrValueByKey(prefix + "_bucket"),
-                    getStrValueByKey(prefix + "_access_key"),
-                    getStrValueByKey(prefix + "_secret_key"),
-                    getStrValueByKey(prefix + "_host"));
-            FileManageAPI man = new QiniuBucketManageImpl(bucket);
-            String newUrl = man
-                    .create(new File(PathKit.getWebRootPath() + url), url)
-                    .get("url").toString();
-            getData().put("url", newUrl);
-        } else {
-            if (getRequest().getContextPath() != null) {
-                url = getRequest().getContextPath() + url;
-            }
-            getData().put("url", url);
-        }
+        IOUtil.moveOrCopyFile(PathKit.getWebRootPath() + "/attached/" + getFile(uploadFieldName).getFileName(), finalFilePath, true);
+        getData().put("error", 0);
+        getData().put("url", getCloudUrl(uri, finalFilePath));
         renderJson(getData());
+    }
+
+    private String getCloudUrl(String uri, String finalFilePath) {
+        // try push to cloud
+        Map<String, String[]> map = new HashMap<String, String[]>();
+        map.put("fileInfo", new String[]{finalFilePath + "," + uri});
+        map.put("name", new String[]{"uploadService"});
+        String url;
+        try {
+            List<Map> urls = HttpUtil.sendGetRequest(ZrlogUtil.getPluginServer() + "/service", map
+                    , new HttpJsonArrayHandle<Map>(), ZrlogUtil.genHeaderMapByRequest(getRequest())).getT();
+            if (urls != null && !urls.isEmpty()) {
+                url = (String) urls.get(0).get("url");
+            } else {
+                url = getRequest().getContextPath() + uri;
+            }
+        } catch (IOException e) {
+            url = getRequest().getContextPath() + uri;
+            LOGGER.error(e);
+        }
+        return url;
     }
 
     @Override

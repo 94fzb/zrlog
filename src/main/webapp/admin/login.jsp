@@ -27,7 +27,6 @@ request.setAttribute("url", request.getScheme()+"://"+request.getHeader("host")+
 						<div class="login-container">
 							<div class="center">
 								<h1>
-									<i class="icon-leaf green"></i>
 									<span class="white">${init.webSite.title}</span>
 								</h1>
 							</div>

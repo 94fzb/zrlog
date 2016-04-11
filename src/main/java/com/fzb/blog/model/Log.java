@@ -1,9 +1,9 @@
 package com.fzb.blog.model;
 
+import com.fzb.blog.controller.Constant;
 import com.fzb.common.util.ParseTools;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Model;
-import org.apache.commons.codec.binary.StringUtils;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -72,7 +72,7 @@ public class Log extends Model<Log> implements Serializable {
                 rubbish, pre, id);
         if (log == null) {
             log = new Log().set("alias", id)
-                    .set("title", "没有上一篇了");
+                    .set("title", Constant.NO_LAST_LOG);
         }
         return log;
     }
@@ -83,7 +83,7 @@ public class Log extends Model<Log> implements Serializable {
                 rubbish, pre, id);
         if (log == null) {
             log = new Log().set("alias", id)
-                    .set("title", "没有下一篇了");
+                    .set("title", Constant.NO_NEXT_LOG);
         }
         return log;
     }

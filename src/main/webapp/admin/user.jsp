@@ -5,7 +5,7 @@
 <script>
 	$(document).ready(function() {
 		$('#id-input-file-1').ace_file_input({
-			no_file : '请选择文件',
+			no_file : '${session.user.header}',
 			btn_choose : '文件',
 			btn_change : '选择',
 			droppable : false,
@@ -16,7 +16,7 @@
 		});
 
 		$('.fileUpload').liteUploader({
-			script : '${url}/admin/log/upload?dir=images'
+			script : '${url}/admin/log/upload?dir=image'
 		}).on('lu:success', function(e, response) {
 			$('.file-name').attr("data-title", response.url)
 			$("#logo").val(response.url);
@@ -59,14 +59,11 @@
 		</div>
 
 		<div class="form-group">
-			<label for="form-field-1"
-				class="col-sm-3 control-label no-padding-right">
-				网站&nbsp;Logo </label>
+			<label for="form-field-1"class="col-sm-3 control-label no-padding-right">头像</label>
 			<div class="col-sm-6">
 				<div class="ace-file-input">
 					<input type="file" name="imgFile" id="id-input-file-1"
 						class="fileUpload icon-upload-alt" value="上传" />
-
 				</div>
 			</div>
 		</div>

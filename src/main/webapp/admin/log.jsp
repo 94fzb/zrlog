@@ -12,9 +12,9 @@ catch(Exception e){
 
 <jsp:include page="include/menu.jsp"/>
 
-	<link href="assets/css/bootstrap.min.css" rel="stylesheet" />
-	<link rel="stylesheet" href="assets/css/ui.jqgrid.css" />
-	<link rel="stylesheet" href="assets/css/ace.min.css" />
+			<link href="assets/css/bootstrap.min.css" rel="stylesheet" />
+			<link rel="stylesheet" href="assets/css/ui.jqgrid.css" />
+			<link rel="stylesheet" href="assets/css/ace.min.css" />
 				<div class="page-header">
 					<h1>
 						文章管理
@@ -46,18 +46,21 @@ catch(Exception e){
 		</div><!-- /.main-content -->
 	</div><!-- /.main-container-inner -->
 </div><!-- /.main-container -->
-		
-		<script type="text/javascript" src="assets/js/zDrag.js"></script>
-		<script type="text/javascript" src="assets/js/zDialog.js"></script>
+
+		<style>
+			.modal-edit {
+				width:1300px;
+			}
+		</style>
+		<script type="text/javascript" src="assets/js/eModal.min.js"></script>
 		<script type="text/javascript">
-			function open2(id,catalog,title)
-			{
-				var diag = new Dialog();
-				diag.Width = 1024;
-				diag.Height = 750;
-				diag.Title = decodeURI(title);
-				diag.URL = "log/editFrame?logId="+id;
-				diag.show();
+			function open2(id,catalog,title){
+				var options = {
+					"url":"${url}/admin/log/editFrame?logId="+id,
+					"title":decodeURI(title),
+					"size":"edit"
+				}
+				eModal.iframe(options);
 			}
 		</script>
 		<script src="assets/js/date-time/bootstrap-datepicker.min.js"></script>

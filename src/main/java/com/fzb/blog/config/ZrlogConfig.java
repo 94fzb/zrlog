@@ -7,26 +7,24 @@ import com.fzb.blog.incp.BlackListInterceptor;
 import com.fzb.blog.incp.InitDataInterceptor;
 import com.fzb.blog.incp.LoginInterceptor;
 import com.fzb.blog.model.*;
+import com.fzb.blog.plugin.PluginConfig;
 import com.fzb.blog.util.InstallUtil;
-import com.fzb.blog.util.plugin.PluginsUtil;
-import com.fzb.blog.util.plugin.api.IZrlogPlugin;
+import com.fzb.common.util.http.HttpUtil;
+import com.fzb.common.util.http.handle.HttpFileHandle;
 import com.jfinal.config.*;
 import com.jfinal.core.JFinal;
 import com.jfinal.ext.interceptor.SessionInViewInterceptor;
 import com.jfinal.kit.PathKit;
 import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
-import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.c3p0.C3p0Plugin;
 import com.jfinal.plugin.ehcache.EhCachePlugin;
 import com.jfinal.render.ViewType;
-import flexjson.JSONDeserializer;
 import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import java.util.HashMap;
 import java.util.Properties;
 import java.util.Random;
 
@@ -36,6 +34,7 @@ import java.util.Random;
 public class ZrlogConfig extends JFinalConfig {
 
     private static Logger LOGGER = Logger.getLogger(ZrlogConfig.class);
+    private static String PLUGIN_CORE_DOWNLOAD_URL = "http://dl.zrlog.com/release/plugin/plugin-core.jar";
 
     public void configConstant(Constants con) {
         //con.setDevMode(true);
@@ -50,6 +49,7 @@ public class ZrlogConfig extends JFinalConfig {
     }
 
     public void configHandler(Handlers handlers) {
+        handlers.add(new PluginHandler());
         handlers.add(new JspSkipHandler());
     }
 
@@ -75,9 +75,10 @@ public class ZrlogConfig extends JFinalConfig {
                 LOGGER.warn("Not found lock file(/WEB-INF/install.lock), Please visit the http://ip:port" + JFinal.me().getContextPath() + "/install installation");
                 return;
             }
+            String dbPropertiesPath = PathKit.getWebRootPath() + "/WEB-INF/db.properties";
             Properties properties = new Properties();
             try {
-                properties.load(new FileInputStream(PathKit.getWebRootPath() + "/WEB-INF/db.properties"));
+                properties.load(new FileInputStream(dbPropertiesPath));
             } catch (IOException e) {
                 LOGGER.error("load db.properties error", e);
             }
@@ -87,6 +88,7 @@ public class ZrlogConfig extends JFinalConfig {
             plugins.add(c3p0Plugin);
             // 添加表与实体的映射关系
             plugins.add(getActiveRecordPlugin(c3p0Plugin));
+            runBlogPlugin(dbPropertiesPath);
 
         } catch (Exception e) {
             LOGGER.warn("configPlugin exception ", e);
@@ -94,31 +96,33 @@ public class ZrlogConfig extends JFinalConfig {
 
     }
 
+    private void runBlogPlugin(final String dbPropertiesPath) {
+        new Thread() {
+            @Override
+            public void run() {
+                //加载 zrlog 提供的插件
+                File pluginCoreFile = new File(PathKit.getWebRootPath() + "/admin/plugins/plugin-core.jar");
+                if (!pluginCoreFile.exists()) {
+                    pluginCoreFile.getParentFile().mkdirs();
+                    String filePath = pluginCoreFile.getParentFile().toString();
+                    try {
+                        LOGGER.info("plugin-core.jar not exists will download from " + PLUGIN_CORE_DOWNLOAD_URL);
+                        HttpUtil.sendGetRequest(PLUGIN_CORE_DOWNLOAD_URL, new HashMap<String, String[]>(), new HttpFileHandle(filePath), new HashMap<String, String>());
+                    } catch (IOException e) {
+                        LOGGER.warn("download plugin core error", e);
+                    }
+                }
+                int port = PluginConfig.pluginServerStart(pluginCoreFile, dbPropertiesPath);
+                JFinal.me().getServletContext().setAttribute("pluginServerPort", port);
+                JFinal.me().getServletContext().setAttribute("pluginServer", "http://localhost:" + port);
+            }
+        }.start();
+
+    }
+
     @Override
     public void afterJFinalStart() {
         super.afterJFinalStart();
-        //加载 zrlog 提供的插件
-        try {
-            List<Object[]> zPlugins = Db.query("select content,pluginName from plugin where level=?", -1);
-            if (zPlugins != null && zPlugins.size() > 0) {
-                for (Object[] pluginStr : zPlugins) {
-                    Map<String, Object> map = new JSONDeserializer<Map<String, Object>>().deserialize(pluginStr[0].toString());
-                    try {
-                        Object tPlugin = Class.forName(map.get("classLoader").toString()).newInstance();
-                        if (tPlugin instanceof IZrlogPlugin) {
-                            if (Integer.parseInt(map.get("status").toString()) == 2) {
-                                PluginsUtil.addPlugin(pluginStr[1].toString(), (IZrlogPlugin) tPlugin);
-                            }
-                        }
-                    } catch (Exception e) {
-                        LOGGER.warn("load Plugin " + pluginStr[1] + " failed " + e.getMessage());
-                    }
-
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.warn("start plugin exception ", e);
-        }
         // 读取系统参数
         Properties systemProp = System.getProperties();
         systemProp.setProperty("zrlog.runtime.path", JFinal.me().getServletContext().getRealPath("/"));
@@ -130,7 +134,6 @@ public class ZrlogConfig extends JFinalConfig {
             LOGGER.warn("load zrlog.properties error");
         }
         JFinal.me().getServletContext().setAttribute("zrlog", properties);
-
     }
 
     public void configRoute(Routes routes) {

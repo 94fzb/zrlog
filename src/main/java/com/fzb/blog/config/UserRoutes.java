@@ -12,7 +12,6 @@ public class UserRoutes extends Routes {
         add("/admin/link", LinkController.class);
         add("/admin/comment", CommentController.class);
         add("/admin/tag", TagController.class);
-        add("/admin/plugin", PluginController.class);
         add("/admin/type", TypeController.class);
         add("/admin/nav", LogNavController.class);
         add("/admin/log", ManageLogController.class);

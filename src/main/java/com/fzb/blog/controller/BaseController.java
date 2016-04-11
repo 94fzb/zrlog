@@ -30,7 +30,10 @@ public class BaseController extends Controller {
         Map<String, Object> init = CacheKit.get("/post/initData", "initData");
         if (init == null) {
             init = new HashMap<String, Object>();
-            init.put("webSite", WebSite.dao.getWebSite());
+            Map<String, Object> websiteMap = WebSite.dao.getWebSite();
+            //兼容早期模板判断方式
+            websiteMap.put("user_comment_pluginStatus", "on".equals(websiteMap.get("duoshuo_status")));
+            init.put("webSite", websiteMap);
             init.put("links", Link.dao.queryAll());
             init.put("types", Type.dao.queryAll());
             init.put(
@@ -64,7 +67,6 @@ public class BaseController extends Controller {
         this.rows = Integer
                 .parseInt(((Map<String, Object>) init.get("webSite")).get(
                         "rows").toString());
-
         //
         webSite = (Map<String, Object>) init.get("webSite");
     }
@@ -106,12 +108,15 @@ public class BaseController extends Controller {
 
     public boolean getStaticHtmlStatus() {
         Object obj = getStrValueByKey("pseudo_staticStatus");
-        if (obj != null) {
-            return "on".equals(obj.toString());
-        }
-        return false;
+        return obj != null && "on".equals(obj.toString());
     }
 
+    /**
+     * 用于转化 GET 的中文乱码
+     *
+     * @param param
+     * @return
+     */
     public String convertRequestParam(String param) {
         if (param != null) {
             try {

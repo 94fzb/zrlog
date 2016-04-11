@@ -9,6 +9,7 @@ request.setAttribute("suburl", request.getRequestURL().substring(basePath.length
 
 <link rel="stylesheet" href="${url }/admin/markdown/css/editormd.min.css" />
 <link rel="stylesheet" href="${url}/assets/css/jquery.gritter.css" />
+
 <script src="${url}/admin/markdown/js/editormd.min.js"></script>
 <script src="${url}/assets/js/jquery.gritter.min.js"></script>
 <script src="${url}/assets/js/bootbox.min.js"></script>
@@ -50,6 +51,13 @@ request.setAttribute("suburl", request.getRequestURL().substring(basePath.length
 				}
 				this.addKeyMap(keyMap);
 			 },
+			 onfullscreen : function() {
+			 	$("#editormd").css("z-index","9999")
+			 },
+
+			 onfullscreenExit : function() {
+			 	$("#editormd").css("z-index",0)
+			 }
 
 		});
 		$(".editormd-markdown-textarea").attr("name","mdContent");
@@ -61,7 +69,7 @@ request.setAttribute("suburl", request.getRequestURL().substring(basePath.length
 			if($("#title").val()=="" || $("#content").val()==""){
 				$.gritter.add({
 					title: '文章的标题和内容都不能为空...',
-					class_name: 'gritter-error' + (!$('#gritter-light').get(0).checked ? ' gritter-light' : ''),
+					class_name: 'gritter-error' + (!$('#gritter-light').get(0).checked ? ' gritter' : ''),
 				});
 				return false;
 			}
@@ -75,7 +83,7 @@ request.setAttribute("suburl", request.getRequestURL().substring(basePath.length
 						var date=new Date();
 						$.gritter.add({
 							title: "自动保存成功 "+date.getHours()+":"+date.getMinutes() +" "+date.getSeconds(),
-							class_name: 'gritter-success' + (!$('#gritter-light').get(0).checked ? ' gritter-light' : '')
+							class_name: 'gritter-success' + (!$('#gritter-light').get(0).checked ? ' gritter' : '')
 						});
 						$("#logId").val(data.logId);
 						$("#alias").val(data.alias);
@@ -110,7 +118,7 @@ request.setAttribute("suburl", request.getRequestURL().substring(basePath.length
 					if(data.add || data.update){
 						$.gritter.add({
 							title: '保存成功...',
-							class_name: 'gritter-info' + (!$('#gritter-light').get(0).checked ? ' gritter-light' : ''),
+							class_name: 'gritter-info' + (!$('#gritter-light').get(0).checked ? ' gritter' : ''),
 						});
 						$("#logId").val(data.logId);
 						$("#alias").val(data.alias);
@@ -164,9 +172,7 @@ request.setAttribute("suburl", request.getRequestURL().substring(basePath.length
 	</select>
 	</div>
 	<input id="alias" type="text" class="col-xs-3"  placeholder="请输入别名"  name="alias" value="${log.alias}">
-	<div class="col-sm-12" style="z-index: 9999">
-		<div id="editormd"></div>
-	</div>
+	<div class="col-sm-12" id="editormd"></div>
 	<hr/>
 	<input value="${log.keywords}" class="col-xs-7" type="text" name="keywords" id="inp" size="60" maxlength="60" /><hr/>
 	<div class="tags" id="tag" style="width: 100%">

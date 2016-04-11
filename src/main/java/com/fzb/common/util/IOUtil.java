@@ -106,7 +106,6 @@ public class IOUtil {
 
     public static void moveOrCopyFile(String src, String tag, boolean isMove) {
         try {
-            long s = System.currentTimeMillis();
             File f = new File(src);
             FileInputStream in = new FileInputStream(f);
             new File(tag).getParentFile().mkdirs();
@@ -120,7 +119,6 @@ public class IOUtil {
             // 一定要记得关闭流额。 不然其他程序那个文件无法进行操作
             in.close();
             out.close();
-            System.out.println(System.currentTimeMillis() - s);
             if (isMove) {
                 f.delete();
             }

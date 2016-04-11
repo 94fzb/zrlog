@@ -81,7 +81,7 @@ public class UserController extends ManageController {
                 String zId = getBaseMs() + getCookie("zId");
                 User user = userMap.get(zId);
                 if (user != null) {
-                    user = User.dao.login(user.getStr("userName"), user.getStr("password"));
+                    user = User.dao.login(user.getStr("userName").toLowerCase(), user.getStr("password"));
                     if (user != null) {
                         getSession().setAttribute("user", user);
                         login = true;
@@ -90,7 +90,7 @@ public class UserController extends ManageController {
             }
         }
         if (!login && getPara("userName") != null && getPara("password") != null) {
-            User user = User.dao.login(getPara("userName"),
+            User user = User.dao.login(getPara("userName").toLowerCase(),
                     Md5Util.MD5(getPara("password")));
             if (user != null) {
                 getSession().setAttribute("user", user);
@@ -141,15 +141,13 @@ public class UserController extends ManageController {
             String oldPassword = getPara("oldPassword");
             if (Md5Util.MD5(oldPassword).equals(dbPassword)) {
                 User.dao.updatePassword(userName, Md5Util.MD5(getPara("newPassword")));
-                setAttr("message", Constant.CHANGEPWDSUCC);
+                setAttr("message", Constant.CHANGE_PWD_SUCCESS);
                 getSession().invalidate();
             } else {
-                setAttr("message", Constant.OLDPWDERROR);
+                setAttr("message", Constant.OLD_PWD_ERROR);
             }
         } else {
-            setAttr("message", Constant.ARGSCHECKFAIL);
+            setAttr("message", Constant.ARGS_CHECK_FAIL);
         }
-
     }
-
 }

@@ -4,7 +4,9 @@
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getHeader("host")+path+"/";
 request.setAttribute("url", request.getScheme()+"://"+request.getHeader("host")+request.getContextPath());
-request.setAttribute("suburl", request.getRequestURL().substring((basePath+"admin/").length()));
+if(request.getAttribute("suburl")==null){
+	request.setAttribute("suburl", request.getRequestURL().substring((basePath+"admin/").length()));
+}
 %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
@@ -30,19 +32,19 @@ request.setAttribute("suburl", request.getRequestURL().substring((basePath+"admi
 		<script src="assets/js/ace.min.js"></script>
 		<script src="assets/js/ace-extra.min.js"></script>
 		<script src="assets/js/jquery.gritter.min.js"></script>
+		<script src="${url}/admin/js/dashboard_set.js"></script>
 	</head>
-<body>
+<body class="${webs.admin_dashboard_skin}">
 		<div class="navbar navbar-default" id="navbar">
 
 			<script type="text/javascript">
 				try{ace.settings.check('navbar' , 'fixed')}catch(e){}
 			</script>
 
-			<div class="navbar-container" id="navbar-container">
+			<div class="navbar-container ${webs.admin_dashboard_inside_container}" id="navbar-container">
 				<div class="navbar-header pull-left">
 					<a href="${url}" class="navbar-brand">
 						<small>
-							<i class="icon-leaf"></i>
 							${webs.title}
 						</small>
 					</a><!-- /.brand -->
@@ -86,29 +88,11 @@ request.setAttribute("suburl", request.getRequestURL().substring((basePath+"admi
 							<a data-toggle="dropdown" href="#" class="dropdown-toggle">
 								<img class="nav-user-photo" src="${session.user.header}" alt="${session.user.userName}" />
 								<span class="user-info">
-									<small>欢迎光临,</small>${session.user.userName}
+									<small>管理员</small>${session.user.userName}
 								</span>
 								<i class="icon-caret-down"></i>
 							</a>
 							<ul class="user-menu pull-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close" >
-								<li>
-									<a href="${url}/admin/website">
-										<i class="icon-cog"></i>
-										设置
-									</a>
-								</li>
-								<li>
-									<a href="${url}/admin/black?include=plugins/duoshuo/setting&menu=1">
-										<i class="icon-cog"></i>
-										多说设置
-									</a>
-								</li>
-								<li>
-									<a href="${url}/admin/black?include=plugins/qiniu/setting&menu=1">
-										<i class="icon-cog"></i>
-										七牛云储存设置
-									</a>
-								</li>
 								<li>
 									<a href="${url}/admin/user">
 										<i class="icon-user"></i>
@@ -116,8 +100,8 @@ request.setAttribute("suburl", request.getRequestURL().substring((basePath+"admi
 									</a>
 								</li>
 								<li>
-									<a href="${url}/admin/user_changepassword">
-										<i class="icon-user"></i>
+									<a href="${url}/admin/change_password">
+										<i class="icon-key"></i>
 										更改密码
 									</a>
 								</li>
@@ -135,12 +119,12 @@ request.setAttribute("suburl", request.getRequestURL().substring((basePath+"admi
 			</div><!-- /.container -->
 		</div>
 
-		<div class="main-container" id="main-container">
+		<div class="main-container ${webs.admin_dashboard_inside_container}" id="main-container">
 			<div class="main-container-inner">
 				<a class="menu-toggler" id="menu-toggler" href="#">
 					<span class="menu-text"></span>
 				</a>
-				<div class="sidebar" id="sidebar">
+				<div class="sidebar ${webs.admin_dashboard_sidebar_collapser}" id="sidebar">
 					<ul class="nav nav-list">
 						<li <c:if test="${'index.jsp'==suburl}">class="active"</c:if>>
 						
@@ -191,16 +175,10 @@ request.setAttribute("suburl", request.getRequestURL().substring((basePath+"admi
 										<span class="menu-text">网站设置</span>
 									</a>
 								</li>
-								<li <c:if test="${'template.jsp'==suburl}">class="active"</c:if>>
+								<li <c:if test="${'template.jsp'==suburl or 'template_center.jsp'==suburl}">class="active"</c:if>>
 									<a href="${url}/admin/template" <c:if test="${'template.jsp'==suburl}">class="active"</c:if>>
 										<i class="icon-double-angle-right"></i>
 										<span class="menu-text">主题设置</span>
-									</a>
-								</li>
-								<li <c:if test="${'template_center.jsp'==suburl}">class="active"</c:if>>
-									<a href="${url}/admin/template_center" <c:if test="${'template.jsp'==suburl}">class="active"</c:if>>
-										<i class="icon-double-angle-right"></i>
-										<span class="menu-text">主题中心</span>
 									</a>
 								</li>
 							</ul>
@@ -240,13 +218,6 @@ request.setAttribute("suburl", request.getRequestURL().substring((basePath+"admi
 										<span class="menu-text"> 插件管理 </span>
 									</a>
 								</li>
-								<li <c:if test="${'plugin_center.jsp'==suburl}">class="active"</c:if>>
-									<a href="${url}/admin/plugin_center" class="dropdown-toggle">
-										<i class="icon-double-angle-right"></i>
-										<span class="menu-text"> 插件中心 </span>
-
-									</a>
-								</li>
 								<li <c:if test="${'nav.jsp'==suburl}">class="active"</c:if>>
 									<a href="${url}/admin/nav" class="dropdown-toggle">
 										<i class="icon-double-angle-right"></i>
@@ -258,7 +229,14 @@ request.setAttribute("suburl", request.getRequestURL().substring((basePath+"admi
 					</ul><!-- /.nav-list -->
 
 					<div class="sidebar-collapse" id="sidebar-collapse">
+						<c:choose>
+						<c:when test="${webs.admin_dashboard_sidebar_collapser eq ''}">
 						<i class="icon-double-angle-left" data-icon1="icon-double-angle-left" data-icon2="icon-double-angle-right"></i>
+						</c:when>
+						<c:otherwise>
+						<i class="icon-double-angle-right" data-icon1="icon-double-angle-left" data-icon2="icon-double-angle-right"></i>
+						</c:otherwise>
+						</c:choose>
 					</div>
 				</div>
 				<div class="main-content">

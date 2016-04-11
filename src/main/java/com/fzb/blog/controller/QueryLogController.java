@@ -1,6 +1,5 @@
 package com.fzb.blog.controller;
 
-import com.fzb.blog.dev.MailUtil;
 import com.fzb.blog.model.Comment;
 import com.fzb.blog.model.Log;
 import com.fzb.blog.model.Type;
@@ -35,9 +34,12 @@ public class QueryLogController extends BaseController {
         String key;
         if (getParaToInt(1) == null) {
             if (isNotNullOrNotEmptyStr(getPara("key"))) {
-                key = convertRequestParam(getPara("key"));
-                setAttr("data",
-                        Log.dao.getLogsByTitleOrContent(1, getDefaultRows(), key));
+                if ("GET".equals(getRequest().getMethod())) {
+                    key = convertRequestParam(getPara("key"));
+                } else {
+                    key = getPara("key");
+                }
+                setAttr("data", Log.dao.getLogsByTitleOrContent(1, getDefaultRows(), key));
             } else {
                 all();
                 removeSessionAttr("key");
@@ -86,8 +88,8 @@ public class QueryLogController extends BaseController {
     }
 
     public void addComment() {
-        // TODO　如何过滤垃圾信息
-        if (getPara("userComment") != null) {
+        if (getPara("logId") != null && getPara("userComment") != null) {
+            // TODO　如何过滤垃圾信息
             new Comment().set("userHome", getPara("userHome"))
                     .set("userMail", getPara("userMail"))
                     .set("userIp", WebTools.getRealIp(getRequest()))
@@ -95,18 +97,7 @@ public class QueryLogController extends BaseController {
                     .set("logId", getPara("logId"))
                     .set("userComment", getPara("userComment"))
                     .set("commTime", new Date()).set("hide", 1).save();
-        }
-        detail(getPara("logId"));
-        if (getStrValueByKey("commentEmailNotify") != null
-                && "on".equals(getStrValueByKey("commentEmailNotify"))) {
-            if (getStrValueByKey("mail_to") != null) {
-                try {
-                    MailUtil.sendMail(getStrValueByKey("mail_to"), getStrValueByKey("title") + "新的评论", "<h3>文章标题：" + Log.dao.findById(getPara("logId")).get("title")
-                            + "</h3>\n" + getPara("userComment"));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
+            detail(getPara("logId"));
         }
     }
 

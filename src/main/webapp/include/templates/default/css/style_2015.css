@@ -23,7 +23,7 @@ section p sup a,
 section article li sub a, section .content sub a,
 section article li sup a, section .content sup a{text-decoration:none;}
 section p a:hover,
-section .content a:hover,
+section .content a:hoveraaa,
 section .content a:hover span{color:#FF7300;}
 section .content table{width:97%; margin: 0 auto 15px; border-left:1px solid #CCCCCC; border-top:1px solid #CCCCCC;}
 section .content th,
@@ -61,7 +61,7 @@ article img{max-width:100% /*680px*/;  height:auto; width: auto;}
 article p img.img660{margin:0 auto; padding:10px; background-color:#F8F8F8; }
 article ul{margin-bottom:10px; margin-left: 10px;}
 article ul ul{margin:0 0 0 10px}
-article li{padding: 2px 0 2px 10px; /*background:url(../images/dot.gif) no-repeat scroll 2px 11px transparent;*/}
+article li{/*padding: 2px 0 2px 10px; background:url(../images/dot.gif) no-repeat scroll 2px 11px transparent;*/}
 article li:before{content:"•"; padding-right:5px;margin-left:-10px;}
 article li a:hover{color:#FF7300; text-decoration:underline;}
 article .summary{padding:10px; margin-bottom:10px; background-color:#F8F8F8;}

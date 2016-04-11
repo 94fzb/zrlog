@@ -7,6 +7,32 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 %>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <jsp:include page="include/menu.jsp"/>
+
+					<div id="ace-settings-container" class="ace-settings-container">
+						<div id="ace-settings-btn" class="btn btn-app btn-xs btn-warning ace-settings-btn">
+							<i class="icon-cog bigger-150"></i>
+						</div>
+
+						<div id="ace-settings-box" class="ace-settings-box">
+							<div>
+								<div class="pull-left">
+									<select class="hide" id="skin-colorpicker" style="display: none;">
+										<option value="#438EB9" data-skin="default">#438EB9</option>
+										<option value="#222A2D" data-skin="skin-1">#222A2D</option>
+										<option value="#D0D0D0" data-skin="skin-3">#D0D0D0</option>
+									</select>
+								</div>
+								<span>&nbsp; 选择皮肤&nbsp; </span>
+							</div>
+
+							<div>
+								<input type="checkbox" <c:if test="${webs.admin_dashboard_inside_container ne ''}">checked="checked"</c:if> id="ace-settings-add-container" class="ace ace-checkbox-2">
+								<label for="ace-settings-add-container" class="lbl">
+									切换窄屏
+								</label>
+							</div>
+						</div>
+					</div>
 						<div class="page-header">
 							<h1>
 								控制台
@@ -16,14 +42,13 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 								</small>
 							</h1>
 						</div><!-- /.page-header -->
-								 <div class="alert alert-block alert-success">
-									<i class="icon-ok green"></i>
+								 <div class="alert alert-block alert-info">
+									<i class="icon-info">&nbsp;</i>
 									欢迎使用
-									<strong class="green">
-										zrlog 日志管理系统
-										<small>(v${zrlog.version})</small>
+									<strong>
+										zrlog 日志管理系统<small>(v${zrlog.version})</small> - 可能是最好用的开源Java博客系统.
 									</strong>
-									,轻量级好用的日志管理系统.
+
 								</div>
 								<table id="sample-table-1" class="table table-striped table-bordered table-hover">
 												<thead>

@@ -1,50 +1,55 @@
 package com.fzb.blog.controller;
 
+import org.apache.log4j.Logger;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public abstract class ManageController extends BaseController {
-	private Map<String, Object> data = new HashMap<String, Object>();
 
-	public Map<String, Object> getData() {
-		return this.data;
-	}
+    private static Logger LOGGER = Logger.getLogger(ManageLogController.class);
 
-	public void oper() {
-		if (getPara("oper") != null) {
-			if ("del".equals(getPara("oper"))) {
-				this.delete();
-			} else if ("update".equals(getPara("oper"))
-					|| "edit".equals(getPara("oper"))) {
-				this.update();
-			} else if ("add".equals(getPara("oper"))) {
-				this.add();
-			} else {
-				System.out.println("unSupport ");
-			}
-			Object map = new HashMap<String,Object>();
-			((Map) map).put(getPara("oper"),true);
-			renderJson(map);
+    private Map<String, Object> data = new HashMap<String, Object>();
 
-		}
-		
-		// 清空数据缓存
-		BaseController.refreshCache();
-	}
-	public void setData(Map<String, Object> data) {
-		this.data = data;
-	}
+    public Map<String, Object> getData() {
+        return this.data;
+    }
 
-	public void put(String key, Object value) {
-		data.put(key, value);
-	}
+    public void oper() {
+        if (getPara("oper") != null) {
+            if ("del".equals(getPara("oper"))) {
+                this.delete();
+            } else if ("update".equals(getPara("oper"))
+                    || "edit".equals(getPara("oper"))) {
+                this.update();
+            } else if ("add".equals(getPara("oper"))) {
+                this.add();
+            } else {
+                LOGGER.warn("unSupport ");
+            }
+            Map map = new HashMap<String, Object>();
+            map.put(getPara("oper"), true);
+            renderJson(map);
+        }
 
-	public abstract void add();
+        // 清空数据缓存
+        BaseController.refreshCache();
+    }
 
-	public abstract void update();
+    public void setData(Map<String, Object> data) {
+        this.data = data;
+    }
 
-	public abstract void delete();
+    public void put(String key, Object value) {
+        data.put(key, value);
+    }
 
-	public abstract void queryAll();
+    public abstract void add();
+
+    public abstract void update();
+
+    public abstract void delete();
+
+    public abstract void queryAll();
 
 }

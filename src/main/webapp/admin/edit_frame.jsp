@@ -19,5 +19,7 @@ request.setAttribute("suburl", request.getRequestURL().substring(basePath.length
 <script src="${url}/assets/js/ace-elements.min.js"></script>
 <script src="${url}/assets/js/ace.min.js"></script>
 <script src="${url}/assets/js/ace-extra.min.js"></script>
-
+<input id="gritter-light" checked="" type="checkbox" class="ace ace-switch ace-switch-5" />
+<div class="main-container">
 <jsp:include page="editor.jsp"/>
+</div>

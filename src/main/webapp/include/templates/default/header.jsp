@@ -21,31 +21,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" />
   <link rel="shortcut icon" href="${rurl }/favicon.ico" />
 
-  <link rel="stylesheet" type="text/css" media="screen" href="${url }/css/common.css" />
+  <link rel="stylesheet" type="text/css" media="screen" href="${url}/css/common.css" />
   <link rel="stylesheet" type="text/css" media="screen" href="${url}/css/style_2015.css" />
-  <link rel="stylesheet" type="text/css" media="screen" href="${url }/css/pager.css" />
-  <link rel="stylesheet" type="text/css" media="screen" href="${url }/css/editormd.css" />
+  <link rel="stylesheet" type="text/css" media="screen" href="${url}/css/pager.css" />
+  <link rel="stylesheet" type="text/css" media="screen" href="${url}/css/editormd.css" />
 
   <script src="${url }/js/lib/jquery-1.10.2.min.js"></script>
   <script>
-    !window.jQuery && document.write('<script src="${url }/js/lib/jquery-1.10.2.min.js"><\/script>');
+    !window.jQuery && document.write('<script src="${url}/js/lib/jquery-1.10.2.min.js"><\/script>');
   </script>
-  <script src="${url }/js/lib/modernizr.custom.16617.js"></script>
+  <script src="${url}/js/lib/modernizr.custom.16617.js"></script>
   <!--[if lt IE 9]>
-  <script src="${url }/js/html5shiv.js"></script>
-  <script src="${url }/js/css3-mediaqueries.js"></script>
+  <script src="${url}/js/html5shiv.js"></script>
+  <script src="${url}/js/css3-mediaqueries.js"></script>
   <link rel="stylesheet" type="text/css" media="screen" href="${url}/css/style-ie7.css" />
   <![endif]-->
 
-  <link type="text/css" rel="stylesheet" href="${rurl }/include/plugs/SyntaxHighlighter/styles/shCoreDefault.css" />
-  <script type="text/javascript" src="${rurl }/include/plugs/SyntaxHighlighter/scripts/shCore.js"></script>
-  <script type="text/javascript" src="${rurl }/include/plugs/SyntaxHighlighter/scripts/shBrushCpp.js"></script>
-  <script type="text/javascript" src="${rurl }/include/plugs/SyntaxHighlighter/scripts/shBrushCSharp.js"></script>
-  <script type="text/javascript" src="${rurl }/include/plugs/SyntaxHighlighter/scripts/shBrushJava.js"></script>
-  <script type="text/javascript" src="${rurl }/include/plugs/SyntaxHighlighter/scripts/shBrushJScript.js"></script>
-  <script type="text/javascript" src="${rurl }/include/plugs/SyntaxHighlighter/scripts/shBrushSql.js"></script>
-  <script type="text/javascript" src="${rurl }/include/plugs/SyntaxHighlighter/scripts/shBrushXml.js"></script>
-  <script type="text/javascript">SyntaxHighlighter.defaults['toolbar'] = false;SyntaxHighlighter.all();  </script>
 </head>
 <body class="default front">
 <div class="page">

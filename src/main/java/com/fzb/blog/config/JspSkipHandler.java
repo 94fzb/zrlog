@@ -1,9 +1,13 @@
 package com.fzb.blog.config;
 
-import com.fzb.common.util.HttpUtil;
 import com.fzb.common.util.IOUtil;
+import com.fzb.common.util.http.HttpUtil;
+import com.fzb.common.util.http.handle.CloseResponseHandle;
 import com.jfinal.handler.Handler;
 import com.jfinal.kit.PathKit;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 
 /**
  * @author zhengchangchun 用于拦截通过请求 .jsp 后缀的请求 如果用户访问的后缀为 .html 的情况下. 第一次使用程序进行抓取.
@@ -23,8 +28,8 @@ public class JspSkipHandler extends Handler {
     public void handle(String target, HttpServletRequest request,
                        HttpServletResponse response, boolean[] isHandled) {
         if (!target.endsWith(".jsp")) {
-            // 处理静态化文件
-            if (target.endsWith(".html")) {
+            // 处理静态化文件,仅仅缓存文章页(变化较小)
+            if (target.endsWith(".html") && target.startsWith("/post/")) {
                 File htmlFile = new File(PathKit.getWebRootPath()
                         + request.getServletPath());
                 if (!htmlFile.exists()) {
@@ -36,9 +41,9 @@ public class JspSkipHandler extends Handler {
                     target = tempTarget;
                     convert2Html(home, htmlFile);
                 }
-                this.nextHandler.handle(target, request, response, isHandled);
+                this.next.handle(target, request, response, isHandled);
             } else {
-                this.nextHandler.handle(target, request, response, isHandled);
+                this.next.handle(target, request, response, isHandled);
             }
         } else {
             try {
@@ -53,11 +58,17 @@ public class JspSkipHandler extends Handler {
     }
 
     private void convert2Html(String sSourceUrl, File file) {
+        if (!file.exists()) {
+            file.getParentFile().mkdirs();
+        }
         try {
-            if (!file.exists()) {
-                file.getParentFile().mkdirs();
+            CloseableHttpResponse closeableHttpResponse = HttpUtil.sendGetRequest(sSourceUrl, new CloseResponseHandle(), new HashMap<String, String>()).getT();
+            if (closeableHttpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                String str = IOUtil.getStringInputStream(closeableHttpResponse.getEntity().getContent());
+                if (str != null) {
+                    IOUtil.writeStrToFile(str, file);
+                }
             }
-            IOUtil.writeStrToFile(HttpUtil.getResponse(sSourceUrl), file);
         } catch (IOException e) {
             LOGGER.error("convert2Html error", e);
         }

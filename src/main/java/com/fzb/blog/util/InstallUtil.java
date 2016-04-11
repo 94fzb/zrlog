@@ -1,5 +1,6 @@
 package com.fzb.blog.util;
 
+import com.fzb.blog.config.ZrlogConfig;
 import com.fzb.blog.model.*;
 import com.fzb.common.util.IOUtil;
 import com.fzb.common.util.Md5Util;
@@ -7,6 +8,7 @@ import com.jfinal.config.Plugins;
 import com.jfinal.core.JFinal;
 import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
 import com.jfinal.plugin.c3p0.C3p0Plugin;
+import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,6 +21,7 @@ import java.util.Properties;
 
 public class InstallUtil {
 
+    private static final Logger LOGGER = Logger.getLogger(InstallUtil.class);
     private String basePath;
     private Map<String, String> dbConn;
     private Map<String, String> configMsg;
@@ -93,19 +96,13 @@ public class InstallUtil {
             String[] sql = s.split("\n");
             String tempSqlStr = "";
             for (String sqlSt : sql) {
-                if (sqlSt.startsWith("#")) {
-                    continue;
-                }
-                if (sqlSt.startsWith("/*")) {
+                if (sqlSt.startsWith("#") || sqlSt.startsWith("/*")) {
                     continue;
                 }
                 tempSqlStr += sqlSt;
             }
             sql = tempSqlStr.split(";");
             for (String sqlSt : sql) {
-                if (sqlSt.startsWith("#")) {
-                    continue;
-                }
                 if (!"".equals(sqlSt)) {
                     st = connect.createStatement();
                     st.execute(sqlSt);
@@ -163,31 +160,21 @@ public class InstallUtil {
             String insertTag = "INSERT INTO `tag`(`tagId`,`text`,`count`) VALUES (1,'记录',1)";
             ps = connect.prepareStatement(insertTag);
             ps.executeUpdate();
-            System.out.println("reRegister c3p0");
+            LOGGER.info("reRegister c3p0");
             Plugins plugins = (Plugins) JFinal.me().getServletContext()
                     .getAttribute("plugins");
-            ActiveRecordPlugin arp = new ActiveRecordPlugin(c3p0Plugin);
-            arp.addMapping("user", "userId", User.class);
-            arp.addMapping("log", "logId", Log.class);
-            arp.addMapping("type", "typeId", Type.class);
-            arp.addMapping("link", "linkId", Link.class);
-            arp.addMapping("comment", "commentId", Comment.class);
-            arp.addMapping("lognav", "navId", LogNav.class);
-            arp.addMapping("website", "siteId", WebSite.class);
-            arp.addMapping("plugin", "pluginId", Plugin.class);
-            arp.addMapping("tag", "tagId", Tag.class);
-            arp.start();
+
             // 添加表与实体的映射关系
-            plugins.add(arp);
+            plugins.add(ZrlogConfig.getActiveRecordPlugin(c3p0Plugin));
             return true;
         } catch (Exception e) {
+            LOGGER.error("install error ", e);
             lock.delete();
-            e.printStackTrace();
         } finally {
             try {
                 connect.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                LOGGER.error("install error ", e);
             }
         }
         return false;

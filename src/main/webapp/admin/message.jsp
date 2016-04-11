@@ -10,5 +10,5 @@
 		</p>
 	</div>
 	<div style="display:none"></div>
-	<body> 
+	</body>
 </html>
