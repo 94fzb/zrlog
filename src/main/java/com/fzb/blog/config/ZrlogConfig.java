@@ -87,8 +87,8 @@ public class ZrlogConfig extends JFinalConfig {
                     properties.getProperty("user"), properties.getProperty("password"));
             plugins.add(c3p0Plugin);
             // 添加表与实体的映射关系
-            plugins.add(getActiveRecordPlugin(c3p0Plugin));
-            runBlogPlugin(dbPropertiesPath);
+            plugins.add(getActiveRecordPlugin(c3p0Plugin, dbPropertiesPath));
+
 
         } catch (Exception e) {
             LOGGER.warn("configPlugin exception ", e);
@@ -96,7 +96,7 @@ public class ZrlogConfig extends JFinalConfig {
 
     }
 
-    private void runBlogPlugin(final String dbPropertiesPath) {
+    private static void runBlogPlugin(final String dbPropertiesPath) {
         new Thread() {
             @Override
             public void run() {
@@ -146,7 +146,7 @@ public class ZrlogConfig extends JFinalConfig {
         routes.add(new UserRoutes());
     }
 
-    public static ActiveRecordPlugin getActiveRecordPlugin(C3p0Plugin c3p0Plugin) {
+    public static ActiveRecordPlugin getActiveRecordPlugin(C3p0Plugin c3p0Plugin, String dbPropertiesPath) {
         ActiveRecordPlugin arp = new ActiveRecordPlugin("c3p0Plugin" + new Random().nextInt(), c3p0Plugin);
         arp.addMapping("user", "userId", User.class);
         arp.addMapping("log", "logId", Log.class);
@@ -157,6 +157,8 @@ public class ZrlogConfig extends JFinalConfig {
         arp.addMapping("website", "siteId", WebSite.class);
         arp.addMapping("plugin", "pluginId", Plugin.class);
         arp.addMapping("tag", "tagId", Tag.class);
+
+        runBlogPlugin(dbPropertiesPath);
         return arp;
     }
 }

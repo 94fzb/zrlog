@@ -16,7 +16,7 @@ public class InstallController extends Controller {
                 + "?&characterEncoding=UTF-8");
         dbConn.put("user", getPara("dbuser"));
         dbConn.put("password", getPara("dbpwd"));
-        dbConn.put("deviceClass", "com.mysql.jdbc.Driver");
+        dbConn.put("driverClass", "com.mysql.jdbc.Driver");
         setSessionAttr("dbConn", dbConn);
         if (new InstallUtil(PathKit.getWebRootPath() + "/WEB-INF", dbConn)
                 .testDbConn()) {

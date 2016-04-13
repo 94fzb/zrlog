@@ -1,7 +1,6 @@
 package com.fzb.blog.util;
 
 import com.fzb.blog.config.ZrlogConfig;
-import com.fzb.blog.model.*;
 import com.fzb.common.util.IOUtil;
 import com.fzb.common.util.Md5Util;
 import com.jfinal.config.Plugins;
@@ -54,7 +53,7 @@ public class InstallUtil {
 
     public boolean testDbConn() {
         try {
-            Class.forName(dbConn.get("deviceClass"));
+            Class.forName(dbConn.get("driverClass"));
             connect = DriverManager.getConnection(dbConn.get("jdbcUrl"),
                     dbConn.get("user"), dbConn.get("password"));
             connect.close();
@@ -110,10 +109,10 @@ public class InstallUtil {
 
             }
             StringBuilder sb = new StringBuilder();
-            sb.append("INSERT INTO `website` (`name`,`status`, `value`, `remark`) VALUES ");
+            sb.append("INSERT INTO `website` (`name`, `value`, `remark`) VALUES ");
             Map<String, Object> defaultMap = defaultWebSite(configMsg);
             for (Map.Entry e : defaultMap.entrySet()) {
-                sb.append("('").append(e.getKey()).append("',true,'").append(e.getValue()).append("',NULL),");
+                sb.append("('").append(e.getKey()).append("','").append(e.getValue()).append("',NULL),");
             }
 
             String insertWebSql = sb.toString().substring(0, sb.toString().length() - 1);
@@ -165,7 +164,9 @@ public class InstallUtil {
                     .getAttribute("plugins");
 
             // 添加表与实体的映射关系
-            plugins.add(ZrlogConfig.getActiveRecordPlugin(c3p0Plugin));
+            ActiveRecordPlugin plugin = ZrlogConfig.getActiveRecordPlugin(c3p0Plugin, file.toString());
+            plugin.start();
+            plugins.add(plugin);
             return true;
         } catch (Exception e) {
             LOGGER.error("install error ", e);
