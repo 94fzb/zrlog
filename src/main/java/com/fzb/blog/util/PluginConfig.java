@@ -1,4 +1,4 @@
-package com.fzb.blog.plugin;
+package com.fzb.blog.util;
 
 import com.fzb.common.util.CmdUtil;
 import org.apache.log4j.Logger;
@@ -15,17 +15,18 @@ public class PluginConfig {
 
     private static Logger LOGGER = Logger.getLogger(PluginConfig.class);
 
-    public static int pluginServerStart(final File serverFileName, final String dbProperties) {
+    private static final Map<String, Process> processMap = new HashMap<String, Process>();
+
+    public static int pluginServerStart(final File serverFileName, final String dbProperties, final String pluginJvmArgs) {
         final int randomServerPort = new Random().nextInt(10000) + 20000;
         final int randomMasterPort = randomServerPort + 20000;
         try {
-            final Map<String, Process> processMap = new HashMap<String, Process>();
-            registerHook(processMap);
+            registerHook();
             if (serverFileName.getName().endsWith(".jar")) {
                 new Thread() {
                     @Override
                     public void run() {
-                        Process pr = CmdUtil.getProcess("java -Xms64m -Xmx64m -jar " + serverFileName.toString() + " " +
+                        Process pr = CmdUtil.getProcess("java " + pluginJvmArgs + " -jar " + serverFileName.toString() + " " +
                                 randomServerPort + " " + randomMasterPort + " " + dbProperties + " " + serverFileName.getParent() + "/jars");
                         String pluginName = serverFileName.getName().replace(".jar", "");
                         if (pr != null) {
@@ -60,16 +61,20 @@ public class PluginConfig {
 
     }
 
-    private static void registerHook(final Map<String, Process> processMap) {
+    private static void registerHook() {
         Runtime rt = Runtime.getRuntime();
         rt.addShutdownHook(new Thread() {
             @Override
             public void run() {
-                for (Map.Entry<String, Process> entry : processMap.entrySet()) {
-                    entry.getValue().destroyForcibly();
-                    LOGGER.info("close plugin " + " " + entry.getKey());
-                }
+                stopPluginCore();
             }
         });
+    }
+
+    public static void stopPluginCore() {
+        for (Map.Entry<String, Process> entry : processMap.entrySet()) {
+            entry.getValue().destroyForcibly();
+            LOGGER.info("close plugin " + " " + entry.getKey());
+        }
     }
 }
