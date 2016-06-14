@@ -2,6 +2,7 @@ package com.fzb.blog.controller;
 
 import com.fzb.blog.model.Link;
 import com.fzb.blog.model.WebSite;
+import com.fzb.blog.util.ResUtil;
 import com.fzb.common.util.IOUtil;
 import com.fzb.common.util.ZipUtil;
 import com.fzb.common.util.http.HttpUtil;
@@ -29,7 +30,7 @@ public class TemplateController extends ManageController {
         new WebSite().updateByKV("template", template);
         if (getPara("resultType") != null
                 && "html".equals(getPara("resultType"))) {
-            setAttr("message", "变更完成");
+            setAttr("message", ResUtil.getStringFromRes("templateUpdateSuccess", getRequest()));
         } else {
             getData().put("success", true);
             renderJson(getData());
@@ -127,12 +128,12 @@ public class TemplateController extends ManageController {
                 String target = fileHandle.getT().getParent() + "/" + fileName;
                 IOUtil.moveOrCopyFile(fileHandle.getT().toString(), target, true);
                 ZipUtil.unZip(target, path.toString() + "/");
-                setAttr("message", "下载模板成功");
+                setAttr("message", ResUtil.getStringFromRes("templateDownloadSuccess", getRequest()));
             } else {
-                setAttr("message", "模板已经存在了");
+                setAttr("message", ResUtil.getStringFromRes("templateExists", getRequest()));
             }
         } catch (Exception e) {
-            setAttr("message", "发生一些错误");
+            setAttr("message", ResUtil.getStringFromRes("someError", getRequest()));
             LOGGER.error("download error ", e);
         }
         setAttr("suburl", "template.jsp");
@@ -148,7 +149,7 @@ public class TemplateController extends ManageController {
             String basePath = getRequest().getScheme() + "://" + getRequest().getHeader("host") + path + "/";
             redirect(basePath);
         } else {
-            setAttr("message", "模板路径不能为空");
+            setAttr("message", ResUtil.getStringFromRes("templatePathNotNull", getRequest()));
         }
     }
 

@@ -1,39 +1,53 @@
-$(function($) {
+var jqGrid;
+function open2(id,catalog,title){
+    var options = {
+        "url":"admin/log/editFrame?logId="+id,
+        "title":decodeURI(title),
+        "size":"edit"
+    }
+    eModal.iframe(options);
+}
+
+jQuery(function($) {
     var grid_selector = "#grid-table";
     var pager_selector = "#grid-pager";
+    var keywords = $("#keywords").val();
 
-    jQuery(grid_selector).jqGrid({
+    jqGrid = jQuery(grid_selector).jqGrid({
 
-    url:'admin/comment/queryAll',
+    url:'admin/log/queryAll?keywords='+keywords,
     datatype: "json",
-        colNames:['', 'ID','评论者主页','IP', '邮箱','昵称','内容','文章编号'],
+        colNames:['编辑','删除','id','标题','关键词', '发布者', '分类','发布时间','查看数','草稿','私有','浏览'],
         colModel:[
-            {name:'myac',index:'commentId', width:80, fixed:true, sortable:false, resize:false,
-                formatter:'actions',
-                formatoptions:{
-                    keys:true,
-
-                    delOptions:{recreateForm: true, beforeShowForm:beforeDeleteCallback},
-                    //editformbutton:true, editOptions:{recreateForm: true, beforeShowForm:beforeEditCallback}
-                }
+            {name:'logId',width:50,index:'logId',sortable:false,formatter:imageFormat},
+            {name:'myac',width:50,index:'',sorttype:"int", editable: true, width:50, fixed:true, sortable:false, resize:false,
+                 formatter: 'actions',
+                  formatoptions: {
+                   keys: true,
+                   editbutton:false,
+                   delbutton: true,
+                   delOptions: {recreateForm: true, beforeShowForm:beforeDeleteCallback, url: 'admin/log/delete' }
+                  }
             },
-            {name:'id',index:'id', width:60, sorttype:"int", editable: false},
-            {name:'userHome',index:'userHome',width:150, sortable:false,editable: true,edittype:"textarea", editoptions:{rows:"2",cols:"20"}},
-            {name:'userIp',index:'userIp', width:150,editable: true,editoptions:{size:"20",maxlength:"30"}},
-            {name:'userMail',index:'userMail', width:70, editable: true},
-            {name:'userName',index:'userName', width:70, editable: true},
-            {name:'userComment',index:'userComment', width:150, editable: true},
-            {name:'logId',index:'logId', width:70, editable: false,formatter:viewLog},
+            {name:'id',index:'id', width:60, sorttype:"int", editable: true},
+            {name:'title',index:'title',width:220, sortable:false,editable: true,edittype:"textarea", editoptions:{rows:"2",cols:"20"}},
+            {name:'keywords',index:'keywords', width:180,editable: true,editoptions:{size:"20",maxlength:"30"}},
+            {name:'userName',index:'userName', width:60, editable: false},
+            {name:'typeName',index:'typeName', width:90, editable: true,edittype:"select",editoptions:{value:"FE:FedEx;IN:InTime;TN:TNT;AR:ARAMEX"}},
 
+            {name:'releaseTime',index:'releaseTime',width:130, editable:true, sorttype:"date",unformat: pickDate},
+            {name:'click',index:'click', width:60, editable: false},
+            {name:'rubbish',index:'rubbish', width:50, editable: false,formatter:renderRubbish},
+            {name:'private',index:'private', width:50, editable: false,formatter:renderPrivate},
+            {name:'logId',width:50,index:'logId',formatter:viewLog},
         ],
-
         viewrecords : true,
         rowNum:10,
         rowList:[10,20,30],
         pager : pager_selector,
         altRows: true,
         //toppager: true,
-
+        editurl:'admin/log/delete',
         multiselect: true,
         //multikey: "ctrlKey",
         multiboxonly: true,
@@ -49,20 +63,34 @@ $(function($) {
             }, 0);
         },
 
-        editurl:"admin/comment/oper",//nothing is saved
-        deleteurl:"admin/comment/oper",//nothing is saved
-        caption: "评论管理",
+        caption: "文章管理",
         height:391,
 
         autowidth: true
 
     });
 
-    function viewLog( cellvalue, options, rowObject ){
-        return '<a target="_blank" href="post/'+rowObject.logId+'"><div id="jEditButton_2" class="ui-pg-div ui-inline-edit" onmouseout="jQuery(this).removeClass(\'ui-state-hover\')" onmouseover="jQuery(this).addClass(\'ui-state-hover\');" style="float: left; cursor: pointer; display: block;" title="" data-original-title="浏览"><span class="ui-icon icon-zoom-in blue"></span></div></a>'
-    }
     //enable search/filter toolbar
     //jQuery(grid_selector).jqGrid('filterToolbar',{defaultSearch:true,stringResult:true})
+    function imageFormat( cellvalue, options, rowObject ){
+        return '<div><div id="jEditButton_2" class="ui-pg-div ui-inline-edit" onmouseout="jQuery(this).removeClass(\'ui-state-hover\')" onmouseover="jQuery(this).addClass(\'ui-state-hover\');" onclick="open2('+rowObject.logId+',\''+rowObject.catalog+'\',\''+rowObject.title.replace("'","")+'\');" style="float: left; cursor: pointer; display: block;" title="" data-original-title="编辑所选记录"><span class="ui-icon ui-icon-pencil"></span></div></div>'
+    }
+    function viewLog( cellvalue, options, rowObject ){
+        return '<a target="_blank" href="admin/log/preview?logId='+rowObject.logId+'"><div id="jEditButton_2" class="ui-pg-div ui-inline-edit" onmouseout="jQuery(this).removeClass(\'ui-state-hover\')" onmouseover="jQuery(this).addClass(\'ui-state-hover\');" style="float: left; cursor: pointer; display: block;" title="" data-original-title="浏览  '+rowObject.title+'"><span class="ui-icon icon-zoom-in blue"></span></div></a>'
+    }
+    function renderPrivate( cellvalue, options, rowObject ){
+        if(rowObject.private){
+            return '是'
+        }
+        return '否'
+    }
+
+    function renderRubbish( cellvalue, options, rowObject ){
+        if(rowObject.rubbish){
+            return '是'
+        }
+        return '否'
+    }
 
     //switch element when editing inline
     function aceSwitch( cellvalue, options, cell ) {
@@ -93,7 +121,7 @@ $(function($) {
             delicon : 'icon-trash red',
             search: false,
             searchicon : 'icon-search orange',
-            refresh: true,
+            refresh: false,
             refreshicon : 'icon-refresh green',
             view: false,
             viewicon : 'icon-zoom-in grey',
@@ -281,4 +309,6 @@ $(function($) {
     }
 
     //var selr = jQuery(grid_selector).jqGrid('getGridParam','selrow');
+
+
 });

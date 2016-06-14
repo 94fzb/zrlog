@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,10 +24,15 @@ public class LoginInterceptor extends PrototypeInterceptor {
     private void visitorPermission(Invocation ai) {
         ai.invoke();
         String basePath = getBaseTemplatePath(ai);
+        MyI18NInterceptor.addToRequest(PathKit.getWebRootPath() + basePath + "/language/", ai.getController().getRequest());
         if (ai.getController().getAttr("log") != null) {
             ai.getController().render(basePath + "/detail.jsp");
         } else if (ai.getController().getAttr("data") != null) {
-            ai.getController().render(basePath + "/page.jsp");
+            if (ai.getActionKey().equals("/") && new File(PathKit.getWebRootPath() + basePath + "/index.jsp").exists()) {
+                ai.getController().render(basePath + "/index.jsp");
+            } else {
+                ai.getController().render(basePath + "/page.jsp");
+            }
         } else {
             ai.getController().render(basePath + "/index.jsp");
         }
@@ -57,7 +63,6 @@ public class LoginInterceptor extends PrototypeInterceptor {
     }
 
     private void adminPermission(Invocation ai) {
-        String basePath = getBaseTemplatePath(ai);
         if (ai.getController().getSession().getAttribute("user") != null) {
             ai.getController().setAttr("user",
                     ai.getController().getSession().getAttribute("user"));
@@ -86,6 +91,9 @@ public class LoginInterceptor extends PrototypeInterceptor {
                     break;
                 }
             }
+        }
+        if (!new File(PathKit.getWebRootPath() + basePath).exists()) {
+            basePath = "/include/templates/default";
         }
         ai.getController().getRequest().setAttribute("template", basePath);
         return basePath;

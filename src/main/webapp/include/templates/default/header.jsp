@@ -5,21 +5,8 @@
 <!DOCTYPE html>
 <html lang="zh" class="no-js">
 <head>
-  <meta charset="utf-8" />
-  <c:set var="webs" value="${init.webSite}" scope="request"></c:set>
-  <title><c:if test="${not empty requestScope.log.title}">${requestScope.log.title} - </c:if>${webs.title} - ${webs.second_title}</title>
-  <link rel="shortcut icon" type="image/x-icon" href="${rurl}/favicon.ico" />
-  <meta name="description" content="${webs.description}"/>
-  <c:choose>
-  <c:when test="${empty requestScope.log or empty requestScope.log.keywords}">
-  <meta name="keywords" content="${webs.keywords}"/>
-  </c:when>
-  <c:otherwise>
-  <meta name="keywords" content="${requestScope.log.keywords}"/>
-  </c:otherwise>
-  </c:choose>
+  <jsp:include page="../../core/core_mate.jsp"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" />
-  <link rel="shortcut icon" href="${rurl }/favicon.ico" />
 
   <link rel="stylesheet" type="text/css" media="screen" href="${url}/css/common.css" />
   <link rel="stylesheet" type="text/css" media="screen" href="${url}/css/style_2015.css" />
@@ -27,9 +14,6 @@
   <link rel="stylesheet" type="text/css" media="screen" href="${url}/css/editormd.css" />
 
   <script src="${url }/js/lib/jquery-1.10.2.min.js"></script>
-  <script>
-    !window.jQuery && document.write('<script src="${url}/js/lib/jquery-1.10.2.min.js"><\/script>');
-  </script>
   <script src="${url}/js/lib/modernizr.custom.16617.js"></script>
   <!--[if lt IE 9]>
   <script src="${url}/js/html5shiv.js"></script>
@@ -69,11 +53,11 @@
             <div class="gn-scroller">
               <ul class="gn-menu">
                 <li class="gn-search-item">
-                  <form method="post" action="${rurl}post/search" id="searchform1"><input placeholder="搜索博客" type="search" name="key" class="gn-search">
-                  <a class="gn-icon icon-search"><span>搜索</span></a></form>
+                  <form method="post" action="${rurl}post/search" id="searchform1"><input placeholder="${_res.searchTip}" type="search" name="key" class="gn-search">
+                  <a class="gn-icon icon-search"><span>${_res.search}</span></a></form>
                 </li>
  				<li>
-                  <a class="gn-icon icon-article">分类</a>
+                  <a class="gn-icon icon-article">${_res.category}</a>
                   <ul class="gn-submenu">
 				<c:forEach var="type" items="${init.types}">
 					<li><a class="gn-icon icon-tag" href="${rurl}post/sort/${type.alias}">${type.typeName} (${type.typeamount})</a></li>

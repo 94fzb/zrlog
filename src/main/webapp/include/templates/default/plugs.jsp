@@ -2,9 +2,9 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <aside>
 	<div class="widget search">
-		 <form id="searchform" action="${rurl }post/search" method="post">
-		<p class="search_input"><input type="text" onblur="OnExit(this)" onfocus="OnEnter(this)" size="15" name="key" title="输入关键字，Enter 键搜索" value="搜索关键字..." class="inputtext"><input type="submit" class="btn" value="搜索"></p>
-			</form>
+		<form id="searchform" action="${rurl }post/search" method="post">
+			<p class="search_input"><input type="text" onblur="OnExit(this)" onfocus="OnEnter(this)" size="15" name="key" title="${_res.searchTip}" value="${_res.searchTip}" class="inputtext"><input type="submit" class="btn" value="${_res.search}"></p>
+		</form>
 	</div>
 	<c:choose>
 		<c:when test="${not empty init.plugins}">
@@ -16,14 +16,12 @@
 		<p>${plugin.content}</p>
 		<br />
 	</div>
-					</c:when>
-					<c:otherwise>
-						<c:choose>
-							<c:when test="${plugin.pluginName eq 'types' }">
+			</c:when>
+				<c:otherwise>
+					<c:choose>
+						<c:when test="${plugin.pluginName eq 'types' }">
 	<div class="widget">
-		<h3>
-			<c:out value="${plugin.pTitle}" />
-		</h3>
+		<h3>${_res.category}</h3>
 		<div class="list">
 		<ul class="category_list">
 			<c:forEach var="type" items="${init.types}">
@@ -33,24 +31,20 @@
 		</ul>
 		</div>
 	</div>
-							</c:when>
-							<c:when test="${plugin.pluginName eq 'links' and pageLevel>=plugin.level}">
+			</c:when>
+			<c:when test="${plugin.pluginName eq 'links' and pageLevel>=plugin.level}">
 	<div class="widget">
-		<h3>
-			<c:out value="${plugin.pTitle}" />
-		</h3>
+		<h3>${_res.link}</h3>
 		<ul>
 			<c:forEach items="${init.links}" var="link">
 				<li><a href="${link.url }" title="${link.alt }" target="_blank">${link.linkName}</a></li>
 			</c:forEach>
 		</ul>
 	</div>
-							</c:when>
-							<c:when test="${plugin.pluginName eq 'archives'}">
+				</c:when>
+			<c:when test="${plugin.pluginName eq 'archives'}">
 	<div class="widget">
-		<h3>
-			<c:out value="${plugin.pTitle}" />
-		</h3>
+		<h3>${_res.archive}</h3>
 		<ul>
 			<c:forEach var="archives" items="${init.archives}">
 				<li><a href="${rurl}post/record/${archives.key}" rel="nofollow">${archives.key}
@@ -63,7 +57,6 @@
 			<c:when test="${plugin.pluginName eq 'tags'}">
 	<script type="text/javascript">
 	$(document).ready(function(){
-		/*多彩tag*/
 		var tags_a = $("#tags").find("a");
 		tags_a.each(function(){
 			var x = 6;
@@ -71,7 +64,6 @@
 			var rand = parseInt(Math.random() * (x - y + 1) + y);
 			$(this).addClass("size"+rand);
 		});
-
 	});
 	</script>
 	<style type="text/css">
@@ -90,9 +82,7 @@
 		a.size6:hover{color:#E13728;}
 	</style>
 	<div class="widget">
-	<h3>
-			<c:out value="${plugin.pTitle}" />
-	</h3>
+	<h3>${_res.tag}</h3>
 	<div class="taglist" id="tags">
 		 <c:forEach items="${init.tags}" var="tag">
 			<a href="${rurl}post/tag/${tag.text}" title="${tag.text}上共有(${tag.count})文章">${tag.text}</a>

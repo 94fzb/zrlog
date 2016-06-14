@@ -10,6 +10,7 @@ bin
 zrlog.iml
 .idea
 .project
+.attach_pid*
 1.log
 logs
 .settings
@@ -19,3 +20,4 @@ src/main/webapp/post
 src/main/webapp/attached
 src/main/webapp/WEB-INF/classes
 src/main/webapp/admin/plugins/*
+src/main/webapp/include/templates/template*

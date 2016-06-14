@@ -1,42 +1,41 @@
-$(function($) {
+jQuery(function($) {
     var grid_selector = "#grid-table";
     var pager_selector = "#grid-pager";
 
     jQuery(grid_selector).jqGrid({
 
-    url:'admin/comment/queryAll',
+    url:'admin/link/queryAll',
     datatype: "json",
-        colNames:['', 'ID','评论者主页','IP', '邮箱','昵称','内容','文章编号'],
+        colNames:[' ', 'ID','链接','网站名','描述', '排序'],
         colModel:[
-            {name:'myac',index:'commentId', width:80, fixed:true, sortable:false, resize:false,
+            {name:'myac',index:'', width:80, fixed:true, sortable:false, resize:false,
                 formatter:'actions',
                 formatoptions:{
                     keys:true,
-
-                    delOptions:{recreateForm: true, beforeShowForm:beforeDeleteCallback},
+                    delbutton: true,
+                    delOptions: {recreateForm: true, beforeShowForm:beforeDeleteCallback, url: 'admin/link/delete' }
+                    //delOptions:{recreateForm: true, beforeShowForm:beforeDeleteCallback},
                     //editformbutton:true, editOptions:{recreateForm: true, beforeShowForm:beforeEditCallback}
                 }
             },
             {name:'id',index:'id', width:60, sorttype:"int", editable: false},
-            {name:'userHome',index:'userHome',width:150, sortable:false,editable: true,edittype:"textarea", editoptions:{rows:"2",cols:"20"}},
-            {name:'userIp',index:'userIp', width:150,editable: true,editoptions:{size:"20",maxlength:"30"}},
-            {name:'userMail',index:'userMail', width:70, editable: true},
-            {name:'userName',index:'userName', width:70, editable: true},
-            {name:'userComment',index:'userComment', width:150, editable: true},
-            {name:'logId',index:'logId', width:70, editable: false,formatter:viewLog},
+            {name:'url',index:'url',width:150, sortable:false,editable: true,edittype:"textarea", editoptions:{rows:"2",cols:"20"}},
+            {name:'linkName',index:'linkName', width:150,editable: true,editoptions:{size:"20",maxlength:"30"}},
+            {name:'alt',index:'alt', width:150,editable: true,editoptions:{size:"20",maxlength:"30"}},
+            {name:'sort',index:'sort', width:70, editable: true},
 
         ],
 
-        viewrecords : true,
+        viewrecords : false,
         rowNum:10,
         rowList:[10,20,30],
         pager : pager_selector,
         altRows: true,
         //toppager: true,
 
-        multiselect: true,
+        multiselect: false,
         //multikey: "ctrlKey",
-        multiboxonly: true,
+        multiboxonly: false,
 
         loadComplete : function() {
             var table = this;
@@ -49,18 +48,14 @@ $(function($) {
             }, 0);
         },
 
-        editurl:"admin/comment/oper",//nothing is saved
-        deleteurl:"admin/comment/oper",//nothing is saved
-        caption: "评论管理",
+        editurl:"admin/link/oper",//nothing is saved
+        caption: "友链管理",
         height:391,
 
         autowidth: true
 
     });
 
-    function viewLog( cellvalue, options, rowObject ){
-        return '<a target="_blank" href="post/'+rowObject.logId+'"><div id="jEditButton_2" class="ui-pg-div ui-inline-edit" onmouseout="jQuery(this).removeClass(\'ui-state-hover\')" onmouseover="jQuery(this).addClass(\'ui-state-hover\');" style="float: left; cursor: pointer; display: block;" title="" data-original-title="浏览"><span class="ui-icon icon-zoom-in blue"></span></div></a>'
-    }
     //enable search/filter toolbar
     //jQuery(grid_selector).jqGrid('filterToolbar',{defaultSearch:true,stringResult:true})
 
@@ -87,9 +82,9 @@ $(function($) {
         { 	//navbar options
             edit: false,
             editicon : 'icon-pencil blue',
-            add: false,
+            add: true,
             addicon : 'icon-plus-sign purple',
-            del: true,
+            del: false,
             delicon : 'icon-trash red',
             search: false,
             searchicon : 'icon-search orange',
@@ -281,4 +276,6 @@ $(function($) {
     }
 
     //var selr = jQuery(grid_selector).jqGrid('getGridParam','selrow');
+
+
 });

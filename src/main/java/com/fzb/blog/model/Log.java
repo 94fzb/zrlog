@@ -1,6 +1,5 @@
 package com.fzb.blog.model;
 
-import com.fzb.blog.controller.Constant;
 import com.fzb.common.util.ParseTools;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Model;
@@ -66,24 +65,24 @@ public class Log extends Model<Log> implements Serializable {
         return null;
     }
 
-    public Log getLastLog(int id) {
+    public Log getLastLog(int id,String notFoundDesc) {
         String lastLogSql = "select l.alias as alias,l.title as title from log l where rubbish=? and private=? and l.logId<? order by logId desc";
         Log log = findFirst(lastLogSql,
                 rubbish, pre, id);
         if (log == null) {
             log = new Log().set("alias", id)
-                    .set("title", Constant.NO_LAST_LOG);
+                    .set("title", notFoundDesc);
         }
         return log;
     }
 
-    public Log getNextLog(int id) {
+    public Log getNextLog(int id,String notFoundDesc) {
         String nextLogSql = "select l.alias as alias,l.title as title from log l where rubbish=? and private=? and l.logId>?";
         Log log = findFirst(nextLogSql,
                 rubbish, pre, id);
         if (log == null) {
             log = new Log().set("alias", id)
-                    .set("title", Constant.NO_NEXT_LOG);
+                    .set("title", notFoundDesc);
         }
         return log;
     }

@@ -3,6 +3,7 @@ package com.fzb.blog.controller;
 import com.fzb.blog.model.Log;
 import com.fzb.blog.model.Tag;
 import com.fzb.blog.model.User;
+import com.fzb.blog.util.ResUtil;
 import com.fzb.blog.util.ZrlogUtil;
 import com.fzb.common.util.IOUtil;
 import com.fzb.common.util.ParseTools;
@@ -61,8 +62,9 @@ public class ManageLogController extends ManageController {
             log = getLog();
         }
         Integer logId = log.getInt("logId");
-        log.put("lastLog", Log.dao.getLastLog(logId));
-        log.put("nextLog", Log.dao.getNextLog(logId));
+        log.put("lastLog", Log.dao.getLastLog(logId, ResUtil.getStringFromRes("noLastLog", getRequest())));
+        log.put("nextLog", Log.dao.getNextLog(logId, ResUtil.getStringFromRes("noNextLog", getRequest())));
+
         setAttr("log", log.getAttrs());
         render(getTemplatePath() + "/detail.jsp");
     }

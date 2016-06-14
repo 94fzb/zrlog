@@ -1,6 +1,7 @@
 package com.fzb.blog.controller;
 
 import com.fzb.blog.util.InstallUtil;
+import com.fzb.blog.util.ResUtil;
 import com.jfinal.core.Controller;
 import com.jfinal.kit.PathKit;
 
@@ -22,7 +23,7 @@ public class InstallController extends Controller {
                 .testDbConn()) {
             render("/install/message.jsp");
         } else {
-            setAttr("errorMsg", Constant.CONNECT_DB_ERROR);
+            setAttr("errorMsg", ResUtil.getStringFromRes("connectDbError", getRequest()));
             index();
         }
     }

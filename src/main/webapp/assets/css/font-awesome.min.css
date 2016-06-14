@@ -114,7 +114,7 @@ a .icon-rotate-90:before,a .icon-rotate-180:before,a .icon-rotate-270:before,a .
 .icon-play:before{content:"\f04b";}
 .icon-pause:before{content:"\f04c";}
 .icon-stop:before{content:"\f04d";}
-.icon-forward:before{content:"\f04e";}
+.icon-:before{content:"\f04e";}
 .icon-fast-forward:before{content:"\f050";}
 .icon-step-forward:before{content:"\f051";}
 .icon-eject:before{content:"\f052";}
@@ -401,3 +401,7 @@ a .icon-rotate-90:before,a .icon-rotate-180:before,a .icon-rotate-270:before,a .
 .icon-vk:before{content:"\f189";}
 .icon-weibo:before{content:"\f18a";}
 .icon-renren:before{content:"\f18b";}
+.icon-language:before{content:"\f1ab";}
+.icon-signal:before:before{content:"\f1ab";}
+.icon-server:before{content:"\f233"}
+.icon-plug:before{content:"\f1e6"}

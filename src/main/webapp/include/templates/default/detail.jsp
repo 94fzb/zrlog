@@ -33,31 +33,22 @@
 	<div class="main clearfloat">
 	<div class="breadcrumb"></div>
 	<section>
-      <!--[if lt IE 9]>
-      <div class="tips not-ie" id="tipsWrap">
-        <span class="close" id="clostBtn" title="Close">关闭</span>
-        <div class="tips-content">
-          <span class="notice">为了您有更好的浏览体验，请升级使用以下浏览器：</span><span class="browsers"><a href="http://www.google.com/chrome" class="chrome" title="谷歌浏览器">Chrome</a><a href="http://www.mozilla.org/en-US/firefox/new/" class="ff" title="火狐">Firefox</a><a href="http://www.opera.com/download/" class="opera" title="Opera">Opera</a><a href="http://www.apple.com/safari/download/" class="safari" title="Safari">Safari</a></span>
-        </div>
-        <script>$('#clostBtn').click( function(){ $('#tipsWrap').css('display','none'); } ); </script>
-      </div>
-      <![endif]-->
-        
+	    <jsp:include page="update_browser.jsp"/>
         <div style="background:rgba(255,255,255,1);">
         <article>
    	  <h1 class="post-title">${log.title}</h1>
 	  <div class="meta">
 	  <p class="category"><a href="${rurl}post/sort/${log.typeAlias}" rel="tag">${log.typeName}</a> </p>
-	  <p class="published">/<time datetime="${log.releaseTime}">&nbsp;${log.releaseTime.year+1900}年${log.releaseTime.month+1}月${log.releaseTime.date}日</time></p>
+	  <p class="published">/<time datetime="${log.releaseTime}">&nbsp;${log.releaseTime.year+1900}${_res.year}${log.releaseTime.month+1}${_res.month}${log.releaseTime.date}${_res.day}</time></p>
 	  </div>
 	  <div class="content">
 		${log.content }
 	  </div>
-  <p style="color:#D4D4D4"> 转载请注明作者和出处(${webs.title})，并添加本页链接。<BR>原文链接:
-							<A title="${log.title }" href="${rurl}post/${log.alias}"><SPAN style="color: rgb(51, 102, 255);" span="">${rurl}post/${log.alias}</SPAN></A></p>
+  <p style="color:#D4D4D4">${_res.reprint}
+		<a title="${log.title }" href="${rurl}post/${log.alias}"><SPAN style="color: rgb(51, 102, 255);" span="">${rurl}post/${log.alias}</SPAN></a></p>
         <div class="pager-nav">
-          <a title="${log.nextLog.title}" href="${rurl }post/${log.nextLog.alias}"><p class="next">下一篇：${log.nextLog.title}</p></a>
-          <a title="${log.lastLog.title}" href="${rurl }post/${log.lastLog.alias}"><p class="prev">上一篇：${log.lastLog.title}</p></a>
+          <a title="${log.nextLog.title}" href="${rurl }post/${log.nextLog.alias}"><p class="next">${_res.nextArticle}：${log.nextLog.title}</p></a>
+          <a title="${log.lastLog.title}" href="${rurl }post/${log.lastLog.alias}"><p class="prev">${_res.lastArticle}：${log.lastLog.title}</p></a>
         </div>
 							</article>
 							 <c:choose>

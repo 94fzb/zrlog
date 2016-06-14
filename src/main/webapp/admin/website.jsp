@@ -3,7 +3,7 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <jsp:include page="include/menu.jsp" />
 <script src="assets/js/ace-elements.min.js"></script>
-<script type="text/javascript" src="${url}/admin/js/set_update.js"></script>
+<script type="text/javascript" src="admin/js/set_update.js"></script>
 <script src="assets/js/jquery.liteuploader.min.js"></script>
 <script>
 	$(document).ready(function() {
@@ -19,7 +19,7 @@
 		});
 
 		$('.fileUpload').liteUploader({
-			script : '${url}/admin/log/upload?dir=image'
+			script : 'admin/log/upload?dir=image'
 		}).on('lu:success', function(e, response) {
 			$('.file-name').attr("data-title", response.url)
 			$("#logo").val(response.url);
@@ -29,7 +29,7 @@
 </script>
 
 <div class="page-header">
-	<h1>网站信息设置</h1>
+	<h1>网站设置</h1>
 </div>
 <!-- /.page-header -->
 <div class="tabbable tabs-left">
@@ -72,7 +72,7 @@
 
 					<div class="col-sm-9">
 						<input type="text" name="keywords" value="${webs.keywords}"
-							class="col-xs-10 col-sm-5" placeholder="请求输入网站关键词 "
+							class="col-xs-10" placeholder="请求输入网站关键词 "
 							id="form-field-1">
 					</div>
 				</div>
@@ -163,7 +163,7 @@
 		</div>
 		<div class="tab-pane" id="errorPageEdit" style="padding: 10px">
 			<iframe
-				src="${url}/admin/black?include=editor/edit&path=/error/&editType=错误页面"
+				src="admin/black?include=editor/edit&path=/error/&editType=错误页面"
 				scrolling="no" style="border: 0px;" width="100%" height="600px">
 			</iframe>
 		</div>

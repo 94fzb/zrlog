@@ -91,11 +91,9 @@ public class PluginHandler extends Handler {
 
         if (data.getT() != null && data.getT().getEntity() != null) {
             request.getSession();
-            // 不让浏览器尝试读取 web 的缓存(请求对应的路径不存在这些文件)
-            response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-            response.setHeader("Pragma", "no-cache");
-            response.setHeader("Expires", "0");
-            response.getOutputStream().write(IOUtil.getByteByInputStream(data.getT().getEntity().getContent()));
+            byte[] bytes = IOUtil.getByteByInputStream(data.getT().getEntity().getContent());
+            response.addHeader("Content-Length", bytes.length + "");
+            response.getOutputStream().write(bytes);
             response.getOutputStream().close();
             return true;
         } else {

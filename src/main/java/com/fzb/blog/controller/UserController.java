@@ -4,6 +4,7 @@ import com.fzb.blog.model.Comment;
 import com.fzb.blog.model.Link;
 import com.fzb.blog.model.Log;
 import com.fzb.blog.model.User;
+import com.fzb.blog.util.ResUtil;
 import com.fzb.blog.util.WebTools;
 import com.fzb.common.util.Md5Util;
 import com.fzb.common.util.ParseTools;
@@ -115,7 +116,7 @@ public class UserController extends ManageController {
                     userMap.put(getBaseMs() + zid, user);
                 }
             } else {
-                setAttr("errorMsg", "用户名或密码错误");
+                setAttr("errorMsg", ResUtil.getStringFromRes("userNameOrPasswordError",getRequest()));
             }
         }
         index();
@@ -129,7 +130,7 @@ public class UserController extends ManageController {
     @Override
     public void update() {
         Db.update("update user set header=?,email=? where userName=?", getPara("header"), getPara("email"), getPara("userName"));
-        setAttr("message", "个人信息变更成功");
+        setAttr("message", ResUtil.getStringFromRes("updatePersonInfoSuccess",getRequest()));
     }
 
     public void changePassword() {
@@ -141,13 +142,13 @@ public class UserController extends ManageController {
             String oldPassword = getPara("oldPassword");
             if (Md5Util.MD5(oldPassword).equals(dbPassword)) {
                 User.dao.updatePassword(userName, Md5Util.MD5(getPara("newPassword")));
-                setAttr("message", Constant.CHANGE_PWD_SUCCESS);
+                setAttr("message", ResUtil.getStringFromRes("changePasswordSuccess",getRequest()));
                 getSession().invalidate();
             } else {
-                setAttr("message", Constant.OLD_PWD_ERROR);
+                setAttr("message",  ResUtil.getStringFromRes("oldPasswordError",getRequest()));
             }
         } else {
-            setAttr("message", Constant.ARGS_CHECK_FAIL);
+            setAttr("message",  ResUtil.getStringFromRes("argsError",getRequest()));
         }
     }
 }

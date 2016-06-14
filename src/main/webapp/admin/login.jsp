@@ -10,13 +10,11 @@ request.setAttribute("url", request.getScheme()+"://"+request.getHeader("host")+
   	<base href="<%=basePath%>">
 	<head>
 		<meta charset="utf-8" />
-		<title>${init.webSite.title} - 请先登录</title>
+		<title>${init.webSite.title} - ${_res.login}</title>
 		<link href="assets/css/bootstrap.min.css" rel="stylesheet" />
 		<link rel="stylesheet" href="assets/css/font-awesome.min.css" />
 		<link rel="stylesheet" href="assets/css/ace.min.css" />
-		<link rel="stylesheet" href="assets/css/ace-rtl.min.css" />
-		
-		<link rel="shortcut icon" href="${url}/favicon.ico" />
+		<link rel="shortcut icon" href="favicon.ico" />
 	</head>
 
 	<body class="login-layout">
@@ -38,24 +36,24 @@ request.setAttribute("url", request.getScheme()+"://"+request.getHeader("host")+
 										<div class="widget-main">
 											<h4 class="header blue lighter bigger">
 												<i class="icon-coffee green"></i>
-												请输入用户名和密码
+												${_res.userNameAndPassword}
 											</h4>
 
 											<div class="space-6"></div>
 
-											<form action="${url}/admin/login" method="post">
+											<form action="admin/login" method="post">
 												<input type="hidden" name="redirectFrom" value="${param.redirectFrom}">
 												<fieldset>
 													<label class="block clearfix">
 														<span class="block input-icon input-icon-right">
-															<input type="text" class="form-control" name="userName" placeholder="用户名" />
+															<input type="text" class="form-control" name="userName" placeholder="${_res.userName}" />
 															<i class="icon-user"></i>
 														</span>
 													</label>
 
 													<label class="block clearfix">
 														<span class="block input-icon input-icon-right">
-															<input type="password" class="form-control" name="password" placeholder="密码" />
+															<input type="password" class="form-control" name="password" placeholder="${_res.password}" />
 															<i class="icon-lock"></i>
 														</span>
 													</label>
@@ -68,12 +66,12 @@ request.setAttribute("url", request.getScheme()+"://"+request.getHeader("host")+
 													<div class="clearfix">
 														<label class="inline">
 															<input type="checkbox" name="rememberMe" class="ace" />
-															<span class="lbl">&nbsp;记住我</span>
+															<span class="lbl">&nbsp;&nbsp;${_res.rememberMe}</span>
 														</label>
 
 														<button type="submit" class="width-35 pull-right btn btn-sm btn-primary">
-															<i class="icon-key"></i>
-															登陆
+															<i class="icon-signin"></i>
+															${_res.login}
 														</button>
 													</div>
 													
@@ -94,7 +92,6 @@ request.setAttribute("url", request.getScheme()+"://"+request.getHeader("host")+
 			</div>
 		</div><!-- /.main-container -->
 
-		 
 	<div style="display:none"></div>
 </body>
 </html>

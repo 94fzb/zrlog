@@ -205,8 +205,8 @@ header nav.mainnav .link-studio:hover{color:#666666;}
 .pager-nav strong{font-weight:bold; color:#666666; }
 .pager-nav p { margin:5px 0; width:100%; font-size:16px; line-height:1.5em; background-color: #FFFFFF; padding:10px 15px; box-shadow:0 0 2px rgba(198,198,198,0.5);-webkit-transition: top 1s ease, left 1s ease;-moz-transition: top 1s ease, left 1s ease;-o-transition: top 1s ease, left 1s ease;-ms-transition: top 1s ease, left 1s ease;}
 .pager-nav p:before {font-family: 'icomoon';  vertical-align:-1px; margin-right: 2px;}
-.pager-nav p.prev:before {content: "\e61a";}
-.pager-nav p.next:before {content: "\e619";}
+.pager-nav p.prev:before {content: "\e619";}
+.pager-nav p.next:before {content: "\e61a";}
 .pager-nav a:hover {color:#FF7300;text-decoration:none;}
 .pager-nav a:hover p{color:#FF7300;text-decoration:none; }
 

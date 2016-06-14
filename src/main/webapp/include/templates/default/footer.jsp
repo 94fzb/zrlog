@@ -5,7 +5,7 @@
     <div class="bottom">
       <div class="inner">
         <footer>
-          <div class="footer-left mission"><p>没有什么能够阻挡，你对自由的向往…</p></div>
+          <div class="footer-left mission"><p>${_res.footerSlogan}</p></div>
           <div class="footer-right">
             <p><cite>&copy; 2013-2016 ${webs.title}</cite></p>
             <p>Powered by <a href="http://zrlog.com" target="_blank">zrlog</a>, <span title="涉水轻舟">Themed by <a href="http://sheshui.me/about" target="_blank">Robin L.</a> &nbsp; </span></p>

@@ -16,26 +16,73 @@ if(request.getAttribute("suburl")==null){
 	<head>
 		<meta charset="utf-8" />
 		<title>${webs.title} - 后台管理  ${stitle} </title>
-		<link href="assets/css/bootstrap.min.css" rel="stylesheet" />
+		<link rel="stylesheet" href="assets/css/bootstrap.min.css"/>
 		<link rel="stylesheet" href="assets/css/font-awesome.min.css" />
 
 		<link rel="stylesheet" href="assets/css/ace.min.css" />
-		<link rel="stylesheet" href="assets/css/ace-rtl.min.css" />
 		<link rel="stylesheet" href="assets/css/ace-skins.min.css" />
 		<link rel="stylesheet" href="assets/css/jquery.gritter.css" />
 		
-		<link rel="shortcut icon" href="${url}/favicon.ico" />
+		<link rel="shortcut icon" href="favicon.ico" />
 		<script src="assets/js/jquery-2.0.3.min.js"></script>
 		<script src="assets/js/bootstrap.min.js"></script>
-		<script src="assets/js/typeahead-bs2.min.js"></script>
 		<script src="assets/js/ace-elements.min.js"></script>
 		<script src="assets/js/ace.min.js"></script>
 		<script src="assets/js/ace-extra.min.js"></script>
 		<script src="assets/js/jquery.gritter.min.js"></script>
-		<script src="${url}/admin/js/dashboard_set.js"></script>
+		<script src="admin/js/dashboard_set.js"></script>
+
+		<style type="text/css">
+		.dropdown-submenu {
+            position: relative;
+        }
+        .dropdown-submenu > .dropdown-menu {
+            border-radius: 0 6px 6px;
+            left: 100%;
+            margin-left: -1px;
+            margin-top: -6px;
+            top: 0;
+        }
+        .dropdown-submenu:hover > .dropdown-menu {
+            display: block;
+        }
+        .dropup .dropdown-submenu > .dropdown-menu {
+            border-radius: 5px 5px 5px 0;
+            bottom: 0;
+            margin-bottom: -2px;
+            margin-top: 0;
+            top: auto;
+        }
+        .dropdown-submenu > a::after {
+            border-color: transparent transparent transparent #cccccc;
+            border-style: solid;
+            border-width: 5px 0 5px 5px;
+            content: " ";
+            display: block;
+            float: right;
+            height: 0;
+            margin-right: -10px;
+            margin-top: 5px;
+            width: 0;
+        }
+        .dropdown-submenu:hover > a::after {
+            border-left-color: #ffffff;
+        }
+        .dropdown-submenu.pull-left {
+            float: none;
+        }
+        .dropdown-submenu.pull-left > .dropdown-menu {
+            border-radius: 6px 0 6px 6px;
+            left: -100%;
+            margin-left: 10px;
+        }
+		.dropdown-menu {
+            float:right;
+        }
+		</style>
 	</head>
 <body class="${webs.admin_dashboard_skin}">
-		<div class="navbar navbar-default" id="navbar">
+		<div class="navbar" id="navbar">
 
 			<script type="text/javascript">
 				try{ace.settings.check('navbar' , 'fixed')}catch(e){}
@@ -65,7 +112,7 @@ if(request.getAttribute("suburl")==null){
 								</li>
 								<c:forEach items="${session.comments.rows}" var="comment">
 								<li>
-									<a target="_blank" href="${url}/post/${comment.logId}">
+									<a target="_blank" href="post/${comment.logId}">
 										<img class="msg-photo" src="${comment.header}">
 										<span class="msg-body">
 											<span class="msg-title">
@@ -77,7 +124,7 @@ if(request.getAttribute("suburl")==null){
 								</li>
 								</c:forEach>
 								<li>
-									<a href="${url}/admin/comment">
+									<a href="admin/comment">
 										查看所有消息
 										<i class="icon-arrow-right"></i>
 									</a>
@@ -92,22 +139,38 @@ if(request.getAttribute("suburl")==null){
 								</span>
 								<i class="icon-caret-down"></i>
 							</a>
-							<ul class="user-menu pull-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close" >
+							<ul class="user-menu pull-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close"  style="width:150px;">
 								<li>
-									<a href="${url}/admin/user">
+									<a href="admin/user">
 										<i class="icon-user"></i>
 										个人资料
 									</a>
 								</li>
 								<li>
-									<a href="${url}/admin/change_password">
+									<a href="admin/change_password">
 										<i class="icon-key"></i>
 										更改密码
 									</a>
 								</li>
 								<li class="divider"></li>
+								<li class="dropdown-submenu pull-left" style="width:150px;">
+									<a>
+										<i class="icon-globe"></i>
+										${_res.language}
+									</a>
+									<ul class="dropdown-menu">
+										<li>
+										<a tabindex="-1" class="language" id="zh_CN">${_res.languageChinese}</a>
+										</li>
+										<li>
+											<a tabindex="-1" class="language" id="en_US">${_res.languageEnglish}</a>
+										</li>
+									</ul>
+
+								</li>
+
 								<li>
-									<a href="${url}/admin/logout">
+									<a href="admin/logout">
 										<i class="icon-off"></i>
 										退出
 									</a>
@@ -128,30 +191,34 @@ if(request.getAttribute("suburl")==null){
 					<ul class="nav nav-list">
 						<li <c:if test="${'index.jsp'==suburl}">class="active"</c:if>>
 						
-							<a href="${url}/admin/index">
+							<a href="admin/index">
 								<i class="icon-dashboard"></i>
-								<span class="menu-text"> 控制台 </span>
+								<span class="menu-text"> ${_res.dashboard} </span>
 							</a>
 						</li>
 						<li <c:if test="${'edit.jsp'==suburl}">class="active"</c:if>>
-							<a href="${url}/admin/edit">
+							<a href="admin/edit">
 								<i class="icon-edit"></i>
 								<span class="menu-text"> 文章撰写 </span>
 							</a>
 						</li>
 						<li <c:if test="${'log.jsp'==suburl}">class="active"</c:if>>
-							<a href="${url}/admin/log">
+							<a href="admin/log">
 								<i class="icon-desktop"></i>
-								<span class="menu-text"> 文章管理 </span>
+								<span class="menu-text"> ${_res.blogManage} </span>
 
 							</a>
 						</li>
 						<li <c:if test="${'comment.jsp'==suburl}">class="active"</c:if>>
-							<a href="${url}/admin/comment" class="dropdown-toggle">
+							<a href="admin/comment" class="dropdown-toggle">
 								<i class="icon-comment"></i>
 								<span class="menu-text"> 评论管理 </span>
-
-								 
+							</a>
+						</li>
+						<li <c:if test="${'plugin.jsp'==suburl or 'plugin_center.jsp'==suburl}">class="active"</c:if>>
+							<a href="admin/plugin" class="dropdown-toggle">
+								<i class="icon-plug"></i>
+								<span class="menu-text"> 插件 </span>
 							</a>
 						</li>
 						<li <c:if test="${'website.jsp'==suburl or 'user.jsp'==suburl or 'template.jsp'==suburl or 'template_center.jsp'==suburl}">class="active open"</c:if>>
@@ -164,62 +231,54 @@ if(request.getAttribute("suburl")==null){
 
 							<ul class="submenu">
 								<li <c:if test="${'user.jsp'==suburl}">class="active"</c:if>>
-									<a href="${url}/admin/user" <c:if test="${'user.jsp'==suburl}">class="active"</c:if>>
+									<a href="admin/user" <c:if test="${'user.jsp'==suburl}">class="active"</c:if>>
 										<i class="icon-double-angle-right"></i>
 										<span class="menu-text">个人信息</span>
 									</a>
 								</li>
 								<li <c:if test="${'website.jsp'==suburl}">class="active"</c:if>>
-									<a href="${url}/admin/website" <c:if test="${'website.jsp'==suburl}">class="active"</c:if>>
+									<a href="admin/website" <c:if test="${'website.jsp'==suburl}">class="active"</c:if>>
 										<i class="icon-double-angle-right"></i>
 										<span class="menu-text">网站设置</span>
 									</a>
 								</li>
 								<li <c:if test="${'template.jsp'==suburl or 'template_center.jsp'==suburl}">class="active"</c:if>>
-									<a href="${url}/admin/template" <c:if test="${'template.jsp'==suburl}">class="active"</c:if>>
+									<a href="admin/template" <c:if test="${'template.jsp'==suburl}">class="active"</c:if>>
 										<i class="icon-double-angle-right"></i>
 										<span class="menu-text">主题设置</span>
 									</a>
 								</li>
 							</ul>
 						</li>
-						
-
-						<li <c:if test="${'type.jsp'==suburl or 'tag.jsp'==suburl or  'plugin.jsp'==suburl or 'nav.jsp'==suburl or 'link.jsp'==suburl or 'plugin_center.jsp'==suburl}">class="active open"</c:if>>
+						<li <c:if test="${'type.jsp'==suburl or 'tag.jsp'==suburl or 'nav.jsp'==suburl or 'link.jsp'==suburl}">class="active open"</c:if>>
 							<a href="#" class="dropdown-toggle">
 								<i class="icon-list"></i>
 								<span class="menu-text">
-									其他
+									更多
 								</span>
 								<b class="arrow icon-angle-down"></b>
 							</a>
 							<ul class="submenu">
 								<li  <c:if test="${'type.jsp'==suburl}">class="active"</c:if>>
-									<a href="${url}/admin/type"  class="dropdown-toggle">
+									<a href="admin/type"  class="dropdown-toggle">
 										<i class="icon-double-angle-right"></i>
 										<span class="menu-text">分类管理</span>
 									</a>
 								</li>
 								<li  <c:if test="${'tag.jsp'==suburl}">class="active"</c:if>>
-									<a href="${url}/admin/tag"  class="dropdown-toggle">
+									<a href="admin/tag"  class="dropdown-toggle">
 										<i class="icon-double-angle-right"></i>
 										<span class="menu-text">查看标签</span>
 									</a>
 								</li>
 								<li <c:if test="${'link.jsp'==suburl}">class="active"</c:if>>
-									<a href="${url}/admin/link" class="dropdown-toggle">
+									<a href="admin/link" class="dropdown-toggle">
 										<i class="icon-double-angle-right"></i>
 										<span class="menu-text"> 链接管理 </span>
 									</a>
 								</li>
-								<li <c:if test="${'plugin.jsp'==suburl}">class="active"</c:if>>
-									<a href="${url}/admin/plugin" class="dropdown-toggle">
-										<i class="icon-double-angle-right"></i>
-										<span class="menu-text"> 插件管理 </span>
-									</a>
-								</li>
 								<li <c:if test="${'nav.jsp'==suburl}">class="active"</c:if>>
-									<a href="${url}/admin/nav" class="dropdown-toggle">
+									<a href="admin/nav" class="dropdown-toggle">
 										<i class="icon-double-angle-right"></i>
 										<span class="menu-text"> 导航栏管理 </span>
 									</a>

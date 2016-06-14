@@ -28,4 +28,12 @@ public class WebSite extends Model<WebSite> {
         }
         return true;
     }
+
+    public String getValueByName(String name) {
+        WebSite webSite  = findFirst("select value from website where name=?", name);
+	if(webSite !=null){
+	   return webSite.get("value");
+	}
+	return "";
+    }
 }

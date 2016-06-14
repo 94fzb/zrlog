@@ -58,15 +58,11 @@ public class BaseController extends Controller {
             }
             init.put("indexHotLog", indexHotLog);
             CacheKit.put("/post/initData", "initData", init);
-            JFinal.me().getServletContext()
-                    .setAttribute("webSite", init.get("webSite"));
+            JFinal.me().getServletContext().setAttribute("webSite", init.get("webSite"));
         }
         setAttr("init", init);
-        this.templatePath = ((Map<String, Object>) init.get("webSite")).get(
-                "template").toString();
-        this.rows = Integer
-                .parseInt(((Map<String, Object>) init.get("webSite")).get(
-                        "rows").toString());
+        this.templatePath = ((Map<String, Object>) init.get("webSite")).get("template").toString();
+        this.rows = Integer.parseInt(((Map<String, Object>) init.get("webSite")).get("rows").toString());
         //
         webSite = (Map<String, Object>) init.get("webSite");
     }

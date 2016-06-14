@@ -17,6 +17,10 @@ public class ParseTools {
         return digest;
     }
 
+    public static String removeHtmlElement(String str) {
+        return str.replaceAll("<[^>]*>", "").replaceAll("\t|\r|", "").replace("\n", " ");
+    }
+
     /**
      * @param str
      * @param defaultValue

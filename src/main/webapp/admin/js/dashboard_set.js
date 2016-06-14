@@ -83,4 +83,21 @@
 				}
 			});
         })
+        $(".language").click(function(e){
+        	var language = $(this).attr("id");
+        	$.post('admin/website/update',{"language":language},function(data){
+				if(data.success){
+					/*$.gritter.add({
+						title: '  操作成功...',
+						class_name: 'gritter-success' + (!$('#gritter-light').get(0).checked ? ' gritter-light' : ''),
+					});*/
+				}else{
+					$.gritter.add({
+						title: '  发生了一些异常...',
+						class_name: 'gritter-error' + (!$('#gritter-light').get(0).checked ? ' gritter-light' : ''),
+					});
+				}
+				window.location.href=window.location.href
+			});
+        })
 	});

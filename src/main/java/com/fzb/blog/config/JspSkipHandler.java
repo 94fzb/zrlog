@@ -7,7 +7,6 @@ import com.jfinal.handler.Handler;
 import com.jfinal.kit.PathKit;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author zhengchangchun 用于拦截通过请求 .jsp 后缀的请求 如果用户访问的后缀为 .html 的情况下. 第一次使用程序进行抓取.
@@ -25,34 +26,52 @@ public class JspSkipHandler extends Handler {
 
     private static Logger LOGGER = LoggerFactory.getLogger(JspSkipHandler.class);
 
+    private static Set<String> FORBIDDEN_URI_EXT_SET = new HashSet<String>();
+
+    static {
+        FORBIDDEN_URI_EXT_SET.add(".jsp");
+        FORBIDDEN_URI_EXT_SET.add(".properties");
+    }
+
     public void handle(String target, HttpServletRequest request,
                        HttpServletResponse response, boolean[] isHandled) {
-        if (!target.endsWith(".jsp")) {
-            // 处理静态化文件,仅仅缓存文章页(变化较小)
-            if (target.endsWith(".html") && target.startsWith("/post/")) {
-                File htmlFile = new File(PathKit.getWebRootPath()
-                        + request.getServletPath());
-                if (!htmlFile.exists()) {
-                    String tempTarget = target.substring(0,
-                            target.lastIndexOf("."));
-                    String home = request.getScheme() + "://"
-                            + request.getHeader("host")
-                            + request.getContextPath() + tempTarget;
-                    target = tempTarget;
-                    convert2Html(home, htmlFile);
+        String ext = null;
+        if (target.contains("/")) {
+            String name = target.substring(target.lastIndexOf("/"));
+            if (name.contains(".")) {
+                ext = name.substring(name.lastIndexOf("."));
+            }
+        }
+        if (ext != null) {
+            if (!FORBIDDEN_URI_EXT_SET.contains(ext)) {
+                // 处理静态化文件,仅仅缓存文章页(变化较小)
+                if (target.endsWith(".html") && target.startsWith("/post/")) {
+                    File htmlFile = new File(PathKit.getWebRootPath()
+                            + request.getServletPath());
+                    if (!htmlFile.exists()) {
+                        String tempTarget = target.substring(0,
+                                target.lastIndexOf("."));
+                        String home = request.getScheme() + "://"
+                                + request.getHeader("host")
+                                + request.getContextPath() + tempTarget;
+                        target = tempTarget;
+                        convert2Html(home, htmlFile);
+                    }
+                    this.next.handle(target, request, response, isHandled);
+                } else {
+                    this.next.handle(target, request, response, isHandled);
                 }
-                this.next.handle(target, request, response, isHandled);
             } else {
-                this.next.handle(target, request, response, isHandled);
+                try {
+                    // 访问 .jsp 的情况下认为非法请求, 返回403
+                    request.getSession();
+                    response.sendError(403);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         } else {
-            try {
-                // 访问 .jsp 的情况下认为非法请求, 返回403
-                request.getSession();
-                response.sendError(403);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            this.next.handle(target, request, response, isHandled);
         }
 
     }

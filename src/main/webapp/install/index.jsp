@@ -1,30 +1,15 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <jsp:include page="header.jsp" />
-<div data-target="#step-container" class="row-fluid" id="fuelux-wizard">
-	<ul class="wizard-steps">
-		<li class="active" data-target="#step1"><span class="step">1</span>
-			<span class="title">数据库信息</span></li>
-
-		<li data-target="#step2" class=""><span class="step">2</span> <span
-			class="title">网站信息</span></li>
-
-		<li data-target="#step3" class=""><span class="step">3</span> <span
-			class="title">完成</span></li>
-	</ul>
-</div>
-<div id="step-container"
-	class="step-content row-fluid position-relative">
-
 	<div id="step1" class="step-pane active">
 		<div class="main">
 			<form method="post" action="install/testDbConn " id="validation-form"
 				class="form-horizontal" novalidate="novalidate">
 				<div class="center">
-					<h3 class="green">填写数据库信息</h3>
+					<h3 class="green">${_res.installInputDbInfo}</h3>
 				</div>
 				<hr>
 				<div class="form-group">
-					<label class="control-label col-xs-12 col-sm-3 no-padding-right">数据库服务器:</label>
+					<label class="control-label col-xs-12 col-sm-3 no-padding-right">${_res.installDbHost}:</label>
 
 					<div class="col-xs-12 col-sm-9">
 						<div class="clearfix">
@@ -37,7 +22,7 @@
 				<div class="space-8"></div>
 
 				<div class="form-group">
-					<label class="control-label col-xs-12 col-sm-3 no-padding-right">数据库名:</label>
+					<label class="control-label col-xs-12 col-sm-3 no-padding-right">${_res.installDbName}:</label>
 
 					<div class="col-xs-12 col-sm-9">
 						<div class="clearfix">
@@ -49,7 +34,7 @@
 
 				<div class="space-8"></div>
 				<div class="form-group">
-					<label class="control-label col-xs-12 col-sm-3 no-padding-right">数据库用户名:</label>
+					<label class="control-label col-xs-12 col-sm-3 no-padding-right">${_res.installDbUserName}:</label>
 
 					<div class="col-xs-12 col-sm-9">
 						<div class="clearfix">
@@ -61,7 +46,7 @@
 
 				<div class="space-8"></div>
 				<div class="form-group">
-					<label class="control-label col-xs-12 col-sm-3 no-padding-right">数据库密码:</label>
+					<label class="control-label col-xs-12 col-sm-3 no-padding-right">${_res.installDbPassword}:</label>
 
 					<div class="col-xs-12 col-sm-9">
 						<div class="clearfix">
@@ -73,7 +58,7 @@
 
 				<div class="space-8"></div>
 				<div class="form-group">
-					<label class="control-label col-xs-12 col-sm-3 no-padding-right">数据库端口:</label>
+					<label class="control-label col-xs-12 col-sm-3 no-padding-right">${_res.installDbPort}:</label>
 
 					<div class="col-xs-12 col-sm-9">
 						<div class="clearfix">
@@ -85,7 +70,7 @@
 
 				<div class="space-8"></div>
 				<div class="form-group">
-					<label class="control-label col-xs-12 col-sm-3 no-padding-right">系统信箱
+					<label class="control-label col-xs-12 col-sm-3 no-padding-right">${_res.installNotifyEmail}
 						Email:</label>
 
 					<div class="col-xs-12 col-sm-9">
@@ -98,7 +83,7 @@
 					<div class="col-xs-12 col-sm-10">
 						<div class="row-fluid wizard-actions">
 							<button data-last="Finish " class="btn btn-success btn-next">
-								下一步 <i class="icon-arrow-right icon-on-right"></i>
+								${_res.installNextStep} <i class="icon-arrow-right icon-on-right"></i>
 							</button>
 						</div>
 					</div>

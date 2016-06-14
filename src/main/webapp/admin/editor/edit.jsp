@@ -7,17 +7,17 @@ String basePath = request.getScheme()+"://"+request.getHeader("host")+path+"/";
 request.setAttribute("url", request.getScheme()+"://"+request.getHeader("host")+request.getContextPath());
 request.setAttribute("suburl", request.getRequestURL().substring(basePath.length()));
 %>
-<link rel="stylesheet" href="${url}/admin/markdown/lib/codemirror/codemirror.min.css">
-<link rel="stylesheet" href="${url}/admin/markdown/lib/codemirror/addon/dialog/dialog.css">
-<link rel="stylesheet" href="${url}/admin/markdown/lib/codemirror/addon/search/matchesonscrollbar.css">
-<script src="${url}/admin/markdown/lib/codemirror/codemirror.min.js"></script>
-<script src="${url}/admin/markdown/lib/codemirror/modes.min.js"></script>
+<link rel="stylesheet" href="admin/markdown/lib/codemirror/codemirror.min.css">
+<link rel="stylesheet" href="admin/markdown/lib/codemirror/addon/dialog/dialog.css">
+<link rel="stylesheet" href="admin/markdown/lib/codemirror/addon/search/matchesonscrollbar.css">
+<script src="admin/markdown/lib/codemirror/codemirror.min.js"></script>
+<script src="admin/markdown/lib/codemirror/modes.min.js"></script>
 
-<script src="${url}/admin/markdown/lib/codemirror/addon/dialog/dialog.js"></script>
-<script src="${url}/admin/markdown/lib/codemirror/addon/search/searchcursor.js"></script>
-<script src="${url}/admin/markdown/lib/codemirror/addon/search/search.js"></script>
-<script src="${url}/admin/markdown/lib/codemirror/addon/scroll/annotatescrollbar.js"></script>
-<script src="${url}/admin/markdown/lib/codemirror/addon/search/matchesonscrollbar.js"></script>
+<script src="admin/markdown/lib/codemirror/addon/dialog/dialog.js"></script>
+<script src="admin/markdown/lib/codemirror/addon/search/searchcursor.js"></script>
+<script src="admin/markdown/lib/codemirror/addon/search/search.js"></script>
+<script src="admin/markdown/lib/codemirror/addon/scroll/annotatescrollbar.js"></script>
+<script src="admin/markdown/lib/codemirror/addon/search/matchesonscrollbar.js"></script>
 <style type="text/css">
 .CodeMirror {
 	border-top: 1px solid black;
@@ -34,7 +34,7 @@ dt {
 		var editor;
 		$("#saveFile").click(function(){
 			$("#code").val(editor.getValue());
-			$.post("${url}/admin/template/saveFile", $("#saveFileForm").serialize(),function(data){
+			$.post("admin/template/saveFile", $("#saveFileForm").serialize(),function(data){
 				if(data.status){
 					$.gritter.add({
 						title: '  操作成功...',
@@ -55,7 +55,7 @@ dt {
 			loadFile($(this).children('option:selected').val()); 
 		});
 		function loadFile(file){
-			$.get("${url}/admin/template/loadFile?file="+file,function(data){
+			$.get("admin/template/loadFile?file="+file,function(data){
 				$("div").remove(".CodeMirror");
 				$("#code").text(data.fileContent);
 				editor = CodeMirror.fromTextArea(document.getElementById("code"), {
