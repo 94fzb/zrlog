@@ -73,7 +73,7 @@ public class PluginConfig {
 
     public static void stopPluginCore() {
         for (Map.Entry<String, Process> entry : processMap.entrySet()) {
-            entry.getValue().destroyForcibly();
+            entry.getValue().destroy();
             LOGGER.info("close plugin " + " " + entry.getKey());
         }
     }
