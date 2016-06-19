@@ -47,17 +47,18 @@ public class PluginHandler extends Handler {
     private void adminPermission(String target, HttpServletRequest request, HttpServletResponse response) throws IOException, InstantiationException {
         User user = (User) request.getSession().getAttribute("user");
         if (user != null) {
-            if (!accessPlugin(target.replace("/admin/plugins", ""), request, response)) {
-                request.getSession();
-                response.sendRedirect(request.getContextPath()
-                        + "/admin/login?redirectFrom="
-                        + request.getRequestURL() + (request.getQueryString() != null ? "?" + request.getQueryString() : ""));
-            }
+            accessPlugin(target.replace("/admin/plugins", ""), request, response);
+        } else {
+            response.sendRedirect(request.getContextPath()
+                    + "/admin/login?redirectFrom="
+                    + request.getRequestURL() + (request.getQueryString() != null ? "?" + request.getQueryString() : ""));
         }
     }
 
     private void visitorPermission(String target, HttpServletRequest request, HttpServletResponse response) throws IOException, InstantiationException {
-        accessPlugin(target.replace("/plugin", "").replace("/p", ""), request, response);
+        if (!accessPlugin(target.replace("/plugin", "").replace("/p", ""), request, response)) {
+            response.sendError(403);
+        }
     }
 
     private boolean accessPlugin(String uri, HttpServletRequest request, HttpServletResponse response) throws IOException, InstantiationException {

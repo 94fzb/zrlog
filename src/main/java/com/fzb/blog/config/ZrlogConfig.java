@@ -117,7 +117,7 @@ public class ZrlogConfig extends JFinalConfig {
             @Override
             public void run() {
                 //加载 zrlog 提供的插件
-                File pluginCoreFile = new File(PathKit.getWebRootPath() + "/admin/plugins/plugin-core.jar");
+                File pluginCoreFile = new File(PathKit.getWebRootPath() + "/WEB-INF/plugins/plugin-core.jar");
                 if (!pluginCoreFile.exists()) {
                     pluginCoreFile.getParentFile().mkdirs();
                     String filePath = pluginCoreFile.getParentFile().toString();

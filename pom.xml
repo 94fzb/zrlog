@@ -108,7 +108,7 @@
                 <configuration>
                     <warSourceDirectory>src/main/webapp</warSourceDirectory>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
-                    <packagingExcludes>attached/**,admin/plugins/**,post/**</packagingExcludes>
+                    <packagingExcludes>attached/**,WEB-INF/plugins/**,post/**</packagingExcludes>
                 </configuration>
             </plugin>
         </plugins>

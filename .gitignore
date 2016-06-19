@@ -19,5 +19,5 @@ hs_err*.log
 src/main/webapp/post
 src/main/webapp/attached
 src/main/webapp/WEB-INF/classes
-src/main/webapp/admin/plugins/*
+src/main/webapp/WEB-INF/plugins/*
 src/main/webapp/include/templates/template*
