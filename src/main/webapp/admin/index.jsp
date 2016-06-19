@@ -20,12 +20,12 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 		<option value="#222A2D" data-skin="skin-1">#222A2D</option>
 	</select>
 </div>
-<span>&nbsp; 选择皮肤</span>
+<span>&nbsp; ${_res['admin.dashboard.chooseSkin']}</span>
 </div>
 <div>
 <input type="checkbox" <c:if test="${webs.admin_dashboard_inside_container ne ''}">checked="checked"</c:if> id="ace-settings-add-container" class="ace ace-checkbox-2">
 <label for="ace-settings-add-container" class="lbl">
-	切换窄屏
+	${_res['admin.dashboard.insideContainer']}
 </label>
 </div>
 </div>
@@ -41,11 +41,8 @@ ${_res.dashboard}
 </div><!-- /.page-header -->
  <div class="alert alert-block alert-info">
 	<i class="icon-info">&nbsp;</i>
-	欢迎使用
-	<strong>
-		zrlog 日志管理系统 - 可能是最好用的开源Java博客系统.
-	</strong>
-	<small> v${zrlog.version} - ${zrlog.buildId} (${zrlog.buildTime})</small>
+	${_res['admin.index.welcomeTips']}
+	<small>&nbsp;v${zrlog.version} - ${zrlog.buildId} (${zrlog.buildTime})</small>
 
 </div>
 <div class="row">
@@ -132,7 +129,7 @@ ${_res.dashboard}
 		<div class="widget-header">
 			<h4>
 				<i class="icon-comments"></i>
-				概要
+				${_res['admin.index.outline']}
 			</h4>
 		</div>
 		<div class="widget-body">

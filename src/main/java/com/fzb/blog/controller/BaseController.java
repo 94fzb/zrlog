@@ -7,6 +7,7 @@ import com.jfinal.core.JFinal;
 import com.jfinal.plugin.ehcache.CacheInterceptor;
 import com.jfinal.plugin.ehcache.CacheKit;
 import com.jfinal.plugin.ehcache.CacheName;
+import flexjson.JSONDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +24,8 @@ public class BaseController extends Controller {
     private Integer rows;
 
     private Map<String, Object> webSite;
+
+    protected String templateConfigSubfix = "_setting";
 
     @Before({CacheInterceptor.class})
     @CacheName("/post/initData")
@@ -68,7 +71,7 @@ public class BaseController extends Controller {
     }
 
     public String getTemplatePath() {
-        return this.templatePath;
+        return this.templatePath == null ? getDefaultTemplatePath() : templatePath;
     }
 
     public Integer getDefaultRows() {
@@ -122,5 +125,22 @@ public class BaseController extends Controller {
             }
         }
         return "";
+    }
+
+    public void fullTemplateSetting(Object jsonStr) {
+        if (isNotNullOrNotEmptyStr(jsonStr)) {
+            Map<String, Object> res = getAttr("_res");
+            res.putAll(new JSONDeserializer<Map<String, Object>>().deserialize(jsonStr.toString()));
+            setAttr("_res", res);
+        }
+    }
+
+    public void fullTemplateSetting() {
+        Object jsonStr = webSite.get(getTemplatePath() + templateConfigSubfix);
+        fullTemplateSetting(jsonStr);
+    }
+
+    public String getDefaultTemplatePath() {
+        return "/include/templates/default";
     }
 }

@@ -25,6 +25,9 @@ public class LoginInterceptor extends PrototypeInterceptor {
         ai.invoke();
         String basePath = getBaseTemplatePath(ai);
         MyI18NInterceptor.addToRequest(PathKit.getWebRootPath() + basePath + "/language/", ai.getController().getRequest());
+        if (ai.getController() instanceof BaseController) {
+            ((BaseController) ai.getController()).fullTemplateSetting();
+        }
         if (ai.getController().getAttr("log") != null) {
             ai.getController().render(basePath + "/detail.jsp");
         } else if (ai.getController().getAttr("data") != null) {
@@ -93,7 +96,7 @@ public class LoginInterceptor extends PrototypeInterceptor {
             }
         }
         if (!new File(PathKit.getWebRootPath() + basePath).exists()) {
-            basePath = "/include/templates/default";
+            basePath = ((BaseController) ai.getController()).getDefaultTemplatePath();
         }
         ai.getController().getRequest().setAttribute("template", basePath);
         return basePath;

@@ -17,7 +17,7 @@ jQuery(function($) {
 
     url:'admin/log/queryAll?keywords='+keywords,
     datatype: "json",
-        colNames:['编辑','删除','id','标题','关键词', '发布者', '分类','发布时间','查看数','草稿','私有','浏览'],
+        colNames:['编辑','删除','ID','标题','关键词', '发布者', '分类','发布时间','查看数','草稿','私有','浏览'],
         colModel:[
             {name:'logId',width:50,index:'logId',sortable:false,formatter:imageFormat},
             {name:'myac',width:50,index:'',sorttype:"int", editable: true, width:50, fixed:true, sortable:false, resize:false,

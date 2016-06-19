@@ -1,5 +1,6 @@
 package com.fzb.blog.controller;
 
+import com.fzb.blog.incp.MyI18NInterceptor;
 import com.fzb.blog.model.Link;
 import com.fzb.blog.model.WebSite;
 import com.fzb.blog.util.ResUtil;
@@ -8,6 +9,7 @@ import com.fzb.common.util.ZipUtil;
 import com.fzb.common.util.http.HttpUtil;
 import com.fzb.common.util.http.handle.HttpFileHandle;
 import com.jfinal.kit.PathKit;
+import flexjson.JSONSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -151,6 +153,51 @@ public class TemplateController extends ManageController {
         } else {
             setAttr("message", ResUtil.getStringFromRes("templatePathNotNull", getRequest()));
         }
+    }
+
+    public void upload() {
+        String uploadFieldName = "file";
+
+        String fileName = getFile(uploadFieldName).getFileName();
+        String finalPath = PathKit.getWebRootPath() + "/include/templates/";
+        String finalFile = finalPath + fileName;
+        IOUtil.moveOrCopyFile(PathKit.getWebRootPath() + "/attached/" + fileName, finalFile, true);
+        getData().put("message", ResUtil.getStringFromRes("templateDownloadSuccess", getRequest()));
+        try {
+            ZipUtil.unZip(finalFile, finalPath + fileName.replace(".zip", "") + "/");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        renderJson(getData());
+    }
+
+    public void configPage() {
+        String templateName = getPara("template");
+        setAttr("include", templateName + "/setting/index");
+        setAttr("template", templateName);
+        setAttr("menu", "1");
+        MyI18NInterceptor.addToRequest(PathKit.getWebRootPath() + templateName + "/language/", getRequest());
+        String jsonStr = new WebSite().getValueByName(templateName + templateConfigSubfix);
+        fullTemplateSetting(jsonStr);
+        render("/admin/blank.jsp");
+    }
+
+    public void setting() {
+        Map<String, String[]> param = getRequest().getParameterMap();
+        String template = getPara("template");
+        Map<String, Object> settingMap = new HashMap<String, Object>();
+        for (Map.Entry<String, String[]> entry : param.entrySet()) {
+            if (!entry.getKey().equals("template")) {
+                if (entry.getValue().length > 1) {
+                    settingMap.put(entry.getKey(), entry.getValue());
+                } else {
+                    settingMap.put(entry.getKey(), entry.getValue()[0]);
+                }
+            }
+        }
+        new WebSite().updateByKV(template + templateConfigSubfix, new JSONSerializer().deepSerialize(settingMap));
+        refreshCache();
+        setAttr("message", "变更成功");
     }
 
 }

@@ -39,7 +39,7 @@ public class BlogBuildInfoUtil {
             }
         }
         if (buildId == null) {
-            buildId = "";
+            buildId = "0000000";
         }
         if (version == null) {
             version = "1.x-dev";

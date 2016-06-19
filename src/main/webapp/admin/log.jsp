@@ -21,7 +21,6 @@ catch(Exception e){
 	}
 </style>
 
-<script src="assets/js/date-time/bootstrap-datepicker.min.js"></script>
 <script src="assets/js/jqGrid/jquery.jqGrid.min.js"></script>
 <script src="assets/js/jqGrid/i18n/grid.locale-cn.js"></script>
 <script type="text/javascript" src="assets/js/eModal.min.js"></script>

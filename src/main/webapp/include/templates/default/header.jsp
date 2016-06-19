@@ -2,6 +2,12 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <jsp:include page="../../core/core_header.jsp"></jsp:include>
+<%
+  Map<String,Object> res = (Map<String,Object>)request.getAttribute("_res");
+  if(res.get("avatar")==null){
+    res.put("avatar",request.getAttribute("url")+"/images/avatar240_240.jpg");
+  }
+%>
 <!DOCTYPE html>
 <html lang="zh" class="no-js">
 <head>
@@ -20,6 +26,20 @@
   <script src="${url}/js/css3-mediaqueries.js"></script>
   <link rel="stylesheet" type="text/css" media="screen" href="${url}/css/style-ie7.css" />
   <![endif]-->
+  <style>
+    header .avatar{
+      display: block;float: left;
+      width:64px;
+      height:64px;
+      margin-top:-8px;
+      margin-right:5px;
+      border-radius: 50%;
+      /*box-shadow: 0px 0px 10px 2px #EDEDEF;*/
+      background: url('${_res.avatar}') scroll center center #FFFFFF;
+      background-size: cover
+      ;overflow: hidden;
+    }
+  </style>
 
 </head>
 <body class="default front">
