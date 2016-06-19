@@ -4,9 +4,9 @@ import com.fzb.common.util.CmdUtil;
 import org.apache.log4j.Logger;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
+import java.util.*;
 
 /**
  * Created by xiaochun on 2016/2/11.
@@ -15,28 +15,44 @@ public class PluginConfig {
 
     private static Logger LOGGER = Logger.getLogger(PluginConfig.class);
 
-    private static final Map<String, Process> processMap = new HashMap<String, Process>();
+    private static Set<InputStream> inSet = new HashSet<InputStream>();
+    private static Process pr;
+    private static boolean canStart = true;
 
     public static int pluginServerStart(final File serverFileName, final String dbProperties, final String pluginJvmArgs) {
         final int randomServerPort = new Random().nextInt(10000) + 20000;
         final int randomMasterPort = randomServerPort + 20000;
+        RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
+        final int pid = Integer.valueOf(runtimeMXBean.getName().split("@")[0]);
         try {
             registerHook();
             if (serverFileName.getName().endsWith(".jar")) {
                 new Thread() {
                     @Override
                     public void run() {
-                        Process pr = CmdUtil.getProcess("java " + pluginJvmArgs + " -jar " + serverFileName.toString() + " " +
-                                randomServerPort + " " + randomMasterPort + " " + dbProperties + " " + serverFileName.getParent() + "/jars");
-                        String pluginName = serverFileName.getName().replace(".jar", "");
-                        if (pr != null) {
-                            processMap.put(pluginName, pr);
-                            printInputStreamWithThread(pr.getInputStream(), pluginName);
-                            printInputStreamWithThread(pr.getErrorStream(), pluginName);
+                        while (true) {
+                            pr = CmdUtil.getProcess("java " + pluginJvmArgs + " -jar " + serverFileName.toString() + " " +
+                                    randomServerPort + " " + randomMasterPort + " " + dbProperties + " " + serverFileName.getParent() + "/jars" + " " + pid);
+                            if (pr != null) {
+                                printInputStreamWithThread(pr.getInputStream());
+                                inSet.add(pr.getInputStream());
+                                printInputStreamWithThread(pr.getErrorStream());
+                                inSet.add(pr.getErrorStream());
+                            }
+                            while (inSet.size() > 0) {
+                                try {
+                                    Thread.sleep(1000);
+                                } catch (InterruptedException e) {
+
+                                }
+                            }
+                            if (!canStart) {
+                                break;
+                            }
                         }
                     }
 
-                    private void printInputStreamWithThread(final InputStream in, final String pluginName) {
+                    private void printInputStreamWithThread(final InputStream in) {
                         new Thread() {
                             @Override
                             public void run() {
@@ -46,6 +62,7 @@ public class PluginConfig {
                                     while ((str = br.readLine()) != null) {
                                         System.out.println(str);
                                     }
+                                    inSet.remove(in);
                                 } catch (IOException e) {
                                     LOGGER.error("plugin output error", e);
                                 }
@@ -67,14 +84,25 @@ public class PluginConfig {
             @Override
             public void run() {
                 stopPluginCore();
+                canStart = false;
             }
         });
     }
 
     public static void stopPluginCore() {
-        for (Map.Entry<String, Process> entry : processMap.entrySet()) {
-            entry.getValue().destroy();
-            LOGGER.info("close plugin " + " " + entry.getKey());
+        if (inSet.size() > 0) {
+            for (InputStream in : inSet) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    LOGGER.warn("close process error");
+                }
+            }
+            inSet.clear();
         }
+        if (pr != null) {
+            pr.destroy();
+        }
+        LOGGER.info("close plugin ");
     }
 }

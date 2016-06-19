@@ -67,8 +67,8 @@ public class LoginInterceptor extends PrototypeInterceptor {
 
     private void adminPermission(Invocation ai) {
         if (ai.getController().getSession().getAttribute("user") != null) {
-            ai.getController().setAttr("user",
-                    ai.getController().getSession().getAttribute("user"));
+            ai.getController().setAttr("user", ai.getController().getSession().getAttribute("user"));
+            getBaseTemplatePath(ai);
             ai.invoke();
             // 存在消息提示
             if (ai.getController().getRequest().getAttribute("message") != null) {
