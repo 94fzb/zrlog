@@ -8,9 +8,11 @@ import com.fzb.blog.util.ResUtil;
 import com.fzb.blog.util.WebTools;
 import com.fzb.common.util.Md5Util;
 import com.fzb.common.util.ParseTools;
+import com.jfinal.kit.PathKit;
 import com.jfinal.plugin.activerecord.Db;
 
 import javax.servlet.http.Cookie;
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +48,13 @@ public class UserController extends ManageController {
             if (getPara(0) == null) {
                 render("/admin/index.jsp");
             } else {
-                render("/admin/" + getPara(0) + ".jsp");
+                String jsp = "/admin/" + getPara(0) + ".jsp";
+                File file = new File(PathKit.getWebRootPath() + jsp);
+                if (file.exists()) {
+                    render(jsp);
+                } else {
+                    renderNotPage();
+                }
             }
         } else {
             render("/admin/login.jsp");
@@ -116,7 +124,7 @@ public class UserController extends ManageController {
                     userMap.put(getBaseMs() + zid, user);
                 }
             } else {
-                setAttr("errorMsg", ResUtil.getStringFromRes("userNameOrPasswordError",getRequest()));
+                setAttr("errorMsg", ResUtil.getStringFromRes("userNameOrPasswordError", getRequest()));
             }
         }
         index();
@@ -130,7 +138,7 @@ public class UserController extends ManageController {
     @Override
     public void update() {
         Db.update("update user set header=?,email=? where userName=?", getPara("header"), getPara("email"), getPara("userName"));
-        setAttr("message", ResUtil.getStringFromRes("updatePersonInfoSuccess",getRequest()));
+        setAttr("message", ResUtil.getStringFromRes("updatePersonInfoSuccess", getRequest()));
     }
 
     public void changePassword() {
@@ -142,13 +150,13 @@ public class UserController extends ManageController {
             String oldPassword = getPara("oldPassword");
             if (Md5Util.MD5(oldPassword).equals(dbPassword)) {
                 User.dao.updatePassword(userName, Md5Util.MD5(getPara("newPassword")));
-                setAttr("message", ResUtil.getStringFromRes("changePasswordSuccess",getRequest()));
+                setAttr("message", ResUtil.getStringFromRes("changePasswordSuccess", getRequest()));
                 getSession().invalidate();
             } else {
-                setAttr("message",  ResUtil.getStringFromRes("oldPasswordError",getRequest()));
+                setAttr("message", ResUtil.getStringFromRes("oldPasswordError", getRequest()));
             }
         } else {
-            setAttr("message",  ResUtil.getStringFromRes("argsError",getRequest()));
+            setAttr("message", ResUtil.getStringFromRes("argsError", getRequest()));
         }
     }
 }

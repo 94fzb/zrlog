@@ -10,10 +10,10 @@
             <div class="well">
                 <h1 class="grey lighter smaller">
                     <span class="blue bigger-125">
-                        <i class="icon-sitemap"></i>
-                        404
+                        <i class="icon-random"></i>
+                        500
                     </span>
-                    ${_res['error.pageNotPage']}
+                    Something Went Wrong
                 </h1>
 
                 <hr>

@@ -3,7 +3,7 @@
  
 <div id="comment">
 <!-- Duoshuo Comment BEGIN -->
-<div style="padding:20px;margin-bottom: 20px" class="ds-thread" data-thread-key="${log.logId}"
+<div class="ds-thread" data-thread-key="${log.logId}"
 	data-title="${log.title}"
 	data-url="${rurl}post/${log.alias}"></div>
 <script type="text/javascript">

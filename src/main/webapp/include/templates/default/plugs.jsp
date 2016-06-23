@@ -1,5 +1,6 @@
 ﻿<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+</section>
 <aside>
 	<div class="widget search">
 		<form id="searchform" action="${rurl }post/search" method="post">

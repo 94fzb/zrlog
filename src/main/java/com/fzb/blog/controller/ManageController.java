@@ -52,4 +52,11 @@ public abstract class ManageController extends BaseController {
 
     public abstract void queryAll();
 
+    public void renderNotPage() {
+        render("/admin/error/404.jsp");
+    }
+
+    public void renderInternalServerErrorPage() {
+        render("/admin/error/500.jsp");
+    }
 }

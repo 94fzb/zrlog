@@ -179,7 +179,12 @@ public class TemplateController extends ManageController {
         MyI18NInterceptor.addToRequest(PathKit.getWebRootPath() + templateName + "/language/", getRequest());
         String jsonStr = new WebSite().getValueByName(templateName + templateConfigSubfix);
         fullTemplateSetting(jsonStr);
-        render("/admin/blank.jsp");
+        File file = new File(PathKit.getWebRootPath() + templateName + "/setting/index.jsp");
+        if (file.exists()) {
+            render("/admin/blank.jsp");
+        } else {
+            renderNotPage();
+        }
     }
 
     public void setting() {

@@ -6,7 +6,7 @@
 	</p>
 
 	<p>
-		<a href="javascript:history.go(-1);"><button class="btn btn-sm btn-success">返回</button></a>
+		<a href="javascript:history.go(-1);"><button class="btn btn-sm btn-success">${_res.goBack}</button></a>
 	</p>
 </div>
 <jsp:include page="include/footer.jsp" />

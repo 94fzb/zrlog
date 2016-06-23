@@ -98,3 +98,7 @@
     </header>
   </div>
 </div>
+<div class="main clearfloat">
+<div class="breadcrumb"></div>
+<section>
+<jsp:include page="update_browser.jsp"/>

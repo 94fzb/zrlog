@@ -1,6 +1,7 @@
 package com.fzb.blog.incp;
 
 import com.fzb.blog.controller.BaseController;
+import com.fzb.blog.controller.ManageController;
 import com.fzb.blog.util.InstallUtil;
 import com.jfinal.aop.Invocation;
 import com.jfinal.aop.PrototypeInterceptor;
@@ -29,14 +30,18 @@ public class LoginInterceptor extends PrototypeInterceptor {
             ((BaseController) ai.getController()).fullTemplateSetting();
         }
         if (ai.getController().getAttr("log") != null) {
+                ai.getController().setAttr("pageLevel", 1);
             ai.getController().render(basePath + "/detail.jsp");
         } else if (ai.getController().getAttr("data") != null) {
             if (ai.getActionKey().equals("/") && new File(PathKit.getWebRootPath() + basePath + "/index.jsp").exists()) {
+                ai.getController().setAttr("pageLevel", 2);
                 ai.getController().render(basePath + "/index.jsp");
             } else {
+                ai.getController().setAttr("pageLevel", 1);
                 ai.getController().render(basePath + "/page.jsp");
             }
         } else {
+            ai.getController().setAttr("pageLevel", 2);
             ai.getController().render(basePath + "/index.jsp");
         }
     }
@@ -69,7 +74,12 @@ public class LoginInterceptor extends PrototypeInterceptor {
         if (ai.getController().getSession().getAttribute("user") != null) {
             ai.getController().setAttr("user", ai.getController().getSession().getAttribute("user"));
             getBaseTemplatePath(ai);
-            ai.invoke();
+            try {
+                ai.invoke();
+            } catch (Exception e) {
+                e.printStackTrace();
+                ((ManageController) ai.getController()).renderInternalServerErrorPage();
+            }
             // 存在消息提示
             if (ai.getController().getRequest().getAttribute("message") != null) {
                 ai.getController().render("/admin/message.jsp");
