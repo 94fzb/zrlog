@@ -19,7 +19,7 @@ public class WebSiteController extends ManageController {
             renderJson(getData());
         }
         // 更新缓存数据
-        BaseController.refreshCache();
+        cleanCache();
     }
 
     @Override

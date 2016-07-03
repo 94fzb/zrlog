@@ -12,11 +12,11 @@ public abstract class ManageController extends BaseController {
 
     private Map<String, Object> data = new HashMap<String, Object>();
 
-    protected void renderNotPage() {
+    public void renderNotPage() {
         render("/admin/error/404.jsp");
     }
 
-    protected void renderInternalServerErrorPage() {
+    public void renderInternalServerErrorPage() {
         render("/admin/error/500.jsp");
     }
 
