@@ -42,7 +42,7 @@ public class TemplateController extends ManageController {
         cookie.setMaxAge(0);
         getResponse().addCookie(cookie);
         // 更新缓存数据
-        BaseController.refreshCache();
+        cleanCache();
     }
 
     public void index() {
@@ -177,7 +177,7 @@ public class TemplateController extends ManageController {
         setAttr("template", templateName);
         setAttr("menu", "1");
         MyI18NInterceptor.addToRequest(PathKit.getWebRootPath() + templateName + "/language/", getRequest());
-        String jsonStr = new WebSite().getValueByName(templateName + templateConfigSubfix);
+        String jsonStr = new WebSite().getValueByName(templateName + templateConfigSuffix);
         fullTemplateSetting(jsonStr);
         File file = new File(PathKit.getWebRootPath() + templateName + "/setting/index.jsp");
         if (file.exists()) {
@@ -200,8 +200,8 @@ public class TemplateController extends ManageController {
                 }
             }
         }
-        new WebSite().updateByKV(template + templateConfigSubfix, new JSONSerializer().deepSerialize(settingMap));
-        refreshCache();
+        new WebSite().updateByKV(template + templateConfigSuffix, new JSONSerializer().deepSerialize(settingMap));
+        cleanCache();
         setAttr("message", "变更成功");
     }
 

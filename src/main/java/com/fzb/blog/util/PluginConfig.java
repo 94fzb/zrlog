@@ -16,7 +16,8 @@ public class PluginConfig {
     private static Process pr;
     private static boolean canStart = true;
 
-    public static int pluginServerStart(final File serverFileName, final String dbProperties, final String pluginJvmArgs) {
+    public static int pluginServerStart(final File serverFileName, final String dbProperties, final String pluginJvmArgs,
+                                        final String runtimePath, final String runTimeVersion) {
         final int randomServerPort = new Random().nextInt(10000) + 20000;
         final int randomMasterPort = randomServerPort + 20000;
         final int randomListenPort = randomServerPort + 30000;
@@ -27,8 +28,8 @@ public class PluginConfig {
                     @Override
                     public void run() {
                         while (true) {
-                            pr = CmdUtil.getProcess("java " + pluginJvmArgs + " -jar " + serverFileName.toString() + " " +
-                                    randomServerPort + " " + randomMasterPort + " " + dbProperties + " " + serverFileName.getParent() + "/jars" + " " + randomListenPort);
+                            pr = CmdUtil.getProcess("java " + pluginJvmArgs + " -jar " + serverFileName, randomServerPort,
+                                    randomMasterPort, dbProperties, serverFileName.getParent() + "/jars", randomListenPort, runtimePath, runTimeVersion);
                             if (pr != null) {
                                 printInputStreamWithThread(pr.getInputStream());
                                 printInputStreamWithThread(pr.getErrorStream());

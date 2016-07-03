@@ -25,7 +25,7 @@ public class BaseController extends Controller {
 
     private Map<String, Object> webSite;
 
-    protected String templateConfigSubfix = "_setting";
+    protected String templateConfigSuffix = "_setting";
 
     @Before({CacheInterceptor.class})
     @CacheName("/post/initData")
@@ -92,10 +92,6 @@ public class BaseController extends Controller {
         return null;
     }
 
-    public static void refreshCache() {
-        CacheKit.remove("/post/initData", "initData");
-    }
-
     public boolean isNotNullOrNotEmptyStr(Object... args) {
         for (Object arg : args) {
             if (arg == null || "".equals(arg)) {
@@ -136,7 +132,7 @@ public class BaseController extends Controller {
     }
 
     public void fullTemplateSetting() {
-        Object jsonStr = webSite.get(getTemplatePath() + templateConfigSubfix);
+        Object jsonStr = webSite.get(getTemplatePath() + templateConfigSuffix);
         fullTemplateSetting(jsonStr);
     }
 

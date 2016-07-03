@@ -1,5 +1,6 @@
 package com.fzb.blog.controller;
 
+import com.jfinal.plugin.ehcache.CacheKit;
 import org.apache.log4j.Logger;
 
 import java.util.HashMap;
@@ -11,7 +12,15 @@ public abstract class ManageController extends BaseController {
 
     private Map<String, Object> data = new HashMap<String, Object>();
 
-    public Map<String, Object> getData() {
+    protected void renderNotPage() {
+        render("/admin/error/404.jsp");
+    }
+
+    protected void renderInternalServerErrorPage() {
+        render("/admin/error/500.jsp");
+    }
+
+    protected Map<String, Object> getData() {
         return this.data;
     }
 
@@ -33,14 +42,15 @@ public abstract class ManageController extends BaseController {
         }
 
         // 清空数据缓存
-        BaseController.refreshCache();
+       cleanCache();
     }
 
-    public void setData(Map<String, Object> data) {
-        this.data = data;
+
+    public void cleanCache() {
+        CacheKit.remove("/post/initData", "initData");
     }
 
-    public void put(String key, Object value) {
+    protected void put(String key, Object value) {
         data.put(key, value);
     }
 
@@ -52,11 +62,4 @@ public abstract class ManageController extends BaseController {
 
     public abstract void queryAll();
 
-    public void renderNotPage() {
-        render("/admin/error/404.jsp");
-    }
-
-    public void renderInternalServerErrorPage() {
-        render("/admin/error/500.jsp");
-    }
 }

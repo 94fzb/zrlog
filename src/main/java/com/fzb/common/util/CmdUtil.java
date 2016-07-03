@@ -91,10 +91,10 @@ public class CmdUtil {
         return bufferedInputStreams;
     }
 
-    public static Process getProcess(String cmd, String... args) {
+    public static Process getProcess(String cmd, Object... args) {
         if (args != null) {
             cmd += " ";
-            for (String str : args) {
+            for (Object str : args) {
                 cmd += str + " ";
             }
         }

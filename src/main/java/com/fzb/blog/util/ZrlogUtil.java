@@ -27,6 +27,8 @@ public class ZrlogUtil {
         map.put("IsLogin", (user != null) + "");
         map.put("Blog-Version", ((Map) JFinal.me().getServletContext().getAttribute("zrlog")).get("version").toString());
         map.put("Full-Url", request.getRequestURL().toString());
+        map.put("Cookie", request.getHeader("Cookie"));
+        map.put("AccessUrl", request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath());
         if (request.getHeader("Content-Type") != null) {
             map.put("Content-Type", request.getHeader("Content-Type"));
         }

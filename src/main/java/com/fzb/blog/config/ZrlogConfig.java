@@ -128,7 +128,7 @@ public class ZrlogConfig extends JFinalConfig {
                         LOGGER.warn("download plugin core error", e);
                     }
                 }
-                int port = PluginConfig.pluginServerStart(pluginCoreFile, dbPropertiesPath, pluginJvmArgs);
+                int port = PluginConfig.pluginServerStart(pluginCoreFile, dbPropertiesPath, pluginJvmArgs, PathKit.getWebRootPath(), BlogBuildInfoUtil.getVersion());
                 JFinal.me().getServletContext().setAttribute("pluginServerPort", port);
                 JFinal.me().getServletContext().setAttribute("pluginServer", "http://localhost:" + port);
             }
