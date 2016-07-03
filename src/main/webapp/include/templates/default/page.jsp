@@ -20,7 +20,7 @@
   <div class="content"><p>${log.digest}</p></div>
 	  <div class="meta">
 	  <p class="category"><a rel="tag" href="${rurl}post/sort/${log.typeAlias}">${log.typeName}</a> </p>
-	  <p class="published">/<time datetime="${log.releaseTime}">&nbsp;${log.releaseTime.year+1900}${_res.year}${log.releaseTime.month+1}${_res.month}${log.releaseTime.date}${_res.day}</time></p>
+	  <p class="published">/<time datetime="${log.releaseTime}">&nbsp;${log.releaseTime.year+1900}-${log.releaseTime.month+1}-${log.releaseTime.date}</time></p>
 	  <p class="commentlink"><a href="${rurl}post/${log.alias}#comment" class="comments_invite">${_res.commentView} [${log.commentSize}]</a></p>
   </div>
 </article>

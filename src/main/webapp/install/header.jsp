@@ -16,7 +16,6 @@
 <link href="${basePath}assets/css/bootstrap.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="${basePath}assets/css/font-awesome.min.css" />
 <link rel="stylesheet" href="${basePath}assets/css/ace.min.css" />
-<link rel="stylesheet" href="${basePath}assets/css/ace-rtl.min.css" />
 </head>
 
 <body>

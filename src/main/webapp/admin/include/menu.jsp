@@ -135,7 +135,7 @@ if(request.getAttribute("suburl")==null){
 							<a data-toggle="dropdown" href="#" class="dropdown-toggle">
 								<img class="nav-user-photo" src="${session.user.header}" alt="${session.user.userName}" />
 								<span class="user-info">
-									<small>管理员</small>${session.user.userName}
+									<small>${_res['admin.manager']}</small>${session.user.userName}
 								</span>
 								<i class="icon-caret-down"></i>
 							</a>
@@ -143,13 +143,13 @@ if(request.getAttribute("suburl")==null){
 								<li>
 									<a href="admin/user">
 										<i class="icon-user"></i>
-										个人资料
+										${_res['admin.user.info']}
 									</a>
 								</li>
 								<li>
 									<a href="admin/change_password">
 										<i class="icon-key"></i>
-										更改密码
+										${_res['admin.changePwd']}
 									</a>
 								</li>
 								<li class="divider"></li>
@@ -172,7 +172,7 @@ if(request.getAttribute("suburl")==null){
 								<li>
 									<a href="admin/logout">
 										<i class="icon-off"></i>
-										退出
+										${_res['admin.user.logout']}
 									</a>
 								</li>
 							</ul>
@@ -199,7 +199,7 @@ if(request.getAttribute("suburl")==null){
 						<li <c:if test="${'edit.jsp'==suburl}">class="active"</c:if>>
 							<a href="admin/edit">
 								<i class="icon-edit"></i>
-								<span class="menu-text"> 文章撰写 </span>
+								<span class="menu-text">${_res['admin.log.edit']} </span>
 							</a>
 						</li>
 						<li <c:if test="${'log.jsp'==suburl}">class="active"</c:if>>
@@ -212,19 +212,19 @@ if(request.getAttribute("suburl")==null){
 						<li <c:if test="${'comment.jsp'==suburl}">class="active"</c:if>>
 							<a href="admin/comment" class="dropdown-toggle">
 								<i class="icon-comment"></i>
-								<span class="menu-text"> 评论管理 </span>
+								<span class="menu-text">${_res['admin.comment.manage']}</span>
 							</a>
 						</li>
 						<li <c:if test="${'plugin.jsp'==suburl or 'plugin_center.jsp'==suburl}">class="active"</c:if>>
 							<a href="admin/plugin" class="dropdown-toggle">
 								<i class="icon-plug"></i>
-								<span class="menu-text"> 插件 </span>
+								<span class="menu-text"> ${_res['admin.plugin.manage']} </span>
 							</a>
 						</li>
 						<li <c:if test="${'website.jsp'==suburl or 'user.jsp'==suburl or 'template.jsp'==suburl or 'template_center.jsp'==suburl}">class="active open"</c:if>>
 							<a href="#" class="dropdown-toggle">
 								<i class="icon-cogs"></i>
-								<span class="menu-text"> 设置  </span>
+								<span class="menu-text">${_res['admin.setting']}</span>
 
 								<b class="arrow icon-angle-down"></b>
 							</a>
@@ -233,19 +233,19 @@ if(request.getAttribute("suburl")==null){
 								<li <c:if test="${'user.jsp'==suburl}">class="active"</c:if>>
 									<a href="admin/user" <c:if test="${'user.jsp'==suburl}">class="active"</c:if>>
 										<i class="icon-double-angle-right"></i>
-										<span class="menu-text">个人信息</span>
+										<span class="menu-text">${_res['admin.user.info']}</span>
 									</a>
 								</li>
 								<li <c:if test="${'website.jsp'==suburl}">class="active"</c:if>>
 									<a href="admin/website" <c:if test="${'website.jsp'==suburl}">class="active"</c:if>>
 										<i class="icon-double-angle-right"></i>
-										<span class="menu-text">网站设置</span>
+										<span class="menu-text">${_res['admin.website.manage']}</span>
 									</a>
 								</li>
 								<li <c:if test="${'template.jsp'==suburl or 'template_center.jsp'==suburl}">class="active"</c:if>>
 									<a href="admin/template" <c:if test="${'template.jsp'==suburl}">class="active"</c:if>>
 										<i class="icon-double-angle-right"></i>
-										<span class="menu-text">主题设置</span>
+										<span class="menu-text">${_res['admin.template.manage']}</span>
 									</a>
 								</li>
 							</ul>
@@ -254,7 +254,7 @@ if(request.getAttribute("suburl")==null){
 							<a href="#" class="dropdown-toggle">
 								<i class="icon-list"></i>
 								<span class="menu-text">
-									更多
+									${_res['admin.more']}
 								</span>
 								<b class="arrow icon-angle-down"></b>
 							</a>
@@ -262,25 +262,25 @@ if(request.getAttribute("suburl")==null){
 								<li  <c:if test="${'type.jsp'==suburl}">class="active"</c:if>>
 									<a href="admin/type"  class="dropdown-toggle">
 										<i class="icon-double-angle-right"></i>
-										<span class="menu-text">分类管理</span>
+										<span class="menu-text">${_res['admin.type.manage']}</span>
 									</a>
 								</li>
 								<li  <c:if test="${'tag.jsp'==suburl}">class="active"</c:if>>
 									<a href="admin/tag"  class="dropdown-toggle">
 										<i class="icon-double-angle-right"></i>
-										<span class="menu-text">查看标签</span>
+										<span class="menu-text">${_res['admin.tag.manage']}</span>
 									</a>
 								</li>
 								<li <c:if test="${'link.jsp'==suburl}">class="active"</c:if>>
 									<a href="admin/link" class="dropdown-toggle">
 										<i class="icon-double-angle-right"></i>
-										<span class="menu-text"> 链接管理 </span>
+										<span class="menu-text">${_res['admin.link.manage']}</span>
 									</a>
 								</li>
 								<li <c:if test="${'nav.jsp'==suburl}">class="active"</c:if>>
 									<a href="admin/nav" class="dropdown-toggle">
 										<i class="icon-double-angle-right"></i>
-										<span class="menu-text"> 导航栏管理 </span>
+										<span class="menu-text"> ${_res['admin.nav.manage']}</span>
 									</a>
 								</li>
 							</ul>
