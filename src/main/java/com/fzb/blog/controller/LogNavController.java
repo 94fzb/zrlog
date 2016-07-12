@@ -6,7 +6,7 @@ public class LogNavController extends ManageController {
     public void delete() {
         String[] ids = getPara("id").split(",");
         for (String id : ids) {
-            LogNav.dao.deleteById(getPara(id));
+            LogNav.dao.deleteById(id);
         }
     }
 
