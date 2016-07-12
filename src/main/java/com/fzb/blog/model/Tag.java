@@ -11,7 +11,7 @@ public class Tag extends Model<Tag> {
     public static final Tag dao = new Tag();
 
     public List<Tag> queryAll() {
-            return find("select tagid as id,text,count from tag");
+        return find("select tagid as id,text,count from tag");
     }
 
     private Set<String> strToSet(String str) {
@@ -26,21 +26,20 @@ public class Tag extends Model<Tag> {
         if (nowTagStr.equals(oldTagStr)) {
             return true;
         }
-        String[] old = oldTagStr.split(",");
-        String[] nstr = nowTagStr.split(",");
+        String[] oldArr = oldTagStr.split(",");
+        String[] nowArr = nowTagStr.split(",");
         Set<String> addSet = new HashSet<String>();
         Set<String> deleteSet = new HashSet<String>();
-        for (String oset : nstr) {
-            addSet.add(oset);
+        for (String str : nowArr) {
+            addSet.add(str.trim());
         }
-        for (String oset : old) {
-            if (!addSet.contains(oset)) {
-                deleteSet.add(oset);
+        for (String str : oldArr) {
+            if (!addSet.contains(str)) {
+                deleteSet.add(str.trim());
             } else {
-                addSet.remove(oset);
+                addSet.remove(str);
             }
         }
-
         insertTag(addSet);
         deleteTag(deleteSet);
 
@@ -51,7 +50,7 @@ public class Tag extends Model<Tag> {
         return insertTag(strToSet(now));
     }
 
-    public boolean insertTag(Set<String> now) {
+    private boolean insertTag(Set<String> now) {
         for (String add : now) {
             Tag t = dao.findFirst("select * from tag where text=?", add);
             if (t == null) {
@@ -67,7 +66,7 @@ public class Tag extends Model<Tag> {
         return deleteTag(strToSet(old));
     }
 
-    public boolean deleteTag(Set<String> old) {
+    private boolean deleteTag(Set<String> old) {
         for (String del : old) {
             Tag t = dao.findFirst("select * from tag where text=?", del);
             if (t != null) {
@@ -101,10 +100,6 @@ public class Tag extends Model<Tag> {
         }
     }
 
-    public static void main(String[] args) {
-        new Tag().update("java", "C#");
-    }
-
     public Map<String, Object> queryAll(Integer page, Integer pageSize) {
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("rows", find("select tagid as id,text,count from tag limit ?,?", ParseTools.getFirstRecord(page, pageSize), pageSize));
@@ -122,4 +117,9 @@ public class Tag extends Model<Tag> {
             data.clear();
         }
     }
+
+    public static void main(String[] args) {
+        new Tag().update("java,java ", "C#,C# ");
+    }
+
 }
