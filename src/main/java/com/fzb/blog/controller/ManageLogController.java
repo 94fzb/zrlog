@@ -158,7 +158,7 @@ public class ManageLogController extends ManageController {
 
     @Override
     public void queryAll() {
-        renderJson(Log.dao.queryAll(getParaToInt("page"), getParaToInt("rows"), convertRequestParam(getPara("keywords"))));
+        renderJson(Log.dao.queryAll(getParaToInt("page"), getParaToInt("rows"), convertRequestParam(getPara("keywords")),getPara("sord"),getPara("sidx")));
     }
 
     private Log getLog() {

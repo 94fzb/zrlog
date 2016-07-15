@@ -18,9 +18,9 @@ jQuery(function($) {
                 }
             },
             {name:'id',index:'id', width:60, sorttype:"int", editable: false},
-            {name:'typeName',index:'typeName',width:150, sortable:false,editable: true,edittype:"textarea", editoptions:{rows:"2",cols:"20"}},
+            {name:'typeName',index:'typeName',width:150, sortable:false,editable: true},
             {name:'alias',index:'alias', width:150,editable: true,editoptions:{size:"20",maxlength:"30"}},
-            {name:'remark',index:'remark', width:70, editable: true},
+            {name:'remark',index:'remark', width:150, editable: true,edittype:"textarea", editoptions:{rows:"3",cols:"20"}},
 
         ],
 

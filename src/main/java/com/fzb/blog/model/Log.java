@@ -65,7 +65,7 @@ public class Log extends Model<Log> implements Serializable {
         return null;
     }
 
-    public Log getLastLog(int id,String notFoundDesc) {
+    public Log getLastLog(int id, String notFoundDesc) {
         String lastLogSql = "select l.alias as alias,l.title as title from log l where rubbish=? and private=? and l.logId<? order by logId desc";
         Log log = findFirst(lastLogSql,
                 rubbish, pre, id);
@@ -76,7 +76,7 @@ public class Log extends Model<Log> implements Serializable {
         return log;
     }
 
-    public Log getNextLog(int id,String notFoundDesc) {
+    public Log getNextLog(int id, String notFoundDesc) {
         String nextLogSql = "select l.alias as alias,l.title as title from log l where rubbish=? and private=? and l.logId>?";
         Log log = findFirst(nextLogSql,
                 rubbish, pre, id);
@@ -110,13 +110,20 @@ public class Log extends Model<Log> implements Serializable {
         return data;
     }
 
-    public Map<String, Object> queryAll(int page, int pageSize, String keywords) {
+    public Map<String, Object> queryAll(int page, int pageSize, String keywords, String sort, String field) {
         Map<String, Object> data = new HashMap<String, Object>();
         String searchKeywords = "";
         if (keywords != null && !"".equals(keywords)) {
             searchKeywords = " and (l.title like '%" + keywords + "%' or l.content like '%" + keywords + "%' or l.keywords like '%" + keywords + "%')";
         }
-        String sql = "select l.*,t.typeName,l.logId as id,t.alias as typeAlias,u.userName,(select count(commentId) from comment where logId=l.logId ) commentSize from log l inner join user u inner join type t where u.userId=l.userId" + searchKeywords + " and t.typeid=l.typeid order by l.logId desc limit ?,?";
+        String pageSort = "l.logId desc";
+        if (sort != null && !"".equals(sort) && field != null && !"".equals(field)) {
+            if ("id".equals(field)) {
+                field = "logId";
+            }
+            pageSort = "l." + field + " " + sort;
+        }
+        String sql = "select l.*,t.typeName,l.logId as id,t.alias as typeAlias,u.userName,(select count(commentId) from comment where logId=l.logId ) commentSize from log l inner join user u inner join type t where u.userId=l.userId" + searchKeywords + " and t.typeid=l.typeid order by " + pageSort + " limit ?,?";
         data.put(
                 "rows",
                 find(sql,

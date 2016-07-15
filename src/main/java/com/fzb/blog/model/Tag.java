@@ -17,7 +17,9 @@ public class Tag extends Model<Tag> {
     private Set<String> strToSet(String str) {
         Set<String> tags = new HashSet<String>();
         for (String tag : str.split(",")) {
-            tags.add(tag);
+            if (tag.trim().length() > 0) {
+                tags.add(tag.trim());
+            }
         }
         return tags;
     }
@@ -85,8 +87,8 @@ public class Tag extends Model<Tag> {
         Map<String, Integer> countMap = new HashMap<String, Integer>();
         List<Log> logs = Log.dao.find("select * from log where rubbish=? and private=? ", false, false);
         for (Log log : logs) {
-            String st = log.getStr("keywords") + ",";
-            for (String tag : st.split(",")) {
+            Set<String> tagSet = strToSet(log.getStr("keywords") + ",");
+            for (String tag : tagSet) {
                 if (countMap.get(tag) != null) {
                     countMap.put(tag, countMap.get(tag) + 1);
                 } else {

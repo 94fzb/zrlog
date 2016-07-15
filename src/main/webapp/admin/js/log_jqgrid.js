@@ -1,5 +1,5 @@
 var jqGrid;
-function open2(id,catalog,title){
+function openEditModal(id,catalog,title){
     var options = {
         "url":"admin/log/editFrame?logId="+id,
         "title":decodeURI(title),
@@ -39,7 +39,7 @@ jQuery(function($) {
             {name:'click',index:'click', width:60, editable: false},
             {name:'rubbish',index:'rubbish', width:50, editable: false,formatter:renderRubbish},
             {name:'private',index:'private', width:50, editable: false,formatter:renderPrivate},
-            {name:'logId',width:50,index:'logId',formatter:viewLog},
+            {name:'logId',width:50,index:'logId',sortable:false,formatter:viewLog},
         ],
         viewrecords : true,
         rowNum:10,
@@ -73,7 +73,7 @@ jQuery(function($) {
     //enable search/filter toolbar
     //jQuery(grid_selector).jqGrid('filterToolbar',{defaultSearch:true,stringResult:true})
     function imageFormat( cellvalue, options, rowObject ){
-        return '<div><div id="jEditButton_2" class="ui-pg-div ui-inline-edit" onmouseout="jQuery(this).removeClass(\'ui-state-hover\')" onmouseover="jQuery(this).addClass(\'ui-state-hover\');" onclick="open2('+rowObject.logId+',\''+rowObject.catalog+'\',\''+rowObject.title.replace("'","")+'\');" style="float: left; cursor: pointer; display: block;" title="" data-original-title="编辑所选记录"><span class="ui-icon ui-icon-pencil"></span></div></div>'
+        return '<div><div id="jEditButton_2" class="ui-pg-div ui-inline-edit" onmouseout="jQuery(this).removeClass(\'ui-state-hover\')" onmouseover="jQuery(this).addClass(\'ui-state-hover\');" onclick="openEditModal('+rowObject.logId+',\''+rowObject.catalog+'\',\''+rowObject.title.replace("'","")+'\');" style="float: left; cursor: pointer; display: block;" title="" data-original-title="编辑所选记录"><span class="ui-icon ui-icon-pencil"></span></div></div>'
     }
     function viewLog( cellvalue, options, rowObject ){
         return '<a target="_blank" href="admin/log/preview?logId='+rowObject.logId+'"><div id="jEditButton_2" class="ui-pg-div ui-inline-edit" onmouseout="jQuery(this).removeClass(\'ui-state-hover\')" onmouseover="jQuery(this).addClass(\'ui-state-hover\');" style="float: left; cursor: pointer; display: block;" title="" data-original-title="浏览  '+rowObject.title+'"><span class="ui-icon icon-zoom-in blue"></span></div></a>'

@@ -13,13 +13,13 @@ jQuery(function($) {
                 formatoptions:{
                     keys:true,
                     delbutton: true,
-                    delOptions: {recreateForm: true, beforeShowForm:beforeDeleteCallback, url: 'admin/link/delete' }
+                    delOptions: {recreateForm: true, beforeShowForm:beforeDeleteCallback}
                     //delOptions:{recreateForm: true, beforeShowForm:beforeDeleteCallback},
                     //editformbutton:true, editOptions:{recreateForm: true, beforeShowForm:beforeEditCallback}
                 }
             },
             {name:'id',index:'id', width:60, sorttype:"int", editable: false},
-            {name:'url',index:'url',width:150, sortable:false,editable: true,edittype:"textarea", editoptions:{rows:"2",cols:"20"}},
+            {name:'url',index:'url',width:150, sortable:false,editable: true,edittype:"textarea", editoptions:{rows:"3",cols:"20"}},
             {name:'linkName',index:'linkName', width:150,editable: true,editoptions:{size:"20",maxlength:"30"}},
             {name:'alt',index:'alt', width:150,editable: true,editoptions:{size:"20",maxlength:"30"}},
             {name:'sort',index:'sort', width:70, editable: true},
