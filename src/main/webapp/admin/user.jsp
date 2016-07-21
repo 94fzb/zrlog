@@ -6,8 +6,8 @@
 	$(document).ready(function() {
 		$('#id-input-file-1').ace_file_input({
 			no_file : '${session.user.header}',
-			btn_choose : '文件',
-			btn_change : '选择',
+			btn_choose : '本地上传',
+			btn_change : '文件',
 			droppable : false,
 			onchange : null,
 			thumbnail : true
@@ -38,7 +38,7 @@
 	<input type="hidden" id="logo" name="header" value="${user.header }">
 	<div class="form-group">
 		<label for="form-field-1"
-			class="col-sm-3 control-label no-padding-right"> 登陆用户名 </label>
+			class="col-sm-3 control-label no-padding-right"> ${_res.userName} </label>
 
 		<div class="col-sm-9">
 			<input type="text" name="userName" value="${user.userName }"
