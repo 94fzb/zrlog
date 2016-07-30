@@ -42,7 +42,7 @@
 	<div class="tab-content">
 		<div class="tab-pane in active" id="basic" style="padding: 10px">
 			<h4 class="header blue">认真输入，有助于网站被收录</h4>
-			<form role="form" class="form-horizontal" id="ajaxbaseMsg">
+			<form role="form" class="form-horizontal" id="baseMsgAjax">
 				<input type="hidden" id="logo" name="logo" value="${webs.logo }">
 				<div class="form-group">
 					<label for="form-field-1"
@@ -112,7 +112,7 @@
 		</div>
 		<div class="tab-pane" id="other" style="padding: 10px">
 			<h4 class="header blue">ICP,网站统计等信息</h4>
-			<form role="form" class="form-horizontal" checkBox="pseudo_staticStatus" id="ajaxotherMsg">
+			<form role="form" class="form-horizontal" checkBox="pseudo_staticStatus" id="otherMsgAjax">
 				<div class="form-group">
 					<label for="form-field-1"
 						class="col-sm-3 control-label no-padding-right"> ICP备案信息 </label>
@@ -168,7 +168,7 @@
 			</iframe>
 		</div>
 		<div class="tab-pane" id="blackList-tab" style="padding: 10px">
-			<form role="form" class="form-horizontal" id="ajaxblackList">
+			<form role="form" class="form-horizontal" id="blackListAjax">
 				<h4 class="header blue">IP 黑名单</h4>
 				<div class="form-group">
 					<label for="form-field-1"

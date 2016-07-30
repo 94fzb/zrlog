@@ -12,11 +12,11 @@ import java.util.List;
 import java.util.Map;
 
 public class Log extends Model<Log> implements Serializable {
+    public static final Log dao = new Log();
     /**
      *
      */
     private static final long serialVersionUID = 1L;
-    public static final Log dao = new Log();
     private boolean pre;
     private boolean rubbish;
 
@@ -157,7 +157,7 @@ public class Log extends Model<Log> implements Serializable {
 
     private void fillData(int page, int pageSize, String where,
                           Map<String, Object> data, Object[] obj) {
-        if (((List<Log>) data.get("rows")).size() > 0) {
+        if (((List) data.get("rows")).size() > 0) {
             data.put("page", page);
             long count = findFirst("select count(l.logId) cnt " + where,
                     obj).getLong("cnt");
@@ -181,7 +181,6 @@ public class Log extends Model<Log> implements Serializable {
 
     public Map<String, Object> getLogsByTag(int page, int pageSize, String tag) {
         Map<String, Object> data = new HashMap<String, Object>();
-        // FIXME too many like
         String sql = "select l.*,t.typeName,t.alias  as typeAlias,(select count(commentId) from comment where logId=l.logId) commentSize,u.userName from log l inner join user u,type t where rubbish=? and private=? and u.userId=l.userId and t.typeId=l.typeId and (l.keywords like ? or l.keywords like ? or l.keywords like ? or l.keywords= ?) order by l.logId desc limit ?,?";
         data.put(
                 "rows",

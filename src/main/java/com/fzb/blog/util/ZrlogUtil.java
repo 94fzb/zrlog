@@ -32,10 +32,6 @@ public class ZrlogUtil {
         if (request.getHeader("Content-Type") != null) {
             map.put("Content-Type", request.getHeader("Content-Type"));
         }
-        /*while (request.getHeaderNames().hasMoreElements()) {
-            String key = request.getHeaderNames().nextElement().toString();
-            map.put(key, request.getHeader(key));
-        }*/
         return map;
     }
 }

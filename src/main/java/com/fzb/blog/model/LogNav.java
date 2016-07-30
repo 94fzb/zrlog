@@ -39,7 +39,7 @@ public class LogNav extends Model<LogNav> {
 
     private void fillData(int page, int pageSize, String where,
                           Map<String, Object> data, Object[] obj) {
-        if (((List<Link>) data.get("rows")).size() > 0) {
+        if (((List) data.get("rows")).size() > 0) {
             data.put("page", page);
             long count = findFirst("select count(1) cnt " + where,
                     obj).getLong("cnt");

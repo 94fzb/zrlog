@@ -1,7 +1,6 @@
 package com.fzb.common.util.http.handle;
 
 import com.fzb.common.util.IOUtil;
-import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 
@@ -20,6 +19,11 @@ public class HttpFileHandle extends HttpHandle<File> {
 
     public HttpFileHandle(String filePath) {
         this.filePath = filePath;
+    }
+
+    private static String randomFile() {
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
+        return df.format(new Date()) + "_" + (new Random()).nextInt(1000);
     }
 
     @Override
@@ -57,10 +61,5 @@ public class HttpFileHandle extends HttpHandle<File> {
             e.printStackTrace();
         }
         return false;
-    }
-
-    private static String randomFile() {
-        SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
-        return df.format(new Date()) + "_" + (new Random()).nextInt(1000);
     }
 }

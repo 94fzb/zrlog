@@ -10,6 +10,10 @@ import java.util.Map.Entry;
 public class Tag extends Model<Tag> {
     public static final Tag dao = new Tag();
 
+    public static void main(String[] args) {
+        new Tag().update("java,java ", "C#,C# ");
+    }
+
     public List<Tag> queryAll() {
         return find("select tagid as id,text,count from tag");
     }
@@ -110,7 +114,7 @@ public class Tag extends Model<Tag> {
     }
 
     private void fillData(int page, int pageSize, String where, Map<String, Object> data, Object[] obj) {
-        if (((List<Link>) data.get("rows")).size() > 0) {
+        if (((List) data.get("rows")).size() > 0) {
             data.put("page", page);
             long count = findFirst("select count(1) cnt " + where, obj).getLong("cnt");
             data.put("total", ParseTools.getTotalPate(count, pageSize));
@@ -118,10 +122,6 @@ public class Tag extends Model<Tag> {
         } else {
             data.clear();
         }
-    }
-
-    public static void main(String[] args) {
-        new Tag().update("java,java ", "C#,C# ");
     }
 
 }

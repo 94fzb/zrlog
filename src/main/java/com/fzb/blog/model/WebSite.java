@@ -30,10 +30,10 @@ public class WebSite extends Model<WebSite> {
     }
 
     public String getValueByName(String name) {
-        WebSite webSite  = findFirst("select value from website where name=?", name);
-	if(webSite !=null){
-	   return webSite.get("value");
-	}
-	return "";
+        WebSite webSite = findFirst("select value from website where name=?", name);
+        if (webSite != null) {
+            return webSite.get("value");
+        }
+        return "";
     }
 }

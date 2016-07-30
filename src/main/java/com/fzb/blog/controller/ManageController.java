@@ -42,7 +42,7 @@ public abstract class ManageController extends BaseController {
         }
 
         // 清空数据缓存
-       cleanCache();
+        cleanCache();
     }
 
 

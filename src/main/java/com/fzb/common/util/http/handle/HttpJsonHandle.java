@@ -2,7 +2,6 @@ package com.fzb.common.util.http.handle;
 
 import com.fzb.common.util.IOUtil;
 import flexjson.JSONDeserializer;
-import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 

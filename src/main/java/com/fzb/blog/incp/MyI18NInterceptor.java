@@ -16,9 +16,8 @@ import java.util.*;
 
 public class MyI18NInterceptor extends PrototypeInterceptor {
 
-    private static final String I18N_FILE_NAME = "_i18nFileName";
     public static final String I18N = "i18n";
-
+    private static final String I18N_FILE_NAME = "_i18nFileName";
     private static final Logger LOGGER = LoggerFactory.getLogger(InitDataInterceptor.class);
     private static final Map<String, Map<String, Object>> I18N_RES_MAP = new HashMap<String, Map<String, Object>>();
     private static final Set<String> loadSet = new HashSet<String>();

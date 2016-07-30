@@ -25,14 +25,11 @@ public class Link extends Model<Link> {
         return data;
     }
 
-    private void fillData(int page, int pageSize, String where,
-                          Map<String, Object> data, Object[] obj) {
-        if (((List<Link>) data.get("rows")).size() > 0) {
+    private void fillData(int page, int pageSize, String where, Map<String, Object> data, Object[] obj) {
+        if (((List) data.get("rows")).size() > 0) {
             data.put("page", page);
-            long count = findFirst("select count(1) cnt " + where, obj)
-                    .getLong("cnt");
-            data.put("total",
-                    ParseTools.getTotalPate(count, pageSize));
+            long count = findFirst("select count(1) cnt " + where, obj).getLong("cnt");
+            data.put("total", ParseTools.getTotalPate(count, pageSize));
             data.put("records", count);
         } else {
             data.clear();

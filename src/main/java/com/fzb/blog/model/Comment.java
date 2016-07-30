@@ -11,14 +11,14 @@ import java.util.List;
 import java.util.Map;
 
 public class Comment extends Model<Comment> {
+    public static final Comment dao = new Comment();
     /**
      *
      */
     private static final long serialVersionUID = 1L;
-    public static final Comment dao = new Comment();
 
     public Map<String, Object> getCommentsByPage(int page, int pageSize) {
-        Map<String, Object> data = new HashMap();
+        Map<String, Object> data = new HashMap<String, Object>();
         String sql = "select commentId as id,userComment,header,userMail,userHome,userIp,userName,hide,logId from comment order by commentId desc limit ?,?";
         data.put(
                 "rows",
@@ -40,7 +40,7 @@ public class Comment extends Model<Comment> {
     }
 
     public Map<String, Object> noRead(int page, int pageSize) {
-        Map<String, Object> data = new HashMap();
+        Map<String, Object> data = new HashMap<String, Object>();
         String sql = "select commentId as id,userComment,header,userMail,userHome,userIp,userName,hide,logId from comment order by commentId desc limit ?,?";
         data.put(
                 "rows",
@@ -51,10 +51,9 @@ public class Comment extends Model<Comment> {
         return data;
     }
 
-    @SuppressWarnings("unchecked")
     private void fillData(int page, int pageSize, String where,
                           Map<String, Object> data, Object[] obj) {
-        if (((List<Comment>) data.get("rows")).size() > 0) {
+        if (((List) data.get("rows")).size() > 0) {
             data.put("page", page);
             long count = findFirst("select count(commentId) cnt "
                     + where, obj).getLong("cnt");

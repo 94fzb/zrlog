@@ -8,9 +8,9 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 public abstract class HttpHandle<T> {
-    private T t;
     protected HttpRequest request;
     protected HttpResponse response;
+    private T t;
 
     public Class<T> getClazz() {
         Type sType = getClass().getGenericSuperclass();
@@ -30,6 +30,7 @@ public abstract class HttpHandle<T> {
 
     /**
      * 处理各种Http响应信息
+     *
      * @param request
      * @param response
      * @return 根据返回值确定是否关闭流

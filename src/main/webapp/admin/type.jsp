@@ -18,7 +18,7 @@
 			查看所有
 		</small>
 	</h1>
-</div><!-- /.page-header -->
+</div>
 <div class="row">
 	<div class="col-xs-12">
 		<!-- PAGE CONTENT BEGINS -->

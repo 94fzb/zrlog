@@ -1,6 +1,10 @@
 package com.fzb.blog.controller;
 
 import com.fzb.blog.model.WebSite;
+import com.fzb.blog.plugin.UpdateVersionPlugin;
+import com.jfinal.config.Plugins;
+import com.jfinal.core.JFinal;
+import com.jfinal.plugin.IPlugin;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -20,6 +24,24 @@ public class WebSiteController extends ManageController {
         }
         // 更新缓存数据
         cleanCache();
+    }
+
+    public void upgrade() {
+        update();
+        Plugins plugins = (Plugins) JFinal.me().getServletContext().getAttribute("plugins");
+        if (getParaToInt("autoUpgradeVersion") == -1) {
+            for (IPlugin plugin : plugins.getPluginList()) {
+                if (plugin instanceof UpdateVersionPlugin) {
+                    plugin.stop();
+                }
+            }
+        } else {
+            for (IPlugin plugin : plugins.getPluginList()) {
+                if (plugin instanceof UpdateVersionPlugin) {
+                    plugin.start();
+                }
+            }
+        }
     }
 
     @Override

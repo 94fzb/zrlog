@@ -19,8 +19,7 @@ public class LinkController extends ManageController {
     }
 
     public void queryAll() {
-        renderJson(Link.dao
-                .queryAll(getParaToInt("page"), getParaToInt("rows")));
+        renderJson(Link.dao.queryAll(getParaToInt("page"), getParaToInt("rows")));
     }
 
     public void add() {

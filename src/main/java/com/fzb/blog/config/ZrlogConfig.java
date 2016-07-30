@@ -9,9 +9,9 @@ import com.fzb.blog.incp.LoginInterceptor;
 import com.fzb.blog.incp.MyI18NInterceptor;
 import com.fzb.blog.model.*;
 import com.fzb.blog.plugin.UpdateVersionPlugin;
-import com.fzb.blog.util.PluginConfig;
 import com.fzb.blog.util.BlogBuildInfoUtil;
 import com.fzb.blog.util.InstallUtil;
+import com.fzb.blog.util.PluginConfig;
 import com.fzb.common.util.http.HttpUtil;
 import com.fzb.common.util.http.handle.HttpFileHandle;
 import com.jfinal.config.*;
@@ -49,6 +49,50 @@ public class ZrlogConfig extends JFinalConfig {
         } catch (IOException e) {
             LOGGER.error("load systemProperties error", e);
         }
+    }
+
+    private static void runBlogPlugin(final String dbPropertiesPath, final String pluginJvmArgs) {
+        new Thread() {
+            @Override
+            public void run() {
+                //加载 zrlog 提供的插件
+                File pluginCoreFile = new File(PathKit.getWebRootPath() + "/WEB-INF/plugins/plugin-core.jar");
+                if (!pluginCoreFile.exists()) {
+                    pluginCoreFile.getParentFile().mkdirs();
+                    String filePath = pluginCoreFile.getParentFile().toString();
+                    try {
+                        LOGGER.info("plugin-core.jar not exists will download from " + PLUGIN_CORE_DOWNLOAD_URL);
+                        HttpUtil.sendGetRequest(PLUGIN_CORE_DOWNLOAD_URL, new HashMap<String, String[]>(), new HttpFileHandle(filePath), new HashMap<String, String>());
+                    } catch (IOException e) {
+                        LOGGER.warn("download plugin core error", e);
+                    }
+                }
+                int port = PluginConfig.pluginServerStart(pluginCoreFile, dbPropertiesPath, pluginJvmArgs, PathKit.getWebRootPath(), BlogBuildInfoUtil.getVersion());
+                JFinal.me().getServletContext().setAttribute("pluginServerPort", port);
+                JFinal.me().getServletContext().setAttribute("pluginServer", "http://localhost:" + port);
+            }
+        }.start();
+
+    }
+
+    public static ActiveRecordPlugin getActiveRecordPlugin(C3p0Plugin c3p0Plugin, String dbPropertiesPath) {
+        ActiveRecordPlugin arp = new ActiveRecordPlugin("c3p0Plugin" + new Random().nextInt(), c3p0Plugin);
+        arp.addMapping("user", "userId", User.class);
+        arp.addMapping("log", "logId", Log.class);
+        arp.addMapping("type", "typeId", Type.class);
+        arp.addMapping("link", "linkId", Link.class);
+        arp.addMapping("comment", "commentId", Comment.class);
+        arp.addMapping("lognav", "navId", LogNav.class);
+        arp.addMapping("website", "siteId", WebSite.class);
+        arp.addMapping("plugin", "pluginId", Plugin.class);
+        arp.addMapping("tag", "tagId", Tag.class);
+
+        Object pluginJvmArgsObj = systemProperties.get("pluginJvmArgs");
+        if (pluginJvmArgsObj == null) {
+            pluginJvmArgsObj = "";
+        }
+        runBlogPlugin(dbPropertiesPath, pluginJvmArgsObj.toString());
+        return arp;
     }
 
     public void configConstant(Constants con) {
@@ -112,30 +156,6 @@ public class ZrlogConfig extends JFinalConfig {
 
     }
 
-    private static void runBlogPlugin(final String dbPropertiesPath, final String pluginJvmArgs) {
-        new Thread() {
-            @Override
-            public void run() {
-                //加载 zrlog 提供的插件
-                File pluginCoreFile = new File(PathKit.getWebRootPath() + "/WEB-INF/plugins/plugin-core.jar");
-                if (!pluginCoreFile.exists()) {
-                    pluginCoreFile.getParentFile().mkdirs();
-                    String filePath = pluginCoreFile.getParentFile().toString();
-                    try {
-                        LOGGER.info("plugin-core.jar not exists will download from " + PLUGIN_CORE_DOWNLOAD_URL);
-                        HttpUtil.sendGetRequest(PLUGIN_CORE_DOWNLOAD_URL, new HashMap<String, String[]>(), new HttpFileHandle(filePath), new HashMap<String, String>());
-                    } catch (IOException e) {
-                        LOGGER.warn("download plugin core error", e);
-                    }
-                }
-                int port = PluginConfig.pluginServerStart(pluginCoreFile, dbPropertiesPath, pluginJvmArgs, PathKit.getWebRootPath(), BlogBuildInfoUtil.getVersion());
-                JFinal.me().getServletContext().setAttribute("pluginServerPort", port);
-                JFinal.me().getServletContext().setAttribute("pluginServer", "http://localhost:" + port);
-            }
-        }.start();
-
-    }
-
     @Override
     public void afterJFinalStart() {
         super.afterJFinalStart();
@@ -164,25 +184,5 @@ public class ZrlogConfig extends JFinalConfig {
         routes.add("/install", InstallController.class);
         // 后台管理者
         routes.add(new UserRoutes());
-    }
-
-    public static ActiveRecordPlugin getActiveRecordPlugin(C3p0Plugin c3p0Plugin, String dbPropertiesPath) {
-        ActiveRecordPlugin arp = new ActiveRecordPlugin("c3p0Plugin" + new Random().nextInt(), c3p0Plugin);
-        arp.addMapping("user", "userId", User.class);
-        arp.addMapping("log", "logId", Log.class);
-        arp.addMapping("type", "typeId", Type.class);
-        arp.addMapping("link", "linkId", Link.class);
-        arp.addMapping("comment", "commentId", Comment.class);
-        arp.addMapping("lognav", "navId", LogNav.class);
-        arp.addMapping("website", "siteId", WebSite.class);
-        arp.addMapping("plugin", "pluginId", Plugin.class);
-        arp.addMapping("tag", "tagId", Tag.class);
-
-        Object pluginJvmArgsObj = systemProperties.get("pluginJvmArgs");
-        if (pluginJvmArgsObj == null) {
-            pluginJvmArgsObj = "";
-        }
-        runBlogPlugin(dbPropertiesPath, pluginJvmArgsObj.toString());
-        return arp;
     }
 }

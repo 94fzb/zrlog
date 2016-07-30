@@ -6,9 +6,6 @@ import org.apache.log4j.Logger;
 import java.io.*;
 import java.util.Random;
 
-/**
- * Created by xiaochun on 2016/2/11.
- */
 public class PluginConfig {
 
     private static Logger LOGGER = Logger.getLogger(PluginConfig.class);
@@ -22,7 +19,7 @@ public class PluginConfig {
         final int randomMasterPort = randomServerPort + 20000;
         final int randomListenPort = randomServerPort + 30000;
         try {
-            registerHook();
+            registerShutdownHook();
             if (serverFileName.getName().endsWith(".jar")) {
                 new Thread() {
                     @Override
@@ -74,7 +71,7 @@ public class PluginConfig {
 
     }
 
-    private static void registerHook() {
+    private static void registerShutdownHook() {
         Runtime rt = Runtime.getRuntime();
         rt.addShutdownHook(new Thread() {
             @Override

@@ -3,6 +3,7 @@ package com.fzb.blog.controller;
 import com.fzb.blog.model.LogNav;
 
 public class LogNavController extends ManageController {
+
     public void delete() {
         String[] ids = getPara("id").split(",");
         for (String id : ids) {

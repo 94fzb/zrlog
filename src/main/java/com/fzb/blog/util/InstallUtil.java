@@ -51,14 +51,23 @@ public class InstallUtil {
         this.dbConn = dbConn;
     }
 
+    private static Map<String, Object> defaultWebSite(Map<String, String> webSite) {
+        Map<String, Object> map = new LinkedHashMap<String, Object>();
+        map.put("rows", 10);
+        map.put("template", "/include/templates/default");
+        map.put("pseudo_staticStatus", false);
+        map.put("title", webSite.get("title"));
+        map.put("second_title", webSite.get("second_title"));
+        map.put("home", webSite.get("home"));
+        return map;
+    }
+
     public boolean testDbConn() {
         try {
             Class.forName(dbConn.get("driverClass"));
-            connect = DriverManager.getConnection(dbConn.get("jdbcUrl"),
-                    dbConn.get("user"), dbConn.get("password"));
+            connect = DriverManager.getConnection(dbConn.get("jdbcUrl"), dbConn.get("user"), dbConn.get("password"));
             connect.close();
         } catch (Exception e) {
-            // e.printStackTrace();
             return false;
         }
         return true;
@@ -78,7 +87,6 @@ public class InstallUtil {
                                 Map<String, String> blogMsg, File lock) {
         File file = new File(basePath + "/db.properties");
         Statement st;
-
         if (file.exists()) {
             file.delete();
         }
@@ -179,16 +187,5 @@ public class InstallUtil {
             }
         }
         return false;
-    }
-
-    private static Map<String, Object> defaultWebSite(Map<String, String> webSite) {
-        Map<String, Object> map = new LinkedHashMap<String, Object>();
-        map.put("rows", 10);
-        map.put("template", "/include/templates/default");
-        map.put("pseudo_staticStatus", false);
-        map.put("title", webSite.get("title"));
-        map.put("second_title", webSite.get("second_title"));
-        map.put("home", webSite.get("home"));
-        return map;
     }
 }

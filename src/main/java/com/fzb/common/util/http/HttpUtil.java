@@ -33,7 +33,7 @@ public class HttpUtil {
 
     private static HttpPost postForm(String urlPath, Map<String, String[]> params) {
         HttpPost httPost = new HttpPost(urlPath);
-        List nvps = new ArrayList();
+        List<BasicNameValuePair> basicNameValuePairList = new ArrayList<BasicNameValuePair>();
         if (params == null) {
             return httPost;
         }
@@ -41,14 +41,14 @@ public class HttpUtil {
         for (String key : keySet) {
             for (String string : params.get(key)) {
                 try {
-                    nvps.add(new BasicNameValuePair(key, URLDecoder.decode(string, "UTF-8")));
+                    basicNameValuePairList.add(new BasicNameValuePair(key, URLDecoder.decode(string, "UTF-8")));
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
             }
         }
         try {
-            httPost.setEntity(new UrlEncodedFormEntity(nvps, "UTF-8"));
+            httPost.setEntity(new UrlEncodedFormEntity(basicNameValuePairList, "UTF-8"));
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -56,9 +56,9 @@ public class HttpUtil {
     }
 
     private static HttpPost postForm(String urlPath, byte[] data) {
-        HttpPost httpost = new HttpPost(urlPath);
-        httpost.setEntity(new ByteArrayEntity(data));
-        return httpost;
+        HttpPost httPost = new HttpPost(urlPath);
+        httPost.setEntity(new ByteArrayEntity(data));
+        return httPost;
     }
 
     private static String mapToQueryStr(Map<String, String[]> params) {
@@ -76,17 +76,14 @@ public class HttpUtil {
         return queryStr;
     }
 
-    private static void setHttpHeaders(HttpRequestBase header, Map<String, String> reqheaders) {
-        // set default http header
+    private static void setHttpHeaders(HttpRequestBase header, Map<String, String> reqHeaders) {
         header.setHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
         header.setHeader("Accept-Charset", "GB2312,UTF-8;q=0.7,*;q=0.7");
         header.setHeader("Accept-Encoding", "gzip, deflate");
         header.setHeader("Accept-Language", "zh-cn,zh;q=0.5");
-        //header.setHeader("Connection", "keep-alive");
-        //TODO 根据操作系统选择 Usage
         header.setHeader("User-Agent", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:41.0) Gecko/20100101 Firefox/41.0");
 
-        for (Map.Entry<String, String> reqHeader : reqheaders.entrySet()) {
+        for (Map.Entry<String, String> reqHeader : reqHeaders.entrySet()) {
             header.setHeader(reqHeader.getKey(), reqHeader.getValue());
             LOGGER.info("key " + reqHeader.getKey() + " value-> " + reqHeader.getValue());
         }
@@ -107,9 +104,9 @@ public class HttpUtil {
     }
 
 
-    public static <T> HttpHandle<? extends T> sendRequest(HttpRequestBase httpRequestBase, HttpHandle<T> httpHandle, Map<String, String> reqheaders)
+    public static <T> HttpHandle<? extends T> sendRequest(HttpRequestBase httpRequestBase, HttpHandle<T> httpHandle, Map<String, String> reqHeaders)
             throws IOException {
-        setHttpHeaders(httpRequestBase, reqheaders);
+        setHttpHeaders(httpRequestBase, reqHeaders);
         CloseableHttpResponse response = httpClient.execute(httpRequestBase);
         boolean needClose = httpHandle.handle(httpRequestBase, response);
         if (needClose) {
@@ -118,7 +115,7 @@ public class HttpUtil {
         return httpHandle;
     }
 
-    public static <T> HttpHandle<? extends T> sendGetRequest(String urlPath, Map<String, String[]> requestParam, HttpHandle<T> httpHandle, Map<String, String> reqheaders)
+    public static <T> HttpHandle<? extends T> sendGetRequest(String urlPath, Map<String, String[]> requestParam, HttpHandle<T> httpHandle, Map<String, String> reqHeaders)
             throws IOException {
         String queryStr = mapToQueryStr(requestParam);
         if (queryStr.length() > 0) {
@@ -135,17 +132,19 @@ public class HttpUtil {
             throw new RuntimeException(e);
         }
         HttpGet httpGet = new HttpGet(uri.toASCIIString());
-        return sendRequest(httpGet, httpHandle, reqheaders);
+        return sendRequest(httpGet, httpHandle, reqHeaders);
     }
 
-    public static <T> HttpHandle<? extends T> sendGetRequest(String urlPath, HttpHandle<T> httpHandle, Map<String, String> reqheaders)
+    public static <T> HttpHandle<? extends T> sendGetRequest(String urlPath, HttpHandle<T> httpHandle, Map<String, String> reqHeaders)
             throws IOException {
-        return sendGetRequest(urlPath, null, httpHandle, reqheaders);
+        return sendGetRequest(urlPath, null, httpHandle, reqHeaders);
     }
 
+    public static String getTextByUrl(String url) throws IOException {
+        return sendGetRequest(url, new HttpStringHandle(), new HashMap<String, String>()).getT();
+    }
 
-    public static void main(String[] args)
-            throws IOException {
+    public static void main(String[] args) throws IOException {
         String urlStr = "http://ports.ubuntu.com/pool/universe/o/opencv/libopencv-imgproc2.4_2.4.9%2bdfsg-1ubuntu4_armhf.deb";
         URL url = new URL(urlStr);
         try {
@@ -154,9 +153,5 @@ public class HttpUtil {
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-    }
-
-    public static String getTextByUrl(String url) throws IOException {
-        return sendGetRequest(url, new HttpStringHandle(), new HashMap<String, String>()).getT();
     }
 }

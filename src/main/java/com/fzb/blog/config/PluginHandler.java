@@ -5,7 +5,6 @@ import com.fzb.blog.util.ZrlogUtil;
 import com.fzb.common.util.IOUtil;
 import com.fzb.common.util.http.HttpUtil;
 import com.fzb.common.util.http.handle.CloseResponseHandle;
-import com.jfinal.aop.Invocation;
 import com.jfinal.handler.Handler;
 import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;

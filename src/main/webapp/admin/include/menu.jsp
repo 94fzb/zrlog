@@ -4,8 +4,8 @@
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getHeader("host")+path+"/";
 request.setAttribute("url", request.getScheme()+"://"+request.getHeader("host")+request.getContextPath());
-if(request.getAttribute("suburl")==null){
-	request.setAttribute("suburl", request.getRequestURL().substring((basePath+"admin/").length()));
+if(request.getAttribute("currentPath")==null){
+	request.setAttribute("currentPath", request.getRequestURL().substring((basePath+"admin/").length()));
 }
 %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -189,39 +189,39 @@ if(request.getAttribute("suburl")==null){
 				</a>
 				<div class="sidebar ${webs.admin_dashboard_sidebar_collapser}" id="sidebar">
 					<ul class="nav nav-list">
-						<li <c:if test="${'index.jsp'==suburl}">class="active"</c:if>>
+						<li <c:if test="${'index.jsp'==currentPath}">class="active"</c:if>>
 						
 							<a href="admin/index">
 								<i class="icon-dashboard"></i>
 								<span class="menu-text"> ${_res.dashboard} </span>
 							</a>
 						</li>
-						<li <c:if test="${'edit.jsp'==suburl}">class="active"</c:if>>
+						<li <c:if test="${'edit.jsp'==currentPath}">class="active"</c:if>>
 							<a href="admin/edit">
 								<i class="icon-edit"></i>
 								<span class="menu-text">${_res['admin.log.edit']} </span>
 							</a>
 						</li>
-						<li <c:if test="${'log.jsp'==suburl}">class="active"</c:if>>
+						<li <c:if test="${'log.jsp'==currentPath}">class="active"</c:if>>
 							<a href="admin/log">
 								<i class="icon-desktop"></i>
 								<span class="menu-text"> ${_res.blogManage} </span>
 
 							</a>
 						</li>
-						<li <c:if test="${'comment.jsp'==suburl}">class="active"</c:if>>
+						<li <c:if test="${'comment.jsp'==currentPath}">class="active"</c:if>>
 							<a href="admin/comment" class="dropdown-toggle">
 								<i class="icon-comment"></i>
 								<span class="menu-text">${_res['admin.comment.manage']}</span>
 							</a>
 						</li>
-						<li <c:if test="${'plugin.jsp'==suburl or 'plugin_center.jsp'==suburl}">class="active"</c:if>>
+						<li <c:if test="${'plugin.jsp'==currentPath or 'plugin_center.jsp'==currentPath}">class="active"</c:if>>
 							<a href="admin/plugin" class="dropdown-toggle">
 								<i class="icon-plug"></i>
 								<span class="menu-text"> ${_res['admin.plugin.manage']} </span>
 							</a>
 						</li>
-						<li <c:if test="${'website.jsp'==suburl or 'user.jsp'==suburl or 'template.jsp'==suburl or 'template_center.jsp'==suburl}">class="active open"</c:if>>
+						<li <c:if test="${'upgrade.jsp'==currentPath or 'website.jsp'==currentPath or 'user.jsp'==currentPath or 'template.jsp'==currentPath or 'template_center.jsp'==currentPath}">class="active open"</c:if>>
 							<a href="#" class="dropdown-toggle">
 								<i class="icon-cogs"></i>
 								<span class="menu-text">${_res['admin.setting']}</span>
@@ -230,27 +230,33 @@ if(request.getAttribute("suburl")==null){
 							</a>
 
 							<ul class="submenu">
-								<li <c:if test="${'user.jsp'==suburl}">class="active"</c:if>>
-									<a href="admin/user" <c:if test="${'user.jsp'==suburl}">class="active"</c:if>>
+								<li <c:if test="${'user.jsp'==currentPath}">class="active"</c:if>>
+									<a href="admin/user" <c:if test="${'user.jsp'==currentPath}">class="active"</c:if>>
 										<i class="icon-double-angle-right"></i>
 										<span class="menu-text">${_res['admin.user.info']}</span>
 									</a>
 								</li>
-								<li <c:if test="${'website.jsp'==suburl}">class="active"</c:if>>
-									<a href="admin/website" <c:if test="${'website.jsp'==suburl}">class="active"</c:if>>
+								<li <c:if test="${'website.jsp'==currentPath}">class="active"</c:if>>
+									<a href="admin/website" <c:if test="${'website.jsp'==currentPath}">class="active"</c:if>>
 										<i class="icon-double-angle-right"></i>
 										<span class="menu-text">${_res['admin.website.manage']}</span>
 									</a>
 								</li>
-								<li <c:if test="${'template.jsp'==suburl or 'template_center.jsp'==suburl}">class="active"</c:if>>
-									<a href="admin/template" <c:if test="${'template.jsp'==suburl}">class="active"</c:if>>
+								<li <c:if test="${'template.jsp'==currentPath or 'template_center.jsp'==currentPath}">class="active"</c:if>>
+									<a href="admin/template" <c:if test="${'template.jsp'==currentPath}">class="active"</c:if>>
 										<i class="icon-double-angle-right"></i>
 										<span class="menu-text">${_res['admin.template.manage']}</span>
 									</a>
 								</li>
+								<li <c:if test="${'upgrade.jsp'==currentPath}">class="active"</c:if>>
+									<a href="admin/upgrade"  class="dropdown-toggle">
+										<i class="icon-double-angle-right"></i>
+										<span class="menu-text"> ${_res['admin.upgrade.manage']}</span>
+									</a>
+								</li>
 							</ul>
 						</li>
-						<li <c:if test="${'type.jsp'==suburl or 'tag.jsp'==suburl or 'nav.jsp'==suburl or 'link.jsp'==suburl}">class="active open"</c:if>>
+						<li <c:if test="${'type.jsp'==currentPath or 'tag.jsp'==currentPath or 'nav.jsp'==currentPath or 'link.jsp'==currentPath}">class="active open"</c:if>>
 							<a href="#" class="dropdown-toggle">
 								<i class="icon-list"></i>
 								<span class="menu-text">
@@ -259,25 +265,25 @@ if(request.getAttribute("suburl")==null){
 								<b class="arrow icon-angle-down"></b>
 							</a>
 							<ul class="submenu">
-								<li  <c:if test="${'type.jsp'==suburl}">class="active"</c:if>>
+								<li  <c:if test="${'type.jsp'==currentPath}">class="active"</c:if>>
 									<a href="admin/type"  class="dropdown-toggle">
 										<i class="icon-double-angle-right"></i>
 										<span class="menu-text">${_res['admin.type.manage']}</span>
 									</a>
 								</li>
-								<li  <c:if test="${'tag.jsp'==suburl}">class="active"</c:if>>
+								<li  <c:if test="${'tag.jsp'==currentPath}">class="active"</c:if>>
 									<a href="admin/tag"  class="dropdown-toggle">
 										<i class="icon-double-angle-right"></i>
 										<span class="menu-text">${_res['admin.tag.manage']}</span>
 									</a>
 								</li>
-								<li <c:if test="${'link.jsp'==suburl}">class="active"</c:if>>
+								<li <c:if test="${'link.jsp'==currentPath}">class="active"</c:if>>
 									<a href="admin/link" class="dropdown-toggle">
 										<i class="icon-double-angle-right"></i>
 										<span class="menu-text">${_res['admin.link.manage']}</span>
 									</a>
 								</li>
-								<li <c:if test="${'nav.jsp'==suburl}">class="active"</c:if>>
+								<li <c:if test="${'nav.jsp'==currentPath}">class="active"</c:if>>
 									<a href="admin/nav" class="dropdown-toggle">
 										<i class="icon-double-angle-right"></i>
 										<span class="menu-text"> ${_res['admin.nav.manage']}</span>

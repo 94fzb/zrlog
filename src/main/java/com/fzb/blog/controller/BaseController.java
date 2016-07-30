@@ -18,14 +18,11 @@ import java.util.*;
 public class BaseController extends Controller {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseController.class);
-
-    private String templatePath;
-
-    private Integer rows;
-
-    private Map<String, Object> webSite;
-
+    private static final String DEFAULT_TEMPLATE_PATH = "/include/templates/default";
     protected String templateConfigSuffix = "_setting";
+    private String templatePath;
+    private Integer rows;
+    private Map<String, Object> webSite;
 
     @Before({CacheInterceptor.class})
     @CacheName("/post/initData")
@@ -39,11 +36,7 @@ public class BaseController extends Controller {
             init.put("webSite", websiteMap);
             init.put("links", Link.dao.queryAll());
             init.put("types", Type.dao.queryAll());
-            init.put(
-                    "logNavs",
-                    LogNav.dao.queryAll(getRequest().getScheme() + "://"
-                            + getRequest().getHeader("host")
-                            + getRequest().getContextPath()));
+            init.put("logNavs", LogNav.dao.queryAll(getRequest().getScheme() + "://" + getRequest().getHeader("host") + getRequest().getContextPath()));
             init.put("plugins", Plugin.dao.queryAll());
             init.put("archives", Log.dao.getArchives());
             init.put("tags", Tag.dao.queryAll());
@@ -54,20 +47,16 @@ public class BaseController extends Controller {
                 Map<String, Object> typeMap = new TreeMap<String, Object>();
                 typeMap.put("typeName", type.getStr("typeName"));
                 typeMap.put("alias", type.getStr("alias"));
-                indexHotLog.put(
-                        typeMap,
-                        (List<Log>) Log.dao.getLogsBySort(1, 6,
-                                type.getStr("alias")).get("rows"));
+                indexHotLog.put(typeMap, (List<Log>) Log.dao.getLogsBySort(1, 6, type.getStr("alias")).get("rows"));
             }
             init.put("indexHotLog", indexHotLog);
             CacheKit.put("/post/initData", "initData", init);
             JFinal.me().getServletContext().setAttribute("webSite", init.get("webSite"));
         }
         setAttr("init", init);
-        this.templatePath = ((Map<String, Object>) init.get("webSite")).get("template").toString();
-        this.rows = Integer.parseInt(((Map<String, Object>) init.get("webSite")).get("rows").toString());
-        //
-        webSite = (Map<String, Object>) init.get("webSite");
+        this.webSite = (Map<String, Object>) init.get("webSite");
+        this.templatePath = webSite.get("template").toString();
+        this.rows = Integer.parseInt(webSite.get("rows").toString());
     }
 
     public String getTemplatePath() {
@@ -137,6 +126,6 @@ public class BaseController extends Controller {
     }
 
     public String getDefaultTemplatePath() {
-        return "/include/templates/default";
+        return DEFAULT_TEMPLATE_PATH;
     }
 }

@@ -10,7 +10,6 @@ import com.fzb.common.util.ParseTools;
 import com.fzb.common.util.http.HttpUtil;
 import com.fzb.common.util.http.handle.HttpJsonArrayHandle;
 import com.jfinal.kit.PathKit;
-import org.apache.commons.codec.binary.StringUtils;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -158,7 +157,7 @@ public class ManageLogController extends ManageController {
 
     @Override
     public void queryAll() {
-        renderJson(Log.dao.queryAll(getParaToInt("page"), getParaToInt("rows"), convertRequestParam(getPara("keywords")),getPara("sord"),getPara("sidx")));
+        renderJson(Log.dao.queryAll(getParaToInt("page"), getParaToInt("rows"), convertRequestParam(getPara("keywords")), getPara("sord"), getPara("sidx")));
     }
 
     private Log getLog() {

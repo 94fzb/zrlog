@@ -67,7 +67,11 @@ public class BlogBuildInfoUtil {
     }
 
     public static boolean isRelease() {
-        return "RELEASE".equals(runMode);
+        return "RELEASE".equalsIgnoreCase(runMode);
+    }
+
+    public static boolean isDev() {
+        return "DEV".equalsIgnoreCase(runMode);
     }
 
     public static void main(String[] args) {

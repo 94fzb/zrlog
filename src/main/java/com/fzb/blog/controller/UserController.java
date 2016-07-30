@@ -142,12 +142,11 @@ public class UserController extends ManageController {
     }
 
     public void changePassword() {
-
         if (isNotNullOrNotEmptyStr(getPara("oldPassword"), getPara("newPassword"))) {
-            // compare oldPasswd
             String userName = ((User) getSessionAttr("user")).getStr("userName");
             String dbPassword = User.dao.getPasswordByName(userName);
             String oldPassword = getPara("oldPassword");
+            // compare oldPassword
             if (Md5Util.MD5(oldPassword).equals(dbPassword)) {
                 User.dao.updatePassword(userName, Md5Util.MD5(getPara("newPassword")));
                 setAttr("message", ResUtil.getStringFromRes("changePasswordSuccess", getRequest()));

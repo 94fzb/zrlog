@@ -30,7 +30,7 @@ public class LoginInterceptor extends PrototypeInterceptor {
             ((BaseController) ai.getController()).fullTemplateSetting();
         }
         if (ai.getController().getAttr("log") != null) {
-                ai.getController().setAttr("pageLevel", 1);
+            ai.getController().setAttr("pageLevel", 1);
             ai.getController().render(basePath + "/detail.jsp");
         } else if (ai.getController().getAttr("data") != null) {
             if (ai.getActionKey().equals("/") && new File(PathKit.getWebRootPath() + basePath + "/index.jsp").exists()) {

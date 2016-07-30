@@ -1,8 +1,7 @@
 
 	$(function(){
 		$(".btn-info").click(function(){
-			var formId="ajax"+$(this).attr("id");
-			
+			var formId=$(this).attr("id")+"Ajax";
 			if($("#"+formId).attr("checkBox")){
 				var checkBoxName=$("#"+formId).attr("checkBox");
 				if($("[name='"+checkBoxName+"']").size() && $("[name='"+checkBoxName+"']")[0].checked==true){
@@ -13,7 +12,13 @@
 				}
 				
 			}
-			$.post('admin/website/update',$("#"+formId).serialize(),function(data){
+			var uri;
+			if($("#"+formId).attr("action")!=null){
+				uri = $("#"+formId).attr("action");
+			}else{
+				uri = 'admin/website/update'
+			}
+			$.post(uri,$("#"+formId).serialize(),function(data){
 				if(data.success){
 					$.gritter.add({
 						title: '  操作成功...',
