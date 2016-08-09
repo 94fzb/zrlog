@@ -72,7 +72,7 @@
 				<div class="col-xs-12 col-sm-10">
 					<div class="row-fluid wizard-actions">
 						<button data-last="Finish " class="btn btn-success btn-next">
-							${_res.installNextStep} <i class="icon-arrow-right icon-on-right"></i>
+							${_res.installNextStep} <i class="fa fa-arrow-right fa fa-on-right"></i>
 						</button>
 					</div>
 				</div>

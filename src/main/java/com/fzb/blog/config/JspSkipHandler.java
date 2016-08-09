@@ -24,9 +24,9 @@ import java.util.Set;
  */
 public class JspSkipHandler extends Handler {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(JspSkipHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JspSkipHandler.class);
 
-    private static Set<String> FORBIDDEN_URI_EXT_SET = new HashSet<String>();
+    private static final Set<String> FORBIDDEN_URI_EXT_SET = new HashSet<String>();
 
     static {
         FORBIDDEN_URI_EXT_SET.add(".jsp");
@@ -37,9 +37,9 @@ public class JspSkipHandler extends Handler {
                        HttpServletResponse response, boolean[] isHandled) {
         String ext = null;
         if (target.contains("/")) {
-            String name = target.substring(target.lastIndexOf("/"));
+            String name = target.substring(target.lastIndexOf('/'));
             if (name.contains(".")) {
-                ext = name.substring(name.lastIndexOf("."));
+                ext = name.substring(name.lastIndexOf('.'));
             }
         }
         if (ext != null) {
@@ -50,7 +50,7 @@ public class JspSkipHandler extends Handler {
                             + request.getServletPath());
                     if (!htmlFile.exists()) {
                         String tempTarget = target.substring(0,
-                                target.lastIndexOf("."));
+                                target.lastIndexOf('.'));
                         String home = request.getScheme() + "://"
                                 + request.getHeader("host")
                                 + request.getContextPath() + tempTarget;

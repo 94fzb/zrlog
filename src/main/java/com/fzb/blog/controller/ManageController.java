@@ -8,7 +8,7 @@ import java.util.Map;
 
 public abstract class ManageController extends BaseController {
 
-    private static Logger LOGGER = Logger.getLogger(ManageLogController.class);
+    private static final Logger LOGGER = Logger.getLogger(ManageLogController.class);
 
     private Map<String, Object> data = new HashMap<String, Object>();
 

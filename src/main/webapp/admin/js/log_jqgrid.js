@@ -33,7 +33,7 @@ jQuery(function($) {
             {name:'title',index:'title',width:220, sortable:false,editable: true,edittype:"textarea", editoptions:{rows:"2",cols:"20"}},
             {name:'keywords',index:'keywords', width:180,editable: true,editoptions:{size:"20",maxlength:"30"}},
             {name:'userName',index:'userName', width:60, editable: false},
-            {name:'typeName',index:'typeName', width:90, editable: true,edittype:"select",editoptions:{value:"FE:FedEx;IN:InTime;TN:TNT;AR:ARAMEX"}},
+            {name:'typeName',index:'typeName', width:90, editable: true},
 
             {name:'releaseTime',index:'releaseTime',width:130, editable:true, sorttype:"date",unformat: pickDate},
             {name:'click',index:'click', width:60, editable: false},
@@ -64,7 +64,7 @@ jQuery(function($) {
         },
 
         caption: "文章管理",
-        height:391,
+        height:411,
 
         autowidth: true
 

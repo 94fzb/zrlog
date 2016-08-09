@@ -4,7 +4,7 @@
 		<h1>
 			${mTitle}
 			<small>
-				<i class="icon-double-angle-right"></i>
+				<i class="fa fa-double-angle-right"></i>
 				${sTitle}
 			</small>
 		</h1>

@@ -7,13 +7,9 @@
 </c:if>
 <jsp:include page="include/menu.jsp"/>
 <div class="page-header">
-	<h1>
-		文章
-		<small>
-			<i class="icon-double-angle-right"></i>
-			撰写文章
-		</small>
-	</h1>
+	<h3>
+		文章撰写
+	</h3>
 </div>
 
 <jsp:include page="editor.jsp"/>

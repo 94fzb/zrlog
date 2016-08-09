@@ -7,91 +7,54 @@ request.setAttribute("url", request.getScheme()+"://"+request.getHeader("host")+
 %>
 <!DOCTYPE html>
 <html>
-  	<base href="<%=basePath%>">
-	<head>
-		<meta charset="utf-8" />
-		<title>${init.webSite.title} - ${_res.login}</title>
-		<link href="assets/css/bootstrap.min.css" rel="stylesheet" />
-		<link rel="stylesheet" href="assets/css/font-awesome.min.css" />
-		<link rel="stylesheet" href="assets/css/ace.min.css" />
-		<link rel="shortcut icon" href="favicon.ico" />
-	</head>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>${init.webSite.title} - ${_res.login}</title>
+    <link href="${url}/assets/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="${url}/assets/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Custom Theme Style -->
+    <link href="${url}/assets/css/custom.min.css" rel="stylesheet">
+    <link rel="shortcut icon" href="f${url}/favicon.ico" />
+  </head>
 
-	<body class="login-layout">
-		<div class="main-container">
-			<div class="main-content">
-				<div class="row">
-					<div class="col-sm-10 col-sm-offset-1">
-						<div class="login-container">
-							<div class="center">
-								<h1>
-									<span class="white">${init.webSite.title}</span>
-								</h1>
-							</div>
-
-							<div class="space-6"></div>
-							<div class="position-relative">
-								<div id="login-box" class="login-box visible widget-box no-border">
-									<div class="widget-body">
-										<div class="widget-main">
-											<h4 class="header blue lighter bigger">
-												<i class="icon-coffee green"></i>
-												${_res.userNameAndPassword}
-											</h4>
-
-											<div class="space-6"></div>
-
-											<form action="admin/login" method="post">
-												<input type="hidden" name="redirectFrom" value="${param.redirectFrom}">
-												<fieldset>
-													<label class="block clearfix">
-														<span class="block input-icon input-icon-right">
-															<input type="text" class="form-control" name="userName" placeholder="${_res.userName}" />
-															<i class="icon-user"></i>
-														</span>
-													</label>
-
-													<label class="block clearfix">
-														<span class="block input-icon input-icon-right">
-															<input type="password" class="form-control" name="password" placeholder="${_res.password}" />
-															<i class="icon-lock"></i>
-														</span>
-													</label>
-
-													<div class="space"></div>
-													<div class="alert alert-danger" <c:if test="${empty errorMsg }">style="display: none;"</c:if> >
-														${errorMsg}														 
-													</div>
- 
-													<div class="clearfix">
-														<label class="inline">
-															<input type="checkbox" name="rememberMe" class="ace" />
-															<span class="lbl">&nbsp;&nbsp;${_res.rememberMe}</span>
-														</label>
-
-														<button type="submit" class="width-35 pull-right btn btn-sm btn-primary">
-															<i class="icon-signin"></i>
-															${_res.login}
-														</button>
-													</div>
-													
-													<div class="space-4"></div>
-												</fieldset>
-											</form>
-
-
-										</div><!-- /widget-main -->
-									</div><!-- /widget-body -->
-								</div><!-- /login-box -->
-
-								 
-							</div><!-- /position-relative -->
-						</div>
-					</div><!-- /.col -->
-				</div><!-- /.row -->
-			</div>
-		</div><!-- /.main-container -->
-
-	<div style="display:none"></div>
-</body>
+  <body class="login">
+    <div>
+      <div class="login_wrapper">
+        <div class="animate form login_form">
+          <section class="login_content">
+            <form action="${url}/admin/login" method="post">
+              <input type="hidden" name="redirectFrom" value="${param.redirectFrom}">
+              <h1>${_res.userNameAndPassword}</h1>
+              <div>
+                <input name="userName" type="text" class="form-control" placeholder="${_res.userName}" required="" />
+              </div>
+              <div>
+                <input name="password" type="password" class="form-control" placeholder="${_res.password}" required="" />
+              </div>
+              <div class="alert alert-danger" <c:if test="${empty errorMsg}">style="display: none;"</c:if> >
+                  ${errorMsg}
+              </div>
+              <div>
+                <button class="btn btn-default submit" type="submit">
+                <i class="fa fa-sign-in"></i>
+                ${_res.login}
+                </button>
+              </div>
+              <div class="separator">
+                <div class="clearfix"></div>
+                <br />
+                <div>
+                  <p>©2016 All Rights Reserved. ${init.webSite.title}</p>
+                </div>
+              </div>
+            </form>
+          </section>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>

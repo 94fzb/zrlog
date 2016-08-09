@@ -18,7 +18,7 @@ import java.util.Map;
 
 public class PluginHandler extends Handler {
 
-    public static Logger LOGGER = Logger.getLogger(PluginHandler.class);
+    private static final Logger LOGGER = Logger.getLogger(PluginHandler.class);
 
     @Override
     public void handle(String target, HttpServletRequest request, HttpServletResponse response, boolean[] isHandled) {

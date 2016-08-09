@@ -6,7 +6,7 @@ $(function($) {
 
     url:'admin/comment/queryAll',
     datatype: "json",
-        colNames:['', 'ID','评论者主页','IP', '邮箱','昵称','内容','文章编号'],
+        colNames:['', 'ID','评论者主页','IP', '邮箱','昵称','内容','浏览'],
         colModel:[
             {name:'myac',index:'commentId', width:80, fixed:true, sortable:false, resize:false,
                 formatter:'actions',
@@ -52,7 +52,7 @@ $(function($) {
         editurl:"admin/comment/oper",//nothing is saved
         deleteurl:"admin/comment/oper",//nothing is saved
         caption: "评论管理",
-        height:391,
+        height:411,
 
         autowidth: true
 

@@ -38,8 +38,8 @@ import java.util.Random;
  */
 public class ZrlogConfig extends JFinalConfig {
 
-    private static Logger LOGGER = Logger.getLogger(ZrlogConfig.class);
-    private static String PLUGIN_CORE_DOWNLOAD_URL = "http://dl.zrlog.com/release/plugin/plugin-core.jar";
+    private static final   Logger LOGGER = Logger.getLogger(ZrlogConfig.class);
+    private static final String PLUGIN_CORE_DOWNLOAD_URL = "http://dl.zrlog.com/release/plugin/plugin-core.jar";
 
     private static Properties systemProperties = new Properties();
 

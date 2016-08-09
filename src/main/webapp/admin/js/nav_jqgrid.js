@@ -48,7 +48,7 @@ jQuery(function($) {
 
         editurl:"admin/nav/oper",//nothing is saved
         caption: "导航管理",
-        height:391,
+        height:411,
 
         autowidth: true
 

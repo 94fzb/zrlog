@@ -6,10 +6,12 @@
 			if($("#newPassword1").val()!=null && $("#newPassword1").val() == $("#newPassword2").val()){
 				$("#updatePassword")[0].submit();
 			}else{
-				$.gritter.add({
-					title: '两次输入的密码不一致 ...',
-					class_name: 'gritter-error' + (!$('#gritter-light').get(0).checked ? ' gritter' : ''),
-				});
+				new PNotify({
+					  title: '两次输入的密码不一致 ...',
+					  type: 'error',
+					  hide: true,
+					  styling: 'bootstrap3'
+				 });
 			}
 			return false;
 		})
@@ -17,12 +19,7 @@
 
 </script>
 <div class="page-header">
-	<h1>用户设置
-		<small>
-			<i class="icon-double-angle-right"></i>
-			密码变更
-		</small>
-	</h1>
+	<h3>密码变更</h3>
 </div><!-- /.page-header -->
 <div class="row">
 <div class="col-xs-12">
@@ -32,7 +29,7 @@
 			<label for="form-field-1" class="col-sm-3 control-label no-padding-right"> 旧密码 </label>
 
 			<div class="col-sm-9">
-				<input type="password" name="oldPassword" value="" class="col-xs-10 col-sm-5" placeholder="" id="orlPassword">
+				<input type="password" name="oldPassword" value="" required="" class="col-xs-10 col-sm-5" placeholder="" id="orlPassword">
 			</div>
 		</div>
 
@@ -40,7 +37,7 @@
 			<label for="form-field-1" class="col-sm-3 control-label no-padding-right"> 新密码 </label>
 
 			<div class="col-sm-9">
-				<input type="password" name="newPassword" value="" class="col-xs-10 col-sm-5" placeholder="" id="newPassword1">
+				<input type="password" name="newPassword" value="" class="col-xs-10 col-sm-5" required=""  placeholder="" id="newPassword1">
 
 			</div>
 		</div>
@@ -49,7 +46,7 @@
 			<label for="form-field-1" class="col-sm-3 control-label no-padding-right"> 确认密码 </label>
 
 			<div class="col-sm-9">
-			<input type="password" name="newPassword2" value="" class="col-xs-10 col-sm-5" placeholder="" id="newPassword2">
+			<input type="password" name="newPassword2" value="" class="col-xs-10 col-sm-5" required=""  placeholder="" id="newPassword2">
 
 			</div>
 		</div>
@@ -58,7 +55,7 @@
 		<div class="clearfix form-actions">
 			<div class="col-md-offset-3 col-md-9">
 				<button id="submit" type="submit" class="btn btn-info">
-					<i class="icon-ok bigger-110"></i>
+					<i class="fa fa-check bigger-110"></i>
 					提交
 				</button>
 

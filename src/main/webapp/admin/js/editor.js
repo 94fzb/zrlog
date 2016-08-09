@@ -57,10 +57,12 @@ $(function(){
 		$("input[name='table-align']").remove();
 		$("#content").val(mdEditor.getPreviewedHTML());
 		if($("#title").val()=="" || $("#content").val()==""){
-			$.gritter.add({
-				title: '文章的标题和内容都不能为空...',
-				class_name: 'gritter-error' + (!$('#gritter-light').get(0).checked ? ' gritter' : ''),
-			});
+			new PNotify({
+				  title: '文章的标题和内容都不能为空...',
+				  type: 'warn',
+				  hide: true,
+				  styling: 'bootstrap3'
+			  });
 			return false;
 		}
 		return true;
@@ -71,10 +73,12 @@ $(function(){
 			$.post('admin/log/createOrUpdate?rubbish=1',$('#addorPre').serialize(),function(data){
 				if(data.add || data.update){
 					var date=new Date();
-					$.gritter.add({
-						title: "自动保存成功 "+date.getHours()+":"+date.getMinutes() +" "+date.getSeconds(),
-						class_name: 'gritter-success' + (!$('#gritter-light').get(0).checked ? ' gritter' : '')
-					});
+					new PNotify({
+						  title: "自动保存成功 "+date.getHours()+":"+date.getMinutes() +":"+date.getSeconds(),
+						  type: 'info',
+						  hide: true,
+						  styling: 'bootstrap3'
+					  });
 					$("#logId").val(data.logId);
 					$("#alias").val(data.alias);
 				}
@@ -107,10 +111,12 @@ $(function(){
 		if(validationPost()){
 			$.post('admin/log/createOrUpdate?rubbish=1',$('#addorPre').serialize(),function(data){
 				if(data.add || data.update){
-					$.gritter.add({
-						title: '保存成功...',
-						class_name: 'gritter-info' + (!$('#gritter-light').get(0).checked ? ' gritter' : ''),
-					});
+					new PNotify({
+						  title: '保存成功...',
+						  type: 'success',
+						  hide: true,
+						  styling: 'bootstrap3'
+					  });
 					$("#logId").val(data.logId);
 					$("#alias").val(data.alias);
 				}
@@ -128,23 +134,16 @@ $(function(){
 		if(validationPost()){
 			$.post('admin/log/createOrUpdate',$('#addorPre').serialize(),function(data){
 				if(data.add || data.update){
-					$.gritter.add({
-						title: '更新成功...',
-						class_name: 'gritter-info' + (!$('#gritter-light').get(0).checked ? ' gritter-light' : ''),
-					});
+					new PNotify({
+						  title: '更新成功...',
+						  type: 'success',
+						  hide: true,
+						  styling: 'bootstrap3'
+					  });
 					$("#logId").val(data.logId);
 					$("#alias").val(data.alias);
 				}
 			});
 		}
-	});
-
-	$("#reset").click(function(){
-		bootbox.setDefaults({locale:"zh_CN"});
-		bootbox.alert("这将会清空你输入的", function() {
-			$('#title').val("");
-			$('#tag').val("");
-			mdEditor.markdown="";
-		});
 	});
 });

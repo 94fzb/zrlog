@@ -8,7 +8,7 @@ import java.util.Random;
 
 public class PluginConfig {
 
-    private static Logger LOGGER = Logger.getLogger(PluginConfig.class);
+    private static final Logger LOGGER = Logger.getLogger(PluginConfig.class);
 
     private static Process pr;
     private static boolean canStart = true;

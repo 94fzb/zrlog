@@ -48,7 +48,7 @@ jQuery(function($) {
 
         editurl:"admin/type/oper",//nothing is saved
         caption: "分类管理",
-        height:391,
+        height:411,
 
         autowidth: true
 

@@ -10,7 +10,7 @@
             <div class="well">
                 <h1 class="grey lighter smaller">
                     <span class="blue bigger-125">
-                        <i class="icon-random"></i>
+                        <i class="fa fa-random"></i>
                         500
                     </span>
                     Something Went Wrong
@@ -20,11 +20,11 @@
                 <div class="space"></div>
                 <div class="center">
                     <a class="btn btn-grey" href="javascript:history.go(-1);">
-                        <i class="icon-arrow-left"></i>
+                        <i class="fa fa-arrow-left"></i>
                         ${_res.goBack}
                     </a>
                     <a class="btn btn-primary" href="#">
-                        <i class="icon-dashboard"></i>
+                        <i class="fa fa-dashboard"></i>
                         ${_res.dashboard}
                     </a>
                 </div>

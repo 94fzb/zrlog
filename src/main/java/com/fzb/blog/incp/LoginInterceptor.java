@@ -106,7 +106,7 @@ public class LoginInterceptor extends PrototypeInterceptor {
             }
         }
         if (!new File(PathKit.getWebRootPath() + basePath).exists()) {
-            basePath = ((BaseController) ai.getController()).getDefaultTemplatePath();
+            basePath = BaseController.getDefaultTemplatePath();
         }
         ai.getController().getRequest().setAttribute("template", basePath);
         return basePath;

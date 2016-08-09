@@ -2,7 +2,7 @@
 </div>
 <hr/>
 <div class="main">
-    <div class="center">
+    <div class="text-center">
         <h4>${_res.installFeedback}</h4>
     </div>
 </div>

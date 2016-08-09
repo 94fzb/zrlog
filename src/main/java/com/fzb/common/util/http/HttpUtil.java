@@ -23,7 +23,7 @@ import java.net.URLDecoder;
 import java.util.*;
 
 public class HttpUtil {
-    private static Logger LOGGER = Logger.getLogger(HttpUtil.class);
+    private static final Logger LOGGER = Logger.getLogger(HttpUtil.class);
     private static CloseableHttpClient httpClient;
 
     static {

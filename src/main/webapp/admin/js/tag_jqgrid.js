@@ -39,7 +39,7 @@ jQuery(function($) {
 
         editurl:"admin/type/oper",//nothing is saved
         caption: "标签",
-        height:391,
+        height:411,
 
         autowidth: true
 

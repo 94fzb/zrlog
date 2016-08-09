@@ -8,7 +8,7 @@ import java.net.Socket;
 
 public class PluginSocketThread extends Thread {
 
-    private static Logger LOGGER = Logger.getLogger(PluginSocketThread.class);
+    private static final Logger LOGGER = Logger.getLogger(PluginSocketThread.class);
     private int port;
     private String host;
 

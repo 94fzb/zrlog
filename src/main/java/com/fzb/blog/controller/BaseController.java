@@ -125,7 +125,7 @@ public class BaseController extends Controller {
         fullTemplateSetting(jsonStr);
     }
 
-    public String getDefaultTemplatePath() {
+    public static String getDefaultTemplatePath() {
         return DEFAULT_TEMPLATE_PATH;
     }
 }

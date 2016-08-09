@@ -2,22 +2,13 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <jsp:include page="include/menu.jsp" />
-<script src="assets/js/ace-elements.min.js"></script>
+
+<link href="assets/css/switchery.min.css" rel="stylesheet">
+
 <script type="text/javascript" src="admin/js/set_update.js"></script>
 <script src="assets/js/jquery.liteuploader.min.js"></script>
 <script>
 	$(document).ready(function() {
-		$('#id-input-file-1').ace_file_input({
-			no_file : '${webs.logo }',
-			btn_choose : '文件',
-			btn_change : '',
-			droppable : false,
-			onchange : null,
-			thumbnail : true
-		//| true | large
-		//whitelist:'gif|png|jpg|jpeg'
-		});
-
 		$('.fileUpload').liteUploader({
 			script : 'admin/log/upload?dir=image'
 		}).on('lu:success', function(e, response) {
@@ -29,7 +20,7 @@
 </script>
 
 <div class="page-header">
-	<h1>网站设置</h1>
+	<h3>网站设置</h3>
 </div>
 <!-- /.page-header -->
 <div class="tabbable tabs-left">
@@ -43,14 +34,13 @@
 		<div class="tab-pane in active" id="basic" style="padding: 10px">
 			<h4 class="header blue">认真输入，有助于网站被收录</h4>
 			<form role="form" class="form-horizontal" id="baseMsgAjax">
-				<input type="hidden" id="logo" name="logo" value="${webs.logo }">
 				<div class="form-group">
 					<label for="form-field-1"
 						class="col-sm-3 control-label no-padding-right"> 网站标题 </label>
 
 					<div class="col-sm-9">
 						<input type="text" name="title" value="${webs.title }"
-							class="col-xs-10 col-sm-5" placeholder="请求输入网站标题 "
+							class="col-xs-10 col-sm-5" placeholder="请输入网站标题 "
 							id="form-field-1">
 					</div>
 				</div>
@@ -93,17 +83,16 @@
 						class="col-sm-3 control-label no-padding-right">
 						网站&nbsp;Logo </label>
 					<div class="col-sm-6">
-						<div class="ace-file-input">
-							<input type="file" name="imgFile" id="id-input-file-1"
-								class="fileUpload icon-upload-alt" value="上传" />
-						</div>
+						<input type="text" class="col-xs-12 col-sm-6" id="logo" name="logo" value="${webs.logo }">
+						<input type="file" name="imgFile" id="id-input-file-1"
+							class="col-xs-12 col-sm-6 fileUpload" value="上传" />
 					</div>
 				</div>
 				<div class="space-4"></div>
 				<div class="clearfix form-actions">
 					<div class="col-md-offset-3 col-md-9">
 						<button id="baseMsg" type="button" class="btn btn-info">
-							<i class="icon-ok bigger-110"></i> 提交
+							<i class="fa fa-check bigger-110"></i> 提交
 						</button>
 					</div>
 				</div>
@@ -134,15 +123,13 @@
 				</div>
 
 				<div class="form-group">
-					<label for="form-field-1"class="col-sm-3 control-label no-padding-right"> 静态化文章页 </label>
-
+					<label class="col-sm-3 control-label no-padding-right"> 静态化文章页 </label>
 					<div class="col-sm-9">
-						<span class="col-sm-1"> <label class="pull-right inline">
-								<input type="hidden" id="pseudo_staticStatus" value="off">
-								<input type="checkbox" name="pseudo_staticStatus"
-								class="ace ace-switch ace-switch-5"
-								<c:if test="${webs.pseudo_staticStatus eq 'on'}">checked="checked"</c:if>
-								id="gritter-light" value="off"> <span class="lbl"></span>
+						<span class="col-sm-1">
+						<input type="hidden" id="pseudo_staticStatus" value="off">
+						<label>
+							<input type="checkbox" class="js-switch" style="display: none;" data-switchery="true" name="pseudo_staticStatus"
+							<c:if test="${webs.pseudo_staticStatus eq 'on'}">checked="checked"</c:if> value="off">
 						</label>
 						</span>
 					</div>
@@ -154,7 +141,7 @@
 				<div class="clearfix form-actions">
 					<div class="col-md-offset-3 col-md-9">
 						<button id="otherMsg" type="button" class="btn btn-info">
-							<i class="icon-ok bigger-110"></i> 提交
+							<i class="fa fa-check bigger-110"></i> 提交
 						</button>
 					</div>
 				</div>
@@ -182,9 +169,8 @@
 				<div class="space-4"></div>
 				<div class="clearfix form-actions">
 					<div class="col-md-offset-3 col-md-9">
-
 						<button id="blackList" type="button" class="btn btn-info">
-							<i class="icon-ok bigger-110"></i> 提交
+							<i class="fa fa-check bigger-110"></i> 提交
 						</button>
 					</div>
 				</div>

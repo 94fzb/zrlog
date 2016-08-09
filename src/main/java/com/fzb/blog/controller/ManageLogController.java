@@ -20,7 +20,7 @@ import java.util.Map.Entry;
 
 public class ManageLogController extends ManageController {
 
-    private static Logger LOGGER = Logger.getLogger(ManageLogController.class);
+    private static final Logger LOGGER = Logger.getLogger(ManageLogController.class);
 
     @Override
     public void add() {

@@ -6,6 +6,5 @@
 <div id="comment-list" class="comment">
 <jsp:include page="comment.jsp"></jsp:include>
 </div>
-</div>
 <jsp:include page="plugs.jsp"></jsp:include>
 <jsp:include page="footer.jsp"></jsp:include>

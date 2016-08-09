@@ -20,16 +20,20 @@
 			}
 			$.post(uri,$("#"+formId).serialize(),function(data){
 				if(data.success){
-					$.gritter.add({
-						title: '  操作成功...',
-						class_name: 'gritter-success' + (!$('#gritter-light').get(0).checked ? ' gritter-light' : ''),
-					});
+					new PNotify({
+						  title: '  操作成功...',
+						  type: 'success',
+						  hide: true,
+						  styling: 'bootstrap3'
+					  });
 					location.href = location.href;
 				}else{
-					$.gritter.add({
-						title: '  发生了一些异常...',
-						class_name: 'gritter-error' + (!$('#gritter-light').get(0).checked ? ' gritter-light' : ''),
-					});
+					new PNotify({
+						  title: '  发生了一些异常...',
+						  type: 'error',
+						  hide: true,
+						  styling: 'bootstrap3'
+					 });
 				}
 			});
 		});

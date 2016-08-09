@@ -50,7 +50,7 @@ jQuery(function($) {
 
         editurl:"admin/link/oper",//nothing is saved
         caption: "友链管理",
-        height:391,
+        height:411,
 
         autowidth: true
 

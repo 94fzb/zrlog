@@ -9,12 +9,9 @@ catch(Exception e){
 
 }
 %>
-
 <jsp:include page="include/menu.jsp"/>
 
-<link href="assets/css/bootstrap.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="assets/css/ui.jqgrid.css" />
-<link rel="stylesheet" href="assets/css/ace.min.css" />
 <style>
 	.modal-edit {
 		width:1300px;
@@ -25,21 +22,21 @@ catch(Exception e){
 <script src="assets/js/jqGrid/i18n/grid.locale-cn.js"></script>
 <script type="text/javascript" src="assets/js/eModal.min.js"></script>
 <script src="admin/js/log_jqgrid.js"></script>
-
-<div class="page-header">
-	<h1>
-		${_res.blogManage}
-		<small>
-			<i class="icon-double-angle-right"></i>${_res.viewAllBlog}
-		</small>
-	</h1>
-	<div class="nav-search" style="padding-top: 7px;">
+<div class="page-title">
+	<div class="title_left">
+		<h3>${_res.blogManage}</h3>
+	</div>
+	<div class="title_right">
+		<div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
 			<form class="form-search">
-				<span class="input-icon">
-					<input id="keywords" type="text" name="keywords" value="${keywords}" placeholder="${_res.searchTip}" class="input-small nav-search-input" autocomplete="off">
-					<i class="icon-search nav-search-icon"></i>
-				</span>
+				<div class="input-group">
+						<input id="keywords"  value="${keywords}" name="keywords" autocomplete="off" type="text" placeholder="${_res.searchTip}" class="form-control">
+						<span class="input-group-btn">
+						  <button type="button" class="btn btn-default">Go!</button>
+						</span>
+				</div>
 			</form>
+		</div>
 	</div>
 </div>
 

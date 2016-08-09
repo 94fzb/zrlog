@@ -4,17 +4,6 @@
 <script src="assets/js/jquery.liteuploader.min.js"></script>
 <script>
 	$(document).ready(function() {
-		$('#id-input-file-1').ace_file_input({
-			no_file : '${session.user.header}',
-			btn_choose : '本地上传',
-			btn_change : '文件',
-			droppable : false,
-			onchange : null,
-			thumbnail : true
-		//| true | large
-		//whitelist:'gif|png|jpg|jpeg'
-		});
-
 		$('.fileUpload').liteUploader({
 			script : 'admin/log/upload?dir=image'
 		}).on('lu:success', function(e, response) {
@@ -25,17 +14,15 @@
 	});
 </script>
 <div class="page-header">
-	<h1>
-		信息设置 <small> <i class="icon-double-angle-right"></i> 个人信息设置
-		</small>
-	</h1>
+	<h3>
+	  个人信息设置
+	</h3>
 </div>
 <!-- /.page-header -->
 <!-- PAGE CONTENT BEGINS -->
 <div class="row">
 <div class="col-xs-12">
 <form role="form" method="post" class="form-horizontal" action="admin/update">
-	<input type="hidden" id="logo" name="header" value="${user.header }">
 	<div class="form-group">
 		<label for="form-field-1"
 			class="col-sm-3 control-label no-padding-right"> ${_res.userName} </label>
@@ -58,11 +45,9 @@
 
 	<div class="form-group">
 		<label for="form-field-1"class="col-sm-3 control-label no-padding-right">头像</label>
-		<div class="col-sm-6">
-			<div class="ace-file-input">
-				<input type="file" name="imgFile" id="id-input-file-1"
-					class="fileUpload icon-upload-alt" value="上传" />
-			</div>
+		<div class="col-sm-9">
+			<input id="logo" class="col-xs-10 col-sm-5" id="form-field-1" name="header" value="${session.user.header}">
+			<input type="file" class="col-xs-10 col-sm-5 fileUpload" id="form-field-1" name="imgFile" value="上传" />
 		</div>
 	</div>
 	<div class="space-4"></div>
@@ -70,7 +55,7 @@
 	<div class="clearfix form-actions">
 		<div class="col-md-offset-3 col-md-9">
 			<button id="submit" type="submit" class="btn btn-info">
-				<i class="icon-ok bigger-110"></i> 提交
+				<i class="fa fa-check bigger-110"></i> 提交
 			</button>
 		</div>
 	</div>

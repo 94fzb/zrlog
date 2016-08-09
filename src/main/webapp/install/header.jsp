@@ -15,34 +15,51 @@
 <title>${_res.installWizard}</title>
 <link href="${basePath}assets/css/bootstrap.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="${basePath}assets/css/font-awesome.min.css" />
-<link rel="stylesheet" href="${basePath}assets/css/ace.min.css" />
+<link rel="stylesheet" href="${basePath}assets/css/custom.min.css" />
 </head>
 
-<body>
-	<div class="col-md-3"></div>
-	<div class="col-md-6">
-	<div class="widget-header widget-header-blue widget-header-flat">
-		<h3 class="lighter">${_res.installWizard}</h3>
-	</div>
-	<div class="widget-body">
-		<div class="widget-main">
+<body style="background:#fff">
+	<div class="col-md-2"></div>
+	<div class="col-md-8">
+	<div class="x_panel">
+		<div class="x_title">
+			<div class="widget-header widget-header-blue widget-header-flat">
+				<h3 class="lighter">${_res.installWizard}</h3>
+			</div>
+			<div class="clearfix"></div>
+		</div>
+
+		<div class="x_content">
 			<div class="alert alert-danger"
 				<c:if test="${empty errorMsg }">style="display: none;"</c:if>>
 				<b>${errorMsg}</b>
 			</div>
 			<c:if test="${currentViewName ne 'forbidden'}">
-			<div data-target="#step-container" class="row-fluid" id="fuelux-wizard">
-            	<ul class="wizard-steps">
-            		<li <c:if test="${currentViewName eq 'index'}">class="active"</c:if> data-target="#step1"><span class="step">1</span>
-            			<span class="title">${_res.installDatabaseInfo}</span></li>
-
-            		<li <c:if test="${currentViewName eq 'message'}">class="active"</c:if> data-target="#step2" class=""><span class="step">2</span> <span
-            			class="title">${_res.installWebSiteInfo}</span></li>
-
-            		<li <c:if test="${currentViewName eq 'success'}">class="active"</c:if> data-target="#step3" class=""><span class="step">3</span> <span
-            			class="title">${_res.installComplete}</span></li>
-            	</ul>
-            </div>
+			<div class="col-xs-12">
+				<div id="wizard" class="form_wizard wizard_horizontal">
+				  <ul class="wizard_steps anchor">
+					<li>
+					  <a <c:if test="${currentViewName eq 'index'}">class="selected"</c:if> href="#step-1">
+						<span class="step_no">1</span>
+						<span class="step_descr">${_res.installDatabaseInfo}</span>
+					  </a>
+					</li>
+					<li>
+					  <a  <c:if test="${currentViewName eq 'message'}">class="selected"</c:if>>
+						<span class="step_no">2</span>
+						<span class="step_descr">${_res.installWebSiteInfo}</span>
+					  </a>
+					</li>
+					<li>
+					  <a <c:if test="${currentViewName eq 'success'}">class="selected"</c:if>>
+						<span class="step_no">3</span>
+						<span class="step_descr">${_res.installComplete}</span>
+					  </a>
+					</li>
+				  </ul>
+			  </div>
+			  </div>
+			  <hr/>
             <div id="step-container"
-            	class="step-content row-fluid position-relative">
+            	class=" stepContainer row-fluid position-relative">
             </c:if>

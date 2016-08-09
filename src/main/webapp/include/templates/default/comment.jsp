@@ -28,7 +28,7 @@
                <p><label for="webHome">网站</label><input type="text" id="web" class="comment_web_input" size="25" name="webHome" value=""></p>
              </div>
              <div class="button-set">
-                <span class="remember"><input type="checkbox" class="checkbox active" checked="checked" id="remember" value="1" name="remember"> <label for="remember">Remember</label> <input type="hidden" name="checkbox_type" value="remember"></span> <span class="submit"><input type="submit"  id="txpCommentSubmit" class="button" name="submit" value="Submit"></span>
+                <span class="submit"><input type="submit"  id="txpCommentSubmit" class="button" name="submit" value="Submit"></span>
              </div>
          </div>
          <input type="hidden" name="logId" value="${log.logId }">

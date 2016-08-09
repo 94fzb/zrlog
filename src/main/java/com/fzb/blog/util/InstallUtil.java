@@ -1,6 +1,7 @@
 package com.fzb.blog.util;
 
 import com.fzb.blog.config.ZrlogConfig;
+import com.fzb.blog.controller.BaseController;
 import com.fzb.common.util.IOUtil;
 import com.fzb.common.util.Md5Util;
 import com.jfinal.config.Plugins;
@@ -24,8 +25,6 @@ public class InstallUtil {
     private String basePath;
     private Map<String, String> dbConn;
     private Map<String, String> configMsg;
-    private Connection connect;
-    private C3p0Plugin c3p0Plugin;
 
     public InstallUtil(String basePath) {
         this.basePath = basePath;
@@ -36,14 +35,6 @@ public class InstallUtil {
         this.basePath = basePath;
         this.dbConn = dbConn;
         this.configMsg = configMsg;
-        c3p0Plugin = new C3p0Plugin(dbConn.get("jdbcUrl"), dbConn.get("user"),
-                dbConn.get("password"), dbConn.get("driverClass"));
-        try {
-            c3p0Plugin.start();
-            this.connect = c3p0Plugin.getDataSource().getConnection();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     public InstallUtil(String basePath, Map<String, String> dbConn) {
@@ -54,7 +45,7 @@ public class InstallUtil {
     private static Map<String, Object> defaultWebSite(Map<String, String> webSite) {
         Map<String, Object> map = new LinkedHashMap<String, Object>();
         map.put("rows", 10);
-        map.put("template", "/include/templates/default");
+        map.put("template", BaseController.getDefaultTemplatePath());
         map.put("pseudo_staticStatus", false);
         map.put("title", webSite.get("title"));
         map.put("second_title", webSite.get("second_title"));
@@ -65,7 +56,7 @@ public class InstallUtil {
     public boolean testDbConn() {
         try {
             Class.forName(dbConn.get("driverClass"));
-            connect = DriverManager.getConnection(dbConn.get("jdbcUrl"), dbConn.get("user"), dbConn.get("password"));
+            Connection connect = DriverManager.getConnection(dbConn.get("jdbcUrl"), dbConn.get("user"), dbConn.get("password"));
             connect.close();
         } catch (Exception e) {
             return false;
@@ -83,8 +74,18 @@ public class InstallUtil {
         return lock.exists();
     }
 
-    public boolean startInstall(Map<String, String> dbConn,
+    private boolean startInstall(Map<String, String> dbConn,
                                 Map<String, String> blogMsg, File lock) {
+        C3p0Plugin c3p0Plugin = new C3p0Plugin(dbConn.get("jdbcUrl"), dbConn.get("user"),
+                dbConn.get("password"), dbConn.get("driverClass"));
+        Connection connect;
+        try {
+            c3p0Plugin.start();
+            connect = c3p0Plugin.getDataSource().getConnection();
+        } catch (SQLException e) {
+            return false;
+        }
+
         File file = new File(basePath + "/db.properties");
         Statement st;
         if (file.exists()) {
@@ -168,8 +169,7 @@ public class InstallUtil {
             ps = connect.prepareStatement(insertTag);
             ps.executeUpdate();
             LOGGER.info("reRegister c3p0");
-            Plugins plugins = (Plugins) JFinal.me().getServletContext()
-                    .getAttribute("plugins");
+            Plugins plugins = (Plugins) JFinal.me().getServletContext().getAttribute("plugins");
 
             // 添加表与实体的映射关系
             ActiveRecordPlugin plugin = ZrlogConfig.getActiveRecordPlugin(c3p0Plugin, file.toString());
