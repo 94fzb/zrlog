@@ -7,7 +7,6 @@
     padding: 0;
     position: absolute;
     width: 70px;
-    z-index: 9999;
 }
 .nav-sm .container.body .col-md-3.left_col.menu_fixed {
     height: 100%;

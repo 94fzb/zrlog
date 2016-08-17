@@ -84,9 +84,15 @@ ${_res.dashboard}
 						</tr>
 						<tr>
 							<td>
-								操作系统语言
+								操作系统地域/语言
 							</td>
-							<td>${system['user.language']}</td>
+							<td>${system['user.country']}/${system['user.language']}</td>
+						</tr>
+						<tr>
+							<td>
+								数据库版本
+							</td>
+							<td>${system['dbServer.version']}</td>
 						</tr>
 
 

@@ -2,12 +2,17 @@ package com.fzb.blog.util;
 
 import com.fzb.blog.model.User;
 import com.jfinal.core.JFinal;
+import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
+import java.net.URI;
+import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ZrlogUtil {
+
+    private static final Logger LOGGER = Logger.getLogger(ZrlogUtil.class);
 
     private ZrlogUtil() {
 
@@ -33,5 +38,40 @@ public class ZrlogUtil {
             map.put("Content-Type", request.getHeader("Content-Type"));
         }
         return map;
+    }
+
+    public static String getDatabaseServerVersion(String jdbcUrl, String userName, String password, String deriveClass) {
+        Connection connect = null;
+        try {
+            Class.forName(deriveClass);
+            URI uri = new URI(new URI(jdbcUrl).getSchemeSpecificPart());
+            jdbcUrl = jdbcUrl.replace(uri.getPath(), "/information_schema");
+            connect = DriverManager.getConnection(jdbcUrl, userName, password);
+            String queryVersionSQL = "select VARIABLE_VALUE from GLOBAL_VARIABLES where `VARIABLE_NAME`='innodb_version'";
+            String queryDbServer = "select VARIABLE_VALUE from GLOBAL_VARIABLES where `VARIABLE_NAME`='version_comment'";
+            PreparedStatement ps = connect.prepareStatement(queryVersionSQL);
+            ResultSet resultSet = ps.executeQuery();
+            String str = "";
+            if (resultSet.next()) {
+                str = resultSet.getString(1);
+            }
+            ps = connect.prepareStatement(queryDbServer);
+            resultSet = ps.executeQuery();
+            if (resultSet.next()) {
+                str += " - " + resultSet.getString(1);
+            }
+            return str;
+        } catch (Exception e) {
+            LOGGER.error("Not can same deriveClass " + deriveClass, e);
+        } finally {
+            if (connect != null) {
+                try {
+                    connect.close();
+                } catch (SQLException e) {
+                    LOGGER.error(e);
+                }
+            }
+        }
+        return "Unknown";
     }
 }

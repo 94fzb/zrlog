@@ -70,6 +70,10 @@ public class BlogBuildInfoUtil {
         return "RELEASE".equalsIgnoreCase(runMode);
     }
 
+    public static boolean isPreview() {
+        return "PREVIEW".equalsIgnoreCase(runMode);
+    }
+
     public static boolean isDev() {
         return "DEV".equalsIgnoreCase(runMode);
     }

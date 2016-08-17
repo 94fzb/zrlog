@@ -12,6 +12,7 @@ import com.fzb.blog.plugin.UpdateVersionPlugin;
 import com.fzb.blog.util.BlogBuildInfoUtil;
 import com.fzb.blog.util.InstallUtil;
 import com.fzb.blog.util.PluginConfig;
+import com.fzb.blog.util.ZrlogUtil;
 import com.fzb.common.util.http.HttpUtil;
 import com.fzb.common.util.http.handle.HttpFileHandle;
 import com.jfinal.config.*;
@@ -38,10 +39,11 @@ import java.util.Random;
  */
 public class ZrlogConfig extends JFinalConfig {
 
-    private static final   Logger LOGGER = Logger.getLogger(ZrlogConfig.class);
+    private static final Logger LOGGER = Logger.getLogger(ZrlogConfig.class);
     private static final String PLUGIN_CORE_DOWNLOAD_URL = "http://dl.zrlog.com/release/plugin/plugin-core.jar";
 
     private static Properties systemProperties = new Properties();
+    private Properties properties = new Properties();
 
     static {
         try {
@@ -137,7 +139,6 @@ public class ZrlogConfig extends JFinalConfig {
                 return;
             }
             String dbPropertiesPath = PathKit.getWebRootPath() + "/WEB-INF/db.properties";
-            Properties properties = new Properties();
             try {
                 properties.load(new FileInputStream(dbPropertiesPath));
             } catch (IOException e) {
@@ -163,6 +164,8 @@ public class ZrlogConfig extends JFinalConfig {
         Properties systemProp = System.getProperties();
         systemProp.setProperty("zrlog.runtime.path", JFinal.me().getServletContext().getRealPath("/"));
         systemProp.setProperty("server.info", JFinal.me().getServletContext().getServerInfo());
+        systemProp.put("dbServer.version", ZrlogUtil.getDatabaseServerVersion(properties.getProperty("jdbcUrl"), properties.getProperty("user"),
+                properties.getProperty("password"), properties.getProperty("driverClass")));
         JFinal.me().getServletContext().setAttribute("system", systemProp);
         systemProperties.put("version", BlogBuildInfoUtil.getVersion());
         systemProperties.put("buildId", BlogBuildInfoUtil.getBuildId());
