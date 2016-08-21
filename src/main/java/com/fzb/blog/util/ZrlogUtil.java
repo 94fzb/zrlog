@@ -44,23 +44,13 @@ public class ZrlogUtil {
         Connection connect = null;
         try {
             Class.forName(deriveClass);
-            URI uri = new URI(new URI(jdbcUrl).getSchemeSpecificPart());
-            jdbcUrl = jdbcUrl.replace(uri.getPath(), "/information_schema");
             connect = DriverManager.getConnection(jdbcUrl, userName, password);
-            String queryVersionSQL = "select VARIABLE_VALUE from GLOBAL_VARIABLES where `VARIABLE_NAME`='innodb_version'";
-            String queryDbServer = "select VARIABLE_VALUE from GLOBAL_VARIABLES where `VARIABLE_NAME`='version_comment'";
+            String queryVersionSQL = "select version()";
             PreparedStatement ps = connect.prepareStatement(queryVersionSQL);
             ResultSet resultSet = ps.executeQuery();
-            String str = "";
             if (resultSet.next()) {
-                str = resultSet.getString(1);
+                return  resultSet.getString(1);
             }
-            ps = connect.prepareStatement(queryDbServer);
-            resultSet = ps.executeQuery();
-            if (resultSet.next()) {
-                str += " - " + resultSet.getString(1);
-            }
-            return str;
         } catch (Exception e) {
             LOGGER.error("Not can same deriveClass " + deriveClass, e);
         } finally {
