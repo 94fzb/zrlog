@@ -100,7 +100,7 @@
 			</form>
 		</div>
 		<div class="tab-pane" id="other" style="padding: 10px">
-			<h4 class="header blue">ICP,网站统计等信息</h4>
+			<h4 class="header blue">ICP，网站统计等信息</h4>
 			<form role="form" class="form-horizontal" checkBox="pseudo_staticStatus" id="otherMsgAjax">
 				<div class="form-group">
 					<label for="form-field-1"

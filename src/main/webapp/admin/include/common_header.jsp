@@ -23,7 +23,7 @@ request.getSession().setAttribute("webs",webSite);
     <!-- Meta, title, CSS, favicons, etc. -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" href="f${url}/favicon.ico" />
+    <link rel="shortcut icon" href="${url}/favicon.ico" />
     <!-- Bootstrap -->
     <link href="${url}/assets/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
