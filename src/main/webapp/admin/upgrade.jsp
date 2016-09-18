@@ -1,9 +1,6 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <jsp:include page="include/menu.jsp"/>
-<link href="assets/css/select2.min.css" rel="stylesheet">
-<link href="assets/css/switchery.min.css" rel="stylesheet">
-
 <script type="text/javascript" src="admin/js/set_update.js"></script>
 <script src="assets/js/switchery.min.js"></script>
 <div class="page-header">
@@ -42,9 +39,9 @@
 			</span>
 		</div>
 	</div>
-	<div class="space-4"></div>
+	<div class="ln_solid"></div>
 
-	<div class="clearfix form-actions">
+	<div class="form-group">
 		<div class="col-md-offset-3 col-md-9">
 			<button id="upgrade" type="button" class="btn btn-info">
 				<i class="fa fa-check bigger-110"></i> ${_res.submit}

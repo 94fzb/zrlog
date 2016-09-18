@@ -19,7 +19,7 @@
                 <hr>
                 <div class="space"></div>
                 <div class="center">
-                    <a class="btn btn-grey" href="javascript:history.go(-1);">
+                    <a class="btn btn-info" href="javascript:history.go(-1);">
                         <i class="fa fa-arrow-left"></i>
                         ${_res.goBack}
                     </a>

@@ -6,8 +6,6 @@ request.setAttribute("url", request.getScheme()+"://"+request.getHeader("host")+
 request.setAttribute("suburl", request.getRequestURL().substring(basePath.length()));
 %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<link href="assets/css/select2.min.css" rel="stylesheet">
-<link href="assets/css/switchery.min.css" rel="stylesheet">
 <link rel="stylesheet" href="admin/markdown/css/editormd.min.css" />
 <style>
 .CodeMirror-scroll {

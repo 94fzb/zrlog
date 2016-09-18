@@ -50,9 +50,9 @@
 			<input type="file" class="col-xs-10 col-sm-5 fileUpload" id="form-field-1" name="imgFile" value="上传" />
 		</div>
 	</div>
-	<div class="space-4"></div>
+	<div class="ln_solid"></div>
 
-	<div class="clearfix form-actions">
+	<div class="form-group">
 		<div class="col-md-offset-3 col-md-9">
 			<button id="submit" type="submit" class="btn btn-info">
 				<i class="fa fa-check bigger-110"></i> 提交

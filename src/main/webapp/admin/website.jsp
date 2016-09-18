@@ -2,9 +2,6 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <jsp:include page="include/menu.jsp" />
-
-<link href="assets/css/switchery.min.css" rel="stylesheet">
-
 <script type="text/javascript" src="admin/js/set_update.js"></script>
 <script src="assets/js/jquery.liteuploader.min.js"></script>
 <script>
@@ -66,9 +63,6 @@
 							id="form-field-1">
 					</div>
 				</div>
-
-				<div class="space-4"></div>
-
 				<div class="form-group">
 					<label for="form-field-2"
 						class="col-sm-3 control-label no-padding-right"> 网站描述 </label>
@@ -88,8 +82,8 @@
 							class="col-xs-12 col-sm-6 fileUpload" value="上传" />
 					</div>
 				</div>
-				<div class="space-4"></div>
-				<div class="clearfix form-actions">
+				<div class="ln_solid"></div>
+				<div class="form-group">
 					<div class="col-md-offset-3 col-md-9">
 						<button id="baseMsg" type="button" class="btn btn-info">
 							<i class="fa fa-check bigger-110"></i> 提交
@@ -136,9 +130,9 @@
 				</div>
 
 
-				<div class="space-4"></div>
+				<div class="ln_solid"></div>
 
-				<div class="clearfix form-actions">
+				<div class="form-group">
 					<div class="col-md-offset-3 col-md-9">
 						<button id="otherMsg" type="button" class="btn btn-info">
 							<i class="fa fa-check bigger-110"></i> 提交
@@ -166,8 +160,8 @@
 							id="form-field-1">${webs.blackList}</textarea>
 					</div>
 				</div>
-				<div class="space-4"></div>
-				<div class="clearfix form-actions">
+				<div class="ln_solid"></div>
+				<div class="form-group">
 					<div class="col-md-offset-3 col-md-9">
 						<button id="blackList" type="button" class="btn btn-info">
 							<i class="fa fa-check bigger-110"></i> 提交

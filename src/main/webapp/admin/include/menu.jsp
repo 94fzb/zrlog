@@ -218,12 +218,22 @@
                 <c:forEach items="${session.comments.rows}" var="comment">
                 <li>
                     <a target="_blank" href="post/${comment.logId}">
+                        <span class="image">
+                        <c:choose>
+                        <c:when test='${not empty comment.header}' >
                         <img class="msg-photo" src="${comment.header}">
-                        <span class="msg-body">
-                            <span class="msg-title">
-                                <span class="blue">${comment.userName}:</span>
-                                ${comment.userComment}
-                            </span>
+                        </c:when>
+                        <c:otherwise>
+                        <img class="msg-photo" src="${url}/assets/images/default-portrait.gif">
+                        </c:otherwise>
+                        </c:choose>
+                        </span>
+                        <span>
+                          <span>${comment.userName}</span>
+                          <span class="time"></span>
+                        </span>
+                        <span class="message">
+                            ${comment.userComment}
                         </span>
                     </a>
                 </li>

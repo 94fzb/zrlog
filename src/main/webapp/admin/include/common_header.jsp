@@ -30,6 +30,8 @@ request.getSession().setAttribute("webs",webSite);
     <link href="${url}/assets/css/font-awesome.min.css" rel="stylesheet">
     <!-- NProgress -->
     <link href="${url}/assets/css/nprogress.css" rel="stylesheet">
+    <link href="${url}/assets/css/select2.min.css" rel="stylesheet">
+    <link href="${url}/assets/css/switchery.min.css" rel="stylesheet">
     <!-- Custom Theme Style -->
     <link href="${url}/assets/css/custom.min.css" rel="stylesheet">
 
