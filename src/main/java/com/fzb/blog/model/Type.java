@@ -1,6 +1,6 @@
 package com.fzb.blog.model;
 
-import com.fzb.common.util.ParseTools;
+import com.fzb.blog.util.ParseUtil;
 import com.jfinal.plugin.activerecord.Model;
 
 import java.util.HashMap;
@@ -21,7 +21,7 @@ public class Type extends Model<Type> {
         data.put(
                 "rows",
                 find("select t.typeId as id,t.alias,t.typeName,t.remark,(select count(logId) from log where typeid=t.typeid) as typeamount from type t limit ?,?",
-                        ParseTools.getFirstRecord(page,
+                        ParseUtil.getFirstRecord(page,
                                 pageSize), pageSize));
         fillData(page, pageSize, "from type", data, new Object[0]);
         return data;
@@ -32,7 +32,7 @@ public class Type extends Model<Type> {
         if (((List) data.get("rows")).size() > 0) {
             data.put("page", page);
             long count = findFirst("select count(1) cnt " + where, obj).getLong("cnt");
-            data.put("total", ParseTools.getTotalPate(count, pageSize));
+            data.put("total", ParseUtil.getTotalPate(count, pageSize));
             data.put("records", count);
         } else {
             data.clear();

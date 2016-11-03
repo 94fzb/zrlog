@@ -7,7 +7,7 @@ import com.fzb.blog.model.User;
 import com.fzb.blog.util.ResUtil;
 import com.fzb.blog.util.WebTools;
 import com.fzb.common.util.Md5Util;
-import com.fzb.common.util.ParseTools;
+import com.fzb.blog.util.ParseUtil;
 import com.jfinal.kit.PathKit;
 import com.jfinal.plugin.activerecord.Db;
 
@@ -33,7 +33,7 @@ public class UserController extends ManageController {
             if (commentMap.get("rows") != null) {
                 List<Comment> rows = (List<Comment>) commentMap.get("rows");
                 for (Comment comment : rows) {
-                    comment.put("userComment", ParseTools.autoDigest(comment.get("userComment").toString(), 15));
+                    comment.put("userComment", ParseUtil.autoDigest(comment.get("userComment").toString(), 15));
                 }
             }
             getSession().setAttribute("comments", commentMap);

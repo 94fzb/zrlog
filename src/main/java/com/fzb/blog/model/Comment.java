@@ -1,6 +1,6 @@
 package com.fzb.blog.model;
 
-import com.fzb.common.util.ParseTools;
+import com.fzb.blog.util.ParseUtil;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Model;
 
@@ -23,7 +23,7 @@ public class Comment extends Model<Comment> {
         data.put(
                 "rows",
                 find(sql,
-                        ParseTools.getFirstRecord(page,
+                        ParseUtil.getFirstRecord(page,
                                 pageSize), pageSize));
         fillData(page, pageSize, "from comment", data, new Object[0]);
         return data;
@@ -45,7 +45,7 @@ public class Comment extends Model<Comment> {
         data.put(
                 "rows",
                 find(sql,
-                        ParseTools.getFirstRecord(page,
+                        ParseUtil.getFirstRecord(page,
                                 pageSize), pageSize));
         fillData(page, pageSize, "from comment", data, new Object[0]);
         return data;
@@ -58,7 +58,7 @@ public class Comment extends Model<Comment> {
             long count = findFirst("select count(commentId) cnt "
                     + where, obj).getLong("cnt");
             data.put("total",
-                    ParseTools.getTotalPate(count, pageSize));
+                    ParseUtil.getTotalPate(count, pageSize));
             data.put("records", count);
         } else {
             data.clear();

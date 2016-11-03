@@ -1,5 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ page language="java" import="java.util.*" import="com.fzb.blog.common.*" pageEncoding="UTF-8"%>
 <%
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getHeader("host")+path+"/";
@@ -7,8 +7,8 @@ request.setAttribute("url", request.getScheme()+"://"+request.getHeader("host")+
 if(request.getAttribute("currentPath")==null){
 	request.setAttribute("currentPath", request.getRequestURL().substring((basePath+"admin/").length()));
 }
-Map init = (Map)request.getAttribute("init");
-Map webSite = (Map)init.get("webSite");
+BaseDataInitVO init = (BaseDataInitVO)request.getAttribute("init");
+Map webSite = (Map)init.getWebSite();
 if(webSite.get("admin_dashboard_naver") == null){
     webSite.put("admin_dashboard_naver","nav-md");
 }

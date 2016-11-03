@@ -1,5 +1,6 @@
 package com.fzb.blog.controller;
 
+import com.fzb.blog.common.BaseDataInitVO;
 import com.fzb.blog.model.*;
 import com.jfinal.aop.Before;
 import com.jfinal.core.Controller;
@@ -13,7 +14,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class BaseController extends Controller {
 
@@ -27,21 +31,21 @@ public class BaseController extends Controller {
     @Before({CacheInterceptor.class})
     @CacheName("/post/initData")
     public void initData() {
-        Map<String, Object> init = CacheKit.get("/post/initData", "initData");
+        BaseDataInitVO init = CacheKit.get("/post/initData", "initDataV1");
         if (init == null) {
-            init = new HashMap<String, Object>();
-            Map<String, Object> websiteMap = WebSite.dao.getWebSite();
+            init = new BaseDataInitVO();
+            Map<String, Object> website = WebSite.dao.getWebSite();
             //兼容早期模板判断方式
-            websiteMap.put("user_comment_pluginStatus", "on".equals(websiteMap.get("duoshuo_status")));
-            init.put("webSite", websiteMap);
-            init.put("links", Link.dao.queryAll());
-            init.put("types", Type.dao.queryAll());
-            init.put("logNavs", LogNav.dao.queryAll(getRequest().getScheme() + "://" + getRequest().getHeader("host") + getRequest().getContextPath()));
-            init.put("plugins", Plugin.dao.queryAll());
-            init.put("archives", Log.dao.getArchives());
-            init.put("tags", Tag.dao.queryAll());
-            init.put("hotLog", Log.dao.getLogsByPage(1, 6));
-            List<Type> types = Type.dao.queryAll();
+            website.put("user_comment_pluginStatus", "on".equals(website.get("duoshuo_status")));
+            init.setWebSite(website);
+            init.setLinks(Link.dao.queryAll());
+            init.setTypes(Type.dao.queryAll());
+            init.setLogNavs(LogNav.dao.queryAll());
+            init.setPlugins(Plugin.dao.queryAll());
+            init.setArchives(Log.dao.getArchives());
+            init.setTags(Tag.dao.queryAll());
+            init.setHotLogs((List<Log>) Log.dao.getLogsByPage(1, 6).get("rows"));
+            List<Type> types = init.getTypes();
             Map<Map<String, Object>, List<Log>> indexHotLog = new LinkedHashMap<Map<String, Object>, List<Log>>();
             for (Type type : types) {
                 Map<String, Object> typeMap = new TreeMap<String, Object>();
@@ -49,12 +53,12 @@ public class BaseController extends Controller {
                 typeMap.put("alias", type.getStr("alias"));
                 indexHotLog.put(typeMap, (List<Log>) Log.dao.getLogsBySort(1, 6, type.getStr("alias")).get("rows"));
             }
-            init.put("indexHotLog", indexHotLog);
-            CacheKit.put("/post/initData", "initData", init);
-            JFinal.me().getServletContext().setAttribute("webSite", init.get("webSite"));
+            init.setIndexHotLogs(indexHotLog);
+            CacheKit.put("/post/initData", "initDataV1", init);
+            JFinal.me().getServletContext().setAttribute("webSite", website);
         }
         setAttr("init", init);
-        this.webSite = (Map<String, Object>) init.get("webSite");
+        this.webSite = init.getWebSite();
         this.templatePath = webSite.get("template").toString();
         this.rows = Integer.parseInt(webSite.get("rows").toString());
     }

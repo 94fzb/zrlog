@@ -2,11 +2,11 @@
          xsi:noNamespaceSchemaLocation="http://www.ehcache.org/ehcache.xsd">
     <diskStore path="java.io.tmpdir"/>
     <cache name="/post/initData"
-           maxElementsInMemory="10000"
-           timeToIdleSeconds="300"
+           maxBytesLocalHeap="4M"
+           maxBytesLocalDisk="8M"
            eternal="false"
            overflowToDisk="true"
-           timeToLiveSeconds="120"
+           timeToLiveSeconds="3600"
            diskPersistent="true"
             />
 </ehcache>

@@ -1,6 +1,6 @@
 package com.fzb.blog.model;
 
-import com.fzb.common.util.ParseTools;
+import com.fzb.blog.util.ParseUtil;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Model;
 
@@ -29,7 +29,7 @@ public class Log extends Model<Log> implements Serializable {
 
     }
 
-    public Map<String, Object> getLogByLogId(Object id) {
+    public Log getLogByLogId(Object id) {
         if (id != null) {
             String sql = "select l.*,u.userName,(select count(commentId) from comment where logId=l.logId) commentSize ,t.alias as typeAlias,t.typeName as typeName  from log l inner join user u,type t where t.typeId=l.typeId and u.userId=l.userId and rubbish=? and private=? and l.logId=?";
             Log log = findFirst(sql, rubbish, pre, id);
@@ -38,7 +38,7 @@ public class Log extends Model<Log> implements Serializable {
                 log = findFirst(sql, rubbish, pre, id);
             }
             if (log != null) {
-                return log.getAttrs();
+                return log;
             }
         }
         return null;
@@ -102,7 +102,7 @@ public class Log extends Model<Log> implements Serializable {
         data.put(
                 "rows",
                 find(sql,
-                        rubbish, pre, ParseTools.getFirstRecord(page,
+                        rubbish, pre, ParseUtil.getFirstRecord(page,
                                 pageSize), pageSize));
         fillData(page, pageSize,
                 "from log l inner join user u where rubbish=? and private=? and u.userId=l.userId ", data,
@@ -127,7 +127,7 @@ public class Log extends Model<Log> implements Serializable {
         data.put(
                 "rows",
                 find(sql,
-                        ParseTools.getFirstRecord(page,
+                        ParseUtil.getFirstRecord(page,
                                 pageSize), pageSize));
         fillData(page, pageSize,
                 "from log l inner join user u where u.userId=l.userId " + searchKeywords, data,
@@ -144,7 +144,7 @@ public class Log extends Model<Log> implements Serializable {
                 find(sql,
                         rubbish, pre,
                         typeAlias,
-                        ParseTools.getFirstRecord(page,
+                        ParseUtil.getFirstRecord(page,
                                 pageSize), pageSize));
 
         fillData(
@@ -162,19 +162,19 @@ public class Log extends Model<Log> implements Serializable {
             long count = findFirst("select count(l.logId) cnt " + where,
                     obj).getLong("cnt");
             data.put("total",
-                    ParseTools.getTotalPate(count, pageSize));
+                    ParseUtil.getTotalPate(count, pageSize));
             data.put("records", count);
         } else {
             data.clear();
         }
     }
 
-    public Map<String, Object> getArchives() {
+    public Map<String, Long> getArchives() {
         List<Object[]> lo = Db
                 .query("select  DATE_FORMAT(releaseTime,'%Y_%m'),count(DATE_FORMAT(releaseTime,'%Y_%m')) from log  where rubbish=? and private=?  group by DATE_FORMAT(releaseTime,'%Y_%m') order by logId desc", rubbish, pre);
-        Map<String, Object> archives = new LinkedHashMap<String, Object>();
+        Map<String, Long> archives = new LinkedHashMap<String, Long>();
         for (Object[] objects : lo) {
-            archives.put(objects[0].toString(), objects[1]);
+            archives.put(objects[0].toString(), (Long) objects[1]);
         }
         return archives;
     }
@@ -190,7 +190,7 @@ public class Log extends Model<Log> implements Serializable {
                         "%," + tag + ",%",
                         "%," + tag,
                         tag,
-                        ParseTools.getFirstRecord(page,
+                        ParseUtil.getFirstRecord(page,
                                 pageSize), pageSize));
         fillData(
                 page,
@@ -209,7 +209,7 @@ public class Log extends Model<Log> implements Serializable {
                 find(sql,
                         rubbish, pre,
                         date,
-                        ParseTools.getFirstRecord(page,
+                        ParseUtil.getFirstRecord(page,
                                 pageSize), pageSize));
         fillData(
                 page,
@@ -229,7 +229,7 @@ public class Log extends Model<Log> implements Serializable {
                         rubbish, pre,
                         "%" + key + "%",
                         "%" + key + "%",
-                        ParseTools.getFirstRecord(page,
+                        ParseUtil.getFirstRecord(page,
                                 pageSize), pageSize));
         fillData(
                 page,

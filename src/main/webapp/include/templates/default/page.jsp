@@ -16,12 +16,16 @@
 	<c:if test="${not empty requestScope.data}">
 <c:forEach var="log" items="${requestScope.data.rows}">
 <article class="entry">
-<h2 class="post-title"><a rel="bookmark" href="${rurl}post/${log.alias}">${log.title}</a></h2>
+<h2 class="post-title"><a rel="bookmark" href="${log.url}">${log.title}</a></h2>
   <div class="content"><p>${log.digest}</p></div>
 	  <div class="meta">
-	  <p class="category"><a rel="tag" href="${rurl}post/sort/${log.typeAlias}">${log.typeName}</a> </p>
+	  <p class="category"><a rel="tag" href="${log.typeUrl}">${log.typeName}</a> </p>
 	  <p class="published">/<time datetime="${log.releaseTime}">&nbsp;${log.releaseTime.year+1900}-${log.releaseTime.month+1}-${log.releaseTime.date}</time></p>
-	  <p class="commentlink"><a href="${rurl}post/${log.alias}#comment" class="comments_invite">${_res.commentView} [${log.commentSize}]</a></p>
+	  <p class="commentlink">
+	    <a href="${log.url}#comment" class="comments_invite">
+	  	${_res.commentView} <c:if test="${not staticBlog}"> [${log.commentSize}] </c:if>
+	  	</a>
+	  </p>
   </div>
 </article>
 </c:forEach>

@@ -26,9 +26,9 @@ public class LoginInterceptor extends PrototypeInterceptor {
         ai.invoke();
         String basePath = getBaseTemplatePath(ai);
         MyI18NInterceptor.addToRequest(PathKit.getWebRootPath() + basePath + "/language/", ai.getController().getRequest());
-        if (ai.getController() instanceof BaseController) {
-            ((BaseController) ai.getController()).fullTemplateSetting();
-        }
+        BaseController baseController = ((BaseController) ai.getController());
+        baseController.fullTemplateSetting();
+        TemplateAttrHelper.fullInfo(ai.getController().getRequest(), baseController.getStaticHtmlStatus());
         if (ai.getController().getAttr("log") != null) {
             ai.getController().setAttr("pageLevel", 1);
             ai.getController().render(basePath + "/detail.jsp");

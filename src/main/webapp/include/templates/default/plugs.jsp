@@ -3,7 +3,7 @@
 </section>
 <aside>
 	<div class="widget search">
-		<form id="searchform" action="${rurl }post/search" method="post">
+		<form id="searchform" action="${searchUrl}" method="post">
 			<p class="search_input"><input type="text" onblur="OnExit(this)" onfocus="OnEnter(this)" size="15" name="key" title="${_res.searchTip}" value="${_res.searchTip}" class="inputtext"><input type="submit" class="btn" value="${_res.search}"></p>
 		</form>
 	</div>
@@ -26,7 +26,7 @@
 		<div class="list">
 		<ul class="category_list">
 			<c:forEach var="type" items="${init.types}">
-				<li><a href="${rurl}post/sort/${type.alias}">${type.typeName} (${type.typeamount})</a>
+				<li><a href="${type.url}">${type.typeName} (${type.typeamount})</a>
 				</li>
 			</c:forEach>
 		</ul>
@@ -47,9 +47,9 @@
 	<div class="widget">
 		<h3>${_res.archive}</h3>
 		<ul>
-			<c:forEach var="archives" items="${init.archives}">
-				<li><a href="${rurl}post/record/${archives.key}" rel="nofollow">${archives.key}
-						(${archives.value})</a>
+			<c:forEach var="archive" items="${init.archiveList}">
+				<li><a href="${archive.url}" rel="nofollow">${archive.text}
+						(${archive.count})</a>
 				</li>
 			</c:forEach>
 		</ul>
@@ -86,7 +86,7 @@
 	<h3>${_res.tag}</h3>
 	<div class="taglist" id="tags">
 		 <c:forEach items="${init.tags}" var="tag">
-			<a href="${rurl}post/tag/${tag.text}" title="${tag.text}上共有(${tag.count})文章">${tag.text}</a>
+			<a href="${tag.url}" title="${tag.text}上共有(${tag.count})文章">${tag.text}</a>
 		 </c:forEach>
 	</div>
 	</div>

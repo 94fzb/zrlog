@@ -1,7 +1,5 @@
 ﻿<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-
-<jsp:include page="../../core/core_header.jsp"></jsp:include>
 <%
   Map<String,Object> res = (Map<String,Object>)request.getAttribute("_res");
   if(res.get("avatar")==null){

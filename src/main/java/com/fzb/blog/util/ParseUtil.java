@@ -1,6 +1,6 @@
-package com.fzb.common.util;
+package com.fzb.blog.util;
 
-public class ParseTools {
+public class ParseUtil {
     public static int getFirstRecord(int page, int pageSize) {
         return (page - 1) * pageSize;
     }

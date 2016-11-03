@@ -5,7 +5,6 @@ import com.jfinal.core.JFinal;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
-import java.net.URI;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +19,10 @@ public class ZrlogUtil {
 
     public static String getPluginServer() {
         return JFinal.me().getServletContext().getAttribute("pluginServer").toString();
+    }
+
+    public static boolean isStaticBlogPlugin(HttpServletRequest httpServletRequest) {
+        return httpServletRequest.getHeader("User-Agent") != null && httpServletRequest.getHeader("User-Agent").startsWith("Static-Blog-Plugin");
     }
 
     public static Map<String, String> genHeaderMapByRequest(HttpServletRequest request) {
@@ -49,7 +52,7 @@ public class ZrlogUtil {
             PreparedStatement ps = connect.prepareStatement(queryVersionSQL);
             ResultSet resultSet = ps.executeQuery();
             if (resultSet.next()) {
-                return  resultSet.getString(1);
+                return resultSet.getString(1);
             }
         } catch (Exception e) {
             LOGGER.error("Not can same deriveClass " + deriveClass, e);

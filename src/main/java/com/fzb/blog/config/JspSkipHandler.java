@@ -1,5 +1,6 @@
 package com.fzb.blog.config;
 
+import com.fzb.blog.util.ZrlogUtil;
 import com.fzb.common.util.IOUtil;
 import com.fzb.common.util.http.HttpUtil;
 import com.fzb.common.util.http.handle.CloseResponseHandle;
@@ -55,7 +56,9 @@ public class JspSkipHandler extends Handler {
                                 + request.getHeader("host")
                                 + request.getContextPath() + tempTarget;
                         target = tempTarget;
-                        convert2Html(home, htmlFile);
+                        if (!ZrlogUtil.isStaticBlogPlugin(request)) {
+                            convert2Html(home, htmlFile);
+                        }
                     }
                     this.next.handle(target, request, response, isHandled);
                 } else {

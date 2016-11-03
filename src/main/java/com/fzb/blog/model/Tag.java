@@ -1,6 +1,6 @@
 package com.fzb.blog.model;
 
-import com.fzb.common.util.ParseTools;
+import com.fzb.blog.util.ParseUtil;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Model;
 
@@ -108,7 +108,7 @@ public class Tag extends Model<Tag> {
 
     public Map<String, Object> queryAll(Integer page, Integer pageSize) {
         Map<String, Object> data = new HashMap<String, Object>();
-        data.put("rows", find("select tagid as id,text,count from tag limit ?,?", ParseTools.getFirstRecord(page, pageSize), pageSize));
+        data.put("rows", find("select tagid as id,text,count from tag limit ?,?", ParseUtil.getFirstRecord(page, pageSize), pageSize));
         fillData(page, pageSize, "from tag", data, new Object[0]);
         return data;
     }
@@ -117,7 +117,7 @@ public class Tag extends Model<Tag> {
         if (((List) data.get("rows")).size() > 0) {
             data.put("page", page);
             long count = findFirst("select count(1) cnt " + where, obj).getLong("cnt");
-            data.put("total", ParseTools.getTotalPate(count, pageSize));
+            data.put("total", ParseUtil.getTotalPate(count, pageSize));
             data.put("records", count);
         } else {
             data.clear();

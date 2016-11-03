@@ -3,9 +3,9 @@ package com.fzb.blog.controller;
 import com.fzb.blog.model.Comment;
 import com.fzb.blog.model.Log;
 import com.fzb.blog.model.Type;
+import com.fzb.blog.util.ParseUtil;
 import com.fzb.blog.util.ResUtil;
 import com.fzb.blog.util.WebTools;
-import com.fzb.common.util.ParseTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +28,6 @@ public class QueryLogController extends BaseController {
     private void setPageInfo(String currentUri, Map<String, Object> data, int currentPage) {
         setAttr("yurl", currentUri);
 
-        currentUri = getRequest().getScheme() + "://" + getRequest().getHeader("host") + getRequest().getContextPath() + "/" + currentUri;
         Integer total = (Integer) data.get("total");
         if (total != null) {
             setAttr("data", data);
@@ -50,7 +49,7 @@ public class QueryLogController extends BaseController {
             if (findInDigest) {
                 log.put("digest", tryWrapperDigest);
             } else {
-                String wrapperContent = wrapper(ParseTools.removeHtmlElement(content), keyword);
+                String wrapperContent = wrapper(ParseUtil.removeHtmlElement(content), keyword);
                 log.put("digest", wrapperContent);
             }
         }
@@ -145,6 +144,8 @@ public class QueryLogController extends BaseController {
             pageList.add(pageEntity(currentUri, currentPage, ResUtil.getStringFromRes("nextPage", getRequest()), currentPage + 1));
         }
         pager.put("pageList", pageList);
+        pager.put("pageStartUrl", currentUri + 1);
+        pager.put("pageEndUrl", currentUri + total);
         pager.put("startPage", currentPage == 1);
         pager.put("endPage", currentPage == total);
         setAttr("pager", pager);
@@ -162,21 +163,6 @@ public class QueryLogController extends BaseController {
         return pageEntity(url, currentPage, page + "", page);
     }
 
-    private void formatAlias(Object data) {
-        if (getStaticHtmlStatus()) {
-            if (data instanceof Map) {
-                Map<String, Object> map = (Map<String, Object>) data;
-                List<Log> logList = (List<Log>) map.get("rows");
-                if (logList != null && logList.size() > 0) {
-                    for (Log log : logList) {
-                        log.set("alias", log.get("alias") + ".html");
-                    }
-                } else {
-                    map.put("alias", map.get("alias") + ".html");
-                }
-            }
-        }
-    }
 
     public void index() {
         if ((getRequest().getServletPath().startsWith("/post"))
@@ -219,7 +205,6 @@ public class QueryLogController extends BaseController {
         setAttr("tipsName", key);
 
         setPageInfo("post/search/" + key + "-", data, getParaToInt(1, 1));
-        formatAlias(getAttr("data"));
         List<Log> logs = (List<Log>) data.get("rows");
         if (logs != null && !logs.isEmpty()) {
             wrapperSearchKeyword(logs, key);
@@ -231,7 +216,6 @@ public class QueryLogController extends BaseController {
         setAttr("tipsName", getPara(0));
 
         setPageInfo("post/record/" + getPara(0) + "-", Log.dao.getLogsByData(getParaToInt(1, 1), getDefaultRows(), getPara(0)), getParaToInt(1, 1));
-        formatAlias(getAttr("data"));
     }
 
     public void addComment() {
@@ -253,17 +237,14 @@ public class QueryLogController extends BaseController {
     }
 
     private void detail(Object id) {
-        Map<String, Object> data = Log.dao.getLogByLogId(id);
-        if (data != null) {
-            Integer logId = (Integer) data.get("logId");
-            Map<String, Object> log = new HashMap<String, Object>();
-            log.putAll(Log.dao.getLogByLogId(logId));
+        Log log = Log.dao.getLogByLogId(id);
+        if (log != null) {
+            Integer logId = log.get("logId");
             Log.dao.clickChange(logId);
             log.put("lastLog", Log.dao.getLastLog(logId, ResUtil.getStringFromRes("noLastLog", getRequest())));
             log.put("nextLog", Log.dao.getNextLog(logId, ResUtil.getStringFromRes("noNextLog", getRequest())));
             log.put("comments", Comment.dao.getCommentsByLogId(logId));
             setAttr("log", log);
-            formatAlias(log);
         }
     }
 
@@ -276,7 +257,6 @@ public class QueryLogController extends BaseController {
         if (type != null) {
             setAttr("tipsName", type.getStr("typeName"));
         }
-        formatAlias(getAttr("data"));
     }
 
     public void tag() {
@@ -286,14 +266,12 @@ public class QueryLogController extends BaseController {
 
             setAttr("tipsType", ResUtil.getStringFromRes("tag", getRequest()));
             setAttr("tipsName", tag);
-            formatAlias(getAttr("data"));
         }
     }
 
     public void all() {
-        int page = ParseTools.strToInt(getPara(1), 1);
+        int page = ParseUtil.strToInt(getPara(1), 1);
         Map<String, Object> data = Log.dao.getLogsByPage(page, getDefaultRows());
         setPageInfo("post/all-", data, page);
-        formatAlias(data);
     }
 }

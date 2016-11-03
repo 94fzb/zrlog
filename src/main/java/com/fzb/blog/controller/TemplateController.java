@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -74,9 +75,11 @@ public class TemplateController extends ManageController {
         File[] templatesFile = new File(webPath + "/include/templates/")
                 .listFiles();
         List<Map<String, Object>> templates = new ArrayList<Map<String, Object>>();
+        HttpServletRequest request = getRequest();
         if (templatesFile != null) {
             for (File file : templatesFile) {
                 if (!file.isFile()) {
+                    String templatePath = file.toString().substring(webPath.length()).replace("\\", "/");
                     Map<String, Object> map = new HashMap<String, Object>();
                     File templateInfo = new File(file.toString() + "/template.properties");
                     if (templateInfo.exists()) {
@@ -88,6 +91,16 @@ public class TemplateController extends ManageController {
                             map.put("digest", properties.get("digest"));
                             map.put("version", properties.get("version"));
                             map.put("url", properties.get("url"));
+                            if (properties.get("previewImages") != null) {
+                                String[] images = properties.get("previewImages").toString().split(",");
+                                for (int i = 0; i < images.length; i++) {
+                                    String image = images[i];
+                                    if (!image.startsWith("https://") || !image.startsWith("http://")) {
+                                        images[i] = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + templatePath + "/" + image;
+                                    }
+                                }
+                                map.put("previewImages", images);
+                            }
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -97,8 +110,9 @@ public class TemplateController extends ManageController {
                         map.put("digest", "");
                         map.put("version", "");
                         map.put("url", "");
+                        map.put("previewImages", new String[0]);
                     }
-                    map.put("template", file.toString().substring(webPath.length()).replace("\\", "/"));
+                    map.put("template", templatePath);
                     templates.add(map);
                 }
             }

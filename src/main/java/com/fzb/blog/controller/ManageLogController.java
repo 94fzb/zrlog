@@ -6,7 +6,7 @@ import com.fzb.blog.model.User;
 import com.fzb.blog.util.ResUtil;
 import com.fzb.blog.util.ZrlogUtil;
 import com.fzb.common.util.IOUtil;
-import com.fzb.common.util.ParseTools;
+import com.fzb.blog.util.ParseUtil;
 import com.fzb.common.util.http.HttpUtil;
 import com.fzb.common.util.http.handle.HttpJsonArrayHandle;
 import com.jfinal.kit.PathKit;
@@ -187,7 +187,7 @@ public class ManageLogController extends ManageController {
         log.set("rubbish", param.get("rubbish") != null);
         // 自动摘要
         if (log.get("digest") == null || "".equals(log.get("digest"))) {
-            log.set("digest", ParseTools.autoDigest(log.get("content").toString(), 200));
+            log.set("digest", ParseUtil.autoDigest(log.get("content").toString(), 200));
         }
         return log;
     }
