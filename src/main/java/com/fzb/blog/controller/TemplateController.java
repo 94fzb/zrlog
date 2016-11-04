@@ -3,6 +3,7 @@ package com.fzb.blog.controller;
 import com.fzb.blog.incp.MyI18NInterceptor;
 import com.fzb.blog.model.Link;
 import com.fzb.blog.model.WebSite;
+import com.fzb.blog.util.I18NUtil;
 import com.fzb.blog.util.ResUtil;
 import com.fzb.common.util.IOUtil;
 import com.fzb.common.util.ZipUtil;
@@ -190,7 +191,7 @@ public class TemplateController extends ManageController {
         setAttr("include", templateName + "/setting/index");
         setAttr("template", templateName);
         setAttr("menu", "1");
-        MyI18NInterceptor.addToRequest(PathKit.getWebRootPath() + templateName + "/language/", getRequest());
+        I18NUtil.addToRequest(PathKit.getWebRootPath() + templateName + "/language/", getRequest());
         String jsonStr = new WebSite().getValueByName(templateName + templateConfigSuffix);
         fullTemplateSetting(jsonStr);
         File file = new File(PathKit.getWebRootPath() + templateName + "/setting/index.jsp");

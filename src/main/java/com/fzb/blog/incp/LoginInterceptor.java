@@ -2,9 +2,10 @@ package com.fzb.blog.incp;
 
 import com.fzb.blog.controller.BaseController;
 import com.fzb.blog.controller.ManageController;
+import com.fzb.blog.util.I18NUtil;
 import com.fzb.blog.util.InstallUtil;
+import com.jfinal.aop.Interceptor;
 import com.jfinal.aop.Invocation;
-import com.jfinal.aop.PrototypeInterceptor;
 import com.jfinal.kit.PathKit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,14 +19,14 @@ import java.util.Map;
 /**
  * @author zhengchangchun 登陆拦截器,负责权限控制
  */
-public class LoginInterceptor extends PrototypeInterceptor {
+public class LoginInterceptor implements Interceptor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginInterceptor.class);
 
     private void visitorPermission(Invocation ai) {
         ai.invoke();
         String basePath = getBaseTemplatePath(ai);
-        MyI18NInterceptor.addToRequest(PathKit.getWebRootPath() + basePath + "/language/", ai.getController().getRequest());
+        I18NUtil.addToRequest(PathKit.getWebRootPath() + basePath + "/language/", ai.getController().getRequest());
         BaseController baseController = ((BaseController) ai.getController());
         baseController.fullTemplateSetting();
         TemplateAttrHelper.fullInfo(ai.getController().getRequest(), baseController.getStaticHtmlStatus());
@@ -113,7 +114,7 @@ public class LoginInterceptor extends PrototypeInterceptor {
     }
 
     @Override
-    public void doIntercept(Invocation invocation) {
+    public void intercept(Invocation invocation) {
         try {
             if (invocation.getActionKey().startsWith("/post")
                     || invocation.getActionKey().equals("/")) {

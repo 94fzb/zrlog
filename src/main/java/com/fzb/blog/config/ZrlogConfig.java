@@ -22,7 +22,6 @@ import com.jfinal.i18n.I18nInterceptor;
 import com.jfinal.kit.PathKit;
 import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
 import com.jfinal.plugin.c3p0.C3p0Plugin;
-import com.jfinal.plugin.ehcache.EhCachePlugin;
 import com.jfinal.render.ViewType;
 import org.apache.log4j.Logger;
 
@@ -44,6 +43,8 @@ public class ZrlogConfig extends JFinalConfig {
 
     private static Properties systemProperties = new Properties();
     private Properties properties = new Properties();
+
+    public static final String I18N = "i18n";
 
     static {
         try {
@@ -101,7 +102,7 @@ public class ZrlogConfig extends JFinalConfig {
         con.setDevMode(!BlogBuildInfoUtil.isRelease());
         con.setViewType(ViewType.JSP);
         con.setEncoding("utf-8");
-        con.setI18nDefaultBaseName(MyI18NInterceptor.I18N);
+        con.setI18nDefaultBaseName(I18N);
         con.setI18nDefaultLocale("zh_CN");
         con.setError404View("/error/404.html");
         con.setError500View("/error/500.html");
@@ -126,13 +127,6 @@ public class ZrlogConfig extends JFinalConfig {
     public void configPlugin(Plugins plugins) {
         try {
             JFinal.me().getServletContext().setAttribute("plugins", plugins);
-            //config ehcache
-            String ehcachePath = PathKit.getRootClassPath() + "/ehcache.xml";
-            if (new File(ehcachePath).exists()) {
-                plugins.add(new EhCachePlugin(ehcachePath));
-            } else {
-                plugins.add(new EhCachePlugin());
-            }
             // 如果不存在 install.lock 文件的情况下不初始化数据
             if (!new InstallUtil(PathKit.getWebRootPath() + "/WEB-INF").checkInstall()) {
                 LOGGER.warn("Not found lock file(/WEB-INF/install.lock), Please visit the http://ip:port" + JFinal.me().getContextPath() + "/install installation");

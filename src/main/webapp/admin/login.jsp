@@ -18,7 +18,7 @@ request.setAttribute("url", request.getScheme()+"://"+request.getHeader("host")+
     <link href="${url}/assets/css/font-awesome.min.css" rel="stylesheet">
     <!-- Custom Theme Style -->
     <link href="${url}/assets/css/custom.min.css" rel="stylesheet">
-    <link rel="shortcut icon" href="f${url}/favicon.ico" />
+    <link rel="shortcut icon" href="${url}/favicon.ico" />
   </head>
 
   <body class="login">

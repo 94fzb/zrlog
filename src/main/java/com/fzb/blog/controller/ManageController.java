@@ -1,6 +1,7 @@
 package com.fzb.blog.controller;
 
-import com.jfinal.plugin.ehcache.CacheKit;
+import com.fzb.blog.incp.InitDataInterceptor;
+import com.jfinal.core.JFinal;
 import org.apache.log4j.Logger;
 
 import java.util.HashMap;
@@ -47,7 +48,7 @@ public abstract class ManageController extends BaseController {
 
 
     public void cleanCache() {
-        CacheKit.remove("/post/initData", "initData");
+        JFinal.me().getServletContext().removeAttribute(InitDataInterceptor.CACHE_KEY);
     }
 
     protected void put(String key, Object value) {

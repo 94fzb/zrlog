@@ -4,10 +4,10 @@ import com.fzb.blog.model.Comment;
 import com.fzb.blog.model.Link;
 import com.fzb.blog.model.Log;
 import com.fzb.blog.model.User;
+import com.fzb.blog.util.ParseUtil;
 import com.fzb.blog.util.ResUtil;
 import com.fzb.blog.util.WebTools;
 import com.fzb.common.util.Md5Util;
-import com.fzb.blog.util.ParseUtil;
 import com.jfinal.kit.PathKit;
 import com.jfinal.plugin.activerecord.Db;
 
@@ -137,7 +137,10 @@ public class UserController extends ManageController {
 
     @Override
     public void update() {
-        Db.update("update user set header=?,email=? where userName=?", getPara("header"), getPara("email"), getPara("userName"));
+        User user = (User) getSession().getAttribute("user");
+        Integer userId = user.getInt("userId");
+        Db.update("update user set header=?,email=?,userName=? where userId=?", getPara("header"), getPara("email"), getPara("userName"), userId);
+        getSession().setAttribute("user", User.dao.findById(userId));
         setAttr("message", ResUtil.getStringFromRes("updatePersonInfoSuccess", getRequest()));
     }
 
