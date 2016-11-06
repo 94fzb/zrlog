@@ -7,15 +7,15 @@
 	request.setAttribute("basePath", basePath);
 	request.setAttribute("currentViewName", request.getRequestURL().substring((basePath+"install/").length()).replaceAll(".jsp",""));
 %>
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE html>
 <html>
 <head>
-<base href="${basePath }">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${_res.installWizard}</title>
 <link href="${basePath}assets/css/bootstrap.min.css" rel="stylesheet" />
-<link rel="stylesheet" href="${basePath}assets/css/font-awesome.min.css" />
 <link rel="stylesheet" href="${basePath}assets/css/custom.min.css" />
+<link rel="stylesheet" href="${basePath}assets/css/font-awesome.min.css" />
 </head>
 
 <body style="background:#fff">

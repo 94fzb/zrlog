@@ -15,6 +15,7 @@ public class PluginConfig {
 
     public static int pluginServerStart(final File serverFileName, final String dbProperties, final String pluginJvmArgs,
                                         final String runtimePath, final String runTimeVersion) {
+        canStart = true;
         final int randomServerPort = new Random().nextInt(10000) + 20000;
         final int randomMasterPort = randomServerPort + 20000;
         final int randomListenPort = randomServerPort + 30000;
@@ -77,7 +78,6 @@ public class PluginConfig {
             @Override
             public void run() {
                 stopPluginCore();
-                canStart = false;
             }
         });
     }
@@ -86,6 +86,7 @@ public class PluginConfig {
         if (pr != null) {
             pr.destroy();
         }
+        canStart = false;
         LOGGER.info("close plugin ");
     }
 }

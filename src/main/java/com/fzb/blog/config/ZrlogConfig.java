@@ -20,6 +20,7 @@ import com.jfinal.core.JFinal;
 import com.jfinal.ext.interceptor.SessionInViewInterceptor;
 import com.jfinal.i18n.I18nInterceptor;
 import com.jfinal.kit.PathKit;
+import com.jfinal.plugin.IPlugin;
 import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
 import com.jfinal.plugin.c3p0.C3p0Plugin;
 import com.jfinal.render.ViewType;
@@ -30,6 +31,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Properties;
 import java.util.Random;
 
@@ -41,12 +43,15 @@ public class ZrlogConfig extends JFinalConfig {
     private static final Logger LOGGER = Logger.getLogger(ZrlogConfig.class);
     private static final String PLUGIN_CORE_DOWNLOAD_URL = "http://dl.zrlog.com/release/plugin/plugin-core.jar";
 
-    private static Properties systemProperties = new Properties();
+    private Properties systemProperties = new Properties();
     private Properties properties = new Properties();
+    // 读取系统参数
+    private Properties systemProp = System.getProperties();
+    private Plugins plugins;
 
     public static final String I18N = "i18n";
 
-    static {
+    public ZrlogConfig() {
         try {
             systemProperties.load(ZrlogConfig.class.getResourceAsStream("/zrlog.properties"));
         } catch (IOException e) {
@@ -54,10 +59,11 @@ public class ZrlogConfig extends JFinalConfig {
         }
     }
 
-    private static void runBlogPlugin(final String dbPropertiesPath, final String pluginJvmArgs) {
+    private void runBlogPlugin(final String dbPropertiesPath, final String pluginJvmArgs) {
         new Thread() {
             @Override
             public void run() {
+                PluginConfig.stopPluginCore();
                 //加载 zrlog 提供的插件
                 File pluginCoreFile = new File(PathKit.getWebRootPath() + "/WEB-INF/plugins/plugin-core.jar");
                 if (!pluginCoreFile.exists()) {
@@ -78,7 +84,7 @@ public class ZrlogConfig extends JFinalConfig {
 
     }
 
-    public static ActiveRecordPlugin getActiveRecordPlugin(C3p0Plugin c3p0Plugin, String dbPropertiesPath) {
+    public ActiveRecordPlugin getActiveRecordPlugin(C3p0Plugin c3p0Plugin, String dbPropertiesPath) {
         ActiveRecordPlugin arp = new ActiveRecordPlugin("c3p0Plugin" + new Random().nextInt(), c3p0Plugin);
         arp.addMapping("user", "userId", User.class);
         arp.addMapping("log", "logId", Log.class);
@@ -126,46 +132,45 @@ public class ZrlogConfig extends JFinalConfig {
 
     public void configPlugin(Plugins plugins) {
         try {
-            JFinal.me().getServletContext().setAttribute("plugins", plugins);
-            // 如果不存在 install.lock 文件的情况下不初始化数据
-            if (!new InstallUtil(PathKit.getWebRootPath() + "/WEB-INF").checkInstall()) {
-                LOGGER.warn("Not found lock file(/WEB-INF/install.lock), Please visit the http://ip:port" + JFinal.me().getContextPath() + "/install installation");
-                return;
+            // 如果没有安装的情况下不初始化数据
+            if (isInstalled()) {
+                String dbPropertiesPath = PathKit.getWebRootPath() + "/WEB-INF/db.properties";
+                try {
+                    properties.load(new FileInputStream(dbPropertiesPath));
+                } catch (IOException e) {
+                    LOGGER.error("load db.systemProperties error", e);
+                }
+                systemProp.put("dbServer.version", ZrlogUtil.getDatabaseServerVersion(properties.getProperty("jdbcUrl"), properties.getProperty("user"),
+                        properties.getProperty("password"), properties.getProperty("driverClass")));
+                // 启动时候进行数据库连接
+                C3p0Plugin c3p0Plugin = new C3p0Plugin(properties.getProperty("jdbcUrl"),
+                        properties.getProperty("user"), properties.getProperty("password"));
+                plugins.add(c3p0Plugin);
+                // 添加表与实体的映射关系
+                plugins.add(getActiveRecordPlugin(c3p0Plugin, dbPropertiesPath));
+                plugins.add(new UpdateVersionPlugin());
             }
-            String dbPropertiesPath = PathKit.getWebRootPath() + "/WEB-INF/db.properties";
-            try {
-                properties.load(new FileInputStream(dbPropertiesPath));
-            } catch (IOException e) {
-                LOGGER.error("load db.systemProperties error", e);
-            }
-            // 启动时候进行数据库连接
-            C3p0Plugin c3p0Plugin = new C3p0Plugin(properties.getProperty("jdbcUrl"),
-                    properties.getProperty("user"), properties.getProperty("password"));
-            plugins.add(c3p0Plugin);
-            // 添加表与实体的映射关系
-            plugins.add(getActiveRecordPlugin(c3p0Plugin, dbPropertiesPath));
-            plugins.add(new UpdateVersionPlugin());
         } catch (Exception e) {
             LOGGER.warn("configPlugin exception ", e);
         }
-
+        this.plugins = plugins;
     }
 
     @Override
     public void afterJFinalStart() {
         super.afterJFinalStart();
-        // 读取系统参数
-        Properties systemProp = System.getProperties();
+        if (!isInstalled()) {
+            LOGGER.warn("Not found lock file(/WEB-INF/install.lock), Please visit the http://ip:port" + JFinal.me().getContextPath() + "/install installation");
+        }
         systemProp.setProperty("zrlog.runtime.path", JFinal.me().getServletContext().getRealPath("/"));
         systemProp.setProperty("server.info", JFinal.me().getServletContext().getServerInfo());
-        systemProp.put("dbServer.version", ZrlogUtil.getDatabaseServerVersion(properties.getProperty("jdbcUrl"), properties.getProperty("user"),
-                properties.getProperty("password"), properties.getProperty("driverClass")));
         JFinal.me().getServletContext().setAttribute("system", systemProp);
         systemProperties.put("version", BlogBuildInfoUtil.getVersion());
         systemProperties.put("buildId", BlogBuildInfoUtil.getBuildId());
         systemProperties.put("buildTime", new SimpleDateFormat("yyyy-MM-dd").format(BlogBuildInfoUtil.getTime()));
         systemProperties.put("runMode", BlogBuildInfoUtil.getRunMode());
         JFinal.me().getServletContext().setAttribute("zrlog", systemProperties);
+        JFinal.me().getServletContext().setAttribute("config", this);
     }
 
     @Override
@@ -181,5 +186,17 @@ public class ZrlogConfig extends JFinalConfig {
         routes.add("/install", InstallController.class);
         // 后台管理者
         routes.add(new UserRoutes());
+    }
+
+    public void installFinish() {
+        configPlugin(plugins);
+        List<IPlugin> pluginList = plugins.getPluginList();
+        for (IPlugin plugin : pluginList) {
+            plugin.start();
+        }
+    }
+
+    public static boolean isInstalled() {
+        return new InstallUtil(PathKit.getWebRootPath() + "/WEB-INF").checkInstall();
     }
 }

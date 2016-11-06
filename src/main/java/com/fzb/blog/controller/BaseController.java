@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.HashMap;
 import java.util.Map;
 
 public class BaseController extends Controller {
@@ -16,7 +17,7 @@ public class BaseController extends Controller {
     protected String templateConfigSuffix = "_setting";
     private String templatePath;
     private Integer rows;
-    private Map<String, Object> webSite;
+    private Map<String, Object> webSite = new HashMap<String, Object>();
 
     public void setWebSite(Map<String, Object> webSite) {
         this.webSite = webSite;

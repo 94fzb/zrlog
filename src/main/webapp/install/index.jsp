@@ -2,7 +2,7 @@
 <jsp:include page="header.jsp" />
 	<div id="step1" class="step-pane active">
 		<div class="main">
-			<form method="post" action="install/testDbConn " id="validation-form"
+			<form method="post" action="${basePath}install/testDbConn " id="validation-form"
 				class="form-horizontal" novalidate="novalidate">
 				<div class="center">
 					<h3 class="green">${_res.installInputDbInfo}</h3>

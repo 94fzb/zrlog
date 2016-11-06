@@ -1,14 +1,19 @@
 package com.fzb.blog.controller;
 
+import com.fzb.blog.config.ZrlogConfig;
 import com.fzb.blog.util.InstallUtil;
 import com.fzb.blog.util.ResUtil;
 import com.jfinal.core.Controller;
+import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
+import org.apache.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class InstallController extends Controller {
+
+    private static final Logger LOGGER = Logger.getLogger(InstallController.class);
 
     public void testDbConn() {
         Map<String, String> dbConn = new HashMap<String, String>();
@@ -44,6 +49,8 @@ public class InstallController extends Controller {
         if (new InstallUtil(PathKit.getWebRootPath() + "/WEB-INF", dbConn,
                 configMsg).install()) {
             render("/install/success.jsp");
+            ZrlogConfig config = (ZrlogConfig) JFinal.me().getServletContext().getAttribute("config");
+            config.installFinish();
         }
     }
 

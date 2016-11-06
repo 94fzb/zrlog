@@ -2,7 +2,7 @@
 <jsp:include page="header.jsp" />
 <div id="step2" class="step-pane active">
 	<div class="main">
-		<form method="post" action="install/installZrlog"
+		<form method="post" action="${basePath}install/installZrlog"
 			id="validation-form" class="form-horizontal" novalidate="novalidate">
 			<div class="center">
 				<h3 class="green">${_res.installInputWebSiteInfo}</h3>

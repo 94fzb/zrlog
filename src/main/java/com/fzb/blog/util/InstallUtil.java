@@ -1,13 +1,8 @@
 package com.fzb.blog.util;
 
-import com.fzb.blog.config.ZrlogConfig;
 import com.fzb.blog.controller.BaseController;
 import com.fzb.common.util.IOUtil;
 import com.fzb.common.util.Md5Util;
-import com.jfinal.config.Plugins;
-import com.jfinal.core.JFinal;
-import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
-import com.jfinal.plugin.c3p0.C3p0Plugin;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -55,13 +50,17 @@ public class InstallUtil {
 
     public boolean testDbConn() {
         try {
-            Class.forName(dbConn.get("driverClass"));
-            Connection connect = DriverManager.getConnection(dbConn.get("jdbcUrl"), dbConn.get("user"), dbConn.get("password"));
-            connect.close();
+            Connection connection = getConnection();
+            connection.close();
         } catch (Exception e) {
             return false;
         }
         return true;
+    }
+
+    private Connection getConnection() throws ClassNotFoundException, SQLException {
+        Class.forName(dbConn.get("driverClass"));
+        return DriverManager.getConnection(dbConn.get("jdbcUrl"), dbConn.get("user"), dbConn.get("password"));
     }
 
     public Boolean install() {
@@ -75,14 +74,11 @@ public class InstallUtil {
     }
 
     private boolean startInstall(Map<String, String> dbConn,
-                                Map<String, String> blogMsg, File lock) {
-        C3p0Plugin c3p0Plugin = new C3p0Plugin(dbConn.get("jdbcUrl"), dbConn.get("user"),
-                dbConn.get("password"), dbConn.get("driverClass"));
+                                 Map<String, String> blogMsg, File lock) {
         Connection connect;
         try {
-            c3p0Plugin.start();
-            connect = c3p0Plugin.getDataSource().getConnection();
-        } catch (SQLException e) {
+            connect = getConnection();
+        } catch (Exception e) {
             return false;
         }
 
@@ -168,13 +164,6 @@ public class InstallUtil {
             String insertTag = "INSERT INTO `tag`(`tagId`,`text`,`count`) VALUES (1,'记录',1)";
             ps = connect.prepareStatement(insertTag);
             ps.executeUpdate();
-            LOGGER.info("reRegister c3p0");
-            Plugins plugins = (Plugins) JFinal.me().getServletContext().getAttribute("plugins");
-
-            // 添加表与实体的映射关系
-            ActiveRecordPlugin plugin = ZrlogConfig.getActiveRecordPlugin(c3p0Plugin, file.toString());
-            plugin.start();
-            plugins.add(plugin);
             return true;
         } catch (Exception e) {
             LOGGER.error("install error ", e);
