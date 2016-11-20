@@ -50,6 +50,7 @@ public class ZrlogConfig extends JFinalConfig {
     private Plugins plugins;
 
     public static final String I18N = "i18n";
+    public static final String DEFAULT_TEMPLATE_PATH = "/include/templates/default";
 
     public ZrlogConfig() {
         try {
@@ -84,7 +85,7 @@ public class ZrlogConfig extends JFinalConfig {
 
     }
 
-    public ActiveRecordPlugin getActiveRecordPlugin(C3p0Plugin c3p0Plugin, String dbPropertiesPath) {
+    private ActiveRecordPlugin getActiveRecordPlugin(C3p0Plugin c3p0Plugin, String dbPropertiesPath) {
         ActiveRecordPlugin arp = new ActiveRecordPlugin("c3p0Plugin" + new Random().nextInt(), c3p0Plugin);
         arp.addMapping("user", "userId", User.class);
         arp.addMapping("log", "logId", Log.class);

@@ -25,7 +25,7 @@ public class TemplateAttrHelper {
         request.setAttribute("staticBlog", staticBlog);
         request.setAttribute("suffix", suffix);
 
-        BaseDataInitVO baseDataInitVO = cloneObject((BaseDataInitVO) request.getAttribute("init"));
+        BaseDataInitVO baseDataInitVO = cloneObject(request.getAttribute("init"));
         request.setAttribute("init", baseDataInitVO);
         Map webSite = (Map) baseDataInitVO.getWebSite();
         String baseUrl = setBaseUrl(request, staticBlog, webSite);

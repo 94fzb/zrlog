@@ -1,5 +1,6 @@
 package com.fzb.blog.incp;
 
+import com.fzb.blog.config.ZrlogConfig;
 import com.fzb.blog.controller.BaseController;
 import com.fzb.blog.controller.ManageController;
 import com.fzb.blog.util.I18NUtil;
@@ -13,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,11 +28,7 @@ public class LoginInterceptor implements Interceptor {
 
     private void visitorPermission(Invocation ai) {
         ai.invoke();
-        String basePath = getBaseTemplatePath(ai);
-        I18NUtil.addToRequest(PathKit.getWebRootPath() + basePath + "/language/", ai.getController().getRequest());
-        BaseController baseController = ((BaseController) ai.getController());
-        baseController.fullTemplateSetting();
-        TemplateAttrHelper.fullInfo(ai.getController().getRequest(), baseController.getStaticHtmlStatus());
+        String basePath = fullTemplateInfo(ai);
         if (ai.getController().getAttr("log") != null) {
             ai.getController().setAttr("pageLevel", 1);
             ai.getController().render(basePath + "/detail.jsp");
@@ -74,11 +73,11 @@ public class LoginInterceptor implements Interceptor {
     private void adminPermission(Invocation ai) {
         if (ai.getController().getSession().getAttribute("user") != null) {
             ai.getController().setAttr("user", ai.getController().getSession().getAttribute("user"));
-            getBaseTemplatePath(ai);
+            fullTemplateInfo(ai);
             try {
                 ai.invoke();
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.error("", e);
                 ((ManageController) ai.getController()).renderInternalServerErrorPage();
             }
             // 存在消息提示
@@ -89,13 +88,17 @@ public class LoginInterceptor implements Interceptor {
             ai.invoke();
         } else {
             HttpServletRequest request = ai.getController().getRequest();
-            ai.getController().redirect(request.getContextPath()
-                    + "/admin/login?redirectFrom="
-                    + request.getRequestURL() + (request.getQueryString() != null ? "?" + request.getQueryString() : ""));
+            try {
+                ai.getController().redirect(request.getContextPath()
+                        + "/admin/login?redirectFrom="
+                        + request.getRequestURL() + URLEncoder.encode(request.getQueryString() != null ? "?" + request.getQueryString() : "", "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                LOGGER.error("", e);
+            }
         }
     }
 
-    private String getBaseTemplatePath(Invocation ai) {
+    private String fullTemplateInfo(Invocation ai) {
         String basePath = ((BaseController) ai.getController()).getTemplatePath();
         Cookie[] cookies = ai.getController().getRequest().getCookies();
         if (cookies != null && cookies.length > 0) {
@@ -110,21 +113,25 @@ public class LoginInterceptor implements Interceptor {
             basePath = BaseController.getDefaultTemplatePath();
         }
         ai.getController().getRequest().setAttribute("template", basePath);
+        I18NUtil.addToRequest(PathKit.getWebRootPath() + basePath + "/language/", ai.getController().getRequest());
+        BaseController baseController = ((BaseController) ai.getController());
+        baseController.fullTemplateSetting();
+        TemplateAttrHelper.fullInfo(ai.getController().getRequest(), baseController.getStaticHtmlStatus());
         return basePath;
     }
 
     @Override
     public void intercept(Invocation invocation) {
         try {
-            if (invocation.getActionKey().startsWith("/post")
+            if (!ZrlogConfig.isInstalled() || invocation.getActionKey().startsWith("/install")) {
+                installPermission(invocation);
+            } else if (invocation.getActionKey().startsWith("/post")
                     || invocation.getActionKey().equals("/")) {
                 visitorPermission(invocation);
             } else if (invocation.getActionKey().startsWith("/api")) {
                 apiPermission(invocation);
             } else if (invocation.getActionKey().startsWith("/admin")) {
                 adminPermission(invocation);
-            } else if (invocation.getActionKey().startsWith("/install")) {
-                installPermission(invocation);
             } else {
                 // 其他未知情况也放行
                 invocation.invoke();

@@ -1,7 +1,6 @@
 package com.fzb.blog.incp;
 
 import com.fzb.blog.common.BaseDataInitVO;
-import com.fzb.blog.config.ZrlogConfig;
 import com.fzb.blog.controller.BaseController;
 import com.fzb.blog.model.*;
 import com.fzb.blog.util.BlogBuildInfoUtil;
@@ -35,23 +34,19 @@ public class InitDataInterceptor implements Interceptor {
     }
 
     private void doIntercept(Invocation invocation) {
-        if (!ZrlogConfig.isInstalled()) {
-            invocation.getController().render("/install/index.jsp");
-        } else {
-            long start = System.currentTimeMillis();
-            if (invocation.getController() instanceof BaseController) {
-                HttpServletRequest request = invocation.getController().getRequest();
-                invocation.getController().setAttr("requrl", request.getRequestURL());
-                BaseController baseController = ((BaseController) invocation.getController());
-                BaseDataInitVO vo = getCache();
-                baseController.setAttr("init", vo);
-                baseController.setWebSite(vo.getWebSite());
-            }
-            if (BlogBuildInfoUtil.isDev()) {
-                LOGGER.info(invocation.getController().getRequest().getRequestURI() + " used time " + (System.currentTimeMillis() - start));
-            }
+        long start = System.currentTimeMillis();
+        if (invocation.getController() instanceof BaseController) {
+            HttpServletRequest request = invocation.getController().getRequest();
+            invocation.getController().setAttr("requrl", request.getRequestURL());
+            BaseController baseController = ((BaseController) invocation.getController());
+            BaseDataInitVO vo = getCache();
+            baseController.setAttr("init", vo);
+            baseController.setWebSite(vo.getWebSite());
         }
         invocation.invoke();
+        if (BlogBuildInfoUtil.isDev()) {
+            LOGGER.info(invocation.getController().getRequest().getRequestURI() + " used time " + (System.currentTimeMillis() - start));
+        }
     }
 
     private BaseDataInitVO getCache() {

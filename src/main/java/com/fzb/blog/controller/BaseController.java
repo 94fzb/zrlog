@@ -1,5 +1,6 @@
 package com.fzb.blog.controller;
 
+import com.fzb.blog.config.ZrlogConfig;
 import com.jfinal.core.Controller;
 import flexjson.JSONDeserializer;
 import org.slf4j.Logger;
@@ -13,7 +14,6 @@ import java.util.Map;
 public class BaseController extends Controller {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseController.class);
-    private static final String DEFAULT_TEMPLATE_PATH = "/include/templates/default";
     protected String templateConfigSuffix = "_setting";
     private String templatePath;
     private Integer rows;
@@ -92,6 +92,6 @@ public class BaseController extends Controller {
     }
 
     public static String getDefaultTemplatePath() {
-        return DEFAULT_TEMPLATE_PATH;
+        return ZrlogConfig.DEFAULT_TEMPLATE_PATH;
     }
 }
