@@ -36,13 +36,17 @@ public class InitDataInterceptor implements Interceptor {
 
     private void doIntercept(Invocation invocation) {
         long start = System.currentTimeMillis();
-        if (invocation.getController() instanceof BaseController) {
-            HttpServletRequest request = invocation.getController().getRequest();
-            invocation.getController().setAttr("requrl", request.getRequestURL());
-            BaseController baseController = ((BaseController) invocation.getController());
-            BaseDataInitVO vo = getCache();
-            baseController.setAttr("init", vo);
-            baseController.setWebSite(vo.getWebSite());
+        if (!ZrlogConfig.isInstalled()) {
+            invocation.getController().render("/install/index.jsp");
+        } else {
+            if (invocation.getController() instanceof BaseController) {
+                HttpServletRequest request = invocation.getController().getRequest();
+                invocation.getController().setAttr("requrl", request.getRequestURL());
+                BaseController baseController = ((BaseController) invocation.getController());
+                BaseDataInitVO vo = getCache();
+                baseController.setAttr("init", vo);
+                baseController.setWebSite(vo.getWebSite());
+            }
         }
         invocation.invoke();
         if (BlogBuildInfoUtil.isDev()) {
