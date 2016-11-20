@@ -1,6 +1,7 @@
 package com.fzb.blog.incp;
 
 import com.fzb.blog.common.BaseDataInitVO;
+import com.fzb.blog.config.ZrlogConfig;
 import com.fzb.blog.controller.BaseController;
 import com.fzb.blog.model.*;
 import com.fzb.blog.util.BlogBuildInfoUtil;
@@ -51,7 +52,7 @@ public class InitDataInterceptor implements Interceptor {
 
     private BaseDataInitVO getCache() {
         BaseDataInitVO cacheInit = (BaseDataInitVO) JFinal.me().getServletContext().getAttribute(CACHE_KEY);
-        if (cacheInit == null) {
+        if (cacheInit == null && ZrlogConfig.isInstalled()) {
             cacheInit = new BaseDataInitVO();
             Map<String, Object> website = WebSite.dao.getWebSite();
             //兼容早期模板判断方式

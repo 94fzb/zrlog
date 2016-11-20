@@ -1,6 +1,5 @@
 package com.fzb.blog.controller;
 
-import com.fzb.blog.incp.MyI18NInterceptor;
 import com.fzb.blog.model.Link;
 import com.fzb.blog.model.WebSite;
 import com.fzb.blog.util.I18NUtil;
@@ -79,7 +78,7 @@ public class TemplateController extends ManageController {
         HttpServletRequest request = getRequest();
         if (templatesFile != null) {
             for (File file : templatesFile) {
-                if (!file.isFile()) {
+                if (!file.isFile() && !file.isHidden()) {
                     String templatePath = file.toString().substring(webPath.length()).replace("\\", "/");
                     Map<String, Object> map = new HashMap<String, Object>();
                     File templateInfo = new File(file.toString() + "/template.properties");

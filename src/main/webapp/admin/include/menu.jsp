@@ -261,6 +261,10 @@
                     </li>
                 </ul>
             </li>
+            <li role="presentation">
+                <a target="_blank" href="http://blog.zrlog.com/post/feedback" class="dropdown-toggle info-number">
+                <i class="fa fa-comments"></i>建议反馈
+             </a>
           </ul>
         </nav>
       </div>
