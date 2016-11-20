@@ -56,7 +56,7 @@ public class InitDataInterceptor implements Interceptor {
 
     private BaseDataInitVO getCache() {
         BaseDataInitVO cacheInit = (BaseDataInitVO) JFinal.me().getServletContext().getAttribute(CACHE_KEY);
-        if (cacheInit == null && ZrlogConfig.isInstalled()) {
+        if (cacheInit == null) {
             cacheInit = new BaseDataInitVO();
             Map<String, Object> website = WebSite.dao.getWebSite();
             //兼容早期模板判断方式

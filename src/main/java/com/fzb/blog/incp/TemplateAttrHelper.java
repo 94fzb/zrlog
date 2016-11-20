@@ -152,8 +152,8 @@ public class TemplateAttrHelper {
         if (data instanceof Log) {
             Log log = (Log) data;
             log.put("alias", log.get("alias") + suffix);
-            log.put("url", baseUrl + "port/" + log.get("alias"));
-            log.put("typeUrl", baseUrl + "port/sort/" + log.get("typeAlias") + suffix);
+            log.put("url", baseUrl + "post/" + log.get("alias"));
+            log.put("typeUrl", baseUrl + "post/sort/" + log.get("typeAlias") + suffix);
             Log lastLog = log.get("lastLog");
             Log nextLog = log.get("nextLog");
             nextLog.put("url", lastLog.get("alias") + suffix);
