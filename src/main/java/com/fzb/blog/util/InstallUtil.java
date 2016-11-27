@@ -1,8 +1,10 @@
 package com.fzb.blog.util;
 
+import com.fzb.blog.config.ZrlogConfig;
 import com.fzb.blog.controller.BaseController;
 import com.fzb.common.util.IOUtil;
 import com.fzb.common.util.Md5Util;
+import com.jfinal.kit.PathKit;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -45,6 +47,7 @@ public class InstallUtil {
         map.put("title", webSite.get("title"));
         map.put("second_title", webSite.get("second_title"));
         map.put("home", webSite.get("home"));
+        map.put(ZrlogConfig.ZRLOG_SQL_VERSION_KEY, ZrlogUtil.getSqlVersion(PathKit.getWebRootPath() + "/WEB-INF/update-sql"));
         return map;
     }
 

@@ -48,6 +48,7 @@ public class ZrlogConfig extends JFinalConfig {
     // 读取系统参数
     private Properties systemProp = System.getProperties();
     private Plugins plugins;
+    public static final String ZRLOG_SQL_VERSION_KEY = "zrlogSqlVersion";
 
     public static final String I18N = "i18n";
     public static final String DEFAULT_TEMPLATE_PATH = "/include/templates/default";
@@ -161,7 +162,15 @@ public class ZrlogConfig extends JFinalConfig {
     public void afterJFinalStart() {
         super.afterJFinalStart();
         if (!isInstalled()) {
-            LOGGER.warn("Not found lock file(/WEB-INF/install.lock), Please visit the http://ip:port" + JFinal.me().getContextPath() + "/install installation");
+            LOGGER.warn("Not found lock file(" + PathKit.getWebRootPath() + "/WEB-INF/install.lock), Please visit the http://yourHostName:port" + JFinal.me().getContextPath() + "/install installation");
+        } else {
+            //检查数据文件是否需要更新
+            String sqlVersion = WebSite.dao.getValueByName(ZRLOG_SQL_VERSION_KEY);
+            Integer updatedVersion = ZrlogUtil.doUpgrade(sqlVersion, PathKit.getWebRootPath() + "/WEB-INF/update-sql", properties.getProperty("jdbcUrl"), properties.getProperty("user"),
+                    properties.getProperty("password"), properties.getProperty("driverClass"));
+            if (updatedVersion > 0) {
+                WebSite.dao.updateByKV(ZRLOG_SQL_VERSION_KEY, updatedVersion + "");
+            }
         }
         systemProp.setProperty("zrlog.runtime.path", JFinal.me().getServletContext().getRealPath("/"));
         systemProp.setProperty("server.info", JFinal.me().getServletContext().getServerInfo());
