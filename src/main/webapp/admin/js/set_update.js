@@ -1,4 +1,5 @@
 $(function(){
+    PNotify.prototype.options.delay == 3000;
     $(".btn-info").click(function(){
         var formId=$(this).attr("id")+"Ajax";
         if($("#"+formId).attr("checkBox")){
@@ -27,6 +28,7 @@ $(function(){
                 new PNotify({
                       title: message,
                       type: 'success',
+                      delay:3000,
                       hide: true,
                       styling: 'bootstrap3'
                 });
@@ -39,6 +41,7 @@ $(function(){
                 }
                 new PNotify({
                       title: message,
+                      delay:3000,
                       type: 'error',
                       hide: true,
                       styling: 'bootstrap3'

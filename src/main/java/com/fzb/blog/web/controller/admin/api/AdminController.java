@@ -96,6 +96,7 @@ public class AdminController extends BaseController {
                 updateRecordResponse.setMessage(ResUtil.getStringFromRes("oldPasswordError", getRequest()));
             }
         } else {
+            updateRecordResponse.setError(1);
             updateRecordResponse.setMessage(ResUtil.getStringFromRes("argsError", getRequest()));
         }
         return updateRecordResponse;

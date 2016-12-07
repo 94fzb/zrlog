@@ -48,6 +48,7 @@ $(function(){
                 new PNotify({
                   title: e.message,
                   type: 'error',
+                  delay:3000,
                   hide: true,
                   styling: 'bootstrap3'
               });

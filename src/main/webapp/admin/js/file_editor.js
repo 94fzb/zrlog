@@ -7,6 +7,7 @@ $(function(){
               new PNotify({
                   title: '操作成功...',
                   type: 'success',
+                  delay:3000,
                   hide: true,
                   styling: 'bootstrap3'
               });
@@ -14,6 +15,7 @@ $(function(){
               new PNotify({
                   title: '发生了一些异常...',
                   type: 'error',
+                  delay:3000,
                   hide: true,
                   styling: 'bootstrap3'
               });

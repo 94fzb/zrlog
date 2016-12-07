@@ -75,6 +75,7 @@ $(function(){
                   title: message,
                   type: 'success',
                   hide: true,
+                  delay:3000,
                   styling: 'bootstrap3'
               });
             $("#logId").val(data.logId);
@@ -89,6 +90,7 @@ $(function(){
 		if($("#title").val()=="" || $("#content").val()==""){
 			new PNotify({
 				  title: '文章的标题和内容都不能为空...',
+                  delay:3000,
 				  type: 'warn',
 				  hide: true,
 				  styling: 'bootstrap3'
