@@ -30,11 +30,11 @@
 	<div class="form-group">
 		<label class="col-sm-3 control-label no-padding-right" for="form-field-1"> ${_res['admin.upgrade.canPreview']} </label>
 
-		<div class="col-sm-9">
+		<div class="col-sm-5">
 			<span class="col-sm-1">
             <input type="hidden" id="upgradeCanPreview" value="off">
             <label>
-                <input type="checkbox" class="js-switch" style="display: none;" data-switchery="true" name="upgradeCanPreview"
+                <input type="checkbox" class="form-control js-switch" style="display: none;" data-switchery="true" name="upgradeCanPreview"
                 <c:if test="${webs.upgradeCanPreview eq 'on'}">checked="checked"</c:if> value="off">
             </label>
             </span>

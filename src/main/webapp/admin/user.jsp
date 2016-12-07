@@ -27,9 +27,9 @@
 		<label for="form-field-1"
 			class="col-sm-3 control-label no-padding-right"> ${_res.userName} </label>
 
-		<div class="col-sm-9">
+		<div class="col-sm-3">
 			<input type="text" name="userName" value="${user.userName }"
-				class="col-xs-10 col-sm-5" placeholder="" id="form-field-1">
+				class="form-control col-xs-12 col-sm-6" placeholder="" id="form-field-1">
 		</div>
 	</div>
 
@@ -37,17 +37,17 @@
 		<label for="form-field-1"
 			class="col-sm-3 control-label no-padding-right"> 邮箱 </label>
 
-		<div class="col-sm-9">
+		<div class="col-sm-3">
 			<input type="text" name="email" value="${user.email }"
-				class="col-xs-10 col-sm-5" placeholder="" id="form-field-1">
+				class="form-control col-xs-12 col-sm-6" placeholder="" id="form-field-1">
 		</div>
 	</div>
 
 	<div class="form-group">
 		<label for="form-field-1"class="col-sm-3 control-label no-padding-right">头像</label>
 		<div class="col-sm-9">
-			<input id="logo" class="col-xs-10 col-sm-5" id="form-field-1" name="header" value="${session.user.header}">
-			<input type="file" class="col-xs-10 col-sm-5 fileUpload" id="form-field-1" name="imgFile" value="上传" />
+			<input id="logo" class="col-xs-6 col-sm-6" id="form-field-1" name="header" value="${session.user.header}">
+			<input type="file" class="col-xs-6 fileUpload" id="form-field-1" name="imgFile" value="上传" />
 		</div>
 	</div>
 	<div class="ln_solid"></div>

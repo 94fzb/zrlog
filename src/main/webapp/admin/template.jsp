@@ -22,8 +22,8 @@
 <div class="row">
 <div>
 	<div class="col-sm-9"></div>
-<div class="form-group col-sm-3">
-	<input type="file" class="fileUpload" name="imgFile" value="上传" />
+        <div class="form-group col-sm-3">
+	    <input type="file" class="fileUpload" class="form-control" name="imgFile" value="上传" />
 </div>
 <div>
 <div class="row">

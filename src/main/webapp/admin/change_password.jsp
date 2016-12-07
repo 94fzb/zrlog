@@ -9,27 +9,27 @@
 	<!-- PAGE CONTENT BEGINS -->
 	<form role="form" action="api/admin/changePassword" id="updatePasswordAjax" class="form-horizontal" method="post">
 		<div class="form-group">
-			<label for="form-field-1" class="col-sm-3 control-label no-padding-right"> 旧密码 </label>
+			<label for="form-field-1" class="col-sm-3 control-label no-padding-right"> 旧密码 * </label>
 
-			<div class="col-sm-9">
-				<input type="password" name="oldPassword" value="" required="" class="col-xs-10 col-sm-5" placeholder="" id="orlPassword">
+			<div class="col-sm-5">
+				<input type="password" name="oldPassword" value="" required="" class="form-control col-xs-12 col-sm-6" placeholder="" id="orlPassword">
 			</div>
 		</div>
 
 		<div class="form-group">
-			<label for="form-field-1" class="col-sm-3 control-label no-padding-right"> 新密码 </label>
+			<label for="form-field-1" class="col-sm-3 control-label no-padding-right"> 新密码 * </label>
 
-			<div class="col-sm-9">
-				<input type="password" name="newPassword" value="" class="col-xs-10 col-sm-5" required=""  placeholder="" id="newPassword1">
+			<div class="col-sm-5">
+				<input type="password" name="newPassword" value="" class="form-control col-xs-12 col-sm-6" required=""  placeholder="" id="newPassword1">
 
 			</div>
 		</div>
 
 		<div class="form-group">
-			<label for="form-field-1" class="col-sm-3 control-label no-padding-right"> 确认密码 </label>
+			<label for="form-field-1" class="col-sm-3 control-label no-padding-right"> 确认密码 * </label>
 
-			<div class="col-sm-9">
-			<input type="password" name="newPassword2" value="" class="col-xs-10 col-sm-5" required=""  placeholder="" id="newPassword2">
+			<div class="col-sm-5">
+			<input type="password" name="newPassword2" value="" class="form-control col-xs-12 col-sm-6" required=""  placeholder="" id="newPassword2">
 
 			</div>
 		</div>

@@ -35,9 +35,9 @@
 					<label for="form-field-1"
 						class="col-sm-3 control-label no-padding-right"> 网站标题 </label>
 
-					<div class="col-sm-9">
+					<div class="col-sm-5">
 						<input type="text" name="title" value="${webs.title }"
-							class="col-xs-10 col-sm-5" placeholder="请输入网站标题 "
+							class="form-control col-xs-12 col-sm-6" placeholder="请输入网站标题 "
 							id="form-field-1">
 					</div>
 				</div>
@@ -46,9 +46,9 @@
 					<label for="form-field-1"
 						class="col-sm-3 control-label no-padding-right"> 网站副标题 </label>
 
-					<div class="col-sm-9">
+					<div class="col-sm-7">
 						<input type="text" name="second_title"
-							value="${webs.second_title }" class="col-xs-10 col-sm-5"
+							value="${webs.second_title }" class="form-control col-xs-12 col-sm-6"
 							placeholder="请求输入网站副标题 " id="form-field-1">
 
 					</div>
@@ -57,9 +57,9 @@
 					<label for="form-field-1"
 						class="col-sm-3 control-label no-padding-right"> 网站关键词 </label>
 
-					<div class="col-sm-9">
+					<div class="col-sm-7">
 						<input type="text" name="keywords" value="${webs.keywords}"
-							class="col-xs-10" placeholder="请求输入网站关键词 "
+							class="form-control col-xs-12 col-sm-6" placeholder="请求输入网站关键词 "
 							id="form-field-1">
 					</div>
 				</div>
@@ -67,8 +67,8 @@
 					<label for="form-field-2"
 						class="col-sm-3 control-label no-padding-right"> 网站描述 </label>
 
-					<div class="col-sm-9">
-						<textarea name="description" class="col-xs-10" rows="5"
+					<div class="col-sm-7">
+						<textarea name="description" class="form-control col-xs-12 col-sm-6" rows="5"
 							placeholder="" id="form-field-2">${webs.description}</textarea>
 					</div>
 				</div>
@@ -100,8 +100,8 @@
 					<label for="form-field-1"
 						class="col-sm-3 control-label no-padding-right"> ICP备案信息 </label>
 
-					<div class="col-sm-9">
-						<textarea name="icp" class="col-xs-10" cols="30" rows="3"
+					<div class="col-sm-7">
+						<textarea name="icp" class="form-control col-xs-12 col-sm-6" cols="30" rows="3"
 							id="form-field-1">${webs.icp}</textarea>
 					</div>
 				</div>
@@ -110,15 +110,15 @@
 					<label for="form-field-1"
 						class="col-sm-3 control-label no-padding-right"> 网站统计 </label>
 
-					<div class="col-sm-9">
-						<textarea name="webCm" class="col-xs-10" cols="30" rows="8"
+					<div class="col-sm-7">
+						<textarea name="webCm" class="form-control col-xs-12 col-sm-6" cols="30" rows="8"
 							id="form-field-1">${webs.webCm}</textarea>
 					</div>
 				</div>
 
 				<div class="form-group">
 					<label class="col-sm-3 control-label no-padding-right"> 静态化文章页 </label>
-					<div class="col-sm-9">
+					<div class="col-sm-5">
 						<span class="col-sm-1">
 						<input type="hidden" id="pseudo_staticStatus" value="off">
 						<label>
@@ -152,10 +152,10 @@
 				<h4 class="header blue">IP 黑名单</h4>
 				<div class="form-group">
 					<label for="form-field-1"
-						class="col-sm-1 control-label no-padding-right"> </label>
+						class="col-sm-1 control-label no-padding-right"></label>
 
 					<div class="col-sm-11">
-						<textarea name="blackList" class="col-xs-10" cols="30" rows="8"
+						<textarea name="blackList" class="form-control col-xs-12 col-sm-6" cols="30" rows="8"
 							id="form-field-1">${webs.blackList}</textarea>
 					</div>
 				</div>
