@@ -1,8 +1,12 @@
 <%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
 		</div>
 		<footer>
+		  <strong>
+			${_res.copyright} <a href="http://www.zrlog.com"> Zrlog 博客程序. </a>
+		   </strong>
+		   All rights reserved.
 		  <div class="pull-right">
-			Copyright © 2013-2016 <a href="http://www.zrlog.com"> Zrlog 博客程序 </a>
+		    <strong>Version</strong> ${zrlog.version} - ${zrlog.buildId}
 		  </div>
 		  <div class="clearfix"></div>
 		</footer>
