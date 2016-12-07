@@ -12,5 +12,5 @@
 	</h3>
 </div>
 
-<jsp:include page="editor.jsp"/>
+<jsp:include page="article_editor.jsp"/>
 <jsp:include page="include/footer.jsp"/>

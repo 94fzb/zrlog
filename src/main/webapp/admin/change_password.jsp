@@ -1,30 +1,13 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <jsp:include page="include/menu.jsp"/>
-<script>
-	$(function(){
-		$("#submit").click(function(e){
-			if($("#newPassword1").val()!=null && $("#newPassword1").val() == $("#newPassword2").val()){
-				$("#updatePassword")[0].submit();
-			}else{
-				new PNotify({
-					  title: '两次输入的密码不一致 ...',
-					  type: 'error',
-					  hide: true,
-					  styling: 'bootstrap3'
-				 });
-			}
-			return false;
-		})
-	})
-
-</script>
+<script type="text/javascript" src="admin/js/set_update.js"></script>
 <div class="page-header">
 	<h3>密码变更</h3>
 </div><!-- /.page-header -->
 <div class="row">
 <div class="col-xs-12">
 	<!-- PAGE CONTENT BEGINS -->
-	<form role="form" action="admin/changePassword" id="updatePassword" class="form-horizontal" method="post">
+	<form role="form" action="api/admin/changePassword" id="updatePasswordAjax" class="form-horizontal" method="post">
 		<div class="form-group">
 			<label for="form-field-1" class="col-sm-3 control-label no-padding-right"> 旧密码 </label>
 
@@ -54,7 +37,7 @@
 
 		<div class="form-group">
 			<div class="col-md-offset-3 col-md-9">
-				<button id="submit" type="submit" class="btn btn-info">
+				<button id="updatePassword" type="button" class="btn btn-info">
 					<i class="fa fa-check bigger-110"></i>
 					提交
 				</button>

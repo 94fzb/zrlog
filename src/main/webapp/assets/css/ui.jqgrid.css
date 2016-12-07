@@ -113,7 +113,7 @@ tr.ui-search-toolbar select {margin: 1px 0 0 0}
 .ui-jqdialog-content .DataTD {padding: 2px; border: 0 none; vertical-align: top;}
 .ui-jqdialog-content .form-view-data {white-space:pre}
 .fm-button { display: inline-block; margin:0 4px 0 0; padding: .4em .5em; text-decoration:none !important; cursor:pointer; position: relative; text-align: center; zoom: 1; }
-.fm-button-icon-left { padding-left: 1.9em; }
+.fm-button-icon-left {/* padding-left: 1.9em; */}
 .fm-button-icon-right { padding-right: 1.9em; }
 .fm-button-icon-left .ui-icon { right: auto; left: .2em; margin-left: 0; position: absolute; top: 50%; margin-top: -8px; }
 .fm-button-icon-right .ui-icon { left: auto; right: .2em; margin-left: 0; position: absolute; top: 50%; margin-top: -8px;}
@@ -453,7 +453,7 @@ th[aria-selected="true"] .ui-jqgrid-sortable {
     color: #307ecc;
 }
 .ui-icon {
-    color: #307ecc;
+    /*color: #307ecc;*/
     float: none;
     position: absolute;
     right: 2px;
@@ -714,7 +714,6 @@ th[aria-selected="true"] .ui-jqgrid-sortable {
     background-color: #f2dede;
     border: 1px solid #eed3d7;
     color: #b94a48;
-    font-size: 13px;
     margin: 4px 4px 8px;
     padding: 6px 10px;
     text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
@@ -732,6 +731,7 @@ th[aria-selected="true"] .ui-jqgrid-sortable {
     margin: 0;
     padding: 0 0 0 12px;
     text-align: left;
+    font-size:14px;
 }
 .widget-header .ui-jqdialog-title {
     padding-left: 0 !important;

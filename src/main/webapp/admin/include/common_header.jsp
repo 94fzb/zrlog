@@ -7,6 +7,9 @@ request.setAttribute("url", request.getScheme()+"://"+request.getHeader("host")+
 if(request.getAttribute("currentPath")==null){
 	request.setAttribute("currentPath", request.getRequestURL().substring((basePath+"admin/").length()));
 }
+if(request.getAttribute("currentPage")==null){
+	request.setAttribute("currentPage", request.getRequestURL().toString().replaceAll(".jsp","").substring((basePath).length()));
+}
 BaseDataInitVO init = (BaseDataInitVO)request.getAttribute("init");
 Map webSite = (Map)init.getWebSite();
 if(webSite.get("admin_dashboard_naver") == null){

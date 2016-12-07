@@ -10,8 +10,7 @@ public class User extends Model<User> implements Serializable {
     public static final User dao = new User();
 
     public User login(String userName, String password) {
-        return findFirst(
-                "select * from user where username=? and password=?",
+        return findFirst("select * from user where username=? and password=?",
                 userName, password);
     }
 

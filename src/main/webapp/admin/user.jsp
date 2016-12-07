@@ -5,7 +5,7 @@
 <script>
 	$(document).ready(function() {
 		$('.fileUpload').liteUploader({
-			script : 'admin/log/upload?dir=image'
+			script : 'api/admin/upload/?dir=image'
 		}).on('lu:success', function(e, response) {
 			$('.file-name').attr("data-title", response.url)
 			$("#logo").val(response.url);
@@ -22,7 +22,7 @@
 <!-- PAGE CONTENT BEGINS -->
 <div class="row">
 <div class="col-xs-12">
-<form role="form" method="post" class="form-horizontal" action="admin/update">
+<form role="form" method="post" class="form-horizontal" id="userAjax" action="api/admin/update">
 	<div class="form-group">
 		<label for="form-field-1"
 			class="col-sm-3 control-label no-padding-right"> ${_res.userName} </label>
@@ -54,7 +54,7 @@
 
 	<div class="form-group">
 		<div class="col-md-offset-3 col-md-9">
-			<button id="submit" type="submit" class="btn btn-info">
+			<button id="user" type="button" class="btn btn-info">
 				<i class="fa fa-check bigger-110"></i> 提交
 			</button>
 		</div>

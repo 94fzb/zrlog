@@ -128,4 +128,31 @@ public class IOUtil {
             e.printStackTrace();
         }
     }
+
+    public static boolean deleteFile(String file) {
+        File f = new File(file);
+        if (f.isDirectory()) {
+            deleteDir(file);
+            return !f.exists();
+        } else {
+            return new File(file).delete();
+        }
+    }
+
+    private static void deleteDir(String filer) {
+        File f = new File(filer);
+        if (f.isDirectory()) {
+            File fs[] = new File(filer).listFiles();
+            if (fs != null && fs.length > 0) {
+                for (File fl : fs) {
+                    if (fl.isDirectory()) {
+                        deleteDir(fl.toString());
+                    } else {
+                        fl.delete();
+                    }
+                }
+            }
+        }
+        f.delete();
+    }
 }

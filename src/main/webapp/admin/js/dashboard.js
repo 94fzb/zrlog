@@ -10,7 +10,7 @@ $(function(){
 				break;
 			}
 		}
-		$.post('admin/website/update',{"admin_dashboard_naver":naver},function(data){
+		$.post('api/admin/website/update',{"admin_dashboard_naver":naver},function(data){
 			if(data.success){
 				//ignore
 			}
@@ -18,7 +18,7 @@ $(function(){
 	});
 	$(".language").click(function(e){
 		var language = $(this).attr("id");
-		$.post('admin/website/update',{"language":language},function(data){
+		$.post('api/admin/website/update',{"language":language},function(data){
 			window.location.href=window.location.href
 		});
 	})

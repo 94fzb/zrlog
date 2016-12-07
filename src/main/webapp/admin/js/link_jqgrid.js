@@ -4,7 +4,7 @@ jQuery(function($) {
 
     jQuery(grid_selector).jqGrid({
 
-    url:'admin/link/queryAll',
+    url:'api/admin/link',
     datatype: "json",
         colNames:[' ', 'ID','链接','网站名','描述', '排序'],
         colModel:[
@@ -13,9 +13,7 @@ jQuery(function($) {
                 formatoptions:{
                     keys:true,
                     delbutton: true,
-                    delOptions: {recreateForm: true, beforeShowForm:beforeDeleteCallback}
-                    //delOptions:{recreateForm: true, beforeShowForm:beforeDeleteCallback},
-                    //editformbutton:true, editOptions:{recreateForm: true, beforeShowForm:beforeEditCallback}
+                    delOptions: {recreateForm: true, beforeShowForm:beforeDeleteCallback,url:"api/admin/link/delete"}
                 }
             },
             {name:'id',index:'id', width:60, sorttype:"int", editable: false},
@@ -40,42 +38,18 @@ jQuery(function($) {
         loadComplete : function() {
             var table = this;
             setTimeout(function(){
-                styleCheckbox(table);
-
-                updateActionIcons(table);
                 updatePagerIcons(table);
                 enableTooltips(table);
             }, 0);
         },
 
-        editurl:"admin/link/oper",//nothing is saved
+        editurl:"api/admin/link/update",
         caption: "友链管理",
-        height:411,
+        height:421,
 
         autowidth: true
 
     });
-
-    //enable search/filter toolbar
-    //jQuery(grid_selector).jqGrid('filterToolbar',{defaultSearch:true,stringResult:true})
-
-    //switch element when editing inline
-    function aceSwitch( cellvalue, options, cell ) {
-        setTimeout(function(){
-            $(cell) .find('input[type=checkbox]')
-                    .wrap('<label class="inline" />')
-                .addClass('ace ace-switch ace-switch-5')
-                .after('<span class="lbl"></span>');
-        }, 0);
-    }
-    //enable datepicker
-    function pickDate( cellvalue, options, cell ) {
-        setTimeout(function(){
-            $(cell) .find('input[type=text]')
-                    .datepicker({format:'yyyy-mm-dd' , autoclose:true});
-        }, 0);
-    }
-
 
     //navButtons
     jQuery(grid_selector).jqGrid('navGrid',pager_selector,
@@ -112,7 +86,8 @@ jQuery(function($) {
                 var form = $(e[0]);
                 form.closest('.ui-jqdialog').find('.ui-jqdialog-titlebar').wrapInner('<div class="widget-header" />')
                 style_edit_form(form);
-            }
+            },
+            url:'api/admin/link/add'
         },
         {
             //delete record form
@@ -131,34 +106,8 @@ jQuery(function($) {
             }
         },
         {
-            //search form
-            recreateForm: true,
-            afterShowSearch: function(e){
-                var form = $(e[0]);
-                form.closest('.ui-jqdialog').find('.ui-jqdialog-title').wrap('<div class="widget-header" />')
-                style_search_form(form);
-            },
-            afterRedraw: function(){
-                style_search_filters($(this));
-            }
-            ,
-            multipleSearch: true,
-            /**
-            multipleGroup:true,
-            showQuery: true
-            */
-        },
-        {
-            //view record form
-            recreateForm: true,
-            beforeShowForm: function(e){
-                var form = $(e[0]);
-                form.closest('.ui-jqdialog').find('.ui-jqdialog-title').wrap('<div class="widget-header" />')
-            }
         }
     )
-
-
 
     function style_edit_form(form) {
         //enable datepicker on "sdate" field and switches for "stock" field
@@ -185,20 +134,6 @@ jQuery(function($) {
         buttons.eq(1).prepend('<i class="icon-remove"></i>')
     }
 
-    function style_search_filters(form) {
-        form.find('.delete-rule').val('X');
-        form.find('.add-rule').addClass('btn btn-xs btn-primary');
-        form.find('.add-group').addClass('btn btn-xs btn-success');
-        form.find('.delete-group').addClass('btn btn-xs btn-danger');
-    }
-    function style_search_form(form) {
-        var dialog = form.closest('.ui-jqdialog');
-        var buttons = dialog.find('.EditTable')
-        buttons.find('.EditButton a[id*="_reset"]').addClass('btn btn-sm btn-info').find('.ui-icon').attr('class', 'icon-retweet');
-        buttons.find('.EditButton a[id*="_query"]').addClass('btn btn-sm btn-inverse').find('.ui-icon').attr('class', 'icon-comment-alt');
-        buttons.find('.EditButton a[id*="_search"]').addClass('btn btn-sm btn-purple').find('.ui-icon').attr('class', 'icon-search');
-    }
-
     function beforeDeleteCallback(e) {
         var form = $(e[0]);
         if(form.data('styled')) return false;
@@ -213,44 +148,6 @@ jQuery(function($) {
         var form = $(e[0]);
         form.closest('.ui-jqdialog').find('.ui-jqdialog-titlebar').wrapInner('<div class="widget-header" />')
         style_edit_form(form);
-    }
-
-
-
-    //it causes some flicker when reloading or navigating grid
-    //it may be possible to have some custom formatter to do this as the grid is being created to prevent this
-    //or go back to default browser checkbox styles for the grid
-    function styleCheckbox(table) {
-    /**
-        $(table).find('input:checkbox').addClass('ace')
-        .wrap('<label />')
-        .after('<span class="lbl align-top" />')
-
-
-        $('.ui-jqgrid-labels th[id*="_cb"]:first-child')
-        .find('input.cbox[type=checkbox]').addClass('ace')
-        .wrap('<label />').after('<span class="lbl align-top" />');
-    */
-    }
-
-
-    //unlike navButtons icons, action icons in rows seem to be hard-coded
-    //you can change them like this in here if you want
-    function updateActionIcons(table) {
-        /**
-        var replacement =
-        {
-            'ui-icon-pencil' : 'icon-pencil blue',
-            'ui-icon-trash' : 'icon-trash red',
-            'ui-icon-disk' : 'icon-ok green',
-            'ui-icon-cancel' : 'icon-remove red'
-        };
-        $(table).find('.ui-pg-div span.ui-icon').each(function(){
-            var icon = $(this);
-            var $class = $.trim(icon.attr('class').replace('ui-icon', ''));
-            if($class in replacement) icon.attr('class', 'ui-icon '+replacement[$class]);
-        })
-        */
     }
 
     //replace icons with FontAwesome icons like above
@@ -275,7 +172,6 @@ jQuery(function($) {
         $(table).find('.ui-pg-div').tooltip({container:'body'});
     }
 
-    //var selr = jQuery(grid_selector).jqGrid('getGridParam','selrow');
 
 
 });

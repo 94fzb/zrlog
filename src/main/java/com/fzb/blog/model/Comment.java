@@ -19,7 +19,7 @@ public class Comment extends Model<Comment> {
 
     public Map<String, Object> getCommentsByPage(int page, int pageSize) {
         Map<String, Object> data = new HashMap<String, Object>();
-        String sql = "select commentId as id,userComment,header,userMail,userHome,userIp,userName,hide,logId from comment order by commentId desc limit ?,?";
+        String sql = "select commentId as id,userComment,header,commTime,userMail,userHome,userIp,userName,hide,logId from comment order by commTime desc limit ?,?";
         data.put(
                 "rows",
                 find(sql,

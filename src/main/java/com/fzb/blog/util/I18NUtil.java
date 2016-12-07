@@ -1,7 +1,8 @@
 package com.fzb.blog.util;
 
-import com.fzb.blog.config.ZrlogConfig;
-import com.fzb.blog.incp.InitDataInterceptor;
+import com.fzb.blog.common.Constants;
+import com.fzb.blog.web.config.ZrlogConfig;
+import com.fzb.blog.web.incp.InitDataInterceptor;
 import com.jfinal.core.JFinal;
 import com.jfinal.i18n.Res;
 import com.jfinal.kit.PathKit;
@@ -29,7 +30,7 @@ public class I18NUtil {
         File[] files = new File(path).listFiles();
         if (files != null) {
             for (File file : files) {
-                if (file.getName().startsWith(ZrlogConfig.I18N) && file.getName().endsWith(".properties")) {
+                if (file.getName().startsWith(Constants.I18N) && file.getName().endsWith(".properties")) {
                     String key = file.getName().replace(".properties", "");
                     Map<String, Object> map = I18N_RES_MAP.get(key);
                     if (map == null) {
@@ -68,19 +69,19 @@ public class I18NUtil {
                 Map<String, Object> webSite = (Map<String, Object>) JFinal.me().getServletContext().getAttribute("webSite");
                 if (webSite != null && webSite.get("language") != null) {
                     String tmpLocale = (String) webSite.get("language");
-                    locale = I18N_RES_MAP.get(ZrlogConfig.I18N + "_" + tmpLocale) != null ? tmpLocale : null;
+                    locale = I18N_RES_MAP.get(Constants.I18N + "_" + tmpLocale) != null ? tmpLocale : null;
                 }
             } else {
                 if (request.getHeader("Accept-Language") != null) {
                     String tmpLocale = request.getHeader("Accept-Language").split(";")[0].replace("-", "_").split(",")[0];
-                    locale = I18N_RES_MAP.get(ZrlogConfig.I18N + "_" + tmpLocale) != null ? tmpLocale : null;
+                    locale = I18N_RES_MAP.get(Constants.I18N + "_" + tmpLocale) != null ? tmpLocale : null;
                 }
             }
 
             if (locale == null) {
                 locale = res.getResourceBundle().getLocale().toString();
             }
-            i18nFile = ZrlogConfig.I18N + "_" + locale;
+            i18nFile = Constants.I18N + "_" + locale;
             request.setAttribute(I18N_FILE_NAME, i18nFile);
         }
         Map<String, Object> i18nMap = I18N_RES_MAP.get(i18nFile);

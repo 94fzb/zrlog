@@ -55,7 +55,7 @@
 <div class="container body">
   <div class="main_container">
     <div class="col-md-3 left_col">
-      <div class="left_col scroll-view">
+      <div id="left_col" class="left_col scroll-view">
         <div class="navbar nav_title" style="border: 0;">
           <a href="${url}" class="site_title"><i class="fa fa-dashboard"></i> <span>${webs.title}</span></a>
         </div>
@@ -64,38 +64,38 @@
         <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
           <div class="menu_section">
             <ul class="nav side-menu">
-                <li <c:if test="${'index.jsp'==currentPath}">class="active"</c:if>>
+                <li>
                     <a href="admin/index">
                         <i class="fa fa-home"></i>
                         <span class="menu-text"> ${_res.dashboard} </span>
                     </a>
                 </li>
-                <li <c:if test="${'edit.jsp'==currentPath}">class="active"</c:if>>
+                <li>
                     <a href="admin/edit">
                         <i class="fa fa-edit"></i>
                         <span class="menu-text">${_res['admin.log.edit']} </span>
                     </a>
                 </li>
-                <li <c:if test="${'log.jsp'==currentPath}">class="active"</c:if>>
-                    <a href="admin/log">
+                <li>
+                    <a href="admin/article">
                         <i class="fa fa-newspaper-o"></i>
                         <span class="menu-text"> ${_res.blogManage} </span>
 
                     </a>
                 </li>
-                <li <c:if test="${'comment.jsp'==currentPath}">class="active"</c:if>>
-                    <a href="admin/comment" class="dropdown-toggle">
+                <li>
+                    <a href="admin/comment">
                         <i class="fa fa-comment"></i>
                         <span class="menu-text">${_res['admin.comment.manage']}</span>
                     </a>
                 </li>
-                <li <c:if test="${'plugin.jsp'==currentPath or 'plugin_center.jsp'==currentPath}">class="active"</c:if>>
-                    <a href="admin/plugin" class="dropdown-toggle">
+                <li>
+                    <a href="admin/plugin">
                         <i class="fa fa-plug"></i>
                         <span class="menu-text"> ${_res['admin.plugin.manage']} </span>
                     </a>
                 </li>
-                <li <c:if test="${'upgrade.jsp'==currentPath or 'website.jsp'==currentPath or 'user.jsp'==currentPath or 'template.jsp'==currentPath or 'template_center.jsp'==currentPath}">class="active open"</c:if>>
+                <li>
                     <a>
                         <i class="fa fa-cogs"></i>
                         <span class="menu-text">${_res['admin.setting']}</span>
@@ -103,33 +103,33 @@
                     </a>
 
                     <ul class="nav child_menu">
-                        <li <c:if test="${'user.jsp'==currentPath}">class="active"</c:if>>
-                            <a href="admin/user" <c:if test="${'user.jsp'==currentPath}">class="active"</c:if>>
+                        <li>
+                            <a href="admin/user">
                                 <i class="fa fa-double-angle-right"></i>
                                 <span class="menu-text">${_res['admin.user.info']}</span>
                             </a>
                         </li>
-                        <li <c:if test="${'website.jsp'==currentPath}">class="active"</c:if>>
-                            <a href="admin/website" <c:if test="${'website.jsp'==currentPath}">class="active"</c:if>>
+                        <li>
+                            <a href="admin/website">
                                 <i class="fa fa-double-angle-right"></i>
                                 <span class="menu-text">${_res['admin.website.manage']}</span>
                             </a>
                         </li>
-                        <li <c:if test="${'template.jsp'==currentPath or 'template_center.jsp'==currentPath}">class="active"</c:if>>
-                            <a href="admin/template" <c:if test="${'template.jsp'==currentPath}">class="active"</c:if>>
+                        <li>
+                            <a href="admin/template">
                                 <i class="fa fa-double-angle-right"></i>
                                 <span class="menu-text">${_res['admin.template.manage']}</span>
                             </a>
                         </li>
-                        <li <c:if test="${'upgrade.jsp'==currentPath}">class="active"</c:if>>
-                            <a href="admin/upgrade"  class="dropdown-toggle">
+                        <li>
+                            <a href="admin/upgrade">
                                 <i class="fa fa-double-angle-right"></i>
                                 <span class="menu-text"> ${_res['admin.upgrade.manage']}</span>
                             </a>
                         </li>
                     </ul>
                 </li>
-                <li <c:if test="${'type.jsp'==currentPath or 'tag.jsp'==currentPath or 'nav.jsp'==currentPath or 'link.jsp'==currentPath}">class="active open"</c:if>>
+                <li>
                     <a>
                         <i class="fa fa-list"></i>
                         <span class="menu-text">
@@ -138,25 +138,25 @@
                         <span class="fa fa-chevron-down"></span>
                     </a>
                     <ul class="nav child_menu">
-                        <li  <c:if test="${'type.jsp'==currentPath}">class="active"</c:if>>
+                        <li>
                             <a href="admin/type"  class="dropdown-toggle">
                                 <i class="fa fa-double-angle-right"></i>
                                 <span class="menu-text">${_res['admin.type.manage']}</span>
                             </a>
                         </li>
-                        <li  <c:if test="${'tag.jsp'==currentPath}">class="active"</c:if>>
+                        <li>
                             <a href="admin/tag"  class="dropdown-toggle">
                                 <i class="fa fa-double-angle-right"></i>
                                 <span class="menu-text">${_res['admin.tag.manage']}</span>
                             </a>
                         </li>
-                        <li <c:if test="${'link.jsp'==currentPath}">class="active"</c:if>>
+                        <li>
                             <a href="admin/link" class="dropdown-toggle">
                                 <i class="fa fa-double-angle-right"></i>
                                 <span class="menu-text">${_res['admin.link.manage']}</span>
                             </a>
                         </li>
-                        <li <c:if test="${'nav.jsp'==currentPath}">class="active"</c:if>>
+                        <li>
                             <a href="admin/nav" class="dropdown-toggle">
                                 <i class="fa fa-double-angle-right"></i>
                                 <span class="menu-text"> ${_res['admin.nav.manage']}</span>
@@ -248,6 +248,26 @@
                 </li>
               </ul>
             </li>
+            <c:if test="${lastVersion.upgrade}">
+            <li role="presentation" class="dropdown">
+              <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
+                <i class="fa fa-bell"></i>
+                <span class="badge bg-green">新</span>
+              </a>
+              <ul id="bell" class="dropdown-menu list-unstyled msg_list" role="menu">
+                <li>
+                    <a href="admin/do_upgrade?buildId=${lastVersion.version.buildId}">
+                        <span>
+                          <span>版本号:v${lastVersion.version.version}-${lastVersion.version.buildId}(${lastVersion.version.type})</span>
+                        </span>
+                        <span class="message">
+                             发布时间:${lastVersion.version.releaseDate}
+                        </span>
+                    </a>
+                </li>
+              </ul>
+            </li>
+            </c:if>
             <li role="presentation" class="dropdown">
                 <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
                  <i class="fa fa-globe"></i>
@@ -263,7 +283,7 @@
             </li>
             <li role="presentation">
                 <a target="_blank" href="http://blog.zrlog.com/post/feedback" class="dropdown-toggle info-number">
-                <i class="fa fa-comments"></i>建议反馈
+                <i class="fa fa-comments"></i>&nbsp;建议反馈
              </a>
           </ul>
         </nav>
