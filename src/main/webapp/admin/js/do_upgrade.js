@@ -1,6 +1,7 @@
 var timer;
 var upgradeTimer;
 var downloadSuccess;
+var finish;
 function status(){
     $.get('api/admin/upgrade/download',function(data){
         $("#progress").attr("data-percent",data.download+"%");
@@ -18,6 +19,7 @@ function upgrade(){
         $("#upgrade-process").html(data.message);
         if(data.process == 100){
             clearInterval(upgradeTimer);
+            finish = true;
         }
     })
 }
@@ -45,7 +47,9 @@ $(function() {
     }
 
     function onFinishCallback(objs, context){
-        alert("update ...")
+        if(finish){
+            location.href = location.href;
+        }
     }
 
     $('.buttonNext').addClass('btn btn-success');
