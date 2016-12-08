@@ -2,11 +2,10 @@ package com.fzb.blog.web.incp;
 
 import com.fzb.blog.common.BaseDataInitVO;
 import com.fzb.blog.common.Constants;
-import com.fzb.blog.web.config.ZrlogConfig;
-import com.fzb.blog.web.controller.BaseController;
 import com.fzb.blog.model.*;
 import com.fzb.blog.util.I18NUtil;
 import com.fzb.blog.util.ZrlogUtil;
+import com.fzb.blog.web.controller.BaseController;
 import com.jfinal.core.Controller;
 import com.jfinal.kit.PathKit;
 import org.apache.log4j.Logger;
@@ -89,11 +88,14 @@ public class TemplateHelper {
                 String url = logNav.get("url").toString();
                 if (url.startsWith("/")) {
                     if (suffix.length() > 0 && url.length() == 1) {
-                        url = "index";
+                        url = "";
                     } else {
                         url = url.substring(1, url.length());
                     }
-                    String tagUri = baseUrl + url + suffix;
+                    String tagUri = baseUrl + url;
+                    if (url.startsWith("/post")) {
+                        tagUri += suffix;
+                    }
                     logNav.put("url", tagUri);
                 }
             }

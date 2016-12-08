@@ -212,7 +212,7 @@ public class Log extends Model<Log> implements Serializable {
         String sql = "select l.*,t.typeName,t.alias as typeAlias,(select count(commentId) from comment where logId=l.logId ) commentSize,u.userName from log l inner join user u,type t where rubbish=? and private=? and u.userId=l.userId and t.typeId=l.typeId and DATE_FORMAT(releaseTime,'%Y_%m')=? order by l.logId desc limit ?,?";
         data.put(
                 "rows",
-                findEntry(sql,
+                find(sql,
                         rubbish, pre,
                         date,
                         ParseUtil.getFirstRecord(page,
