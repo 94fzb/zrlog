@@ -3,6 +3,7 @@ package com.fzb.blog.web.controller.admin.api;
 import com.fzb.blog.common.response.CheckVersionResponse;
 import com.fzb.blog.common.response.DownloadUpdatePackageResponse;
 import com.fzb.blog.common.response.UpdateRecordResponse;
+import com.fzb.blog.common.response.UpgradeProcessResponse;
 import com.fzb.blog.model.WebSite;
 import com.fzb.blog.service.CacheService;
 import com.fzb.blog.web.controller.BaseController;
@@ -24,7 +25,7 @@ public class UpgradeController extends BaseController {
 
     private CacheService cacheService = new CacheService();
 
-    public UpdateRecordResponse update() {
+    public UpdateRecordResponse setting() {
         Map<String, String[]> tmpParamMap = getParaMap();
         for (Map.Entry<String, String[]> param : tmpParamMap.entrySet()) {
             new WebSite().updateByKV(param.getKey(), param.getValue()[0]);
@@ -80,6 +81,24 @@ public class UpgradeController extends BaseController {
             }
         }
         return checkVersionResponse;
+    }
+
+    public UpgradeProcessResponse doUpgrade() {
+        DownloadProcessHandle handle = (DownloadProcessHandle) getSession().getAttribute("downing");
+        File file = handle.getFile();
+        UpgradeProcessResponse upgradeProcessResponse = new UpgradeProcessResponse();
+        Plugins plugins = (Plugins) JFinal.me().getServletContext().getAttribute("plugins");
+        for (IPlugin plugin : plugins.getPluginList()) {
+            if (plugin instanceof UpdateVersionPlugin) {
+                UpdateVersionPlugin updateVersionPlugin = (UpdateVersionPlugin) plugin;
+                if (!updateVersionPlugin.isUpdating()) {
+                    updateVersionPlugin.startUpgrade(file);
+                }
+                upgradeProcessResponse.setProcess(updateVersionPlugin.getProcess());
+                upgradeProcessResponse.setMessage(updateVersionPlugin.getProcessMsg());
+            }
+        }
+        return upgradeProcessResponse;
     }
 
 }

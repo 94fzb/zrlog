@@ -71,22 +71,21 @@ public class IOUtil {
         }
     }
 
-    public static void moveOrCopy(String filer, String tag, boolean isMove) {
-        System.out.println(filer);
-        File f = new File(filer);
+    public static void moveOrCopy(String src, String target, boolean isMove) {
+        File f = new File(src);
         if (f.isDirectory()) {
-            File fs[] = new File(filer).listFiles();
-            tag = tag + "/" + f.getName();
-            new File(tag).mkdirs();
+            File fs[] = new File(src).listFiles();
+            target = target + "/" + f.getName();
+            new File(target).mkdirs();
             for (File fl : fs) {
                 if (fl.isDirectory()) {
-                    moveOrCopy(fl.toString(), tag, isMove);
+                    moveOrCopy(fl.toString(), target, isMove);
                 } else {
-                    moveOrCopyFile(fl.toString(), tag + "/" + fl.getName(), isMove);
+                    moveOrCopyFile(fl.toString(), target + "/" + fl.getName(), isMove);
                 }
             }
         } else {
-            moveOrCopyFile(f.toString(), tag + "/" + f.getName(), isMove);
+            moveOrCopyFile(f.toString(), target + "/" + f.getName(), isMove);
         }
     }
 
@@ -104,12 +103,12 @@ public class IOUtil {
         }
     }
 
-    public static void moveOrCopyFile(String src, String tag, boolean isMove) {
+    public static void moveOrCopyFile(String src, String target, boolean isMove) {
         try {
             File f = new File(src);
             FileInputStream in = new FileInputStream(f);
-            new File(tag).getParentFile().mkdirs();
-            FileOutputStream out = new FileOutputStream(tag);
+            new File(target).getParentFile().mkdirs();
+            FileOutputStream out = new FileOutputStream(target);
             // 小于1M(大小根据自己的情况而定)的文件直接一次性写入。
             byte[] b = new byte[1024];
             int length = 0; // 出来cnt次后 文件 跳出循环

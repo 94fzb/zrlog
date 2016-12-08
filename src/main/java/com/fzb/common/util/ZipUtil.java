@@ -55,7 +55,6 @@ public class ZipUtil {
                 IOUtil.getAllFiles(file.toString(), files);
             }
         }
-        System.out.println(files);
         ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(target));
         for (File file : files) {
             ZipEntry entry;

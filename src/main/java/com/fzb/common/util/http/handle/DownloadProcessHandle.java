@@ -57,4 +57,8 @@ public class DownloadProcessHandle extends HttpHandle<Integer> implements Serial
     public int getProcess() {
         return process;
     }
+
+    public File getFile() {
+        return file;
+    }
 }

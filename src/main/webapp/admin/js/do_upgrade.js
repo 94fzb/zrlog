@@ -1,4 +1,5 @@
 var timer;
+var upgradeTimer;
 var downloadSuccess;
 function status(){
     $.get('api/admin/upgrade/download',function(data){
@@ -8,6 +9,15 @@ function status(){
             downloadSuccess  = true;
             clearInterval(timer);
             $("#processbar-title").text("更新包下载完成");
+        }
+    })
+}
+
+function upgrade(){
+    $.get('api/admin/upgrade/doUpgrade',function(data){
+        $("#upgrade-process").html(data.message);
+        if(data.process == 100){
+            clearInterval(upgradeTimer);
         }
     })
 }
@@ -27,6 +37,7 @@ $(function() {
             return true;
         }
         if(context.fromStep == 2){
+            upgradeTimer = setInterval("upgrade()",500);
             if(downloadSuccess){
                 return true;
             }

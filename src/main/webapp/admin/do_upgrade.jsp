@@ -45,7 +45,9 @@
     </div>
   </div><div id="step-33" style="min-height: 600px;" class="content" style="display: none;">
     <h2 class="StepTitle">Step 3 Content</h2>
-    <h3>正在执行更新。。。</h3>
+    <h3>正在执行更新...</h3>
+    <div id="upgrade-process">
+    </div>
   </div>
 </div>
 </div>

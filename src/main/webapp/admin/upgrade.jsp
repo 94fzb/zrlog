@@ -11,7 +11,7 @@
 
 <div class="row">
 <div class="col-xs-12">
-<form role="form" action="api/admin/upgrade/update" class="form-horizontal" id="upgradeAjax" checkBox="upgradeCanPreview">
+<form role="form" action="api/admin/upgrade/setting" class="form-horizontal" id="upgradeAjax" checkBox="upgradeCanPreview">
 	<div class="form-group">
 		<label for="form-field-1"
 			class="col-sm-3 control-label no-padding-right"> ${_res['admin.upgrade.autoCheckCycle']} </label>
