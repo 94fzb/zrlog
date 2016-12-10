@@ -24,6 +24,7 @@ $(function($) {
             {name:'logId',index:'logId', width:30, editable: false,formatter:viewLog},
 
         ],
+        viewrecords : true,
         editurl:"api/admin/comment/update",
         rowNum:10,
         rowList:[10,20,30],
