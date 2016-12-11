@@ -1,6 +1,6 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <jsp:include page="header.jsp" />
-	<div id="step1" class="step-pane active">
+	<div id="step1">
 		<div class="main">
 			<form method="post" action="${basePath}install/testDbConn " id="validation-form"
 				class="form-horizontal" novalidate="novalidate">
@@ -11,9 +11,9 @@
 				<div class="form-group">
 					<label class="control-label col-xs-12 col-sm-3 no-padding-right">${_res.installDbHost}:</label>
 
-					<div class="col-xs-12 col-sm-9">
+					<div class="col-xs-6 col-sm-3">
 						<div class="clearfix">
-							<input type="text" value="127.0.0.1" class="col-xs-12 col-sm-9"
+							<input type="text" value="127.0.0.1" class="form-control"
 								name="dbhost">
 						</div>
 					</div>
@@ -24,9 +24,9 @@
 				<div class="form-group">
 					<label class="control-label col-xs-12 col-sm-3 no-padding-right">${_res.installDbName}:</label>
 
-					<div class="col-xs-12 col-sm-9">
+					<div class="col-xs-6 col-sm-3">
 						<div class="clearfix">
-							<input type="text" value="zrlog" class="col-xs-12 col-sm-9"
+							<input type="text" value="zrlog" class="form-control"
 								name="dbname">
 						</div>
 					</div>
@@ -36,9 +36,9 @@
 				<div class="form-group">
 					<label class="control-label col-xs-12 col-sm-3 no-padding-right">${_res.installDbUserName}:</label>
 
-					<div class="col-xs-12 col-sm-9">
+					<div class="col-xs-6 col-sm-3">
 						<div class="clearfix">
-							<input type="text" value="root" class="col-xs-12 col-sm-9"
+							<input type="text" value="root" class="form-control"
 								name="dbuser">
 						</div>
 					</div>
@@ -48,9 +48,9 @@
 				<div class="form-group">
 					<label class="control-label col-xs-12 col-sm-3 no-padding-right">${_res.installDbPassword}:</label>
 
-					<div class="col-xs-12 col-sm-9">
+					<div class="col-xs-6 col-sm-3">
 						<div class="clearfix">
-							<input type="password" class="col-xs-12 col-sm-9"
+							<input type="password" class="form-control"
 								name="dbpwd">
 						</div>
 					</div>
@@ -60,9 +60,9 @@
 				<div class="form-group">
 					<label class="control-label col-xs-12 col-sm-3 no-padding-right">${_res.installDbPort}:</label>
 
-					<div class="col-xs-12 col-sm-9">
+					<div class="col-xs-2 col-sm-1">
 						<div class="clearfix">
-							<input type="text" value="3306" class="col-xs-12 col-sm-9"
+							<input type="text" value="3306" class="form-control"
 								name="port">
 						</div>
 					</div>
@@ -73,9 +73,9 @@
 					<label class="control-label col-xs-12 col-sm-3 no-padding-right">${_res.installNotifyEmail}
 						Email:</label>
 
-					<div class="col-xs-12 col-sm-9">
+					<div class="col-xs-8 col-sm-4">
 						<div class="clearfix">
-							<input type="text" class="col-xs-12 col-sm-9" name="dbhost">
+							<input type="text" class="form-control col-xs-12 col-sm-9" name="dbhost">
 						</div>
 					</div>
 				</div>

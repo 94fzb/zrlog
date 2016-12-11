@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="${basePath}assets/css/font-awesome.min.css" />
 </head>
 
-<body style="background:#fff">
+<body style="">
 	<div class="col-md-2"></div>
 	<div class="col-md-8">
 	<div class="x_panel">
@@ -37,21 +37,21 @@
 			<c:if test="${currentViewName ne 'forbidden'}">
 			<div class="col-xs-12">
 				<div id="wizard" class="form_wizard wizard_horizontal">
-				  <ul class="wizard_steps anchor">
+				  <ul class="list-unstyled wizard_steps anchor">
 					<li>
-					  <a <c:if test="${currentViewName eq 'index'}">class="selected"</c:if> href="#step-1">
+					  <a <c:if test="${currentViewName eq 'index'}">class="selected"</c:if> <c:if test="${currentViewName ne 'index'}">class="disable"</c:if> href="#step-1"  isdone="1" rel="1">
 						<span class="step_no">1</span>
 						<span class="step_descr">${_res.installDatabaseInfo}</span>
 					  </a>
 					</li>
 					<li>
-					  <a  <c:if test="${currentViewName eq 'message'}">class="selected"</c:if>>
+					  <a <c:if test="${currentViewName eq 'message'}">class="selected"</c:if> <c:if test="${currentViewName ne 'message'}">class="disable"</c:if> href="#step-2" isdone="0" rel="2">
 						<span class="step_no">2</span>
 						<span class="step_descr">${_res.installWebSiteInfo}</span>
 					  </a>
 					</li>
 					<li>
-					  <a <c:if test="${currentViewName eq 'success'}">class="selected"</c:if>>
+					  <a <c:if test="${currentViewName eq 'success'}">class="selected"</c:if> <c:if test="${currentViewName ne 'success'}">class="disable"</c:if> href="#step-3" isdone="0" rel="3">
 						<span class="step_no">3</span>
 						<span class="step_descr">${_res.installComplete}</span>
 					  </a>

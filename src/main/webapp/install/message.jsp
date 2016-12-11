@@ -1,6 +1,6 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <jsp:include page="header.jsp" />
-<div id="step2" class="step-pane active">
+<div id="step2">
 	<div class="main">
 		<form method="post" action="${basePath}install/installZrlog"
 			id="validation-form" class="form-horizontal" novalidate="novalidate">
@@ -11,9 +11,9 @@
 			<div class="form-group">
 				<label class="control-label col-xs-12 col-sm-3 no-padding-right">${_res.installAdmin}:</label>
 
-				<div class="col-xs-12 col-sm-9">
+				<div class="col-xs-6 col-sm-3">
 					<div class="clearfix">
-						<input type="text" value="admin" class="col-xs-12 col-sm-9"
+						<input type="text" value="admin" class="form-control"
 							name="username">
 					</div>
 				</div>
@@ -24,9 +24,9 @@
 			<div class="form-group">
 				<label class="control-label col-xs-12 col-sm-3 no-padding-right">${_res.installAdminPassword}:</label>
 
-				<div class="col-xs-12 col-sm-9">
+				<div class="col-xs-6 col-sm-3">
 					<div class="clearfix">
-						<input type="password" autocomplete="off" class="col-xs-12 col-sm-9" name="password">
+						<input type="password" autocomplete="off" class="form-control" name="password">
 					</div>
 				</div>
 			</div>
@@ -35,10 +35,10 @@
 			<div class="form-group">
 				<label class="control-label col-xs-12 col-sm-3 no-padding-right">${_res.installAdminEmail}:</label>
 
-				<div class="col-xs-12 col-sm-9">
+				<div class="col-xs-6 col-sm-3">
 					<div class="clearfix">
 						<input type="text" value="admin@example.com"
-							class="col-xs-12 col-sm-9" name="email">
+							class="form-control" name="email">
 					</div>
 				</div>
 			</div>
@@ -47,9 +47,9 @@
 			<div class="form-group">
 				<label class="control-label col-xs-12 col-sm-3 no-padding-right">${_res.installWebSiteTitle}:</label>
 
-				<div class="col-xs-12 col-sm-9">
+				<div class="col-xs-8 col-sm-4">
 					<div class="clearfix">
-						<input type="text" value="" placeholder="${_res.installWebSiteTitleTip}" class="col-xs-12 col-sm-9"
+						<input type="text" value="" placeholder="${_res.installWebSiteTitleTip}" class="form-control"
 							name="title">
 					</div>
 				</div>
@@ -59,9 +59,9 @@
 			<div class="form-group">
 				<label class="control-label col-xs-12 col-sm-3 no-padding-right">${_res.installWebSiteSecond}:</label>
 
-				<div class="col-xs-12 col-sm-9">
+				<div class="col-xs-8 col-sm-4">
 					<div class="clearfix">
-						<input type="text" value="" class="col-xs-12 col-sm-9"
+						<input type="text" value="" class="form-control"
 							name="second_title">
 					</div>
 				</div>

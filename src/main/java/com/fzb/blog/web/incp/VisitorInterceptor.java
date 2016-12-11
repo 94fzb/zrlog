@@ -1,6 +1,6 @@
 package com.fzb.blog.web.incp;
 
-import com.fzb.blog.service.InstallService;
+import com.fzb.blog.web.config.ZrlogConfig;
 import com.jfinal.aop.Interceptor;
 import com.jfinal.aop.Invocation;
 import com.jfinal.kit.PathKit;
@@ -16,10 +16,14 @@ class VisitorInterceptor implements Interceptor {
         String actionKey = ai.getActionKey();
         if (actionKey.startsWith("/install")) {
             installPermission(ai);
-        } else if (actionKey.startsWith("/api")) {
-            apiPermission(ai);
-        } else if (actionKey.startsWith("/")) {
-            visitorPermission(ai);
+        } else {
+            if (ZrlogConfig.isInstalled()) {
+                if (actionKey.startsWith("/api")) {
+                    apiPermission(ai);
+                } else if (actionKey.startsWith("/")) {
+                    visitorPermission(ai);
+                }
+            }
         }
     }
 
@@ -59,7 +63,7 @@ class VisitorInterceptor implements Interceptor {
     }
 
     private void installPermission(Invocation ai) {
-        if (!new InstallService(PathKit.getWebRootPath() + "/WEB-INF").checkInstall()) {
+        if (!ZrlogConfig.isInstalled()) {
             ai.invoke();
         } else {
             ai.getController().getRequest().getSession();
