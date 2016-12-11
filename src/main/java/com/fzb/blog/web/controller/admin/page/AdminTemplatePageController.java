@@ -26,9 +26,6 @@ public class AdminTemplatePageController extends BaseController {
 
     private CacheService cacheService = new CacheService();
 
-    public AdminTemplatePageController() {
-    }
-
     public String index() {
         String webPath = PathKit.getWebRootPath();
         File[] templatesFile = new File(webPath + Constants.TEMPLATE_BASE_PATH).listFiles();

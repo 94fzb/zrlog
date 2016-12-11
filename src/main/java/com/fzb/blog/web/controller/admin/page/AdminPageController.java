@@ -40,7 +40,8 @@ public class AdminPageController extends BaseController {
 
     public String login() {
         if (AdminTokenThreadLocal.getUser() != null) {
-            return "/admin/index";
+            redirect("/admin/index");
+            return null;
         } else {
             return "/admin/login";
         }
