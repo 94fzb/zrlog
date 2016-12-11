@@ -21,7 +21,7 @@ public class Version implements Serializable {
     }
 
     public String getReleaseDate() {
-        return releaseDate.substring(0, releaseDate.indexOf(" "));
+        return releaseDate;
     }
 
     public void setReleaseDate(String releaseDate) {

@@ -14,7 +14,6 @@ import flexjson.JSONDeserializer;
 import org.apache.log4j.Logger;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -49,17 +48,18 @@ public class UpdateVersionPlugin implements IPlugin {
                         }
                         String txtContent = HttpUtil.getTextByUrl(versionUrl + "?_" + System.currentTimeMillis()).trim();
                         Version tLastVersion = new JSONDeserializer<Version>().deserialize(txtContent, Version.class);
-                        System.out.println(txtContent);
+                        LOGGER.info(txtContent);
                         tLastVersion.setChangeLog(HttpUtil.getTextByUrl("http://www.zrlog.com/changelog/" + tLastVersion.getVersion() + "-" + tLastVersion.getBuildId() + ".html"));
-                        if (!tLastVersion.getBuildId().equals(BlogBuildInfoUtil.getBuildId())) {
+                        Date buildDate = new SimpleDateFormat("yyyy-MM-dd hh:mm").parse(tLastVersion.getReleaseDate());
+                        if (!tLastVersion.getBuildId().equals(BlogBuildInfoUtil.getBuildId()) && buildDate.after(BlogBuildInfoUtil.getTime())) {
                             LOGGER.info("ZrLog New update found new [" + tLastVersion.getVersion() + "-" + tLastVersion.getBuildId() + "]");
                             if (BlogBuildInfoUtil.isDev()) {
                                 LOGGER.info("Maybe need clone again from git repo");
                             }
                             lastVersion = tLastVersion;
                         }
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    } catch (Exception e) {
+                        LOGGER.error(e);
                     }
                 }
             }, new Date(), autoUpgradeVersionType.getCycle() * 1000);
