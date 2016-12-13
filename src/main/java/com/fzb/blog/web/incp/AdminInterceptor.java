@@ -42,7 +42,9 @@ class AdminInterceptor implements Interceptor {
                 }
             } catch (Exception e) {
                 LOGGER.error("", e);
-                controller.render(Constants.ADMIN_ERROR_PAGE);
+                if (JFinal.me().getConstants().getViewType() == ViewType.JSP) {
+                    controller.render(Constants.ADMIN_ERROR_PAGE + ".jsp");
+                }
             } finally {
                 AdminTokenThreadLocal.remove();
             }
