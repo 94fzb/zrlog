@@ -14,8 +14,9 @@
             <url>http://blog.94fzb.com</url>
         </developer>
         <developer>
-            <email>790774747@qq.com</email>
-                <url>https://www.weekdragon.cn</url>
+            <name>weekdragon</name>
+            <email>790774717@qq.com</email>
+            <url>https://www.weekdragon.cn</url>
         </developer>
     </developers>
     <dependencies>
