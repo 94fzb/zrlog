@@ -37,6 +37,18 @@
       background-size: cover
       ;overflow: hidden;
     }
+    .gn-menu-main li.sitename .gn-icon {
+        width: 50px;
+        height: 50px;
+        margin-top: 10px;
+        border-radius: 50%;
+        background-size: cover;
+        background-color: #f0f0f0;
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-image: url('${_res.avatar}');
+        display: inline-block;
+    }
   </style>
 
 </head>
