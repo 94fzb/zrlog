@@ -9,8 +9,13 @@
     <description>zrlog 基于JFinal/简洁好用的开源博客</description>
     <developers>
         <developer>
+            <name>xiaochun</name>
             <email>xchun90@163.com</email>
             <url>http://blog.94fzb.com</url>
+        </developer>
+        <developer>
+            <email>790774747@qq.com</email>
+                <url>https://www.weekdragon.cn</url>
         </developer>
     </developers>
     <dependencies>
