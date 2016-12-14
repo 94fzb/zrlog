@@ -7,7 +7,7 @@
 <script>
 	$(document).ready(function() {
 		$('.fileUpload').liteUploader({
-			script : 'admin/log/upload?dir=image'
+			script : 'api/admin/upload?dir=image'
 		}).on('lu:success', function(e, response) {
 			$('.file-name').attr("data-title", response.url)
 			$("#logo").val(response.url);
