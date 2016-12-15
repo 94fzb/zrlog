@@ -21,6 +21,7 @@ jQuery(function($) {
 
         ],
 
+        editurl: "api/admin/nav/update",
         viewrecords : true,
         rowNum:10,
         rowList:[10,20,30],
