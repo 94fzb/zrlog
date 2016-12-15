@@ -1,23 +1,19 @@
 package com.fzb.blog.web.controller.blog;
 
-import com.fzb.blog.web.controller.BaseController;
 import com.fzb.blog.model.Comment;
 import com.fzb.blog.model.Log;
 import com.fzb.blog.model.Type;
+import com.fzb.blog.service.ArticleService;
 import com.fzb.blog.util.ParseUtil;
 import com.fzb.blog.util.ResUtil;
+import com.fzb.blog.web.controller.BaseController;
 import com.fzb.blog.web.util.WebTools;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class QueryLogController extends BaseController {
+public class PostController extends BaseController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(QueryLogController.class);
-
-
-    private static final int DIGEST_LENGTH = 200;
+    private ArticleService articleService = new ArticleService();
 
     /**
      * add page info for template more easy
@@ -36,79 +32,6 @@ public class QueryLogController extends BaseController {
                 fullPager(currentUri, currentPage, total);
             }
         }
-    }
-
-    private void wrapperSearchKeyword(List<Log> logs, String keyword) {
-        for (Log log : logs) {
-            String title = log.get("title").toString();
-            String content = log.get("content").toString();
-            String digest = log.get("digest").toString();
-            log.put("title", wrapper(title, keyword));
-            String tryWrapperDigest = wrapper(digest, keyword);
-            boolean findInDigest = tryWrapperDigest.length() != digest.length();
-
-            if (findInDigest) {
-                log.put("digest", tryWrapperDigest);
-            } else {
-                String wrapperContent = wrapper(ParseUtil.removeHtmlElement(content), keyword);
-                log.put("digest", wrapperContent);
-            }
-        }
-    }
-
-    private String wrapper(String content, String keyword) {
-        String newContent = content;
-        if (content.contains(keyword)) {
-            newContent = content.replace(keyword, wrapperFontRed(keyword));
-        } else {
-            String lowerContent = content.toLowerCase();
-            if (lowerContent.contains(keyword.toLowerCase())) {
-                String[] strings = lowerContent.split(keyword.toLowerCase());
-                StringBuilder sb = new StringBuilder();
-                int count = 0;
-                if (strings.length > 1) {
-                    for (int i = 0; i < strings.length - 1; i++) {
-                        count += strings[i].length();
-                        String str = wrapperFontRed(content.substring(count, count + keyword.length()));
-                        System.out.println(str);
-                        System.out.println(sb.toString());
-                        sb.append(content.substring(count - strings[i].length(), count));
-                        sb.append(str);
-                        count += keyword.length();
-                    }
-                    // 添加最后一段数据
-                    sb.append(content.substring(count).replace(keyword.toLowerCase(), wrapperFontRed(keyword)));
-                    newContent = sb.toString();
-                } else if (strings.length > 0) {
-                    sb.append(content.substring(0, strings[0].length()));
-                    sb.append(lowerContent.substring(strings[0].length()).replace(keyword.toLowerCase(), wrapperFontRed(content.substring(strings[0].length()))));
-                    newContent = sb.toString();
-                } else {
-                    newContent = wrapperFontRed(content);
-                }
-            }
-        }
-        if (newContent.length() != content.length()) {
-            int first = newContent.indexOf("<font") - 5;
-            if (first > -1 && newContent.length() > DIGEST_LENGTH) {
-                String[] fontArr = (newContent.substring(first)).split("</font>");
-                newContent = "";
-                for (String str : fontArr) {
-                    if (!"".equals(newContent) && newContent.length() + str.length() > DIGEST_LENGTH) {
-                        if (newContent.length() < 100) {
-                            newContent += str.substring(0, 100);
-                        }
-                        break;
-                    }
-                    newContent += str + "</font>";
-                }
-            }
-        }
-        return newContent;
-    }
-
-    private String wrapperFontRed(String content) {
-        return "<font color=\"#CC0000\">" + content + "</font>";
     }
 
     private void fullPager(String currentUri, int currentPage, Integer total) {
@@ -208,7 +131,7 @@ public class QueryLogController extends BaseController {
         setPageInfo("post/search/" + key + "-", data, getParaToInt(1, 1));
         List<Log> logs = (List<Log>) data.get("rows");
         if (logs != null && !logs.isEmpty()) {
-            wrapperSearchKeyword(logs, key);
+            articleService.wrapperSearchKeyword(logs, key);
         }
     }
 

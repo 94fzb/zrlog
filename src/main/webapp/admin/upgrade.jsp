@@ -2,13 +2,18 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <jsp:include page="include/menu.jsp"/>
 <script type="text/javascript" src="admin/js/set_update.js"></script>
+<script type="text/javascript" src="admin/js/upgrade.js"></script>
 <script src="assets/js/switchery.min.js"></script>
 <div class="page-header">
 	<h3>
 		${_res['admin.upgrade.manage']}
 	</h3>
+	<div class="text-right">
+        <button id="checkUpgrade" type="button" class="btn btn-blank">
+            <i class="fa fa-refresh bigger-110"></i> ${_res.checkUpgrade}
+        </button>
+    </div>
 </div>
-
 <div class="row">
 <div class="col-xs-12">
 <form role="form" action="api/admin/upgrade/setting" class="form-horizontal" id="upgradeAjax" checkBox="upgradeCanPreview">

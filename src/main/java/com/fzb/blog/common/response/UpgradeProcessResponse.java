@@ -3,7 +3,6 @@ package com.fzb.blog.common.response;
 public class UpgradeProcessResponse {
 
     private int error;
-    private int process;
     private String message;
     private boolean needRestart;
 
@@ -13,14 +12,6 @@ public class UpgradeProcessResponse {
 
     public void setError(int error) {
         this.error = error;
-    }
-
-    public int getProcess() {
-        return process;
-    }
-
-    public void setProcess(int process) {
-        this.process = process;
     }
 
     public String getMessage() {

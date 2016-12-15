@@ -9,4 +9,6 @@ public class Constants {
     public static final String ADMIN_ERROR_PAGE = "/admin/error/500";
     public static final String ADMIN_NOT_FOUND_PAGE = "/admin/error/404";
     public static final String ZRLOG_RESOURCE_DOWNLOAD_URL = "http://dl.zrlog.com";
+    public static final String AUTO_UPGRADE_VERSION_KEY = "autoUpgradeVersion";
+    public static final int DEFAULT_ARTICLE_DIGEST_LENGTH = 200;
 }

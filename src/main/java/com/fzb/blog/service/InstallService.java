@@ -2,6 +2,7 @@ package com.fzb.blog.service;
 
 import com.fzb.blog.common.Constants;
 import com.fzb.blog.util.ZrlogUtil;
+import com.fzb.blog.web.plugin.type.AutoUpgradeVersionType;
 import com.fzb.common.util.IOUtil;
 import com.fzb.common.util.Md5Util;
 import com.jfinal.kit.PathKit;
@@ -39,10 +40,11 @@ public class InstallService {
         this.dbConn = dbConn;
     }
 
-    private static Map<String, Object> defaultWebSite(Map<String, String> webSite) {
+    private static Map<String, Object> getDefaultWebSiteSettingMap(Map<String, String> webSite) {
         Map<String, Object> map = new LinkedHashMap<String, Object>();
         map.put("rows", 10);
         map.put("template", Constants.DEFAULT_TEMPLATE_PATH);
+        map.put(Constants.AUTO_UPGRADE_VERSION_KEY, AutoUpgradeVersionType.ONE_DAY.getCycle());
         map.put("pseudo_staticStatus", false);
         map.put("title", webSite.get("title"));
         map.put("second_title", webSite.get("second_title"));
@@ -118,7 +120,7 @@ public class InstallService {
             }
             StringBuilder sb = new StringBuilder();
             sb.append("INSERT INTO `website` (`name`, `value`, `remark`) VALUES ");
-            Map<String, Object> defaultMap = defaultWebSite(configMsg);
+            Map<String, Object> defaultMap = getDefaultWebSiteSettingMap(configMsg);
             for (Map.Entry e : defaultMap.entrySet()) {
                 sb.append("('").append(e.getKey()).append("','").append(e.getValue()).append("',NULL),");
             }

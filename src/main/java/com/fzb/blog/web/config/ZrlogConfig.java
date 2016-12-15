@@ -6,7 +6,7 @@ import com.fzb.blog.util.BlogBuildInfoUtil;
 import com.fzb.blog.util.ZrlogUtil;
 import com.fzb.blog.web.controller.blog.APIController;
 import com.fzb.blog.web.controller.blog.InstallController;
-import com.fzb.blog.web.controller.blog.QueryLogController;
+import com.fzb.blog.web.controller.blog.PostController;
 import com.fzb.blog.web.handler.JspSkipHandler;
 import com.fzb.blog.web.handler.PluginHandler;
 import com.fzb.blog.web.incp.BlackListInterceptor;
@@ -192,9 +192,9 @@ public class ZrlogConfig extends JFinalConfig {
 
     public void configRoute(Routes routes) {
         // 添加浏览者能访问Control 路由
-        routes.add("/post", QueryLogController.class);
+        routes.add("/post", PostController.class);
         routes.add("/api", APIController.class);
-        routes.add("/", QueryLogController.class);
+        routes.add("/", PostController.class);
         routes.add("/install", InstallController.class);
         // 后台管理者
         routes.add(new AdminRoutes());

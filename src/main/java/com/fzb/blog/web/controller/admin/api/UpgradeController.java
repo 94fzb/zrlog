@@ -1,5 +1,6 @@
 package com.fzb.blog.web.controller.admin.api;
 
+import com.fzb.blog.common.Constants;
 import com.fzb.blog.common.response.CheckVersionResponse;
 import com.fzb.blog.common.response.DownloadUpdatePackageResponse;
 import com.fzb.blog.common.response.UpdateRecordResponse;
@@ -8,7 +9,9 @@ import com.fzb.blog.model.WebSite;
 import com.fzb.blog.service.CacheService;
 import com.fzb.blog.web.controller.BaseController;
 import com.fzb.blog.web.plugin.UpdateVersionPlugin;
+import com.fzb.blog.web.plugin.UpdateVersionThread;
 import com.fzb.blog.web.plugin.Version;
+import com.fzb.blog.web.plugin.type.AutoUpgradeVersionType;
 import com.fzb.common.util.http.HttpUtil;
 import com.fzb.common.util.http.handle.DownloadProcessHandle;
 import com.jfinal.config.Plugins;
@@ -34,7 +37,7 @@ public class UpgradeController extends BaseController {
         UpdateRecordResponse recordResponse = new UpdateRecordResponse();
         recordResponse.setError(0);
         Plugins plugins = (Plugins) JFinal.me().getServletContext().getAttribute("plugins");
-        if (getParaToInt("autoUpgradeVersion") == -1) {
+        if (AutoUpgradeVersionType.cycle(getParaToInt(Constants.AUTO_UPGRADE_VERSION_KEY)) == AutoUpgradeVersionType.NEVER) {
             for (IPlugin plugin : plugins.getPluginList()) {
                 if (plugin instanceof UpdateVersionPlugin) {
                     plugin.stop();
@@ -69,11 +72,15 @@ public class UpgradeController extends BaseController {
     }
 
     public CheckVersionResponse lastVersion() {
+        return getCheckVersionResponse(false);
+    }
+
+    private CheckVersionResponse getCheckVersionResponse(boolean fetchAble) {
         Plugins plugins = (Plugins) JFinal.me().getServletContext().getAttribute("plugins");
         CheckVersionResponse checkVersionResponse = new CheckVersionResponse();
         for (IPlugin plugin : plugins.getPluginList()) {
             if (plugin instanceof UpdateVersionPlugin) {
-                Version version = ((UpdateVersionPlugin) plugin).getLastVersion();
+                Version version = ((UpdateVersionPlugin) plugin).getLastVersion(fetchAble);
                 if (version != null) {
                     checkVersionResponse.setUpgrade(true);
                     checkVersionResponse.setVersion(version);
@@ -83,21 +90,21 @@ public class UpgradeController extends BaseController {
         return checkVersionResponse;
     }
 
+    public CheckVersionResponse checkNewVersion() {
+        return getCheckVersionResponse(true);
+    }
+
     public UpgradeProcessResponse doUpgrade() {
         DownloadProcessHandle handle = (DownloadProcessHandle) getSession().getAttribute("downing");
         File file = handle.getFile();
         UpgradeProcessResponse upgradeProcessResponse = new UpgradeProcessResponse();
-        Plugins plugins = (Plugins) JFinal.me().getServletContext().getAttribute("plugins");
-        for (IPlugin plugin : plugins.getPluginList()) {
-            if (plugin instanceof UpdateVersionPlugin) {
-                UpdateVersionPlugin updateVersionPlugin = (UpdateVersionPlugin) plugin;
-                if (!updateVersionPlugin.isUpdating()) {
-                    updateVersionPlugin.startUpgrade(file);
-                }
-                upgradeProcessResponse.setProcess(updateVersionPlugin.getProcess());
-                upgradeProcessResponse.setMessage(updateVersionPlugin.getProcessMsg());
-            }
+        UpdateVersionThread updateVersionThread = (UpdateVersionThread) JFinal.me().getServletContext().getAttribute("updateVersionThread");
+        if (updateVersionThread == null) {
+            updateVersionThread = new UpdateVersionThread(file);
+            JFinal.me().getServletContext().setAttribute("updateVersionThread", updateVersionThread);
+            updateVersionThread.start();
         }
+        upgradeProcessResponse.setMessage(updateVersionThread.getMessage());
         return upgradeProcessResponse;
     }
 
