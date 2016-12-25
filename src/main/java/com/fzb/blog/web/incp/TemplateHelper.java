@@ -82,6 +82,11 @@ public class TemplateHelper {
             archive.setUrl(tagUri);
             archiveList.add(archive);
         }
+        fullNavBar(request, suffix, baseDataInitVO, baseUrl);
+        baseDataInitVO.setArchiveList(archiveList);
+    }
+
+    private static void fullNavBar(HttpServletRequest request, String suffix, BaseDataInitVO baseDataInitVO, String baseUrl) {
         List<LogNav> logNavs = baseDataInitVO.getLogNavs();
         if (!logNavs.isEmpty()) {
             for (LogNav logNav : logNavs) {
@@ -97,10 +102,14 @@ public class TemplateHelper {
                         tagUri += suffix;
                     }
                     logNav.put("url", tagUri);
+                    if (request.getRequestURL().toString().equals(tagUri)) {
+                        logNav.put("current", true);
+                    } else {
+                        logNav.put("current", false);
+                    }
                 }
             }
         }
-        baseDataInitVO.setArchiveList(archiveList);
     }
 
     public static String fullTemplateInfo(Controller controller) {
@@ -144,6 +153,7 @@ public class TemplateHelper {
         request.setAttribute("url", templateUrl);
         request.setAttribute("templateUrl", templateUrl);
         request.setAttribute("rurl", baseUrl);
+        request.setAttribute("baseUrl", baseUrl);
         return baseUrl;
     }
 
@@ -190,8 +200,8 @@ public class TemplateHelper {
             log.put("typeUrl", baseUrl + "post/sort/" + log.get("typeAlias") + suffix);
             Log lastLog = log.get("lastLog");
             Log nextLog = log.get("nextLog");
-            nextLog.put("url", lastLog.get("alias") + suffix);
-            lastLog.put("url", lastLog.get("alias") + suffix);
+            nextLog.put("url", baseUrl + "post/sort/" + lastLog.get("alias") + suffix);
+            lastLog.put("url", baseUrl + "post/sort/" + lastLog.get("alias") + suffix);
         } else if (data instanceof Map) {
             Map map = (Map) data;
             List<Log> logList = (List<Log>) map.get("rows");

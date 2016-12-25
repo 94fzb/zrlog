@@ -42,7 +42,7 @@ public class InitDataInterceptor implements Interceptor {
         } else {
             if (invocation.getController() instanceof BaseController) {
                 HttpServletRequest request = invocation.getController().getRequest();
-                invocation.getController().setAttr("requrl", request.getRequestURL());
+                invocation.getController().setAttr("requrl", request.getRequestURL().toString());
                 BaseController baseController = ((BaseController) invocation.getController());
                 BaseDataInitVO vo = getCache();
                 baseController.setAttr("init", vo);
@@ -69,8 +69,8 @@ public class InitDataInterceptor implements Interceptor {
             cacheInit.setPlugins(Plugin.dao.queryAll());
             cacheInit.setArchives(Log.dao.getArchives());
             cacheInit.setTags(Tag.dao.queryAll());
-            cacheInit.setHotLogs((List<Log>) Log.dao.getLogsByPage(1, 6).get("rows"));
             List<Type> types = cacheInit.getTypes();
+            cacheInit.setHotLogs((List<Log>) Log.dao.getLogsByPage(1, 6).get("rows"));
             Map<Map<String, Object>, List<Log>> indexHotLog = new LinkedHashMap<Map<String, Object>, List<Log>>();
             for (Type type : types) {
                 Map<String, Object> typeMap = new TreeMap<String, Object>();

@@ -1,7 +1,6 @@
 package com.fzb.blog.util;
 
 import com.fzb.blog.common.Constants;
-import com.fzb.blog.web.config.ZrlogConfig;
 import com.fzb.blog.web.incp.InitDataInterceptor;
 import com.jfinal.core.JFinal;
 import com.jfinal.i18n.Res;

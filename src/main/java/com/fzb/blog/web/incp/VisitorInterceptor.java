@@ -3,10 +3,14 @@ package com.fzb.blog.web.incp;
 import com.fzb.blog.web.config.ZrlogConfig;
 import com.jfinal.aop.Interceptor;
 import com.jfinal.aop.Invocation;
+import com.jfinal.core.JFinal;
+import com.jfinal.json.Json;
 import com.jfinal.kit.PathKit;
 
 import java.io.File;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 class VisitorInterceptor implements Interceptor {
@@ -30,22 +34,33 @@ class VisitorInterceptor implements Interceptor {
     private void visitorPermission(Invocation ai) {
         ai.invoke();
         String basePath = TemplateHelper.fullTemplateInfo(ai.getController());
+        String path = "index.jsp";
         if (ai.getController().getAttr("log") != null) {
             ai.getController().setAttr("pageLevel", 1);
-            ai.getController().render(basePath + "/detail.jsp");
+            path = "detail.jsp";
         } else if (ai.getController().getAttr("data") != null) {
             if (ai.getActionKey().equals("/") && new File(PathKit.getWebRootPath() + basePath + "/index.jsp").exists()) {
                 ai.getController().setAttr("pageLevel", 2);
-                ai.getController().render(basePath + "/index.jsp");
+                path = "index.jsp";
             } else {
                 ai.getController().setAttr("pageLevel", 1);
-                ai.getController().render(basePath + "/page.jsp");
+                path = "page.jsp";
             }
         } else {
             ai.getController().setAttr("pageLevel", 2);
-            ai.getController().render(basePath + "/index.jsp");
         }
-
+        boolean dev = JFinal.me().getConstants().getDevMode();
+        ai.getController().setAttr("dev", dev);
+        if (dev) {
+            Map<String, Object> attrMap = new LinkedHashMap<String, Object>();
+            Enumeration<String> enumerations = ai.getController().getAttrNames();
+            while (enumerations.hasMoreElements()) {
+                String key = enumerations.nextElement();
+                attrMap.put(key, ai.getController().getAttr(key));
+            }
+            ai.getController().setAttr("requestScopeJsonString", Json.getJson().toJson(attrMap));
+        }
+        ai.getController().render(basePath + "/" + path);
     }
 
     private void apiPermission(Invocation ai) {

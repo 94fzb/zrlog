@@ -1,8 +1,8 @@
 package com.fzb.blog.web.controller.blog;
 
-import com.fzb.blog.web.config.ZrlogConfig;
 import com.fzb.blog.service.InstallService;
 import com.fzb.blog.util.ResUtil;
+import com.fzb.blog.web.config.ZrlogConfig;
 import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;

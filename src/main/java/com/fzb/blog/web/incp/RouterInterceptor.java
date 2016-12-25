@@ -22,6 +22,7 @@ public class RouterInterceptor implements Interceptor {
                 visitorInterceptor.intercept(invocation);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             invocation.getController().renderError(500);
             LOGGER.error("interceptor exception ", e);
         }
