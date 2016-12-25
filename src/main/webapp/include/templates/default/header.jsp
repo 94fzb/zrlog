@@ -53,8 +53,9 @@
 
 </head>
 <body class="default front">
+<jsp:include page="../../core/dev.jsp"/>
 <div class="page">
-  <div class="top">
+<div class="top">
   <div class="inner">
     <header>
       <h1 class="site-name">
