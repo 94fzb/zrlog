@@ -74,7 +74,7 @@ public class ZrlogConfig extends JFinalConfig {
                     String filePath = pluginCoreFile.getParentFile().toString();
                     try {
                         LOGGER.info("plugin-core.jar not exists will download from " + PLUGIN_CORE_DOWNLOAD_URL);
-                        HttpUtil.sendGetRequest(PLUGIN_CORE_DOWNLOAD_URL, new HashMap<String, String[]>(), new HttpFileHandle(filePath), new HashMap<String, String>());
+                        HttpUtil.sendGetRequest(PLUGIN_CORE_DOWNLOAD_URL + "?_=" + System.currentTimeMillis(), new HashMap<String, String[]>(), new HttpFileHandle(filePath), new HashMap<String, String>());
                     } catch (IOException e) {
                         LOGGER.warn("download plugin core error", e);
                     }

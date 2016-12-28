@@ -49,6 +49,11 @@ class VisitorInterceptor implements Interceptor {
         } else {
             ai.getController().setAttr("pageLevel", 2);
         }
+        fullDevData(ai);
+        ai.getController().render(basePath + "/" + path);
+    }
+
+    private void fullDevData(Invocation ai) {
         boolean dev = JFinal.me().getConstants().getDevMode();
         ai.getController().setAttr("dev", dev);
         if (dev) {
@@ -60,7 +65,6 @@ class VisitorInterceptor implements Interceptor {
             }
             ai.getController().setAttr("requestScopeJsonString", Json.getJson().toJson(attrMap));
         }
-        ai.getController().render(basePath + "/" + path);
     }
 
     private void apiPermission(Invocation ai) {
