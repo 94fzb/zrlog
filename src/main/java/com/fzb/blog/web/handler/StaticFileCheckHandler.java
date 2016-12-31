@@ -20,17 +20,19 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * @author zhengchangchun 用于拦截通过请求 .jsp 后缀的请求 如果用户访问的后缀为 .html 的情况下. 第一次使用程序进行抓取.
- *         后面的直接跳转到静态文件
+ * 用于对静态文件的请求的检查，和静态化文章页，加快文章页的响应。
  */
-public class JspSkipHandler extends Handler {
+public class StaticFileCheckHandler extends Handler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JspSkipHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StaticFileCheckHandler.class);
 
+    //不希望部分技术人走后门，拦截一些不合法的请求
     private static final Set<String> FORBIDDEN_URI_EXT_SET = new HashSet<String>();
 
     static {
+        //由于程序的.jsp文件没有存放在WEB-INF目录，为了防止访问.jsp页面获得的没有数据的页面，或则是错误的页面。
         FORBIDDEN_URI_EXT_SET.add(".jsp");
+        //这主要用在主题目录下面的配置文件。
         FORBIDDEN_URI_EXT_SET.add(".properties");
     }
 
@@ -66,7 +68,7 @@ public class JspSkipHandler extends Handler {
                 }
             } else {
                 try {
-                    // 访问 .jsp 的情况下认为非法请求, 返回403
+                    //非法请求, 返回403
                     request.getSession();
                     response.sendError(403);
                 } catch (IOException e) {
@@ -79,6 +81,11 @@ public class JspSkipHandler extends Handler {
 
     }
 
+    /**
+     * 将一个网页转化对应文件，用于静态化文章页
+     * @param sSourceUrl
+     * @param file
+     */
     private void convert2Html(String sSourceUrl, File file) {
         if (!file.exists()) {
             file.getParentFile().mkdirs();

@@ -7,8 +7,8 @@ import com.fzb.blog.util.ZrlogUtil;
 import com.fzb.blog.web.controller.blog.APIController;
 import com.fzb.blog.web.controller.blog.InstallController;
 import com.fzb.blog.web.controller.blog.PostController;
-import com.fzb.blog.web.handler.JspSkipHandler;
 import com.fzb.blog.web.handler.PluginHandler;
+import com.fzb.blog.web.handler.StaticFileCheckHandler;
 import com.fzb.blog.web.incp.BlackListInterceptor;
 import com.fzb.blog.web.incp.InitDataInterceptor;
 import com.fzb.blog.web.incp.MyI18NInterceptor;
@@ -149,7 +149,7 @@ public class ZrlogConfig extends JFinalConfig {
      */
     public void configHandler(Handlers handlers) {
         handlers.add(new PluginHandler());
-        handlers.add(new JspSkipHandler());
+        handlers.add(new StaticFileCheckHandler());
     }
 
     /**
