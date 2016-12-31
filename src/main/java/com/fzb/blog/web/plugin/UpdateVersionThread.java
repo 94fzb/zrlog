@@ -14,6 +14,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * 更新Zrlog，具体的流程看 run() 里面有详细流程。本质就是合成新war包，然后替换掉war包。
+ */
 public class UpdateVersionThread extends Thread {
 
     private static final Logger LOGGER = Logger.getLogger(UpdateVersionThread.class);
@@ -90,6 +93,10 @@ public class UpdateVersionThread extends Thread {
         }
     }
 
+    /**
+     * 提示更新进度
+     * @return
+     */
     public String getMessage() {
         return sb.toString();
     }

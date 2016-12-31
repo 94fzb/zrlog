@@ -6,6 +6,9 @@ import org.apache.log4j.Logger;
 import java.io.IOException;
 import java.net.Socket;
 
+/**
+ * 处理由于未知原因插件异常停止后，还可以通过命令重新加载，保证插件的高可用。
+ */
 public class PluginSocketThread extends Thread {
 
     private static final Logger LOGGER = Logger.getLogger(PluginSocketThread.class);
@@ -21,6 +24,7 @@ public class PluginSocketThread extends Thread {
 
     @Override
     public void run() {
+        //使用Socket的方式进行监听，如果插件服务停止后，那么SocketServer也会被关闭，方法堵塞结束，标记插件服务停止。
         Socket socket;
         while (true) {
             try {

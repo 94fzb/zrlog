@@ -1,5 +1,9 @@
 package com.fzb.blog.web.plugin.type;
 
+/**
+ * 定义常见的自动检查更新检查周期。
+ * 使用秒为单位，而不是毫秒
+ */
 public enum AutoUpgradeVersionType {
 
     NEVER(-1), ONE_DAY(86400), ONE_WEEK(604800), HALF_MONTH(1296000);

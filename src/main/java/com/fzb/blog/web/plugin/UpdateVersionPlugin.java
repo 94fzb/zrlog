@@ -9,6 +9,9 @@ import java.util.Timer;
 
 import static com.fzb.blog.common.Constants.AUTO_UPGRADE_VERSION_KEY;
 
+/**
+ * 基于JFinal插件的实现，使用定时器，定时检查是否有新的版本发布。
+ */
 public class UpdateVersionPlugin implements IPlugin {
 
     private Timer timer;
@@ -23,6 +26,7 @@ public class UpdateVersionPlugin implements IPlugin {
             if (timer != null) {
                 timer.cancel();
             }
+            //开启了定时检查，定时器开始工作
             if (autoUpgradeVersionType != AutoUpgradeVersionType.NEVER) {
                 timer = new Timer();
                 UpdateVersionTimerTask timerTask = new UpdateVersionTimerTask(checkPreview);
@@ -41,10 +45,11 @@ public class UpdateVersionPlugin implements IPlugin {
         return true;
     }
 
-    public Version getLastVersion() {
-        return lastVersion;
-    }
-
+    /**
+     * 获取最新的版本信息。
+     * @param fetch 是否发起新的请求
+     * @return
+     */
     public Version getLastVersion(boolean fetch) {
         if (fetch) {
             final boolean checkPreview = "on".equals(WebSite.dao.getValueByName("upgradeCanPreview"));

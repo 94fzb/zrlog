@@ -10,6 +10,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimerTask;
 
+/**
+ * 定时检查是否有新的更新包可用，原则比较简单，比对服务器罪行buildId和war包的构建时间（与resources/build.properties对比）
+ * 注意 开发环境没有这个文件
+ */
 class UpdateVersionTimerTask extends TimerTask {
 
     private static final Logger LOGGER = Logger.getLogger(UpdateVersionTimerTask.class);
@@ -33,6 +37,7 @@ class UpdateVersionTimerTask extends TimerTask {
             String txtContent = HttpUtil.getTextByUrl(versionUrl + "?_" + System.currentTimeMillis()).trim();
             Version tLastVersion = new JSONDeserializer<Version>().deserialize(txtContent, Version.class);
             LOGGER.info(txtContent);
+            //手动设置对应ChangeLog。
             tLastVersion.setChangeLog(HttpUtil.getTextByUrl("http://www.zrlog.com/changelog/" + tLastVersion.getVersion() + "-" + tLastVersion.getBuildId() + ".html"));
             Date buildDate = new SimpleDateFormat("yyyy-MM-dd hh:mm").parse(tLastVersion.getReleaseDate());
             if (!tLastVersion.getBuildId().equals(BlogBuildInfoUtil.getBuildId()) && buildDate.after(BlogBuildInfoUtil.getTime())) {

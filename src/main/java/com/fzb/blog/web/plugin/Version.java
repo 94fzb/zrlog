@@ -2,6 +2,9 @@ package com.fzb.blog.web.plugin;
 
 import java.io.Serializable;
 
+/**
+ * 这个对应了 last.runType.json 里面的字段
+ */
 public class Version implements Serializable {
 
     private String buildId;
