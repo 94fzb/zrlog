@@ -2,6 +2,9 @@ package com.fzb.blog.web.incp;
 
 import com.fzb.blog.model.User;
 
+/**
+ * 使用ThreadLocal作多个类之间取值，和设值。而不是向传统方式需要获得HttpRequest对象才能取值，设值。
+ */
 public class AdminTokenThreadLocal {
 
     private static ThreadLocal<User> userThreadLocal = new ThreadLocal<User>();
