@@ -5,6 +5,9 @@ import com.jfinal.aop.Interceptor;
 import com.jfinal.aop.Invocation;
 import com.jfinal.kit.PathKit;
 
+/**
+ * 多语言（国际化）相关的配置，这里并没有直接继承至JFinal提供的I18N方案，而只是使用JFinal的配置。
+ */
 public class MyI18NInterceptor implements Interceptor {
 
     @Override
