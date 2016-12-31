@@ -16,6 +16,10 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
+/**
+ * 负责全部后台请求的处理（/admin/plugins/*除外），目前还是使用的Session的方式保存用户是否登陆，及管理员登陆成功后将管理员数据存放在Session
+ * 中用于标示权限。
+ */
 class AdminInterceptor implements Interceptor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AdminInterceptor.class);
@@ -25,6 +29,12 @@ class AdminInterceptor implements Interceptor {
         adminPermission(inv);
     }
 
+    /**
+     * 为了规范代码，这里做了一点类是Spring的ResponseEntity的东西，及通过方法的返回值来判断是应该返回页面还会对应JSON数据
+     * 预定方式看 AdminRouters
+     * 这里用到了 ThreadLocal，后期会替换掉Session的方式。
+     * @param ai
+     */
     private void adminPermission(Invocation ai) {
         Controller controller = ai.getController();
         if (controller.getSession().getAttribute("user") != null) {
@@ -52,6 +62,7 @@ class AdminInterceptor implements Interceptor {
             ai.invoke();
             tryDoRender(ai, controller);
         } else {
+            //在重定向到登陆页面时，同时携带了当前的请求路径，方便登陆成功后的跳转
             HttpServletRequest request = ai.getController().getRequest();
             try {
                 ai.getController().redirect(request.getContextPath()
@@ -63,6 +74,12 @@ class AdminInterceptor implements Interceptor {
         }
     }
 
+    /**
+     * 尝试通过Controller的放回值来进行数据的渲染
+     * @param ai
+     * @param controller
+     * @return true 表示已经渲染数据了，false 表示并未按照约定编写，及没有进行渲染
+     */
     private boolean tryDoRender(Invocation ai, Controller controller) {
         Object returnValue = ai.getReturnValue();
         boolean rendered = false;
