@@ -5,6 +5,9 @@ import com.jfinal.aop.Invocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * JFinal没有对应URI path的过滤的配置，于是需要手动通过URI path进行划分到不同的Interception。
+ */
 public class RouterInterceptor implements Interceptor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RouterInterceptor.class);
@@ -16,6 +19,7 @@ public class RouterInterceptor implements Interceptor {
     public void intercept(Invocation invocation) {
         try {
             String actionKey = invocation.getActionKey();
+            //这样写一点页不优雅，路径少还好，多了就痛苦了
             if (actionKey.startsWith("/admin") || actionKey.startsWith("/api/admin")) {
                 adminInterceptor.intercept(invocation);
             } else {
