@@ -12,6 +12,9 @@ import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 提供一些基础的工具类，方便其子类调用
+ */
 public class BaseController extends Controller {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseController.class);
@@ -92,6 +95,10 @@ public class BaseController extends Controller {
         fullTemplateSetting(jsonStr);
     }
 
+    /**
+     * 封装Jqgrid的分页参数
+     * @return
+     */
     public PageableRequest getPageable() {
         PageableRequest pageableRequest = new PageableRequest();
         pageableRequest.setRows(getParaToInt("rows"));

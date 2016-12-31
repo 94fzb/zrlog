@@ -6,15 +6,20 @@ import com.fzb.blog.web.config.ZrlogConfig;
 import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
-import org.apache.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 与安装向导相关的路由进行控制
+ * 注意 install.lock 文件相当重要，如果不是重新安装请不要删除这个自动生成的文件
+ */
 public class InstallController extends Controller {
 
-    private static final Logger LOGGER = Logger.getLogger(InstallController.class);
 
+    /**
+     * 检查数据库是否可以正常连接使用，无法连接时给出相应的提示
+     */
     public void testDbConn() {
         Map<String, String> dbConn = new HashMap<String, String>();
         dbConn.put("jdbcUrl", "jdbc:mysql://" + getPara("dbhost") + ":"
@@ -33,6 +38,9 @@ public class InstallController extends Controller {
         }
     }
 
+    /**
+     * 数据库检查通过后，根据填写信息，执行数据表，表数据的初始化
+     */
     public void installZrlog() {
         String home = getRequest().getScheme() + "://"
                 + getRequest().getHeader("host")
@@ -50,10 +58,14 @@ public class InstallController extends Controller {
                 configMsg).install()) {
             render("/install/success.jsp");
             ZrlogConfig config = (ZrlogConfig) JFinal.me().getServletContext().getAttribute("config");
+            //通知启动插件，配置库连接等操作
             config.installFinish();
         }
     }
 
+    /**
+     * 加载安装向导第一个页面数据
+     */
     public void index() {
         render("/install/index.jsp");
     }
