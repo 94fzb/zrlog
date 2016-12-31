@@ -15,11 +15,16 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
+/**
+ * 缓存全局数据，并且存放在Servlet的Context里面，避免每次请求都需要重数据读取数据，当超过指定时间后，删除缓存数据，避免缓存到脏数据一直存在。
+ */
 public class InitDataInterceptor implements Interceptor {
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InitDataInterceptor.class);
+    //重最后一次请求开始计算时间，超过这个值后缓存被清除
     private static final int IDLE_TIME = 1000 * 120;
+    //用于定时检查缓存的定时器
     private Timer timer = new Timer();
     private volatile long lastAccessTime;
 
@@ -37,6 +42,7 @@ public class InitDataInterceptor implements Interceptor {
 
     private void doIntercept(Invocation invocation) {
         long start = System.currentTimeMillis();
+        //未安装情况下无法设置缓存
         if (!ZrlogConfig.isInstalled()) {
             invocation.getController().render("/install/index.jsp");
         } else {
@@ -50,6 +56,7 @@ public class InitDataInterceptor implements Interceptor {
             }
         }
         invocation.invoke();
+        //开发环境下面打印整个请求的耗时，便于优化代码
         if (BlogBuildInfoUtil.isDev()) {
             LOGGER.info(invocation.getActionKey() + " used time " + (System.currentTimeMillis() - start));
         }
@@ -79,6 +86,7 @@ public class InitDataInterceptor implements Interceptor {
                 indexHotLog.put(typeMap, (List<Log>) Log.dao.getLogsBySort(1, 6, type.getStr("alias")).get("rows"));
             }
             cacheInit.setIndexHotLogs(indexHotLog);
+            //存放公共数据到ServletContext
             JFinal.me().getServletContext().setAttribute("webSite", website);
             JFinal.me().getServletContext().setAttribute(Constants.CACHE_KEY, cacheInit);
         }
