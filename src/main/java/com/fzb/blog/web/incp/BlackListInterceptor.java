@@ -5,16 +5,15 @@ import com.fzb.blog.web.util.WebTools;
 import com.jfinal.aop.Interceptor;
 import com.jfinal.aop.Invocation;
 import com.jfinal.core.JFinal;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * 通过获取调用者IP地址进行黑名单的检查，主要用于防止恶意访问，可以在后台管理界面添加记录。
+ */
 public class BlackListInterceptor implements Interceptor {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(BlackListInterceptor.class);
 
     @Override
     public void intercept(Invocation invocation) {
