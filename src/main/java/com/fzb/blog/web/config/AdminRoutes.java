@@ -10,7 +10,7 @@ import com.jfinal.config.Routes;
  * 后台管理者路由，这里目前分为2中情况，及服务端响应模板页面和用户对数据的操作
  * 约定
  * 1. 添加页面需要响应时，使用 /admin 的路由，及同步操作
- * 2. 浏览数据，表更数据。使用 /api/admin 的路由，以JSON的格式进行响应，及异步操作
+ * 2. 浏览数据，变更数据。使用 /api/admin 的路由，以JSON的格式进行响应，及异步操作
  */
 class AdminRoutes extends Routes {
     public void config() {
