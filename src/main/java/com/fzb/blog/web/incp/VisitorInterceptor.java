@@ -3,6 +3,7 @@ package com.fzb.blog.web.incp;
 import com.fzb.blog.web.config.ZrlogConfig;
 import com.jfinal.aop.Interceptor;
 import com.jfinal.aop.Invocation;
+import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.jfinal.json.Json;
 import com.jfinal.kit.PathKit;
@@ -13,6 +14,12 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * 目前这里分为3种情况，
+ * 1. /post / 前台页面，扩展其他页面请使用 /** 这样的。
+ * 2. /install 用于安装向导的路由
+ * 3. /api 用于将文章相关的数据数据转化JSON数据
+ */
 class VisitorInterceptor implements Interceptor {
 
     @Override
@@ -31,6 +38,10 @@ class VisitorInterceptor implements Interceptor {
         }
     }
 
+    /**
+     * 查询出来的文章数据存放在request域里面，通过判断Key，选择对应需要渲染的模板文件
+     * @param ai
+     */
     private void visitorPermission(Invocation ai) {
         ai.invoke();
         String basePath = TemplateHelper.fullTemplateInfo(ai.getController());
@@ -49,21 +60,25 @@ class VisitorInterceptor implements Interceptor {
         } else {
             ai.getController().setAttr("pageLevel", 2);
         }
-        fullDevData(ai);
+        fullDevData(ai.getController());
         ai.getController().render(basePath + "/" + path);
     }
 
-    private void fullDevData(Invocation ai) {
+    /**
+     * 方便开发环境使用，将Servlet的Request域的数据转化JSON字符串，配合dev.jsp使用，定制主题更加方便
+     * @param controller
+     */
+    private void fullDevData(Controller controller) {
         boolean dev = JFinal.me().getConstants().getDevMode();
-        ai.getController().setAttr("dev", dev);
+        controller.setAttr("dev", dev);
         if (dev) {
             Map<String, Object> attrMap = new LinkedHashMap<String, Object>();
-            Enumeration<String> enumerations = ai.getController().getAttrNames();
+            Enumeration<String> enumerations = controller.getAttrNames();
             while (enumerations.hasMoreElements()) {
                 String key = enumerations.nextElement();
-                attrMap.put(key, ai.getController().getAttr(key));
+                attrMap.put(key, controller.getAttr(key));
             }
-            ai.getController().setAttr("requestScopeJsonString", Json.getJson().toJson(attrMap));
+            controller.setAttr("requestScopeJsonString", Json.getJson().toJson(attrMap));
         }
     }
 
