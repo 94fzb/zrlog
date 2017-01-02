@@ -8,6 +8,9 @@ import com.jfinal.kit.PathKit;
 
 import java.io.File;
 
+/**
+ * 对缓存数据的操作
+ */
 public class CacheService {
 
     public void cleanCache() {

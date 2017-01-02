@@ -4,8 +4,8 @@ import com.fzb.blog.model.Comment;
 import com.fzb.blog.model.Log;
 import com.fzb.blog.model.Type;
 import com.fzb.blog.service.ArticleService;
+import com.fzb.blog.util.I18NUtil;
 import com.fzb.blog.util.ParseUtil;
-import com.fzb.blog.util.ResUtil;
 import com.fzb.blog.web.controller.BaseController;
 import com.fzb.blog.web.util.WebTools;
 
@@ -38,7 +38,7 @@ public class PostController extends BaseController {
         Map<String, Object> pager = new HashMap<String, Object>();
         List<Map<String, Object>> pageList = new ArrayList<Map<String, Object>>();
         if (currentPage != 1) {
-            pageList.add(pageEntity(currentUri, currentPage, ResUtil.getStringFromRes("prevPage", getRequest()), currentPage - 1));
+            pageList.add(pageEntity(currentUri, currentPage, I18NUtil.getStringFromRes("prevPage", getRequest()), currentPage - 1));
         }
         if (total > 10) {
             if (currentPage < 3 || total - 4 < currentPage) {
@@ -65,7 +65,7 @@ public class PostController extends BaseController {
             }
         }
         if (currentPage != total) {
-            pageList.add(pageEntity(currentUri, currentPage, ResUtil.getStringFromRes("nextPage", getRequest()), currentPage + 1));
+            pageList.add(pageEntity(currentUri, currentPage, I18NUtil.getStringFromRes("nextPage", getRequest()), currentPage + 1));
         }
         pager.put("pageList", pageList);
         pager.put("pageStartUrl", currentUri + 1);
@@ -125,7 +125,7 @@ public class PostController extends BaseController {
         // 记录回话的Key
         setSessionAttr("key", key);
 
-        setAttr("tipsType", ResUtil.getStringFromRes("search", getRequest()));
+        setAttr("tipsType", I18NUtil.getStringFromRes("search", getRequest()));
         setAttr("tipsName", key);
 
         setPageInfo("post/search/" + key + "-", data, getParaToInt(1, 1));
@@ -136,7 +136,7 @@ public class PostController extends BaseController {
     }
 
     public void record() {
-        setAttr("tipsType", ResUtil.getStringFromRes("archive", getRequest()));
+        setAttr("tipsType", I18NUtil.getStringFromRes("archive", getRequest()));
         setAttr("tipsName", getPara(0));
 
         setPageInfo("post/record/" + getPara(0) + "-", Log.dao.getLogsByData(getParaToInt(1, 1), getDefaultRows(), getPara(0)), getParaToInt(1, 1));
@@ -165,8 +165,8 @@ public class PostController extends BaseController {
         if (log != null) {
             Integer logId = log.get("logId");
             Log.dao.clickChange(logId);
-            log.put("lastLog", Log.dao.getLastLog(logId, ResUtil.getStringFromRes("noLastLog", getRequest())));
-            log.put("nextLog", Log.dao.getNextLog(logId, ResUtil.getStringFromRes("noNextLog", getRequest())));
+            log.put("lastLog", Log.dao.getLastLog(logId, I18NUtil.getStringFromRes("noLastLog", getRequest())));
+            log.put("nextLog", Log.dao.getNextLog(logId, I18NUtil.getStringFromRes("noNextLog", getRequest())));
             log.put("comments", Comment.dao.getCommentsByLogId(logId));
             setAttr("log", log);
         }
@@ -177,7 +177,7 @@ public class PostController extends BaseController {
 
         Type type = Type.dao.findByAlias(getPara(0));
         setAttr("type", type);
-        setAttr("tipsType", ResUtil.getStringFromRes("category", getRequest()));
+        setAttr("tipsType", I18NUtil.getStringFromRes("category", getRequest()));
         if (type != null) {
             setAttr("tipsName", type.getStr("typeName"));
         }
@@ -188,7 +188,7 @@ public class PostController extends BaseController {
             String tag = convertRequestParam(getPara(0));
             setPageInfo("post/tag/" + getPara(0) + "-", Log.dao.getLogsByTag(getParaToInt(1, 1), getDefaultRows(), tag), getParaToInt(1, 1));
 
-            setAttr("tipsType", ResUtil.getStringFromRes("tag", getRequest()));
+            setAttr("tipsType", I18NUtil.getStringFromRes("tag", getRequest()));
             setAttr("tipsName", tag);
         }
     }

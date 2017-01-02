@@ -1,7 +1,7 @@
 package com.fzb.blog.web.controller.blog;
 
 import com.fzb.blog.service.InstallService;
-import com.fzb.blog.util.ResUtil;
+import com.fzb.blog.util.I18NUtil;
 import com.fzb.blog.web.config.ZrlogConfig;
 import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
@@ -33,7 +33,7 @@ public class InstallController extends Controller {
                 .testDbConn()) {
             render("/install/message.jsp");
         } else {
-            setAttr("errorMsg", ResUtil.getStringFromRes("connectDbError", getRequest()));
+            setAttr("errorMsg", I18NUtil.getStringFromRes("connectDbError", getRequest()));
             index();
         }
     }

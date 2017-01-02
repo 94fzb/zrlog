@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 存放程序的友情链接，对应数据库link表
+ */
 public class Link extends Model<Link> {
     public static final Link dao = new Link();
 

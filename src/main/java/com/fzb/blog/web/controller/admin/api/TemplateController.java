@@ -5,7 +5,7 @@ import com.fzb.blog.common.response.UploadTemplateResponse;
 import com.fzb.blog.common.response.WebSiteSettingUpdateResponse;
 import com.fzb.blog.model.WebSite;
 import com.fzb.blog.service.CacheService;
-import com.fzb.blog.util.ResUtil;
+import com.fzb.blog.util.I18NUtil;
 import com.fzb.blog.web.controller.BaseController;
 import com.fzb.common.util.IOUtil;
 import com.fzb.common.util.ZipUtil;
@@ -66,7 +66,7 @@ public class TemplateController extends BaseController {
         String finalFile = finalPath + fileName;
         IOUtil.moveOrCopyFile(PathKit.getWebRootPath() + "/attached/" + fileName, finalFile, true);
         UploadTemplateResponse response = new UploadTemplateResponse();
-        response.setMessage(ResUtil.getStringFromRes("templateDownloadSuccess", getRequest()));
+        response.setMessage(I18NUtil.getStringFromRes("templateDownloadSuccess", getRequest()));
         try {
             ZipUtil.unZip(finalFile, finalPath + fileName.replace(".zip", "") + "/");
         } catch (IOException e) {

@@ -1,5 +1,8 @@
 package com.fzb.blog.util;
 
+/**
+ * 一些常见的转化的工具方法。
+ */
 public class ParseUtil {
     public static int getFirstRecord(int page, int pageSize) {
         return (page - 1) * pageSize;

@@ -17,6 +17,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 
+/**
+ * 与安装向导相关的业务代码
+ */
 public class InstallService {
 
     private static final Logger LOGGER = Logger.getLogger(InstallService.class);
@@ -40,6 +43,11 @@ public class InstallService {
         this.dbConn = dbConn;
     }
 
+    /**
+     * 封装网站设置的数据数据，返回Map形式方便调用者进行遍历
+     * @param webSite
+     * @return
+     */
     private static Map<String, Object> getDefaultWebSiteSettingMap(Map<String, String> webSite) {
         Map<String, Object> map = new LinkedHashMap<String, Object>();
         map.put("rows", 10);
@@ -53,6 +61,10 @@ public class InstallService {
         return map;
     }
 
+    /**
+     * 尝试使用填写的数据库信息连接数据库
+     * @return false 表示建立连接失败，true 表示成功
+     */
     public boolean testDbConn() {
         try {
             Connection connection = getConnection();
@@ -68,11 +80,19 @@ public class InstallService {
         return DriverManager.getConnection(dbConn.get("jdbcUrl"), dbConn.get("user"), dbConn.get("password"));
     }
 
+    /**
+     * 通过执行数据库的sql文件，完成对数据库表，基础表数据的初始化，达到安装的效果
+     * @return false 表示安装没有正常执行，true 表示初始化数据库成功。
+     */
     public Boolean install() {
         File lock = new File(basePath + "/install.lock");
         return !lock.exists() && startInstall(dbConn, configMsg, lock);
     }
 
+    /**
+     * 通过检查特定目录下面是否存在 install.lock 文件，进行判断是否已经完成安装
+     * @return
+     */
     public boolean checkInstall() {
         File lock = new File(basePath + "/install.lock");
         return lock.exists();

@@ -12,6 +12,9 @@ import java.io.FileNotFoundException;
 import java.sql.*;
 import java.util.*;
 
+/**
+ * Zrlog特有的一些工具方法
+ */
 public class ZrlogUtil {
 
     private static final Logger LOGGER = Logger.getLogger(ZrlogUtil.class);

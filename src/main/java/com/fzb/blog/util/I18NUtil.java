@@ -14,6 +14,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * 多语言的工具类
+ */
 public class I18NUtil {
 
     private static final String I18N_FILE_NAME = "_i18nFileName";
@@ -85,5 +88,9 @@ public class I18NUtil {
         }
         Map<String, Object> i18nMap = I18N_RES_MAP.get(i18nFile);
         request.setAttribute("_res", i18nMap);
+    }
+
+    public static String getStringFromRes(String key, HttpServletRequest request) {
+        return ((Map) request.getAttribute("_res")).get(key).toString();
     }
 }

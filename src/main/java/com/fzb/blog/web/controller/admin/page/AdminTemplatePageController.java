@@ -4,7 +4,6 @@ import com.fzb.blog.common.Constants;
 import com.fzb.blog.model.WebSite;
 import com.fzb.blog.service.CacheService;
 import com.fzb.blog.util.I18NUtil;
-import com.fzb.blog.util.ResUtil;
 import com.fzb.blog.web.controller.BaseController;
 import com.fzb.common.util.IOUtil;
 import com.fzb.common.util.ZipUtil;
@@ -107,7 +106,7 @@ public class AdminTemplatePageController extends BaseController {
             String basePath = getRequest().getScheme() + "://" + getRequest().getHeader("host") + path + "/";
             redirect(basePath);
         } else {
-            setAttr("message", ResUtil.getStringFromRes("templatePathNotNull", getRequest()));
+            setAttr("message", I18NUtil.getStringFromRes("templatePathNotNull", getRequest()));
         }
     }
 
@@ -123,12 +122,12 @@ public class AdminTemplatePageController extends BaseController {
                 String target = fileHandle.getT().getParent() + "/" + fileName;
                 IOUtil.moveOrCopyFile(fileHandle.getT().toString(), target, true);
                 ZipUtil.unZip(target, path.toString() + "/");
-                setAttr("message", ResUtil.getStringFromRes("templateDownloadSuccess", getRequest()));
+                setAttr("message", I18NUtil.getStringFromRes("templateDownloadSuccess", getRequest()));
             } else {
-                setAttr("message", ResUtil.getStringFromRes("templateExists", getRequest()));
+                setAttr("message", I18NUtil.getStringFromRes("templateExists", getRequest()));
             }
         } catch (Exception e) {
-            setAttr("message", ResUtil.getStringFromRes("someError", getRequest()));
+            setAttr("message", I18NUtil.getStringFromRes("someError", getRequest()));
             LOGGER.error("download error ", e);
         }
     }

@@ -8,6 +8,9 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.*;
 
+/**
+ * 存放文章数据，对应数据的log表。
+ */
 public class Log extends Model<Log> implements Serializable {
     public static final Log dao = new Log();
     /**
@@ -243,10 +246,6 @@ public class Log extends Model<Log> implements Serializable {
                 "from log l inner join user u,type t where rubbish=? and private=? and u.userId=l.userId and t.typeId=l.typeId and (l.title like ? or l.content like ?)",
                 data, new Object[]{rubbish, pre, "%" + key + "%", "%" + key + "%"});
         return data;
-    }
-
-    public List<Object[]> getAllAlias() {
-        return Db.query("select alias,releaseTime from log where rubbish=? and private=?", rubbish, pre);
     }
 
     public void clickChange(int logId) {

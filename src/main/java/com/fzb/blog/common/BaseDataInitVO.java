@@ -6,6 +6,9 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 程序初始化的数据（及全局的数据），存放了标签，分类，网站设置等信息。
+ */
 public class BaseDataInitVO implements Serializable {
 
     private List<Tag> tags;

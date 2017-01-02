@@ -16,6 +16,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 与文章相关的业务代码
+ */
 public class ArticleService {
 
     public CreateOrUpdateLogResponse createOrUpdate(Integer userId, Map<String, String[]> createArticleRequestMap) {
@@ -87,6 +90,11 @@ public class ArticleService {
                 pageableRequest.getPage(), pageableRequest.getRows(), keywords, pageableRequest.getOrder(), pageableRequest.getSort()), ArticleResponseEntry.class);
     }
 
+    /**
+     * 高亮用户检索的关键字
+     * @param logs
+     * @param keyword
+     */
     public void wrapperSearchKeyword(List<Log> logs, String keyword) {
         for (Log log : logs) {
             String title = log.get("title").toString();

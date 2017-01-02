@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 存放导航条的信息，对应数据库的lognav表
+ */
 public class LogNav extends Model<LogNav> {
     public static final LogNav dao = new LogNav();
 

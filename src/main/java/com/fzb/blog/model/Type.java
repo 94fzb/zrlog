@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 存放文章的分类信息，对应数据的type表
+ */
 public class Type extends Model<Type> {
     public static final Type dao = new Type();
 

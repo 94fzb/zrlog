@@ -7,8 +7,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
 
+/**
+ * 读取Zrlog构建信息，及build.properties。
+ * 注 build.properties 为使用CI工具自动加入的，git代码仓库并没有该文件。
+ */
 public class BlogBuildInfoUtil {
 
+    /*目前以git的commitId的前7位标记构建的Id*/
     private static String buildId;
     private static String version;
     private static Date time;
