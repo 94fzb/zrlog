@@ -7,7 +7,7 @@
         <footer>
           <div class="footer-left mission"><p>${_res.footerSlogan}</p></div>
           <div class="footer-right">
-            <p><cite>&copy; 2013-2016 ${webs.title}</cite></p>
+            <p><cite>&copy; 2013-2017 ${webs.title}</cite></p>
             <p>Powered by <a href="http://zrlog.com" target="_blank">zrlog</a>, <span title="涉水轻舟">Themed by <a href="http://sheshui.me/about" target="_blank">Robin L.</a></span></p>
           </div>
           <div class="clearfix"></div>
