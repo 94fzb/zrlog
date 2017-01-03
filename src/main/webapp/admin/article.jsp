@@ -2,7 +2,7 @@
 <%@page import="java.net.URLEncoder"%>
 <%
 try{
-String str = new String(request.getParameter("keywords").toString().getBytes("ISO-8859-1"));
+String str = new String(request.getParameter("keywords").toString().getBytes("ISO-8859-1"),"UTF-8");
 request.setAttribute("keywords", str);
 }
 catch(Exception e){
