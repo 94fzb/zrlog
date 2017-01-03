@@ -112,6 +112,7 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <version>2.3</version>
                 <configuration>
+                    <resourceEncoding>UTF-8</resourceEncoding>
                     <warSourceDirectory>src/main/webapp</warSourceDirectory>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                     <packagingExcludes>attached/**,WEB-INF/plugins/**,post/**</packagingExcludes>
