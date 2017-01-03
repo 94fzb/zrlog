@@ -89,7 +89,12 @@ ${_res.dashboard}
 							</td>
 							<td>${system['dbServer.version']}</td>
 						</tr>
-
+                        <tr>
+							<td>
+								系统编码
+							</td>
+							<td>${system['file.encoding']}</td>
+						</tr>
 
 					</tbody>
 				</table>
