@@ -26,6 +26,9 @@ import java.util.Map;
 
 public class UpgradeController extends BaseController {
 
+    private static final String DOWNLOAD_ATTR_KEY = "downing";
+    private static final String UPDATE_THREAD_ATTR_KEY = "updateVersionThread";
+
     private CacheService cacheService = new CacheService();
 
     public UpdateRecordResponse setting() {
@@ -54,7 +57,7 @@ public class UpgradeController extends BaseController {
     }
 
     public DownloadUpdatePackageResponse download() {
-        DownloadProcessHandle handle = (DownloadProcessHandle) getSession().getAttribute("downing");
+        DownloadProcessHandle handle = getSessionAttr(DOWNLOAD_ATTR_KEY);
         if (handle == null) {
             File file = new File(PathKit.getWebRootPath() + "/WEB-INF/update-temp/" + "zrlog.war");
             file.getParentFile().mkdir();
@@ -95,13 +98,13 @@ public class UpgradeController extends BaseController {
     }
 
     public UpgradeProcessResponse doUpgrade() {
-        DownloadProcessHandle handle = (DownloadProcessHandle) getSession().getAttribute("downing");
+        DownloadProcessHandle handle = getSessionAttr(DOWNLOAD_ATTR_KEY);
         File file = handle.getFile();
         UpgradeProcessResponse upgradeProcessResponse = new UpgradeProcessResponse();
-        UpdateVersionThread updateVersionThread = (UpdateVersionThread) JFinal.me().getServletContext().getAttribute("updateVersionThread");
+        UpdateVersionThread updateVersionThread = getSessionAttr(UPDATE_THREAD_ATTR_KEY);
         if (updateVersionThread == null) {
             updateVersionThread = new UpdateVersionThread(file);
-            JFinal.me().getServletContext().setAttribute("updateVersionThread", updateVersionThread);
+            setSessionAttr(UPDATE_THREAD_ATTR_KEY, updateVersionThread);
             updateVersionThread.start();
         }
         upgradeProcessResponse.setMessage(updateVersionThread.getMessage());
