@@ -40,6 +40,7 @@ class VisitorInterceptor implements Interceptor {
 
     /**
      * 查询出来的文章数据存放在request域里面，通过判断Key，选择对应需要渲染的模板文件
+     *
      * @param ai
      */
     private void visitorPermission(Invocation ai) {
@@ -66,6 +67,7 @@ class VisitorInterceptor implements Interceptor {
 
     /**
      * 方便开发环境使用，将Servlet的Request域的数据转化JSON字符串，配合dev.jsp使用，定制主题更加方便
+     *
      * @param controller
      */
     private void fullDevData(Controller controller) {

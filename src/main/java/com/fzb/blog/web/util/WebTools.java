@@ -9,6 +9,7 @@ public class WebTools {
 
     /**
      * 处理由于浏览器使用透明代理，或者是WebServer运行在诸如 nginx/apache 这类 HttpServer后面的情况，通过获取请求头真实IP地址
+     *
      * @param request
      * @return
      */

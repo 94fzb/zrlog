@@ -95,6 +95,7 @@ public class UpdateVersionThread extends Thread {
 
     /**
      * 提示更新进度
+     *
      * @return
      */
     public String getMessage() {

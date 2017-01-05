@@ -22,7 +22,7 @@ import java.util.Map;
  * 目前插件服务拦截了
  * 1./admin/plugins/* （进行权限检查）
  * 2./plugin/* /p/* （是plugin的短路由，代码逻辑上是不区分的，不检查权限）
- *
+ * <p>
  * 如果想了解更多关于插件的实现可以浏览这篇文章 http://blog.zrlog.com/post/zrlog-plugin-dev
  */
 public class PluginHandler extends Handler {
@@ -54,6 +54,7 @@ public class PluginHandler extends Handler {
 
     /**
      * 检查是否登陆，未登陆的请求直接放回403的错误页面
+     *
      * @param target
      * @param request
      * @param response
@@ -73,6 +74,7 @@ public class PluginHandler extends Handler {
 
     /**
      * 不检查是否登陆，错误请求直接直接转化为403
+     *
      * @param target
      * @param request
      * @param response
@@ -87,6 +89,7 @@ public class PluginHandler extends Handler {
 
     /**
      * 代理中转HTTP请求，目前仅支持，GET，POST 请求方式的中转。
+     *
      * @param uri
      * @param request
      * @param response

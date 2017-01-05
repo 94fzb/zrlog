@@ -33,6 +33,7 @@ class AdminInterceptor implements Interceptor {
      * 为了规范代码，这里做了一点类是Spring的ResponseEntity的东西，及通过方法的返回值来判断是应该返回页面还会对应JSON数据
      * 预定方式看 AdminRouters
      * 这里用到了 ThreadLocal，后期会替换掉Session的方式。
+     *
      * @param ai
      */
     private void adminPermission(Invocation ai) {
@@ -76,6 +77,7 @@ class AdminInterceptor implements Interceptor {
 
     /**
      * 尝试通过Controller的放回值来进行数据的渲染
+     *
      * @param ai
      * @param controller
      * @return true 表示已经渲染数据了，false 表示并未按照约定编写，及没有进行渲染

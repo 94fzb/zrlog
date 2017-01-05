@@ -47,6 +47,7 @@ public class UpdateVersionPlugin implements IPlugin {
 
     /**
      * 获取最新的版本信息。
+     *
      * @param fetch 是否发起新的请求
      * @return
      */

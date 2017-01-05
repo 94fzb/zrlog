@@ -18,10 +18,11 @@ public class PluginConfig {
 
     /**
      * plugin-core 目前会监听2个TCP端口，一个用于和Zrlog通信，另一个用于和插件通信
+     *
      * @param serverFileName plugin-core.jar 存放的物理路径
      * @param dbProperties
      * @param pluginJvmArgs
-     * @param runtimePath plugin-core的运行目录
+     * @param runtimePath    plugin-core的运行目录
      * @param runTimeVersion zrlog目前的版本
      * @return
      */

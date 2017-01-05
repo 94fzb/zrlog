@@ -75,6 +75,7 @@ public class ZrlogConfig extends JFinalConfig {
      * 运行Zrlog的插件，当WEB-INF/plugins/这里目录下面不存在plugin-core.jar时，会通过网络请求下载最新的plugin核心服务，也可以通过
      * 这种方式进行插件的及时更新。
      * plugin-core也是一个java进程，通过调用系统命令的命令进行启动的。
+     *
      * @param dbPropertiesPath
      * @param pluginJvmArgs
      */

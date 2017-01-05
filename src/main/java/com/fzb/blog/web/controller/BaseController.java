@@ -86,7 +86,6 @@ public class BaseController extends Controller {
         if (isNotNullOrNotEmptyStr(jsonStr)) {
             Map<String, Object> res = getAttr("_res");
             res.putAll(new JSONDeserializer<Map<String, Object>>().deserialize(jsonStr.toString()));
-            setAttr("_res", res);
         }
     }
 
@@ -97,6 +96,7 @@ public class BaseController extends Controller {
 
     /**
      * 封装Jqgrid的分页参数
+     *
      * @return
      */
     public PageableRequest getPageable() {
