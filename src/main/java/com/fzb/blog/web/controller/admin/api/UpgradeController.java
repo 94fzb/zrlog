@@ -68,7 +68,7 @@ public class UpgradeController extends BaseController {
                 e.printStackTrace();
             }
         }
-        getSession().setAttribute("downing", handle);
+        getSession().setAttribute(DOWNLOAD_ATTR_KEY, handle);
         DownloadUpdatePackageResponse downloadUpdatePackageResponse = new DownloadUpdatePackageResponse();
         downloadUpdatePackageResponse.setProcess(handle.getProcess());
         return downloadUpdatePackageResponse;

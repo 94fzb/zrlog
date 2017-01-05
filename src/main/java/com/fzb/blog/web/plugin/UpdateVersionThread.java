@@ -8,6 +8,7 @@ import com.jfinal.kit.PathKit;
 import org.apache.log4j.Logger;
 
 import java.io.File;
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,7 +18,7 @@ import java.util.UUID;
 /**
  * 更新Zrlog，具体的流程看 run() 里面有详细流程。本质就是合成新war包，然后替换掉war包。
  */
-public class UpdateVersionThread extends Thread {
+public class UpdateVersionThread extends Thread implements Serializable {
 
     private static final Logger LOGGER = Logger.getLogger(UpdateVersionThread.class);
 
