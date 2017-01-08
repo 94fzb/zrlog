@@ -200,8 +200,8 @@ public class TemplateHelper {
             log.put("typeUrl", baseUrl + "post/sort/" + log.get("typeAlias") + suffix);
             Log lastLog = log.get("lastLog");
             Log nextLog = log.get("nextLog");
-            nextLog.put("url", baseUrl + "post/sort/" + lastLog.get("alias") + suffix);
-            lastLog.put("url", baseUrl + "post/sort/" + lastLog.get("alias") + suffix);
+            nextLog.put("url", baseUrl + "post/" + nextLog.get("alias") + suffix);
+            lastLog.put("url", baseUrl + "post/" + lastLog.get("alias") + suffix);
         } else if (data instanceof Map) {
             Map map = (Map) data;
             List<Log> logList = (List<Log>) map.get("rows");
