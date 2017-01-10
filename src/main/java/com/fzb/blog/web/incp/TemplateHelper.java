@@ -139,15 +139,19 @@ public class TemplateHelper {
 
     private static String setBaseUrl(HttpServletRequest request, boolean staticBlog, Map webSite) {
         String templateUrl;
-        String baseUrl = request.getScheme() + "://" + request.getHeader("host") + request.getContextPath() + "/";
+        String scheme=request.getHeader("X-Forwarded-Protocol");;
+        if(scheme==null){
+        	scheme=request.getScheme();
+        }
+        String baseUrl = scheme + "://" + request.getHeader("host") + request.getContextPath() + "/";
         if (staticBlog) {
             baseUrl = request.getContextPath() + "/";
             templateUrl = request.getContextPath() + request.getAttribute("template");
         } else {
             if (webSite.get("staticResourceHost") != null && !"".equals(webSite.get("staticResourceHost"))) {
-                templateUrl = request.getScheme() + "://" + webSite.get("staticResourceHost").toString() + request.getAttribute("template");
+                templateUrl = scheme + "://" + webSite.get("staticResourceHost").toString() + request.getAttribute("template");
             } else {
-                templateUrl = request.getScheme() + "://" + request.getHeader("host") + request.getContextPath() + request.getAttribute("template");
+                templateUrl = scheme + "://" + request.getHeader("host") + request.getContextPath() + request.getAttribute("template");
             }
         }
         request.setAttribute("url", templateUrl);
