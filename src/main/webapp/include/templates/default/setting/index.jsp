@@ -67,6 +67,17 @@
     </div>
 
     <div class="form-group">
+        <label for="form-field-1"
+            class="col-sm-3 control-label no-padding-right"> 标题 </label>
+
+        <div class="col-sm-9">
+            <input type="text" name="title" value="${_res.title}"
+                class="form-control col-xs-10 col-sm-5" placeholder=""
+                id="form-field-1">
+        </div>
+    </div>
+
+    <div class="form-group">
         <label
             class="col-sm-3 control-label no-padding-right">
             网站&nbsp;Logo </label>

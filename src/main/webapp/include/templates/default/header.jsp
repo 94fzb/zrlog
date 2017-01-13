@@ -5,6 +5,14 @@
   if(res.get("avatar")==null){
     res.put("avatar",request.getAttribute("url")+"/images/avatar240_240.jpg");
   }
+  if(res.get("title")==null){
+    String host = request.getHeader("host");
+    System.out.println(host);
+    if(host.indexOf(":")!=-1){
+        host = host.substring(0,host.indexOf(":"));
+    }
+    res.put("title",host);
+  }
 %>
 <!DOCTYPE html>
 <html lang="zh" class="no-js">
@@ -60,7 +68,7 @@
     <header>
       <h1 class="site-name">
         <i class="avatar"></i>
-        <a href="${rurl}"><%=request.getHeader("host") %></a>
+        <a href="${rurl}">${_res.title}</a>
         <span class="slogan">${webs.title }</span>
       </h1>
       <nav class="mainnav">

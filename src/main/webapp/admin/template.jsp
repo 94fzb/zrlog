@@ -24,9 +24,10 @@
 	<div class="col-sm-9"></div>
         <div class="form-group col-sm-3">
 	    <input type="file" class="fileUpload" class="form-control" name="imgFile" value="上传" />
+	    <br/>
 </div>
 <div>
-<div class="row">
+<div class="rows">
 	<c:forEach items="${templates}" var="template">
 	 <div class="col-md-3 col-xs-12 widget widget_tally_box">
          <div class="x_panel ui-ribbon-container fixed_height_390">
@@ -52,13 +53,12 @@
             <div class="caption">
              <div class="tools tools-bottom text-center">
                 <!--<a href="${template.url }" target="_blank" title="${template.author }">${_res['admin.theme.user']}:<i class="fa fa-user"></i></a>-->
-                <a href="admin/blank?menu=1&include=file_editor&path=${template.template}&editType=${_res['admin.theme']}"><i class="fa fa-pencil"></i></a>
+                <a href="admin/blank?menu=1&include=file_editor&path=${template.template}&editType=template"><i class="fa fa-pencil"></i></a>
                 <a target="_blank" href="admin/template/preview?template=${template.template}&resultType=html"><i class="fa fa-eye"></i></a>
                 <a href="admin/template/config?template=${template.template}"><i class="fa fa-cog"></i></a>
                 <a class="apply-btn" href="#" template="${template.template}"><i class="fa fa-check"></i></a>
               </div>
               </div>
-
            </div>
          </div>
        </div>
@@ -66,8 +66,13 @@
 	</div>
 	</div>
 	<hr/>
-<a href="admin/template_center"><button class="btn btn-info"><i class="fa fa-cloud-download"></i>${_res['admin.theme.download']}</button></a>
 </div><!-- /span -->
+</div>
+<hr/>
+<div class="row">
+<div class="col-md-2">
+<a href="admin/template_center"><button class="btn btn-info"><i class="fa fa-cloud-download"></i>${_res['admin.theme.download']}</button></a>
+</div>
 </div>
 </div><!-- /row -->
 <jsp:include page="include/footer.jsp"/>

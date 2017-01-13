@@ -42,6 +42,9 @@ request.setAttribute("suburl", request.getRequestURL().substring(basePath.length
 		strFile.add(fileList.get(i).toString().substring(webPath.length()-1).replace('\\', '/'));
 	}
 	request.setAttribute ("templates", strFile);
+	if("template".equals(request.getParameter("editType"))){
+	    request.setAttribute("tips","主题编辑功能建议仅用于临时变更");
+	}
 %>
 <link rel="stylesheet" href="admin/markdown/lib/codemirror/codemirror.min.css">
 <link rel="stylesheet" href="admin/markdown/lib/codemirror/addon/dialog/dialog.css">
@@ -69,6 +72,7 @@ dt {
 		文件编辑
 	</h3>
 </div>
+<h4 class="text-right">${tips}</h4>
 <form id="saveFileForm">
 <div class="form-group">
 	 <select name="file"  id="form-field-select-6" class="form-control">
