@@ -6,10 +6,10 @@
 	if(webSite.get("staticResourceHost")!=null && !"".equals(webSite.get("staticResourceHost"))){
 		templateHost = webSite.get("staticResourceHost").toString();
 	}
-	String templateUrl = request.getScheme() + "://" +templateHost +request.getAttribute("template");
+	String templateUrl = com.fzb.blog.web.util.WebTools.getRealScheme(request) + "://" +templateHost +request.getAttribute("template");
 	request.setAttribute("url", templateUrl);
 	request.setAttribute("templateUrl", templateUrl);
-	request.setAttribute("rurl",request.getScheme() + "://" + request.getHeader("host")+ request.getContextPath()+"/");
+	request.setAttribute("rurl",com.fzb.blog.web.util.WebTools.getRealScheme(request) + "://" + request.getHeader("host")+ request.getContextPath()+"/");
 	String suffix="";
 	if(request.getContextPath()+((Map<String,Object>)(((Map<String,Object>)request.getAttribute("init")).get("webSite"))).get("pseudo_static")!=null){
 		suffix=".html";

@@ -2,10 +2,7 @@
 <%@ page language="java" import="java.util.*" import="com.fzb.blog.common.*" pageEncoding="UTF-8"%>
 <%
 String path = request.getContextPath();
-String scheme = request.getHeader("X-Forwarded-Protocol");
-if (scheme == null) {
-    scheme = request.getScheme();
-}
+String scheme = com.fzb.blog.web.util.WebTools.getRealScheme(request);
 String basePath = scheme + "://"+request.getHeader("host")+path+"/";
 request.setAttribute("url", scheme + "://"+request.getHeader("host")+request.getContextPath());
 if(request.getAttribute("currentPath")==null){

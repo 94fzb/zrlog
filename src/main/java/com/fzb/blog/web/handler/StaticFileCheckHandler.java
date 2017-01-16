@@ -1,6 +1,7 @@
 package com.fzb.blog.web.handler;
 
 import com.fzb.blog.util.ZrlogUtil;
+import com.fzb.blog.web.util.WebTools;
 import com.fzb.common.util.IOUtil;
 import com.fzb.common.util.http.HttpUtil;
 import com.fzb.common.util.http.handle.CloseResponseHandle;
@@ -54,7 +55,7 @@ public class StaticFileCheckHandler extends Handler {
                     if (!htmlFile.exists()) {
                         String tempTarget = target.substring(0,
                                 target.lastIndexOf('.'));
-                        String home = request.getScheme() + "://"
+                        String home = WebTools.getRealScheme(request) + "://"
                                 + request.getHeader("host")
                                 + request.getContextPath() + tempTarget;
                         target = tempTarget;

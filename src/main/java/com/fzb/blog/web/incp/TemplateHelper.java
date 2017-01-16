@@ -6,6 +6,7 @@ import com.fzb.blog.model.*;
 import com.fzb.blog.util.I18NUtil;
 import com.fzb.blog.util.ZrlogUtil;
 import com.fzb.blog.web.controller.BaseController;
+import com.fzb.blog.web.util.WebTools;
 import com.jfinal.core.Controller;
 import com.jfinal.kit.PathKit;
 import org.apache.log4j.Logger;
@@ -139,10 +140,7 @@ public class TemplateHelper {
 
     private static String setBaseUrl(HttpServletRequest request, boolean staticBlog, Map webSite) {
         String templateUrl;
-        String scheme = request.getHeader("X-Forwarded-Protocol");
-        if (scheme == null) {
-            scheme = request.getScheme();
-        }
+        String scheme = WebTools.getRealScheme(request);
         String baseUrl = scheme + "://" + request.getHeader("host") + request.getContextPath() + "/";
         if (staticBlog) {
             baseUrl = request.getContextPath() + "/";

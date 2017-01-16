@@ -3,7 +3,7 @@
 <%
 	request.setCharacterEncoding("UTF-8");
 	String path = request.getContextPath();
-	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()+ path + "/";
+	String basePath = com.fzb.blog.web.util.WebTools.getRealScheme(request) + "://" + request.getServerName() + ":" + request.getServerPort()+ path + "/";
 	request.setAttribute("basePath", basePath);
 	request.setAttribute("currentViewName", request.getRequestURL().substring((basePath+"install/").length()).replaceAll(".jsp",""));
 %>

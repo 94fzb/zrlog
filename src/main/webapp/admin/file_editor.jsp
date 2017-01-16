@@ -3,9 +3,9 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%
 String path = request.getContextPath();
-String basePath = request.getScheme()+"://"+request.getHeader("host")+path+"/";
-request.setAttribute("url", request.getScheme()+"://"+request.getHeader("host")+request.getContextPath());
-request.setAttribute("suburl", request.getRequestURL().substring(basePath.length()));
+String scheme = com.fzb.blog.web.util.WebTools.getRealScheme(request);
+String basePath = scheme+"://"+request.getHeader("host")+path+"/";
+request.setAttribute("url", scheme+"://"+request.getHeader("host")+request.getContextPath());
 %>
 <%!
 	 private List<String> fileList=new ArrayList<String>();

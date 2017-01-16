@@ -1,6 +1,7 @@
 package com.fzb.blog.util;
 
 import com.fzb.blog.model.User;
+import com.fzb.blog.web.util.WebTools;
 import com.fzb.common.util.IOUtil;
 import com.jfinal.core.JFinal;
 import org.apache.log4j.Logger;
@@ -42,7 +43,7 @@ public class ZrlogUtil {
         map.put("Blog-Version", ((Map) JFinal.me().getServletContext().getAttribute("zrlog")).get("version").toString());
         map.put("Full-Url", request.getRequestURL().toString());
         map.put("Cookie", request.getHeader("Cookie"));
-        map.put("AccessUrl", request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath());
+        map.put("AccessUrl", WebTools.getRealScheme(request) + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath());
         if (request.getHeader("Content-Type") != null) {
             map.put("Content-Type", request.getHeader("Content-Type"));
         }

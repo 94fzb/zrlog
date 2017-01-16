@@ -29,4 +29,12 @@ public class WebTools {
         }
         return ip;
     }
+
+    public static String getRealScheme(HttpServletRequest request) {
+        String scheme = request.getHeader("X-Forwarded-Protocol");
+        if (scheme == null) {
+            scheme = request.getScheme();
+        }
+        return scheme;
+    }
 }
