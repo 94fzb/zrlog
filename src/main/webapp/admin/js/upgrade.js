@@ -14,6 +14,9 @@ $(function(){
               hide: true,
               styling: 'bootstrap3'
             });
+            if(e.upgrade){
+                location.href = location.href;
+            }
         })
         return false;
     }

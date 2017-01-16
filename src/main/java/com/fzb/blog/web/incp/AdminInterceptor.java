@@ -2,6 +2,7 @@ package com.fzb.blog.web.incp;
 
 import com.fzb.blog.common.Constants;
 import com.fzb.blog.model.User;
+import com.fzb.blog.web.util.WebTools;
 import com.jfinal.aop.Interceptor;
 import com.jfinal.aop.Invocation;
 import com.jfinal.core.Controller;
@@ -66,9 +67,13 @@ class AdminInterceptor implements Interceptor {
             //在重定向到登陆页面时，同时携带了当前的请求路径，方便登陆成功后的跳转
             HttpServletRequest request = ai.getController().getRequest();
             try {
+                String url = request.getRequestURL().toString();
+                if (WebTools.getRealScheme(request).equals("https://")) {
+                    url = url.replace("http://", "https://");
+                }
                 ai.getController().redirect(request.getContextPath()
                         + "/admin/login?redirectFrom="
-                        + request.getRequestURL() + URLEncoder.encode(request.getQueryString() != null ? "?" + request.getQueryString() : "", "UTF-8"));
+                        + url + URLEncoder.encode(request.getQueryString() != null ? "?" + request.getQueryString() : "", "UTF-8"));
             } catch (UnsupportedEncodingException e) {
                 LOGGER.error("", e);
             }
