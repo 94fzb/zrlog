@@ -2,8 +2,12 @@
 <%@ page language="java" import="java.util.*" import="com.fzb.blog.common.*" pageEncoding="UTF-8"%>
 <%
 String path = request.getContextPath();
-String basePath = request.getScheme()+"://"+request.getHeader("host")+path+"/";
-request.setAttribute("url", request.getScheme()+"://"+request.getHeader("host")+request.getContextPath());
+String scheme = request.getHeader("X-Forwarded-Protocol");
+if (scheme == null) {
+    scheme = request.getScheme();
+}
+String basePath = scheme + "://"+request.getHeader("host")+path+"/";
+request.setAttribute("url", scheme + "://"+request.getHeader("host")+request.getContextPath());
 if(request.getAttribute("currentPath")==null){
 	request.setAttribute("currentPath", request.getRequestURL().substring((basePath+"admin/").length()));
 }
@@ -38,7 +42,7 @@ request.getSession().setAttribute("webs",webSite);
     <!-- Custom Theme Style -->
     <link href="${url}/assets/css/custom.min.css" rel="stylesheet">
 
-    <link rel="stylesheet" href="assets/css/pnotify.css" />
+    <link rel="stylesheet" href="${url}/assets/css/pnotify.css" />
     <!-- jQuery -->
     <script src="${url}/assets/js/jquery.min.js"></script>
     <script src="${url}/admin/js/dashboard.js"></script>

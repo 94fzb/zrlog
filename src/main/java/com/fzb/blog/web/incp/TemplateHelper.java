@@ -139,9 +139,9 @@ public class TemplateHelper {
 
     private static String setBaseUrl(HttpServletRequest request, boolean staticBlog, Map webSite) {
         String templateUrl;
-        String scheme=request.getHeader("X-Forwarded-Protocol");;
-        if(scheme==null){
-        	scheme=request.getScheme();
+        String scheme = request.getHeader("X-Forwarded-Protocol");
+        if (scheme == null) {
+            scheme = request.getScheme();
         }
         String baseUrl = scheme + "://" + request.getHeader("host") + request.getContextPath() + "/";
         if (staticBlog) {

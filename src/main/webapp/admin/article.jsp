@@ -32,7 +32,7 @@ catch(Exception e){
 				<div class="input-group">
 						<input id="keywords"  value="${keywords}" name="keywords" autocomplete="off" type="text" placeholder="${_res.searchTip}" class="form-control">
 						<span class="input-group-btn">
-						  <button type="submit" class="btn btn-default">Go!</button>
+						  <button type="submit" class="btn btn-default">${_res.search}</button>
 						</span>
 				</div>
 			</form>

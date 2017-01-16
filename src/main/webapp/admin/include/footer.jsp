@@ -2,7 +2,7 @@
 		</div>
 		<footer>
 		  <strong>
-			${_res.copyright} <a href="http://www.zrlog.com"> Zrlog 博客程序. </a>
+			${_res.copyright} <a href="http://www.zrlog.com"> ZrLog . </a>
 		   </strong>
 		   All rights reserved.
 		  <div class="pull-right">

@@ -51,7 +51,7 @@
             <p>${template.digest }</p>
             <div class="divider"></div>
             <div class="caption">
-             <div class="tools tools-bottom text-center">
+             <div class="tools tools-bottom text-center" style="font-size: 14px;">
                 <!--<a href="${template.url }" target="_blank" title="${template.author }">${_res['admin.theme.user']}:<i class="fa fa-user"></i></a>-->
                 <a href="admin/blank?menu=1&include=file_editor&path=${template.template}&editType=template"><i class="fa fa-pencil"></i></a>
                 <a target="_blank" href="admin/template/preview?template=${template.template}&resultType=html"><i class="fa fa-eye"></i></a>

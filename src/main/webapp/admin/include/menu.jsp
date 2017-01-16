@@ -3,61 +3,12 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <jsp:include page="common_header.jsp"/>
 <body class="${webs.admin_dashboard_naver}">
-<style type="text/css">
-.dropdown-submenu {
-    position: relative;
-}
-.dropdown-submenu > .dropdown-menu {
-    border-radius: 0 6px 6px;
-    left: 100%;
-    margin-left: -1px;
-    margin-top: -6px;
-    top: 0;
-}
-.dropdown-submenu:hover > .dropdown-menu {
-    display: block;
-}
-.dropup .dropdown-submenu > .dropdown-menu {
-    border-radius: 5px 5px 5px 0;
-    bottom: 0;
-    margin-bottom: -2px;
-    margin-top: 0;
-    top: auto;
-}
-.dropdown-submenu > a::after {
-    border-color: transparent transparent transparent #cccccc;
-    border-style: solid;
-    border-width: 5px 0 5px 5px;
-    content: " ";
-    display: block;
-    float: right;
-    height: 0;
-    margin-right: -10px;
-    margin-top: 5px;
-    width: 0;
-}
-.dropdown-submenu:hover > a::after {
-    border-left-color: #ffffff;
-}
-.dropdown-submenu.pull-left {
-    float: none;
-}
-.dropdown-submenu.pull-left > .dropdown-menu {
-    left: -50%;
-}
-.dropdown-menu {
-    float:right;
-}
-.language {
-    width:120px;
-}
-</style>
 <div class="container body">
   <div class="main_container">
     <div class="col-md-3 left_col">
       <div id="left_col" class="left_col scroll-view">
         <div class="navbar nav_title" style="border: 0;">
-          <a href="${url}" class="site_title"><i class="fa fa-dashboard"></i> <span>${webs.title}</span></a>
+          <a href="${url}" class="site_title"><i class="fa fa-home"></i> <span>${webs.title}</span></a>
         </div>
         <div class="clearfix"></div>
         <!-- sidebar menu -->
@@ -66,7 +17,7 @@
             <ul class="nav side-menu">
                 <li>
                     <a href="admin/index">
-                        <i class="fa fa-home"></i>
+                        <i class="fa fa-dashboard"></i>
                         <span class="menu-text"> ${_res.dashboard} </span>
                     </a>
                 </li>
