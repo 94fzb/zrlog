@@ -200,7 +200,7 @@
               </ul>
             </li>
             <c:if test="${lastVersion.upgrade}">
-            <li role="presentation" class="dropdown">
+            <li role="presentation" class='dropdown <c:if test="${'upgrade.jsp'==currentPath}">open</c:if>'>
               <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
                 <i class="fa fa-bell"></i>
                 <span class="badge bg-green">新</span>
