@@ -9,6 +9,7 @@
           <div class="footer-right">
             <p><cite>&copy; 2013-2017 ${webs.title}</cite></p>
             <p>Powered by <a href="http://zrlog.com" target="_blank">zrlog</a>, <span title="涉水轻舟">Themed by <a href="http://sheshui.me/about" target="_blank">Robin L.</a></span></p>
+            <p>${webs.icp}</p>
           </div>
           <div class="clearfix"></div>
         </footer>
