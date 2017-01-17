@@ -5,7 +5,6 @@ import com.fzb.blog.model.WebSite;
 import com.fzb.blog.service.CacheService;
 import com.fzb.blog.util.I18NUtil;
 import com.fzb.blog.web.controller.BaseController;
-import com.fzb.blog.web.util.WebTools;
 import com.fzb.common.util.IOUtil;
 import com.fzb.common.util.ZipUtil;
 import com.fzb.common.util.http.HttpUtil;
@@ -51,7 +50,7 @@ public class AdminTemplatePageController extends BaseController {
                                 for (int i = 0; i < images.length; i++) {
                                     String image = images[i];
                                     if (!image.startsWith("https://") && !image.startsWith("http://")) {
-                                        images[i] = WebTools.getRealScheme(request) + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + templatePath + "/" + image;
+                                        images[i] = "//" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + templatePath + "/" + image;
                                     }
                                 }
                                 map.put("previewImages", images);

@@ -68,7 +68,7 @@ class AdminInterceptor implements Interceptor {
             HttpServletRequest request = ai.getController().getRequest();
             try {
                 String url = request.getRequestURL().toString();
-                if (WebTools.getRealScheme(request).equals("https://")) {
+                if (WebTools.getRealScheme(request).equals("https")) {
                     url = url.replace("http://", "https://");
                 }
                 ai.getController().redirect(request.getContextPath()
