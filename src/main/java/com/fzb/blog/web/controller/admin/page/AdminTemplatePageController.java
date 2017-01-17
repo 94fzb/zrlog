@@ -50,7 +50,7 @@ public class AdminTemplatePageController extends BaseController {
                                 for (int i = 0; i < images.length; i++) {
                                     String image = images[i];
                                     if (!image.startsWith("https://") && !image.startsWith("http://")) {
-                                        images[i] = "/"+ request.getContextPath() + templatePath + "/" + image;
+                                        images[i] = request.getContextPath() + templatePath + "/" + image;
                                     }
                                 }
                                 map.put("previewImages", images);
