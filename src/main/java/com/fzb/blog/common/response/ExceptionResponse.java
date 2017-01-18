@@ -1,6 +1,6 @@
 package com.fzb.blog.common.response;
 
-public class SessionTimeoutResponse {
+public class ExceptionResponse {
 
     private int error;
     private String message;

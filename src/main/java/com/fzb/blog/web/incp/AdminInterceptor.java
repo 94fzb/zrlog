@@ -1,10 +1,11 @@
 package com.fzb.blog.web.incp;
 
 import com.fzb.blog.common.Constants;
-import com.fzb.blog.common.response.SessionTimeoutResponse;
+import com.fzb.blog.common.response.ExceptionResponse;
 import com.fzb.blog.model.User;
 import com.fzb.blog.util.I18NUtil;
 import com.fzb.blog.web.util.WebTools;
+import com.fzb.common.util.ExceptionUtils;
 import com.jfinal.aop.Interceptor;
 import com.jfinal.aop.Invocation;
 import com.jfinal.core.Controller;
@@ -56,8 +57,17 @@ class AdminInterceptor implements Interceptor {
                 }
             } catch (Exception e) {
                 LOGGER.error("", e);
-                if (JFinal.me().getConstants().getViewType() == ViewType.JSP) {
-                    controller.render(Constants.ADMIN_ERROR_PAGE + ".jsp");
+                if (controller.getRequest().getRequestURI().startsWith("/api")) {
+                    ExceptionResponse exceptionResponse = new ExceptionResponse();
+                    exceptionResponse.setError(1);
+                    if (JFinal.me().getConstants().getDevMode()) {
+                        exceptionResponse.setMessage(ExceptionUtils.recordStackTraceMsg(e));
+                    }
+                    ai.getController().renderJson(exceptionResponse);
+                } else {
+                    if (JFinal.me().getConstants().getViewType() == ViewType.JSP) {
+                        controller.render(Constants.ADMIN_ERROR_PAGE + ".jsp");
+                    }
                 }
             } finally {
                 AdminTokenThreadLocal.remove();
@@ -66,25 +76,29 @@ class AdminInterceptor implements Interceptor {
             ai.invoke();
             tryDoRender(ai, controller);
         } else {
-            if (ai.getActionKey().startsWith("/api")) {
-                SessionTimeoutResponse sessionTimeoutResponse = new SessionTimeoutResponse();
-                sessionTimeoutResponse.setError(1);
-                sessionTimeoutResponse.setMessage(I18NUtil.getStringFromRes("admin.session.timeout", ai.getController().getRequest()));
-                ai.getController().renderJson(sessionTimeoutResponse);
-            } else {
-                //在重定向到登陆页面时，同时携带了当前的请求路径，方便登陆成功后的跳转
-                HttpServletRequest request = ai.getController().getRequest();
-                try {
-                    String url = request.getRequestURL().toString();
-                    if (WebTools.getRealScheme(request).equals("https")) {
-                        url = url.replace("http://", "https://");
-                    }
-                    ai.getController().redirect(request.getContextPath()
-                            + "/admin/login?redirectFrom="
-                            + url + URLEncoder.encode(request.getQueryString() != null ? "?" + request.getQueryString() : "", "UTF-8"));
-                } catch (UnsupportedEncodingException e) {
-                    LOGGER.error("", e);
+            blockUnLoginRequestHandler(ai);
+        }
+    }
+
+    private void blockUnLoginRequestHandler(Invocation ai) {
+        if (ai.getActionKey().startsWith("/api")) {
+            ExceptionResponse exceptionResponse = new ExceptionResponse();
+            exceptionResponse.setError(1);
+            exceptionResponse.setMessage(I18NUtil.getStringFromRes("admin.session.timeout", ai.getController().getRequest()));
+            ai.getController().renderJson(exceptionResponse);
+        } else {
+            //在重定向到登陆页面时，同时携带了当前的请求路径，方便登陆成功后的跳转
+            HttpServletRequest request = ai.getController().getRequest();
+            try {
+                String url = request.getRequestURL().toString();
+                if (WebTools.getRealScheme(request).equals("https")) {
+                    url = url.replace("http://", "https://");
                 }
+                ai.getController().redirect(request.getContextPath()
+                        + "/admin/login?redirectFrom="
+                        + url + URLEncoder.encode(request.getQueryString() != null ? "?" + request.getQueryString() : "", "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                LOGGER.error("", e);
             }
         }
     }
