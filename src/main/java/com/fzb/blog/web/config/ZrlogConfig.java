@@ -132,7 +132,7 @@ public class ZrlogConfig extends JFinalConfig {
      * @param con
      */
     public void configConstant(Constants con) {
-        con.setDevMode(!BlogBuildInfoUtil.isRelease());
+        con.setDevMode(!BlogBuildInfoUtil.isDev());
         con.setViewType(ViewType.JSP);
         con.setEncoding("utf-8");
         con.setI18nDefaultBaseName(com.fzb.blog.common.Constants.I18N);
