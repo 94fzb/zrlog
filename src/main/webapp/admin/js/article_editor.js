@@ -81,6 +81,14 @@ $(function(){
             $("#logId").val(data.logId);
             $("#alias").val(data.alias);
             updatePreviewLink(data.logId);
+        }else{
+            new PNotify({
+                  title: data.message,
+                  type: 'error',
+                  hide: true,
+                  delay:3000,
+                  styling: 'bootstrap3'
+              });
         }
     }
 
