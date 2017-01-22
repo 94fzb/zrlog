@@ -40,7 +40,8 @@ $(function(){
                 if($("#redirectFrom").val().length!=0){
                     redirectTo = $("#redirectFrom").val();
                 }else{
-                    redirectTo = "admin/index";
+                    var baseUrl = $("base").attr("href");
+                    redirectTo = baseUrl + "admin/index";
                 }
                 location.href = redirectTo;
 

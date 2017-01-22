@@ -12,6 +12,7 @@ import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
 import com.jfinal.render.ViewType;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,7 +93,10 @@ class AdminInterceptor implements Interceptor {
             try {
                 String url = request.getRequestURL().toString();
                 if (WebTools.getRealScheme(request).equals("https")) {
-                    url = url.replace("http://", "https://");
+                    url = "https://" + request.getHeader("Host") + request.getRequestURI();
+                    if (!StringUtils.isEmpty(request.getQueryString())) {
+                        url += "?" + request.getQueryString();
+                    }
                 }
                 ai.getController().redirect(request.getContextPath()
                         + "/admin/login?redirectFrom="
