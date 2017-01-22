@@ -32,6 +32,15 @@ public class Tag extends Model<Tag> {
     }
 
     public boolean update(String nowTagStr, String oldTagStr) {
+        if (nowTagStr == null && oldTagStr == null) {
+            return true;
+        }
+        if (nowTagStr == null) {
+            nowTagStr = "";
+        }
+        if (oldTagStr == null) {
+            oldTagStr = "";
+        }
         if (nowTagStr.equals(oldTagStr)) {
             return true;
         }
