@@ -20,7 +20,7 @@ public class WebSiteController extends BaseController {
 
         WebSiteSettingUpdateResponse updateResponse = new WebSiteSettingUpdateResponse();
         updateResponse.setError(0);
-        cacheService.cleanCache();
+        cacheService.refreshInitDataCache(this);
         return updateResponse;
     }
 }

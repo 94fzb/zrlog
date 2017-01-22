@@ -16,8 +16,8 @@ $(document).ready(function() {
               hide: true,
               styling: 'bootstrap3'
           });
+          location.href = location.href;
         })
-        location.href = location.href;
         return false;
     })
 });
