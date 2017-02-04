@@ -81,7 +81,7 @@ public class AdminTokenService {
         return sessionTimeout;
     }
 
-    private String getDomain(HttpServletRequest request) {
+    public String getDomain(HttpServletRequest request) {
         String host = request.getHeader("Host");
         int idx = host.indexOf(":");
         if (idx != -1) {
