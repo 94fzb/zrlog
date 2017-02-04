@@ -66,8 +66,8 @@ public class PluginHandler extends Handler {
     private void adminPermission(String target, HttpServletRequest request, HttpServletResponse response) throws IOException, InstantiationException {
         int userId = adminTokenService.getUserId(request);
         if (userId > 0) {
-            accessPlugin(target.replace("/admin/plugins", ""), request, response);
             adminTokenService.setAdminToken(userId, request, response);
+            accessPlugin(target.replace("/admin/plugins", ""), request, response);
         } else {
             response.sendRedirect(request.getContextPath()
                     + "/admin/login?redirectFrom="
