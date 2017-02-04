@@ -20,28 +20,30 @@ public class AdminTokenService {
 
     public int getUserId(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
-        String decTokenString = null;
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals(Constants.ADMIN_TOKEN)) {
-                decTokenString = cookie.getValue();
-            }
-        }
-        try {
-            if (decTokenString != null) {
-                int userId = Integer.valueOf(decTokenString.substring(0, decTokenString.indexOf(",")));
-                User user = User.dao.findById(userId);
-                if (user != null) {
-                    byte[] adminTokenEncryptAfter = Base64.decodeBase64(decTokenString.substring(decTokenString.indexOf(","), decTokenString.length()).getBytes());
-                    AdminToken adminToken = new JSONDeserializer<AdminToken>().deserialize(new String(AESCryptoUtil.decrypt(user.getStr("secretKey"), adminTokenEncryptAfter)), AdminToken.class);
-                    if (adminToken.getCreatedDate() + getSessionTimeout() > System.currentTimeMillis()) {
-                        return userId;
-                    }
-                } else {
-                    return -1;
+        if (cookies != null) {
+            String decTokenString = null;
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(Constants.ADMIN_TOKEN)) {
+                    decTokenString = cookie.getValue();
                 }
             }
-        } catch (Exception e) {
-            LOGGER.info("error", e);
+            try {
+                if (decTokenString != null) {
+                    int userId = Integer.valueOf(decTokenString.substring(0, decTokenString.indexOf(",")));
+                    User user = User.dao.findById(userId);
+                    if (user != null) {
+                        byte[] adminTokenEncryptAfter = Base64.decodeBase64(decTokenString.substring(decTokenString.indexOf(","), decTokenString.length()).getBytes());
+                        AdminToken adminToken = new JSONDeserializer<AdminToken>().deserialize(new String(AESCryptoUtil.decrypt(user.getStr("secretKey"), adminTokenEncryptAfter)), AdminToken.class);
+                        if (adminToken.getCreatedDate() + getSessionTimeout() > System.currentTimeMillis()) {
+                            return userId;
+                        }
+                    } else {
+                        return -1;
+                    }
+                }
+            } catch (Exception e) {
+                LOGGER.info("error", e);
+            }
         }
         return -1;
     }
