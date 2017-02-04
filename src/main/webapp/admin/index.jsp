@@ -115,14 +115,14 @@ ${_res.dashboard}
 			<div class="animated flipInY col-lg-6 col-md-6 col-sm-6 col-xs-12">
 				<div class="tile-stats">
 				  <div class="icon"><i class="fa fa-comments-o"></i></div>
-				  <div class="count">${session.toDayCommCount}</div>
+				  <div class="count">${toDayCommCount}</div>
 				  <h3>今天评论</h3>
 				</div>
 			  </div>
 			  <div class="animated flipInY col-lg-6 col-md-6 col-sm-6 col-xs-12">
 				<div class="tile-stats">
 				  <div class="icon"><i class="fa fa-comments-o"></i></div>
-				  <div class="count">${session.commCount }</div>
+				  <div class="count">${commCount }</div>
 				  <h3>总评论</h3>
 				</div>
 		</div>

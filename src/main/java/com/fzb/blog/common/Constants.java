@@ -14,4 +14,10 @@ public class Constants {
     public static final String ZRLOG_RESOURCE_DOWNLOAD_URL = "http://dl.zrlog.com";
     public static final String AUTO_UPGRADE_VERSION_KEY = "autoUpgradeVersion";
     public static final int DEFAULT_ARTICLE_DIGEST_LENGTH = 200;
+    public static final String ADMIN_TOKEN = "admin_token";
+    //字符长度必须要大于16个字符
+    public static final String AES_PUBLIC_KEY = "_BLOG_BLOG_BLOG_";
+    //20分钟
+    public static final int DEFAULT_SESSION_TIMEOUT = 1000 * 20 * 60;
+    public static final String SESSION_TIMEOUT_KEY = "session_timeout";
 }

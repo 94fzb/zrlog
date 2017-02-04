@@ -1,6 +1,8 @@
 package com.fzb.blog.util;
 
 import com.fzb.blog.model.User;
+import com.fzb.blog.web.incp.AdminToken;
+import com.fzb.blog.web.incp.AdminTokenThreadLocal;
 import com.fzb.blog.web.util.WebTools;
 import com.fzb.common.util.IOUtil;
 import com.jfinal.core.JFinal;
@@ -34,12 +36,13 @@ public class ZrlogUtil {
 
     public static Map<String, String> genHeaderMapByRequest(HttpServletRequest request) {
         Map<String, String> map = new HashMap<String, String>();
-        User user = (User) request.getSession().getAttribute("user");
-        if (user != null) {
+        AdminToken adminToken = AdminTokenThreadLocal.getUser();
+        if (adminToken != null) {
+            User user = User.dao.findById(adminToken.getUserId());
             map.put("LoginUserName", user.get("userName").toString());
-            map.put("LoginUserId", user.get("userId").toString());
+            map.put("LoginUserId", adminToken.getUserId() + "");
         }
-        map.put("IsLogin", (user != null) + "");
+        map.put("IsLogin", (adminToken != null) + "");
         map.put("Blog-Version", ((Map) JFinal.me().getServletContext().getAttribute("zrlog")).get("version").toString());
         map.put("Full-Url", request.getRequestURL().toString());
         map.put("Cookie", request.getHeader("Cookie"));

@@ -27,6 +27,8 @@ import java.net.URLEncoder;
  */
 class AdminInterceptor implements Interceptor {
 
+    private AdminTokenService adminTokenService = new AdminTokenService();
+
     private static final Logger LOGGER = LoggerFactory.getLogger(AdminInterceptor.class);
 
     @Override
@@ -43,12 +45,13 @@ class AdminInterceptor implements Interceptor {
      */
     private void adminPermission(Invocation ai) {
         Controller controller = ai.getController();
-        if (controller.getSession().getAttribute("user") != null) {
+        int userId = adminTokenService.getUserId(controller.getRequest());
+        if (userId > 0) {
             try {
-                User user = (User) controller.getSession().getAttribute("user");
+                User user = User.dao.findById(userId);
                 controller.setAttr("user", user);
                 TemplateHelper.fullTemplateInfo(controller);
-                AdminTokenThreadLocal.setUser(user);
+                adminTokenService.setAdminToken(userId, controller.getRequest(), controller.getResponse());
                 ai.invoke();
                 if (!tryDoRender(ai, controller)) {
                     // 存在消息提示

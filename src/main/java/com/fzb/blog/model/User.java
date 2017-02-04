@@ -17,14 +17,14 @@ public class User extends Model<User> implements Serializable {
                 userName, password);
     }
 
-    public String getPasswordByName(String userName) {
-        return (String) findFirst("select password from user where username=?",
-                userName).get("password");
+    public String getPasswordByUserId(int userId) {
+        return (String) findFirst("select password from user where userId=?",
+                userId).get("password");
     }
 
-    public boolean updatePassword(String userName, String password) {
-        return Db.update("update user set password=? where userName=?",
-                password, userName) > 0;
+    public boolean updatePassword(int userId, String password) {
+        return Db.update("update user set password=? where userId=?",
+                password, userId) > 0;
     }
 
 }

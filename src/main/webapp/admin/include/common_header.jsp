@@ -16,7 +16,7 @@ Map webSite = (Map)init.getWebSite();
 if(webSite.get("admin_dashboard_naver") == null){
     webSite.put("admin_dashboard_naver","nav-md");
 }
-request.getSession().setAttribute("webs",webSite);
+request.setAttribute("webs",webSite);
 %>
 <!DOCTYPE html>
 <html>

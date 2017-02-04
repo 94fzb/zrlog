@@ -26,7 +26,7 @@ import java.util.Map;
 
 public class UpgradeController extends BaseController {
 
-    private static final String DOWNLOAD_ATTR_KEY = "downing";
+    private static final String DOWNLOAD_ATTR_KEY_PREFIX = "downing";
     private static final String UPDATE_THREAD_ATTR_KEY = "updateVersionThread";
 
     private CacheService cacheService = new CacheService();
@@ -57,7 +57,7 @@ public class UpgradeController extends BaseController {
     }
 
     public DownloadUpdatePackageResponse download() {
-        DownloadProcessHandle handle = getSessionAttr(DOWNLOAD_ATTR_KEY);
+        DownloadProcessHandle handle = getSessionAttr(DOWNLOAD_ATTR_KEY_PREFIX);
         if (handle == null) {
             File file = new File(PathKit.getWebRootPath() + "/WEB-INF/update-temp/" + "zrlog.war");
             file.getParentFile().mkdir();
@@ -68,7 +68,7 @@ public class UpgradeController extends BaseController {
                 e.printStackTrace();
             }
         }
-        getSession().setAttribute(DOWNLOAD_ATTR_KEY, handle);
+        getSession().setAttribute(DOWNLOAD_ATTR_KEY_PREFIX, handle);
         DownloadUpdatePackageResponse downloadUpdatePackageResponse = new DownloadUpdatePackageResponse();
         downloadUpdatePackageResponse.setProcess(handle.getProcess());
         return downloadUpdatePackageResponse;
@@ -98,7 +98,7 @@ public class UpgradeController extends BaseController {
     }
 
     public UpgradeProcessResponse doUpgrade() {
-        DownloadProcessHandle handle = getSessionAttr(DOWNLOAD_ATTR_KEY);
+        DownloadProcessHandle handle = getSessionAttr(DOWNLOAD_ATTR_KEY_PREFIX);
         File file = handle.getFile();
         UpgradeProcessResponse upgradeProcessResponse = new UpgradeProcessResponse();
         UpdateVersionThread updateVersionThread = getSessionAttr(UPDATE_THREAD_ATTR_KEY);

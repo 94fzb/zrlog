@@ -16,6 +16,7 @@ import java.sql.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
 
 /**
  * 与安装向导相关的业务代码
@@ -153,11 +154,12 @@ public class InstallService {
 
             PreparedStatement ps = connect.prepareStatement(insertWebSql);
             ps.executeUpdate();
-            String insertUserSql = "INSERT INTO `user`( `userId`,`userName`, `password`, `email`) VALUES (1,?,?,?)";
-            ps = connect.prepareStatement(insertUserSql);
+            String insertUserSql = "INSERT INTO `user`( `userId`,`userName`, `password`, `email`,`secretKey`) VALUES (1,?,?,?,?)";
+            ps  = connect.prepareStatement(insertUserSql);
             ps.setString(1, blogMsg.get("username"));
             ps.setString(2, Md5Util.MD5(blogMsg.get("password")));
             ps.setString(3, configMsg.get("email"));
+            ps.setString(4, UUID.randomUUID().toString());
             ps.executeUpdate();
 
             String insertLogNavSql = "INSERT INTO `lognav`( `navId`,`url`, `navName`, `sort`) VALUES (?,?,?,?)";

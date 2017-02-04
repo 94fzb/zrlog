@@ -23,11 +23,11 @@ public class AdminPageController extends BaseController {
                     comment.put("userComment", ParseUtil.autoDigest(comment.get("userComment").toString(), 15));
                 }
             }
-            getSession().setAttribute("comments", commentMap);
-            getSession().setAttribute("commCount", Comment.dao.getCommentCount());
-            getSession().setAttribute("toDayCommCount", Comment.dao.getToDayCommentCount());
-            getSession().setAttribute("clickCount", Log.dao.getAllClick());
-            getSession().setAttribute("lastVersion", new UpgradeController().lastVersion());
+            getRequest().setAttribute("comments", commentMap);
+            getRequest().setAttribute("commCount", Comment.dao.getCommentCount());
+            getRequest().setAttribute("toDayCommCount", Comment.dao.getToDayCommentCount());
+            getRequest().setAttribute("clickCount", Log.dao.getAllClick());
+            getRequest().setAttribute("lastVersion", new UpgradeController().lastVersion());
             if (getPara(0) == null) {
                 return "/admin/index";
             } else {
