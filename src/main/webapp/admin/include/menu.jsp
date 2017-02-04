@@ -166,7 +166,7 @@
                 <span class="badge bg-green">${fn:length(comments.rows)}</span>
               </a>
               <ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
-                <c:forEach items="${session.comments.rows}" var="comment">
+                <c:forEach items="${comments.rows}" var="comment">
                 <li>
                     <a target="_blank" href="post/${comment.logId}">
                         <span class="image">

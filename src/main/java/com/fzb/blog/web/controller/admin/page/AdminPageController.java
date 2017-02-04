@@ -7,6 +7,7 @@ import com.fzb.blog.util.ParseUtil;
 import com.fzb.blog.web.controller.BaseController;
 import com.fzb.blog.web.controller.admin.api.UpgradeController;
 import com.fzb.blog.web.incp.AdminTokenThreadLocal;
+import com.jfinal.core.JFinal;
 
 import javax.servlet.http.Cookie;
 import java.util.List;
@@ -23,11 +24,11 @@ public class AdminPageController extends BaseController {
                     comment.put("userComment", ParseUtil.autoDigest(comment.get("userComment").toString(), 15));
                 }
             }
-            getRequest().setAttribute("comments", commentMap);
-            getRequest().setAttribute("commCount", Comment.dao.getCommentCount());
-            getRequest().setAttribute("toDayCommCount", Comment.dao.getToDayCommentCount());
-            getRequest().setAttribute("clickCount", Log.dao.getAllClick());
-            getRequest().setAttribute("lastVersion", new UpgradeController().lastVersion());
+            JFinal.me().getServletContext().setAttribute("comments", commentMap);
+            JFinal.me().getServletContext().setAttribute("commCount", Comment.dao.getCommentCount());
+            JFinal.me().getServletContext().setAttribute("toDayCommCount", Comment.dao.getToDayCommentCount());
+            JFinal.me().getServletContext().setAttribute("clickCount", Log.dao.getAllClick());
+            JFinal.me().getServletContext().setAttribute("lastVersion", new UpgradeController().lastVersion());
             if (getPara(0) == null) {
                 return "/admin/index";
             } else {
