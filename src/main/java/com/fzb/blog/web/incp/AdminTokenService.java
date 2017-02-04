@@ -70,7 +70,7 @@ public class AdminTokenService {
         }
     }
 
-    private int getSessionTimeout() {
+    public int getSessionTimeout() {
         String sessionTimeoutString = WebSite.dao.getValueByName(Constants.SESSION_TIMEOUT_KEY);
         int sessionTimeout;
         if (!StringUtils.isEmpty(sessionTimeoutString)) {

@@ -6,6 +6,7 @@ import com.fzb.blog.model.Log;
 import com.fzb.blog.util.ParseUtil;
 import com.fzb.blog.web.controller.BaseController;
 import com.fzb.blog.web.controller.admin.api.UpgradeController;
+import com.fzb.blog.web.incp.AdminTokenService;
 import com.fzb.blog.web.incp.AdminTokenThreadLocal;
 import com.jfinal.core.JFinal;
 
@@ -14,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 public class AdminPageController extends BaseController {
+
+    private AdminTokenService adminTokenService = new AdminTokenService();
 
     public String index() {
         if (AdminTokenThreadLocal.getUser() != null) {
@@ -53,10 +56,12 @@ public class AdminPageController extends BaseController {
         for (Cookie cookie : cookies) {
             if ("zId".equals(cookie.getName())) {
                 cookie.setValue("");
+                cookie.setMaxAge(adminTokenService.getSessionTimeout());
                 getResponse().addCookie(cookie);
             }
             if (Constants.ADMIN_TOKEN.equals(cookie.getName())) {
                 cookie.setValue("");
+                cookie.setMaxAge(adminTokenService.getSessionTimeout());
                 getResponse().addCookie(cookie);
             }
         }
