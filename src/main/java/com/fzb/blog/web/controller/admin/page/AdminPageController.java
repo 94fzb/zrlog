@@ -3,7 +3,6 @@ package com.fzb.blog.web.controller.admin.page;
 import com.fzb.blog.common.Constants;
 import com.fzb.blog.model.Comment;
 import com.fzb.blog.model.Log;
-import com.fzb.blog.model.User;
 import com.fzb.blog.util.ParseUtil;
 import com.fzb.blog.web.controller.BaseController;
 import com.fzb.blog.web.controller.admin.api.UpgradeController;
@@ -53,15 +52,10 @@ public class AdminPageController extends BaseController {
         Cookie cookies[] = getRequest().getCookies();
         for (Cookie cookie : cookies) {
             if ("zId".equals(cookie.getName())) {
-                Map<String, User> userMap = (Map<String, User>) getSession().getServletContext().getAttribute("userMap");
-                if (userMap != null) {
-                    userMap.remove(cookie.getValue());
-                    cookie.setMaxAge(0);
-                    getResponse().addCookie(cookie);
-                }
+                cookie.setValue("");
+                getResponse().addCookie(cookie);
             }
             if (Constants.ADMIN_TOKEN.equals(cookie.getName())) {
-                cookie.setMaxAge(0);
                 cookie.setValue("");
                 getResponse().addCookie(cookie);
             }
