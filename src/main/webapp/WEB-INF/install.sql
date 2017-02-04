@@ -89,6 +89,7 @@ CREATE TABLE `user` (
   `password` varchar(128) DEFAULT NULL,
   `userName` varchar(16) DEFAULT NULL,
   `header` varchar(255) DEFAULT NULL,
+  `secretKey` varchar(1024) DEFAULT NULL COMMENT '密钥',
   PRIMARY KEY (`userId`),
   UNIQUE KEY `userName` (`userName`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
