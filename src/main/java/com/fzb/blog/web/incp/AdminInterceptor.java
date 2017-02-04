@@ -51,7 +51,9 @@ class AdminInterceptor implements Interceptor {
                 User user = User.dao.findById(userId);
                 controller.setAttr("user", user);
                 TemplateHelper.fullTemplateInfo(controller);
-                adminTokenService.setAdminToken(userId, controller.getRequest(), controller.getResponse());
+                if (!ai.getActionKey().equals("/admin/logout")) {
+                    adminTokenService.setAdminToken(userId, controller.getRequest(), controller.getResponse());
+                }
                 ai.invoke();
                 if (!tryDoRender(ai, controller)) {
                     // 存在消息提示
