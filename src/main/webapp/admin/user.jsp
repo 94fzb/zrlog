@@ -46,7 +46,7 @@
 	<div class="form-group">
 		<label for="form-field-1"class="col-sm-3 control-label no-padding-right">头像</label>
 		<div class="col-sm-9">
-			<input id="logo" class="col-xs-6 col-sm-6" id="form-field-1" name="header" value="${session.user.header}">
+			<input id="logo" class="col-xs-6 col-sm-6" id="form-field-1" name="header" value="${user.header}">
 			<input type="file" class="col-xs-6 fileUpload" id="form-field-1" name="imgFile" value="上传" />
 		</div>
 	</div>

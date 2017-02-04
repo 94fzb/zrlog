@@ -82,8 +82,7 @@ public class AdminController extends BaseController {
 
     public UpdateRecordResponse update() {
         UpdateRecordResponse updateRecordResponse = new UpdateRecordResponse();
-        User user = (User) getSession().getAttribute("user");
-        Integer userId = user.getInt("userId");
+        Integer userId = AdminTokenThreadLocal.getUserId();
         Db.update("update user set header=?,email=?,userName=? where userId=?", getPara("header"), getPara("email"), getPara("userName"), userId);
         getRequest().setAttribute("user", User.dao.findById(userId));
         updateRecordResponse.setMessage(I18NUtil.getStringFromRes("updatePersonInfoSuccess", getRequest()));
