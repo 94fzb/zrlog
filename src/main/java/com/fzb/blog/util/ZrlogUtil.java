@@ -136,7 +136,7 @@ public class ZrlogUtil {
                 Integer fileVersion = Integer.valueOf(f.getName().replace(".sql", ""));
                 if (fileVersion > version) {
                     LOGGER.info("need update sql " + f);
-                    sqlList.add(IOUtil.getStringInputStream(new FileInputStream(f)));
+                    sqlList.addAll(Arrays.asList(IOUtil.getStringInputStream(new FileInputStream(f)).split("\n")));
                 }
             } catch (FileNotFoundException e) {
                 LOGGER.error("", e);

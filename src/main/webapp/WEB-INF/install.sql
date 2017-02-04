@@ -157,7 +157,7 @@ DROP TABLE IF EXISTS `website`;
 CREATE TABLE `website` (
   `siteId` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,
-  `value` varchar(2000) DEFAULT NULL,
+  `value` text DEFAULT NULL,
   `remark` varchar(2000) DEFAULT NULL,
   PRIMARY KEY (`siteId`),
   UNIQUE KEY `name` (`name`)
