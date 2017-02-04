@@ -62,14 +62,16 @@ public class TemplateController extends BaseController {
     public UploadTemplateResponse upload() {
         String uploadFieldName = "file";
 
-        String fileName = getFile(uploadFieldName).getFileName();
+        String templateName = getFile(uploadFieldName).getOriginalFileName();
         String finalPath = PathKit.getWebRootPath() + Constants.TEMPLATE_BASE_PATH;
-        String finalFile = finalPath + fileName;
-        IOUtil.moveOrCopyFile(PathKit.getWebRootPath() + "/attached/" + fileName, finalFile, true);
+        String finalFile = finalPath + templateName;
+        IOUtil.deleteFile(finalFile);
+        //start extract template file
+        IOUtil.moveOrCopyFile(getFile(uploadFieldName).getFile().toString(), finalFile, true);
         UploadTemplateResponse response = new UploadTemplateResponse();
         response.setMessage(I18NUtil.getStringFromRes("templateDownloadSuccess", getRequest()));
         try {
-            String extractFolder = finalPath + fileName.replace(".zip", "") + "/";
+            String extractFolder = finalPath + templateName.replace(".zip", "") + "/";
             IOUtil.deleteFile(extractFolder);
             ZipUtil.unZip(finalFile, extractFolder);
         } catch (IOException e) {
