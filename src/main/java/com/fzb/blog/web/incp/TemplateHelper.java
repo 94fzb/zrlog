@@ -8,6 +8,7 @@ import com.fzb.blog.util.ZrlogUtil;
 import com.fzb.blog.web.controller.BaseController;
 import com.fzb.blog.web.util.WebTools;
 import com.jfinal.core.Controller;
+import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
 import org.apache.log4j.Logger;
 
@@ -146,7 +147,7 @@ public class TemplateHelper {
             baseUrl = request.getContextPath() + "/";
             templateUrl = request.getContextPath() + request.getAttribute("template");
         } else {
-            if (webSite.get("staticResourceHost") != null && !"".equals(webSite.get("staticResourceHost"))) {
+            if (webSite.get("staticResourceHost") != null && !"".equals(webSite.get("staticResourceHost")) && !JFinal.me().getConstants().getDevMode()) {
                 templateUrl = scheme + "://" + webSite.get("staticResourceHost").toString() + request.getAttribute("template");
             } else {
                 templateUrl = scheme + "://" + request.getHeader("host") + request.getContextPath() + request.getAttribute("template");

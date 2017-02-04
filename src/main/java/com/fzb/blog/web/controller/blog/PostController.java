@@ -88,20 +88,22 @@ public class PostController extends BaseController {
     }
 
 
-    public void index() {
+    public String index() {
         if ((getRequest().getServletPath().startsWith("/post"))
                 && (getPara(0) != null)) {
             if (getPara(0).equals("all")) {
-                all();
+                return all();
             } else if (getPara(0) != null) {
-                detail();
+                return detail();
+            } else {
+                return all();
             }
         } else {
-            all();
+            return all();
         }
     }
 
-    public void search() {
+    public String search() {
         String key;
         Map<String, Object> data;
         if (getParaToInt(1) == null) {
@@ -113,9 +115,8 @@ public class PostController extends BaseController {
                 }
                 data = Log.dao.getLogsByTitleOrContent(1, getDefaultRows(), key);
             } else {
-                all();
                 removeSessionAttr("key");
-                return;
+                return all();
             }
 
         } else {
@@ -133,16 +134,18 @@ public class PostController extends BaseController {
         if (logs != null && !logs.isEmpty()) {
             articleService.wrapperSearchKeyword(logs, key);
         }
+        return "page";
     }
 
-    public void record() {
+    public String record() {
         setAttr("tipsType", I18NUtil.getStringFromRes("archive", getRequest()));
         setAttr("tipsName", getPara(0));
 
         setPageInfo("post/record/" + getPara(0) + "-", Log.dao.getLogsByData(getParaToInt(1, 1), getDefaultRows(), getPara(0)), getParaToInt(1, 1));
+        return "page";
     }
 
-    public void addComment() {
+    public String addComment() {
         if (getPara("logId") != null && getPara("userComment") != null) {
             // TODO　如何过滤垃圾信息
             new Comment().set("userHome", getPara("userHome"))
@@ -154,13 +157,14 @@ public class PostController extends BaseController {
                     .set("commTime", new Date()).set("hide", 1).save();
             detail(getPara("logId"));
         }
+        return "detail";
     }
 
-    public void detail() {
-        detail(getPara());
+    public String detail() {
+        return detail(getPara());
     }
 
-    private void detail(Object id) {
+    private String detail(Object id) {
         Log log = Log.dao.getLogByLogId(id);
         if (log != null) {
             Integer logId = log.get("logId");
@@ -170,9 +174,10 @@ public class PostController extends BaseController {
             log.put("comments", Comment.dao.getCommentsByLogId(logId));
             setAttr("log", log);
         }
+        return "detail";
     }
 
-    public void sort() {
+    public String sort() {
         setPageInfo("post/sort/" + getPara(0) + "-", Log.dao.getLogsBySort(getParaToInt(1, 1), getDefaultRows(), getPara(0)), getParaToInt(1, 1));
 
         Type type = Type.dao.findByAlias(getPara(0));
@@ -181,9 +186,10 @@ public class PostController extends BaseController {
         if (type != null) {
             setAttr("tipsName", type.getStr("typeName"));
         }
+        return "page";
     }
 
-    public void tag() {
+    public String tag() {
         if (getPara(0) != null) {
             String tag = convertRequestParam(getPara(0));
             setPageInfo("post/tag/" + getPara(0) + "-", Log.dao.getLogsByTag(getParaToInt(1, 1), getDefaultRows(), tag), getParaToInt(1, 1));
@@ -191,11 +197,17 @@ public class PostController extends BaseController {
             setAttr("tipsType", I18NUtil.getStringFromRes("tag", getRequest()));
             setAttr("tipsName", tag);
         }
+        return "page";
     }
 
-    public void all() {
+    public String tags() {
+        return "tags";
+    }
+
+    public String all() {
         int page = ParseUtil.strToInt(getPara(1), 1);
         Map<String, Object> data = Log.dao.getLogsByPage(page, getDefaultRows());
         setPageInfo("post/all-", data, page);
+        return "index";
     }
 }

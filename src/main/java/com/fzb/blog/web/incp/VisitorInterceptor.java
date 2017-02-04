@@ -7,6 +7,7 @@ import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.jfinal.json.Json;
 import com.jfinal.kit.PathKit;
+import com.jfinal.render.ViewType;
 
 import java.io.File;
 import java.util.Enumeration;
@@ -45,24 +46,23 @@ class VisitorInterceptor implements Interceptor {
      */
     private void visitorPermission(Invocation ai) {
         ai.invoke();
+        String templateName = ai.getReturnValue();
         String basePath = TemplateHelper.fullTemplateInfo(ai.getController());
-        String path = "index.jsp";
         if (ai.getController().getAttr("log") != null) {
             ai.getController().setAttr("pageLevel", 1);
-            path = "detail.jsp";
         } else if (ai.getController().getAttr("data") != null) {
             if (ai.getActionKey().equals("/") && new File(PathKit.getWebRootPath() + basePath + "/index.jsp").exists()) {
                 ai.getController().setAttr("pageLevel", 2);
-                path = "index.jsp";
             } else {
                 ai.getController().setAttr("pageLevel", 1);
-                path = "page.jsp";
             }
         } else {
             ai.getController().setAttr("pageLevel", 2);
         }
         fullDevData(ai.getController());
-        ai.getController().render(basePath + "/" + path);
+        if (JFinal.me().getConstants().getViewType() == ViewType.JSP) {
+            ai.getController().render(basePath + "/" + templateName + ".jsp");
+        }
     }
 
     /**

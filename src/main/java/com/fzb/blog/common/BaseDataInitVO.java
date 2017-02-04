@@ -21,6 +21,7 @@ public class BaseDataInitVO implements Serializable {
     private List<Log> hotLogs;
     private List<LogNav> logNavs;
     private Map<Map<String, Object>, List<Log>> indexHotLogs;
+    private Statistics statistics;
 
     public List<Tag> getTags() {
         return tags;
@@ -100,5 +101,44 @@ public class BaseDataInitVO implements Serializable {
 
     public void setArchiveList(List<Archive> archiveList) {
         this.archiveList = archiveList;
+    }
+
+    public static class Statistics implements Serializable {
+
+        private long totalArticleSize;
+        private long totalTagSize;
+        private long totalTypeSize;
+
+        public long getTotalArticleSize() {
+            return totalArticleSize;
+        }
+
+        public void setTotalArticleSize(long totalArticleSize) {
+            this.totalArticleSize = totalArticleSize;
+        }
+
+        public long getTotalTagSize() {
+            return totalTagSize;
+        }
+
+        public void setTotalTagSize(long totalTagSize) {
+            this.totalTagSize = totalTagSize;
+        }
+
+        public long getTotalTypeSize() {
+            return totalTypeSize;
+        }
+
+        public void setTotalTypeSize(long totalTypeSize) {
+            this.totalTypeSize = totalTypeSize;
+        }
+    }
+
+    public Statistics getStatistics() {
+        return statistics;
+    }
+
+    public void setStatistics(Statistics statistics) {
+        this.statistics = statistics;
     }
 }

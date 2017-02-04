@@ -26,7 +26,6 @@ public class Log extends Model<Log> implements Serializable {
     }
 
     public Log() {
-
     }
 
     public Log getLogByLogId(Object id) {
@@ -264,5 +263,10 @@ public class Log extends Model<Log> implements Serializable {
     @Override
     public Map<String, Object> getAttrs() {
         return super.getAttrs();
+    }
+
+    public long getTotalArticleSize() {
+        String sql = "select count(1) as count from log where rubbish=? and private=?";
+        return findFirst(sql, false, false).getLong("count");
     }
 }

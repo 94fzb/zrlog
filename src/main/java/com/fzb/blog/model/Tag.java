@@ -136,4 +136,7 @@ public class Tag extends Model<Tag> {
         }
     }
 
+    public long countByText() {
+        return 0;
+    }
 }

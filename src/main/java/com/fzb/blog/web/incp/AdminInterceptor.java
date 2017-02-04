@@ -58,7 +58,7 @@ class AdminInterceptor implements Interceptor {
                 }
             } catch (Exception e) {
                 LOGGER.error("", e);
-                if (controller.getRequest().getRequestURI().startsWith("/api")) {
+                if (ai.getActionKey().startsWith("/api")) {
                     ExceptionResponse exceptionResponse = new ExceptionResponse();
                     exceptionResponse.setError(1);
                     if (JFinal.me().getConstants().getDevMode()) {

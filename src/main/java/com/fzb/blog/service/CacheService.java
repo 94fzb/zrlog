@@ -48,13 +48,19 @@ public class CacheService {
             Map<String, Object> website = WebSite.dao.getWebSite();
             //兼容早期模板判断方式
             website.put("user_comment_pluginStatus", "on".equals(website.get("duoshuo_status")));
+
+            BaseDataInitVO.Statistics statistics = new BaseDataInitVO.Statistics();
+            statistics.setTotalArticleSize(Log.dao.getTotalArticleSize());
+            cacheInit.setStatistics(statistics);
             cacheInit.setWebSite(website);
             cacheInit.setLinks(Link.dao.queryAll());
             cacheInit.setTypes(Type.dao.queryAll());
+            statistics.setTotalTypeSize(cacheInit.getTypes().size());
             cacheInit.setLogNavs(LogNav.dao.queryAll());
             cacheInit.setPlugins(Plugin.dao.queryAll());
             cacheInit.setArchives(Log.dao.getArchives());
             cacheInit.setTags(Tag.dao.queryAll());
+            statistics.setTotalTagSize(cacheInit.getTags().size());
             List<Type> types = cacheInit.getTypes();
             cacheInit.setHotLogs((List<Log>) Log.dao.getLogsByPage(1, 6).get("rows"));
             Map<Map<String, Object>, List<Log>> indexHotLog = new LinkedHashMap<Map<String, Object>, List<Log>>();
