@@ -1,5 +1,6 @@
 package com.fzb.blog.web.controller.admin.page;
 
+import com.fzb.blog.common.Constants;
 import com.fzb.blog.model.Comment;
 import com.fzb.blog.model.Log;
 import com.fzb.blog.model.User;
@@ -59,8 +60,12 @@ public class AdminPageController extends BaseController {
                     getResponse().addCookie(cookie);
                 }
             }
+            if (Constants.ADMIN_TOKEN.equals(cookie.getName())) {
+                cookie.setMaxAge(0);
+                cookie.setValue("");
+                getResponse().addCookie(cookie);
+            }
         }
-        getSession().invalidate();
         redirect("/admin/login");
     }
 }
