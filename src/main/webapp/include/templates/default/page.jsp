@@ -16,7 +16,7 @@
 	<c:if test="${not empty requestScope.data}">
 <c:forEach var="log" items="${requestScope.data.rows}">
 <article class="entry">
-<h2 class="post-title"><a rel="bookmark" href="${log.url}">${log.title}</a></h2>
+  <h2 class="post-title"><a rel="bookmark" href="${log.url}">${log.title}</a></h2>
   <div class="content"><p>${log.digest}</p></div>
 	  <div class="meta">
 	  <p class="category"><a rel="tag" href="${log.typeUrl}">${log.typeName}</a> </p>
@@ -33,5 +33,5 @@
 </c:otherwise>
 </c:choose>
 <jsp:include page="pager.jsp"></jsp:include>
-<jsp:include page="plugs.jsp"></jsp:include>
+<jsp:include page="plugin.jsp"></jsp:include>
 <jsp:include page="footer.jsp"></jsp:include>
