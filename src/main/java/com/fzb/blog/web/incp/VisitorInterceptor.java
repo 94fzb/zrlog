@@ -47,22 +47,25 @@ class VisitorInterceptor implements Interceptor {
     private void visitorPermission(Invocation ai) {
         ai.invoke();
         String templateName = ai.getReturnValue();
+        String ext = "";
+        if (JFinal.me().getConstants().getViewType() == ViewType.JSP) {
+            ext = ".jsp";
+        }
         String basePath = TemplateHelper.fullTemplateInfo(ai.getController());
         if (ai.getController().getAttr("log") != null) {
             ai.getController().setAttr("pageLevel", 1);
         } else if (ai.getController().getAttr("data") != null) {
-            if (ai.getActionKey().equals("/") && new File(PathKit.getWebRootPath() + basePath + "/index.jsp").exists()) {
+            if (ai.getActionKey().equals("/") && new File(PathKit.getWebRootPath() + basePath + "/" + templateName + ext).exists()) {
                 ai.getController().setAttr("pageLevel", 2);
             } else {
+                templateName = "page";
                 ai.getController().setAttr("pageLevel", 1);
             }
         } else {
             ai.getController().setAttr("pageLevel", 2);
         }
         fullDevData(ai.getController());
-        if (JFinal.me().getConstants().getViewType() == ViewType.JSP) {
-            ai.getController().render(basePath + "/" + templateName + ".jsp");
-        }
+        ai.getController().render(basePath + "/" + templateName + ext);
     }
 
     /**

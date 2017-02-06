@@ -115,7 +115,6 @@ public class PostController extends BaseController {
                 }
                 data = Log.dao.getLogsByTitleOrContent(1, getDefaultRows(), key);
             } else {
-                removeSessionAttr("key");
                 return all();
             }
 
@@ -124,7 +123,7 @@ public class PostController extends BaseController {
             data = Log.dao.getLogsByTitleOrContent(getParaToInt(1), getDefaultRows(), key);
         }
         // 记录回话的Key
-        setSessionAttr("key", key);
+        setAttr("key", key);
 
         setAttr("tipsType", I18NUtil.getStringFromRes("search", getRequest()));
         setAttr("tipsName", key);
