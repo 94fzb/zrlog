@@ -28,7 +28,7 @@ public class AdminTokenService {
                 }
             }
             try {
-                if (decTokenString != null) {
+                if (StringUtils.isNotBlank(decTokenString)) {
                     int userId = Integer.valueOf(decTokenString.substring(0, decTokenString.indexOf(",")));
                     User user = User.dao.findById(userId);
                     if (user != null) {
