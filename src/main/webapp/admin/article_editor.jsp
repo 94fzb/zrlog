@@ -62,7 +62,7 @@ request.setAttribute("url", scheme+"://"+request.getHeader("host")+request.getCo
 	<div class="col-xs-12">
 	<div class="tagsinput" id="tag" style="width: 100%">
 	<c:forEach items="${init.tags}" var="tags">
-		<span class="tag"><i class="fa fa-tag"></i> ${tags.text}</span>
+		<span class="tag"><i class="fa fa-tag"></i>${tags.text}</span>
 	</c:forEach>
 	</div>
 	</div>
