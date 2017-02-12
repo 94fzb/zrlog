@@ -107,6 +107,15 @@
 				</div>
 
 				<div class="form-group">
+                    <label for="form-field-1"
+                        class="col-sm-3 control-label no-padding-right"> 会话过期时间（分钟） </label>
+
+                    <div class="col-sm-7">
+                        <input name="session_timeout" class="form-control col-xs-12 col-sm-6" value="${webs.session_timeout}">
+                    </div>
+                </div>
+
+				<div class="form-group">
 					<label for="form-field-1"
 						class="col-sm-3 control-label no-padding-right"> 网站统计 </label>
 

@@ -6,6 +6,8 @@ import com.jfinal.plugin.activerecord.Model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -169,11 +171,16 @@ public class Log extends Model<Log> implements Serializable {
     }
 
     public Map<String, Long> getArchives() {
-        List<Object[]> lo = Db
-                .query("select  DATE_FORMAT(releaseTime,'%Y_%m'),count(DATE_FORMAT(releaseTime,'%Y_%m')) from log  where rubbish=? and private=?  group by DATE_FORMAT(releaseTime,'%Y_%m') order by logId desc", rubbish, pre);
+        List<Timestamp> lo = Db
+                .query("select  releaseTime from log  where rubbish=? and private=? order by logId desc", rubbish, pre);
         Map<String, Long> archives = new LinkedHashMap<String, Long>();
-        for (Object[] objects : lo) {
-            archives.put(objects[0].toString(), (Long) objects[1]);
+        for (Timestamp objects : lo) {
+            String key = new SimpleDateFormat("yyyy_MM").format(new Date(objects.getTime()));
+            if (archives.containsKey(key)) {
+                archives.put(key, archives.get(key) + 1);
+            } else {
+                archives.put(key, 1L);
+            }
         }
         return archives;
     }
