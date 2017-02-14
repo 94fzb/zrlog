@@ -18,6 +18,6 @@ public class Constants {
     //字符长度必须要大于16个字符
     public static final String AES_PUBLIC_KEY = "_BLOG_BLOG_BLOG_";
     //20分钟
-    public static final int DEFAULT_SESSION_TIMEOUT = 1000 * 20 * 60;
+    public static final long DEFAULT_SESSION_TIMEOUT = 1000 * 20 * 60L;
     public static final String SESSION_TIMEOUT_KEY = "session_timeout";
 }

@@ -50,7 +50,7 @@ public class AdminTokenService {
 
     public void setAdminToken(int userId, HttpServletRequest request, HttpServletResponse response) {
         User user = User.dao.findById(userId);
-        int sessionTimeout = getSessionTimeout();
+        long sessionTimeout = getSessionTimeout();
         AdminToken adminToken = new AdminToken();
         adminToken.setUserId(user.getInt("userId"));
         long loginTime = System.currentTimeMillis();
@@ -60,8 +60,9 @@ public class AdminTokenService {
         try {
             String encryptAfterString = Base64.encodeBase64String(AESCryptoUtil.encrypt(user.get("secretKey").toString(), encryptBeforeString.getBytes()));
             String finalTokenString = adminToken.getUserId() + "," + encryptAfterString;
+
             Cookie cookie = new Cookie(Constants.ADMIN_TOKEN, finalTokenString);
-            cookie.setMaxAge(sessionTimeout / 1000);
+            cookie.setMaxAge((int) (sessionTimeout / 1000));
             cookie.setDomain(getDomain(request));
             cookie.setPath("/");
             response.addCookie(cookie);
@@ -70,12 +71,13 @@ public class AdminTokenService {
         }
     }
 
-    public int getSessionTimeout() {
+    public Long getSessionTimeout() {
         String sessionTimeoutString = WebSite.dao.getValueByName(Constants.SESSION_TIMEOUT_KEY);
-        int sessionTimeout;
+        Long sessionTimeout;
+        System.out.println(sessionTimeoutString);
         if (!StringUtils.isEmpty(sessionTimeoutString)) {
             //*60， Cookie过期时间单位为分钟
-            sessionTimeout = Integer.valueOf(sessionTimeoutString) * 60;
+            sessionTimeout = Long.valueOf(sessionTimeoutString) * 60 * 1000;
             if (sessionTimeout <= 0) {
                 sessionTimeout = Constants.DEFAULT_SESSION_TIMEOUT;
             }
