@@ -56,12 +56,12 @@ public class AdminPageController extends BaseController {
         for (Cookie cookie : cookies) {
             if ("zId".equals(cookie.getName())) {
                 cookie.setValue("");
-                cookie.setMaxAge(adminTokenService.getSessionTimeout());
+                cookie.setMaxAge(adminTokenService.getSessionTimeout().intValue());
                 getResponse().addCookie(cookie);
             }
             if (Constants.ADMIN_TOKEN.equals(cookie.getName())) {
                 cookie.setValue("");
-                cookie.setMaxAge(adminTokenService.getSessionTimeout());
+                cookie.setMaxAge(adminTokenService.getSessionTimeout().intValue());
                 cookie.setPath("/");
                 cookie.setDomain(adminTokenService.getDomain(getRequest()));
                 getResponse().addCookie(cookie);
