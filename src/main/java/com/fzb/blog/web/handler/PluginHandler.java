@@ -2,6 +2,7 @@ package com.fzb.blog.web.handler;
 
 import com.fzb.blog.util.ZrlogUtil;
 import com.fzb.blog.web.incp.AdminTokenService;
+import com.fzb.blog.web.incp.AdminTokenThreadLocal;
 import com.fzb.common.util.IOUtil;
 import com.fzb.common.util.http.HttpUtil;
 import com.fzb.common.util.http.handle.CloseResponseHandle;
@@ -66,8 +67,12 @@ public class PluginHandler extends Handler {
     private void adminPermission(String target, HttpServletRequest request, HttpServletResponse response) throws IOException, InstantiationException {
         int userId = adminTokenService.getUserId(request);
         if (userId > 0) {
-            adminTokenService.setAdminToken(userId, request, response);
-            accessPlugin(target.replace("/admin/plugins", ""), request, response);
+            try {
+                adminTokenService.setAdminToken(userId, request, response);
+                accessPlugin(target.replace("/admin/plugins", ""), request, response);
+            } finally {
+                AdminTokenThreadLocal.remove();
+            }
         } else {
             response.sendRedirect(request.getContextPath()
                     + "/admin/login?redirectFrom="
