@@ -8,7 +8,6 @@
 </div>
 </div>
 </div>
-</div>
 <div style="display: none"></div>
-<body>
+</body>
 </html>

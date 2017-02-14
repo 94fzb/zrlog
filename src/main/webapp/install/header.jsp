@@ -32,7 +32,7 @@
 		<div class="x_content">
 			<div class="alert alert-danger"
 				<c:if test="${empty errorMsg }">style="display: none;"</c:if>>
-				<b>${errorMsg}</b>
+				<b><i class="fa fa-info-circle"></i> ${errorMsg}</b>
 			</div>
 			<c:if test="${currentViewName ne 'forbidden'}">
 			<div class="col-xs-12">

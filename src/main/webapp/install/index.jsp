@@ -1,5 +1,14 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <jsp:include page="header.jsp" />
+    <div class="row red">
+	<div class="col-md-12">
+        <h3><i class="fa fa-info"></i> ${_res.installPrompt}</h3>
+        <ul>
+            <li><h4>${_res.installWarn1}</h4></li>
+            <li><h4>${_res.installWarn2}</h4></li>
+        </ul>
+    </div>
+    </div>
 	<div id="step1">
 		<div class="main">
 			<form method="post" action="${basePath}install/testDbConn " id="validation-form"
@@ -7,7 +16,7 @@
 				<div class="center">
 					<h3 class="green">${_res.installInputDbInfo}</h3>
 				</div>
-				<hr>
+				<div class="space-8"></div>
 				<div class="form-group">
 					<label class="control-label col-xs-12 col-sm-3 no-padding-right">${_res.installDbHost}:</label>
 
@@ -83,7 +92,7 @@
 					<div class="col-xs-12 col-sm-10">
 						<div class="row-fluid wizard-actions">
 							<button data-last="Finish " class="btn btn-success btn-next">
-								${_res.installNextStep} <i class="fa fa-arrow-right fa fa-on-right"></i>
+								${_res.installNextStep}<i class="fa fa-arrow-right"></i>
 							</button>
 						</div>
 					</div>
