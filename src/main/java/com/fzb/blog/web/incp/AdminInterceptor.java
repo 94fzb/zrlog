@@ -44,45 +44,51 @@ class AdminInterceptor implements Interceptor {
      * @param ai
      */
     private void adminPermission(Invocation ai) {
-        Controller controller = ai.getController();
-        int userId = adminTokenService.getUserId(controller.getRequest());
-        if (userId > 0) {
-            try {
-                User user = User.dao.findById(userId);
-                controller.setAttr("user", user);
-                TemplateHelper.fullTemplateInfo(controller);
-                if (!ai.getActionKey().equals("/admin/logout")) {
-                    adminTokenService.setAdminToken(userId, controller.getRequest(), controller.getResponse());
+        try {
+            Controller controller = ai.getController();
+            int userId = adminTokenService.getUserId(controller.getRequest());
+            if (userId > 0) {
+                try {
+                    User user = User.dao.findById(userId);
+                    controller.setAttr("user", user);
+                    TemplateHelper.fullTemplateInfo(controller);
+                    if (!ai.getActionKey().equals("/admin/logout")) {
+                        adminTokenService.setAdminToken(userId, controller.getRequest(), controller.getResponse());
+                    }
+                    ai.invoke();
+                    if (!tryDoRender(ai, controller)) {
+                        // 存在消息提示
+                        if (controller.getRequest().getAttribute("message") != null) {
+                            controller.render("/admin/message.jsp");
+                        }
+                    }
+                } catch (Exception e) {
+                    LOGGER.error("", e);
+                    exceptionHandler(ai, e);
                 }
+            } else if (ai.getActionKey().equals("/admin/login") || ai.getActionKey().equals("/api/admin/login")) {
                 ai.invoke();
-                if (!tryDoRender(ai, controller)) {
-                    // 存在消息提示
-                    if (controller.getRequest().getAttribute("message") != null) {
-                        controller.render("/admin/message.jsp");
-                    }
-                }
-            } catch (Exception e) {
-                LOGGER.error("", e);
-                if (ai.getActionKey().startsWith("/api")) {
-                    ExceptionResponse exceptionResponse = new ExceptionResponse();
-                    exceptionResponse.setError(1);
-                    if (JFinal.me().getConstants().getDevMode()) {
-                        exceptionResponse.setMessage(ExceptionUtils.recordStackTraceMsg(e));
-                    }
-                    ai.getController().renderJson(exceptionResponse);
-                } else {
-                    if (JFinal.me().getConstants().getViewType() == ViewType.JSP) {
-                        controller.render(Constants.ADMIN_ERROR_PAGE + ".jsp");
-                    }
-                }
-            } finally {
-                AdminTokenThreadLocal.remove();
+                tryDoRender(ai, controller);
+            } else {
+                blockUnLoginRequestHandler(ai);
             }
-        } else if (ai.getActionKey().equals("/admin/login") || ai.getActionKey().equals("/api/admin/login")) {
-            ai.invoke();
-            tryDoRender(ai, controller);
+        } finally {
+            AdminTokenThreadLocal.remove();
+        }
+    }
+
+    private void exceptionHandler(Invocation ai, Exception e) {
+        if (ai.getActionKey().startsWith("/api")) {
+            ExceptionResponse exceptionResponse = new ExceptionResponse();
+            exceptionResponse.setError(1);
+            if (JFinal.me().getConstants().getDevMode()) {
+                exceptionResponse.setMessage(ExceptionUtils.recordStackTraceMsg(e));
+            }
+            ai.getController().renderJson(exceptionResponse);
         } else {
-            blockUnLoginRequestHandler(ai);
+            if (JFinal.me().getConstants().getViewType() == ViewType.JSP) {
+                ai.getController().render(Constants.ADMIN_ERROR_PAGE + ".jsp");
+            }
         }
     }
 
