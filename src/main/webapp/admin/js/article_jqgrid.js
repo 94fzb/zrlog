@@ -19,9 +19,8 @@ jQuery(function($) {
 
     url:'api/admin/article?keywords='+keywords,
     datatype: "json",
-        colNames:['编辑','删除','ID','标题','关键词', '作者', '分类','发布时间','查看数','草稿','私有','浏览'],
+        colNames:['删除','ID','标题','关键词', '作者', '分类','发布时间','查看数','草稿','私有','编辑','浏览'],
         colModel:[
-            {name:'id',width:50,index:'id',sortable:false,formatter:imageFormat},
             {name:'delete',width:50,index:'id', sortable:false,
                  formatter: 'actions',
                   formatoptions: {
@@ -41,6 +40,7 @@ jQuery(function($) {
             {name:'click',index:'click', width:50, editable: false},
             {name:'rubbish',index:'rubbish', width:50, editable: false,formatter:renderRubbish},
             {name:'_private',index:'_private', width:50, editable: false,formatter:renderPrivate},
+            {name:'id',width:50,index:'id',sortable:false,formatter:editFormat},
             {name:'id',width:50,index:'id',sortable:false,formatter:viewLog},
         ],
         viewrecords : true,
@@ -94,8 +94,8 @@ jQuery(function($) {
 
     //enable search/filter toolbar
     //jQuery(grid_selector).jqGrid('filterToolbar',{defaultSearch:true,stringResult:true})
-    function imageFormat( cellvalue, options, rowObject ){
-        return '<div><div id="jEditButton_2" class="ui-pg-div ui-inline-edit" onmouseout="jQuery(this).removeClass(\'ui-state-hover\')" onmouseover="jQuery(this).addClass(\'ui-state-hover\');" onclick="openEditModal('+rowObject.id+',\''+rowObject.catalog+'\',\''+rowObject.title.replace("'","")+'\');" style="float: left; cursor: pointer; display: block;" title="" data-original-title="编辑所选记录"><span class="ui-icon ui-icon-pencil"></span></div></div>'
+    function editFormat( cellvalue, options, rowObject ){
+        return '<a href="admin/article/edit?id='+rowObject.id+'"><div id="jEditButton_2" class="ui-pg-div ui-inline-edit" onmouseout="jQuery(this).removeClass(\'ui-state-hover\')" onmouseover="jQuery(this).addClass(\'ui-state-hover\');" style="float: left; cursor: pointer; display: block;" title="" data-original-title="编辑所选记录"><span class="ui-icon ui-icon-pencil"></span></div></a>'
     }
     function viewLog( cellvalue, options, rowObject ){
         return '<a target="_blank" href="admin/article/preview?id='+rowObject.id+'"><div id="jEditButton_2" class="ui-pg-div ui-inline-edit" onmouseout="jQuery(this).removeClass(\'ui-state-hover\')" onmouseover="jQuery(this).addClass(\'ui-state-hover\');" style="float: left; cursor: pointer; display: block;" title="" data-original-title="浏览  '+rowObject.title+'"><span class="ui-icon icon-zoom-in blue"></span></div></a>'

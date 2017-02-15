@@ -21,8 +21,8 @@
                         <span class="menu-text"> ${_res.dashboard} </span>
                     </a>
                 </li>
-                <li>
-                    <a href="admin/edit">
+                <li <c:if test='${currentPage=="admin/edit"}'>class="current-page"</c:if>>
+                    <a href="admin/article/edit<c:if test='${not empty pageContext.request.queryString}'>?${pageContext.request.queryString}</c:if>">
                         <i class="fa fa-edit"></i>
                         <span class="menu-text">${_res['admin.log.edit']} </span>
                     </a>

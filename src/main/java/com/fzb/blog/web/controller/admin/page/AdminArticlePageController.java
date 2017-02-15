@@ -22,8 +22,13 @@ public class AdminArticlePageController extends BaseController {
     }
 
     public String edit() {
-        Integer logId = Integer.parseInt(getPara("id"));
-        setAttr("log", Log.dao.adminQueryLogByLogId(logId).getAttrs());
-        return "/admin/article_edit_frame";
+        if (getPara("id") != null) {
+            Integer logId = Integer.parseInt(getPara("id"));
+            Log log = Log.dao.adminQueryLogByLogId(logId);
+            if (log != null) {
+                setAttr("log", log.getAttrs());
+            }
+        }
+        return "/admin/edit";
     }
 }
