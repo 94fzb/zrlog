@@ -98,7 +98,7 @@ jQuery(function($) {
         return '<a href="admin/article/edit?id='+rowObject.id+'"><div id="jEditButton_2" class="ui-pg-div ui-inline-edit" onmouseout="jQuery(this).removeClass(\'ui-state-hover\')" onmouseover="jQuery(this).addClass(\'ui-state-hover\');" style="float: left; cursor: pointer; display: block;" title="" data-original-title="编辑所选记录"><span class="ui-icon ui-icon-pencil"></span></div></a>'
     }
     function viewLog( cellvalue, options, rowObject ){
-        return '<a target="_blank" href="admin/article/preview?id='+rowObject.id+'"><div id="jEditButton_2" class="ui-pg-div ui-inline-edit" onmouseout="jQuery(this).removeClass(\'ui-state-hover\')" onmouseover="jQuery(this).addClass(\'ui-state-hover\');" style="float: left; cursor: pointer; display: block;" title="" data-original-title="浏览  '+rowObject.title+'"><span class="ui-icon icon-zoom-in blue"></span></div></a>'
+        return '<a target="_blank" href="admin/article/preview?id='+rowObject.id+'"><div id="jEditButton_2" class="ui-pg-div ui-inline-edit" onmouseout="jQuery(this).removeClass(\'ui-state-hover\')" onmouseover="jQuery(this).addClass(\'ui-state-hover\');" style="float: left; cursor: pointer; display: block;" title="" data-original-title="浏览  '+rowObject.title+'"><span class="ui-icon icon-zoom-in grey"></span></div></a>'
     }
     function renderPrivate( cellvalue, options, rowObject ){
         if(rowObject['_private']){

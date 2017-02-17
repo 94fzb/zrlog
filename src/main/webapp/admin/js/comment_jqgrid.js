@@ -17,10 +17,10 @@ $(function($) {
             },
             {name:'userComment',index:'userComment', width:150, editable: true},
             {name:'userName',index:'userName', width:70, editable: true},
-            {name:'userHome',index:'userHome',width:150, sortable:false,editable: true,edittype:"textarea", editoptions:{rows:"2",cols:"20"}},
-            {name:'userIp',index:'userIp', width:150,editable: true,editoptions:{size:"20",maxlength:"30"}},
-            {name:'userMail',index:'userMail', width:70, editable: true},
-            {name:'commTime',index:'commTime', width:70,editable: true,editoptions:{size:"20",maxlength:"30"}},
+            {name:'userHome',index:'userHome',width:150, sortable:false,editable: false,edittype:"textarea",formatter:'link', editoptions:{rows:"2",cols:"20"}},
+            {name:'userIp',index:'userIp', width:150,editable: false,editoptions:{size:"20",maxlength:"30"}},
+            {name:'userMail',index:'userMail', width:70, editable: false},
+            {name:'commTime',index:'commTime', width:70,editable: false,editoptions:{size:"20",maxlength:"30"}},
             {name:'logId',index:'logId', width:30, editable: false,formatter:viewLog},
 
         ],
@@ -72,7 +72,7 @@ $(function($) {
     $(window).bind('resize', function(){resizeJqGrid()}).trigger('resize');
 
     function viewLog( cellvalue, options, rowObject ){
-        return '<a target="_blank" href="post/'+rowObject.logId+'"><div id="jEditButton_2" class="ui-pg-div ui-inline-edit" onmouseout="jQuery(this).removeClass(\'ui-state-hover\')" onmouseover="jQuery(this).addClass(\'ui-state-hover\');" style="float: left; cursor: pointer; display: block;" title="" data-original-title="浏览"><span class="icon-zoom-in blue"></span></div></a>'
+        return '<a target="_blank" href="post/'+rowObject.logId+'"><div id="jEditButton_2" class="ui-pg-div ui-inline-edit" onmouseout="jQuery(this).removeClass(\'ui-state-hover\')" onmouseover="jQuery(this).addClass(\'ui-state-hover\');" style="float: left; cursor: pointer; display: block;" title="" data-original-title="浏览"><span class="icon-zoom-in grey"></span></div></a>'
     }
     //navButtons
     jQuery(grid_selector).jqGrid('navGrid',pager_selector,

@@ -18,9 +18,13 @@ request.setAttribute("url", scheme+"://"+request.getHeader("host")+request.getCo
     padding-bottom: 30px;
     position: relative;
 }
+.form-control {
+height: 38px;
+}
 
 </style>
 <script src="admin/markdown/js/editormd.min.js"></script>
+<script src="assets/js/select2/select2.min.js"></script>
 <script src="admin/js/article_editor.js"></script>
 <div class="row">
 <div class="col-md-1" style="float:right">
@@ -41,7 +45,7 @@ request.setAttribute("url", scheme+"://"+request.getHeader("host")+request.getCo
 	<input  name="title" id="title" size="60" maxlength="60"  value="${log.title}" class="form-control" type="text" placeholder="请输入文章标题"></input>
 	</div>
 	<div class="col-xs-2">
-	<select name="typeId" class="form-control">
+	<select name="typeId" class="form-control select2_single">
 	  <c:forEach items="${init.types}" var="type">
 		<option <c:if test="${type.id eq log.typeId}">selected="selected"</c:if> value="${type.id}">${type.typeName}</option>
 	  </c:forEach>

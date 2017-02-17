@@ -15,7 +15,7 @@ jQuery(function($) {
                 }
             },
             {name:'id',index:'id', width:60, sorttype:"int", editable: false},
-            {name:'url',index:'url',width:150, sortable:false,editable: true,edittype:"textarea", editoptions:{rows:"2",cols:"20"}},
+            {name:'url',index:'url',width:150, sortable:false,editable: true,edittype:"textarea",formatter:'link', editoptions:{rows:"2",cols:"20"}},
             {name:'navName',index:'navName', width:150,editable: true,editoptions:{size:"20",maxlength:"30"}},
             {name:'sort',index:'sort', width:70, editable: true},
 

@@ -2,6 +2,10 @@ var change=0;
 var uploadUrl='api/admin/upload/';
 var mdEditor;
 $(function(){
+    $(".select2_single").select2({
+      minimumResultsForSearch: -1,
+      allowClear: true
+    });
 	var checkedSkin = $("body").get(0).getAttribute("class");
 	var dark = (checkedSkin == 'skin-1');
 	mdEditor = editormd("editormd", {

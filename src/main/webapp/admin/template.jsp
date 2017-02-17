@@ -71,8 +71,9 @@
 <hr/>
 <div class="row">
 <div class="col-md-2">
-<a href="admin/template_center"><button class="btn btn-info"><i class="fa fa-cloud-download"></i>${_res['admin.theme.download']}</button></a>
+<a href="admin/template_center"><button class="btn btn-dark btn-round"><i class="fa fa-cloud-download"></i>${_res['admin.theme.download']}</button></a>
 </div>
 </div>
+<br/>
 </div><!-- /row -->
 <jsp:include page="include/footer.jsp"/>
