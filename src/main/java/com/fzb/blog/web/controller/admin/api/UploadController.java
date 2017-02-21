@@ -44,7 +44,7 @@ public class UploadController extends BaseController {
         map.put("name", new String[]{"uploadService"});
         String url;
         try {
-            List<Map> urls = HttpUtil.sendGetRequest(ZrlogUtil.getPluginServer() + "/service", map
+            List<Map> urls = HttpUtil.getInstance().sendGetRequest(ZrlogUtil.getPluginServer() + "/service", map
                     , new HttpJsonArrayHandle<Map>(), ZrlogUtil.genHeaderMapByRequest(getRequest())).getT();
             if (urls != null && !urls.isEmpty()) {
                 url = (String) urls.get(0).get("url");

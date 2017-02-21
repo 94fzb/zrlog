@@ -44,7 +44,7 @@ public class ZrlogConfig extends JFinalConfig {
 
     private static final Logger LOGGER = Logger.getLogger(ZrlogConfig.class);
     //插件服务的下载地址
-    private static final String PLUGIN_CORE_DOWNLOAD_URL = com.fzb.blog.common.Constants.ZRLOG_RESOURCE_DOWNLOAD_URL + "/release/plugin/plugin-core.jar";
+    private static final String PLUGIN_CORE_DOWNLOAD_URL = com.fzb.blog.common.Constants.ZRLOG_RESOURCE_DOWNLOAD_URL + "/plugin/core/plugin-core.jar";
     //存放Zrlog的一些系统参数
     private Properties systemProperties = new Properties();
     private Properties dbProperties = new Properties();
@@ -92,7 +92,7 @@ public class ZrlogConfig extends JFinalConfig {
                     String filePath = pluginCoreFile.getParentFile().toString();
                     try {
                         LOGGER.info("plugin-core.jar not exists will download from " + PLUGIN_CORE_DOWNLOAD_URL);
-                        HttpUtil.sendGetRequest(PLUGIN_CORE_DOWNLOAD_URL + "?_=" + System.currentTimeMillis(), new HashMap<String, String[]>(), new HttpFileHandle(filePath), new HashMap<String, String>());
+                        HttpUtil.getInstance().sendGetRequest(PLUGIN_CORE_DOWNLOAD_URL + "?_=" + System.currentTimeMillis(), new HashMap<String, String[]>(), new HttpFileHandle(filePath), new HashMap<String, String>());
                     } catch (IOException e) {
                         LOGGER.warn("download plugin core error", e);
                     }

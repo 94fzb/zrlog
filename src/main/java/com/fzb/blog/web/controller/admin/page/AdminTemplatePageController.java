@@ -117,7 +117,7 @@ public class AdminTemplatePageController extends BaseController {
             File path = new File(PathKit.getWebRootPath() + Constants.TEMPLATE_BASE_PATH + templatePath + "/");
 
             if (!path.exists()) {
-                HttpFileHandle fileHandle = (HttpFileHandle) HttpUtil.sendGetRequest(getPara("host") + "/template/download?id=" + getParaToInt("id"),
+                HttpFileHandle fileHandle = (HttpFileHandle) HttpUtil.getInstance().sendGetRequest(getPara("host") + "/template/download?id=" + getParaToInt("id"),
                         new HttpFileHandle(PathKit.getWebRootPath() + Constants.TEMPLATE_BASE_PATH), new HashMap<String, String>());
                 String target = fileHandle.getT().getParent() + "/" + fileName;
                 IOUtil.moveOrCopyFile(fileHandle.getT().toString(), target, true);

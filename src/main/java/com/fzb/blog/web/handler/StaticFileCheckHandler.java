@@ -93,7 +93,7 @@ public class StaticFileCheckHandler extends Handler {
             file.getParentFile().mkdirs();
         }
         try {
-            CloseableHttpResponse closeableHttpResponse = HttpUtil.sendGetRequest(sSourceUrl, new CloseResponseHandle(), new HashMap<String, String>()).getT();
+            CloseableHttpResponse closeableHttpResponse = HttpUtil.getInstance().sendGetRequest(sSourceUrl, new CloseResponseHandle(), new HashMap<String, String>()).getT();
             if (closeableHttpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 String str = IOUtil.getStringInputStream(closeableHttpResponse.getEntity().getContent());
                 if (str != null) {

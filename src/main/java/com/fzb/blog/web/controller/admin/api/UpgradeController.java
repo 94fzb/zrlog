@@ -63,7 +63,7 @@ public class UpgradeController extends BaseController {
             file.getParentFile().mkdir();
             handle = new DownloadProcessHandle(file);
             try {
-                HttpUtil.sendGetRequest(lastVersion().getVersion().getDownloadUrl(), handle, new HashMap<String, String>());
+                HttpUtil.getInstance().sendGetRequest(lastVersion().getVersion().getDownloadUrl(), handle, new HashMap<String, String>());
             } catch (IOException e) {
                 e.printStackTrace();
             }
