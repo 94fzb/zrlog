@@ -74,7 +74,6 @@ public class AdminTokenService {
     public Long getSessionTimeout() {
         String sessionTimeoutString = WebSite.dao.getValueByName(Constants.SESSION_TIMEOUT_KEY);
         Long sessionTimeout;
-        System.out.println(sessionTimeoutString);
         if (!StringUtils.isEmpty(sessionTimeoutString)) {
             //*60， Cookie过期时间单位为分钟
             sessionTimeout = Long.valueOf(sessionTimeoutString) * 60 * 1000;

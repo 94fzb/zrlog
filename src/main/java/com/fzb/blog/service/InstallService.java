@@ -2,7 +2,6 @@ package com.fzb.blog.service;
 
 import com.fzb.blog.common.Constants;
 import com.fzb.blog.util.ZrlogUtil;
-import com.fzb.blog.web.plugin.type.AutoUpgradeVersionType;
 import com.fzb.common.util.IOUtil;
 import com.fzb.common.util.Md5Util;
 import com.jfinal.kit.PathKit;
@@ -54,7 +53,7 @@ public class InstallService {
         Map<String, Object> map = new LinkedHashMap<String, Object>();
         map.put("rows", 10);
         map.put("template", Constants.DEFAULT_TEMPLATE_PATH);
-        map.put(Constants.AUTO_UPGRADE_VERSION_KEY, AutoUpgradeVersionType.ONE_DAY.getCycle());
+        map.put(Constants.AUTO_UPGRADE_VERSION_KEY, Constants.DEFAULT_AUTO_UPGRADE_VERSION_TYPE.getCycle());
         map.put("pseudo_staticStatus", false);
         map.put("title", webSite.get("title"));
         map.put("second_title", webSite.get("second_title"));
@@ -155,7 +154,7 @@ public class InstallService {
             PreparedStatement ps = connect.prepareStatement(insertWebSql);
             ps.executeUpdate();
             String insertUserSql = "INSERT INTO `user`( `userId`,`userName`, `password`, `email`,`secretKey`) VALUES (1,?,?,?,?)";
-            ps  = connect.prepareStatement(insertUserSql);
+            ps = connect.prepareStatement(insertUserSql);
             ps.setString(1, blogMsg.get("username"));
             ps.setString(2, Md5Util.MD5(blogMsg.get("password")));
             ps.setString(3, configMsg.get("email"));

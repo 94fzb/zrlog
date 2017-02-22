@@ -3,6 +3,7 @@ package com.fzb.blog.web.plugin;
 import com.fzb.blog.model.WebSite;
 import com.fzb.blog.web.plugin.type.AutoUpgradeVersionType;
 import com.jfinal.plugin.IPlugin;
+import org.apache.log4j.Logger;
 
 import java.util.Date;
 import java.util.Timer;
@@ -14,13 +15,15 @@ import static com.fzb.blog.common.Constants.AUTO_UPGRADE_VERSION_KEY;
  */
 public class UpdateVersionPlugin implements IPlugin {
 
+    private static final Logger LOGGER = Logger.getLogger(UpdateVersionPlugin.class);
+
     private Timer timer;
-    private Version lastVersion;
+    private UpdateVersionTimerTask updateVersionTimerTask;
 
     @Override
     public boolean start() {
-        final String value = WebSite.dao.getValueByName(AUTO_UPGRADE_VERSION_KEY);
-        final boolean checkPreview = "on".equals(WebSite.dao.getValueByName("upgradeCanPreview"));
+        String value = WebSite.dao.getValueByName(AUTO_UPGRADE_VERSION_KEY);
+        boolean checkPreview = "on".equals(WebSite.dao.getValueByName("upgradeCanPreview"));
         if (value != null && !"".equals(value)) {
             AutoUpgradeVersionType autoUpgradeVersionType = AutoUpgradeVersionType.cycle(Integer.parseInt(value));
             if (timer != null) {
@@ -29,10 +32,10 @@ public class UpdateVersionPlugin implements IPlugin {
             //开启了定时检查，定时器开始工作
             if (autoUpgradeVersionType != AutoUpgradeVersionType.NEVER) {
                 timer = new Timer();
-                UpdateVersionTimerTask timerTask = new UpdateVersionTimerTask(checkPreview);
-                timer.schedule(timerTask, new Date(), autoUpgradeVersionType.getCycle() * 1000);
-                lastVersion = timerTask.getVersion();
+                updateVersionTimerTask = new UpdateVersionTimerTask(checkPreview);
+                timer.schedule(updateVersionTimerTask, new Date(), autoUpgradeVersionType.getCycle() * 1000);
             }
+            LOGGER.info("UpdateVersionPlugin start autoUpgradeVersionType " + autoUpgradeVersionType);
         }
         return true;
     }
@@ -52,12 +55,17 @@ public class UpdateVersionPlugin implements IPlugin {
      * @return
      */
     public Version getLastVersion(boolean fetch) {
-        if (fetch) {
-            final boolean checkPreview = "on".equals(WebSite.dao.getValueByName("upgradeCanPreview"));
-            UpdateVersionTimerTask timerTask = new UpdateVersionTimerTask(checkPreview);
-            timerTask.run();
-            lastVersion = timerTask.getVersion();
+        boolean checkPreview = "on".equals(WebSite.dao.getValueByName("upgradeCanPreview"));
+        if (updateVersionTimerTask == null) {
+            updateVersionTimerTask = new UpdateVersionTimerTask(checkPreview);
         }
-        return lastVersion;
+        if (fetch) {
+            try {
+                return updateVersionTimerTask.fetchLastVersion(checkPreview);
+            } catch (Exception e) {
+                LOGGER.error(e);
+            }
+        }
+        return updateVersionTimerTask.getVersion();
     }
 }
