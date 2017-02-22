@@ -35,7 +35,7 @@ public class TemplateHelper {
 
         BaseDataInitVO baseDataInitVO = cloneObject(request.getAttribute("init"));
         request.setAttribute("init", baseDataInitVO);
-        Map webSite = (Map) baseDataInitVO.getWebSite();
+        Map webSite = baseDataInitVO.getWebSite();
         String baseUrl = setBaseUrl(request, staticBlog, webSite);
         request.setAttribute("webs", webSite);
         request.setAttribute("searchUrl", baseUrl + "post/search");

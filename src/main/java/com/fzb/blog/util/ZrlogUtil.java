@@ -44,9 +44,13 @@ public class ZrlogUtil {
         }
         map.put("IsLogin", (adminToken != null) + "");
         map.put("Blog-Version", ((Map) JFinal.me().getServletContext().getAttribute("zrlog")).get("version").toString());
-        map.put("Full-Url", request.getRequestURL().toString());
+        String fullUrl = WebTools.getRealScheme(request) + "://" + request.getHeader("Host") + request.getContextPath() + request.getRequestURI();
+        if (request.getQueryString() != null) {
+            fullUrl = fullUrl + "?" + request.getQueryString();
+        }
+        map.put("Full-Url", fullUrl);
         map.put("Cookie", request.getHeader("Cookie"));
-        map.put("AccessUrl", WebTools.getRealScheme(request) + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath());
+        map.put("AccessUrl", WebTools.getRealScheme(request) + "://" + request.getHeader("Host") + request.getContextPath());
         if (request.getHeader("Content-Type") != null) {
             map.put("Content-Type", request.getHeader("Content-Type"));
         }
