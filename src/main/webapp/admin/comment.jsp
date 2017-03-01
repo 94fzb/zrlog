@@ -7,15 +7,13 @@
 <script src="admin/js/comment_jqgrid.js"></script>
 <div class="page-header">
 	<h3>
-		评论管理
+		${_res['admin.comment.manage']}
 	</h3>
 </div><!-- /.page-header -->
 <div class="row">
 	<div class="col-xs-12">
-		<!-- PAGE CONTENT BEGINS -->
 		<table id="grid-table"></table>
 		<div id="grid-pager"></div>
-		<!-- PAGE CONTENT ENDS -->
-	</div><!-- /.col -->
+	</div>
 </div>
 <jsp:include page="include/footer.jsp"/>

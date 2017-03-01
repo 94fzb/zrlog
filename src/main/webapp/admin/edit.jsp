@@ -8,7 +8,7 @@
 <jsp:include page="include/menu.jsp"/>
 <div class="page-header">
 	<h3>
-		文章撰写
+		${_res['admin.log.edit']}
 	</h3>
 </div>
 

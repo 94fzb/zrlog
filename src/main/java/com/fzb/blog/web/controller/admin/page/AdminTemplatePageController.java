@@ -77,6 +77,7 @@ public class AdminTemplatePageController extends BaseController {
         }
 
         setAttr("templates", templates);
+        setAttr("previewTemplate", getTemplatePathByCookie());
         return "/admin/template";
     }
 

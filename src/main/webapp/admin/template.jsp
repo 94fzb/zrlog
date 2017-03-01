@@ -16,14 +16,14 @@
 </style>
 <div class="page-header">
 	<h3>
-	${_res['admin.theme.manage']}
+	${_res['admin.template.manage']}
 	</h3>
 </div>
 <div class="row">
 <div>
 	<div class="col-sm-9"></div>
         <div class="form-group col-sm-3">
-	    <input type="file" class="fileUpload" class="form-control" name="file" value="上传" />
+	    <input type="file" class="fileUpload" class="form-control" name="file" value="" />
 	    <br/>
 </div>
 <div>
@@ -39,6 +39,15 @@
                  </div>
                </div>
             </c:when>
+            <c:otherwise>
+                <c:if test="${template.template eq previewTemplate}">
+                   <div class="ui-ribbon-wrapper">
+                    <div class="ui-ribbon">
+                      ${_res['admin.theme.inPreview']}
+                    </div>
+                  </div>
+               </c:if>
+            </c:otherwise>
            </c:choose>
            <div class="x_title">
              <h2>${template.name }</h2>
@@ -54,7 +63,7 @@
              <div class="tools tools-bottom text-center" style="font-size: 14px;">
                 <!--<a href="${template.url }" target="_blank" title="${template.author }">${_res['admin.theme.user']}:<i class="fa fa-user"></i></a>-->
                 <a href="admin/blank?menu=1&include=file_editor&path=${template.template}&editType=template"><i class="fa fa-pencil"></i></a>
-                <a target="_blank" href="admin/template/preview?template=${template.template}&resultType=html"><i class="fa fa-eye"></i></a>
+                <a target="_blank" href="admin/template/preview?template=${template.template}"><i class="fa fa-eye"></i></a>
                 <a href="admin/template/config?template=${template.template}"><i class="fa fa-cog"></i></a>
                 <a class="apply-btn" href="#" template="${template.template}"><i class="fa fa-check"></i></a>
               </div>
@@ -71,7 +80,7 @@
 <hr/>
 <div class="row">
 <div class="col-md-2">
-<a href="admin/template_center"><button class="btn btn-dark btn-round"><i class="fa fa-cloud-download"></i>${_res['admin.theme.download']}</button></a>
+<a href="admin/template_center"><button class="btn btn-dark btn-round"><i class="fa fa-cloud-download"></i>&nbsp;${_res['admin.theme.download']}</button></a>
 </div>
 </div>
 <br/>

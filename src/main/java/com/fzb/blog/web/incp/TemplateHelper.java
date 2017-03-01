@@ -12,7 +12,6 @@ import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
 import org.apache.log4j.Logger;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.util.ArrayList;
@@ -118,18 +117,6 @@ public class TemplateHelper {
         if (controller instanceof BaseController) {
             BaseController baseController = ((BaseController) controller);
             String basePath = baseController.getTemplatePath();
-            Cookie[] cookies = controller.getRequest().getCookies();
-            if (cookies != null && cookies.length > 0) {
-                for (Cookie cookie : cookies) {
-                    if (cookie.getName().equals("template") && cookie.getValue().startsWith(Constants.TEMPLATE_BASE_PATH)) {
-                        basePath = cookie.getValue();
-                        break;
-                    }
-                }
-            }
-            if (!new File(PathKit.getWebRootPath() + basePath).exists()) {
-                basePath = Constants.DEFAULT_TEMPLATE_PATH;
-            }
             controller.getRequest().setAttribute("template", basePath);
             I18NUtil.addToRequest(PathKit.getWebRootPath() + basePath + "/language/", controller.getRequest());
             baseController.fullTemplateSetting();

@@ -87,6 +87,17 @@ public class I18NUtil {
             request.setAttribute(I18N_FILE_NAME, i18nFile);
         }
         Map<String, Object> i18nMap = I18N_RES_MAP.get(i18nFile);
+        if (request.getHeader("Accept-Language") != null) {
+            String tmpLocale = request.getHeader("Accept-Language").split(";")[0].replace("-", "_").split(",")[0];
+            if (!tmpLocale.startsWith("zh")) {
+                Map<String, Object> zhI18nMap = I18N_RES_MAP.get(Constants.I18N + "_" + "zh_CN");
+                for (Map.Entry<String, Object> entry : zhI18nMap.entrySet()) {
+                    if (!i18nMap.containsKey(entry.getKey())) {
+                        i18nMap.put(entry.getKey(), entry.getValue());
+                    }
+                }
+            }
+        }
         request.setAttribute("_res", i18nMap);
     }
 

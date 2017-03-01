@@ -17,7 +17,7 @@
 </script>
 
 <div class="page-header">
-	<h3>网站设置</h3>
+	<h3>${_res['admin.website.manage']}</h3>
 </div>
 <!-- /.page-header -->
 <div class="tabbable tabs-left">

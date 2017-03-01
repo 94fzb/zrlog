@@ -9,7 +9,7 @@
 
 <div class="page-header">
 	<h3>
-		导航管理
+		${_res['admin.type.manage']}
 	</h3>
 </div>
 <div class="row">

@@ -3,10 +3,13 @@ package com.fzb.blog.web.controller;
 import com.fzb.blog.common.Constants;
 import com.fzb.blog.common.request.PageableRequest;
 import com.jfinal.core.Controller;
+import com.jfinal.kit.PathKit;
 import flexjson.JSONDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.Cookie;
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.HashMap;
@@ -29,8 +32,35 @@ public class BaseController extends Controller {
         this.rows = Integer.parseInt(webSite.get("rows").toString());
     }
 
+    /**
+     * 获取主题的相对于程序的路径，当Cookie中有值的情况下，优先使用Cookie里面的数据（仅当主题存在的情况下，否则返回默认的主题），
+     *
+     * @return
+     */
     public String getTemplatePath() {
-        return this.templatePath == null ? Constants.DEFAULT_TEMPLATE_PATH : templatePath;
+        this.templatePath = this.templatePath == null ? Constants.DEFAULT_TEMPLATE_PATH : templatePath;
+        String previewTheme = getTemplatePathByCookie();
+        if (previewTheme != null) {
+            this.templatePath = previewTheme;
+        }
+        if (!new File(PathKit.getWebRootPath() + this.templatePath).exists()) {
+            templatePath = Constants.DEFAULT_TEMPLATE_PATH;
+        }
+        return templatePath;
+    }
+
+    protected String getTemplatePathByCookie() {
+        String previewTemplate = null;
+        Cookie[] cookies = getRequest().getCookies();
+        if (cookies != null && cookies.length > 0) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("template") && cookie.getValue().startsWith(Constants.TEMPLATE_BASE_PATH)) {
+                    previewTemplate = cookie.getValue();
+                    break;
+                }
+            }
+        }
+        return previewTemplate;
     }
 
     public Integer getDefaultRows() {

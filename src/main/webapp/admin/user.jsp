@@ -15,7 +15,7 @@
 </script>
 <div class="page-header">
 	<h3>
-	  个人信息设置
+	  ${_res['admin.user.info']}
 	</h3>
 </div>
 <!-- /.page-header -->

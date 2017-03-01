@@ -8,18 +8,13 @@
 <script src="admin/js/tag_jqgrid.js"></script>
 <div class="page-header">
 	<h3>
-		查看标签
+		${_res['admin.tag.manage']}
 	</h3>
 </div><!-- /.page-header -->
 <div class="row">
 	<div class="col-xs-12">
-		<!-- PAGE CONTENT BEGINS -->
-
 		<table id="grid-table"></table>
-
 		<div id="grid-pager"></div>
-
-		<!-- PAGE CONTENT ENDS -->
-	</div><!-- /.col -->
+	</div>
 </div>
 <jsp:include page="include/footer.jsp"/>

@@ -8,7 +8,7 @@
 <script src="admin/js/link_jqgrid.js"></script>
 <div class="page-header">
 	<h3>
-		链接管理
+		${_res['admin.link.manage']}
 	</h3>
 </div><!-- /.page-header -->
 <div class="row">
