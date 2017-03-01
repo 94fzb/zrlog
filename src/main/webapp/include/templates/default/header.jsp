@@ -2,8 +2,8 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%
   Map<String,Object> res = (Map<String,Object>)request.getAttribute("_res");
-  if(res.get("avatar")==null){
-    res.put("avatar",request.getAttribute("url")+"/images/avatar240_240.jpg");
+  if(res.get("avatar")==null || "".equals(res.get("avatar"))){
+    res.put("avatar",request.getAttribute("url")+"/images/avatar.gif");
   }
   if(res.get("title")==null){
     String host = request.getHeader("host");
