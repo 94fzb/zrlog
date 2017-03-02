@@ -37,7 +37,7 @@ jQuery(function($) {
                 enableTooltips(table);
             }, 0);
         },
-        caption: "分类管理",
+        caption: _res['admin.type.manage'],
         height:421,
 
         autowidth: true

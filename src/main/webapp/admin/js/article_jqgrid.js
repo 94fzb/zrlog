@@ -60,7 +60,7 @@ jQuery(function($) {
             }, 0);
         },
 
-        caption: "文章管理",
+        caption: _res.blogManage,
         height:421,
 
         autowidth: true

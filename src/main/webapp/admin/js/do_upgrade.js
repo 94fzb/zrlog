@@ -27,7 +27,10 @@ function upgrade(){
 $(function() {
     $('#wizard_verticle').smartWizard({
        onLeaveStep:leaveAStepCallback,
-       onFinish:onFinishCallback
+       onFinish:onFinishCallback,
+       labelPrevious:_res['labelPrevious'],
+       labelNext:_res['labelNext'],
+       labelFinish:_res['labelFinish']
     });
     function leaveAStepCallback(obj, context){
         if(context.fromStep == 1){

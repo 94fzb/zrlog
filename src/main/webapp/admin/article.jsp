@@ -19,8 +19,7 @@ catch(Exception e){
 </style>
 
 <script src="assets/js/jqGrid/jquery.jqGrid.min.js"></script>
-<script src="assets/js/jqGrid/i18n/grid.locale-cn.js"></script>
-<script type="text/javascript" src="assets/js/eModal.min.js"></script>
+<script src="assets/js/jqGrid/i18n/grid.locale-${lang}.js"></script>
 <script src="admin/js/article_jqgrid.js"></script>
 <div class="page-title">
 	<div class="title_left">

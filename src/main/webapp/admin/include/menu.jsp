@@ -234,7 +234,7 @@
             </li>
             <li role="presentation">
                 <a target="_blank" href="http://blog.zrlog.com/post/feedback" class="dropdown-toggle info-number">
-                <i class="fa fa-comments"></i>&nbsp;建议反馈
+                <i class="fa fa-comments"></i>&nbsp;${_res['suggestAndFeedback']}
              </a>
           </ul>
         </nav>

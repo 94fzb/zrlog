@@ -44,7 +44,7 @@ jQuery(function($) {
         },
 
         editurl:"api/admin/link/update",
-        caption: "友链管理",
+        caption:_res['admin.link.manage'],
         height:421,
 
         autowidth: true

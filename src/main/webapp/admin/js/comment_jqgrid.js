@@ -40,7 +40,7 @@ $(function($) {
                 enableTooltips(table);
             }, 0);
         },
-        caption: "评论管理",
+        caption: _res['admin.comment.manage'],
         height:421,
         autowidth: true
 

@@ -17,6 +17,7 @@ if(webSite.get("admin_dashboard_naver") == null){
     webSite.put("admin_dashboard_naver","nav-md");
 }
 request.setAttribute("webs",webSite);
+request.setAttribute("res",new flexjson.JSONSerializer().deepSerialize(request.getAttribute("_res")));
 %>
 <!DOCTYPE html>
 <html>
@@ -43,4 +44,8 @@ request.setAttribute("webs",webSite);
     <!-- jQuery -->
     <script src="${url}/assets/js/jquery.min.js"></script>
     <script src="${url}/admin/js/dashboard.js"></script>
+    <script>
+        var _res = ${res};
+    </script>
+
   </head>

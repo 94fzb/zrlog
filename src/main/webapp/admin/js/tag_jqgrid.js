@@ -33,7 +33,7 @@ jQuery(function($) {
         },
 
         editurl:"admin/type/oper",
-        caption: "标签",
+        caption: _res['admin.tag.manage'],
         height:421,
 
         autowidth: true
