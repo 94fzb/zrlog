@@ -4,6 +4,7 @@ import com.fzb.blog.common.Constants;
 import com.fzb.blog.model.User;
 import com.fzb.blog.model.WebSite;
 import com.fzb.blog.web.util.AESCryptoUtil;
+import com.jfinal.core.JFinal;
 import flexjson.JSONDeserializer;
 import flexjson.JSONSerializer;
 import org.apache.commons.codec.binary.Base64;
@@ -63,7 +64,7 @@ public class AdminTokenService {
 
             Cookie cookie = new Cookie(Constants.ADMIN_TOKEN, finalTokenString);
             cookie.setMaxAge((int) (sessionTimeout / 1000));
-            cookie.setDomain(getDomain(request));
+            setCookieDomain(request, cookie);
             cookie.setPath("/");
             response.addCookie(cookie);
         } catch (Exception e) {
@@ -93,5 +94,12 @@ public class AdminTokenService {
             host = host.substring(0, idx);
         }
         return host;
+    }
+
+    public void setCookieDomain(HttpServletRequest request, Cookie cookie) {
+        //一些IE遇到localhost的情况下无法正常存储cookie信息
+        if (!JFinal.me().getConstants().getDevMode()) {
+            cookie.setDomain(getDomain(request));
+        }
     }
 }

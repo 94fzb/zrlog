@@ -63,7 +63,7 @@ public class AdminPageController extends BaseController {
                 cookie.setValue("");
                 cookie.setMaxAge(adminTokenService.getSessionTimeout().intValue());
                 cookie.setPath("/");
-                cookie.setDomain(adminTokenService.getDomain(getRequest()));
+                adminTokenService.setCookieDomain(getRequest(), cookie);
                 getResponse().addCookie(cookie);
             }
         }
