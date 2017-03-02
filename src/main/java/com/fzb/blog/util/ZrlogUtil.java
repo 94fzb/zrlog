@@ -44,7 +44,7 @@ public class ZrlogUtil {
         }
         map.put("IsLogin", (adminToken != null) + "");
         map.put("Blog-Version", ((Map) JFinal.me().getServletContext().getAttribute("zrlog")).get("version").toString());
-        String fullUrl = WebTools.getRealScheme(request) + "://" + request.getHeader("Host") + request.getContextPath() + request.getRequestURI();
+        String fullUrl = WebTools.getRealScheme(request) + "://" + request.getHeader("Host") + request.getRequestURI();
         if (request.getQueryString() != null) {
             fullUrl = fullUrl + "?" + request.getQueryString();
         }
