@@ -36,10 +36,10 @@ public class IOUtil {
     }
 
     public static void getAllFiles(String path, List<File> files) {
-        getAllFilesByProfix(path, null, files);
+        getAllFilesBySuffix(path, null, files);
     }
 
-    public static void getAllFilesByProfix(String path, String suffix,
+    public static void getAllFilesBySuffix(String path, String suffix,
                                            List<File> files) {
         File file = new File(path);
         if (file.isDirectory()) {
@@ -47,7 +47,7 @@ public class IOUtil {
             if (fs != null) {
                 for (File file2 : fs) {
                     if (file2.isDirectory()) {
-                        getAllFilesByProfix(file2.getPath(), suffix, files);
+                        getAllFilesBySuffix(file2.getPath(), suffix, files);
                     } else {
                         if (suffix != null) {
                             if (file2.toString().endsWith(suffix)) {
@@ -59,7 +59,6 @@ public class IOUtil {
                     }
                 }
             }
-
         } else {
             if (suffix != null) {
                 if (file.toString().endsWith(suffix)) {
@@ -75,17 +74,19 @@ public class IOUtil {
         File f = new File(src);
         if (f.isDirectory()) {
             File fs[] = new File(src).listFiles();
-            target = target + "/" + f.getName();
+            target = target + File.separator + f.getName();
             new File(target).mkdirs();
-            for (File fl : fs) {
-                if (fl.isDirectory()) {
-                    moveOrCopy(fl.toString(), target, isMove);
-                } else {
-                    moveOrCopyFile(fl.toString(), target + "/" + fl.getName(), isMove);
+            if (fs != null) {
+                for (File fl : fs) {
+                    if (fl.isDirectory()) {
+                        moveOrCopy(fl.toString(), target, isMove);
+                    } else {
+                        moveOrCopyFile(fl.toString(), target + File.separator + fl.getName(), isMove);
+                    }
                 }
             }
         } else {
-            moveOrCopyFile(f.toString(), target + "/" + f.getName(), isMove);
+            moveOrCopyFile(f.toString(), target + File.separator + f.getName(), isMove);
         }
     }
 
@@ -104,28 +105,32 @@ public class IOUtil {
     }
 
     public static void moveOrCopyFile(String src, String target, boolean isMove) {
-        try {
-            File f = new File(src);
-            FileInputStream in = new FileInputStream(f);
-            new File(target).getParentFile().mkdirs();
-            FileOutputStream out = new FileOutputStream(target);
-            // 小于1M(大小根据自己的情况而定)的文件直接一次性写入。
-            byte[] b = new byte[1024];
-            int length = 0; // 出来cnt次后 文件 跳出循环
-            while ((length = in.read(b)) != -1) {
-                out.write(b, 0, length);
+        if (isMove) {
+            File dest = new File(target);
+            dest.getParentFile().mkdirs();
+            new File(src).renameTo(dest);
+        } else {
+            try {
+                File f = new File(src);
+                FileInputStream in = new FileInputStream(f);
+                new File(target).getParentFile().mkdirs();
+                FileOutputStream out = new FileOutputStream(target);
+                // 小于1M(大小根据自己的情况而定)的文件直接一次性写入。
+                byte[] b = new byte[1024];
+                int length = 0; // 出来cnt次后 文件 跳出循环
+                while ((length = in.read(b)) != -1) {
+                    out.write(b, 0, length);
+                }
+                // 一定要记得关闭流额。 不然其他程序那个文件无法进行操作
+                in.close();
+                out.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            // 一定要记得关闭流额。 不然其他程序那个文件无法进行操作
-            in.close();
-            out.close();
-            if (isMove) {
-                f.delete();
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+
     }
 
     public static boolean deleteFile(String file) {

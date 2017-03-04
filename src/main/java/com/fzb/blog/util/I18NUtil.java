@@ -5,6 +5,7 @@ import com.fzb.blog.web.incp.InitDataInterceptor;
 import com.jfinal.core.JFinal;
 import com.jfinal.i18n.Res;
 import com.jfinal.kit.PathKit;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,12 +62,12 @@ public class I18NUtil {
             }
         }
         String i18nFile;
+        String locale = "";
         if (request.getAttribute(I18N_FILE_NAME) != null) {
             i18nFile = request.getAttribute(I18N_FILE_NAME).toString();
         } else {
             Res res = (Res) request.getAttribute("_res");
             //try get locale info for HTTP header
-            String locale = null;
             if (request.getRequestURI().contains("/admin")) {
                 Map<String, Object> webSite = (Map<String, Object>) JFinal.me().getServletContext().getAttribute("webSite");
                 if (webSite != null && webSite.get("language") != null) {
@@ -89,9 +90,8 @@ public class I18NUtil {
             request.setAttribute(I18N_FILE_NAME, i18nFile);
         }
         Map<String, Object> i18nMap = I18N_RES_MAP.get(i18nFile);
-        if (request.getHeader("Accept-Language") != null) {
-            String tmpLocale = request.getHeader("Accept-Language").split(";")[0].replace("-", "_").split(",")[0];
-            if (!tmpLocale.startsWith("zh")) {
+        if (!StringUtils.isBlank(locale)) {
+            if (!locale.startsWith("zh")) {
                 Map<String, Object> zhI18nMap = I18N_RES_MAP.get(Constants.I18N + "_" + "zh_CN");
                 for (Map.Entry<String, Object> entry : zhI18nMap.entrySet()) {
                     if (!i18nMap.containsKey(entry.getKey())) {
