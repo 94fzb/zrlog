@@ -62,7 +62,7 @@ public class I18NUtil {
             }
         }
         String i18nFile;
-        String locale = "";
+        String locale = null;
         if (request.getAttribute(I18N_FILE_NAME) != null) {
             i18nFile = request.getAttribute(I18N_FILE_NAME).toString();
         } else {
