@@ -85,7 +85,9 @@ public class I18NUtil {
                 locale = res.getResourceBundle().getLocale().toString();
             }
             request.setAttribute("local", locale);
-            request.setAttribute("lang", locale.substring(0, locale.indexOf("_")));
+            if (locale.contains("_")) {
+                request.setAttribute("lang", locale.substring(0, locale.indexOf("_")));
+            }
             i18nFile = Constants.I18N + "_" + locale;
             request.setAttribute(I18N_FILE_NAME, i18nFile);
         }
