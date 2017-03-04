@@ -172,12 +172,14 @@ public class ZrlogConfig extends JFinalConfig {
      * 加载JFinal的插件，比如JFinal提供的C3P0Plugin，Zrlog自动检查更新，加载Zrlog提供的插件。
      */
     public void configPlugin(Plugins plugins) {
+        FileInputStream in = null;
         try {
             // 如果没有安装的情况下不初始化数据
             if (isInstalled()) {
                 String dbPropertiesFile = PathKit.getWebRootPath() + "/WEB-INF/db.properties";
                 try {
-                    dbProperties.load(new FileInputStream(dbPropertiesFile));
+                    in = new FileInputStream(dbPropertiesFile);
+                    dbProperties.load(in);
                 } catch (IOException e) {
                     LOGGER.error("load db.systemProperties error", e);
                 }
@@ -198,6 +200,14 @@ public class ZrlogConfig extends JFinalConfig {
             }
         } catch (Exception e) {
             LOGGER.warn("configPlugin exception ", e);
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    LOGGER.error("close stream error", e);
+                }
+            }
         }
         JFinal.me().getServletContext().setAttribute("plugins", plugins);
         this.plugins = plugins;

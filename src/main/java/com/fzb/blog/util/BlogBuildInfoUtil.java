@@ -1,5 +1,9 @@
 package com.fzb.blog.util;
 
+
+import com.fzb.blog.model.Log;
+import org.apache.log4j.Logger;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
@@ -12,6 +16,8 @@ import java.util.Properties;
  * 注 build.properties 为使用CI工具自动加入的，git代码仓库并没有该文件。
  */
 public class BlogBuildInfoUtil {
+
+    private static final Logger LOGGER = Logger.getLogger(BlogBuildInfoUtil.class);
 
     /*目前以git的commitId的前7位标记构建的Id*/
     private static String buildId;
@@ -41,6 +47,12 @@ public class BlogBuildInfoUtil {
                 e.printStackTrace();
             } catch (ParseException e) {
                 e.printStackTrace();
+            } finally {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    LOGGER.error("close stream error", e);
+                }
             }
         }
         if (buildId == null) {

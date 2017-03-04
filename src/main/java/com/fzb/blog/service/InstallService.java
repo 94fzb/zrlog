@@ -7,10 +7,7 @@ import com.fzb.common.util.Md5Util;
 import com.jfinal.kit.PathKit;
 import org.apache.log4j.Logger;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.sql.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -116,10 +113,11 @@ public class InstallService {
         if (file.exists()) {
             file.delete();
         }
+        FileOutputStream out = null;
         try {
+            out = new FileOutputStream(file);
             lock.createNewFile();
             file.createNewFile();
-            OutputStream out = new FileOutputStream(file);
             Properties prop = new Properties();
             prop.putAll(dbConn);
             prop.store(out, "This is a database configuration file");
@@ -194,6 +192,7 @@ public class InstallService {
             String insertTag = "INSERT INTO `tag`(`tagId`,`text`,`count`) VALUES (1,'记录',1)";
             ps = connect.prepareStatement(insertTag);
             ps.executeUpdate();
+            out.close();
             return true;
         } catch (Exception e) {
             LOGGER.error("install error ", e);
@@ -203,6 +202,13 @@ public class InstallService {
                 connect.close();
             } catch (SQLException e) {
                 LOGGER.error("install error ", e);
+            }
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    LOGGER.error("close stream error", e);
+                }
             }
         }
         return false;

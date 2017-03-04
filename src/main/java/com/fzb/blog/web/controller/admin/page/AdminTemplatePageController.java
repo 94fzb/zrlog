@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 
 public class AdminTemplatePageController extends BaseController {
@@ -38,8 +39,10 @@ public class AdminTemplatePageController extends BaseController {
                     File templateInfo = new File(file.toString() + "/template.properties");
                     if (templateInfo.exists()) {
                         Properties properties = new Properties();
+                        InputStream in = null;
                         try {
-                            properties.load(new FileInputStream(templateInfo));
+                            in = new FileInputStream(templateInfo);
+                            properties.load(in);
                             map.put("author", properties.get("author"));
                             map.put("name", properties.get("name"));
                             map.put("digest", properties.get("digest"));
@@ -57,6 +60,14 @@ public class AdminTemplatePageController extends BaseController {
                             }
                         } catch (IOException e) {
                             e.printStackTrace();
+                        } finally {
+                            try {
+                                if (in != null) {
+                                    in.close();
+                                }
+                            } catch (IOException e) {
+                                LOGGER.error("close stream error ", e);
+                            }
                         }
                     } else {
                         map.put("author", "");

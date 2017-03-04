@@ -41,13 +41,23 @@ public class I18NUtil {
                         I18N_RES_MAP.put(key, map);
                     }
                     Properties properties = new Properties();
+                    FileInputStream in = null;
                     try {
-                        properties.load(new FileInputStream(file));
+                        in = new FileInputStream(file);
+                        properties.load(in);
                         for (Map.Entry<Object, Object> entry : properties.entrySet()) {
                             map.put(entry.getKey().toString(), entry.getValue());
                         }
                     } catch (IOException e) {
                         LOGGER.error("load properties error", e);
+                    } finally {
+                        if (in != null) {
+                            try {
+                                in.close();
+                            } catch (IOException e) {
+                                LOGGER.error("close stream error", e);
+                            }
+                        }
                     }
                 }
             }

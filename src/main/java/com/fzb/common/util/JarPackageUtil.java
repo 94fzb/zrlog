@@ -42,7 +42,7 @@ public class JarPackageUtil {
             if (file.isFile()) {
                 String entryName = file.toString().substring(basePath.length()).replace("\\", "/");
                 jarEntry = new JarEntry(entryName);
-                LOGGER.info("Adding " + entryName);
+                LOGGER.debug("Adding " + entryName);
                 jarOutputStream.putNextEntry(jarEntry);
                 InputStream is = new BufferedInputStream(new FileInputStream(file));
                 while ((len = is.read(b, 0, b.length)) != -1) {

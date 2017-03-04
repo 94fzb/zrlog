@@ -1,9 +1,13 @@
 package com.fzb.common.util;
 
+import org.apache.log4j.Logger;
+
 import java.io.*;
 import java.util.List;
 
 public class IOUtil {
+
+    private static final Logger LOGGER = Logger.getLogger(IOUtil.class);
 
     public static byte[] getByteByInputStream(InputStream in) {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
@@ -124,10 +128,8 @@ public class IOUtil {
                 // 一定要记得关闭流额。 不然其他程序那个文件无法进行操作
                 in.close();
                 out.close();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error("copy file " + src + " to " + target + " error", e);
             }
         }
 
