@@ -2,26 +2,36 @@ var timer;
 var upgradeTimer;
 var downloadSuccess;
 var finish;
+var downloadRequestPending = false;
+var upgradeRequestPending = false;
 function status(){
-    $.get('api/admin/upgrade/download',function(data){
-        $("#progress").attr("data-percent",data.download+"%");
-        $("#progress2").width(data.process+"%");
-        if(data.process==100){
-            downloadSuccess  = true;
-            clearInterval(timer);
-            $("#processbar-title").text("更新包下载完成");
-        }
-    })
+    if(!downloadRequestPending){
+        downloadRequestPending = true;
+        $.get('api/admin/upgrade/download',function(data){
+            $("#progress").attr("data-percent",data.download+"%");
+            $("#progress2").width(data.process+"%");
+            if(data.process==100){
+                downloadSuccess  = true;
+                clearInterval(timer);
+                $("#processbar-title").text("更新包下载完成");
+            }
+            downloadRequestPending = false;
+        })
+    }
 }
 
 function upgrade(){
-    $.get('api/admin/upgrade/doUpgrade',function(data){
-        $("#upgrade-process").html(data.message);
-        if(data.process == 100){
-            clearInterval(upgradeTimer);
-            finish = true;
-        }
-    })
+    if(!upgradeRequestPending){
+        upgradeRequestPending = true;
+        $.get('api/admin/upgrade/doUpgrade',function(data){
+            $("#upgrade-process").html(data.message);
+            if(data.finish){
+                clearInterval(upgradeTimer);
+                finish = true;
+            }
+            upgradeRequestPending = false;
+        })
+    }
 }
 
 $(function() {

@@ -4,6 +4,7 @@ public class UpgradeProcessResponse {
 
     private int error;
     private String message;
+    private boolean finish;
     private boolean needRestart;
 
     public int getError() {
@@ -28,5 +29,13 @@ public class UpgradeProcessResponse {
 
     public void setNeedRestart(boolean needRestart) {
         this.needRestart = needRestart;
+    }
+
+    public boolean isFinish() {
+        return finish;
+    }
+
+    public void setFinish(boolean finish) {
+        this.finish = finish;
     }
 }

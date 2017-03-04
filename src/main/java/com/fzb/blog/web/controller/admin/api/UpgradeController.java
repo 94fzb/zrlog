@@ -108,6 +108,7 @@ public class UpgradeController extends BaseController {
             updateVersionThread.start();
         }
         upgradeProcessResponse.setMessage(updateVersionThread.getMessage());
+        upgradeProcessResponse.setFinish(updateVersionThread.isFinish());
         return upgradeProcessResponse;
     }
 

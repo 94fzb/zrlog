@@ -40,8 +40,12 @@ public class PluginConfig {
                     @Override
                     public void run() {
                         while (true) {
-                            String javaHome = System.getProperty("java.home");
-                            pr = CmdUtil.getProcess(javaHome + "/bin/java " + pluginJvmArgs + " -jar " + serverFileName, randomServerPort,
+                            String javaHome = System.getProperty("java.home").replace("\\", "/");
+                            String java = javaHome + "/bin/java";
+                            if (java.contains(" ")) {
+                                java = "java";
+                            }
+                            pr = CmdUtil.getProcess(java, pluginJvmArgs, "-jar", serverFileName, randomServerPort,
                                     randomMasterPort, dbProperties, serverFileName.getParent() + "/jars", randomListenPort, runtimePath, runTimeVersion);
                             if (pr != null) {
                                 printInputStreamWithThread(pr.getInputStream());
