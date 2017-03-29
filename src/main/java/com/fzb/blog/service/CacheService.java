@@ -75,13 +75,11 @@ public class CacheService {
             //存放公共数据到ServletContext
             JFinal.me().getServletContext().setAttribute("webSite", website);
             JFinal.me().getServletContext().setAttribute(Constants.CACHE_KEY, cacheInit);
-            if (BlogBuildInfoUtil.isDev()) {
-                List<File> staticFiles = new ArrayList<File>();
-                IOUtil.getAllFiles(PathKit.getWebRootPath(), staticFiles);
-                for (File file : staticFiles) {
-                    String uri = file.toString().substring(PathKit.getWebRootPath().length());
-                    cacheFileMap.put(uri, uri + "?t=" + file.lastModified());
-                }
+            List<File> staticFiles = new ArrayList<File>();
+            IOUtil.getAllFiles(PathKit.getWebRootPath(), staticFiles);
+            for (File file : staticFiles) {
+                String uri = file.toString().substring(PathKit.getWebRootPath().length());
+                cacheFileMap.put(uri, uri + "?t=" + file.lastModified());
             }
         }
         if (baseController != null) {
@@ -89,12 +87,10 @@ public class CacheService {
             baseController.setWebSite(cacheInit.getWebSite());
             String host = WebTools.getRealScheme(baseController.getRequest()) + "://" + baseController.getRequest().getHeader("host") + baseController.getRequest().getContextPath();
             Map<String, String> tempStaticFileMap = new HashMap<String, String>();
-            if (BlogBuildInfoUtil.isDev()) {
-                List<File> staticFiles = new ArrayList<File>();
-                IOUtil.getAllFiles(PathKit.getWebRootPath(), staticFiles);
-                for (Map.Entry<String, String> entry : cacheFileMap.entrySet()) {
-                    tempStaticFileMap.put(entry.getKey(), host + entry.getValue());
-                }
+            List<File> staticFiles = new ArrayList<File>();
+            IOUtil.getAllFiles(PathKit.getWebRootPath(), staticFiles);
+            for (Map.Entry<String, String> entry : cacheFileMap.entrySet()) {
+                tempStaticFileMap.put(entry.getKey(), host + entry.getValue());
             }
             baseController.setAttr("cacheFile", tempStaticFileMap);
         }
