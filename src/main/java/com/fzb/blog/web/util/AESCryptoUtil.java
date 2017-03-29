@@ -1,7 +1,7 @@
 package com.fzb.blog.web.util;
 
 import com.fzb.blog.common.Constants;
-import com.fzb.common.util.Md5Util;
+import com.fzb.common.util.SecurityUtils;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
@@ -24,7 +24,7 @@ public class AESCryptoUtil {
     public static byte[] encrypt(String secretKey, byte[] value) throws Exception {
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
         //必须要16位
-        secretKey = Md5Util.MD5(secretKey).substring(8, 24);
+        secretKey = SecurityUtils.md5(secretKey).substring(8, 24);
         secretKeySpec = new SecretKeySpec(secretKey.getBytes("UTF-8"), "AES");
         cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, iv);
         return cipher.doFinal(value);
@@ -33,7 +33,7 @@ public class AESCryptoUtil {
     public static byte[] decrypt(String secretKey, byte[] encrypted) throws Exception {
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
         //必须要16位
-        secretKey = Md5Util.MD5(secretKey).substring(8, 24);
+        secretKey = SecurityUtils.md5(secretKey).substring(8, 24);
         secretKeySpec = new SecretKeySpec(secretKey.getBytes("UTF-8"), "AES");
         cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, iv);
         return cipher.doFinal(encrypted);

@@ -2,9 +2,9 @@
 <jsp:include page="include/menu.jsp"/>
 <link rel="stylesheet" href="assets/css/ui.jqgrid.css" />
 
-<script src="assets/js/jqGrid/jquery.jqGrid.min.js"></script>
-<script src="assets/js/jqGrid/i18n/grid.locale-${lang}.js"></script>
-<script src="admin/js/comment_jqgrid.js"></script>
+<script src="${cacheFile['/assets/js/jqGrid/jquery.jqGrid.min.js']}"></script>
+<script src="${url}/assets/js/jqGrid/i18n/grid.locale-${lang}.js"></script>
+<script src="${cacheFile['/admin/js/comment_jqgrid.js']}"></script>
 <div class="page-header">
 	<h3>
 		${_res['admin.comment.manage']}

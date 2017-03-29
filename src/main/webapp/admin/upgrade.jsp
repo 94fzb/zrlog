@@ -1,9 +1,9 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <jsp:include page="include/menu.jsp"/>
-<script type="text/javascript" src="admin/js/set_update.js"></script>
-<script type="text/javascript" src="admin/js/upgrade.js"></script>
-<script src="assets/js/switchery.min.js"></script>
+<script type="text/javascript" src="${cacheFile['/admin/js/set_update.js']}"></script>
+<script type="text/javascript" src="${cacheFile['/admin/js/upgrade.js']}"></script>
+<script src="${cacheFile['/assets/js/switchery.min.js']}"></script>
 <div class="page-header">
 	<h3>
 		${_res['admin.upgrade.manage']}

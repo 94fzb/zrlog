@@ -46,17 +46,17 @@ request.setAttribute("url", scheme+"://"+request.getHeader("host")+request.getCo
 	    request.setAttribute("tips","主题编辑功能建议仅用于临时变更");
 	}
 %>
-<link rel="stylesheet" href="admin/markdown/lib/codemirror/codemirror.min.css">
-<link rel="stylesheet" href="admin/markdown/lib/codemirror/addon/dialog/dialog.css">
-<link rel="stylesheet" href="admin/markdown/lib/codemirror/addon/search/matchesonscrollbar.css">
-<script src="admin/markdown/lib/codemirror/codemirror.min.js"></script>
-<script src="admin/markdown/lib/codemirror/modes.min.js"></script>
-<script src="admin/markdown/lib/codemirror/addon/dialog/dialog.js"></script>
-<script src="admin/markdown/lib/codemirror/addon/search/searchcursor.js"></script>
-<script src="admin/markdown/lib/codemirror/addon/search/search.js"></script>
-<script src="admin/markdown/lib/codemirror/addon/scroll/annotatescrollbar.js"></script>
-<script src="admin/markdown/lib/codemirror/addon/search/matchesonscrollbar.js"></script>
-<script src="admin/js/file_editor.js"></script>
+<link rel="stylesheet" href="${cacheFile['/admin/markdown/lib/codemirror/codemirror.min.css']}">
+<link rel="stylesheet" href="${cacheFile['/admin/markdown/lib/codemirror/addon/dialog/dialog.css']}">
+<link rel="stylesheet" href="${cacheFile['/admin/markdown/lib/codemirror/addon/search/matchesonscrollbar.css']}">
+<script src="${cacheFile['/admin/markdown/lib/codemirror/codemirror.min.js']}"></script>
+<script src="${cacheFile['/admin/markdown/lib/codemirror/modes.min.js']}"></script>
+<script src="${cacheFile['/admin/markdown/lib/codemirror/addon/dialog/dialog.js']}"></script>
+<script src="${cacheFile['/admin/markdown/lib/codemirror/addon/search/searchcursor.js']}"></script>
+<script src="${cacheFile['/admin/markdown/lib/codemirror/addon/search/search.js']}"></script>
+<script src="${cacheFile['/admin/markdown/lib/codemirror/addon/scroll/annotatescrollbar.js']}"></script>
+<script src="${cacheFile['/admin/markdown/lib/codemirror/addon/search/matchesonscrollbar.js']}"></script>
+<script src="${cacheFile['/admin/js/file_editor.js']}"></script>
 <style type="text/css">
 .CodeMirror {
 	border-top: 1px solid black;

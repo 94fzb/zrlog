@@ -8,7 +8,7 @@ import com.fzb.blog.web.controller.BaseController;
 import com.fzb.blog.web.incp.AdminTokenService;
 import com.fzb.blog.web.incp.AdminTokenThreadLocal;
 import com.fzb.blog.web.util.WebTools;
-import com.fzb.common.util.Md5Util;
+import com.fzb.common.util.SecurityUtils;
 import com.jfinal.core.JFinal;
 import com.jfinal.plugin.activerecord.Db;
 
@@ -22,7 +22,7 @@ public class AdminController extends BaseController {
     private AdminTokenService adminTokenService = new AdminTokenService();
 
     private String getBaseMs() {
-        return Md5Util.MD5(WebTools.getRealIp(getRequest()) + "," + getRequest().getHeader("User-Agent")).substring(2, 10);
+        return SecurityUtils.md5(WebTools.getRealIp(getRequest()) + "," + getRequest().getHeader("User-Agent")).substring(2, 10);
     }
 
     public LoginResponse login() {
@@ -43,7 +43,7 @@ public class AdminController extends BaseController {
             }
         }
         if (!login && getPara("userName") != null && getPara("password") != null) {
-            User user = User.dao.login(getPara("userName").toLowerCase(), Md5Util.MD5(getPara("password")));
+            User user = User.dao.login(getPara("userName").toLowerCase(), SecurityUtils.md5(getPara("password")));
             if (user != null) {
                 if ("on".equals(getPara("rememberMe"))) {
                     Map<String, User> userMap = (Map<String, User>) JFinal.me().getServletContext().getAttribute("userMap");
@@ -96,8 +96,8 @@ public class AdminController extends BaseController {
             String dbPassword = User.dao.getPasswordByUserId(AdminTokenThreadLocal.getUserId());
             String oldPassword = getPara("oldPassword");
             // compare oldPassword
-            if (Md5Util.MD5(oldPassword).equals(dbPassword)) {
-                User.dao.updatePassword(AdminTokenThreadLocal.getUserId(), Md5Util.MD5(getPara("newPassword")));
+            if (SecurityUtils.md5(oldPassword).equals(dbPassword)) {
+                User.dao.updatePassword(AdminTokenThreadLocal.getUserId(), SecurityUtils.md5(getPara("newPassword")));
                 updateRecordResponse.setMessage(I18NUtil.getStringFromRes("changePasswordSuccess", getRequest()));
                 getSession().invalidate();
             } else {

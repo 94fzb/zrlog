@@ -1,6 +1,6 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <jsp:include page="include/menu.jsp"/>
-<script type="text/javascript" src="admin/js/set_update.js"></script>
+<script type="text/javascript" src="${cacheFile['admin/js/set_update.js']}"></script>
 <div class="page-header">
 	<h3>密码变更</h3>
 </div><!-- /.page-header -->

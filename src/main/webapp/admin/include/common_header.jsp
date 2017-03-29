@@ -28,22 +28,22 @@ request.setAttribute("res",new flexjson.JSONSerializer().deepSerialize(request.g
     <!-- Meta, title, CSS, favicons, etc. -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" href="${url}/favicon.ico" />
+    <link rel="shortcut icon" href="${cacheFile['/favicon.ico']}" />
     <!-- Bootstrap -->
-    <link href="${url}/assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="${cacheFile['/assets/css/bootstrap.min.css']}" rel="stylesheet">
     <!-- Font Awesome -->
-    <link href="${url}/assets/css/font-awesome.min.css" rel="stylesheet">
+    <link href="${cacheFile['/assets/css/font-awesome.min.css']}" rel="stylesheet">
     <!-- NProgress -->
-    <link href="${url}/assets/css/nprogress.css" rel="stylesheet">
-    <link href="${url}/assets/css/select2.min.css" rel="stylesheet">
-    <link href="${url}/assets/css/switchery.min.css" rel="stylesheet">
+    <link href="${cacheFile['/assets/css/nprogress.css']}" rel="stylesheet">
+    <link href="${cacheFile['/assets/css/select2.min.css']}" rel="stylesheet">
+    <link href="${cacheFile['/assets/css/switchery.min.css']}" rel="stylesheet">
     <!-- Custom Theme Style -->
-    <link href="${url}/assets/css/custom.min.css" rel="stylesheet">
+    <link href="${cacheFile['/assets/css/custom.min.css']}" rel="stylesheet">
 
-    <link rel="stylesheet" href="${url}/assets/css/pnotify.css" />
+    <link rel="stylesheet" href="${cacheFile['/assets/css/pnotify.css']}" />
     <!-- jQuery -->
-    <script src="${url}/assets/js/jquery.min.js"></script>
-    <script src="${url}/admin/js/dashboard.js"></script>
+    <script src="${cacheFile['/assets/js/jquery.min.js']}"></script>
+    <script src="${cacheFile['/admin/js/dashboard.js']}"></script>
     <script>
         var _res = ${res};
     </script>

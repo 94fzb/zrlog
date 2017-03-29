@@ -1,7 +1,7 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <jsp:include page="include/menu.jsp" />
-<script type="text/javascript" src="admin/js/set_update.js"></script>
-<script src="assets/js/jquery.liteuploader.min.js"></script>
+<script type="text/javascript" src="${cacheFile['/admin/js/set_update.js']}"></script>
+<script src="${cacheFile['/assets/js/jquery.liteuploader.min.js']}"></script>
 <script>
 	$(document).ready(function() {
 		$('.fileUpload').liteUploader({

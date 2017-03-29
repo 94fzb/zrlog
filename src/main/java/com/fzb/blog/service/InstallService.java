@@ -2,8 +2,8 @@ package com.fzb.blog.service;
 
 import com.fzb.blog.common.Constants;
 import com.fzb.blog.util.ZrlogUtil;
+import com.fzb.common.util.SecurityUtils;
 import com.fzb.common.util.IOUtil;
-import com.fzb.common.util.Md5Util;
 import com.jfinal.kit.PathKit;
 import org.apache.log4j.Logger;
 
@@ -154,7 +154,7 @@ public class InstallService {
             String insertUserSql = "INSERT INTO `user`( `userId`,`userName`, `password`, `email`,`secretKey`) VALUES (1,?,?,?,?)";
             ps = connect.prepareStatement(insertUserSql);
             ps.setString(1, blogMsg.get("username"));
-            ps.setString(2, Md5Util.MD5(blogMsg.get("password")));
+            ps.setString(2, SecurityUtils.md5(blogMsg.get("password")));
             ps.setString(3, configMsg.get("email"));
             ps.setString(4, UUID.randomUUID().toString());
             ps.executeUpdate();

@@ -1,8 +1,8 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <jsp:include page="include/menu.jsp"/>
-<script src="assets/js/jquery.liteuploader.min.js"></script>
-<script src="admin/js/template.js"></script>
+<script src="${cacheFile['/assets/js/jquery.liteuploader.min.js']}"></script>
+<script src="${cacheFile['/admin/js/template.js']}"></script>
 <style>
 .thumbnail {
     text-align: center;

@@ -3,21 +3,22 @@ package com.fzb.blog.service;
 import com.fzb.blog.common.BaseDataInitVO;
 import com.fzb.blog.common.Constants;
 import com.fzb.blog.model.*;
+import com.fzb.blog.util.BlogBuildInfoUtil;
 import com.fzb.blog.web.controller.BaseController;
+import com.fzb.blog.web.util.WebTools;
 import com.fzb.common.util.IOUtil;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
 
 import java.io.File;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * 对缓存数据的操作
  */
 public class CacheService {
+
+    private static Map<String, String> cacheFileMap = new HashMap<String, String>();
 
     public void refreshInitDataCache(BaseController baseController) {
         cleanCache();
@@ -74,10 +75,28 @@ public class CacheService {
             //存放公共数据到ServletContext
             JFinal.me().getServletContext().setAttribute("webSite", website);
             JFinal.me().getServletContext().setAttribute(Constants.CACHE_KEY, cacheInit);
+            if (BlogBuildInfoUtil.isDev()) {
+                List<File> staticFiles = new ArrayList<File>();
+                IOUtil.getAllFiles(PathKit.getWebRootPath(), staticFiles);
+                for (File file : staticFiles) {
+                    String uri = file.toString().substring(PathKit.getWebRootPath().length());
+                    cacheFileMap.put(uri, uri + "?t=" + file.lastModified());
+                }
+            }
         }
         if (baseController != null) {
             baseController.setAttr("init", cacheInit);
             baseController.setWebSite(cacheInit.getWebSite());
+            String host = WebTools.getRealScheme(baseController.getRequest()) + "://" + baseController.getRequest().getHeader("host") + baseController.getRequest().getContextPath();
+            Map<String, String> tempStaticFileMap = new HashMap<String, String>();
+            if (BlogBuildInfoUtil.isDev()) {
+                List<File> staticFiles = new ArrayList<File>();
+                IOUtil.getAllFiles(PathKit.getWebRootPath(), staticFiles);
+                for (Map.Entry<String, String> entry : cacheFileMap.entrySet()) {
+                    tempStaticFileMap.put(entry.getKey(), host + entry.getValue());
+                }
+            }
+            baseController.setAttr("cacheFile", tempStaticFileMap);
         }
     }
 }

@@ -6,7 +6,7 @@ String basePath = scheme+"://"+request.getServerName()+":"+request.getServerPort
 request.setAttribute("url", scheme+"://"+request.getHeader("host")+request.getContextPath());
 %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<link rel="stylesheet" href="admin/markdown/css/editormd.min.css" />
+<link rel="stylesheet" href="${cacheFile['/admin/markdown/css/editormd.min.css']}" />
 <style>
 .CodeMirror-scroll {
     box-sizing: content-box;
@@ -23,12 +23,12 @@ height: 38px;
 }
 
 </style>
-<script src="admin/markdown/js/editormd.min.js"></script>
+<script src="${cacheFile['/admin/markdown/js/editormd.min.js']}"></script>
 <c:if test='${lang eq "en"}'>
-<script src="admin/markdown/languages/${lang}.js"></script>
+<script src="${cacheFile['admin/markdown/languages/${lang}.js']}"></script>
 </c:if>
-<script src="assets/js/select2/select2.min.js"></script>
-<script src="admin/js/article_editor.js"></script>
+<script src="${cacheFile['/assets/js/select2/select2.min.js']}"></script>
+<script src="${cacheFile['/admin/js/article_editor.js']}"></script>
 <div class="row">
 <div class="col-md-1" style="float:right">
     <a id="preview-link" target="_blank" style="display:none">
