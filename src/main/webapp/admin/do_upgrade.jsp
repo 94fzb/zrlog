@@ -1,11 +1,11 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <jsp:include page="include/menu.jsp"/>
-<script type="text/javascript" src="{url}${cacheFile['/admin/js/set_update.js']}"></script>
-<script src="{url}${cacheFile['/assets/js/jquery-ui-1.10.3.full.min.js']}"></script>
-<script src="{url}${cacheFile['/assets/js/switchery.min.js']}"></script>
-<script src="{url}${cacheFile['/assets/js/jquery.smartWizard.js']}"></script>
-<script src="{url}${cacheFile['/admin/js/do_upgrade.js']}"></script>
+<script type="text/javascript" src="${cacheFile['/admin/js/set_update.js']}"></script>
+<script src="${cacheFile['/assets/js/jquery-ui-1.10.3.full.min.js']}"></script>
+<script src="${cacheFile['/assets/js/switchery.min.js']}"></script>
+<script src="${cacheFile['/assets/js/jquery.smartWizard.js']}"></script>
+<script src="${cacheFile['/admin/js/do_upgrade.js']}"></script>
 <div class="row">
 <div class="col-xs-12">
 	<div class="x_panel">
