@@ -4,6 +4,7 @@ import com.fzb.blog.common.Constants;
 import com.fzb.blog.model.User;
 import com.fzb.blog.model.WebSite;
 import com.fzb.blog.web.util.AESCryptoUtil;
+import com.fzb.common.util.ByteUtils;
 import com.jfinal.core.JFinal;
 import flexjson.JSONDeserializer;
 import flexjson.JSONSerializer;
@@ -19,6 +20,8 @@ public class AdminTokenService {
 
     private static final Logger LOGGER = Logger.getLogger(AdminTokenService.class);
 
+    private static final String TOKEN_SPLIT_CHAR = "#";
+
     public int getUserId(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
@@ -30,11 +33,12 @@ public class AdminTokenService {
             }
             try {
                 if (StringUtils.isNotBlank(decTokenString)) {
-                    int userId = Integer.valueOf(decTokenString.substring(0, decTokenString.indexOf(",")));
+                    int userId = Integer.valueOf(decTokenString.substring(0, decTokenString.indexOf(TOKEN_SPLIT_CHAR)));
                     User user = User.dao.findById(userId);
                     if (user != null) {
-                        byte[] adminTokenEncryptAfter = Base64.decodeBase64(decTokenString.substring(decTokenString.indexOf(","), decTokenString.length()).getBytes());
-                        AdminToken adminToken = new JSONDeserializer<AdminToken>().deserialize(new String(AESCryptoUtil.decrypt(user.getStr("secretKey"), adminTokenEncryptAfter)), AdminToken.class);
+                        byte[] adminTokenEncryptAfter = ByteUtils.hexString2Bytes(decTokenString.substring(decTokenString.indexOf(TOKEN_SPLIT_CHAR) + 1, decTokenString.length()));
+                        String base64Encode = new String(AESCryptoUtil.decrypt(user.getStr("secretKey"), Base64.decodeBase64(adminTokenEncryptAfter)));
+                        AdminToken adminToken = new JSONDeserializer<AdminToken>().deserialize(base64Encode, AdminToken.class);
                         if (adminToken.getCreatedDate() + getSessionTimeout() > System.currentTimeMillis()) {
                             return userId;
                         }
@@ -59,9 +63,9 @@ public class AdminTokenService {
         AdminTokenThreadLocal.setAdminToken(adminToken);
         String encryptBeforeString = new JSONSerializer().deepSerialize(adminToken);
         try {
-            String encryptAfterString = Base64.encodeBase64String(AESCryptoUtil.encrypt(user.get("secretKey").toString(), encryptBeforeString.getBytes()));
-            String finalTokenString = adminToken.getUserId() + "," + encryptAfterString;
-
+            byte[] base64Bytes = Base64.encodeBase64(AESCryptoUtil.encrypt(user.get("secretKey").toString(), encryptBeforeString.getBytes()));
+            String encryptAfterString = ByteUtils.bytesToHexString(base64Bytes);
+            String finalTokenString = adminToken.getUserId() + TOKEN_SPLIT_CHAR + encryptAfterString;
             Cookie cookie = new Cookie(Constants.ADMIN_TOKEN, finalTokenString);
             cookie.setMaxAge((int) (sessionTimeout / 1000));
             setCookieDomain(request, cookie);
