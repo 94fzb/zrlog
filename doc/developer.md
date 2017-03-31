@@ -9,9 +9,8 @@
 
 ## 参考资料
 
-[JFinal 官方手册](http://jfinal.com)
-
-[mysql 官方文档](http://doc.mysql.com)
+- [JFinal 官方手册](http://jfinal.com)
+- [mysql 官方文档](http://doc.mysql.com)
 
 ## 手册目的
 

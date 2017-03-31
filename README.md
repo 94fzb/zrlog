@@ -8,11 +8,10 @@
 
 ### 一图胜千言
 
-![](http://o8psjdat3.bkt.clouddn.com//attached/image/20161210/20161210163950_376.png)
+![](http://static.blog.zrlog.com/attached/image/20170331/20170331202106_594.png)
 
-![](http://o8psjdat3.bkt.clouddn.com//attached/image/20161210/20161210164115_590.png)
+![](http://static.blog.zrlog.com/attached/image/20170331/20170331201039_532.png)
 
-![](http://o8psjdat3.bkt.clouddn.com//attached/image/20161210/20161210164036_172.png)
 
 ### 部署环境前提
 * 1.jre 版本 >= 1.7
@@ -32,10 +31,14 @@
 * 10.可发表私有文章
 * ...
 
-### 程序安装
+### 程序安装（war包）
 * 1.下载 [最新 war](http://dl.zrlog.com/release/zrlog.war) 放在 tomcat的webapps目录 (将zrlog.war改为ROOT.war可避免输入二级目录)
 * 2.访问 http://host:port/zrlog/install 
 * 3.填写数据，管理员信息，完成安装
+
+### 文档
+
+[汇聚了一些常见问题](https://blog.zrlog.com/post/sort/doc)
 
 ### 联系方式
 * QQ交流 504008147
