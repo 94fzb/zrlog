@@ -112,6 +112,7 @@ ${_res.dashboard}
 		</div>
 		<div class="widget-body">
 			<div class="widget-main">
+			<div class="row">
 			<div class="animated flipInY col-lg-6 col-md-6 col-sm-6 col-xs-12">
 				<div class="tile-stats">
 				  <div class="icon"><i class="fa fa-comments-o"></i></div>
@@ -132,6 +133,7 @@ ${_res.dashboard}
 				  <div class="count">${clickCount }</div>
 				  <h3>文章总浏览次数</h3>
 				</div>
+		</div>
 		</div>
 		</div>
 		</div>
