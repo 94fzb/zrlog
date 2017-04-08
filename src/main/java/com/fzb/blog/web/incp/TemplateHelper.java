@@ -103,7 +103,8 @@ public class TemplateHelper {
                         tagUri += suffix;
                     }
                     logNav.put("url", tagUri);
-                    if (request.getRequestURL().toString().equals(tagUri)) {
+                    String ignoreScheme = request.getRequestURL().toString().replace("http://", "http://");
+                    if (ignoreScheme.equals(tagUri.replace("https://", "http://"))) {
                         logNav.put("current", true);
                     } else {
                         logNav.put("current", false);
