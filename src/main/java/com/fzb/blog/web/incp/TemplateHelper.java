@@ -98,17 +98,17 @@ public class TemplateHelper {
                     } else {
                         url = url.substring(1, url.length());
                     }
-                    String tagUri = baseUrl + url;
                     if (url.startsWith("/post")) {
-                        tagUri += suffix;
+                        url += suffix;
                     }
-                    logNav.put("url", tagUri);
-                    String ignoreScheme = request.getRequestURL().toString().replace("http://", "http://");
-                    if (ignoreScheme.equals(tagUri.replace("https://", "http://"))) {
-                        logNav.put("current", true);
-                    } else {
-                        logNav.put("current", false);
-                    }
+                    url = baseUrl + url;
+                    logNav.put("url", url);
+                }
+                String ignoreScheme = request.getRequestURL().toString().replace("https://", "http://");
+                if (ignoreScheme.equals(url.replace("https://", "http://"))) {
+                    logNav.put("current", true);
+                } else {
+                    logNav.put("current", false);
                 }
             }
         }
