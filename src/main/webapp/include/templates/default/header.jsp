@@ -61,7 +61,7 @@
 
 </head>
 <body class="default front">
-<jsp:include page="../../core/dev.jsp"/>
+<%--<jsp:include page="../../core/dev.jsp"/>--%>
 <div class="page">
 <div class="top">
   <div class="inner">
