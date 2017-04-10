@@ -87,7 +87,18 @@ public class AdminTemplatePageController extends BaseController {
             }
         }
 
-        setAttr("templates", templates);
+        List<Map<String, Object>> sortTemplates = new ArrayList<Map<String, Object>>();
+        for (Map<String, Object> stringObjectMap : templates) {
+            if (stringObjectMap.get("template").equals(Constants.DEFAULT_TEMPLATE_PATH)) {
+                sortTemplates.add(stringObjectMap);
+            }
+        }
+        for (Map<String, Object> stringObjectMap : templates) {
+            if (!stringObjectMap.get("template").equals(Constants.DEFAULT_TEMPLATE_PATH)) {
+                sortTemplates.add(stringObjectMap);
+            }
+        }
+        setAttr("templates", sortTemplates);
         setAttr("previewTemplate", getTemplatePathByCookie());
         return "/admin/template";
     }

@@ -2,8 +2,10 @@ package com.fzb.blog.web.incp;
 
 import com.fzb.blog.service.CacheService;
 import com.fzb.blog.util.BlogBuildInfoUtil;
+import com.fzb.blog.util.ZrlogUtil;
 import com.fzb.blog.web.config.ZrlogConfig;
 import com.fzb.blog.web.controller.BaseController;
+import com.fzb.blog.web.util.WebTools;
 import com.jfinal.aop.Interceptor;
 import com.jfinal.aop.Invocation;
 import org.slf4j.Logger;
@@ -48,7 +50,7 @@ public class InitDataInterceptor implements Interceptor {
             if (invocation.getController() instanceof BaseController) {
                 HttpServletRequest request = invocation.getController().getRequest();
                 BaseController baseController = ((BaseController) invocation.getController());
-                baseController.setAttr("requrl", request.getRequestURL().toString());
+                baseController.setAttr("requrl", ZrlogUtil.getFullUrl(request));
                 cacheService.refreshInitDataCache(baseController);
                 lastAccessTime = System.currentTimeMillis();
             }

@@ -23,4 +23,5 @@ src/main/webapp/WEB-INF/plugins/*
 src/main/webapp/include/templates/template*
 
 src/main/webapp/include/templates/README.md
+src/main/webapp/include/templates/*.sh
 src/main/webapp/include/templates/.gitignore
