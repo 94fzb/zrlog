@@ -44,7 +44,7 @@ public class ZrlogUtil {
         }
         map.put("IsLogin", (adminToken != null) + "");
         map.put("Blog-Version", ((Map) JFinal.me().getServletContext().getAttribute("zrlog")).get("version").toString());
-        String fullUrl = WebTools.getRealScheme(request) + "://" + request.getHeader("Host") + request.getRequestURI();
+        String fullUrl = getFullUrl(request);
         if (request.getQueryString() != null) {
             fullUrl = fullUrl + "?" + request.getQueryString();
         }
@@ -55,6 +55,10 @@ public class ZrlogUtil {
             map.put("Content-Type", request.getHeader("Content-Type"));
         }
         return map;
+    }
+
+    public static String getFullUrl(HttpServletRequest request) {
+        return WebTools.getRealScheme(request) + "://" + request.getHeader("Host") + request.getRequestURI();
     }
 
     public static String getDatabaseServerVersion(String jdbcUrl, String userName, String password, String deriveClass) {
