@@ -2191,49 +2191,6 @@ textarea:focus {
     width: 12.5%;
 }
 }
-.tagsinput {
-    background: #fff none repeat scroll 0 0;
-    border: 1px solid #ccc;
-    overflow-y: auto;
-    padding: 6px 6px 0;
-    width: 300px;
-}
-span.tag {
-    background: #1abb9c none repeat scroll 0 0;
-    color: #f1f6f7;
-    display: block;
-    float: left;
-    font-family: helvetica;
-    font-weight: 500;
-    margin-bottom: 5px;
-    margin-right: 5px;
-    padding: 5px 9px;
-    text-decoration: none;
-}
-span.tag a {
-    color: #f1f6f7 !important;
-}
-.tagsinput span.tag a {
-    color: #82ad2b;
-    font-size: 11px;
-    font-weight: bold;
-    text-decoration: none;
-}
-.tagsinput input {
-    background: transparent none repeat scroll 0 0;
-    border: 1px solid transparent;
-    color: #000;
-    font-family: helvetica;
-    font-size: 13px;
-    margin: 0;
-    outline: 0 none;
-    padding: 3px;
-    width: 80px;
-}
-.tagsinput div {
-    display: block;
-    float: left;
-}
 .tags_clear {
     clear: both;
     height: 0;
@@ -2332,7 +2289,50 @@ ul.timeline li {
     white-space: nowrap;
     width: 100%;
 }
-.tag {
+.tagsinput {
+    background: #fff none repeat scroll 0 0;
+    border: 1px solid #ccc;
+    overflow-y: auto;
+    padding: 6px 6px 0;
+    width: 300px;
+}
+span.tag2 {
+    background: #1abb9c none repeat scroll 0 0;
+    color: #f1f6f7;
+    display: block;
+    float: left;
+    font-family: helvetica;
+    font-weight: 500;
+    margin-bottom: 5px;
+    margin-right: 5px;
+    padding: 5px 9px;
+    text-decoration: none;
+}
+span.tag2 a {
+    color: #f1f6f7 !important;
+}
+.tagsinput span.tag2 a {
+    color: #82ad2b;
+    font-size: 11px;
+    font-weight: bold;
+    text-decoration: none;
+}
+.tagsinput input {
+    background: transparent none repeat scroll 0 0;
+    border: 1px solid transparent;
+    color: #000;
+    font-family: helvetica;
+    font-size: 13px;
+    margin: 0;
+    outline: 0 none;
+    padding: 3px;
+    width: 80px;
+}
+.tagsinput div {
+    display: block;
+    float: left;
+}
+.tag2 {
     background: #1abb9c none repeat scroll 0 0;
     color: #fff !important;
     line-height: 1;

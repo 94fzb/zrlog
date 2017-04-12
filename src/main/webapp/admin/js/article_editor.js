@@ -124,7 +124,7 @@ $(function(){
 	setInterval(autoSave,1000*6);
 
 	var $tags=$("#inp");
-	$(".tag").click(function(e){
+	$(".tag2").click(function(e){
 		$tags.val($tags.val()+$(this).text()+",");
 		$(this).remove();
 		e.preventDefault();
