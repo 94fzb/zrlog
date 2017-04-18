@@ -17,6 +17,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 public class TemplateHelper {
 
@@ -131,11 +132,12 @@ public class TemplateHelper {
         String templateUrl;
         String scheme = WebTools.getRealScheme(request);
         String baseUrl = scheme + "://" + request.getHeader("host") + request.getContextPath() + "/";
+        String templatePath = request.getAttribute("template").toString();
         if (staticBlog) {
             baseUrl = request.getContextPath() + "/";
-            templateUrl = request.getContextPath() + request.getAttribute("template");
+            templateUrl = request.getContextPath() + templatePath;
         } else {
-            if (webSite.get("staticResourceHost") != null && !"".equals(webSite.get("staticResourceHost")) && !JFinal.me().getConstants().getDevMode()) {
+            if (isCdnResourceAble(webSite, templatePath)) {
                 templateUrl = scheme + "://" + webSite.get("staticResourceHost").toString() + request.getAttribute("template");
             } else {
                 templateUrl = scheme + "://" + request.getHeader("host") + request.getContextPath() + request.getAttribute("template");
@@ -146,6 +148,22 @@ public class TemplateHelper {
         request.setAttribute("rurl", baseUrl);
         request.setAttribute("baseUrl", baseUrl);
         return baseUrl;
+    }
+
+    private static boolean isCdnResourceAble(Map webSite, String templatePath) {
+        Properties properties = new Properties();
+        try {
+            File file = new File(PathKit.getWebRootPath() + templatePath + "/template.properties");
+            if (file.exists()) {
+                properties.load(new FileInputStream(file));
+                if (properties.getProperty("staticResource") != null) {
+                    return webSite.get("staticResourceHost") != null && !"".equals(webSite.get("staticResourceHost"))/* && !JFinal.me().getConstants().getDevMode()*/;
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.error("load properties error");
+        }
+        return false;
     }
 
     private static <T> T cloneObject(Object obj) {

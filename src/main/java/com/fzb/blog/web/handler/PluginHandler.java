@@ -108,17 +108,17 @@ public class PluginHandler extends Handler {
     private boolean accessPlugin(String uri, HttpServletRequest request, HttpServletResponse response) throws IOException, InstantiationException {
         String pluginServerHttp = ZrlogUtil.getPluginServer();
         CloseableHttpResponse httpResponse;
-        CloseResponseHandle data = new CloseResponseHandle();
+        CloseResponseHandle handle = new CloseResponseHandle();
         Map<String, String[]> paramMap = request.getParameterMap();
         //GET请求不关心request.getInputStream() 的数据
         if ("GET".equals(request.getMethod())) {
-            httpResponse = HttpUtil.getDisableRedirectInstance().sendGetRequest(pluginServerHttp + uri, paramMap, data, ZrlogUtil.genHeaderMapByRequest(request)).getT();
+            httpResponse = HttpUtil.getDisableRedirectInstance().sendGetRequest(pluginServerHttp + uri, paramMap, handle, ZrlogUtil.genHeaderMapByRequest(request)).getT();
         } else {
             //如果是表单数据提交不关心请求头，反之将所有请求头都发到插件服务
             if (request.getHeader("Content-Type").contains("application/x-www-form-urlencoded")) {
-                httpResponse = HttpUtil.getDisableRedirectInstance().sendPostRequest(pluginServerHttp + uri, paramMap, data, ZrlogUtil.genHeaderMapByRequest(request)).getT();
+                httpResponse = HttpUtil.getDisableRedirectInstance().sendPostRequest(pluginServerHttp + uri, paramMap, handle, ZrlogUtil.genHeaderMapByRequest(request)).getT();
             } else {
-                httpResponse = HttpUtil.getDisableRedirectInstance().sendPostRequest(pluginServerHttp + uri, IOUtil.getByteByInputStream(request.getInputStream()), data, ZrlogUtil.genHeaderMapByRequest(request)).getT();
+                httpResponse = HttpUtil.getDisableRedirectInstance().sendPostRequest(pluginServerHttp + uri, IOUtil.getByteByInputStream(request.getInputStream()), handle, ZrlogUtil.genHeaderMapByRequest(request)).getT();
             }
         }
         //添加插件服务的HTTP响应头到调用者响应头里面
@@ -137,16 +137,20 @@ public class PluginHandler extends Handler {
             }
             response.setStatus(httpResponse.getStatusLine().getStatusCode());
         }
-        //将插件服务的HTTP的body返回给调用者
-        if (data.getT() != null && data.getT().getEntity() != null) {
-            request.getSession();
-            byte[] bytes = IOUtil.getByteByInputStream(data.getT().getEntity().getContent());
-            response.addHeader("Content-Length", bytes.length + "");
-            response.getOutputStream().write(bytes);
-            response.getOutputStream().close();
-            return true;
-        } else {
-            return false;
+        try {
+            //将插件服务的HTTP的body返回给调用者
+            if (handle.getT() != null && handle.getT().getEntity() != null) {
+                request.getSession();
+                byte[] bytes = IOUtil.getByteByInputStream(handle.getT().getEntity().getContent());
+                response.addHeader("Content-Length", bytes.length + "");
+                response.getOutputStream().write(bytes);
+                response.getOutputStream().close();
+                return true;
+            } else {
+                return false;
+            }
+        } finally {
+            handle.close();
         }
     }
 }
