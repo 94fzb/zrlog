@@ -3,7 +3,6 @@ package com.fzb.blog.service;
 import com.fzb.blog.common.BaseDataInitVO;
 import com.fzb.blog.common.Constants;
 import com.fzb.blog.model.*;
-import com.fzb.blog.util.BlogBuildInfoUtil;
 import com.fzb.blog.web.controller.BaseController;
 import com.fzb.blog.web.util.WebTools;
 import com.fzb.common.util.IOUtil;
@@ -90,7 +89,7 @@ public class CacheService {
             List<File> staticFiles = new ArrayList<File>();
             IOUtil.getAllFiles(PathKit.getWebRootPath(), staticFiles);
             for (Map.Entry<String, String> entry : cacheFileMap.entrySet()) {
-                tempStaticFileMap.put(entry.getKey(), host + entry.getValue());
+                tempStaticFileMap.put(entry.getKey().replace("\\", "/"), host + entry.getValue().replace("\\", "/"));
             }
             baseController.setAttr("cacheFile", tempStaticFileMap);
         }

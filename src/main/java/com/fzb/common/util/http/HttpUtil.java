@@ -25,7 +25,7 @@ import java.util.*;
 public class HttpUtil {
     private static final Logger LOGGER = Logger.getLogger(HttpUtil.class);
     private static CloseableHttpClient httpClient;
-    private static CloseableHttpClient disableRedirecthttpClient;
+    private static CloseableHttpClient disableRedirectHttpClient;
     private static HttpUtil disableRedirectInstance = new HttpUtil(true);
     private static HttpUtil instance = new HttpUtil(false);
 
@@ -46,7 +46,7 @@ public class HttpUtil {
     static {
         PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
         httpClient = HttpClientBuilder.create().setConnectionManager(connectionManager).build();
-        disableRedirecthttpClient = HttpClientBuilder.create().setConnectionManager(connectionManager).disableRedirectHandling().build();
+        disableRedirectHttpClient = HttpClientBuilder.create().setConnectionManager(connectionManager).disableRedirectHandling().build();
     }
 
     private HttpPost postForm(String urlPath, Map<String, String[]> params) {
@@ -127,7 +127,7 @@ public class HttpUtil {
         setHttpHeaders(httpRequestBase, reqHeaders);
         CloseableHttpClient tClient;
         if (disableRedirect) {
-            tClient = disableRedirecthttpClient;
+            tClient = disableRedirectHttpClient;
         } else {
             tClient = httpClient;
         }
