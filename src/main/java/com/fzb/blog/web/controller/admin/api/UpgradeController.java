@@ -8,6 +8,7 @@ import com.fzb.blog.common.response.UpgradeProcessResponse;
 import com.fzb.blog.model.WebSite;
 import com.fzb.blog.service.CacheService;
 import com.fzb.blog.web.controller.BaseController;
+import com.fzb.blog.web.plugin.PluginConfig;
 import com.fzb.blog.web.plugin.UpdateVersionPlugin;
 import com.fzb.blog.web.plugin.UpdateVersionThread;
 import com.fzb.blog.web.plugin.Version;
@@ -105,6 +106,7 @@ public class UpgradeController extends BaseController {
         if (updateVersionThread == null) {
             updateVersionThread = new UpdateVersionThread(file);
             setSessionAttr(UPDATE_THREAD_ATTR_KEY, updateVersionThread);
+            PluginConfig.stopPluginCore();
             updateVersionThread.start();
         }
         upgradeProcessResponse.setMessage(updateVersionThread.getMessage());

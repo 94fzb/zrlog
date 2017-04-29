@@ -152,16 +152,26 @@ public class TemplateHelper {
 
     private static boolean isCdnResourceAble(Map webSite, String templatePath) {
         Properties properties = new Properties();
-        try {
-            File file = new File(PathKit.getWebRootPath() + templatePath + "/template.properties");
-            if (file.exists()) {
-                properties.load(new FileInputStream(file));
+        File file = new File(PathKit.getWebRootPath() + templatePath + "/template.properties");
+        if (file.exists()) {
+            FileInputStream fileInputStream = null;
+            try {
+                fileInputStream = new FileInputStream(file);
+                properties.load(fileInputStream);
                 if (properties.getProperty("staticResource") != null) {
                     return webSite.get("staticResourceHost") != null && !"".equals(webSite.get("staticResourceHost"))/* && !JFinal.me().getConstants().getDevMode()*/;
                 }
+            } catch (IOException e) {
+                LOGGER.error("load properties error", e);
+            } finally {
+                if (fileInputStream != null) {
+                    try {
+                        fileInputStream.close();
+                    } catch (IOException e) {
+                        LOGGER.error("close inputStream error", e);
+                    }
+                }
             }
-        } catch (IOException e) {
-            LOGGER.error("load properties error");
         }
         return false;
     }
