@@ -6,6 +6,7 @@ import com.fzb.blog.web.incp.AdminTokenThreadLocal;
 import com.fzb.common.util.IOUtil;
 import com.fzb.common.util.http.HttpUtil;
 import com.fzb.common.util.http.handle.CloseResponseHandle;
+import com.jfinal.core.JFinal;
 import com.jfinal.handler.Handler;
 import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -130,10 +131,14 @@ public class PluginHandler extends Handler {
             }
             //防止多次被Transfer-Encoding
             headerMap.remove("Transfer-Encoding");
-            LOGGER.info("--------------------------------- response");
+            if (JFinal.me().getConstants().getDevMode()) {
+                LOGGER.info("--------------------------------- response");
+            }
             for (Map.Entry<String, String> t : headerMap.entrySet()) {
                 response.addHeader(t.getKey(), t.getValue());
-                LOGGER.info("key " + t.getKey() + " value-> " + t.getValue());
+                if (JFinal.me().getConstants().getDevMode()) {
+                    LOGGER.info("key " + t.getKey() + " value-> " + t.getValue());
+                }
             }
             response.setStatus(httpResponse.getStatusLine().getStatusCode());
         }

@@ -109,6 +109,5 @@ public class PluginConfig {
             pr.destroy();
         }
         canStart = false;
-        LOGGER.info("close plugin ");
     }
 }
