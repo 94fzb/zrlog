@@ -115,7 +115,7 @@
                     <resourceEncoding>UTF-8</resourceEncoding>
                     <warSourceDirectory>src/main/webapp</warSourceDirectory>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
-                    <packagingExcludes>attached/**,WEB-INF/plugins/**,post/**</packagingExcludes>
+                    <packagingExcludes>include/templates/.idea/**,include/templates/*.zip,/attached/**,WEB-INF/plugins/**,post/**</packagingExcludes>
                 </configuration>
             </plugin>
         </plugins>
