@@ -11,12 +11,6 @@ if(request.getAttribute("currentPath")==null){
 if(request.getAttribute("currentPage")==null){
 	request.setAttribute("currentPage", request.getRequestURL().toString().replaceAll(".jsp","").substring((basePath).length()));
 }
-BaseDataInitVO init = (BaseDataInitVO)request.getAttribute("init");
-Map webSite = (Map)init.getWebSite();
-if(webSite.get("admin_dashboard_naver") == null){
-    webSite.put("admin_dashboard_naver","nav-md");
-}
-request.setAttribute("webs",webSite);
 request.setAttribute("res",new flexjson.JSONSerializer().deepSerialize(request.getAttribute("_res")));
 %>
 <!DOCTYPE html>

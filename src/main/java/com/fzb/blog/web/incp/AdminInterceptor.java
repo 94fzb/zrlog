@@ -1,5 +1,6 @@
 package com.fzb.blog.web.incp;
 
+import com.fzb.blog.common.BaseDataInitVO;
 import com.fzb.blog.common.Constants;
 import com.fzb.blog.common.response.ExceptionResponse;
 import com.fzb.blog.model.User;
@@ -20,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Map;
 
 /**
  * 负责全部后台请求的处理（/admin/plugins/*除外），目前还是使用的Session的方式保存用户是否登陆，及管理员登陆成功后将管理员数据存放在Session
@@ -44,10 +46,17 @@ class AdminInterceptor implements Interceptor {
      * @param ai
      */
     private void adminPermission(Invocation ai) {
+        System.out.println(ai.getActionKey());
         try {
             Controller controller = ai.getController();
             int userId = adminTokenService.getUserId(controller.getRequest());
             if (userId > 0) {
+                BaseDataInitVO init = (BaseDataInitVO) ai.getController().getRequest().getAttribute("init");
+                Map<String, Object> webSite = init.getWebSite();
+                if (webSite.get("admin_dashboard_naver") == null) {
+                    webSite.put("admin_dashboard_naver", "nav-md");
+                }
+                ai.getController().getRequest().setAttribute("webs", webSite);
                 try {
                     User user = User.dao.findById(userId);
                     controller.setAttr("user", user);

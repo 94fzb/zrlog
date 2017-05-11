@@ -3,10 +3,16 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.fzb</groupId>
     <artifactId>zrlog</artifactId>
-    <version>1.6.5</version>
+    <version>1.7.0-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>zrlog</name>
     <description>zrlog 基于JFinal/简洁好用的开源博客</description>
+
+    <properties>
+        <tomcat.version>8.0.28</tomcat.version>
+        <java.version>1.7</java.version>
+    </properties>
+
     <developers>
         <developer>
             <name>xiaochun</name>
@@ -37,8 +43,8 @@
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
             <scope>provided</scope>
         </dependency>
 
@@ -88,6 +94,44 @@
             <version>3.8.2</version>
             <scope>test</scope>
         </dependency>
+
+        <!--tomcat embed mode-->
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-core</artifactId>
+            <version>${tomcat.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-logging-juli</artifactId>
+            <version>${tomcat.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-jasper</artifactId>
+            <version>${tomcat.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-jasper</artifactId>
+            <version>${tomcat.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-jasper-el</artifactId>
+            <version>${tomcat.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-jsp-api</artifactId>
+            <version>${tomcat.version}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -102,11 +146,20 @@
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
                 <version>2.3.2</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <port>8080</port>
+                    <path>/</path>
+                </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-war-plugin</artifactId>
@@ -115,7 +168,15 @@
                     <resourceEncoding>UTF-8</resourceEncoding>
                     <warSourceDirectory>src/main/webapp</warSourceDirectory>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
-                    <packagingExcludes>include/templates/.idea/**,include/templates/*.zip,/attached/**,WEB-INF/plugins/**,post/**</packagingExcludes>
+                    <packagingExcludes>
+                        WEB-INF/classes/rebel.xml,
+                        WEB-INF/classes/com/fzb/blog/web/Application.class,
+                        include/templates/.idea/**,
+                        include/templates/*.zip,
+                        attached/**,
+                        WEB-INF/plugins/**,
+                        post/**
+                    </packagingExcludes>
                 </configuration>
             </plugin>
         </plugins>
