@@ -2,8 +2,8 @@ package com.fzb.blog.util;
 
 import com.fzb.blog.common.Constants;
 import com.fzb.blog.web.incp.InitDataInterceptor;
+import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
-import com.jfinal.i18n.Res;
 import com.jfinal.kit.PathKit;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -22,8 +22,8 @@ public class I18NUtil {
 
     private static final String I18N_FILE_NAME = "_i18nFileName";
     private static final Logger LOGGER = LoggerFactory.getLogger(InitDataInterceptor.class);
-    private static final Map<String, Map<String, Object>> I18N_RES_MAP = new HashMap<String, Map<String, Object>>();
-    private static final Set<String> loadSet = new HashSet<String>();
+    private static final Map<String, Map<String, Object>> I18N_RES_MAP = new HashMap<>();
+    private static final Set<String> loadSet = new HashSet<>();
 
     static {
         loadI18N(PathKit.getRootClassPath());
@@ -37,7 +37,7 @@ public class I18NUtil {
                     String key = file.getName().replace(".properties", "");
                     Map<String, Object> map = I18N_RES_MAP.get(key);
                     if (map == null) {
-                        map = new HashMap<String, Object>();
+                        map = new HashMap<>();
                         I18N_RES_MAP.put(key, map);
                     }
                     Properties properties = new Properties();
@@ -65,7 +65,7 @@ public class I18NUtil {
         return files != null;
     }
 
-    public static void addToRequest(String path, HttpServletRequest request) {
+    public static void addToRequest(String path, Controller controller) {
         if (JFinal.me().getConstants().getDevMode() || !loadSet.contains(path)) {
             if (loadI18N(path)) {
                 loadSet.add(path);
@@ -73,10 +73,10 @@ public class I18NUtil {
         }
         String i18nFile;
         String locale = null;
+        HttpServletRequest request = controller.getRequest();
         if (request.getAttribute(I18N_FILE_NAME) != null) {
             i18nFile = request.getAttribute(I18N_FILE_NAME).toString();
         } else {
-            Res res = (Res) request.getAttribute("_res");
             //try get locale info for HTTP header
             if (request.getRequestURI().contains("/admin")) {
                 Map<String, Object> webSite = (Map<String, Object>) JFinal.me().getServletContext().getAttribute("webSite");
@@ -92,7 +92,7 @@ public class I18NUtil {
             }
 
             if (locale == null) {
-                locale = res.getResourceBundle().getLocale().toString();
+                locale = "zh_CN";
             }
             request.setAttribute("local", locale);
             if (locale.contains("_")) {
@@ -112,7 +112,7 @@ public class I18NUtil {
                 }
             }
         }
-        request.setAttribute("_res", i18nMap);
+        controller.setAttr("_res", i18nMap);
     }
 
     public static String getStringFromRes(String key, HttpServletRequest request) {

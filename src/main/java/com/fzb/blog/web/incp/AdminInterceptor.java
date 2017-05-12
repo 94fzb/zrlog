@@ -29,9 +29,8 @@ import java.util.Map;
  */
 class AdminInterceptor implements Interceptor {
 
-    private AdminTokenService adminTokenService = new AdminTokenService();
-
     private static final Logger LOGGER = LoggerFactory.getLogger(AdminInterceptor.class);
+    private AdminTokenService adminTokenService = new AdminTokenService();
 
     @Override
     public void intercept(Invocation inv) {

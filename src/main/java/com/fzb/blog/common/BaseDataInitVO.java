@@ -103,6 +103,14 @@ public class BaseDataInitVO implements Serializable {
         this.archiveList = archiveList;
     }
 
+    public Statistics getStatistics() {
+        return statistics;
+    }
+
+    public void setStatistics(Statistics statistics) {
+        this.statistics = statistics;
+    }
+
     public static class Statistics implements Serializable {
 
         private long totalArticleSize;
@@ -132,13 +140,5 @@ public class BaseDataInitVO implements Serializable {
         public void setTotalTypeSize(long totalTypeSize) {
             this.totalTypeSize = totalTypeSize;
         }
-    }
-
-    public Statistics getStatistics() {
-        return statistics;
-    }
-
-    public void setStatistics(Statistics statistics) {
-        this.statistics = statistics;
     }
 }

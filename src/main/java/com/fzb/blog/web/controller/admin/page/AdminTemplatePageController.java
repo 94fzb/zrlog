@@ -110,7 +110,7 @@ public class AdminTemplatePageController extends BaseController {
             setAttr("include", templateName + "/setting/index");
             setAttr("template", templateName);
             setAttr("menu", "1");
-            I18NUtil.addToRequest(PathKit.getWebRootPath() + templateName + "/language/", getRequest());
+            I18NUtil.addToRequest(PathKit.getWebRootPath() + templateName + "/language/", this);
             String jsonStr = new WebSite().getValueByName(templateName + templateConfigSuffix);
             fullTemplateSetting(jsonStr);
             return "/admin/blank";

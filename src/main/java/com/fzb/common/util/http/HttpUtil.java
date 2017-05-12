@@ -29,6 +29,12 @@ public class HttpUtil {
     private static HttpUtil disableRedirectInstance = new HttpUtil(true);
     private static HttpUtil instance = new HttpUtil(false);
 
+    static {
+        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
+        httpClient = HttpClientBuilder.create().setConnectionManager(connectionManager).build();
+        disableRedirectHttpClient = HttpClientBuilder.create().setConnectionManager(connectionManager).disableRedirectHandling().build();
+    }
+
     private boolean disableRedirect;
 
     private HttpUtil(boolean disableRedirect) {
@@ -43,10 +49,15 @@ public class HttpUtil {
         return instance;
     }
 
-    static {
-        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-        httpClient = HttpClientBuilder.create().setConnectionManager(connectionManager).build();
-        disableRedirectHttpClient = HttpClientBuilder.create().setConnectionManager(connectionManager).disableRedirectHandling().build();
+    public static void main(String[] args) throws IOException {
+        String urlStr = "http://ports.ubuntu.com/pool/universe/o/opencv/libopencv-imgproc2.4_2.4.9%2bdfsg-1ubuntu4_armhf.deb";
+        URL url = new URL(urlStr);
+        try {
+            URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
+            System.out.println(uri.toASCIIString());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
     }
 
     private HttpPost postForm(String urlPath, Map<String, String[]> params) {
@@ -121,7 +132,6 @@ public class HttpUtil {
         return sendRequest(postForm(urlPath, date), httpHandle, reqHeaders);
     }
 
-
     public <T> HttpHandle<? extends T> sendRequest(HttpRequestBase httpRequestBase, HttpHandle<T> httpHandle, Map<String, String> reqHeaders)
             throws IOException {
         setHttpHeaders(httpRequestBase, reqHeaders);
@@ -166,16 +176,5 @@ public class HttpUtil {
 
     public String getTextByUrl(String url) throws IOException {
         return sendGetRequest(url, new HttpStringHandle(), new HashMap<String, String>()).getT();
-    }
-
-    public static void main(String[] args) throws IOException {
-        String urlStr = "http://ports.ubuntu.com/pool/universe/o/opencv/libopencv-imgproc2.4_2.4.9%2bdfsg-1ubuntu4_armhf.deb";
-        URL url = new URL(urlStr);
-        try {
-            URI uri = new URI(url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(), url.getPath(), url.getQuery(), url.getRef());
-            System.out.println(uri.toASCIIString());
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
     }
 }
