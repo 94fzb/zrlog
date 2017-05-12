@@ -1,7 +1,6 @@
 package com.fzb.blog.web.plugin;
 
 import com.fzb.blog.common.Constants;
-import com.fzb.common.util.CmdUtil;
 import com.fzb.common.util.IOUtil;
 import com.fzb.common.util.JarPackageUtil;
 import com.fzb.common.util.ZipUtil;

@@ -20,12 +20,12 @@ import com.fzb.common.util.http.handle.HttpFileHandle;
 import com.jfinal.config.*;
 import com.jfinal.core.JFinal;
 import com.jfinal.ext.interceptor.SessionInViewInterceptor;
-import com.jfinal.i18n.I18nInterceptor;
 import com.jfinal.kit.PathKit;
 import com.jfinal.plugin.IPlugin;
 import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
 import com.jfinal.plugin.c3p0.C3p0Plugin;
 import com.jfinal.render.ViewType;
+import com.jfinal.template.Engine;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -162,7 +162,6 @@ public class ZrlogConfig extends JFinalConfig {
     public void configInterceptor(Interceptors incp) {
         incp.add(new SessionInViewInterceptor());
         incp.add(new InitDataInterceptor());
-        incp.add(new I18nInterceptor());
         incp.add(new MyI18NInterceptor());
         incp.add(new BlackListInterceptor());
         incp.add(new RouterInterceptor());
@@ -268,10 +267,10 @@ public class ZrlogConfig extends JFinalConfig {
         routes.add(new AdminRoutes());
     }
 
-    /*@Override
+    @Override
     public void configEngine(Engine engine) {
 
-    }*/
+    }
 
     /**
      * 当安装流程正常执行完成时，调用了该方法，主要用于配置，启动JFinal插件功能，以及相应的Zrlog的插件服务。

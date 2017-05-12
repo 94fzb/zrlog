@@ -8,7 +8,6 @@ import com.fzb.blog.util.ZrlogUtil;
 import com.fzb.blog.web.controller.BaseController;
 import com.fzb.blog.web.util.WebTools;
 import com.jfinal.core.Controller;
-import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
 import org.apache.log4j.Logger;
 
@@ -120,7 +119,7 @@ public class TemplateHelper {
             BaseController baseController = ((BaseController) controller);
             String basePath = baseController.getTemplatePath();
             controller.getRequest().setAttribute("template", basePath);
-            I18NUtil.addToRequest(PathKit.getWebRootPath() + basePath + "/language/", controller.getRequest());
+            I18NUtil.addToRequest(PathKit.getWebRootPath() + basePath + "/language/", controller);
             baseController.fullTemplateSetting();
             TemplateHelper.fullInfo(controller.getRequest(), baseController.getStaticHtmlStatus());
             return basePath;

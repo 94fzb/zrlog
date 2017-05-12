@@ -5,7 +5,6 @@ import com.fzb.blog.util.BlogBuildInfoUtil;
 import com.fzb.blog.util.ZrlogUtil;
 import com.fzb.blog.web.config.ZrlogConfig;
 import com.fzb.blog.web.controller.BaseController;
-import com.fzb.blog.web.util.WebTools;
 import com.jfinal.aop.Interceptor;
 import com.jfinal.aop.Invocation;
 import org.slf4j.Logger;

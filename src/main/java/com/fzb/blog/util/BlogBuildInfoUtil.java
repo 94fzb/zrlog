@@ -1,7 +1,6 @@
 package com.fzb.blog.util;
 
 
-import com.fzb.blog.model.Log;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;

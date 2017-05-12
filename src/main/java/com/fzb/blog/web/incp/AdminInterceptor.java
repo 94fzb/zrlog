@@ -29,9 +29,8 @@ import java.util.Map;
  */
 class AdminInterceptor implements Interceptor {
 
-    private AdminTokenService adminTokenService = new AdminTokenService();
-
     private static final Logger LOGGER = LoggerFactory.getLogger(AdminInterceptor.class);
+    private AdminTokenService adminTokenService = new AdminTokenService();
 
     @Override
     public void intercept(Invocation inv) {
@@ -46,7 +45,6 @@ class AdminInterceptor implements Interceptor {
      * @param ai
      */
     private void adminPermission(Invocation ai) {
-        System.out.println(ai.getActionKey());
         try {
             Controller controller = ai.getController();
             int userId = adminTokenService.getUserId(controller.getRequest());

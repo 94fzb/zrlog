@@ -7,7 +7,7 @@
 *~
 .classpath
 bin
-zrlog.iml
+*.iml
 .idea
 .project
 .attach_pid*
