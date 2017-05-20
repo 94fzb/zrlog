@@ -1,0 +1,1 @@
+mvn clean compile tomcat7:run -Dscope=provided
