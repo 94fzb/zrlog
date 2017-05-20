@@ -11,7 +11,7 @@
     <properties>
         <tomcat7Version>7.0.47</tomcat7Version>
         <java.version>1.7</java.version>
-        <scope>compile</scope>
+        <tomcat-scope>compile</tomcat-scope>
     </properties>
 
     <developers>
@@ -101,37 +101,37 @@
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
             <version>${tomcat7Version}</version>
-            <scope>${scope}</scope>
+            <scope>${tomcat-scope}</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-logging-juli</artifactId>
             <version>${tomcat7Version}</version>
-            <scope>${scope}</scope>
+            <scope>${tomcat-scope}</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-jasper</artifactId>
             <version>${tomcat7Version}</version>
-            <scope>${scope}</scope>
+            <scope>${tomcat-scope}</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat</groupId>
             <artifactId>tomcat-jasper</artifactId>
             <version>${tomcat7Version}</version>
-            <scope>${scope}</scope>
+            <scope>${tomcat-scope}</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat</groupId>
             <artifactId>tomcat-jasper-el</artifactId>
             <version>${tomcat7Version}</version>
-            <scope>${scope}</scope>
+            <scope>${tomcat-scope}</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat</groupId>
             <artifactId>tomcat-jsp-api</artifactId>
             <version>${tomcat7Version}</version>
-            <scope>${scope}</scope>
+            <scope>${tomcat-scope}</scope>
         </dependency>
     </dependencies>
 
