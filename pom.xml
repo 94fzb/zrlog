@@ -9,8 +9,9 @@
     <description>zrlog 基于JFinal/简洁好用的开源博客</description>
 
     <properties>
-        <tomcat.version>8.0.28</tomcat.version>
+        <tomcat7Version>7.0.47</tomcat7Version>
         <java.version>1.7</java.version>
+        <scope>compile</scope>
     </properties>
 
     <developers>
@@ -99,32 +100,38 @@
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
-            <version>${tomcat.version}</version>
+            <version>${tomcat7Version}</version>
+            <scope>${scope}</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-logging-juli</artifactId>
-            <version>${tomcat.version}</version>
+            <version>${tomcat7Version}</version>
+            <scope>${scope}</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-jasper</artifactId>
-            <version>${tomcat.version}</version>
+            <version>${tomcat7Version}</version>
+            <scope>${scope}</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat</groupId>
             <artifactId>tomcat-jasper</artifactId>
-            <version>${tomcat.version}</version>
+            <version>${tomcat7Version}</version>
+            <scope>${scope}</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat</groupId>
             <artifactId>tomcat-jasper-el</artifactId>
-            <version>${tomcat.version}</version>
+            <version>${tomcat7Version}</version>
+            <scope>${scope}</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat</groupId>
             <artifactId>tomcat-jsp-api</artifactId>
-            <version>${tomcat.version}</version>
+            <version>${tomcat7Version}</version>
+            <scope>${scope}</scope>
         </dependency>
     </dependencies>
 

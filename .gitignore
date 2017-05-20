@@ -6,8 +6,7 @@
 
 *~
 .classpath
-bin
-zrlog.iml
+*.iml
 .idea
 .project
 .attach_pid*
@@ -27,3 +26,4 @@ src/main/webapp/include/templates/*.sh
 src/main/webapp/include/templates/.gitignore
 src/main/resources/rebel.xml
 tomcat.*
+*.jar

@@ -45,7 +45,6 @@ class AdminInterceptor implements Interceptor {
      * @param ai
      */
     private void adminPermission(Invocation ai) {
-        System.out.println(ai.getActionKey());
         try {
             Controller controller = ai.getController();
             int userId = adminTokenService.getUserId(controller.getRequest());
