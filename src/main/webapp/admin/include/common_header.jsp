@@ -17,7 +17,7 @@ request.setAttribute("res",new flexjson.JSONSerializer().deepSerialize(request.g
 <html>
   <base href="<%=basePath%>">
   <head>
-    <title>${webs.title} | 后台管理 </title>
+    <title>${webs.title} | ${_res['admin.management']} </title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <!-- Meta, title, CSS, favicons, etc. -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">

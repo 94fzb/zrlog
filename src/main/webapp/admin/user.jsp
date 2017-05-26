@@ -35,7 +35,7 @@
 
 	<div class="form-group">
 		<label for="form-field-1"
-			class="col-sm-3 control-label no-padding-right"> 邮箱 </label>
+			class="col-sm-3 control-label no-padding-right"> ${_res['email']} </label>
 
 		<div class="col-sm-3">
 			<input type="text" name="email" value="${user.email }"
@@ -44,7 +44,7 @@
 	</div>
 
 	<div class="form-group">
-		<label for="form-field-1"class="col-sm-3 control-label no-padding-right">头像</label>
+		<label for="form-field-1"class="col-sm-3 control-label no-padding-right">${_res['headPortrait']}</label>
 		<div class="col-sm-9">
 			<input id="logo" class="col-xs-6 col-sm-6" id="form-field-1" name="header" value="${user.header}">
 			<input type="file" class="col-xs-6 fileUpload" id="form-field-1" name="imgFile" value="上传" />
@@ -55,7 +55,7 @@
 	<div class="form-group">
 		<div class="col-md-offset-3 col-md-9">
 			<button id="user" type="button" class="btn btn-info">
-				<i class="fa fa-check bigger-110"></i> 提交
+				<i class="fa fa-check bigger-110"></i> ${_res['submit']}
 			</button>
 		</div>
 	</div>

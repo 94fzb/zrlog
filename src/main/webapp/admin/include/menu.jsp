@@ -192,7 +192,7 @@
                 <li>
                     <div class="text-center">
                     <a href="admin/comment">
-                        查看所有消息
+                        ${_res['admin.viewAllComment']}
                         <i class="fa fa-angle-right"></i>
                     </a>
                     </div>

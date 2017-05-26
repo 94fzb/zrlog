@@ -114,12 +114,11 @@ height: 38px;
 	<div class="form-group col-xs-12">
 		<div class="col-md-offset-5 col-md-6">
 			<button class="btn btn-primary" id="saveToRubbish" type="button">
-				<i class="fa fa-pencil bigger-110"></i>
-				存为草稿
+				${_res['saveAsDraft']}
 			</button>
 			<button class="btn btn-info" id="createOrUpdate" type="button">
 				<i class="fa fa-save bigger-110"></i>
-				保存
+				${_res['save']}
 			</button>
 		</div>
 	</div>
