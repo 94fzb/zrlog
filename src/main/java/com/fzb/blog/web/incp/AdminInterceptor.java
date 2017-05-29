@@ -57,6 +57,9 @@ class AdminInterceptor implements Interceptor {
                 ai.getController().getRequest().setAttribute("webs", webSite);
                 try {
                     User user = User.dao.findById(userId);
+                    if (StringUtils.isBlank(user.getStr("header"))) {
+                        user.set("header", "assets/images/default-portrait.gif");
+                    }
                     controller.setAttr("user", user);
                     TemplateHelper.fullTemplateInfo(controller);
                     if (!ai.getActionKey().equals("/admin/logout")) {

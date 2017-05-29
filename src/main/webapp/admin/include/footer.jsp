@@ -6,7 +6,7 @@
 		   </strong>
 		   All rights reserved.
 		  <div class="pull-right">
-		    <strong>Version</strong> ${zrlog.version} - ${zrlog.buildId}
+		    <strong>Version</strong> ${zrlog.version}
 		  </div>
 		  <div class="clearfix"></div>
 		</footer>

@@ -10,7 +10,6 @@ ${_res.dashboard}
  <div class="alert alert-block alert-info">
 	<i class="fa fa-info">&nbsp;</i>
 	${_res['admin.index.welcomeTips']}
-	<small>&nbsp;v${zrlog.version} - ${zrlog.buildId} (${zrlog.buildTime})</small>
 </div>
 <div class="row">
 <div class="col-sm-7">
@@ -39,17 +38,11 @@ ${_res.dashboard}
 							<td>
 								运行环境
 							</td>
-							<td>${system['java.vm.name']}</td>
-						</tr>
-						 <tr>
-							<td>
-								运行环境版本
-							</td>
-							<td>${system['java.runtime.version']}</td>
+							<td>${system['java.vm.name']} (${system['java.runtime.version']})</td>
 						</tr>
 						<tr>
 							<td>
-								J2EE 容器信息
+								JavaEE 容器信息
 							</td>
 							<td>${system['server.info']}</td>
 						</tr>
@@ -58,12 +51,6 @@ ${_res.dashboard}
 								运行路径
 							</td>
 							<td>${system['zrlog.runtime.path']}</td>
-						</tr>
-						<tr>
-							<td>
-								虚拟机提供者
-							</td>
-							<td>${system['java.vm.vendor']}</td>
 						</tr>
 						<tr>
 							<td>
@@ -94,6 +81,12 @@ ${_res.dashboard}
 								系统编码
 							</td>
 							<td>${system['file.encoding']}</td>
+						</tr>
+                        <tr>
+							<td>
+								程序版本
+							</td>
+							<td>${zrlog.version} - ${zrlog.buildId} (${zrlog.buildTime})</td>
 						</tr>
 
 					</tbody>
