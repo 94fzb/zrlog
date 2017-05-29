@@ -6,6 +6,11 @@ $(function(){
       minimumResultsForSearch: -1,
       allowClear: true
     });
+    function zeroPad(num, places) {
+      var zero = places - num.toString().length + 1;
+      return Array(+(zero > 0 && zero)).join("0") + num;
+    }
+
 	var checkedSkin = $("body").get(0).getAttribute("class");
 	var dark = (checkedSkin == 'skin-1');
 	mdEditor = editormd("editormd", {
@@ -116,7 +121,7 @@ $(function(){
 		if(change && validationPost()){
 			$.post('api/admin/article/createOrUpdate?rubbish=1',$('#article-form').serialize(),function(data){
                 var date=new Date();
-                tips(data,"自动保存成功 "+date.getHours()+":"+date.getMinutes() +":"+date.getSeconds())
+                tips(data,"自动保存成功 "+zeroPad(date.getHours(),2)+":"+zeroPad(date.getMinutes(),2) +":"+zeroPad(date.getSeconds(),2))
 			});
 		}
 		change = 0;
