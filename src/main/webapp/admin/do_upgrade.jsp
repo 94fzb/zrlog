@@ -13,8 +13,8 @@
 		<h2>
     		更新向导
     	</h2>
-  <div class="col-xs-2"></div>
-  <div class="col-xs-8">
+  <div class="col-md-2"></div>
+  <div class="col-md-8">
 <div id="wizard_verticle" class="form_wizard wizard_horizontal">
   <ul class="list-unstyled wizard_steps anchor">
     <li>

@@ -70,6 +70,8 @@ class AdminInterceptor implements Interceptor {
                         // 存在消息提示
                         if (controller.getRequest().getAttribute("message") != null) {
                             controller.render("/admin/message.jsp");
+                        } else {
+                            controller.render(Constants.ADMIN_NOT_FOUND_PAGE + ".jsp");
                         }
                     }
                 } catch (Exception e) {
@@ -148,9 +150,13 @@ class AdminInterceptor implements Interceptor {
                     if (new File(PathKit.getWebRootPath() + templatePath).exists()) {
                         controller.render(templatePath);
                         rendered = true;
+                    } else {
+                        rendered = false;
                     }
                 }
             }
+        } else {
+            rendered = true;
         }
         return rendered;
     }

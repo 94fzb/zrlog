@@ -86,7 +86,7 @@
 				<div class="form-group">
 					<div class="col-md-offset-3 col-md-9">
 						<button id="baseMsg" type="button" class="btn btn-info">
-							<i class="fa fa-check bigger-110"></i> 提交
+							<i class="fa fa-check bigger-110"></i> ${_res['submit']}
 						</button>
 					</div>
 				</div>
@@ -144,7 +144,7 @@
 				<div class="form-group">
 					<div class="col-md-offset-3 col-md-9">
 						<button id="otherMsg" type="button" class="btn btn-info">
-							<i class="fa fa-check bigger-110"></i> 提交
+							<i class="fa fa-check bigger-110"></i> ${_res['submit']}
 						</button>
 					</div>
 				</div>
@@ -172,7 +172,7 @@
 				<div class="form-group">
 					<div class="col-md-offset-3 col-md-9">
 						<button id="blackList" type="button" class="btn btn-info">
-							<i class="fa fa-check bigger-110"></i> 提交
+							<i class="fa fa-check bigger-110"></i> ${_res['submit']}
 						</button>
 					</div>
 				</div>

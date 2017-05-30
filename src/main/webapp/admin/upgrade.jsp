@@ -3,6 +3,7 @@
 <jsp:include page="include/menu.jsp"/>
 <script type="text/javascript" src="${cacheFile['/admin/js/set_update.js']}"></script>
 <script type="text/javascript" src="${cacheFile['/admin/js/upgrade.js']}"></script>
+<script src="${cacheFile['/assets/js/select2/select2.min.js']}"></script>
 <script src="${cacheFile['/assets/js/switchery.min.js']}"></script>
 <div class="page-header">
 	<h3>
@@ -23,7 +24,7 @@
 
 		<div class="col-sm-3">
 			<span class="col-sm-9">
-			<select name="autoUpgradeVersion" class="form-control">
+			<select name="autoUpgradeVersion" class="form-control select2_single">
 				<!--
 				<option <c:if test="${webs.autoUpgradeVersion == 60}">selected="selected"</c:if> value="60">${_res['admin.upgrade.cycle.oneMinute']}</option>
 				<option <c:if test="${webs.autoUpgradeVersion == 3600}">selected="selected"</c:if> value="3600">${_res['admin.upgrade.cycle.oneHour']}</option>

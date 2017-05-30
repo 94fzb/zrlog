@@ -32,8 +32,9 @@ public class AdminPageController extends BaseController {
             JFinal.me().getServletContext().setAttribute("toDayCommCount", Comment.dao.getToDayCommentCount());
             JFinal.me().getServletContext().setAttribute("clickCount", Log.dao.getAllClick());
             JFinal.me().getServletContext().setAttribute("lastVersion", new UpgradeController().lastVersion());
-            if (getPara(0) == null) {
-                return "/admin/index";
+            if (getPara(0) == null || getRequest().getRequestURI().endsWith("admin/") || "login".equals(getPara(0))) {
+                redirect("/admin/index");
+                return null;
             } else {
                 return "/admin/" + getPara(0);
             }

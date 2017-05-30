@@ -1,4 +1,8 @@
 $(function(){
+    $(".select2_single").select2({
+      minimumResultsForSearch: -1,
+      allowClear: true
+    });
     function checkVersion(){
         $.get("api/admin/upgrade/checkNewVersion",function(e){
            var message = "";

@@ -91,7 +91,7 @@ ${fileContent}
 <div class="form-group">
 	<div class="col-md-offset-1">
 		<button class="btn btn-info" type="button" id="saveFile">
-			<i class="fa fa-check bigger-110"></i> 保存
+			<i class="fa fa-check bigger-110"></i> ${_res['submit']}
 		</button>
 	</div>
 </div>
