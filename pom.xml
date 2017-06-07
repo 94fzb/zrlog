@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.fzb</groupId>
     <artifactId>zrlog</artifactId>
-    <version>1.7.0</version>
+    <version>1.8.0-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>zrlog</name>
     <description>zrlog 基于JFinal/简洁好用的开源博客</description>
@@ -88,6 +88,11 @@
             <groupId>net.sf.flexjson</groupId>
             <artifactId>flexjson</artifactId>
             <version>3.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.8.1</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

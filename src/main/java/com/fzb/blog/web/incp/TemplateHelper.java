@@ -187,9 +187,7 @@ public class TemplateHelper {
             T t = (T) objectInputStream.readObject();
             objectInputStream.close();
             return t;
-        } catch (IOException e) {
-            LOGGER.error(e);
-        } catch (ClassNotFoundException e) {
+        } catch (IOException | ClassNotFoundException e) {
             LOGGER.error(e);
         } finally {
             if (objectInputStream != null) {

@@ -26,7 +26,7 @@
          <c:forEach items="${log.comments}" var="comment">
            <ul class="comments">
             <li><p>${comment.userComment}</p>
-         <p class="small"><a rel="nofollow" >${comment.userName }</a> ${_res.on} ${comment.commTime }</p>
+         <p class="small"><a rel="nofollow" >${comment.userName }</a> ${_res.on}&nbsp;${comment.commTime}</p>
             </li></ul>
          </c:forEach>
          <div id="cwrapper">

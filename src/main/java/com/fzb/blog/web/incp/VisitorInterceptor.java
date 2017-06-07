@@ -47,6 +47,9 @@ class VisitorInterceptor implements Interceptor {
     private void visitorPermission(Invocation ai) {
         ai.invoke();
         String templateName = ai.getReturnValue();
+        if (templateName == null) {
+            return;
+        }
         String ext = "";
         if (JFinal.me().getConstants().getViewType() == ViewType.JSP) {
             ext = ".jsp";
