@@ -8,7 +8,11 @@ import com.fzb.blog.util.I18NUtil;
 import com.fzb.blog.util.ParseUtil;
 import com.fzb.blog.web.controller.BaseController;
 import com.fzb.blog.web.util.WebTools;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.*;
 
 public class PostController extends BaseController {
@@ -144,19 +148,29 @@ public class PostController extends BaseController {
         return "page";
     }
 
-    public String addComment() {
-        if (getPara("logId") != null && getPara("userComment") != null) {
-            // TODO　如何过滤垃圾信息
-            new Comment().set("userHome", getPara("userHome"))
-                    .set("userMail", getPara("userMail"))
-                    .set("userIp", WebTools.getRealIp(getRequest()))
-                    .set("userName", getPara("userName"))
-                    .set("logId", getPara("logId"))
-                    .set("userComment", getPara("userComment"))
-                    .set("commTime", new Date()).set("hide", 1).save();
-            detail(getPara("logId"));
+    public void addComment() throws UnsupportedEncodingException {
+        Integer logId = getParaToInt("logId");
+        if (logId != null && getPara("userComment") != null) {
+            String comment = Jsoup.clean(getPara("userComment"), Whitelist.basic());
+            if (comment.length() > 0) {
+                // TODO　如何过滤垃圾信息
+                new Comment().set("userHome", getPara("userHome"))
+                        .set("userMail", getPara("userMail"))
+                        .set("userIp", WebTools.getRealIp(getRequest()))
+                        .set("userName", getPara("userName"))
+                        .set("logId", logId)
+                        .set("userComment", comment)
+                        .set("commTime", new Date()).set("hide", 1).save();
+            }
+            detail(logId);
+            Log log = Log.dao.getLogById(logId);
+            String alias = URLEncoder.encode(log.getStr("alias"), "UTF-8");
+            if (getRequest().getContextPath().isEmpty()) {
+                redirect("/post/" + alias);
+            } else {
+                redirect(getRequest().getContextPath() + "post/" + alias);
+            }
         }
-        return "detail";
     }
 
     public String detail() {
@@ -164,7 +178,7 @@ public class PostController extends BaseController {
     }
 
     private String detail(Object id) {
-        Log log = Log.dao.getLogByLogId(id);
+        Log log = Log.dao.getLogById(id);
         if (log != null) {
             Integer logId = log.get("logId");
             Log.dao.clickChange(logId);

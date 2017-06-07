@@ -38,17 +38,13 @@ public class PluginHandler extends Handler {
         if (target.startsWith("/admin/plugins/")) {
             try {
                 adminPermission(target, request, response);
-            } catch (IOException e) {
-                LOGGER.error(e);
-            } catch (InstantiationException e) {
+            } catch (IOException | InstantiationException e) {
                 LOGGER.error(e);
             }
         } else if (target.startsWith("/plugin/") || target.startsWith("/p/")) {
             try {
                 visitorPermission(target, request, response);
-            } catch (IOException e) {
-                LOGGER.error(e);
-            } catch (InstantiationException e) {
+            } catch (IOException | InstantiationException e) {
                 LOGGER.error(e);
             }
         } else {

@@ -96,9 +96,7 @@ public class StaticFileCheckHandler extends Handler {
             CloseableHttpResponse closeableHttpResponse = HttpUtil.getInstance().sendGetRequest(sSourceUrl, new CloseResponseHandle(), new HashMap<String, String>()).getT();
             if (closeableHttpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 String str = IOUtil.getStringInputStream(closeableHttpResponse.getEntity().getContent());
-                if (str != null) {
-                    IOUtil.writeBytesToFile(str.getBytes("UTF-8"), file);
-                }
+                IOUtil.writeBytesToFile(str.getBytes("UTF-8"), file);
             }
         } catch (IOException e) {
             LOGGER.error("convert2Html error", e);

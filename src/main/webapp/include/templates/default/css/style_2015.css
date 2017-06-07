@@ -25,7 +25,7 @@ section article li sup a, section .content sup a{text-decoration:none;}
 section p a:hover,
 section .content a:hoveraaa,
 section .content a:hover span{color:#FF7300;}
-section .content table{width:97%; margin: 0 auto 15px; border-left:1px solid #CCCCCC; border-top:1px solid #CCCCCC;}
+section .content table{border-left:1px solid #CCCCCC; border-top:1px solid #CCCCCC;}
 section .content th,
 section .content td{padding:5px 8px; font-size:13px; border-right:1px solid #DDDDDD; border-bottom:1px solid #DDDDDD;}
 section .content th{font-weight:bold; background-color:#f2f2f2; text-align:center;}

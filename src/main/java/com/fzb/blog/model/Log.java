@@ -30,7 +30,7 @@ public class Log extends Model<Log> implements Serializable {
     public Log() {
     }
 
-    public Log getLogByLogId(Object id) {
+    public Log getLogById(Object id) {
         if (id != null) {
             String sql = "select l.*,u.userName,(select count(commentId) from comment where logId=l.logId) commentSize ,t.alias as typeAlias,t.typeName as typeName  from log l inner join user u,type t where t.typeId=l.typeId and u.userId=l.userId and rubbish=? and private=? and l.logId=?";
             Log log = findFirst(sql, rubbish, pre, id);
