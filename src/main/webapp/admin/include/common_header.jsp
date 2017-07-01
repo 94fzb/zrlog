@@ -40,6 +40,7 @@ request.setAttribute("res",new flexjson.JSONSerializer().deepSerialize(request.g
     <script src="${cacheFile['/admin/js/dashboard.js']}"></script>
     <script>
         var _res = ${res};
+        var editorMdPath = "admin/markdown/lib/"
     </script>
 
   </head>

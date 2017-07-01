@@ -16,7 +16,7 @@ $(function(){
 	mdEditor = editormd("editormd", {
 		width: "100%",
 		height: 400,
-		path : 'admin/markdown/lib/',
+		path : editorMdPath,
 		codeFold : true,
 		appendMarkdown :$("#markdown").val(),
 		saveHTMLToTextarea : true,

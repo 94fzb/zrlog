@@ -25,7 +25,7 @@ height: 38px;
 </style>
 <script src="${cacheFile['/admin/markdown/js/editormd.min.js']}"></script>
 <c:if test='${lang eq "en"}'>
-<script src="${cacheFile['admin/markdown/languages/${lang}.js']}"></script>
+<script src="${cacheFile['/admin/markdown/languages/en.js']}"></script>
 </c:if>
 <script src="${cacheFile['/assets/js/select2/select2.min.js']}"></script>
 <script src="${cacheFile['/admin/js/article_editor.js']}"></script>
