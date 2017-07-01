@@ -35,20 +35,28 @@ public class PluginHandler extends Handler {
 
     @Override
     public void handle(String target, HttpServletRequest request, HttpServletResponse response, boolean[] isHandled) {
-        if (target.startsWith("/admin/plugins/")) {
-            try {
-                adminPermission(target, request, response);
-            } catch (IOException | InstantiationException e) {
-                LOGGER.error(e);
+        try {
+            int userId = adminTokenService.getUserId(request);
+            if (userId > 0) {
+                adminTokenService.setAdminToken(userId, request, response);
             }
-        } else if (target.startsWith("/plugin/") || target.startsWith("/p/")) {
-            try {
-                visitorPermission(target, request, response);
-            } catch (IOException | InstantiationException e) {
-                LOGGER.error(e);
+            if (target.startsWith("/admin/plugins/")) {
+                try {
+                    adminPermission(target, request, response);
+                } catch (IOException | InstantiationException e) {
+                    LOGGER.error(e);
+                }
+            } else if (target.startsWith("/plugin/") || target.startsWith("/p/")) {
+                try {
+                    visitorPermission(target, request, response);
+                } catch (IOException | InstantiationException e) {
+                    LOGGER.error(e);
+                }
+            } else {
+                this.next.handle(target, request, response, isHandled);
             }
-        } else {
-            this.next.handle(target, request, response, isHandled);
+        } finally {
+            AdminTokenThreadLocal.remove();
         }
     }
 
@@ -62,14 +70,8 @@ public class PluginHandler extends Handler {
      * @throws InstantiationException
      */
     private void adminPermission(String target, HttpServletRequest request, HttpServletResponse response) throws IOException, InstantiationException {
-        int userId = adminTokenService.getUserId(request);
-        if (userId > 0) {
-            try {
-                adminTokenService.setAdminToken(userId, request, response);
-                accessPlugin(target.replace("/admin/plugins", ""), request, response);
-            } finally {
-                AdminTokenThreadLocal.remove();
-            }
+        if (AdminTokenThreadLocal.getUser() != null) {
+            accessPlugin(target.replace("/admin/plugins", ""), request, response);
         } else {
             response.sendRedirect(request.getContextPath()
                     + "/admin/login?redirectFrom="
