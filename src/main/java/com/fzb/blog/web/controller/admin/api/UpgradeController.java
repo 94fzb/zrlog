@@ -38,6 +38,7 @@ public class UpgradeController extends BaseController {
             new WebSite().updateByKV(param.getKey(), param.getValue()[0]);
         }
         cacheService.refreshInitDataCache(this, true);
+        cacheService.removeCachedStaticFile();
         UpdateRecordResponse recordResponse = new UpdateRecordResponse();
         recordResponse.setError(0);
         Plugins plugins = (Plugins) JFinal.me().getServletContext().getAttribute("plugins");

@@ -61,7 +61,7 @@ public class AdminTokenService {
         long loginTime = System.currentTimeMillis();
         adminToken.setCreatedDate(loginTime);
         AdminTokenThreadLocal.setAdminToken(adminToken);
-        String encryptBeforeString = new JSONSerializer().deepSerialize(adminToken);
+        String encryptBeforeString = new JSONSerializer().exclude("*.class").deepSerialize(adminToken);
         try {
             byte[] base64Bytes = Base64.encodeBase64(AESCryptoUtil.encrypt(user.get("secretKey").toString(), encryptBeforeString.getBytes()));
             String encryptAfterString = ByteUtils.bytesToHexString(base64Bytes);

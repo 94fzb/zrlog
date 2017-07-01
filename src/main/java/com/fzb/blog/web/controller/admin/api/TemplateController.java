@@ -36,6 +36,7 @@ public class TemplateController extends BaseController {
         getResponse().addCookie(cookie);
         // 更新缓存数据
         cacheService.refreshInitDataCache(this, true);
+        cacheService.removeCachedStaticFile();
         return webSiteSettingUpdateResponse;
     }
 
@@ -95,6 +96,7 @@ public class TemplateController extends BaseController {
         }
         new WebSite().updateByKV(template + templateConfigSuffix, new JSONSerializer().deepSerialize(settingMap));
         cacheService.refreshInitDataCache(this, true);
+        cacheService.removeCachedStaticFile();
         UpdateRecordResponse updateRecordResponse = new UpdateRecordResponse();
         updateRecordResponse.setMessage("变更成功");
         return updateRecordResponse;

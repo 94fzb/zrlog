@@ -21,6 +21,7 @@ public class WebSiteController extends BaseController {
         WebSiteSettingUpdateResponse updateResponse = new WebSiteSettingUpdateResponse();
         updateResponse.setError(0);
         cacheService.refreshInitDataCache(this, true);
+        cacheService.removeCachedStaticFile();
         return updateResponse;
     }
 }

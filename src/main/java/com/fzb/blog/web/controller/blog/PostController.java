@@ -4,6 +4,7 @@ import com.fzb.blog.model.Comment;
 import com.fzb.blog.model.Log;
 import com.fzb.blog.model.Type;
 import com.fzb.blog.service.ArticleService;
+import com.fzb.blog.service.CacheService;
 import com.fzb.blog.util.I18NUtil;
 import com.fzb.blog.util.ParseUtil;
 import com.fzb.blog.web.controller.BaseController;
@@ -12,6 +13,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.*;
 
@@ -162,13 +164,17 @@ public class PostController extends BaseController {
                         .set("userComment", comment)
                         .set("commTime", new Date()).set("hide", 1).save();
             }
-            detail(logId);
             Log log = Log.dao.getLogById(logId);
             String alias = URLEncoder.encode(log.getStr("alias"), "UTF-8");
+            String ext = "";
+            if (getStaticHtmlStatus()) {
+                ext = ".html";
+                new CacheService().clearStaticPostFileByLogId(logId + "");
+            }
             if (getRequest().getContextPath().isEmpty()) {
-                redirect("/post/" + alias);
+                redirect("/post/" + alias + ext);
             } else {
-                redirect(getRequest().getContextPath() + "post/" + alias);
+                redirect(getRequest().getContextPath() + "post/" + alias + ext);
             }
         }
     }

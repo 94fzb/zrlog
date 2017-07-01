@@ -38,7 +38,7 @@ public class ArticleController extends BaseController {
     public CreateOrUpdateLogResponse createOrUpdate() {
         // 移除缓存文件
         if (getStaticHtmlStatus()) {
-            cacheService.clearStaticPostFileByLogId(getPara("logId") + "");
+            cacheService.removeCachedStaticFile();
         }
         return articleService.createOrUpdate(AdminTokenThreadLocal.getUserId(), getRequest().getParameterMap());
     }

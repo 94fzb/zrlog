@@ -15,7 +15,9 @@ import org.apache.log4j.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,30 +35,40 @@ public class PluginHandler extends Handler {
 
     private AdminTokenService adminTokenService = new AdminTokenService();
 
+    private List<String> pluginHandlerPaths = Arrays.asList("/admin/plugins/", "/plugin/", "/p/");
+
     @Override
     public void handle(String target, HttpServletRequest request, HttpServletResponse response, boolean[] isHandled) {
-        try {
-            int userId = adminTokenService.getUserId(request);
-            if (userId > 0) {
-                adminTokenService.setAdminToken(userId, request, response);
+        boolean isPluginPath = false;
+        for (String path : pluginHandlerPaths) {
+            if (target.startsWith(path)) {
+                isPluginPath = true;
             }
-            if (target.startsWith("/admin/plugins/")) {
-                try {
-                    adminPermission(target, request, response);
-                } catch (IOException | InstantiationException e) {
-                    LOGGER.error(e);
+        }
+        if (isPluginPath) {
+            try {
+                int userId = adminTokenService.getUserId(request);
+                if (userId > 0) {
+                    adminTokenService.setAdminToken(userId, request, response);
                 }
-            } else if (target.startsWith("/plugin/") || target.startsWith("/p/")) {
-                try {
-                    visitorPermission(target, request, response);
-                } catch (IOException | InstantiationException e) {
-                    LOGGER.error(e);
+                if (target.startsWith("/admin/plugins/")) {
+                    try {
+                        adminPermission(target, request, response);
+                    } catch (IOException | InstantiationException e) {
+                        LOGGER.error(e);
+                    }
+                } else if (target.startsWith("/plugin/") || target.startsWith("/p/")) {
+                    try {
+                        visitorPermission(target, request, response);
+                    } catch (IOException | InstantiationException e) {
+                        LOGGER.error(e);
+                    }
                 }
-            } else {
-                this.next.handle(target, request, response, isHandled);
+            } finally {
+                AdminTokenThreadLocal.remove();
             }
-        } finally {
-            AdminTokenThreadLocal.remove();
+        } else {
+            this.next.handle(target, request, response, isHandled);
         }
     }
 

@@ -28,7 +28,6 @@ public class CacheService {
 
     private void clearCache() {
         JFinal.me().getServletContext().removeAttribute(Constants.CACHE_KEY);
-        IOUtil.deleteFile(PathKit.getWebRootPath() + "/post");
     }
 
     public boolean clearStaticPostFileByLogId(String id) {
@@ -41,6 +40,10 @@ public class CacheService {
             return delete || deleteAlias;
         }
         return false;
+    }
+
+    public void removeCachedStaticFile() {
+        IOUtil.deleteFile(PathKit.getWebRootPath() + "/post");
     }
 
     private void initCache(BaseController baseController) {

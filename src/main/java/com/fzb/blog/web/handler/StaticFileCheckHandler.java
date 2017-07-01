@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -50,20 +51,23 @@ public class StaticFileCheckHandler extends Handler {
             if (!FORBIDDEN_URI_EXT_SET.contains(ext)) {
                 // 处理静态化文件,仅仅缓存文章页(变化较小)
                 if (target.endsWith(".html") && target.startsWith("/post/")) {
-                    File htmlFile = new File(PathKit.getWebRootPath()
-                            + request.getServletPath());
-                    if (!htmlFile.exists()) {
-                        String tempTarget = target.substring(0,
-                                target.lastIndexOf('.'));
-                        String home = WebTools.getRealScheme(request) + "://"
-                                + request.getHeader("host")
-                                + request.getContextPath() + tempTarget;
-                        target = tempTarget;
-                        if (!ZrlogUtil.isStaticBlogPlugin(request)) {
-                            convert2Html(home, htmlFile);
+                    try {
+                        String path = new String(request.getServletPath().getBytes("ISO-8859-1"), "UTF-8");
+                        File htmlFile = new File(PathKit.getWebRootPath() + path);
+                        isHandled[0] = true;
+                        if (!htmlFile.exists()) {
+                            String home = WebTools.getRealScheme(request) + "://" + request.getHeader("host")
+                                    + request.getContextPath() + path.substring(0, path.lastIndexOf("."));
+                            if (!ZrlogUtil.isStaticBlogPlugin(request)) {
+                                convert2Html(home, htmlFile);
+                            }
                         }
+                        response.setContentType("text/html;charset=UTF-8");
+                        response.getOutputStream().write(IOUtil.getByteByInputStream(new FileInputStream(htmlFile)));
+                        this.next.handle(target, request, response, isHandled);
+                    } catch (Exception e) {
+                        LOGGER.error("error", e);
                     }
-                    this.next.handle(target, request, response, isHandled);
                 } else {
                     this.next.handle(target, request, response, isHandled);
                 }
@@ -88,7 +92,7 @@ public class StaticFileCheckHandler extends Handler {
      * @param sSourceUrl
      * @param file
      */
-    private void convert2Html(String sSourceUrl, File file) {
+    private byte[] convert2Html(String sSourceUrl, File file) {
         if (!file.exists()) {
             file.getParentFile().mkdirs();
         }
@@ -97,9 +101,11 @@ public class StaticFileCheckHandler extends Handler {
             if (closeableHttpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 String str = IOUtil.getStringInputStream(closeableHttpResponse.getEntity().getContent());
                 IOUtil.writeBytesToFile(str.getBytes("UTF-8"), file);
+                return str.getBytes();
             }
         } catch (IOException e) {
             LOGGER.error("convert2Html error", e);
         }
+        return new byte[]{};
     }
 }
