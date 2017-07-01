@@ -34,7 +34,7 @@ public class InitDataInterceptor implements Interceptor {
             public void run() {
                 if (lastAccessTime > 0 && System.currentTimeMillis() - lastAccessTime > IDLE_TIME) {
                     lastAccessTime = 0;
-                    cacheService.refreshInitDataCache(null);
+                    cacheService.refreshInitDataCache(null, true);
                 }
             }
         }, 0, 60000);
@@ -50,7 +50,7 @@ public class InitDataInterceptor implements Interceptor {
                 HttpServletRequest request = invocation.getController().getRequest();
                 BaseController baseController = ((BaseController) invocation.getController());
                 baseController.setAttr("requrl", ZrlogUtil.getFullUrl(request));
-                cacheService.refreshInitDataCache(baseController);
+                cacheService.refreshInitDataCache(baseController, false);
                 lastAccessTime = System.currentTimeMillis();
             }
         }

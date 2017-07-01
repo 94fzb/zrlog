@@ -35,7 +35,7 @@ public class TemplateController extends BaseController {
         cookie.setMaxAge(0);
         getResponse().addCookie(cookie);
         // 更新缓存数据
-        cacheService.refreshInitDataCache(this);
+        cacheService.refreshInitDataCache(this, true);
         return webSiteSettingUpdateResponse;
     }
 
@@ -94,7 +94,7 @@ public class TemplateController extends BaseController {
             }
         }
         new WebSite().updateByKV(template + templateConfigSuffix, new JSONSerializer().deepSerialize(settingMap));
-        cacheService.refreshInitDataCache(this);
+        cacheService.refreshInitDataCache(this, true);
         UpdateRecordResponse updateRecordResponse = new UpdateRecordResponse();
         updateRecordResponse.setMessage("变更成功");
         return updateRecordResponse;

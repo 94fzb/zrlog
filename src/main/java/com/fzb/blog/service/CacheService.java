@@ -17,19 +17,21 @@ import java.util.*;
  */
 public class CacheService {
 
-    private static Map<String, String> cacheFileMap = new HashMap<String, String>();
+    private static Map<String, String> cacheFileMap = new HashMap<>();
 
-    public void refreshInitDataCache(BaseController baseController) {
-        cleanCache();
-        updateCache(baseController);
+    public void refreshInitDataCache(BaseController baseController, boolean cleanAble) {
+        if (cleanAble || JFinal.me().getConstants().getDevMode()) {
+            clearCache();
+        }
+        initCache(baseController);
     }
 
-    private void cleanCache() {
+    private void clearCache() {
         JFinal.me().getServletContext().removeAttribute(Constants.CACHE_KEY);
         IOUtil.deleteFile(PathKit.getWebRootPath() + "/post");
     }
 
-    public boolean cleanStaticPostFileByLogId(String id) {
+    public boolean clearStaticPostFileByLogId(String id) {
         Log log = Log.dao.findById(id);
         if (log != null) {
             File file = new File(PathKit.getWebRootPath() + "/post/" + id + ".html");
@@ -41,7 +43,7 @@ public class CacheService {
         return false;
     }
 
-    private void updateCache(BaseController baseController) {
+    private void initCache(BaseController baseController) {
         BaseDataInitVO cacheInit = (BaseDataInitVO) JFinal.me().getServletContext().getAttribute(Constants.CACHE_KEY);
         if (cacheInit == null) {
             cacheInit = new BaseDataInitVO();
@@ -63,7 +65,7 @@ public class CacheService {
             statistics.setTotalTagSize(cacheInit.getTags().size());
             List<Type> types = cacheInit.getTypes();
             cacheInit.setHotLogs((List<Log>) Log.dao.getLogsByPage(1, 6).get("rows"));
-            Map<Map<String, Object>, List<Log>> indexHotLog = new LinkedHashMap<Map<String, Object>, List<Log>>();
+            Map<Map<String, Object>, List<Log>> indexHotLog = new LinkedHashMap<>();
             for (Type type : types) {
                 Map<String, Object> typeMap = new TreeMap<String, Object>();
                 typeMap.put("typeName", type.getStr("typeName"));
@@ -74,7 +76,7 @@ public class CacheService {
             //存放公共数据到ServletContext
             JFinal.me().getServletContext().setAttribute("webSite", website);
             JFinal.me().getServletContext().setAttribute(Constants.CACHE_KEY, cacheInit);
-            List<File> staticFiles = new ArrayList<File>();
+            List<File> staticFiles = new ArrayList<>();
             IOUtil.getAllFiles(PathKit.getWebRootPath(), staticFiles);
             for (File file : staticFiles) {
                 String uri = file.toString().substring(PathKit.getWebRootPath().length());
@@ -85,9 +87,7 @@ public class CacheService {
             baseController.setAttr("init", cacheInit);
             baseController.setWebSite(cacheInit.getWebSite());
             String host = WebTools.getRealScheme(baseController.getRequest()) + "://" + baseController.getRequest().getHeader("host") + baseController.getRequest().getContextPath();
-            Map<String, String> tempStaticFileMap = new HashMap<String, String>();
-            List<File> staticFiles = new ArrayList<File>();
-            IOUtil.getAllFiles(PathKit.getWebRootPath(), staticFiles);
+            Map<String, String> tempStaticFileMap = new HashMap<>();
             for (Map.Entry<String, String> entry : cacheFileMap.entrySet()) {
                 tempStaticFileMap.put(entry.getKey().replace("\\", "/"), host + entry.getValue().replace("\\", "/"));
             }

@@ -37,7 +37,7 @@ public class UpgradeController extends BaseController {
         for (Map.Entry<String, String[]> param : tmpParamMap.entrySet()) {
             new WebSite().updateByKV(param.getKey(), param.getValue()[0]);
         }
-        cacheService.refreshInitDataCache(this);
+        cacheService.refreshInitDataCache(this, true);
         UpdateRecordResponse recordResponse = new UpdateRecordResponse();
         recordResponse.setError(0);
         Plugins plugins = (Plugins) JFinal.me().getServletContext().getAttribute("plugins");
