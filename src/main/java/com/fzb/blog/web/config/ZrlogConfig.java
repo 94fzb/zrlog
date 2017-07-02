@@ -59,7 +59,7 @@ public class ZrlogConfig extends JFinalConfig {
     public ZrlogConfig() {
         try {
             systemProperties.load(ZrlogConfig.class.getResourceAsStream("/zrlog.properties"));
-        } catch (Exception e) {
+        } catch (IOException e) {
             LOGGER.error("load systemProperties error", e);
         }
     }
@@ -231,9 +231,7 @@ public class ZrlogConfig extends JFinalConfig {
                 WebSite.dao.updateByKV(com.fzb.blog.common.Constants.ZRLOG_SQL_VERSION_KEY, updatedVersion + "");
             }
         }
-        if (JFinal.me().getServletContext().getRealPath("/") != null) {
-            systemProp.setProperty("zrlog.runtime.path", JFinal.me().getServletContext().getRealPath("/"));
-        }
+        systemProp.setProperty("zrlog.runtime.path", JFinal.me().getServletContext().getRealPath("/"));
         systemProp.setProperty("server.info", JFinal.me().getServletContext().getServerInfo());
         JFinal.me().getServletContext().setAttribute("system", systemProp);
         systemProperties.put("version", BlogBuildInfoUtil.getVersion());
