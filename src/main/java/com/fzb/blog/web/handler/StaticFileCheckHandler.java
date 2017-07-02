@@ -17,9 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 用于对静态文件的请求的检查，和静态化文章页，加快文章页的响应。
@@ -59,7 +57,13 @@ public class StaticFileCheckHandler extends Handler {
                             String home = WebTools.getRealScheme(request) + "://" + request.getHeader("host")
                                     + request.getContextPath() + path.substring(0, path.lastIndexOf("."));
                             if (!ZrlogUtil.isStaticBlogPlugin(request)) {
-                                convert2Html(home, htmlFile);
+                                Map<String, String> requestHeaders = new HashMap<>();
+                                Enumeration<String> headerNames = request.getHeaderNames();
+                                while (headerNames.hasMoreElements()) {
+                                    String key = headerNames.nextElement();
+                                    requestHeaders.put(key, request.getHeader(key));
+                                }
+                                convert2Html(home, htmlFile, requestHeaders);
                             }
                         }
                         response.setContentType("text/html;charset=UTF-8");
@@ -92,12 +96,12 @@ public class StaticFileCheckHandler extends Handler {
      * @param sSourceUrl
      * @param file
      */
-    private byte[] convert2Html(String sSourceUrl, File file) {
+    private byte[] convert2Html(String sSourceUrl, File file, Map<String, String> requestHeaders) {
         if (!file.exists()) {
             file.getParentFile().mkdirs();
         }
         try {
-            CloseableHttpResponse closeableHttpResponse = HttpUtil.getInstance().sendGetRequest(sSourceUrl, new CloseResponseHandle(), new HashMap<String, String>()).getT();
+            CloseableHttpResponse closeableHttpResponse = HttpUtil.getInstance().sendGetRequest(sSourceUrl, new CloseResponseHandle(), requestHeaders).getT();
             if (closeableHttpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 String str = IOUtil.getStringInputStream(closeableHttpResponse.getEntity().getContent());
                 IOUtil.writeBytesToFile(str.getBytes("UTF-8"), file);
