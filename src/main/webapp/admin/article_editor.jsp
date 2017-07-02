@@ -40,7 +40,7 @@ height: 38px;
 </div>
 <div class="x_content">
 <form target="_blank" class="form-horizontal form-label-left" id="article-form">
-	<textarea id="markdown" style="display: none;">${log.mdContent}</textarea>
+	<textarea editormdTheme='${webs.editorMdTheme}' id="markdown" style="display: none;">${log.mdContent}</textarea>
 	<input type="hidden" id="logId" name="logId" value="${log.logId}">
 	<textarea placeholder="${_res.editorPlaceholder}" id="content" name="content" style="display: none;">${log.content}</textarea>
 	<div class="form-group">

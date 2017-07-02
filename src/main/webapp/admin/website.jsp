@@ -114,6 +114,17 @@
                         <input name="session_timeout" class="form-control col-xs-12 col-sm-6" value="${webs.session_timeout}">
                     </div>
                 </div>
+				<div class="form-group">
+                    <label for="form-field-1"
+                        class="col-sm-3 control-label no-padding-right"> 编辑器主题 </label>
+
+                   <span class="col-sm-2">
+                    <select name="editorMdTheme" class="form-control select2_single">
+                        <option <c:if test="${webs.editorMdTheme eq 'default'}">selected="selected"</c:if> value="default">默认</option>
+                        <option <c:if test="${webs.editorMdTheme eq 'dark'}">selected="selected"</c:if> value="dark">护眼</option>
+                    </select>
+                    </span>
+                </div>
 
 				<div class="form-group">
 					<label for="form-field-1"
