@@ -6,10 +6,10 @@ String scheme = com.fzb.blog.web.util.WebTools.getRealScheme(request);
 String basePath = scheme + "://"+request.getHeader("host")+path+"/";
 request.setAttribute("url", scheme + "://"+request.getHeader("host")+request.getContextPath());
 if(request.getAttribute("currentPath")==null){
-	request.setAttribute("currentPath", request.getRequestURL().substring((basePath+"admin/").length()));
+	request.setAttribute("currentPath", com.fzb.blog.util.ZrlogUtil.getFullUrl(request).substring((basePath+"admin/").length()));
 }
 if(request.getAttribute("currentPage")==null){
-	request.setAttribute("currentPage", request.getRequestURL().toString().replaceAll(".jsp","").substring((basePath).length()));
+	request.setAttribute("currentPage", com.fzb.blog.util.ZrlogUtil.getFullUrl(request).replaceAll(".jsp","").substring(basePath.length()));
 }
 request.setAttribute("res",new flexjson.JSONSerializer().deepSerialize(request.getAttribute("_res")));
 %>
