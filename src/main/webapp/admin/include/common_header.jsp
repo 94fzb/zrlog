@@ -11,7 +11,7 @@ if(request.getAttribute("currentPath")==null){
 if(request.getAttribute("currentPage")==null){
 	request.setAttribute("currentPage", com.fzb.blog.util.ZrlogUtil.getFullUrl(request).replaceAll(".jsp","").substring(basePath.length()));
 }
-request.setAttribute("res",new flexjson.JSONSerializer().deepSerialize(request.getAttribute("_res")));
+request.setAttribute("res",new com.google.gson.Gson().toJson(request.getAttribute("_res")));
 %>
 <!DOCTYPE html>
 <html>

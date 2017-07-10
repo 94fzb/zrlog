@@ -2,9 +2,9 @@ package com.fzb.blog.web.controller;
 
 import com.fzb.blog.common.Constants;
 import com.fzb.blog.common.request.PageableRequest;
+import com.google.gson.Gson;
 import com.jfinal.core.Controller;
 import com.jfinal.kit.PathKit;
-import flexjson.JSONDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,7 +115,7 @@ public class BaseController extends Controller {
     public void fullTemplateSetting(Object jsonStr) {
         if (isNotNullOrNotEmptyStr(jsonStr)) {
             Map<String, Object> res = getAttr("_res");
-            res.putAll(new JSONDeserializer<Map<String, Object>>().deserialize(jsonStr.toString()));
+            res.putAll(new Gson().fromJson(jsonStr.toString(), Map.class));
         }
     }
 

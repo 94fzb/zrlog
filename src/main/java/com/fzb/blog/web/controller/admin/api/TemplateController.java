@@ -10,8 +10,8 @@ import com.fzb.blog.util.I18NUtil;
 import com.fzb.blog.web.controller.BaseController;
 import com.fzb.common.util.IOUtil;
 import com.fzb.common.util.ZipUtil;
+import com.google.gson.Gson;
 import com.jfinal.kit.PathKit;
-import flexjson.JSONSerializer;
 
 import javax.servlet.http.Cookie;
 import java.io.File;
@@ -94,7 +94,7 @@ public class TemplateController extends BaseController {
                 }
             }
         }
-        new WebSite().updateByKV(template + templateConfigSuffix, new JSONSerializer().deepSerialize(settingMap));
+        new WebSite().updateByKV(template + templateConfigSuffix, new Gson().toJson(settingMap));
         cacheService.refreshInitDataCache(this, true);
         cacheService.removeCachedStaticFile();
         UpdateRecordResponse updateRecordResponse = new UpdateRecordResponse();

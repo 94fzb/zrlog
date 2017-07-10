@@ -1,7 +1,7 @@
 package com.fzb.common.util.http.handle;
 
 import com.fzb.common.util.IOUtil;
-import flexjson.JSONDeserializer;
+import com.google.gson.Gson;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -16,7 +16,7 @@ public class HttpJsonArrayHandle<T> extends HttpHandle<List<T>> {
         try {
             String jsonStr = IOUtil.getStringInputStream(response.getEntity().getContent());
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                setT(new JSONDeserializer<List<T>>().deserialize(jsonStr));
+                setT(new Gson().fromJson(jsonStr, List.class));
             } else {
                 setT(new ArrayList<T>());
             }

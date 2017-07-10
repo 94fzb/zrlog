@@ -1,7 +1,5 @@
 package com.fzb.blog.common.response;
 
-import flexjson.JSON;
-
 import java.util.Date;
 
 public class ArticleResponseEntry {
@@ -14,7 +12,6 @@ public class ArticleResponseEntry {
     private Date releaseTime;
     private String typeName;
     private boolean rubbish;
-    @JSON(name = "private")
     private boolean _private;
 
     public int getClick() {

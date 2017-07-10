@@ -3,7 +3,7 @@ package com.fzb.blog.web.plugin;
 import com.fzb.blog.common.Constants;
 import com.fzb.blog.util.BlogBuildInfoUtil;
 import com.fzb.common.util.http.HttpUtil;
-import flexjson.JSONDeserializer;
+import com.google.gson.Gson;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -44,7 +44,7 @@ class UpdateVersionTimerTask extends TimerTask {
             versionUrl = Constants.ZRLOG_RESOURCE_DOWNLOAD_URL + "/release/last.version.json";
         }
         String txtContent = HttpUtil.getInstance().getTextByUrl(versionUrl + "?_" + System.currentTimeMillis()).trim();
-        Version tLastVersion = new JSONDeserializer<Version>().deserialize(txtContent, Version.class);
+        Version tLastVersion = new Gson().fromJson(txtContent, Version.class);
         LOGGER.info(txtContent);
         //手动设置对应ChangeLog。
         tLastVersion.setChangeLog(HttpUtil.getInstance().getTextByUrl("http://www.zrlog.com/changelog/" + tLastVersion.getVersion() + "-" + tLastVersion.getBuildId() + ".html"));

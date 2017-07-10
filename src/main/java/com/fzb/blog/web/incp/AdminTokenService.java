@@ -5,9 +5,8 @@ import com.fzb.blog.model.User;
 import com.fzb.blog.model.WebSite;
 import com.fzb.blog.web.util.AESCryptoUtil;
 import com.fzb.common.util.ByteUtils;
+import com.google.gson.Gson;
 import com.jfinal.core.JFinal;
-import flexjson.JSONDeserializer;
-import flexjson.JSONSerializer;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -38,7 +37,7 @@ public class AdminTokenService {
                     if (user != null) {
                         byte[] adminTokenEncryptAfter = ByteUtils.hexString2Bytes(decTokenString.substring(decTokenString.indexOf(TOKEN_SPLIT_CHAR) + 1, decTokenString.length()));
                         String base64Encode = new String(AESCryptoUtil.decrypt(user.getStr("secretKey"), Base64.decodeBase64(adminTokenEncryptAfter)));
-                        AdminToken adminToken = new JSONDeserializer<AdminToken>().deserialize(base64Encode, AdminToken.class);
+                        AdminToken adminToken = new Gson().fromJson(base64Encode, AdminToken.class);
                         if (adminToken.getCreatedDate() + getSessionTimeout() > System.currentTimeMillis()) {
                             return userId;
                         }
@@ -61,7 +60,7 @@ public class AdminTokenService {
         long loginTime = System.currentTimeMillis();
         adminToken.setCreatedDate(loginTime);
         AdminTokenThreadLocal.setAdminToken(adminToken);
-        String encryptBeforeString = new JSONSerializer().exclude("*.class").deepSerialize(adminToken);
+        String encryptBeforeString = new Gson().toJson(adminToken);
         try {
             byte[] base64Bytes = Base64.encodeBase64(AESCryptoUtil.encrypt(user.get("secretKey").toString(), encryptBeforeString.getBytes()));
             String encryptAfterString = ByteUtils.bytesToHexString(base64Bytes);
