@@ -9,10 +9,10 @@ import com.fzb.blog.web.controller.blog.InstallController;
 import com.fzb.blog.web.controller.blog.PostController;
 import com.fzb.blog.web.handler.PluginHandler;
 import com.fzb.blog.web.handler.StaticFileCheckHandler;
-import com.fzb.blog.web.incp.BlackListInterceptor;
-import com.fzb.blog.web.incp.InitDataInterceptor;
-import com.fzb.blog.web.incp.MyI18NInterceptor;
-import com.fzb.blog.web.incp.RouterInterceptor;
+import com.fzb.blog.web.interceptor.BlackListInterceptor;
+import com.fzb.blog.web.interceptor.InitDataInterceptor;
+import com.fzb.blog.web.interceptor.MyI18NInterceptor;
+import com.fzb.blog.web.interceptor.RouterInterceptor;
 import com.fzb.blog.web.plugin.PluginConfig;
 import com.fzb.blog.web.plugin.UpdateVersionPlugin;
 import com.fzb.common.util.http.HttpUtil;
@@ -157,14 +157,14 @@ public class ZrlogConfig extends JFinalConfig {
      * JFinal的拦截器，这里配置时需要区分先后顺序的。由于JFinal提供拦截器并没有类似Spring的拦截器可以对请求路径的配置，这里并不是很优雅。
      * 及需要在对应Interception中自行通过路由进行拦截。详细可以看 RouterInterceptor 这拦截器的代码
      *
-     * @param incp
+     * @param interceptors
      */
-    public void configInterceptor(Interceptors incp) {
-        incp.add(new SessionInViewInterceptor());
-        incp.add(new InitDataInterceptor());
-        incp.add(new MyI18NInterceptor());
-        incp.add(new BlackListInterceptor());
-        incp.add(new RouterInterceptor());
+    public void configInterceptor(Interceptors interceptors) {
+        interceptors.add(new SessionInViewInterceptor());
+        interceptors.add(new InitDataInterceptor());
+        interceptors.add(new MyI18NInterceptor());
+        interceptors.add(new BlackListInterceptor());
+        interceptors.add(new RouterInterceptor());
     }
 
     /***

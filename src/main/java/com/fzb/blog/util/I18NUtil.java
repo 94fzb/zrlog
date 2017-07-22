@@ -1,7 +1,7 @@
 package com.fzb.blog.util;
 
 import com.fzb.blog.common.Constants;
-import com.fzb.blog.web.incp.InitDataInterceptor;
+import com.fzb.blog.web.interceptor.InitDataInterceptor;
 import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;

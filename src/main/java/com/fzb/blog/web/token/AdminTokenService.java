@@ -1,4 +1,4 @@
-package com.fzb.blog.web.incp;
+package com.fzb.blog.web.token;
 
 import com.fzb.blog.common.Constants;
 import com.fzb.blog.model.User;

@@ -5,8 +5,8 @@ import com.fzb.blog.common.response.UpdateRecordResponse;
 import com.fzb.blog.model.User;
 import com.fzb.blog.util.I18NUtil;
 import com.fzb.blog.web.controller.BaseController;
-import com.fzb.blog.web.incp.AdminTokenService;
-import com.fzb.blog.web.incp.AdminTokenThreadLocal;
+import com.fzb.blog.web.token.AdminTokenService;
+import com.fzb.blog.web.token.AdminTokenThreadLocal;
 import com.fzb.blog.web.util.WebTools;
 import com.fzb.common.util.SecurityUtils;
 import com.jfinal.core.JFinal;
@@ -48,7 +48,7 @@ public class AdminController extends BaseController {
                 if ("on".equals(getPara("rememberMe"))) {
                     Map<String, User> userMap = (Map<String, User>) JFinal.me().getServletContext().getAttribute("userMap");
                     if (userMap == null) {
-                        userMap = new HashMap<String, User>();
+                        userMap = new HashMap<>();
                         JFinal.me().getServletContext().setAttribute("userMap", userMap);
                     }
                     String zid = UUID.randomUUID().toString();

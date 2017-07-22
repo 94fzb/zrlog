@@ -6,7 +6,7 @@ import com.fzb.blog.model.Tag;
 import com.fzb.blog.service.ArticleService;
 import com.fzb.blog.service.CacheService;
 import com.fzb.blog.web.controller.BaseController;
-import com.fzb.blog.web.incp.AdminTokenThreadLocal;
+import com.fzb.blog.web.token.AdminTokenThreadLocal;
 
 public class ArticleController extends BaseController {
 

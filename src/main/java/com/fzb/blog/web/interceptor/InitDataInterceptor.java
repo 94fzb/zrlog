@@ -1,4 +1,4 @@
-package com.fzb.blog.web.incp;
+package com.fzb.blog.web.interceptor;
 
 import com.fzb.blog.service.CacheService;
 import com.fzb.blog.util.BlogBuildInfoUtil;

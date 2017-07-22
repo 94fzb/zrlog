@@ -1,10 +1,12 @@
-package com.fzb.blog.web.incp;
+package com.fzb.blog.web.interceptor;
 
 import com.fzb.blog.common.BaseDataInitVO;
 import com.fzb.blog.common.Constants;
 import com.fzb.blog.common.response.ExceptionResponse;
 import com.fzb.blog.model.User;
 import com.fzb.blog.util.I18NUtil;
+import com.fzb.blog.web.token.AdminTokenService;
+import com.fzb.blog.web.token.AdminTokenThreadLocal;
 import com.fzb.blog.web.util.WebTools;
 import com.fzb.common.util.ExceptionUtils;
 import com.jfinal.aop.Interceptor;
@@ -24,8 +26,7 @@ import java.net.URLEncoder;
 import java.util.Map;
 
 /**
- * 负责全部后台请求的处理（/admin/plugins/*除外），目前还是使用的Session的方式保存用户是否登陆，及管理员登陆成功后将管理员数据存放在Session
- * 中用于标示权限。
+ * 负责全部后台请求的处理（/admin/plugins/*,/api/admin/plugins/* 除外）
  */
 class AdminInterceptor implements Interceptor {
 
@@ -39,8 +40,7 @@ class AdminInterceptor implements Interceptor {
 
     /**
      * 为了规范代码，这里做了一点类是Spring的ResponseEntity的东西，及通过方法的返回值来判断是应该返回页面还会对应JSON数据
-     * 预定方式看 AdminRouters
-     * 这里用到了 ThreadLocal，后期会替换掉Session的方式。
+     * 具体方式看 AdminRouters，这里用到了 ThreadLocal
      *
      * @param ai
      */
