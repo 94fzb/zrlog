@@ -69,7 +69,7 @@
 	</script>
 	<style type="text/css">
 		.taglist a{padding:0px;display:inline-block;white-space:nowrap;}
-		a.size1{font-size:10px;padding:2px;color:#804D40;}
+		a.size1{font-size:10px;padding:2px;color``}
 		a.size1:hover{color:#E13728;}
 		a.size2{padding:2px;font-size:12px;color:#B9251A;}
 		a.size2:hover{color:#E13728;}

@@ -1,4 +1,4 @@
-package com.fzb.blog.web.incp;
+package com.fzb.blog.web.interceptor;
 
 import com.jfinal.aop.Interceptor;
 import com.jfinal.aop.Invocation;

@@ -42,10 +42,8 @@ public class BlogBuildInfoUtil {
                 if (properties.get("runMode") != null && !"".equals(properties.get("runMode"))) {
                     runMode = properties.get("runMode").toString();
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ParseException e) {
-                e.printStackTrace();
+            } catch (IOException | ParseException e) {
+                LOGGER.error("read stream error", e);
             } finally {
                 try {
                     inputStream.close();

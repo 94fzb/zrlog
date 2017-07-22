@@ -46,8 +46,8 @@ public class Tag extends Model<Tag> {
         }
         String[] oldArr = oldTagStr.split(",");
         String[] nowArr = nowTagStr.split(",");
-        Set<String> addSet = new HashSet<String>();
-        Set<String> deleteSet = new HashSet<String>();
+        Set<String> addSet = new HashSet<>();
+        Set<String> deleteSet = new HashSet<>();
         for (String str : nowArr) {
             addSet.add(str.trim());
         }

@@ -1,4 +1,4 @@
-package com.fzb.blog.web.incp;
+package com.fzb.blog.web.interceptor;
 
 import com.fzb.blog.util.I18NUtil;
 import com.jfinal.aop.Interceptor;

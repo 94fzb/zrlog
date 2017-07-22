@@ -1,4 +1,4 @@
-package com.fzb.blog.web.incp;
+package com.fzb.blog.web.interceptor;
 
 import com.fzb.blog.web.controller.BaseController;
 import com.fzb.blog.web.util.WebTools;
@@ -21,7 +21,7 @@ public class BlackListInterceptor implements Interceptor {
             BaseController baseController = (BaseController) invocation.getController();
             String ipStr = baseController.getStrValueByKey("blackList");
             if (ipStr != null) {
-                Set<String> ipSet = new HashSet<String>(Arrays.asList(ipStr.split(",")));
+                Set<String> ipSet = new HashSet<>(Arrays.asList(ipStr.split(",")));
                 String requestIP = WebTools.getRealIp(baseController.getRequest());
                 if (ipSet.contains(requestIP)) {
                     baseController.render(JFinal.me().getConstants().getErrorView(403));

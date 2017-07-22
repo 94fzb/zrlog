@@ -12,6 +12,7 @@
         <tomcat7Version>7.0.47</tomcat7Version>
         <java.version>1.7</java.version>
         <tomcat-scope>compile</tomcat-scope>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <developers>
