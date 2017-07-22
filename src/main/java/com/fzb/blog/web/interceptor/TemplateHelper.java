@@ -1,4 +1,4 @@
-package com.fzb.blog.web.incp;
+package com.fzb.blog.web.interceptor;
 
 import com.fzb.blog.common.BaseDataInitVO;
 import com.fzb.blog.common.Constants;
@@ -74,7 +74,7 @@ public class TemplateHelper {
             }
         }
         Map<String, Long> archiveMap = baseDataInitVO.getArchives();
-        List<Archive> archiveList = new ArrayList<Archive>();
+        List<Archive> archiveList = new ArrayList<>();
         for (Map.Entry<String, Long> entry : archiveMap.entrySet()) {
             Archive archive = new Archive();
             archive.setCount(entry.getValue());

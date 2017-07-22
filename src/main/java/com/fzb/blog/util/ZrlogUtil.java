@@ -1,8 +1,8 @@
 package com.fzb.blog.util;
 
 import com.fzb.blog.model.User;
-import com.fzb.blog.web.incp.AdminToken;
-import com.fzb.blog.web.incp.AdminTokenThreadLocal;
+import com.fzb.blog.web.token.AdminToken;
+import com.fzb.blog.web.token.AdminTokenThreadLocal;
 import com.fzb.blog.web.util.WebTools;
 import com.fzb.common.util.IOUtil;
 import com.jfinal.core.JFinal;
@@ -35,7 +35,7 @@ public class ZrlogUtil {
     }
 
     public static Map<String, String> genHeaderMapByRequest(HttpServletRequest request) {
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         AdminToken adminToken = AdminTokenThreadLocal.getUser();
         if (adminToken != null) {
             User user = User.dao.findById(adminToken.getUserId());
@@ -91,9 +91,7 @@ public class ZrlogUtil {
         try {
             Class.forName(driverClass);
             return DriverManager.getConnection(jdbcUrl, user, password);
-        } catch (ClassNotFoundException e) {
-            LOGGER.error(e);
-        } catch (SQLException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             LOGGER.error(e);
         }
         return null;
@@ -109,7 +107,7 @@ public class ZrlogUtil {
 
     private static List<File> getSqlFileList(String basePath) {
         File file = new File(basePath);
-        List<File> fileList = new ArrayList<File>();
+        List<File> fileList = new ArrayList<>();
         if (file.exists() && file.isDirectory()) {
             File[] fs = file.listFiles();
             if (fs != null && fs.length > 0) {
@@ -132,7 +130,7 @@ public class ZrlogUtil {
     }
 
     private static List<String> getExecSqlList(String sqlVersion, String basePath) {
-        List<String> sqlList = new ArrayList<String>();
+        List<String> sqlList = new ArrayList<>();
         Integer version = 0;
         try {
             version = Integer.valueOf(sqlVersion);

@@ -6,8 +6,8 @@ import com.fzb.blog.model.Log;
 import com.fzb.blog.util.ParseUtil;
 import com.fzb.blog.web.controller.BaseController;
 import com.fzb.blog.web.controller.admin.api.UpgradeController;
-import com.fzb.blog.web.incp.AdminTokenService;
-import com.fzb.blog.web.incp.AdminTokenThreadLocal;
+import com.fzb.blog.web.token.AdminTokenService;
+import com.fzb.blog.web.token.AdminTokenThreadLocal;
 import com.jfinal.core.JFinal;
 
 import javax.servlet.http.Cookie;

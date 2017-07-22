@@ -1,8 +1,8 @@
 package com.fzb.blog.web.handler;
 
 import com.fzb.blog.util.ZrlogUtil;
-import com.fzb.blog.web.incp.AdminTokenService;
-import com.fzb.blog.web.incp.AdminTokenThreadLocal;
+import com.fzb.blog.web.token.AdminTokenService;
+import com.fzb.blog.web.token.AdminTokenThreadLocal;
 import com.fzb.common.util.IOUtil;
 import com.fzb.common.util.http.HttpUtil;
 import com.fzb.common.util.http.handle.CloseResponseHandle;
@@ -134,7 +134,7 @@ public class PluginHandler extends Handler {
         }
         //添加插件服务的HTTP响应头到调用者响应头里面
         if (httpResponse != null) {
-            Map<String, String> headerMap = new HashMap<String, String>();
+            Map<String, String> headerMap = new HashMap<>();
             Header[] headers = httpResponse.getAllHeaders();
             for (Header header : headers) {
                 headerMap.put(header.getName(), header.getValue());

@@ -3,12 +3,10 @@ package com.fzb.blog.model;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Model;
 
-import java.io.Serializable;
-
 /**
- * 存放用于管理员的相关信息，对应数据的user表。这里实现序列化的目前是user数据存放在了session中必须实现序列化的接口
+ * 存放用于管理员的相关信息，对应数据的user表
  */
-public class User extends Model<User> implements Serializable {
+public class User extends Model<User> {
 
     public static final User dao = new User();
 

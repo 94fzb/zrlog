@@ -1,4 +1,4 @@
-package com.fzb.blog.web.incp;
+package com.fzb.blog.web.interceptor;
 
 import com.fzb.blog.web.config.ZrlogConfig;
 import com.jfinal.aop.Interceptor;
@@ -80,7 +80,7 @@ class VisitorInterceptor implements Interceptor {
         boolean dev = JFinal.me().getConstants().getDevMode();
         controller.setAttr("dev", dev);
         if (dev) {
-            Map<String, Object> attrMap = new LinkedHashMap<String, Object>();
+            Map<String, Object> attrMap = new LinkedHashMap<>();
             Enumeration<String> enumerations = controller.getAttrNames();
             while (enumerations.hasMoreElements()) {
                 String key = enumerations.nextElement();
@@ -97,7 +97,7 @@ class VisitorInterceptor implements Interceptor {
         } else if (ai.getController().getAttr("data") != null) {
             ai.getController().renderJson(ai.getController().getAttr("data"));
         } else {
-            Map<String, Object> error = new HashMap<String, Object>();
+            Map<String, Object> error = new HashMap<>();
             error.put("status", 500);
             error.put("message", "unSupport");
             ai.getController().renderJson(error);
