@@ -10,9 +10,20 @@ public class User extends Model<User> {
 
     public static final User dao = new User();
 
-    public User login(String userName, String password) {
-        return findFirst("select * from user where username=? and password=?",
-                userName, password);
+    public String getPasswordByUserName(String userName) {
+        User user = findFirst("select * from user where username=?", userName);
+        if (user != null) {
+            return user.get("password");
+        }
+        return null;
+    }
+
+    public Integer getIdByUserName(String userName) {
+        User user = findFirst("select * from user where username=?", userName);
+        if (user != null) {
+            return user.getInt("userId");
+        }
+        return null;
     }
 
     public String getPasswordByUserId(int userId) {
