@@ -35,10 +35,13 @@ public class WebTools {
     }
 
     public static String getRealScheme(HttpServletRequest request) {
-        String scheme = request.getHeader("X-Forwarded-Protocol");
-        if (scheme == null) {
-            scheme = request.getScheme();
+        if (request != null) {
+            String scheme = request.getHeader("X-Forwarded-Protocol");
+            if (scheme == null) {
+                scheme = request.getScheme();
+            }
+            return scheme;
         }
-        return scheme;
+        return "http";
     }
 }
