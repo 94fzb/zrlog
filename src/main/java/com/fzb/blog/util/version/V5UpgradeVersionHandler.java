@@ -19,7 +19,7 @@ public class V5UpgradeVersionHandler implements UpgradeVersionHandler {
         int userId = 0;
         ResultSet userRs = userPs.executeQuery();
         if (userRs.next()) {
-            userId = userRs.getInt("id");
+            userId = userRs.getInt("userid");
         }
         PreparedStatement ps = connection.prepareStatement("select logid,content from log");
         ResultSet rs = ps.executeQuery();
