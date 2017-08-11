@@ -17,7 +17,7 @@ request.setAttribute("res",new com.google.gson.Gson().toJson(request.getAttribut
 <html>
   <base href="<%=basePath%>">
   <head>
-    <title>${webs.title} | ${_res['admin.management']} </title>
+    <title>${webs.title} | <c:if test="${not empty subTitle}"> ${subTitle} | </c:if> ${_res['admin.management']}</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <!-- Meta, title, CSS, favicons, etc. -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">

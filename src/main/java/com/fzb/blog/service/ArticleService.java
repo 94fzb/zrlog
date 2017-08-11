@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
@@ -216,7 +217,12 @@ public class ArticleService {
                     bytes = IOUtil.getByteByInputStream(new FileInputStream(PathKit.getWebRootPath() + url));
                 }
                 if (bytes.length > 0) {
-                    IOUtil.writeBytesToFile(ThumbnailUtil.jpeg(bytes, 1f), thumbnailFile);
+                    try {
+                        IOUtil.writeBytesToFile(ThumbnailUtil.jpeg(bytes, 1f), thumbnailFile);
+                    } catch (IOException e) {
+                        LOGGER.error("generation jpeg thumbnail error ", e);
+                        return url;
+                    }
                     return new UploadService().getCloudUrl(JFinal.me().getContextPath(), path, thumbnailFile.getPath(), null) + "?v=1";
                 }
             } catch (Exception e) {
