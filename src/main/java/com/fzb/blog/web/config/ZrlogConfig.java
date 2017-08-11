@@ -220,6 +220,15 @@ public class ZrlogConfig extends JFinalConfig {
     @Override
     public void afterJFinalStart() {
         super.afterJFinalStart();
+        systemProp.setProperty("zrlog.runtime.path", JFinal.me().getServletContext().getRealPath("/"));
+        systemProp.setProperty("server.info", JFinal.me().getServletContext().getServerInfo());
+        JFinal.me().getServletContext().setAttribute("system", systemProp);
+        systemProperties.put("version", BlogBuildInfoUtil.getVersion());
+        systemProperties.put("buildId", BlogBuildInfoUtil.getBuildId());
+        systemProperties.put("buildTime", new SimpleDateFormat("yyyy-MM-dd").format(BlogBuildInfoUtil.getTime()));
+        systemProperties.put("runMode", BlogBuildInfoUtil.getRunMode());
+        JFinal.me().getServletContext().setAttribute("zrlog", systemProperties);
+        JFinal.me().getServletContext().setAttribute("config", this);
         if (!isInstalled()) {
             LOGGER.warn("Not found lock file(" + PathKit.getWebRootPath() + "/WEB-INF/install.lock), Please visit the http://yourHostName:port" + JFinal.me().getContextPath() + "/install installation");
         } else {
@@ -231,15 +240,6 @@ public class ZrlogConfig extends JFinalConfig {
                 WebSite.dao.updateByKV(com.fzb.blog.common.Constants.ZRLOG_SQL_VERSION_KEY, updatedVersion + "");
             }
         }
-        systemProp.setProperty("zrlog.runtime.path", JFinal.me().getServletContext().getRealPath("/"));
-        systemProp.setProperty("server.info", JFinal.me().getServletContext().getServerInfo());
-        JFinal.me().getServletContext().setAttribute("system", systemProp);
-        systemProperties.put("version", BlogBuildInfoUtil.getVersion());
-        systemProperties.put("buildId", BlogBuildInfoUtil.getBuildId());
-        systemProperties.put("buildTime", new SimpleDateFormat("yyyy-MM-dd").format(BlogBuildInfoUtil.getTime()));
-        systemProperties.put("runMode", BlogBuildInfoUtil.getRunMode());
-        JFinal.me().getServletContext().setAttribute("zrlog", systemProperties);
-        JFinal.me().getServletContext().setAttribute("config", this);
     }
 
     /**

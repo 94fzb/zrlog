@@ -33,13 +33,13 @@ public class UploadController extends BaseController {
         IOUtil.moveOrCopyFile(PathKit.getWebRootPath() + "/attached/" + getFile(uploadFieldName).getFileName(), finalFilePath, true);
         UploadFileResponse uploadFileResponse = new UploadFileResponse();
         uploadFileResponse.setError(0);
-        uploadFileResponse.setUrl(getCloudUrl(uri, finalFilePath));
+        uploadFileResponse.setUrl(getCloudUrl(getRequest().getContextPath(), uri, finalFilePath));
         return uploadFileResponse;
     }
 
-    private String getCloudUrl(String uri, String finalFilePath) {
+    public String getCloudUrl(String contextPath, String uri, String finalFilePath) {
         // try push to cloud
-        Map<String, String[]> map = new HashMap<String, String[]>();
+        Map<String, String[]> map = new HashMap<>();
         map.put("fileInfo", new String[]{finalFilePath + "," + uri});
         map.put("name", new String[]{"uploadService"});
         String url;
@@ -49,10 +49,10 @@ public class UploadController extends BaseController {
             if (urls != null && !urls.isEmpty()) {
                 url = (String) urls.get(0).get("url");
             } else {
-                url = getRequest().getContextPath() + uri;
+                url = contextPath + uri;
             }
         } catch (IOException e) {
-            url = getRequest().getContextPath() + uri;
+            url = contextPath + uri;
             LOGGER.error(e);
         }
         return url;
