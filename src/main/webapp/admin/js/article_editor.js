@@ -150,4 +150,11 @@ $(function(){
 			});
 		}
 	});
+
+    $('#thumbnail-upload').liteUploader({
+        script : 'api/admin/upload/thumbnail?dir=thumbnail'
+    }).on('lu:success', function(e, response) {
+        $("#thumbnail-img").attr("src",response.url);
+        $("#thumbnail").val(response.url);
+    });
 });

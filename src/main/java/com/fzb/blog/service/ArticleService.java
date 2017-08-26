@@ -9,10 +9,26 @@ import com.fzb.blog.model.Log;
 import com.fzb.blog.model.Tag;
 import com.fzb.blog.util.BeanUtil;
 import com.fzb.blog.util.ParseUtil;
+import com.fzb.blog.util.ThumbnailUtil;
+import com.fzb.blog.web.token.AdminToken;
+import com.fzb.blog.web.token.AdminTokenThreadLocal;
+import com.fzb.common.util.IOUtil;
+import com.fzb.common.util.http.HttpUtil;
+import com.fzb.common.util.http.handle.HttpFileHandle;
+import com.jfinal.core.JFinal;
+import com.jfinal.kit.PathKit;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.net.URL;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +36,8 @@ import java.util.Map;
  * 与文章相关的业务代码
  */
 public class ArticleService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ArticleService.class);
 
     public CreateOrUpdateLogResponse createOrUpdate(Integer userId, Map<String, String[]> createArticleRequestMap) {
         String[] logId = createArticleRequestMap.get("logId");
@@ -61,6 +79,7 @@ public class ArticleService {
             }
         }
         Object logId = log.get("logId");
+        String content = log.get("content");
         if (StringUtils.isEmpty(logId + "")) {
             logId = Log.dao.getMaxRecord() + 1;
             log.set("logId", logId);
@@ -78,6 +97,9 @@ public class ArticleService {
         log.set("recommended", createArticleRequestMap.get("recommended") != null);
         log.set("private", createArticleRequestMap.get("private") != null);
         log.set("rubbish", createArticleRequestMap.get("rubbish") != null);
+        if (log.get("thumbnail") == null) {
+            log.set("thumbnail", getFirstImgUrl(content, userId));
+        }
         // 自动摘要
         if (log.get("digest") == null || "".equals(log.get("digest"))) {
             log.set("digest", ParseUtil.autoDigest(log.get("content").toString(), 200));
@@ -167,5 +189,40 @@ public class ArticleService {
 
     private String wrapperFontRed(String content) {
         return "<font color=\"#CC0000\">" + content + "</font>";
+    }
+
+    public String getFirstImgUrl(String htmlContent, int userId) {
+        Elements elements = Jsoup.parse(htmlContent).select("img");
+        if (!elements.isEmpty()) {
+            String url = elements.first().attr("src");
+            try {
+                AdminToken adminToken = new AdminToken();
+                adminToken.setUserId(userId);
+                AdminTokenThreadLocal.setAdminToken(adminToken);
+                new File(JFinal.me().getConstants().getBaseUploadPath()).mkdirs();
+                String path = url;
+                File thumbnailFile;
+                byte[] bytes;
+                if (url.startsWith("https://") || url.startsWith("http://")) {
+                    HttpFileHandle fileHandler = new HttpFileHandle(JFinal.me().getConstants().getBaseUploadPath());
+                    path = new URL(url).getPath();
+                    path = path.substring(0, path.indexOf(".")) + "_thumbnail" + path.substring(path.indexOf("."));
+                    HttpUtil.getInstance().sendGetRequest(url, new HashMap<String, String[]>(), fileHandler, new HashMap<String, String>());
+                    bytes = IOUtil.getByteByInputStream(new FileInputStream(fileHandler.getT().getPath()));
+                    thumbnailFile = new File(fileHandler.getT().getPath() + ".tmp");
+                } else {
+                    path = url.substring(0, url.indexOf(".")) + "_thumbnail" + url.substring(path.indexOf("."));
+                    thumbnailFile = new File(PathKit.getWebRootPath() + path);
+                    bytes = IOUtil.getByteByInputStream(new FileInputStream(PathKit.getWebRootPath() + url));
+                }
+                if (bytes.length > 0) {
+                    IOUtil.writeBytesToFile(ThumbnailUtil.jpeg(bytes, 1f), thumbnailFile);
+                    return new UploadService().getCloudUrl(JFinal.me().getContextPath(), path, thumbnailFile.getPath(), null) + "?v=1";
+                }
+            } catch (Exception e) {
+                LOGGER.error("", e);
+            }
+        }
+        return null;
     }
 }

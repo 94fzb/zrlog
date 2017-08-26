@@ -35,7 +35,7 @@ section .content h2,section .content h3, section .content h4, section .content h
 section .content h2:first-child,section .content h3:first-child,section .content h4:first-child{margin-top:0;}
 section span#read-more{height:1; line-height:1; font-size:1;}
 section .entry{position:relative}
-section .entry .post-title{margin-bottom:0.6em; }
+section .entry .post-title{margin-bottom:0.6em; padding-top: 14px;}
 section .entry h3{font-size:16px; font-weight:normal; margin-bottom:0.6em;}
 section .entry .article-image{line-height:1;overflow:hidden;width:150px;height:150px;border-radius:50%; margin-right:15px;margin-bottom:10px;padding-right: 0; /*border:6px solid #f8f8f8; box-shadow: 0px 1px 6px 1px rgba(0, 0, 0, 0.25)*/}
 section .entry .article-image img{width:auto;max-width:none;}

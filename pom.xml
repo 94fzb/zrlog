@@ -12,6 +12,7 @@
         <tomcat7Version>7.0.47</tomcat7Version>
         <java.version>1.7</java.version>
         <tomcat-scope>compile</tomcat-scope>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <developers>
@@ -93,6 +94,11 @@
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
             <version>1.8.1</version>
+        </dependency>
+        <dependency>
+            <groupId>net.coobird</groupId>
+            <artifactId>thumbnailator</artifactId>
+            <version>0.4.8</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

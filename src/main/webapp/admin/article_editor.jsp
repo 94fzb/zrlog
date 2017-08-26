@@ -18,15 +18,15 @@ request.setAttribute("url", scheme+"://"+request.getHeader("host")+request.getCo
     padding-bottom: 30px;
     position: relative;
 }
-.form-control {
-height: 38px;
+.img-responsive{
+border-radius: 4px;
 }
-
 </style>
 <script src="${cacheFile['/admin/markdown/js/editormd.min.js']}"></script>
 <c:if test='${lang eq "en"}'>
 <script src="${cacheFile['/admin/markdown/languages/en.js']}"></script>
 </c:if>
+<script src="${cacheFile['/assets/js/jquery.liteuploader.min.js']}"></script>
 <script src="${cacheFile['/assets/js/select2/select2.min.js']}"></script>
 <script src="${cacheFile['/admin/js/article_editor.js']}"></script>
 <div class="row">
@@ -40,6 +40,14 @@ height: 38px;
 </div>
 <div class="x_content">
 <form target="_blank" class="form-horizontal form-label-left" id="article-form">
+    <div class="form-group">
+    <div class="col-xs-7"><label for="exampleInputFile"><h4>${_res['writeCover']}</h4></label>
+	<input type="file" id="thumbnail-upload" name="imgFile" value="${log.thumbnail}" />
+	<input type="hidden" name="thumbnail" id="thumbnail">
+	<br/>
+    <img class="img-responsive" id="thumbnail-img" src="${log.thumbnail}"/>
+    </div>
+    </div>
 	<textarea editormdTheme='${webs.editorMdTheme}' id="markdown" style="display: none;">${log.mdContent}</textarea>
 	<input type="hidden" id="logId" name="logId" value="${log.logId}">
 	<textarea placeholder="${_res.editorPlaceholder}" id="content" name="content" style="display: none;">${log.content}</textarea>

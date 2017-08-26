@@ -1,6 +1,9 @@
 package com.fzb.blog.util;
 
 import com.fzb.blog.model.User;
+import com.fzb.blog.util.version.UpgradeVersionHandler;
+import com.fzb.blog.web.token.AdminToken;
+import com.fzb.blog.web.token.AdminTokenThreadLocal;
 import com.fzb.blog.web.token.AdminToken;
 import com.fzb.blog.web.token.AdminTokenThreadLocal;
 import com.fzb.blog.web.util.WebTools;
@@ -44,15 +47,17 @@ public class ZrlogUtil {
         }
         map.put("IsLogin", (adminToken != null) + "");
         map.put("Blog-Version", ((Map) JFinal.me().getServletContext().getAttribute("zrlog")).get("version").toString());
-        String fullUrl = getFullUrl(request);
-        if (request.getQueryString() != null) {
-            fullUrl = fullUrl + "?" + request.getQueryString();
-        }
-        map.put("Full-Url", fullUrl);
-        map.put("Cookie", request.getHeader("Cookie"));
-        map.put("AccessUrl", WebTools.getRealScheme(request) + "://" + request.getHeader("Host") + request.getContextPath());
-        if (request.getHeader("Content-Type") != null) {
-            map.put("Content-Type", request.getHeader("Content-Type"));
+        if (request != null) {
+            String fullUrl = getFullUrl(request);
+            if (request.getQueryString() != null) {
+                fullUrl = fullUrl + "?" + request.getQueryString();
+            }
+            map.put("Cookie", request.getHeader("Cookie"));
+            map.put("AccessUrl", WebTools.getRealScheme(request) + "://" + request.getHeader("Host") + request.getContextPath());
+            if (request.getHeader("Content-Type") != null) {
+                map.put("Content-Type", request.getHeader("Content-Type"));
+            }
+            map.put("Full-Url", fullUrl);
         }
         return map;
     }
@@ -160,10 +165,27 @@ public class ZrlogUtil {
                 try {
                     for (String sql : sqlList) {
                         statement = connection.createStatement();
-                        statement.execute(sql);
+                        try {
+                            statement.execute(sql);
+                        } catch (Exception e) {
+                            LOGGER.error("execution sql ", e);
+                        }
                     }
-                } catch (SQLException e) {
-                    LOGGER.error(e);
+                    List<UpgradeVersionHandler> upgradeVersionHandlerList = new ArrayList<>();
+                    for (int i = Integer.valueOf(currentVersion) + 1; i <= getSqlVersion(basePath); i++) {
+                        try {
+                            UpgradeVersionHandler upgradeVersionHandler = (UpgradeVersionHandler) Class.forName("com.fzb.blog.util.version.V" + i + "UpgradeVersionHandler").newInstance();
+                            upgradeVersionHandlerList.add(upgradeVersionHandler);
+                        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
+                            LOGGER.error("", e);
+                        }
+                    }
+                    for (UpgradeVersionHandler upgradeVersionHandler : upgradeVersionHandlerList) {
+                        upgradeVersionHandler.doUpgrade(connection);
+                    }
+                } catch (Exception e) {
+                    LOGGER.error("", e);
+                    return -1;
                 } finally {
                     if (statement != null) {
                         try {

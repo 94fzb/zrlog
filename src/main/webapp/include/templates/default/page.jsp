@@ -16,11 +16,14 @@
 	<c:if test="${not empty requestScope.data}">
 <c:forEach var="log" items="${requestScope.data.rows}">
 <article class="entry">
+  <c:if test="${not empty log.thumbnail}">
+  <img alt="${log.title}" src="${log.thumbnail}"/>
+  </c:if>
   <h2 class="post-title"><a rel="bookmark" href="${log.url}">${log.title}</a></h2>
   <div class="content"><p>${log.digest}</p></div>
 	  <div class="meta">
 	  <p class="category"><a rel="tag" href="${log.typeUrl}">${log.typeName}</a> </p>
-	  <p class="published">/<time datetime="${log.releaseTime}">&nbsp;${log.releaseTime.year+1900}-${log.releaseTime.month+1}-${log.releaseTime.date}</time></p>
+	  <p class="published">/<time>&nbsp;${log.releaseTime.year+1900}-${log.releaseTime.month+1}-${log.releaseTime.date}</time></p>
 	  <p class="commentlink">
 	    <a href="${log.url}#comment" class="comments_invite">
 	  	${_res.commentView} <c:if test="${not staticBlog}"> [${log.commentSize}] </c:if>

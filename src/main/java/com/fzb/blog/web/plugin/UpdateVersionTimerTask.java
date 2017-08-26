@@ -55,6 +55,10 @@ class UpdateVersionTimerTask extends TimerTask {
                 LOGGER.info("Maybe need clone again from git repo");
             }
             this.version = tLastVersion;
+            //不包含时区信息
+            if (version.getReleaseDate().contains("+")) {
+                version.setReleaseDate(version.getReleaseDate().substring(0, version.getReleaseDate().lastIndexOf("+")));
+            }
             return version;
         }
         return null;
