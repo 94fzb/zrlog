@@ -40,7 +40,8 @@ border-radius: 4px;
 </div>
 <div class="x_content">
 <form target="_blank" class="form-horizontal form-label-left" id="article-form">
-    <div class="form-group">
+    <c:if test="${'on' eq webSite['article_thumbnail']}">
+	<div class="form-group">
     <div class="col-xs-7"><label for="exampleInputFile"><h4>${_res['writeCover']}</h4></label>
 	<input type="file" id="thumbnail-upload" name="imgFile" value="${log.thumbnail}" />
 	<input type="hidden" name="thumbnail" id="thumbnail">
@@ -48,6 +49,7 @@ border-radius: 4px;
     <img class="img-responsive" id="thumbnail-img" src="${log.thumbnail}"/>
     </div>
     </div>
+	</c:if>
 	<textarea editormdTheme='${webs.editorMdTheme}' id="markdown" style="display: none;">${log.mdContent}</textarea>
 	<input type="hidden" id="logId" name="logId" value="${log.logId}">
 	<textarea placeholder="${_res.editorPlaceholder}" id="content" name="content" style="display: none;">${log.content}</textarea>

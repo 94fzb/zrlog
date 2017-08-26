@@ -49,7 +49,7 @@ public class TemplateHelper {
         } else if (request.getAttribute("log") != null) {
             data = request.getAttribute("log");
         }
-        staticHtml(data, baseUrl, suffix);
+        staticHtml(data, baseUrl, suffix,webSite.get("article_thumbnail") == null || "on".equals(webSite.get("article_thumbnail")));
         if (request.getAttribute("pager") != null && !((List<Map<String, Object>>) ((Map) request.getAttribute("pager")).get("pageList")).isEmpty()) {
             List<Map<String, Object>> pageList = ((List<Map<String, Object>>) ((Map) request.getAttribute("pager")).get("pageList"));
             for (Map<String, Object> pageMap : pageList) {
@@ -208,7 +208,7 @@ public class TemplateHelper {
         return null;
     }
 
-    private static void staticHtml(Object data, String baseUrl, String suffix) {
+    private static void staticHtml(Object data, String baseUrl, String suffix,boolean enableArticle) {
         if (data instanceof Log) {
             Log log = (Log) data;
             log.put("alias", log.get("alias") + suffix);
@@ -223,6 +223,9 @@ public class TemplateHelper {
             List<Log> logList = (List<Log>) map.get("rows");
             if (logList != null) {
                 for (Log log : logList) {
+                    if(!enableArticle){
+                        log.put("thumbnail",null);
+                    }
                     log.put("url", baseUrl + "post/" + log.get("alias") + suffix);
                     log.put("typeUrl", baseUrl + "post/sort/" + log.get("typeAlias") + suffix);
                 }

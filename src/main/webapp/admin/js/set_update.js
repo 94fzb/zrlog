@@ -1,14 +1,28 @@
 $(function(){
     PNotify.prototype.options.delay == 3000;
+    $('.switchery').on("click",function(){
+        var input = $(this).previousSibling();
+        if(input.val() == 'off'){
+            input.val("on");
+            input.checked = true;
+        }else{
+            input.val("off");
+            input.checked = on;
+        }
+        
+    });    
     $(".btn-info").click(function(){
         var formId=$(this).attr("id")+"Ajax";
         if($("#"+formId).attr("checkBox")){
-            var checkBoxName=$("#"+formId).attr("checkBox");
-            if($("[name='"+checkBoxName+"']").size() && $("[name='"+checkBoxName+"']")[0].checked==true){
-                $("#"+checkBoxName).attr("name",checkBoxName).attr("value","on");
-            }
-            else{
-                $("#"+checkBoxName).attr("name",checkBoxName).attr("value","off");
+            var checkBoxNames=$("#"+formId).attr("checkBox").split(",");
+            for(var i=0;i<checkBoxNames.length;i++){
+                checkBoxName = checkBoxNames[i];
+                if($("[name='"+checkBoxName+"']").size() && $("[name='"+checkBoxName+"']")[0].checked==true){
+                    $("#"+checkBoxName).attr("name",checkBoxName).attr("value","on");
+                }
+                else{
+                    $("#"+checkBoxName).attr("name",checkBoxName).attr("value","off");
+                }
             }
         }
         var uri;

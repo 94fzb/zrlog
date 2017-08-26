@@ -95,7 +95,7 @@
 		</div>
 		<div class="tab-pane" id="other" style="padding: 10px">
 			<h4 class="header blue">ICP，网站统计等信息</h4>
-			<form role="form" class="form-horizontal" checkBox="pseudo_staticStatus" id="otherMsgAjax">
+			<form role="form" class="form-horizontal" checkBox="pseudo_staticStatus,article_thumbnail" id="otherMsgAjax">
 				<div class="form-group">
 					<label for="form-field-1"
 						class="col-sm-3 control-label no-padding-right"> ICP备案信息 </label>
@@ -149,6 +149,18 @@
 					</div>
 				</div>
 
+				<div class="form-group">
+					<label class="col-sm-3 control-label no-padding-right"> 文章封面 </label>
+					<div class="col-sm-5">
+						<span class="col-sm-1">
+						<input type="hidden" id="article_thumbnail" value="off">
+						<label>
+							<input type="checkbox" class="js-switch" style="display: none;" data-switchery="true" name="article_thumbnail"
+							<c:if test="${webs.article_thumbnail eq 'on'}">checked="checked"</c:if> value="off">
+						</label>
+						</span>
+					</div>
+				</div>
 
 				<div class="ln_solid"></div>
 

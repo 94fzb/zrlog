@@ -54,10 +54,8 @@ public class ArticleService {
         if (BooleanUtils.isFalse(log.getBoolean("rubbish"))) {
             Tag.dao.insertTag(log.getStr("keywords"));
         }
-        CreateOrUpdateLogResponse createOrUpdateLogResponse = new CreateOrUpdateLogResponse();
+        CreateOrUpdateLogResponse createOrUpdateLogResponse = getCreateOrUpdateLogResponse(log);
         createOrUpdateLogResponse.setError(log.save() ? 0 : 1);
-        createOrUpdateLogResponse.setLogId(log.getInt("logId"));
-        createOrUpdateLogResponse.setAlias(log.getStr("alias"));
         return createOrUpdateLogResponse;
     }
 
@@ -65,10 +63,16 @@ public class ArticleService {
         Log log = getLog(userId, createArticleRequestMap);
         String oldTagStr = Log.dao.findById(log.getInt("logId")).get("keywords");
         Tag.dao.update(log.getStr("keywords"), oldTagStr);
+        CreateOrUpdateLogResponse updateLogResponse = getCreateOrUpdateLogResponse(log);
+        updateLogResponse.setError(log.update() ? 0 : 1);
+        return updateLogResponse;
+    }
+
+    private CreateOrUpdateLogResponse getCreateOrUpdateLogResponse(Log log) {
         CreateOrUpdateLogResponse updateLogResponse = new CreateOrUpdateLogResponse();
         updateLogResponse.setLogId(log.getInt("logId"));
-        updateLogResponse.setError(log.update() ? 0 : 1);
         updateLogResponse.setAlias(log.getStr("alias"));
+        updateLogResponse.setThumbnail(log.getStr("thumbnail"));
         return updateLogResponse;
     }
 
@@ -98,7 +102,7 @@ public class ArticleService {
         log.set("recommended", createArticleRequestMap.get("recommended") != null);
         log.set("private", createArticleRequestMap.get("private") != null);
         log.set("rubbish", createArticleRequestMap.get("rubbish") != null);
-        if (log.get("thumbnail") == null) {
+        if (StringUtils.isBlank((String) log.get("thumbnail"))) {
             log.set("thumbnail", getFirstImgUrl(content, userId));
         }
         // 自动摘要

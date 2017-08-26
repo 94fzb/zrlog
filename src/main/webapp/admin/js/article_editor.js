@@ -88,7 +88,12 @@ $(function(){
                   styling: 'bootstrap3'
               });
             $("#logId").val(data.logId);
-            $("#alias").val(data.alias);
+			$("#alias").val(data.alias);
+			currentThumbnail = $("#thumbnail").val();
+			if(data.thumbnail!=currentThumbnail){
+				$("#thumbnail-img").attr("src",data.thumbnail);
+				$("#thumbnail").val(data.thumbnail);
+			}
             updatePreviewLink(data.logId);
         }else{
             new PNotify({
