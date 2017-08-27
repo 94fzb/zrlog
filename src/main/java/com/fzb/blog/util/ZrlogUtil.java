@@ -4,8 +4,6 @@ import com.fzb.blog.model.User;
 import com.fzb.blog.util.version.UpgradeVersionHandler;
 import com.fzb.blog.web.token.AdminToken;
 import com.fzb.blog.web.token.AdminTokenThreadLocal;
-import com.fzb.blog.web.token.AdminToken;
-import com.fzb.blog.web.token.AdminTokenThreadLocal;
 import com.fzb.blog.web.util.WebTools;
 import com.fzb.common.util.IOUtil;
 import com.jfinal.core.JFinal;

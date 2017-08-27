@@ -19,7 +19,6 @@ import com.fzb.common.util.http.HttpUtil;
 import com.fzb.common.util.http.handle.HttpFileHandle;
 import com.jfinal.config.*;
 import com.jfinal.core.JFinal;
-import com.jfinal.ext.interceptor.SessionInViewInterceptor;
 import com.jfinal.kit.PathKit;
 import com.jfinal.plugin.IPlugin;
 import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
@@ -160,7 +159,6 @@ public class ZrlogConfig extends JFinalConfig {
      * @param interceptors
      */
     public void configInterceptor(Interceptors interceptors) {
-        interceptors.add(new SessionInViewInterceptor());
         interceptors.add(new InitDataInterceptor());
         interceptors.add(new MyI18NInterceptor());
         interceptors.add(new BlackListInterceptor());

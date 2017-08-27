@@ -4,7 +4,7 @@
 <aside>
 	<div class="widget search">
 		<form id="searchform" action="${searchUrl}" method="post">
-			<p class="search_input"><input type="text" onblur="OnExit(this)" onfocus="OnEnter(this)" size="15" name="key" title="${_res.searchTip}" value="${key}" class="inputtext"><input type="submit" class="btn" value="${_res.search}"></p>
+			<p class="search_input"><input type="text" placeholder="${_res.searchTip}" size="15" name="key" value="${key}" class="inputtext"><input type="submit" class="btn" value="${_res.search}"></p>
 		</form>
 	</div>
 	<c:choose>

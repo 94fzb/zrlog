@@ -16,7 +16,6 @@
       </div>
     </div>
   </div> <!-- //page -->
-<script src="${url}/js/sheshui.js?201308"></script>
 <div style="display:none">${webs.webCm}</div>
 </body>
 </html>

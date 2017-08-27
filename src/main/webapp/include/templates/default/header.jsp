@@ -75,7 +75,7 @@
         <ul class="section_list">
           <c:forEach var="lognav" items="${init.logNavs}">
               <c:choose>
-                  <c:when test="${lognav.url eq requrl}">
+                  <c:when test="${lognav.current}">
           <li class="active"><a href="${lognav.url}"><c:out value="${lognav.navName}" /></a></li>
                   </c:when>
                   <c:otherwise>
