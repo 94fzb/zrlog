@@ -37,15 +37,23 @@ function upgrade(){
         })
     }
 }
-
+var checkRequestPadding = false;
 function checkRestartSuccess(){
-    $.get('api/admin/website/version',function(data){
-        if(data.buildId == buildId){
-            clearInterval(checkRestartTimer);
-            alert("升级成功，确定将会跳转到管理首页")
-            location.href = 'admin';
-        }
-    })
+    if(!checkRequestPadding){
+        checkRequestPadding = true;
+        $.get('api/admin/website/version',function(data){
+            checkRequestPadding = false;
+            if(data.buildId == buildId){
+                clearInterval(checkRestartTimer);
+                var ok =  confirm("升级成功，跳转到管理首页？")
+                if(ok){
+                    location.href = 'admin';
+                }
+            }
+        }).fail(function(jqXHR, textStatus, errorThrown){
+            checkRequestPadding = false;
+       })
+    }
 }
 
 $(function() {

@@ -40,7 +40,7 @@ border-radius: 4px;
 </div>
 <div class="x_content">
 <form target="_blank" class="form-horizontal form-label-left" id="article-form">
-    <c:if test="${'on' eq webSite['article_thumbnail']}">
+    <c:if test="${'off' ne webSite['article_thumbnail']}">
 	<div class="form-group">
     <div class="col-xs-7"><label for="exampleInputFile"><h4>${_res['writeCover']}</h4></label>
 	<input type="file" id="thumbnail-upload" name="imgFile" value="${log.thumbnail}" />

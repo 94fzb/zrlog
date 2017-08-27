@@ -41,7 +41,7 @@
                <p><label for="webHome">${_res.website}</label><input type="text" id="web" class="comment_web_input" size="25" name="webHome" value=""></p>
              </div>
              <div class="button-set">
-                <span class="submit"><input type="submit"  id="txpCommentSubmit" class="button" name="submit" value="Submit"></span>
+                <span class="submit"><input type="submit"  id="txpCommentSubmit" class="button" name="submit" value="${_res.submit}"></span>
              </div>
          </div>
          <input type="hidden" name="logId" value="${log.logId }">

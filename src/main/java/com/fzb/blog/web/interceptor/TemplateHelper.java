@@ -49,7 +49,7 @@ public class TemplateHelper {
         } else if (request.getAttribute("log") != null) {
             data = request.getAttribute("log");
         }
-        staticHtml(data, baseUrl, suffix,webSite.get("article_thumbnail") == null || "on".equals(webSite.get("article_thumbnail")));
+        staticHtml(data, baseUrl, suffix, webSite.get("article_thumbnail") == null || "on".equals(webSite.get("article_thumbnail")));
         if (request.getAttribute("pager") != null && !((List<Map<String, Object>>) ((Map) request.getAttribute("pager")).get("pageList")).isEmpty()) {
             List<Map<String, Object>> pageList = ((List<Map<String, Object>>) ((Map) request.getAttribute("pager")).get("pageList"));
             for (Map<String, Object> pageMap : pageList) {
@@ -92,7 +92,10 @@ public class TemplateHelper {
         if (!logNavs.isEmpty()) {
             for (LogNav logNav : logNavs) {
                 String url = logNav.get("url").toString();
-                if (url.startsWith("/")) {
+                if (url.equals("/") && (request.getRequestURI().equals("/all-1") || request.getRequestURI().equals("/post/all-1"))) {
+                    logNav.put("current", true);
+                    continue;
+                } else if (url.startsWith("/")) {
                     if (suffix.length() > 0 && url.length() == 1) {
                         url = "";
                     } else {
@@ -208,7 +211,7 @@ public class TemplateHelper {
         return null;
     }
 
-    private static void staticHtml(Object data, String baseUrl, String suffix,boolean enableArticle) {
+    private static void staticHtml(Object data, String baseUrl, String suffix, boolean enableArticle) {
         if (data instanceof Log) {
             Log log = (Log) data;
             log.put("alias", log.get("alias") + suffix);
@@ -223,8 +226,8 @@ public class TemplateHelper {
             List<Log> logList = (List<Log>) map.get("rows");
             if (logList != null) {
                 for (Log log : logList) {
-                    if(!enableArticle){
-                        log.put("thumbnail",null);
+                    if (!enableArticle) {
+                        log.put("thumbnail", null);
                     }
                     log.put("url", baseUrl + "post/" + log.get("alias") + suffix);
                     log.put("typeUrl", baseUrl + "post/sort/" + log.get("typeAlias") + suffix);

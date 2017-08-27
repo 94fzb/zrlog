@@ -15,13 +15,13 @@ $(function($) {
                     delOptions:{recreateForm: true, beforeShowForm:beforeDeleteCallback,url: 'api/admin/comment/delete'},
                 }
             },
-            {name:'userComment',index:'userComment', width:150, editable: true},
-            {name:'userName',index:'userName', width:70, editable: true},
+            {name:'userComment',index:'userComment', width:150, editable: true, sortable:false},
+            {name:'userName',index:'userName', width:70, editable: true, sortable:false},
             {name:'userHome',index:'userHome',width:150, sortable:false,editable: false,edittype:"textarea",formatter:'link', editoptions:{rows:"2",cols:"20"}},
-            {name:'userIp',index:'userIp', width:150,editable: false,editoptions:{size:"20",maxlength:"30"}},
-            {name:'userMail',index:'userMail', width:70, editable: false},
+            {name:'userIp',index:'userIp', width:150,editable: false,editoptions:{size:"20",maxlength:"30"}, sortable:false},
+            {name:'userMail',index:'userMail', width:70, editable: false, sortable:false},
             {name:'commTime',index:'commTime', width:70,editable: false,editoptions:{size:"20",maxlength:"30"}},
-            {name:'logId',index:'logId', width:30, editable: false,formatter:viewLog},
+            {name:'logId',index:'logId', width:30, editable: false,formatter:viewLog, sortable:false},
 
         ],
         viewrecords : true,
