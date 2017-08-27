@@ -53,7 +53,7 @@ class UpdateVersionTimerTask extends TimerTask {
             tLastVersion.setChangeLog(changeLogHtml);
         } else {
             String commitCompareLink = "https://git.oschina.net/94fzb/zrlog/compare/" + BlogBuildInfoUtil.getBuildId() + "..." + tLastVersion.getBuildId();
-            tLastVersion.setChangeLog("<h4>Not found change log,Please see commit: <a href='" + commitCompareLink + "'>" + commitCompareLink + "</a></h4>");
+            tLastVersion.setChangeLog("<h4>Not found change log,Please see commit: <a target='_blank' href='" + commitCompareLink + "'>" + commitCompareLink + "</a></h4>");
         }
         Date buildDate = new SimpleDateFormat("yyyy-MM-dd hh:mm").parse(tLastVersion.getReleaseDate());
         if (!tLastVersion.getBuildId().equals(BlogBuildInfoUtil.getBuildId()) && buildDate.after(BlogBuildInfoUtil.getTime())) {

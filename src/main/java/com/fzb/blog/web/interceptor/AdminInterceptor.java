@@ -66,11 +66,11 @@ class AdminInterceptor implements Interceptor {
                         adminTokenService.setAdminToken(userId, controller.getRequest(), controller.getResponse());
                     }
                     ai.invoke();
-                    if (!tryDoRender(ai, controller)) {
-                        // 存在消息提示
-                        if (controller.getRequest().getAttribute("message") != null) {
-                            controller.render("/admin/message.jsp");
-                        } else {
+                    // 存在消息提示
+                    if (controller.getAttr("message") != null) {
+                        controller.render("/admin/message.jsp");
+                    } else {
+                        if (!tryDoRender(ai, controller)) {
                             controller.render(Constants.ADMIN_NOT_FOUND_PAGE + ".jsp");
                         }
                     }
