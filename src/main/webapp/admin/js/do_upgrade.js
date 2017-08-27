@@ -45,7 +45,7 @@ function checkRestartSuccess(){
             checkRequestPadding = false;
             if(data.buildId == buildId){
                 clearInterval(checkRestartTimer);
-                var ok =  confirm("升级成功，跳转到管理首页？")
+                var ok =  confirm("更新成功，跳转到管理首页？")
                 if(ok){
                     location.href = 'admin';
                 }

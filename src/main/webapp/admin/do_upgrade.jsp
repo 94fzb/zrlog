@@ -15,7 +15,7 @@
     	</h2>
   <div class="col-md-2"></div>
   <div class="col-md-8">
-<div id="wizard_verticle" class="form_wizard wizard_horizontal">
+<div id="wizard_verticle" class="form_wizard wizard_horizontal" style="min-height: 300px;">
   <ul class="list-unstyled wizard_steps anchor">
     <li>
       <a href="${currentPage}#step-11" class="selected" isdone="1" rel="1">
