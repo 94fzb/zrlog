@@ -2,6 +2,7 @@ package com.fzb.common.util.http;
 
 import com.fzb.common.util.http.handle.HttpHandle;
 import com.fzb.common.util.http.handle.HttpStringHandle;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -176,5 +177,13 @@ public class HttpUtil {
 
     public String getTextByUrl(String url) throws IOException {
         return sendGetRequest(url, new HttpStringHandle(), new HashMap<String, String>()).getT();
+    }
+
+    public String getSuccessTextByUrl(String url) throws IOException {
+        HttpStringHandle httpStringHandle = (HttpStringHandle) sendGetRequest(url, new HttpStringHandle(), new HashMap<String, String>());
+        if (httpStringHandle.getStatusCode() == HttpStatus.SC_OK) {
+            return httpStringHandle.getT();
+        }
+        return null;
     }
 }

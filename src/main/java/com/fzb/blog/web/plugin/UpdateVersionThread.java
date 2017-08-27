@@ -1,6 +1,7 @@
 package com.fzb.blog.web.plugin;
 
 import com.fzb.blog.common.Constants;
+import com.fzb.common.util.ExceptionUtils;
 import com.fzb.common.util.IOUtil;
 import com.fzb.common.util.JarPackageUtil;
 import com.fzb.common.util.ZipUtil;
@@ -35,9 +36,13 @@ public class UpdateVersionThread extends Thread implements Serializable {
         sb.append("<p>").append(str).append("</p>");
     }
 
+    private void updateProcessErrorMsg(Throwable e) {
+        sb.append("<pre style='color:red'>").append(ExceptionUtils.recordStackTraceMsg(e)).append("</pre>");
+    }
+
+
     public void run() {
         try {
-            updateProcessMsg("开始更新");
             String warName;
             String contextPath = JFinal.me().getServletContext().getContextPath();
             String folderName;
@@ -59,7 +64,6 @@ public class UpdateVersionThread extends Thread implements Serializable {
             tempFilePath.mkdirs();
             IOUtil.moveOrCopy(file.toString(), tempFilePath.getParentFile().toString(), false);
             String tempFile = tempFilePath.getParentFile() + File.separator + file.getName();
-            updateProcessMsg("解压文件");
             ZipUtil.unZip(tempFile, filePath + File.separator);
             updateProcessMsg("解压完成");
             List<File> fileList = new ArrayList<File>();
@@ -90,11 +94,9 @@ public class UpdateVersionThread extends Thread implements Serializable {
             finalFile.delete();
             LOGGER.info("finalFile " + finalFile);
             IOUtil.moveOrCopy(tempWarFile.toString(), finalFile.getParentFile().toString(), false);
-            updateProcessMsg("升级完成");
         } catch (Exception e) {
-            e.printStackTrace();
-            LOGGER.error(e);
-            updateProcessMsg("升级失败\n" + e.getMessage());
+            LOGGER.error("", e);
+            updateProcessErrorMsg(e);
         }
         finish = true;
     }

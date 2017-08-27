@@ -104,7 +104,7 @@
                   </ul>
                 </li>
               </ul>
-            </div><!-- /gn-scroller -->
+            </div>
           </nav>
         </li>
         <li class="sitename"><a class="gn-icon icon-info" href="/"><span><%=request.getHeader("host") %></span></a></li>
@@ -117,7 +117,7 @@
     </header>
   </div>
 </div>
-<div class="main clearfloat">
 <div class="breadcrumb"></div>
+<div class="main clearfloat">
 <section>
 <jsp:include page="update_browser.jsp"/>

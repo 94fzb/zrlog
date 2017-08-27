@@ -4,6 +4,7 @@ import com.fzb.blog.common.Constants;
 import com.fzb.blog.util.BlogBuildInfoUtil;
 import com.fzb.common.util.http.HttpUtil;
 import com.google.gson.Gson;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -47,7 +48,13 @@ class UpdateVersionTimerTask extends TimerTask {
         Version tLastVersion = new Gson().fromJson(txtContent, Version.class);
         LOGGER.info(txtContent);
         //手动设置对应ChangeLog。
-        tLastVersion.setChangeLog(HttpUtil.getInstance().getTextByUrl("http://www.zrlog.com/changelog/" + tLastVersion.getVersion() + "-" + tLastVersion.getBuildId() + ".html"));
+        String changeLogHtml = HttpUtil.getInstance().getSuccessTextByUrl("http://www.zrlog.com/changelog/" + tLastVersion.getVersion() + "-" + tLastVersion.getBuildId() + ".html");
+        if (StringUtils.isNotBlank(changeLogHtml)) {
+            tLastVersion.setChangeLog(changeLogHtml);
+        } else {
+            String commitCompareLink = "https://git.oschina.net/94fzb/zrlog/commit/" + BlogBuildInfoUtil.getBuildId() + "..." + tLastVersion.getBuildId();
+            tLastVersion.setChangeLog("<h3>Not found change log,Please see commit: <a href='" + commitCompareLink + "'>" + commitCompareLink + "</a></h3>");
+        }
         Date buildDate = new SimpleDateFormat("yyyy-MM-dd hh:mm").parse(tLastVersion.getReleaseDate());
         if (!tLastVersion.getBuildId().equals(BlogBuildInfoUtil.getBuildId()) && buildDate.after(BlogBuildInfoUtil.getTime())) {
             LOGGER.info("ZrLog New update found new [" + tLastVersion.getVersion() + "-" + tLastVersion.getBuildId() + "]");

@@ -19,9 +19,9 @@ jQuery(function($) {
 
     url:'api/admin/article?keywords='+keywords,
     datatype: "json",
-        colNames:['删除','ID','标题','关键词', '作者', '分类','发布时间','查看数','草稿','私有','编辑','浏览'],
+        colNames:['','ID','标题','关键词', '作者', '分类','发布时间','查看数','草稿','私有','编辑','浏览'],
         colModel:[
-            {name:'delete',width:50,index:'id', sortable:false,
+            {name:'delete',width:28,index:'id', sortable:false,
                  formatter: 'actions',
                   formatoptions: {
                    keys: true,

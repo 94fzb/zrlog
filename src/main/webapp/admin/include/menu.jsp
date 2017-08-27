@@ -11,72 +11,51 @@
           <a href="${url}" class="site_title"><i class="fa fa-home"></i> <span>${webs.title}</span></a>
         </div>
         <div class="clearfix"></div>
-        <!-- sidebar menu -->
         <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
           <div class="menu_section">
             <ul class="nav side-menu">
                 <li>
                     <a href="admin/index">
-                        <i class="fa fa-dashboard"></i>
-                        <span class="menu-text"> ${_res.dashboard} </span>
+                        <i class="fa fa-dashboard"></i>${_res.dashboard}
                     </a>
                 </li>
                 <li <c:if test='${currentPage=="admin/edit"}'>class="current-page"</c:if>>
                     <a href="admin/article/edit<c:if test='${not empty pageContext.request.queryString}'>?${pageContext.request.queryString}</c:if>">
-                        <i class="fa fa-edit"></i>
-                        <span class="menu-text">${_res['admin.log.edit']} </span>
+                        <i class="fa fa-edit"></i>${_res['admin.log.edit']}
                     </a>
                 </li>
                 <li>
                     <a href="admin/article">
-                        <i class="fa fa-newspaper-o"></i>
-                        <span class="menu-text"> ${_res.blogManage} </span>
-
+                        <i class="fa fa-newspaper-o"></i>${_res.blogManage}
                     </a>
                 </li>
                 <li>
                     <a href="admin/comment">
-                        <i class="fa fa-comment"></i>
-                        <span class="menu-text">${_res['admin.comment.manage']}</span>
+                        <i class="fa fa-comment"></i>${_res['admin.comment.manage']}
                     </a>
                 </li>
                 <li>
                     <a href="admin/plugin">
-                        <i class="fa fa-plug"></i>
-                        <span class="menu-text"> ${_res['admin.plugin.manage']} </span>
+                        <i class="fa fa-plug"></i>${_res['admin.plugin.manage']}
                     </a>
                 </li>
                 <li>
                     <a>
-                        <i class="fa fa-cogs"></i>
-                        <span class="menu-text">${_res['admin.setting']}</span>
+                        <i class="fa fa-cogs"></i>${_res['admin.setting']}
                         <span class="fa fa-chevron-down"></span>
                     </a>
-
                     <ul class="nav child_menu">
                         <li>
-                            <a href="admin/user">
-                                <i class="fa fa-double-angle-right"></i>
-                                <span class="menu-text">${_res['admin.user.info']}</span>
-                            </a>
+                            <a href="admin/user">${_res['admin.user.info']}</a>
                         </li>
                         <li>
-                            <a href="admin/website">
-                                <i class="fa fa-double-angle-right"></i>
-                                <span class="menu-text">${_res['admin.website.manage']}</span>
-                            </a>
+                            <a href="admin/website">${_res['admin.website.manage']}</a>
                         </li>
                         <li>
-                            <a href="admin/template">
-                                <i class="fa fa-double-angle-right"></i>
-                                <span class="menu-text">${_res['admin.template.manage']}</span>
-                            </a>
+                            <a href="admin/template">${_res['admin.template.manage']}</a>
                         </li>
                         <li>
-                            <a href="admin/upgrade">
-                                <i class="fa fa-double-angle-right"></i>
-                                <span class="menu-text"> ${_res['admin.upgrade.manage']}</span>
-                            </a>
+                            <a href="admin/upgrade">${_res['admin.upgrade.manage']}</a>
                         </li>
                     </ul>
                 </li>
@@ -90,36 +69,22 @@
                     </a>
                     <ul class="nav child_menu">
                         <li>
-                            <a href="admin/type"  class="dropdown-toggle">
-                                <i class="fa fa-double-angle-right"></i>
-                                <span class="menu-text">${_res['admin.type.manage']}</span>
-                            </a>
+                            <a href="admin/type"  class="dropdown-toggle">${_res['admin.type.manage']}</a>
                         </li>
                         <li>
-                            <a href="admin/tag"  class="dropdown-toggle">
-                                <i class="fa fa-double-angle-right"></i>
-                                <span class="menu-text">${_res['admin.tag.manage']}</span>
-                            </a>
+                            <a href="admin/tag"  class="dropdown-toggle">${_res['admin.tag.manage']}</a>
                         </li>
                         <li>
-                            <a href="admin/link" class="dropdown-toggle">
-                                <i class="fa fa-double-angle-right"></i>
-                                <span class="menu-text">${_res['admin.link.manage']}</span>
-                            </a>
+                            <a href="admin/link" class="dropdown-toggle">${_res['admin.link.manage']}</a>
                         </li>
                         <li>
-                            <a href="admin/nav" class="dropdown-toggle">
-                                <i class="fa fa-double-angle-right"></i>
-                                <span class="menu-text"> ${_res['admin.nav.manage']}</span>
-                            </a>
+                            <a href="admin/nav" class="dropdown-toggle">${_res['admin.nav.manage']}</span></a>
                         </li>
                     </ul>
                 </li>
             </ul>
           </div>
-
         </div>
-        <!-- /sidebar menu -->
       </div>
     </div>
 

@@ -31,10 +31,9 @@ request.setAttribute("res",new com.google.gson.Gson().toJson(request.getAttribut
     <link href="${cacheFile['/assets/css/nprogress.css']}" rel="stylesheet">
     <link href="${cacheFile['/assets/css/select2.min.css']}" rel="stylesheet">
     <link href="${cacheFile['/assets/css/switchery.min.css']}" rel="stylesheet">
+    <link href="${cacheFile['/assets/css/pnotify.css']}" rel="stylesheet" />
     <!-- Custom Theme Style -->
     <link href="${cacheFile['/assets/css/custom.min.css']}" rel="stylesheet">
-
-    <link rel="stylesheet" href="${cacheFile['/assets/css/pnotify.css']}" />
     <!-- jQuery -->
     <script src="${cacheFile['/assets/js/jquery.min.js']}"></script>
     <script src="${cacheFile['/admin/js/dashboard.js']}"></script>
@@ -42,5 +41,4 @@ request.setAttribute("res",new com.google.gson.Gson().toJson(request.getAttribut
         var _res = ${res};
         var editorMdPath = "admin/markdown/lib/"
     </script>
-
   </head>

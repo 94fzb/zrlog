@@ -496,7 +496,7 @@ a:hover, a:focus {
     position: relative;
 }
 .nav.side-menu > li > a {
-    margin-bottom: 6px;
+    margin-bottom: 5px;
 }
 .nav.side-menu > li > a:hover {
     color: #f2f5f7 !important;
@@ -3290,11 +3290,11 @@ div[data-role="editor-toolbar"] {
     background-color: #fff;
     border: 1px solid #ccc;
     border-radius: 0;
-    min-height: 38px;
+    min-height: 34px;
 }
 .select2-container--default .select2-selection--single .select2-selection__rendered {
     color: #73879c;
-    padding-top: 5px;
+    padding-top: 3px;
 }
 .select2-container--default .select2-selection--multiple .select2-selection__rendered {
     padding-top: 3px;
