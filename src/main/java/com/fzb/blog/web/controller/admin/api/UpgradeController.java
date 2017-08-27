@@ -63,9 +63,10 @@ public class UpgradeController extends BaseController {
         if (handle == null) {
             File file = new File(PathKit.getWebRootPath() + "/WEB-INF/update-temp/" + "zrlog.war");
             file.getParentFile().mkdir();
-            handle = new DownloadProcessHandle(file);
+            Version version = lastVersion().getVersion();
+            handle = new DownloadProcessHandle(version, file);
             try {
-                HttpUtil.getInstance().sendGetRequest(lastVersion().getVersion().getDownloadUrl(), handle, new HashMap<String, String>());
+                HttpUtil.getInstance().sendGetRequest(version.getDownloadUrl(), handle, new HashMap<String, String>());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -112,6 +113,8 @@ public class UpgradeController extends BaseController {
         }
         upgradeProcessResponse.setMessage(updateVersionThread.getMessage());
         upgradeProcessResponse.setFinish(updateVersionThread.isFinish());
+        upgradeProcessResponse.setBuildId(handle.getVersion().getBuildId());
+        upgradeProcessResponse.setVersion(handle.getVersion().getVersion());
         return upgradeProcessResponse;
     }
 

@@ -1,5 +1,6 @@
 package com.fzb.common.util.http.handle;
 
+import com.fzb.blog.web.plugin.Version;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 
@@ -10,14 +11,11 @@ public class DownloadProcessHandle extends HttpHandle<Integer> implements Serial
     private int process;
     private File file;
     private long length;
+    private Version version;
 
-    public DownloadProcessHandle(File file) {
+    public DownloadProcessHandle(Version version, File file) {
         this.file = file;
-    }
-
-    public DownloadProcessHandle(File file, long length) {
-        this.file = file;
-        this.length = length;
+        this.version = version;
     }
 
     @Override
@@ -60,5 +58,9 @@ public class DownloadProcessHandle extends HttpHandle<Integer> implements Serial
 
     public File getFile() {
         return file;
+    }
+
+    public Version getVersion() {
+        return version;
     }
 }

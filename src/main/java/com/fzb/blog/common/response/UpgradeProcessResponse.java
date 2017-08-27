@@ -5,6 +5,8 @@ public class UpgradeProcessResponse {
     private int error;
     private String message;
     private boolean finish;
+    private String buildId;
+    private String version;
     private boolean needRestart;
 
     public int getError() {
@@ -37,5 +39,21 @@ public class UpgradeProcessResponse {
 
     public void setFinish(boolean finish) {
         this.finish = finish;
+    }
+
+    public String getBuildId() {
+        return buildId;
+    }
+
+    public void setBuildId(String buildId) {
+        this.buildId = buildId;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 }

@@ -1,9 +1,11 @@
 var timer;
 var upgradeTimer;
 var downloadSuccess;
+var checkRestartTimer;
 var finish;
 var downloadRequestPending = false;
 var upgradeRequestPending = false;
+var buildId;
 function status(){
     if(!downloadRequestPending){
         downloadRequestPending = true;
@@ -28,10 +30,22 @@ function upgrade(){
             if(data.finish){
                 clearInterval(upgradeTimer);
                 finish = true;
+                buildId = data.buildId;
+                checkRestartTimer = setInterval('checkRestartSuccess()',500);
             }
             upgradeRequestPending = false;
         })
     }
+}
+
+function checkRestartSuccess(){
+    $.get('api/admin/website/version',function(data){
+        if(data.buildId == buildId){
+            clearInterval(checkRestartTimer);
+            alert("升级成功，确定将会跳转到管理首页")
+            location.href = 'admin';
+        }
+    })
 }
 
 $(function() {
