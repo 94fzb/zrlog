@@ -214,7 +214,8 @@ public class ArticleService {
                     path = path.substring(0, path.indexOf(".")) + "_thumbnail" + path.substring(path.indexOf("."));
                     HttpUtil.getInstance().sendGetRequest(url, new HashMap<String, String[]>(), fileHandler, new HashMap<String, String>());
                     bytes = IOUtil.getByteByInputStream(new FileInputStream(fileHandler.getT().getPath()));
-                    thumbnailFile = new File(fileHandler.getT().getPath() + ".tmp");
+                    File tmpFile = new File(fileHandler.getT().getPath());
+                    thumbnailFile = new File(tmpFile.getParent() + "/tmp-" + tmpFile.getName());
                 } else {
                     path = url.substring(0, url.indexOf(".")) + "_thumbnail" + url.substring(path.indexOf("."));
                     thumbnailFile = new File(PathKit.getWebRootPath() + path);
@@ -222,7 +223,12 @@ public class ArticleService {
                 }
                 if (bytes.length > 0) {
                     try {
-                        IOUtil.writeBytesToFile(ThumbnailUtil.jpeg(bytes, 1f), thumbnailFile);
+                        String extName = thumbnailFile.getName().substring(thumbnailFile.getName().lastIndexOf("."));
+                        if (!extName.equalsIgnoreCase(".gif")) {
+                            IOUtil.writeBytesToFile(ThumbnailUtil.jpeg(bytes, 1f), thumbnailFile);
+                        } else {
+                            IOUtil.writeBytesToFile(bytes, thumbnailFile);
+                        }
                     } catch (IOException e) {
                         LOGGER.error("generation jpeg thumbnail error ", e);
                         return url;
