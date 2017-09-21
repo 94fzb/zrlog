@@ -152,28 +152,32 @@ public class PostController extends BaseController {
     public void addComment() throws UnsupportedEncodingException {
         Integer logId = getParaToInt("logId");
         if (logId != null && getPara("userComment") != null) {
-            String comment = Jsoup.clean(getPara("userComment"), Whitelist.basic());
-            if (comment.length() > 0) {
-                // TODO　如何过滤垃圾信息
-                new Comment().set("userHome", getPara("userHome"))
-                        .set("userMail", getPara("userMail"))
-                        .set("userIp", WebTools.getRealIp(getRequest()))
-                        .set("userName", getPara("userName"))
-                        .set("logId", logId)
-                        .set("userComment", comment)
-                        .set("commTime", new Date()).set("hide", 1).save();
-            }
             Log log = Log.dao.getLogById(logId);
-            String alias = URLEncoder.encode(log.getStr("alias"), "UTF-8");
-            String ext = "";
-            if (getStaticHtmlStatus()) {
-                ext = ".html";
-                new CacheService().clearStaticPostFileByLogId(logId + "");
-            }
-            if (getRequest().getContextPath().isEmpty()) {
-                redirect("/post/" + alias + ext);
+            if (log != null && log.getBoolean("canComment")) {
+                String comment = Jsoup.clean(getPara("userComment"), Whitelist.basic());
+                if (comment.length() > 0) {
+                    // TODO　如何过滤垃圾信息
+                    new Comment().set("userHome", getPara("userHome"))
+                            .set("userMail", getPara("userMail"))
+                            .set("userIp", WebTools.getRealIp(getRequest()))
+                            .set("userName", getPara("userName"))
+                            .set("logId", logId)
+                            .set("userComment", comment)
+                            .set("commTime", new Date()).set("hide", 1).save();
+                }
+                String alias = URLEncoder.encode(log.getStr("alias"), "UTF-8");
+                String ext = "";
+                if (getStaticHtmlStatus()) {
+                    ext = ".html";
+                    new CacheService().clearStaticPostFileByLogId(logId + "");
+                }
+                if (getRequest().getContextPath().isEmpty()) {
+                    redirect("/post/" + alias + ext);
+                } else {
+                    redirect(getRequest().getContextPath() + "post/" + alias + ext);
+                }
             } else {
-                redirect(getRequest().getContextPath() + "post/" + alias + ext);
+                renderError(404);
             }
         }
     }
