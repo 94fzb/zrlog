@@ -56,17 +56,6 @@
 	</div>
 			</c:when>
 			<c:when test="${plugin.pluginName eq 'tags'}">
-	<script type="text/javascript">
-	$(document).ready(function(){
-		var tags_a = $("#tags").find("a");
-		tags_a.each(function(){
-			var x = 6;
-			var y = 0;
-			var rand = parseInt(Math.random() * (x - y + 1) + y);
-			$(this).addClass("size"+rand);
-		});
-	});
-	</script>
 	<style type="text/css">
 		.taglist a{padding:0px;display:inline-block;white-space:nowrap;}
 		a.size1{font-size:10px;padding:2px;color``}

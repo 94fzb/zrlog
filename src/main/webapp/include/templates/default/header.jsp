@@ -32,6 +32,9 @@
   <script src="${templateUrl}/js/css3-mediaqueries.js"></script>
   <link rel="stylesheet" type="text/css" media="screen" href="${templateUrl}/css/style-ie7.css" />
   <![endif]-->
+  <script src="${templateUrl }/js/classie.js"></script>
+  <script src="${templateUrl }/js/gnmenu.js"></script>
+  <script src="${templateUrl }/js/sheshui.js"></script>
   <style>
     header .avatar{
       display: block;float: left;
@@ -109,11 +112,6 @@
         </li>
         <li class="sitename"><a class="gn-icon icon-info" href="/"><span><%=request.getHeader("host") %></span></a></li>
       </ul>
-    <script src="${templateUrl }/js/classie.js"></script>
-    <script src="${templateUrl }/js/gnmenu.js"></script>
-    <script>
-      new gnMenu(document.getElementById( 'gn-menu' ));
-    </script>
     </header>
   </div>
 </div>
