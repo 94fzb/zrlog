@@ -1,10 +1,10 @@
-<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ page language="java" import="java.util.*"  session="false" pageEncoding="UTF-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<jsp:include page="header.jsp"></jsp:include>
+<%@ include file="header.jsp"%>
 <c:choose>
 	<c:when test="${empty requestScope.data}">
 		<c:set var="pageLevel" value="1" scope="request"/>
-		<jsp:include page="404.jsp"></jsp:include>
+		<%@ include file="404.jsp"%>
 	</c:when>
 	<c:otherwise>
 	<c:if test="${not empty tipsType}">
@@ -35,6 +35,6 @@
 </c:if>
 </c:otherwise>
 </c:choose>
-<jsp:include page="pager.jsp"></jsp:include>
-<jsp:include page="plugin.jsp"></jsp:include>
-<jsp:include page="footer.jsp"></jsp:include>
+<%@ include file="pager.jsp"%>
+<%@ include file="plugin.jsp"%>
+<%@ include file="footer.jsp"%>

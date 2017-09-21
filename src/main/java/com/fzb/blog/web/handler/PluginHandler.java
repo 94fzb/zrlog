@@ -1,6 +1,7 @@
 package com.fzb.blog.web.handler;
 
 import com.fzb.blog.util.ZrlogUtil;
+import com.fzb.blog.web.token.AdminToken;
 import com.fzb.blog.web.token.AdminTokenService;
 import com.fzb.blog.web.token.AdminTokenThreadLocal;
 import com.fzb.common.util.IOUtil;
@@ -47,9 +48,9 @@ public class PluginHandler extends Handler {
         }
         if (isPluginPath) {
             try {
-                int userId = adminTokenService.getUserId(request);
-                if (userId > 0) {
-                    adminTokenService.setAdminToken(userId, request, response);
+                AdminToken adminToken = adminTokenService.getAdminToken(request);
+                if (adminToken != null) {
+                    adminTokenService.setAdminToken(adminToken.getUserId(), adminToken.getSessionId(), request, response);
                 }
                 if (target.startsWith("/admin/plugins/")) {
                     try {

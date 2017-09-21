@@ -21,7 +21,7 @@ public class AdminTokenService {
 
     private static final String TOKEN_SPLIT_CHAR = "#";
 
-    public int getUserId(HttpServletRequest request) {
+    public AdminToken getAdminToken(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             String decTokenString = null;
@@ -39,24 +39,25 @@ public class AdminTokenService {
                         String base64Encode = new String(AESCryptoUtil.decrypt(user.getStr("secretKey"), Base64.decodeBase64(adminTokenEncryptAfter)));
                         AdminToken adminToken = new Gson().fromJson(base64Encode, AdminToken.class);
                         if (adminToken.getCreatedDate() + getSessionTimeout() > System.currentTimeMillis()) {
-                            return userId;
+                            return adminToken;
                         }
                     } else {
-                        return -1;
+                        return null;
                     }
                 }
             } catch (Exception e) {
                 LOGGER.info("error", e);
             }
         }
-        return -1;
+        return null;
     }
 
-    public void setAdminToken(int userId, HttpServletRequest request, HttpServletResponse response) {
+    public void setAdminToken(int userId, int sessionId, HttpServletRequest request, HttpServletResponse response) {
         User user = User.dao.findById(userId);
         long sessionTimeout = getSessionTimeout();
         AdminToken adminToken = new AdminToken();
         adminToken.setUserId(user.getInt("userId"));
+        adminToken.setSessionId(sessionId);
         long loginTime = System.currentTimeMillis();
         adminToken.setCreatedDate(loginTime);
         AdminTokenThreadLocal.setAdminToken(adminToken);

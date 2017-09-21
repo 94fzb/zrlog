@@ -31,11 +31,4 @@ public class ByteUtils {
             return (c - 'A' + 10) & 0x0F;
         return (c - '0') & 0x0F;
     }
-
-    public static void main(String args[]) {
-        String str = "xxx";
-        String bytes = bytesToHexString(str.getBytes());
-        System.out.println(new String(hexString2Bytes(bytes)));
-
-    }
 }

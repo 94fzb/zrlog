@@ -5,6 +5,7 @@ import com.fzb.blog.common.Constants;
 import com.fzb.blog.common.response.ExceptionResponse;
 import com.fzb.blog.model.User;
 import com.fzb.blog.util.I18NUtil;
+import com.fzb.blog.web.token.AdminToken;
 import com.fzb.blog.web.token.AdminTokenService;
 import com.fzb.blog.web.token.AdminTokenThreadLocal;
 import com.fzb.blog.web.util.WebTools;
@@ -47,8 +48,8 @@ class AdminInterceptor implements Interceptor {
     private void adminPermission(Invocation ai) {
         try {
             Controller controller = ai.getController();
-            int userId = adminTokenService.getUserId(controller.getRequest());
-            if (userId > 0) {
+            AdminToken adminToken = adminTokenService.getAdminToken(controller.getRequest());
+            if (adminToken != null) {
                 BaseDataInitVO init = (BaseDataInitVO) ai.getController().getRequest().getAttribute("init");
                 Map<String, Object> webSite = init.getWebSite();
                 if (webSite.get("admin_dashboard_naver") == null) {
@@ -56,14 +57,14 @@ class AdminInterceptor implements Interceptor {
                 }
                 ai.getController().getRequest().setAttribute("webs", webSite);
                 try {
-                    User user = User.dao.findById(userId);
+                    User user = User.dao.findById(adminToken.getUserId());
                     if (StringUtils.isBlank(user.getStr("header"))) {
                         user.set("header", "assets/images/default-portrait.gif");
                     }
                     controller.setAttr("user", user);
                     TemplateHelper.fullTemplateInfo(controller);
                     if (!ai.getActionKey().equals("/admin/logout")) {
-                        adminTokenService.setAdminToken(userId, controller.getRequest(), controller.getResponse());
+                        adminTokenService.setAdminToken(adminToken.getUserId(), adminToken.getSessionId(), controller.getRequest(), controller.getResponse());
                     }
                     ai.invoke();
                     // 存在消息提示

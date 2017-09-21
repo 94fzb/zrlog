@@ -1,4 +1,4 @@
-<%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
+<%@ page language="java" session="false" import="java.util.*" pageEncoding="utf-8"%>
 	</div>
     <footer>
       <strong>${_res.copyright} <a href="https://www.zrlog.com"> ZrLog . </a></strong>

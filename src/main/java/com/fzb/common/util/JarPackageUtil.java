@@ -53,15 +53,4 @@ public class JarPackageUtil {
         }
         jarOutputStream.close();
     }
-
-    public static void main(String[] args) {
-        try {
-            //unZip("E:/putty.zip", "E:/test/");
-            List<File> files = new LinkedList<File>();
-            files.add(new File("C:\\Users\\xiaochun\\git\\zrlog\\target\\ROOT"));
-            inJar(files, "C:\\Users\\xiaochun\\git\\zrlog\\target\\ROOT\\", "C:/7/1.war");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 }

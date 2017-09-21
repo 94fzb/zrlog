@@ -13,6 +13,7 @@ import com.fzb.blog.web.plugin.UpdateVersionPlugin;
 import com.fzb.blog.web.plugin.UpdateVersionThread;
 import com.fzb.blog.web.plugin.Version;
 import com.fzb.blog.web.plugin.type.AutoUpgradeVersionType;
+import com.fzb.blog.web.token.AdminTokenThreadLocal;
 import com.fzb.common.util.http.HttpUtil;
 import com.fzb.common.util.http.handle.DownloadProcessHandle;
 import com.jfinal.config.Plugins;
@@ -24,11 +25,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class UpgradeController extends BaseController {
 
-    private static final String DOWNLOAD_ATTR_KEY_PREFIX = "downing";
-    private static final String UPDATE_THREAD_ATTR_KEY = "updateVersionThread";
+    private static Map<Integer, DownloadProcessHandle> downloadProcessHandleMap = new ConcurrentHashMap<>();
+    private static Map<Integer, UpdateVersionThread> updateVersionThreadMap = new ConcurrentHashMap<>();
 
     private CacheService cacheService = new CacheService();
 
@@ -59,7 +61,7 @@ public class UpgradeController extends BaseController {
     }
 
     public DownloadUpdatePackageResponse download() {
-        DownloadProcessHandle handle = getSessionAttr(DOWNLOAD_ATTR_KEY_PREFIX);
+        DownloadProcessHandle handle = downloadProcessHandleMap.get(AdminTokenThreadLocal.getUser().getSessionId());
         if (handle == null) {
             File file = new File(PathKit.getWebRootPath() + "/WEB-INF/update-temp/" + "zrlog.war");
             file.getParentFile().mkdir();
@@ -71,7 +73,7 @@ public class UpgradeController extends BaseController {
                 e.printStackTrace();
             }
         }
-        getSession().setAttribute(DOWNLOAD_ATTR_KEY_PREFIX, handle);
+        downloadProcessHandleMap.put(AdminTokenThreadLocal.getUser().getSessionId(), handle);
         DownloadUpdatePackageResponse downloadUpdatePackageResponse = new DownloadUpdatePackageResponse();
         downloadUpdatePackageResponse.setProcess(handle.getProcess());
         return downloadUpdatePackageResponse;
@@ -101,13 +103,13 @@ public class UpgradeController extends BaseController {
     }
 
     public UpgradeProcessResponse doUpgrade() {
-        DownloadProcessHandle handle = getSessionAttr(DOWNLOAD_ATTR_KEY_PREFIX);
+        DownloadProcessHandle handle = downloadProcessHandleMap.get(AdminTokenThreadLocal.getUser().getSessionId());
         File file = handle.getFile();
         UpgradeProcessResponse upgradeProcessResponse = new UpgradeProcessResponse();
-        UpdateVersionThread updateVersionThread = getSessionAttr(UPDATE_THREAD_ATTR_KEY);
+        UpdateVersionThread updateVersionThread = updateVersionThreadMap.get(AdminTokenThreadLocal.getUser().getSessionId());
         if (updateVersionThread == null) {
             updateVersionThread = new UpdateVersionThread(file);
-            setSessionAttr(UPDATE_THREAD_ATTR_KEY, updateVersionThread);
+            updateVersionThreadMap.put(AdminTokenThreadLocal.getUser().getSessionId(), updateVersionThread);
             PluginConfig.stopPluginCore();
             updateVersionThread.start();
         }

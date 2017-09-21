@@ -11,9 +11,13 @@ import com.fzb.common.util.SecurityUtils;
 import com.jfinal.plugin.activerecord.Db;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class AdminController extends BaseController {
 
     private AdminTokenService adminTokenService = new AdminTokenService();
+
+    private static AtomicInteger sessionAtomicInteger = new AtomicInteger();
 
     public LoginResponse login() {
         String key = getPara("key");
@@ -23,7 +27,7 @@ public class AdminController extends BaseController {
         if (StringUtils.isNotBlank(userName) && StringUtils.isNotBlank(password) && StringUtils.isNotBlank(key)) {
             String dbPassword = User.dao.getPasswordByUserName(userName.toLowerCase());
             if (dbPassword != null && SecurityUtils.md5(key + ":" + dbPassword).equals(password)) {
-                adminTokenService.setAdminToken(User.dao.getIdByUserName(userName.toLowerCase()), getRequest(), getResponse());
+                adminTokenService.setAdminToken(User.dao.getIdByUserName(userName.toLowerCase()), sessionAtomicInteger.incrementAndGet(), getRequest(), getResponse());
             } else {
                 loginResponse.setError(1);
                 loginResponse.setMessage(I18NUtil.getStringFromRes("userNameOrPasswordError", getRequest()));

@@ -1,4 +1,4 @@
-<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ page language="java" session="false" import="java.util.*" pageEncoding="UTF-8"%>
 <jsp:include page="include/menu.jsp"/>
 <link rel="stylesheet" href="assets/css/ui.jqgrid.css" />
 

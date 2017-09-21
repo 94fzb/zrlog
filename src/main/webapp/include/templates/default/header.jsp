@@ -17,7 +17,7 @@
 <!DOCTYPE html>
 <html lang="zh" class="no-js">
 <head>
-  <jsp:include page="../../core/core_mate.jsp"/>
+  <%@ include file="../../core/core_mate.jsp"%>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" />
 
   <link rel="stylesheet" type="text/css" media="screen" href="${templateUrl}/css/common.css" />
@@ -64,7 +64,6 @@
 
 </head>
 <body class="default front">
-<%--<jsp:include page="../../core/dev.jsp"/>--%>
 <div class="page">
 <div class="top">
   <div class="inner">
@@ -118,4 +117,4 @@
 <div class="breadcrumb"></div>
 <div class="main clearfloat">
 <section>
-<jsp:include page="update_browser.jsp"/>
+<%@ include file="update_browser.jsp"%>

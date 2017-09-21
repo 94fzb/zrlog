@@ -1,4 +1,4 @@
-<%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
+<%@ page language="java" session="false" import="java.util.*" pageEncoding="utf-8"%>
 <!-- Bootstrap -->
 <script src="${cacheFile['/assets/js/bootstrap.min.js']}"></script>
 <!-- NProgress -->

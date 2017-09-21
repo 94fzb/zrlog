@@ -75,16 +75,4 @@ public class ZipUtil {
         zos.close();
 
     }
-
-    public static void main(String[] args) {
-        try {
-            //unZip("E:/putty.zip", "E:/test/");
-            List<File> files = new LinkedList<File>();
-            files.add(new File("E:/keygen.exe"));
-            files.add(new File("E:/xmlpull_1_0_5"));
-            inZip(files, "E:/", "E:/test/1.zip");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 }

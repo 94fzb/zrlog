@@ -15,7 +15,7 @@ public class CmdUtil {
             cmdStr = "netstat -atu";
         }
         String content = sendCmd(cmdStr);
-        if (content != null && content.length() > 0 && content.split("\n").length > 1) {
+        if (content.length() > 0 && content.split("\n").length > 1) {
             String cons[] = content.split("\n");
             for (int i = 2; i < cons.length; i++) {
                 content = cons[i];
@@ -94,9 +94,11 @@ public class CmdUtil {
     public static Process getProcess(String cmd, Object... args) {
         if (args != null) {
             cmd += " ";
+            StringBuilder cmdBuilder = new StringBuilder(cmd);
             for (Object str : args) {
-                cmd += str + " ";
+                cmdBuilder.append(str).append(" ");
             }
+            cmd = cmdBuilder.toString();
         }
         Runtime rt = Runtime.getRuntime();
         try {

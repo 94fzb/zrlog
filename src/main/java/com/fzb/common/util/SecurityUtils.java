@@ -46,8 +46,5 @@ public class SecurityUtils {
 
     public static void main(String[] args) throws IOException {
         System.out.println(md5("123456"));
-        /*System.out.println(System.currentTimeMillis());
-        System.out.println(MD5(UUID.randomUUID().toString()));
-		System.out.println(System.currentTimeMillis());*/
     }
 }

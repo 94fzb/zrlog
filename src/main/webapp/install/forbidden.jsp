@@ -1,4 +1,4 @@
-<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ page language="java" session="false" import="java.util.*" pageEncoding="UTF-8"%>
 <%
 request.setAttribute("errorMsg", ((Map)request.getAttribute("_res")).get("installed"));
 %>
