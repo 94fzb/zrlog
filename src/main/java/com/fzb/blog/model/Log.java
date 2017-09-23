@@ -53,10 +53,8 @@ public class Log extends Model<Log> implements Serializable {
      */
     public Log adminQueryLogByLogId(Object id) {
         if (id != null) {
-            String sql;
-            Log log;
-            sql = "select l.*,u.userName,(select count(commentId) from comment where logId=l.logId) commentSize ,t.alias as typeAlias,t.typeName as typeName  from log l inner join user u,type t where t.typeId=l.typeId and u.userId=l.userId and l.logId=?";
-            log = findFirst(sql, id);
+            String sql = "select l.*,u.userName,(select count(commentId) from comment where logId=l.logId) commentSize ,t.alias as typeAlias,t.typeName as typeName  from log l inner join user u,type t where t.typeId=l.typeId and u.userId=l.userId and l.logId=?";
+            Log log = findFirst(sql, id);
             if (log == null) {
                 sql = "select l.*,u.userName,(select count(commentId) from comment where logId=l.logId) commentSize ,t.alias as typeAlias,t.typeName as typeName  from log l inner join user u,type t where t.typeId=l.typeId and u.userId=l.userId and l.alias=?";
                 log = findFirst(sql, id);
@@ -68,11 +66,9 @@ public class Log extends Model<Log> implements Serializable {
 
     public Log getLastLog(int id, String notFoundDesc) {
         String lastLogSql = "select l.alias as alias,l.title as title from log l where rubbish=? and private=? and l.logId<? order by logId desc";
-        Log log = findFirst(lastLogSql,
-                rubbish, pre, id);
+        Log log = findFirst(lastLogSql, rubbish, pre, id);
         if (log == null) {
-            log = new Log().set("alias", id)
-                    .set("title", notFoundDesc);
+            log = new Log().set("alias", id).set("title", notFoundDesc);
         }
         return log;
     }
@@ -100,11 +96,7 @@ public class Log extends Model<Log> implements Serializable {
         Map<String, Object> data = new HashMap<String, Object>();
         String sql = "select l.*,t.typeName,t.alias as typeAlias,u.userName,(select count(commentId) from comment where logId=l.logId) commentSize from log l inner join user u inner join type t where rubbish=? and private=? and u.userId=l.userId and t.typeid=l.typeid  order by l.logId desc limit  ?,?";
 
-        data.put(
-                "rows",
-                find(sql,
-                        rubbish, pre, ParseUtil.getFirstRecord(page,
-                                pageSize), pageSize));
+        data.put("rows", find(sql, rubbish, pre, ParseUtil.getFirstRecord(page, pageSize), pageSize));
         fillData(page, pageSize,
                 "from log l inner join user u where rubbish=? and private=? and u.userId=l.userId ", data,
                 new Object[]{rubbish, pre});
@@ -112,10 +104,10 @@ public class Log extends Model<Log> implements Serializable {
     }
 
     public Map<String, Object> queryAll(int page, int pageSize, String keywords, String order, String field) {
-        Map<String, Object> data = new HashMap<String, Object>();
+        Map<String, Object> data = new HashMap<>();
         String searchKeywords = "";
         if (keywords != null && !"".equals(keywords)) {
-            searchKeywords = " and (l.title like '%" + keywords + "%' or l.content like '%" + keywords + "%' or l.keywords like '%" + keywords + "%')";
+            searchKeywords = " and (l.title like '%" + keywords + "%' or l.search_content like '%" + keywords + "%' or l.keywords like '%" + keywords + "%')";
         }
         String pageSort = "l.logId desc";
         if (order != null && !"".equals(order) && field != null && !"".equals(field)) {
@@ -125,14 +117,8 @@ public class Log extends Model<Log> implements Serializable {
             pageSort = "l." + field + " " + order;
         }
         String sql = "select l.*,l.private _private,t.typeName,l.logId as id,t.alias as typeAlias,u.userName,(select count(commentId) from comment where logId=l.logId ) commentSize from log l inner join user u inner join type t where u.userId=l.userId" + searchKeywords + " and t.typeid=l.typeid order by " + pageSort + " limit ?,?";
-        data.put(
-                "rows",
-                findEntry(sql,
-                        ParseUtil.getFirstRecord(page,
-                                pageSize), pageSize));
-        fillData(page, pageSize,
-                "from log l inner join user u where u.userId=l.userId " + searchKeywords, data,
-                new Object[]{});
+        data.put("rows", findEntry(sql, ParseUtil.getFirstRecord(page, pageSize), pageSize));
+        fillData(page, pageSize, "from log l inner join user u where u.userId=l.userId " + searchKeywords, data, new Object[]{});
         return data;
     }
 
@@ -140,17 +126,9 @@ public class Log extends Model<Log> implements Serializable {
                                              String typeAlias) {
         Map<String, Object> data = new HashMap<String, Object>();
         String sql = "select l.*,t.typeName,t.alias  as typeAlias,(select count(commentId) from comment where logId=l.logId ) commentSize,u.userName from log l inner join user u,type t where rubbish=? and private=? and u.userId=l.userId and t.typeId=l.typeId and t.alias=? order by l.logId desc limit ?,?";
-        data.put(
-                "rows",
-                find(sql,
-                        rubbish, pre,
-                        typeAlias,
-                        ParseUtil.getFirstRecord(page,
-                                pageSize), pageSize));
+        data.put("rows", find(sql, rubbish, pre, typeAlias, ParseUtil.getFirstRecord(page, pageSize), pageSize));
 
-        fillData(
-                page,
-                pageSize,
+        fillData(page, pageSize,
                 "from log l inner join user u,type t where u.userId=l.userId and t.typeId=l.typeId and rubbish=? and private=? and t.alias=?",
                 data, new Object[]{rubbish, pre, typeAlias});
         return data;
@@ -160,10 +138,8 @@ public class Log extends Model<Log> implements Serializable {
                           Map<String, Object> data, Object[] obj) {
         if (((List) data.get("rows")).size() > 0) {
             data.put("page", page);
-            long count = findFirst("select count(l.logId) cnt " + where,
-                    obj).getLong("cnt");
-            data.put("total",
-                    ParseUtil.getTotalPate(count, pageSize));
+            long count = findFirst("select count(l.logId) cnt " + where, obj).getLong("cnt");
+            data.put("total", ParseUtil.getTotalPate(count, pageSize));
             data.put("records", count);
         } else {
             data.clear();
@@ -171,8 +147,7 @@ public class Log extends Model<Log> implements Serializable {
     }
 
     public Map<String, Long> getArchives() {
-        List<Timestamp> lo = Db
-                .query("select  releaseTime from log  where rubbish=? and private=? order by logId desc", rubbish, pre);
+        List<Timestamp> lo = Db.query("select  releaseTime from log  where rubbish=? and private=? order by logId desc", rubbish, pre);
         Map<String, Long> archives = new LinkedHashMap<String, Long>();
         for (Timestamp objects : lo) {
             String key = new SimpleDateFormat("yyyy_MM").format(new Date(objects.getTime()));
@@ -186,30 +161,18 @@ public class Log extends Model<Log> implements Serializable {
     }
 
     public Map<String, Object> getLogsByTag(int page, int pageSize, String tag) {
-        Map<String, Object> data = new HashMap<String, Object>();
+        Map<String, Object> data = new HashMap<>();
         String sql = "select l.*,t.typeName,t.alias  as typeAlias,(select count(commentId) from comment where logId=l.logId) commentSize,u.userName from log l inner join user u,type t where rubbish=? and private=? and u.userId=l.userId and t.typeId=l.typeId and (l.keywords like ? or l.keywords like ? or l.keywords like ? or l.keywords= ?) order by l.logId desc limit ?,?";
-        data.put(
-                "rows",
-                find(sql,
-                        rubbish, pre,
-                        tag + ",%",
-                        "%," + tag + ",%",
-                        "%," + tag,
-                        tag,
-                        ParseUtil.getFirstRecord(page,
-                                pageSize), pageSize));
-        fillData(
-                page,
-                pageSize,
+        data.put("rows", find(sql, rubbish, pre, tag + ",%", "%," + tag + ",%", "%," + tag, tag, ParseUtil.getFirstRecord(page, pageSize), pageSize));
+        fillData(page, pageSize,
                 "from log l inner join user u,type t where rubbish=? and private=? and u.userId=l.userId and t.typeId=l.typeId and  (l.keywords like ? or l.keywords like ? or l.keywords like ? or l.keywords= ?)",
-                data, new Object[]{rubbish, pre, tag + ",%", "%," + tag + ",%", "%," + tag,
-                        tag});
+                data, new Object[]{rubbish, pre, tag + ",%", "%," + tag + ",%", "%," + tag, tag});
         return data;
     }
 
     private List<Map<String, Object>> findEntry(String sql, Object... paras) {
         List<Log> logList = find(sql, paras);
-        List<Map<String, Object>> convertList = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> convertList = new ArrayList<>();
         for (Log log : logList) {
             convertList.add(log.getAttrs());
         }
@@ -217,18 +180,10 @@ public class Log extends Model<Log> implements Serializable {
     }
 
     public Map<String, Object> getLogsByData(int page, int pageSize, String date) {
-        Map<String, Object> data = new HashMap<String, Object>();
+        Map<String, Object> data = new HashMap<>();
         String sql = "select l.*,t.typeName,t.alias as typeAlias,(select count(commentId) from comment where logId=l.logId ) commentSize,u.userName from log l inner join user u,type t where rubbish=? and private=? and u.userId=l.userId and t.typeId=l.typeId and DATE_FORMAT(releaseTime,'%Y_%m')=? order by l.logId desc limit ?,?";
-        data.put(
-                "rows",
-                find(sql,
-                        rubbish, pre,
-                        date,
-                        ParseUtil.getFirstRecord(page,
-                                pageSize), pageSize));
-        fillData(
-                page,
-                pageSize,
+        data.put("rows", find(sql, rubbish, pre, date, ParseUtil.getFirstRecord(page, pageSize), pageSize));
+        fillData(page, pageSize,
                 "from log l inner join user u,type t where rubbish=? and private=? and u.userId=l.userId and t.typeId=l.typeId and  DATE_FORMAT(releaseTime,'%Y_%m')=?",
                 data, new Object[]{rubbish, pre, date});
         return data;
@@ -236,19 +191,10 @@ public class Log extends Model<Log> implements Serializable {
 
     public Map<String, Object> getLogsByTitleOrContent(int page, int pageSize,
                                                        String key) {
-        Map<String, Object> data = new HashMap<String, Object>();
+        Map<String, Object> data = new HashMap<>();
         String sql = "select l.*,t.typeName,t.alias as typeAlias,(select count(commentId) from comment where logId=l.logId) commentSize,u.userName from log l inner join user u,type t where rubbish=? and private=? and u.userId=l.userId and t.typeId=l.typeId and (l.title like ? or l.content like ?) order by l.logId desc limit ?,?";
-        data.put(
-                "rows",
-                find(sql,
-                        rubbish, pre,
-                        "%" + key + "%",
-                        "%" + key + "%",
-                        ParseUtil.getFirstRecord(page,
-                                pageSize), pageSize));
-        fillData(
-                page,
-                pageSize,
+        data.put("rows", find(sql, rubbish, pre, "%" + key + "%", "%" + key + "%", ParseUtil.getFirstRecord(page, pageSize), pageSize));
+        fillData(page, pageSize,
                 "from log l inner join user u,type t where rubbish=? and private=? and u.userId=l.userId and t.typeId=l.typeId and (l.title like ? or l.content like ?)",
                 data, new Object[]{rubbish, pre, "%" + key + "%", "%" + key + "%"});
         return data;
@@ -273,7 +219,6 @@ public class Log extends Model<Log> implements Serializable {
     }
 
     public long getTotalArticleSize() {
-        String sql = "select count(1) as count from log where rubbish=? and private=?";
-        return findFirst(sql, false, false).getLong("count");
+        return findFirst("select count(1) as count from log where rubbish=? and private=?", false, false).getLong("count");
     }
 }

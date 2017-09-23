@@ -19,26 +19,20 @@ request.setAttribute("res",new com.google.gson.Gson().toJson(request.getAttribut
   <head>
     <title>${webs.title} | <c:if test="${not empty subTitle}"> ${subTitle} | </c:if> ${_res['admin.management']}</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <!-- Meta, title, CSS, favicons, etc. -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" href="${cacheFile['/favicon.ico']}" />
-    <!-- Bootstrap -->
     <link href="${cacheFile['/assets/css/bootstrap.min.css']}" rel="stylesheet">
-    <!-- Font Awesome -->
     <link href="${cacheFile['/assets/css/font-awesome.min.css']}" rel="stylesheet">
-    <!-- NProgress -->
     <link href="${cacheFile['/assets/css/nprogress.css']}" rel="stylesheet">
     <link href="${cacheFile['/assets/css/select2.min.css']}" rel="stylesheet">
     <link href="${cacheFile['/assets/css/switchery.min.css']}" rel="stylesheet">
     <link href="${cacheFile['/assets/css/pnotify.css']}" rel="stylesheet" />
-    <!-- Custom Theme Style -->
     <link href="${cacheFile['/assets/css/custom.min.css']}" rel="stylesheet">
-    <!-- jQuery -->
     <script src="${cacheFile['/assets/js/jquery.min.js']}"></script>
     <script src="${cacheFile['/admin/js/dashboard.js']}"></script>
     <script>
         var _res = ${res};
-        var editorMdPath = "admin/markdown/lib/"
+        var editorMdPath = "admin/markdown/lib/";
     </script>
   </head>

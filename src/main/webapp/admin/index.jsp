@@ -6,7 +6,7 @@
 <h3>
 ${_res.dashboard}
 </h3>
-</div><!-- /.page-header -->
+</div>
  <div class="alert alert-block alert-info">
 	<i class="fa fa-info">&nbsp;</i>
 	${_res['admin.index.welcomeTips']}

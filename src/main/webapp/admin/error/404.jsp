@@ -4,8 +4,6 @@
 <jsp:include page="../include/menu.jsp"/>
 <div class="row">
     <div class="col-xs-12">
-        <!-- PAGE CONTENT BEGINS -->
-
         <div class="error-container">
             <div class="well">
                 <h1 class="grey lighter smaller">
@@ -15,7 +13,6 @@
                     </span>
                     ${_res['error.pageNotPage']}
                 </h1>
-
                 <hr>
                 <div class="space"></div>
                 <div class="center">
@@ -29,7 +26,7 @@
                     </a>
                 </div>
             </div>
-        </div><!-- PAGE CONTENT ENDS -->
-    </div><!-- /.col -->
-</div><!-- /.row -->
+        </div>
+    </div>
+</div>
 <jsp:include page="../include/footer.jsp"/>

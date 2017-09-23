@@ -23,11 +23,7 @@ public class Comment extends Model<Comment> {
     public Map<String, Object> getCommentsByPage(int page, int pageSize) {
         Map<String, Object> data = new HashMap<String, Object>();
         String sql = "select commentId as id,userComment,header,commTime,userMail,userHome,userIp,userName,hide,logId from comment order by commTime desc limit ?,?";
-        data.put(
-                "rows",
-                find(sql,
-                        ParseUtil.getFirstRecord(page,
-                                pageSize), pageSize));
+        data.put("rows", find(sql, ParseUtil.getFirstRecord(page, pageSize), pageSize));
         fillData(page, pageSize, "from comment", data, new Object[0]);
         return data;
     }
@@ -45,23 +41,16 @@ public class Comment extends Model<Comment> {
     public Map<String, Object> noRead(int page, int pageSize) {
         Map<String, Object> data = new HashMap<String, Object>();
         String sql = "select commentId as id,userComment,header,userMail,userHome,userIp,userName,hide,logId from comment order by commTime desc limit ?,?";
-        data.put(
-                "rows",
-                find(sql,
-                        ParseUtil.getFirstRecord(page,
-                                pageSize), pageSize));
+        data.put("rows", find(sql, ParseUtil.getFirstRecord(page, pageSize), pageSize));
         fillData(page, pageSize, "from comment", data, new Object[0]);
         return data;
     }
 
-    private void fillData(int page, int pageSize, String where,
-                          Map<String, Object> data, Object[] obj) {
+    private void fillData(int page, int pageSize, String where, Map<String, Object> data, Object[] obj) {
         if (((List) data.get("rows")).size() > 0) {
             data.put("page", page);
-            long count = findFirst("select count(commentId) cnt "
-                    + where, obj).getLong("cnt");
-            data.put("total",
-                    ParseUtil.getTotalPate(count, pageSize));
+            long count = findFirst("select count(commentId) cnt " + where, obj).getLong("cnt");
+            data.put("total", ParseUtil.getTotalPate(count, pageSize));
             data.put("records", count);
         } else {
             data.clear();

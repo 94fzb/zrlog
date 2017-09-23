@@ -18,8 +18,6 @@
 	  ${_res['admin.user.info']}
 	</h3>
 </div>
-<!-- /.page-header -->
-<!-- PAGE CONTENT BEGINS -->
 <div class="row">
 <div class="col-xs-12">
 <form role="form" method="post" class="form-horizontal" id="userAjax" action="api/admin/update">
@@ -32,7 +30,6 @@
 				class="form-control col-xs-12 col-sm-6" placeholder="" id="form-field-1">
 		</div>
 	</div>
-
 	<div class="form-group">
 		<label for="form-field-1"
 			class="col-sm-3 control-label no-padding-right"> ${_res['email']} </label>
@@ -42,7 +39,6 @@
 				class="form-control col-xs-12 col-sm-6" placeholder="" id="form-field-1">
 		</div>
 	</div>
-
 	<div class="form-group">
 		<label for="form-field-1"class="col-sm-3 control-label no-padding-right">${_res['headPortrait']}</label>
 		<div class="col-sm-9">
@@ -51,7 +47,6 @@
 		</div>
 	</div>
 	<div class="ln_solid"></div>
-
 	<div class="form-group">
 		<div class="col-md-offset-3 col-md-9">
 			<button id="user" type="button" class="btn btn-info">
@@ -59,9 +54,7 @@
 			</button>
 		</div>
 	</div>
-
 </form>
 </div>
 </div>
-<!-- PAGE CONTENT ENDS -->
 <jsp:include page="include/footer.jsp"/>

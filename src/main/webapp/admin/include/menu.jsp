@@ -87,8 +87,6 @@
         </div>
       </div>
     </div>
-
-    <!-- top navigation -->
     <div class="top_nav">
       <div class="nav_menu">
         <nav>
@@ -205,6 +203,4 @@
         </nav>
       </div>
     </div>
-    <!-- /top navigation -->
-    <!-- page content -->
     <div class="right_col" role="main"  style="min-height: 1080px;">

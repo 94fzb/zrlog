@@ -109,6 +109,7 @@ public class ArticleService {
         if (log.get("digest") == null || "".equals(log.get("digest"))) {
             log.set("digest", ParseUtil.autoDigest(log.get("content").toString(), 200));
         }
+        log.set("search_content", getExtractSearchTxt((String) log.get("content")));
         return log;
     }
 
@@ -155,8 +156,6 @@ public class ArticleService {
                     for (int i = 0; i < strings.length - 1; i++) {
                         count += strings[i].length();
                         String str = wrapperFontRed(content.substring(count, count + keyword.length()));
-                        System.out.println(str);
-                        System.out.println(sb.toString());
                         sb.append(content.substring(count - strings[i].length(), count));
                         sb.append(str);
                         count += keyword.length();
@@ -240,5 +239,9 @@ public class ArticleService {
             }
         }
         return null;
+    }
+
+    public String getExtractSearchTxt(String content) {
+        return Jsoup.parse(content).body().text();
     }
 }

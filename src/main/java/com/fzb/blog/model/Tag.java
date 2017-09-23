@@ -22,7 +22,7 @@ public class Tag extends Model<Tag> {
     }
 
     private Set<String> strToSet(String str) {
-        Set<String> tags = new HashSet<String>();
+        Set<String> tags = new HashSet<>();
         for (String tag : str.split(",")) {
             if (tag.trim().length() > 0) {
                 tags.add(tag.trim());
@@ -119,7 +119,7 @@ public class Tag extends Model<Tag> {
     }
 
     public Map<String, Object> queryAll(Integer page, Integer pageSize) {
-        Map<String, Object> data = new HashMap<String, Object>();
+        Map<String, Object> data = new HashMap<>();
         data.put("rows", find("select tagid as id,text,count from tag limit ?,?", ParseUtil.getFirstRecord(page, pageSize), pageSize));
         fillData(page, pageSize, "from tag", data, new Object[0]);
         return data;
@@ -134,9 +134,5 @@ public class Tag extends Model<Tag> {
         } else {
             data.clear();
         }
-    }
-
-    public long countByText() {
-        return 0;
     }
 }

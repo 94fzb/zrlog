@@ -27,13 +27,11 @@ public class User extends Model<User> {
     }
 
     public String getPasswordByUserId(int userId) {
-        return (String) findFirst("select password from user where userId=?",
-                userId).get("password");
+        return (String) findFirst("select password from user where userId=?", userId).get("password");
     }
 
     public boolean updatePassword(int userId, String password) {
-        return Db.update("update user set password=? where userId=?",
-                password, userId) > 0;
+        return Db.update("update user set password=? where userId=?", password, userId) > 0;
     }
 
 }

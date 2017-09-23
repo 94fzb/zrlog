@@ -46,7 +46,4 @@ public class Type extends Model<Type> {
         return dao.findFirst("select * from type where alias=?", alias);
     }
 
-    public long countByName() {
-        return 0;
-    }
 }

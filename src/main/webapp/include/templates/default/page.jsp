@@ -1,4 +1,4 @@
-<%@ page language="java" import="java.util.*"  session="false" pageEncoding="UTF-8"%>
+<%@ page language="java" session="false" import="java.util.*" pageEncoding="UTF-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ include file="header.jsp"%>
 <c:choose>
@@ -17,7 +17,7 @@
 <c:forEach var="log" items="${requestScope.data.rows}">
 <article class="entry">
   <c:if test="${not empty log.thumbnail}">
-  <img alt="${log.title}" src="${log.thumbnail}"/>
+  <img alt="${log.thumbnailAlt}" src="${log.thumbnail}"/>
   </c:if>
   <h2 class="post-title"><a rel="bookmark" href="${log.url}">${log.title}</a></h2>
   <div class="content"><p>${log.digest}</p></div>

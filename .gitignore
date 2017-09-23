@@ -28,3 +28,4 @@ src/main/resources/rebel.xml
 tomcat.*
 *.jar
 !.mvn/wrapper/maven-wrapper.jar
+*.hprof

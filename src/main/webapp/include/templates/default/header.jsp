@@ -1,4 +1,4 @@
-﻿<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+﻿<%@ page language="java" session="false" import="java.util.*" pageEncoding="UTF-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%
   Map<String,Object> res = (Map<String,Object>)request.getAttribute("_res");
@@ -20,9 +20,7 @@
   <%@ include file="../../core/core_mate.jsp"%>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" />
 
-  <link rel="stylesheet" type="text/css" media="screen" href="${templateUrl}/css/common.css" />
-  <link rel="stylesheet" type="text/css" media="screen" href="${templateUrl}/css/style_2015.css" />
-  <link rel="stylesheet" type="text/css" media="screen" href="${templateUrl}/css/pager.css" />
+  <link rel="stylesheet" type="text/css" media="screen" href="${templateUrl}/css/style.css" />
   <link rel="stylesheet" type="text/css" media="screen" href="${templateUrl}/css/editormd.css" />
 
   <script src="${templateUrl }/js/lib/jquery-1.10.2.min.js"></script>
@@ -32,8 +30,6 @@
   <script src="${templateUrl}/js/css3-mediaqueries.js"></script>
   <link rel="stylesheet" type="text/css" media="screen" href="${templateUrl}/css/style-ie7.css" />
   <![endif]-->
-  <script src="${templateUrl }/js/classie.js"></script>
-  <script src="${templateUrl }/js/gnmenu.js"></script>
   <script src="${templateUrl }/js/sheshui.js"></script>
   <style>
     header .avatar{

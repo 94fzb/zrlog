@@ -105,6 +105,7 @@ CREATE TABLE `log` (
   `canComment` bit(1) DEFAULT b'1',
   `click` int(11) DEFAULT '0',
   `content` longtext,
+  `search_content` longtext,
   `mdContent` longtext,
   `digest` text,
   `keywords` varchar(255) DEFAULT NULL,

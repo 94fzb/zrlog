@@ -18,12 +18,8 @@ public class Link extends Model<Link> {
     }
 
     public Map<String, Object> queryAll(Integer page, Integer pageSize) {
-        Map<String, Object> data = new HashMap<String, Object>();
-        data.put(
-                "rows",
-                find("select linkName,linkId as id,sort,url,alt from link order by sort limit ?,?",
-                        ParseUtil.getFirstRecord(page,
-                                pageSize), pageSize));
+        Map<String, Object> data = new HashMap<>();
+        data.put("rows", find("select linkName,linkId as id,sort,url,alt from link order by sort limit ?,?", ParseUtil.getFirstRecord(page, pageSize), pageSize));
         fillData(page, pageSize, "from link", data, new Object[0]);
         return data;
     }

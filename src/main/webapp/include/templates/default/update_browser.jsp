@@ -1,4 +1,4 @@
-<%@page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ page language="java" session="false" import="java.util.*" pageEncoding="UTF-8"%>
 <!--[if lt IE 9]>
 <div class="tips not-ie" id="tipsWrap">
 <span class="close" id="clostBtn" title="Close">关闭</span>

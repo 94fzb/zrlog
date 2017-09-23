@@ -75,7 +75,7 @@
 	</div>
 	</div>
 	<hr/>
-</div><!-- /span -->
+</div>
 </div>
 <div class="row">
 <div class="divider"></div>
@@ -86,5 +86,5 @@
 </div>
 </div>
 <br/>
-</div><!-- /row -->
+</div>
 <jsp:include page="include/footer.jsp"/>

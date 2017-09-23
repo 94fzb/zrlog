@@ -7,6 +7,5 @@
 		${_res['admin.log.edit']}
 	</h3>
 </div>
-
 <jsp:include page="article_editor.jsp"/>
 <jsp:include page="include/footer.jsp"/>

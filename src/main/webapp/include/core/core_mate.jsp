@@ -1,4 +1,4 @@
-<%@page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ page language="java" session="false" import="java.util.*" pageEncoding="UTF-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
   <meta charset="utf-8" />
   <c:set var="webs" value="${init.webSite}" scope="request"></c:set>

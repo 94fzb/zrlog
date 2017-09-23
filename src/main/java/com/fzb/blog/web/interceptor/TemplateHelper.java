@@ -3,7 +3,9 @@ package com.fzb.blog.web.interceptor;
 import com.fzb.blog.common.BaseDataInitVO;
 import com.fzb.blog.common.Constants;
 import com.fzb.blog.model.*;
+import com.fzb.blog.util.BeanUtil;
 import com.fzb.blog.util.I18NUtil;
+import com.fzb.blog.util.ParseUtil;
 import com.fzb.blog.util.ZrlogUtil;
 import com.fzb.blog.web.controller.BaseController;
 import com.fzb.blog.web.util.WebTools;
@@ -12,7 +14,9 @@ import com.jfinal.kit.PathKit;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +36,7 @@ public class TemplateHelper {
         request.setAttribute("staticBlog", staticBlog);
         request.setAttribute("suffix", suffix);
 
-        BaseDataInitVO baseDataInitVO = cloneObject(request.getAttribute("init"));
+        BaseDataInitVO baseDataInitVO = BeanUtil.cloneObject(request.getAttribute("init"));
         request.setAttribute("init", baseDataInitVO);
         Map webSite = baseDataInitVO.getWebSite();
         String baseUrl = setBaseUrl(request, staticBlog, webSite);
@@ -88,9 +92,9 @@ public class TemplateHelper {
     }
 
     private static void fullNavBar(HttpServletRequest request, String suffix, BaseDataInitVO baseDataInitVO, String baseUrl) {
-        List<LogNav> logNavs = baseDataInitVO.getLogNavs();
-        if (!logNavs.isEmpty()) {
-            for (LogNav logNav : logNavs) {
+        List<LogNav> logNavList = baseDataInitVO.getLogNavs();
+        if (!logNavList.isEmpty()) {
+            for (LogNav logNav : logNavList) {
                 String url = logNav.get("url").toString();
                 if (url.equals("/") && (request.getRequestURI().equals("/all-1") || request.getRequestURI().equals("/post/all-1"))) {
                     logNav.put("current", true);
@@ -178,40 +182,7 @@ public class TemplateHelper {
         return false;
     }
 
-    private static <T> T cloneObject(Object obj) {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        ObjectOutputStream objectOutputStream = null;
-        ObjectInputStream objectInputStream = null;
-        try {
-            objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
-            objectOutputStream.writeObject(obj);
-            objectOutputStream.close();
-            objectInputStream = new ObjectInputStream(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()));
-            T t = (T) objectInputStream.readObject();
-            objectInputStream.close();
-            return t;
-        } catch (IOException | ClassNotFoundException e) {
-            LOGGER.error(e);
-        } finally {
-            if (objectInputStream != null) {
-                try {
-                    objectInputStream.close();
-                } catch (IOException e) {
-                    LOGGER.error(e);
-                }
-            }
-            if (objectOutputStream != null) {
-                try {
-                    objectOutputStream.close();
-                } catch (IOException e) {
-                    LOGGER.error(e);
-                }
-            }
-        }
-        return null;
-    }
-
-    private static void staticHtml(Object data, String baseUrl, String suffix, boolean enableArticle) {
+    private static void staticHtml(Object data, String baseUrl, String suffix, boolean thumbnailEnableArticle) {
         if (data instanceof Log) {
             Log log = (Log) data;
             log.put("alias", log.get("alias") + suffix);
@@ -226,8 +197,10 @@ public class TemplateHelper {
             List<Log> logList = (List<Log>) map.get("rows");
             if (logList != null) {
                 for (Log log : logList) {
-                    if (!enableArticle) {
+                    if (!thumbnailEnableArticle) {
                         log.put("thumbnail", null);
+                    } else if (log.get("thumbnail") != null) {
+                        log.put("thumbnailAlt", ParseUtil.removeHtmlElement((String) log.get("title")));
                     }
                     log.put("url", baseUrl + "post/" + log.get("alias") + suffix);
                     log.put("typeUrl", baseUrl + "post/sort/" + log.get("typeAlias") + suffix);
