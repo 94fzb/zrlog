@@ -56,37 +56,27 @@
 <form id="template-form" class="form-horizontal">
     <input type="hidden" name="template" value="${template}">
     <div class="form-group">
+        <label for="form-field-1" class="col-sm-3 control-label no-padding-right"> 标题 </label>
+        <div class="col-sm-4">
+            <input type="text" name="title" value="${_res.title}" class="form-control col-xs-10 col-sm-5" placeholder="不建议大于10个字符" id="form-field-1">
+        </div>
+    </div>
+    <div class="form-group">
         <label for="form-field-1"
             class="col-sm-3 control-label no-padding-right"> 底部 Slogan </label>
 
-        <div class="col-sm-9">
+        <div class="col-sm-4">
             <input type="text" name="footerSlogan" value="${_res.footerSlogan}"
-                class="form-control col-xs-10 col-sm-5" placeholder=""
+                class="form-control col-xs-10 col-sm-5" placeholder="放上一句自己喜欢的话语，让更多的人了解你"
                 id="form-field-1">
         </div>
     </div>
-
     <div class="form-group">
-        <label for="form-field-1"
-            class="col-sm-3 control-label no-padding-right"> 标题 </label>
-
-        <div class="col-sm-9">
-            <input type="text" name="title" value="${_res.title}"
-                class="form-control col-xs-10 col-sm-5" placeholder=""
-                id="form-field-1">
+        <label class="col-sm-3 control-label no-padding-right">网站&nbsp;Logo </label>
+        <div class="col-sm-6">
+            <input id="logo" class="form-control col-sm-10" name="avatar" value="${_res.avatar}">
         </div>
-    </div>
-
-    <div class="form-group">
-        <label
-            class="col-sm-3 control-label no-padding-right">
-            网站&nbsp;Logo </label>
-        <div class="col-sm-7">
-            <input id="logo" class="form-control" name="avatar" value="${_res.avatar}">
-        </div>
-        <div class="col-sm-2">
-            <input type="file" class="fileUpload icon-upload-alt" name="imgFile" value="上传" />
-        </div>
+        <div class="col-sm-2"><input type="file" class="fileUpload icon-upload-alt" name="imgFile" value="上传" /></div>
     </div>
     <div class="ln_solid"></div>
     <div class="form-group">
