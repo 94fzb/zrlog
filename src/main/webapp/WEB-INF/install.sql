@@ -112,6 +112,7 @@ CREATE TABLE `log` (
   `thumbnail` varchar(255) DEFAULT NULL,
   `recommended` bit(1) DEFAULT b'0',
   `releaseTime` datetime DEFAULT NULL,
+  `last_update_date` datetime DEFAULT NULL,
   `title` varchar(255) DEFAULT NULL,
   `typeId` int(11) DEFAULT NULL,
   `userId` int(11) DEFAULT NULL,

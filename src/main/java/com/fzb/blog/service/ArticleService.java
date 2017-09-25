@@ -98,6 +98,7 @@ public class ArticleService {
             log.set("alias", (log.get("alias") + "").trim().replace(" ", "-"));
         }
         log.set("userId", userId);
+        log.set("last_update_date", new Date());
         log.set("canComment", createArticleRequestMap.get("canComment") != null);
         log.set("recommended", createArticleRequestMap.get("recommended") != null);
         log.set("private", createArticleRequestMap.get("private") != null);

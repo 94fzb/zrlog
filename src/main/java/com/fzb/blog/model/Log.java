@@ -32,10 +32,10 @@ public class Log extends Model<Log> implements Serializable {
 
     public Log getLogById(Object id) {
         if (id != null) {
-            String sql = "select l.*,u.userName,(select count(commentId) from comment where logId=l.logId) commentSize ,t.alias as typeAlias,t.typeName as typeName  from log l inner join user u,type t where t.typeId=l.typeId and u.userId=l.userId and rubbish=? and private=? and l.logId=?";
+            String sql = "select l.*,last_update_date as lastUpdateDate,u.userName,(select count(commentId) from comment where logId=l.logId) commentSize ,t.alias as typeAlias,t.typeName as typeName  from log l inner join user u,type t where t.typeId=l.typeId and u.userId=l.userId and rubbish=? and private=? and l.logId=?";
             Log log = findFirst(sql, rubbish, pre, id);
             if (log == null) {
-                sql = "select l.*,u.userName,(select count(commentId) from comment where logId=l.logId) commentSize ,t.alias as typeAlias,t.typeName as typeName  from log l inner join user u,type t where t.typeId=l.typeId and u.userId=l.userId and rubbish=? and private=? and l.alias=?";
+                sql = "select l.*,last_update_date as lastUpdateDate,u.userName,(select count(commentId) from comment where logId=l.logId) commentSize ,t.alias as typeAlias,t.typeName as typeName  from log l inner join user u,type t where t.typeId=l.typeId and u.userId=l.userId and rubbish=? and private=? and l.alias=?";
                 log = findFirst(sql, rubbish, pre, id);
             }
             if (log != null) {
@@ -93,7 +93,7 @@ public class Log extends Model<Log> implements Serializable {
     }
 
     public Map<String, Object> getLogsByPage(int page, int pageSize) {
-        Map<String, Object> data = new HashMap<String, Object>();
+        Map<String, Object> data = new HashMap<>();
         String sql = "select l.*,t.typeName,t.alias as typeAlias,u.userName,(select count(commentId) from comment where logId=l.logId) commentSize from log l inner join user u inner join type t where rubbish=? and private=? and u.userId=l.userId and t.typeid=l.typeid  order by l.logId desc limit  ?,?";
 
         data.put("rows", find(sql, rubbish, pre, ParseUtil.getFirstRecord(page, pageSize), pageSize));
