@@ -50,6 +50,9 @@ $(function(){
               } else {
                 mode = spec = val;
               }
+              if(spec == 'application/x-jsp') {
+                 spec = 'text/html';
+              }
               if (mode) {
                 editor.setOption("mode", spec);
               } else {
