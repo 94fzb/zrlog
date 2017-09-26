@@ -88,7 +88,7 @@ border-radius: 4px;
 	<div class="col-xs-4">
 		<label>
 			<input type="checkbox" name="canComment" <c:if test="${log == null}">checked="checked"</c:if> <c:if test="${log['canComment']}">checked="checked"</c:if> class="js-switch" style="display: none;" data-switchery="true">
-			发布评论
+			允许评论
 		</label>
 	</div>
 	<div class="col-xs-4">

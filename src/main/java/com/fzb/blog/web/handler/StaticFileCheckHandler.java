@@ -12,7 +12,9 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
 import java.io.*;
 import java.util.*;
 
@@ -117,6 +119,7 @@ public class StaticFileCheckHandler extends Handler {
 
             // Finally override the flush method so that it trims whitespace.
             public void flush() {
+                boolean first = true;
                 synchronized (builder) {
                     BufferedReader reader = new BufferedReader(new StringReader(builder.toString()));
                     String line;
@@ -127,7 +130,12 @@ public class StaticFileCheckHandler extends Handler {
                                 trim = true;
                                 out.write(line);
                             } else if (trim) {
-                                out.write(line.trim());
+                                if (!first) {
+                                    out.write(line.trim());
+                                } else {
+                                    first = false;
+                                    out.write(line);
+                                }
                                 if (stopTrim(line)) {
                                     trim = false;
                                     println();

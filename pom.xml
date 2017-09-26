@@ -182,6 +182,7 @@
                         include/templates/*.zip,
                         attached/**,
                         WEB-INF/plugins/**,
+                        WEB-INF/update-temp/**,
                         WEB-INF/lib/tomcat*,
                         WEB-INF/lib/ecj*,
                         post/**
