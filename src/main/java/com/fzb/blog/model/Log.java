@@ -107,7 +107,7 @@ public class Log extends Model<Log> implements Serializable {
         Map<String, Object> data = new HashMap<>();
         String searchKeywords = "";
         if (keywords != null && !"".equals(keywords)) {
-            searchKeywords = " and (l.title like '%" + keywords + "%' or l.search_content like '%" + keywords + "%' or l.keywords like '%" + keywords + "%')";
+            searchKeywords = " and (l.title like '%" + keywords + "%' or l.plain_content like '%" + keywords + "%' or l.keywords like '%" + keywords + "%')";
         }
         String pageSort = "l.logId desc";
         if (order != null && !"".equals(order) && field != null && !"".equals(field)) {
@@ -124,7 +124,7 @@ public class Log extends Model<Log> implements Serializable {
 
     public Map<String, Object> getLogsBySort(int page, int pageSize,
                                              String typeAlias) {
-        Map<String, Object> data = new HashMap<String, Object>();
+        Map<String, Object> data = new HashMap<>();
         String sql = "select l.*,t.typeName,t.alias  as typeAlias,(select count(commentId) from comment where logId=l.logId ) commentSize,u.userName from log l inner join user u,type t where rubbish=? and private=? and u.userId=l.userId and t.typeId=l.typeId and t.alias=? order by l.logId desc limit ?,?";
         data.put("rows", find(sql, rubbish, pre, typeAlias, ParseUtil.getFirstRecord(page, pageSize), pageSize));
 
@@ -148,7 +148,7 @@ public class Log extends Model<Log> implements Serializable {
 
     public Map<String, Long> getArchives() {
         List<Timestamp> lo = Db.query("select  releaseTime from log  where rubbish=? and private=? order by logId desc", rubbish, pre);
-        Map<String, Long> archives = new LinkedHashMap<String, Long>();
+        Map<String, Long> archives = new LinkedHashMap<>();
         for (Timestamp objects : lo) {
             String key = new SimpleDateFormat("yyyy_MM").format(new Date(objects.getTime()));
             if (archives.containsKey(key)) {
@@ -189,13 +189,12 @@ public class Log extends Model<Log> implements Serializable {
         return data;
     }
 
-    public Map<String, Object> getLogsByTitleOrContent(int page, int pageSize,
-                                                       String key) {
+    public Map<String, Object> findByTitleOrPlainContentLike(int page, int pageSize, String key) {
         Map<String, Object> data = new HashMap<>();
         String sql = "select l.*,t.typeName,t.alias as typeAlias,(select count(commentId) from comment where logId=l.logId) commentSize,u.userName from log l inner join user u,type t where rubbish=? and private=? and u.userId=l.userId and t.typeId=l.typeId and (l.title like ? or l.content like ?) order by l.logId desc limit ?,?";
         data.put("rows", find(sql, rubbish, pre, "%" + key + "%", "%" + key + "%", ParseUtil.getFirstRecord(page, pageSize), pageSize));
         fillData(page, pageSize,
-                "from log l inner join user u,type t where rubbish=? and private=? and u.userId=l.userId and t.typeId=l.typeId and (l.title like ? or l.content like ?)",
+                "from log l inner join user u,type t where rubbish=? and private=? and u.userId=l.userId and t.typeId=l.typeId and (l.title like ? or l.plain_content like ?)",
                 data, new Object[]{rubbish, pre, "%" + key + "%", "%" + key + "%"});
         return data;
     }
@@ -208,7 +207,7 @@ public class Log extends Model<Log> implements Serializable {
         }
     }
 
-    public BigDecimal getAllClick() {
+    public BigDecimal sumAllClick() {
         String sql = "select sum(click) from log";
         return findFirst(sql).getBigDecimal("sum(click)");
     }

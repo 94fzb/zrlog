@@ -24,8 +24,6 @@ import java.util.*;
 public class StaticFileCheckHandler extends Handler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StaticFileCheckHandler.class);
-    private static final String[] START_TRIM_AFTER = {"<html", "</textarea", "</pre", "</script"};
-    private static final String[] STOP_TRIM_AFTER = {"</html", "<textarea", "<pre", "<script"};
 
     //不希望部分技术人走后门，拦截一些不合法的请求
     private static final Set<String> FORBIDDEN_URI_EXT_SET = new HashSet<String>();
@@ -38,7 +36,7 @@ public class StaticFileCheckHandler extends Handler {
     }
 
     public void handle(String target, HttpServletRequest request,
-                       HttpServletResponse response, boolean[] isHandled) {
+                       final HttpServletResponse response, boolean[] isHandled) {
         String ext = null;
         if (target.contains("/")) {
             String name = target.substring(target.lastIndexOf('/'));
@@ -86,94 +84,8 @@ public class StaticFileCheckHandler extends Handler {
                 }
             }
         } else {
-            HttpServletResponseWrapper responseWrapper = new HttpServletResponseWrapper(response) {
-
-                @Override
-                public PrintWriter getWriter() throws IOException {
-                    return createTrimWriter(this);
-                }
-            };
-            this.next.handle(target, request, responseWrapper, isHandled);
+            this.next.handle(target, request, response, isHandled);
         }
-    }
-
-    private static PrintWriter createTrimWriter(final HttpServletResponse response)
-            throws IOException {
-        return new PrintWriter(new OutputStreamWriter(response.getOutputStream(), "UTF-8"), true) {
-            private StringBuilder builder = new StringBuilder();
-            private boolean trim = false;
-
-            public void write(int c) {
-                builder.append((char) c); // It is actually a char, not an int.
-            }
-
-            public void write(char[] chars, int offset, int length) {
-                builder.append(chars, offset, length);
-                this.flush(); // Preflush it.
-            }
-
-            public void write(String string, int offset, int length) {
-                builder.append(string, offset, length);
-                this.flush(); // Preflush it.
-            }
-
-            // Finally override the flush method so that it trims whitespace.
-            public void flush() {
-                boolean first = true;
-                synchronized (builder) {
-                    BufferedReader reader = new BufferedReader(new StringReader(builder.toString()));
-                    String line;
-
-                    try {
-                        while ((line = reader.readLine()) != null) {
-                            if (startTrim(line)) {
-                                trim = true;
-                                out.write(line);
-                            } else if (trim) {
-                                if (!first) {
-                                    out.write(line.trim());
-                                } else {
-                                    first = false;
-                                    out.write(line);
-                                }
-                                if (stopTrim(line)) {
-                                    trim = false;
-                                    println();
-                                }
-                            } else {
-                                out.write(line);
-                                println();
-                            }
-                        }
-                    } catch (IOException e) {
-                        setError();
-                        // Log e or do e.printStackTrace() if necessary.
-                    }
-
-                    // Reset the local StringBuilder and issue real flush.
-                    builder = new StringBuilder();
-                    super.flush();
-                }
-            }
-
-            private boolean startTrim(String line) {
-                for (String match : START_TRIM_AFTER) {
-                    if (line.contains(match)) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-
-            private boolean stopTrim(String line) {
-                for (String match : STOP_TRIM_AFTER) {
-                    if (line.contains(match)) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-        };
     }
 
     /**

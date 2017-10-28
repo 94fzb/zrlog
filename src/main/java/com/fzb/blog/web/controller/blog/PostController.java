@@ -118,14 +118,14 @@ public class PostController extends BaseController {
                 } else {
                     key = getPara("key");
                 }
-                data = Log.dao.getLogsByTitleOrContent(1, getDefaultRows(), key);
+                data = Log.dao.findByTitleOrPlainContentLike(1, getDefaultRows(), key);
             } else {
                 return all();
             }
 
         } else {
             key = convertRequestParam(getPara(0));
-            data = Log.dao.getLogsByTitleOrContent(getParaToInt(1), getDefaultRows(), key);
+            data = Log.dao.findByTitleOrPlainContentLike(getParaToInt(1), getDefaultRows(), key);
         }
         // 记录回话的Key
         setAttr("key", key);

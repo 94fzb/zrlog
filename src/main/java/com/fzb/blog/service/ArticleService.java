@@ -110,7 +110,7 @@ public class ArticleService {
         if (log.get("digest") == null || "".equals(log.get("digest"))) {
             log.set("digest", ParseUtil.autoDigest(log.get("content").toString(), 200));
         }
-        log.set("search_content", getExtractSearchTxt((String) log.get("content")));
+        log.set("plain_content", getPlainSearchTxt((String) log.get("content")));
         return log;
     }
 
@@ -242,7 +242,7 @@ public class ArticleService {
         return null;
     }
 
-    public String getExtractSearchTxt(String content) {
+    public String getPlainSearchTxt(String content) {
         return Jsoup.parse(content).body().text();
     }
 }

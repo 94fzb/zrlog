@@ -175,7 +175,7 @@ public class ZrlogUtil {
                             UpgradeVersionHandler upgradeVersionHandler = (UpgradeVersionHandler) Class.forName("com.fzb.blog.util.version.V" + i + "UpgradeVersionHandler").newInstance();
                             upgradeVersionHandlerList.add(upgradeVersionHandler);
                         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
-                            LOGGER.error("", e);
+                            LOGGER.warn("Try exec upgrade method error, " + e.getMessage());
                         }
                     }
                     for (UpgradeVersionHandler upgradeVersionHandler : upgradeVersionHandlerList) {
