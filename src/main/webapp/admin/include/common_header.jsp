@@ -2,14 +2,14 @@
 <%@ page language="java" session="false" import="java.util.*" pageEncoding="UTF-8"%>
 <%
 String path = request.getContextPath();
-String scheme = com.fzb.blog.web.util.WebTools.getRealScheme(request);
+String scheme = com.zrlog.web.util.WebTools.getRealScheme(request);
 String basePath = scheme + "://"+request.getHeader("host")+path+"/";
 request.setAttribute("url", scheme + "://"+request.getHeader("host")+request.getContextPath());
 if(request.getAttribute("currentPath")==null){
-	request.setAttribute("currentPath", com.fzb.blog.util.ZrlogUtil.getFullUrl(request).substring((basePath+"admin/").length()));
+	request.setAttribute("currentPath", com.zrlog.util.ZrlogUtil.getFullUrl(request).substring((basePath+"admin/").length()));
 }
 if(request.getAttribute("currentPage")==null){
-	request.setAttribute("currentPage", com.fzb.blog.util.ZrlogUtil.getFullUrl(request).replaceAll(".jsp","").substring(basePath.length()));
+	request.setAttribute("currentPage", com.zrlog.util.ZrlogUtil.getFullUrl(request).replaceAll(".jsp","").substring(basePath.length()));
 }
 request.setAttribute("res",new com.google.gson.Gson().toJson(request.getAttribute("_res")));
 %>

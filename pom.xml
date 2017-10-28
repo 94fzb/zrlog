@@ -1,12 +1,13 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.fzb</groupId>
+    <groupId>com.zrlog</groupId>
     <artifactId>zrlog</artifactId>
     <version>1.8.0-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>zrlog</name>
-    <description>zrlog 基于JFinal/简洁好用的开源博客</description>
+    <description>ZrLog是使用Java开发的博客/CMS程序，具有简约，易用，组件化，内存占用低等特点。自带Markdown编辑器，让更多的精力放在写作上，而不是花费大量时间在学习程序的使用上。</description>
+    <url>https://www.zrlog.com</url>
 
     <properties>
         <tomcat7Version>7.0.47</tomcat7Version>
@@ -27,6 +28,19 @@
             <url>https://www.weekdragon.cn</url>
         </developer>
     </developers>
+
+    <issueManagement>
+        <system>Github Issue</system>
+        <url>http://github.com/94fzb/zrlog</url>
+    </issueManagement>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
     <dependencies>
         <dependency>
             <groupId>com.jfinal</groupId>
@@ -99,6 +113,11 @@
             <groupId>net.coobird</groupId>
             <artifactId>thumbnailator</artifactId>
             <version>0.4.8</version>
+        </dependency>
+        <dependency>
+            <groupId>com.hibegin</groupId>
+            <artifactId>common-util</artifactId>
+            <version>0.0.1</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

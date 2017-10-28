@@ -3,7 +3,7 @@
 <%@ page language="java" session="false" import="java.util.*" pageEncoding="UTF-8"%>
 <%
 String path = request.getContextPath();
-String scheme = com.fzb.blog.web.util.WebTools.getRealScheme(request);
+String scheme = com.zrlog.web.util.WebTools.getRealScheme(request);
 String basePath = scheme+"://"+request.getHeader("host")+path+"/";
 request.setAttribute("url", scheme+"://"+request.getHeader("host")+request.getContextPath());
 %>
