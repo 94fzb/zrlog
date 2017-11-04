@@ -17,7 +17,7 @@ $(function ($) {
                         recreateForm: true,
                         beforeShowForm: beforeDeleteCallback,
                         url: 'api/admin/comment/delete'
-                    },
+                    }
                 }
             },
             {name: 'userComment', index: 'userComment', width: 150, editable: true, sortable: false},
@@ -46,9 +46,10 @@ $(function ($) {
                 index: 'commTime',
                 width: 70,
                 editable: false,
-                editoptions: {size: "20", maxlength: "30"}
+                editoptions: {size: "20", maxlength: "30"},
+                sortable: false
             },
-            {name: 'logId', index: 'logId', width: 30, editable: false, formatter: viewLog, sortable: false},
+            {name: 'logId', index: 'logId', width: 30, editable: false, formatter: viewLog, sortable: false}
 
         ],
         viewrecords: true,
@@ -103,7 +104,7 @@ $(function ($) {
     }).trigger('resize');
 
     function viewLog(cellvalue, options, rowObject) {
-        return '<a target="_blank" href="post/' + rowObject.logId + '"><div id="jEditButton_2" class="ui-pg-div ui-inline-edit" onmouseout="jQuery(this).removeClass(\'ui-state-hover\')" onmouseover="jQuery(this).addClass(\'ui-state-hover\');" style="float: left; cursor: pointer; display: block;" title="" data-original-title="浏览"><span class="icon-zoom-in grey"></span></div></a>'
+        return '<a target="_blank" href="admin/article/preview?id=' + rowObject.logId + '"><div id="jEditButton_2" class="ui-pg-div ui-inline-edit" onmouseout="jQuery(this).removeClass(\'ui-state-hover\')" onmouseover="jQuery(this).addClass(\'ui-state-hover\');" style="float: left; cursor: pointer; display: block;" title="" data-original-title="浏览"><span class="ui-icon icon-zoom-in grey"></span></div></a>'
     }
 
     //navButtons
