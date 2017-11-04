@@ -19,6 +19,17 @@
 <script src="${cacheFile['/admin/markdown/lib/codemirror/addon/scroll/annotatescrollbar.js']}"></script>
 <script src="${cacheFile['/admin/markdown/lib/codemirror/addon/search/matchesonscrollbar.js']}"></script>
 <script src="${cacheFile['/admin/js/file_editor.js']}"></script>
+<style>
+    .CodeMirror {
+        border-top: 1px solid black;
+        border-bottom: 1px solid black;
+    }
+
+    dt {
+        font-family: monospace;
+        color: #666;
+    }
+</style>
 <div class="page-header">
     <h3>
         文件编辑

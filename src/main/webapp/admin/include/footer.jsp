@@ -1,13 +1,16 @@
-<%@ page session="false"  pageEncoding="utf-8" %>
+<%@ page session="false" pageEncoding="utf-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 </div>
-<footer>
-    <strong>${_res.copyright} <a href="https://www.zrlog.com"> ZrLog . </a></strong>
-    All rights reserved.
-    <div class="pull-right">
-        <strong>Version</strong> ${zrlog.version}
-    </div>
-    <div class="clearfix"></div>
-</footer>
+<c:if test="${currentPage != 'admin/edit'}">
+    <footer>
+        <strong>${_res.copyright} <a href="https://www.zrlog.com"> ZrLog . </a></strong>
+        All rights reserved.
+        <div class="pull-right">
+            <strong>Version</strong> ${zrlog.version}
+        </div>
+        <div class="clearfix"></div>
+    </footer>
+</c:if>
 </div>
 </div>
 <jsp:include page="simple_footer.jsp"/>

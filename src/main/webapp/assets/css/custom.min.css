@@ -4846,27 +4846,6 @@ ul.notifications {
     min-height: 300px;
 }
 
-.CodeMirror {
-    border-top: 1px solid black;
-    border-bottom: 1px solid black;
-}
-
-dt {
-    font-family: monospace;
-    color: #666;
-}
-
-.CodeMirror-scroll {
-    box-sizing: content-box;
-    height: 100%;
-    margin-bottom: -30px;
-    margin-right: -30px;
-    outline: 0 none;
-    overflow: hidden;
-    padding-bottom: 30px;
-    position: relative;
-}
-
 .img-responsive {
     border-radius: 4px;
 }
@@ -4880,4 +4859,49 @@ dt {
 .thumbnail .caption {
     padding: 9px;
     color: #333;
+}
+
+.select2-container {
+    width: 100% !important;
+}
+
+.WriteCover-previewWrapper {
+    height: 100%;
+    width: 660px;
+    background-size: 100% auto;
+    background-position: center top;
+    -webkit-box-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    position: relative;
+    border-radius: 4px;
+}
+.WriteCover-wrapper {
+    background: rgba(0,0,0,.075);
+    line-height: 192px;
+    background-size: 100% auto;
+    width: 660px;
+    color: #808080;
+    text-align: center;
+    border-radius: 4px;
+    margin-left: 12px;
+}
+.WriteCover-uploadInput {
+    position: absolute;
+    display: block;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+}
+.fa-3 {
+    width: 60px;
+    height: 60px;
+    font-size: 35px !important;
 }

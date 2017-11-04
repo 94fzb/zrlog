@@ -197,7 +197,7 @@ public class Log extends Model<Log> implements Serializable {
 
     public Map<String, Object> findByTitleOrPlainContentLike(int page, int pageSize, String key) {
         Map<String, Object> data = new HashMap<>();
-        String sql = "select l.*,t.typeName,t.alias as typeAlias,(select count(commentId) from comment where logId=l.logId) commentSize,u.userName from log l inner join user u,type t where rubbish=? and private=? and u.userId=l.userId and t.typeId=l.typeId and (l.title like ? or l.content like ?) order by l.logId desc limit ?,?";
+        String sql = "select l.*,t.typeName,t.alias as typeAlias,(select count(commentId) from comment where logId=l.logId) commentSize,u.userName from log l inner join user u,type t where rubbish=? and private=? and u.userId=l.userId and t.typeId=l.typeId and (l.title like ? or l.plain_content like ?) order by l.logId desc limit ?,?";
         data.put("rows", find(sql, rubbish, pre, "%" + key + "%", "%" + key + "%", ParseUtil.getFirstRecord(page, pageSize), pageSize));
         fillData(page, pageSize,
                 "from log l inner join user u,type t where rubbish=? and private=? and u.userId=l.userId and t.typeId=l.typeId and (l.title like ? or l.plain_content like ?)",

@@ -40,8 +40,8 @@ public class PostController extends BaseController {
     }
 
     private void fullPager(String currentUri, int currentPage, Integer total) {
-        Map<String, Object> pager = new HashMap<String, Object>();
-        List<Map<String, Object>> pageList = new ArrayList<Map<String, Object>>();
+        Map<String, Object> pager = new HashMap<>();
+        List<Map<String, Object>> pageList = new ArrayList<>();
         if (currentPage != 1) {
             pageList.add(pageEntity(currentUri, currentPage, I18NUtil.getStringFromRes("prevPage", getRequest()), currentPage - 1));
         }
@@ -81,7 +81,7 @@ public class PostController extends BaseController {
     }
 
     private Map<String, Object> pageEntity(String url, int currentPage, String desc, int page) {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         map.put("url", url + page);
         map.put("desc", desc);
         map.put("current", currentPage == page);
@@ -128,10 +128,10 @@ public class PostController extends BaseController {
             data = Log.dao.findByTitleOrPlainContentLike(getParaToInt(1), getDefaultRows(), key);
         }
         // 记录回话的Key
-        setAttr("key", key);
+        setAttr("key", WebTools.htmlEncode(key));
 
         setAttr("tipsType", I18NUtil.getStringFromRes("search", getRequest()));
-        setAttr("tipsName", key);
+        setAttr("tipsName",  WebTools.htmlEncode(key));
 
         setPageInfo("post/search/" + key + "-", data, getParaToInt(1, 1));
         List<Log> logs = (List<Log>) data.get("rows");

@@ -31,7 +31,7 @@
                             </li>
                             <li>
                                 <a href="admin/comment">
-                                    <i class="fa fa-comment"></i>${_res['admin.comment.manage']}
+                                    <i class="fa fa-comments"></i>${_res['admin.comment.manage']}
                                 </a>
                             </li>
                             <li>
@@ -210,4 +210,4 @@
                 </nav>
             </div>
         </div>
-        <div class="right_col" role="main" style="min-height: 1080px;">
+        <div class="right_col" role="main" style="min-height: 1080px">

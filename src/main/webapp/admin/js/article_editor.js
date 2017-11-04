@@ -7,16 +7,32 @@ $(function () {
         allowClear: true
     });
 
+    var divW = $("#left_col").width();
+
+    function checkResize() {
+        var w = $("#editormd").width();
+        if (w !== divW) {
+            resizeSize();
+            divW = w;
+        }
+    }
+
+    function resizeSize() {
+        mdEditor.resize()
+    }
+
+    setInterval(checkResize, 200);
+
     function zeroPad(num, places) {
         var zero = places - num.toString().length + 1;
         return Array(+(zero > 0 && zero)).join("0") + num;
     }
 
     var editormdTheme = $("#markdown").attr("editormdTheme");
-    var dark = editormdTheme == 'dark';
+    var dark = editormdTheme === 'dark';
     mdEditor = editormd("editormd", {
         width: "100%",
-        height: 400,
+        height: 760,
         path: editorMdPath,
         codeFold: true,
         appendMarkdown: $("#markdown").val(),
@@ -80,7 +96,7 @@ $(function () {
     }
 
     function tips(data, message) {
-        if (data.error == 0) {
+        if (data.error === 0) {
             new PNotify({
                 title: message,
                 type: 'success',
@@ -123,14 +139,22 @@ $(function () {
         return true;
     }
 
+    var saving = false;
+    var xhr;
+
     function autoSave() {
         if (change && validationPost()) {
-            $.post('api/admin/article/createOrUpdate?rubbish=1', $('#article-form').serialize(), function (data) {
+            if (xhr !== null && saving) {
+                xhr.abort();
+            }
+            saving = true;
+            xhr = $.post('api/admin/article/createOrUpdate?rubbish=1', $('#article-form').serialize(), function (data) {
                 var date = new Date();
+                saving = false;
                 tips(data, "自动保存成功 " + zeroPad(date.getHours(), 2) + ":" + zeroPad(date.getMinutes(), 2) + ":" + zeroPad(date.getSeconds(), 2))
             });
+            change = 0;
         }
-        change = 0;
     }
 
     setInterval(autoSave, 1000 * 6);
@@ -161,7 +185,28 @@ $(function () {
     $('#thumbnail-upload').liteUploader({
         script: 'api/admin/upload/thumbnail?dir=thumbnail'
     }).on('lu:success', function (e, response) {
-        $("#thumbnail-img").attr("src", response.url);
-        $("#thumbnail").val(response.url);
+        if (response.error) {
+            alert(response.message);
+        } else {
+            $("#thumbnail-img").css('background-image', "url('" + response.url + "')");
+            var w = gup("w", response.url);
+            var h = gup("h", response.url);
+            if (w < 660) {
+                h = 660.0 / w * h;
+            }
+            $("#thumbnail-img").height(h);
+            $("#thumbnail").val(response.url);
+            $("#camera-icon").hide()
+        }
+
     });
 });
+
+function gup(name, url) {
+    if (!url) url = location.href;
+    name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+    var regexS = "[\\?&]" + name + "=([^&#]*)";
+    var regex = new RegExp(regexS);
+    var results = regex.exec(url);
+    return results == null ? null : results[1];
+}
