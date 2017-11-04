@@ -1,6 +1,7 @@
 package com.zrlog.web.interceptor;
 
 import com.jfinal.core.Controller;
+import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
 import com.zrlog.common.BaseDataInitVO;
 import com.zrlog.common.Constants;
@@ -25,6 +26,40 @@ import java.util.Properties;
 public class TemplateHelper {
 
     private static final Logger LOGGER = Logger.getLogger(TemplateHelper.class);
+
+    /**
+     * 根据文件后缀 查找符合要求文件列表
+     *
+     * @param path
+     * @param prefix
+     */
+    private static void fillFileInfo(String path, List<String> fileList, String... prefix) {
+        File file[] = new File(path).listFiles();
+
+        assert file != null;
+        for (File f : file) {
+            if (f.isDirectory() && new File(f.getAbsolutePath()).listFiles() != null) {
+                fillFileInfo(f.getAbsolutePath(), fileList, prefix);
+            } else {
+                for (String pre : prefix) {
+                    if (f.getAbsoluteFile().toString().endsWith(pre)) {
+                        fileList.add(f.getAbsoluteFile().toString());
+                    }
+                }
+            }
+        }
+    }
+
+    public static List<String> getFiles(String path) {
+        List<String> fileList = new ArrayList<>();
+        fillFileInfo(JFinal.me().getServletContext().getRealPath("/") + path, fileList, ".jsp", ".js", ".css", ".html");
+        String webPath = JFinal.me().getServletContext().getRealPath("/");
+        List<String> strFile = new ArrayList<>();
+        for (String aFileList : fileList) {
+            strFile.add(aFileList.substring(webPath.length() - 1).replace('\\', '/'));
+        }
+        return strFile;
+    }
 
     public static void fullInfo(HttpServletRequest request, boolean staticHtml) {
         boolean staticBlog = ZrlogUtil.isStaticBlogPlugin(request);

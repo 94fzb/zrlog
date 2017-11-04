@@ -1,4 +1,4 @@
-<%@ page language="java" session="false" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ page session="false"  pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="f" %>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <jsp:include page="../include/menu.jsp"/>
@@ -31,5 +31,6 @@
             </div>
         </div><!-- PAGE CONTENT ENDS -->
     </div><!-- /.col -->
-</div><!-- /.row -->
+</div>
+<!-- /.row -->
 <jsp:include page="../include/footer.jsp"/>

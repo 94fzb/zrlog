@@ -1,7 +1,7 @@
-<%@ page language="java" session="false" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ page session="false"  pageEncoding="UTF-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
   <meta charset="utf-8" />
-  <c:set var="webs" value="${init.webSite}" scope="request"></c:set>
+  <c:set var="webs" value="${init.webSite}" scope="request"/>
   <title><c:if test="${not empty requestScope.log.title}">${requestScope.log.title} - </c:if>${webs.title} - ${webs.second_title}</title>
   <meta name="description" content="${webs.description}"/>
   <c:choose>
