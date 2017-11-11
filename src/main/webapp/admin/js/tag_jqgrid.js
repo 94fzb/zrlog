@@ -8,17 +8,9 @@ jQuery(function ($) {
         datatype: "json",
         colNames: ['ID', '标签名', '计数'],
         colModel: [
-            {name: 'id', index: 'id', width: 60, sorttype: "int", editable: false},
-            {
-                name: 'text',
-                index: 'text',
-                width: 150,
-                sortable: false,
-                editable: true,
-                edittype: "textarea",
-                editoptions: {rows: "2", cols: "20"}
-            },
-            {name: 'count', index: 'count', width: 70, editable: true},
+            {name: 'id', index: 'id', width: 60, sorttype: "int", editable: false, sortable: false},
+            {name: 'text', index: 'text', width: 150, sortable: false, editable: true, edittype: "textarea", editoptions: {rows: "2", cols: "20"}},
+            {name: 'count', index: 'count', width: 70, editable: true, sortable: false}
         ],
 
         viewrecords: true,
@@ -26,10 +18,8 @@ jQuery(function ($) {
         rowList: [10, 20, 30],
         pager: pager_selector,
         altRows: true,
-        //toppager: true,
 
         multiselect: false,
-        //multikey: "ctrlKey",
         multiboxonly: true,
 
         loadComplete: function () {
