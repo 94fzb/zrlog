@@ -115,32 +115,52 @@ public class ArticleService {
     }
 
     public PageableResponse<ArticleResponseEntry> page(PageableRequest pageableRequest, String keywords) {
-        return BeanUtil.convertPageable(Log.dao.queryAll(
-                pageableRequest.getPage(), pageableRequest.getRows(), keywords, pageableRequest.getOrder(), pageableRequest.getSort()), ArticleResponseEntry.class);
+        Map<String, Object> data = Log.dao.queryAll(
+                pageableRequest.getPage(), pageableRequest.getRows(), keywords, pageableRequest.getOrder(), pageableRequest.getSort());
+        wrapperSearchKeyword(data, keywords);
+        return BeanUtil.convertPageable(data, ArticleResponseEntry.class);
+    }
+
+    public Map<String, Object> searchArticle(int page, int row, String keywords) {
+        Map<String, Object> data = Log.dao.findByTitleOrPlainContentLike(page, row, keywords);
+        wrapperSearchKeyword(data, keywords);
+        return data;
     }
 
     /**
      * 高亮用户检索的关键字
-     *
-     * @param logs
-     * @param keyword
      */
-    public void wrapperSearchKeyword(List<Log> logs, String keyword) {
-        for (Log log : logs) {
-            String title = log.get("title").toString();
-            String content = log.get("content").toString();
-            String digest = log.get("digest").toString();
-            log.put("title", wrapper(title, keyword));
-            String tryWrapperDigest = wrapper(digest, keyword);
-            boolean findInDigest = tryWrapperDigest.length() != digest.length();
+    private void wrapperSearchKeyword(Map<String, Object> data, String keywords) {
+        if (StringUtils.isNotBlank(keywords)) {
+            List<Object> logs = (List<Object>) data.get("rows");
+            if (logs != null && !logs.isEmpty()) {
+                for (Object tLog : logs) {
+                    Map<String, Object> log = null;
+                    if (tLog instanceof Map) {
+                        log = (Map<String, Object>) tLog;
+                    }
+                    if (tLog instanceof Log) {
+                        log = ((Log) tLog).getAttrs();
+                    }
+                    if (log != null) {
+                        String title = log.get("title").toString();
+                        String content = log.get("content").toString();
+                        String digest = log.get("digest").toString();
+                        log.put("title", wrapper(title, keywords));
+                        String tryWrapperDigest = wrapper(digest, keywords);
+                        boolean findInDigest = tryWrapperDigest.length() != digest.length();
 
-            if (findInDigest) {
-                log.put("digest", tryWrapperDigest);
-            } else {
-                String wrapperContent = wrapper(ParseUtil.removeHtmlElement(content), keyword);
-                log.put("digest", wrapperContent);
+                        if (findInDigest) {
+                            log.put("digest", tryWrapperDigest);
+                        } else {
+                            String wrapperContent = wrapper(ParseUtil.removeHtmlElement(content), keywords);
+                            log.put("digest", wrapperContent);
+                        }
+                    }
+                }
             }
         }
+
     }
 
     private String wrapper(String content, String keyword) {

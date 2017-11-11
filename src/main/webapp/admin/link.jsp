@@ -5,6 +5,7 @@
 <script src="${cacheFile['/assets/js/date-time/bootstrap-datepicker.min.js']}"></script>
 <script src="${cacheFile['/assets/js/jqGrid/jquery.jqGrid.min.js']}"></script>
 <script src="${url}/assets/js/jqGrid/i18n/grid.locale-${lang}.js"></script>
+<script src="${cacheFile['/admin/js/jqgrid_common.js']}"></script>
 <script src="${cacheFile['/admin/js/link_jqgrid.js']}"></script>
 <div class="page-header">
     <h3>
