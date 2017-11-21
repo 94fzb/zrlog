@@ -58,6 +58,7 @@
                                                 class="fa fa-eye"></i></a>
                                         <a href="admin/template/config?template=${template.template}"><i
                                                 class="fa fa-cog"></i></a>
+                                        <c:if test="${template.deleteAble}"><a href="#" class="delete-btn" template="${template.template}"><i class="fa fa-remove"></i></a></c:if>
                                         <a class="apply-btn" href="#" template="${template.template}"><i
                                                 class="fa fa-check"></i></a>
                                     </div>

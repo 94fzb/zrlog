@@ -1,6 +1,7 @@
 package com.zrlog.web.controller.admin.page;
 
 import com.zrlog.common.Constants;
+import com.zrlog.common.TemplateVO;
 import com.zrlog.model.WebSite;
 import com.zrlog.service.CacheService;
 import com.zrlog.util.I18NUtil;
@@ -18,24 +19,23 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.util.*;
 
 public class AdminTemplatePageController extends BaseController {
 
     private static final Logger LOGGER = Logger.getLogger(AdminTemplatePageController.class);
 
-    private CacheService cacheService = new CacheService();
-
     public String index() {
         String webPath = PathKit.getWebRootPath();
         File[] templatesFile = new File(webPath + Constants.TEMPLATE_BASE_PATH).listFiles();
-        List<Map<String, Object>> templates = new ArrayList<Map<String, Object>>();
+        List<TemplateVO> templates = new ArrayList<>();
         HttpServletRequest request = getRequest();
         if (templatesFile != null) {
             for (File file : templatesFile) {
                 if (file.isDirectory() && !file.isHidden()) {
                     String templatePath = file.toString().substring(webPath.length()).replace("\\", "/");
-                    Map<String, Object> map = new HashMap<String, Object>();
+                    TemplateVO templateVO = new TemplateVO();
                     File templateInfo = new File(file.toString() + "/template.properties");
                     if (templateInfo.exists()) {
                         Properties properties = new Properties();
@@ -43,11 +43,11 @@ public class AdminTemplatePageController extends BaseController {
                         try {
                             in = new FileInputStream(templateInfo);
                             properties.load(in);
-                            map.put("author", properties.get("author"));
-                            map.put("name", properties.get("name"));
-                            map.put("digest", properties.get("digest"));
-                            map.put("version", properties.get("version"));
-                            map.put("url", properties.get("url"));
+                            templateVO.setAuthor(properties.getProperty("author"));
+                            templateVO.setName(properties.getProperty("name"));
+                            templateVO.setDigest(properties.getProperty("digest"));
+                            templateVO.setVersion(properties.getProperty("version"));
+                            templateVO.setUrl(properties.getProperty("url"));
                             if (properties.get("previewImages") != null) {
                                 String[] images = properties.get("previewImages").toString().split(",");
                                 for (int i = 0; i < images.length; i++) {
@@ -56,7 +56,7 @@ public class AdminTemplatePageController extends BaseController {
                                         images[i] = request.getContextPath() + templatePath + "/" + image;
                                     }
                                 }
-                                map.put("previewImages", images);
+                                templateVO.setPreviewImages(Arrays.asList(images));
                             }
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -70,32 +70,35 @@ public class AdminTemplatePageController extends BaseController {
                             }
                         }
                     } else {
-                        map.put("author", "");
-                        map.put("name", templatePath.substring(Constants.TEMPLATE_BASE_PATH.length()));
-                        map.put("version", "");
-                        map.put("url", "");
+                        templateVO.setAuthor("");
+                        templateVO.setName(templatePath.substring(Constants.TEMPLATE_BASE_PATH.length()));
+                        templateVO.setUrl("");
+                        templateVO.setVersion("");
                     }
-                    if (map.get("previewImages") == null || ((String[]) map.get("previewImages")).length == 0) {
-                        map.put("previewImages", new String[]{"assets/images/template-default-preview.png"});
+                    if (templateVO.getPreviewImages() == null || templateVO.getPreviewImages().isEmpty()) {
+                        templateVO.setPreviewImages(Collections.singletonList("assets/images/template-default-preview.png"));
                     }
-                    if (org.apache.commons.lang3.StringUtils.isEmpty((String) map.get("digest"))) {
-                        map.put("digest", "无简介");
+                    if (org.apache.commons.lang3.StringUtils.isEmpty(templateVO.getDigest())) {
+                        templateVO.setDigest("无简介");
                     }
-                    map.put("template", templatePath);
-                    templates.add(map);
+                    templateVO.setTemplate(templatePath);
+                    templates.add(templateVO);
                 }
             }
         }
 
-        List<Map<String, Object>> sortTemplates = new ArrayList<Map<String, Object>>();
-        for (Map<String, Object> stringObjectMap : templates) {
-            if (stringObjectMap.get("template").equals(Constants.DEFAULT_TEMPLATE_PATH)) {
-                sortTemplates.add(stringObjectMap);
+        List<TemplateVO> sortTemplates = new ArrayList<>();
+        for (TemplateVO templateVO : templates) {
+            if (templateVO.getTemplate().equals(Constants.DEFAULT_TEMPLATE_PATH)) {
+                templateVO.setDeleteAble(false);
+                sortTemplates.add(templateVO);
+            } else {
+                templateVO.setDeleteAble(true);
             }
         }
-        for (Map<String, Object> stringObjectMap : templates) {
-            if (!stringObjectMap.get("template").equals(Constants.DEFAULT_TEMPLATE_PATH)) {
-                sortTemplates.add(stringObjectMap);
+        for (TemplateVO templateVO : templates) {
+            if (!templateVO.getTemplate().equals(Constants.DEFAULT_TEMPLATE_PATH)) {
+                sortTemplates.add(templateVO);
             }
         }
         setAttr("templates", sortTemplates);

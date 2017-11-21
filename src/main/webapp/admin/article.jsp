@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="${cacheFile['/assets/css/ui.jqgrid.css']}"/>
 <script src="${cacheFile['/assets/js/jqGrid/jquery.jqGrid.min.js']}"></script>
 <script src="${url}/assets/js/jqGrid/i18n/grid.locale-${lang}.js"></script>
+<script src="${cacheFile['/admin/js/jqgrid_common.js']}"></script>
 <script src="${cacheFile['/admin/js/article_jqgrid.js']}"></script>
 <div class="page-title">
     <div class="title_left">
@@ -24,7 +25,7 @@
                     <input id="keywords" value="${keywords}" name="keywords" autocomplete="off" type="text"
                            placeholder="${_res.searchTip}" class="form-control">
                     <span class="input-group-btn">
-						  <button type="submit" class="btn btn-default">${_res.search}</button>
+						  <button type="submit" id="searchArticleBtn" class="btn btn-default">${_res.search}</button>
 						</span>
                 </div>
             </form>

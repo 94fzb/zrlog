@@ -132,8 +132,8 @@ public class ZrlogUtil {
         return fileList;
     }
 
-    private static List<String> getExecSqlList(String sqlVersion, String basePath) {
-        List<String> sqlList = new ArrayList<>();
+    private static List<Map.Entry<Integer, List<String>>> getExecSqlList(String sqlVersion, String basePath) {
+        List<Map.Entry<Integer, List<String>>> sqlList = new ArrayList<>();
         Integer version = 0;
         try {
             version = Integer.valueOf(sqlVersion);
@@ -145,7 +145,8 @@ public class ZrlogUtil {
                 Integer fileVersion = Integer.valueOf(f.getName().replace(".sql", ""));
                 if (fileVersion > version) {
                     LOGGER.info("need update sql " + f);
-                    sqlList.addAll(Arrays.asList(IOUtil.getStringInputStream(new FileInputStream(f)).split("\n")));
+                    Map.Entry<Integer, List<String>> entry = new AbstractMap.SimpleEntry<>(fileVersion, Arrays.asList(IOUtil.getStringInputStream(new FileInputStream(f)).split("\n")));
+                    sqlList.add(entry);
                 }
             } catch (FileNotFoundException e) {
                 LOGGER.error("", e);
@@ -155,52 +156,50 @@ public class ZrlogUtil {
     }
 
     public static Integer doUpgrade(String currentVersion, String basePath, String jdbcUrl, String user, String password, String driverClass) {
-        List<String> sqlList = getExecSqlList(currentVersion, basePath);
+        List<Map.Entry<Integer, List<String>>> sqlList = getExecSqlList(currentVersion, basePath);
         if (!sqlList.isEmpty()) {
-            Connection connection = getConnection(jdbcUrl, user, password, driverClass);
-            if (connection != null) {
-                Statement statement = null;
-                try {
-                    for (String sql : sqlList) {
-                        statement = connection.createStatement();
+            try {
+                for (Map.Entry<Integer, List<String>> entry : sqlList) {
+                    Connection connection = getConnection(jdbcUrl, user, password, driverClass);
+                    if (connection != null) {
+                        //执行需要更新的sql脚本
+                        Statement statement = connection.createStatement();
                         try {
-                            statement.execute(sql);
+                            for (String sql : entry.getValue()) {
+                                statement.execute(sql);
+                            }
                         } catch (Exception e) {
                             LOGGER.error("execution sql ", e);
+                        } finally {
+                            if (statement != null) {
+                                try {
+                                    statement.close();
+                                } catch (SQLException e) {
+                                    LOGGER.error(e);
+                                }
+                            }
                         }
-                    }
-                    List<UpgradeVersionHandler> upgradeVersionHandlerList = new ArrayList<>();
-                    for (int i = Integer.valueOf(currentVersion) + 1; i <= getSqlVersion(basePath); i++) {
+                        //执行需要转换的数据
                         try {
-                            UpgradeVersionHandler upgradeVersionHandler = (UpgradeVersionHandler) Class.forName("com.zrlog.util.version.V" + i + "UpgradeVersionHandler").newInstance();
-                            upgradeVersionHandlerList.add(upgradeVersionHandler);
+                            UpgradeVersionHandler upgradeVersionHandler = (UpgradeVersionHandler) Class.forName("com.zrlog.util.version.V" + entry.getKey() + "UpgradeVersionHandler").newInstance();
+                            try {
+                                upgradeVersionHandler.doUpgrade(connection);
+                            } catch (Exception e) {
+                                LOGGER.error("", e);
+                                return -1;
+                            }
                         } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
                             LOGGER.warn("Try exec upgrade method error, " + e.getMessage());
+                        } finally {
+                            connection.close();
                         }
-                    }
-                    for (UpgradeVersionHandler upgradeVersionHandler : upgradeVersionHandlerList) {
-                        upgradeVersionHandler.doUpgrade(connection);
-                    }
-                } catch (Exception e) {
-                    LOGGER.error("", e);
-                    return -1;
-                } finally {
-                    if (statement != null) {
-                        try {
-                            statement.close();
-                        } catch (SQLException e) {
-                            LOGGER.error(e);
-                        }
-                    }
-                    try {
-                        connection.close();
-                    } catch (SQLException e) {
-                        LOGGER.error(e);
                     }
                 }
+            } catch (Exception e) {
+                LOGGER.error("", e);
+                return -1;
             }
-            return getSqlVersion(basePath);
         }
-        return -1;
+        return getSqlVersion(basePath);
     }
 }

@@ -1,7 +1,8 @@
 $(function () {
     $(".select2_single").select2({
         minimumResultsForSearch: -1,
-        allowClear: true
+        allowClear: true,
+        dropdownParent: $("#cycle-select-parent")
     });
 
     function checkVersion() {

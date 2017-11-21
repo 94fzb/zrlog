@@ -19,29 +19,29 @@
     </h3>
 </div>
 <div class="row">
-    <div class="col-xs-12">
-        <form role="form" method="post" class="form-horizontal" id="userAjax" action="api/admin/update">
+    <div class="col-md-6">
+        <form role="form" method="post" data-toggle="validator" class="form-horizontal" id="userAjax" action="api/admin/update">
             <div class="form-group">
-                <label class="col-sm-3 control-label no-padding-right"> ${_res.userName} </label>
+                <label class="col-md-3 control-label no-padding-right"> ${_res.userName} </label>
 
-                <div class="col-sm-3">
+                <div class="col-md-6">
                     <input type="text" name="userName" value="${user.userName }"
-                           class="form-control col-xs-12 col-sm-6" placeholder="">
+                           class="form-control" required placeholder="">
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-sm-3 control-label no-padding-right"> ${_res['email']} </label>
+                <label class="col-md-3 control-label no-padding-right"> ${_res['email']} </label>
 
-                <div class="col-sm-3">
+                <div class="col-md-6">
                     <input type="text" name="email" value="${user.email }"
-                           class="form-control col-xs-12 col-sm-6" placeholder="">
+                           class="form-control" placeholder="">
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-sm-3 control-label no-padding-right">${_res['headPortrait']}</label>
-                <div class="col-sm-9">
-                    <input id="logo" class="col-xs-6 col-sm-6" name="header" value="${user.header}"/>
-                    <input type="file" class="col-xs-6 fileUpload" name="imgFile" value="上传"/>
+                <label class="col-md-3 control-label no-padding-right">${_res['headPortrait']}</label>
+                <div class="col-md-9">
+                    <input id="logo" class="col-md-7" name="header" value="${user.header}"/>
+                    <input type="file" class="col-md-5 fileUpload" name="imgFile" value="上传"/>
                 </div>
             </div>
             <div class="ln_solid"></div>

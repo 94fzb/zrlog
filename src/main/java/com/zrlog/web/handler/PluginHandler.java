@@ -66,6 +66,7 @@ public class PluginHandler extends Handler {
                     }
                 }
             } finally {
+                isHandled[0] = true;
                 AdminTokenThreadLocal.remove();
             }
         } else {

@@ -40,6 +40,15 @@ public class TemplateController extends BaseController {
         return webSiteSettingUpdateResponse;
     }
 
+    public WebSiteSettingUpdateResponse delete() {
+        String template = getPara("template");
+        File file = new File(PathKit.getWebRootPath() + template);
+        if (file.exists()) {
+            IOUtil.deleteFile(file.toString());
+        }
+        return new WebSiteSettingUpdateResponse();
+    }
+
     public Map loadFile() {
         String file = getRequest().getRealPath("/") + getPara("file");
         Map<String, Object> map = new HashMap<String, Object>();
