@@ -3,6 +3,7 @@
 <link rel="stylesheet" href="${cacheFile['/assets/css/ui.jqgrid.css']}"/>
 <script src="${cacheFile['/assets/js/jqGrid/jquery.jqGrid.min.js']}"></script>
 <script src="${url}/assets/js/jqGrid/i18n/grid.locale-${lang}.js"></script>
+<script src="${cacheFile['/admin/js/jqgrid_common.js']}"></script>
 <script src="${cacheFile['/admin/js/comment_jqgrid.js']}"></script>
 <div class="page-header">
     <h3>

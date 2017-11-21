@@ -4,7 +4,8 @@ var mdEditor;
 $(function () {
     $(".select2_single").select2({
         minimumResultsForSearch: -1,
-        allowClear: true
+        allowClear: true,
+        dropdownParent: $("#type-select-parent")
     });
 
     var divW = $("#left_col").width();
@@ -20,8 +21,6 @@ $(function () {
     function resizeSize() {
         mdEditor.resize()
     }
-
-    setInterval(checkResize, 200);
 
     function zeroPad(num, places) {
         var zero = places - num.toString().length + 1;
@@ -66,6 +65,7 @@ $(function () {
                 }
             }
             this.addKeyMap(keyMap);
+            setInterval(checkResize, 200);
         },
         onfullscreen: function () {
             $("#editormd").css("z-index", "9999")

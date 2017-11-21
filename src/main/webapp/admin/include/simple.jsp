@@ -1,4 +1,4 @@
-<%@ page language="java" session="false" import="java.util.*" pageEncoding="UTF-8" %>
+<%@ page session="false"  pageEncoding="UTF-8" %>
 <%
     String path = request.getContextPath();
     String basePath = com.zrlog.web.util.WebTools.getRealScheme(request) + "://" + request.getServerName() + ":" + request.getServerPort() + path + "/";

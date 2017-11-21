@@ -27,7 +27,7 @@
         <li><a href="#blackList-tab" data-toggle="tab">IP 黑名单</a></li>
     </ul>
     <div class="tab-content">
-        <div class="tab-pane in active" id="basic" style="padding: 10px">
+        <div class="tab-pane in active col-md-6" id="basic" style="padding: 10px">
             <h4 class="header blue">认真输入，有助于网站被收录</h4>
             <form role="form" class="form-horizontal" id="baseMsgAjax">
                 <div class="form-group">
@@ -39,9 +39,9 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="col-sm-3 control-label no-padding-right"> 网站副标题 </label>
+                    <label class="col-md-3 control-label no-padding-right"> 网站副标题 </label>
 
-                    <div class="col-sm-7">
+                    <div class="col-md-9">
                         <input type="text" name="second_title"
                                value="${webs.second_title }" class="form-control col-xs-12 col-sm-6"
                                placeholder="请求输入网站副标题 ">
@@ -49,9 +49,9 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-sm-3 control-label no-padding-right"> 网站关键词 </label>
+                    <label class="col-md-3 control-label no-padding-right"> 网站关键词 </label>
 
-                    <div class="col-sm-7">
+                    <div class="col-md-9">
                         <input type="text" name="keywords" value="${webs.keywords}"
                                class="form-control col-xs-12 col-sm-6" placeholder="请求输入网站关键词 "
                         >
@@ -59,20 +59,20 @@
                 </div>
                 <div class="form-group">
                     <label for="form-field-2"
-                           class="col-sm-3 control-label no-padding-right"> 网站描述 </label>
+                           class="col-md-3 control-label no-padding-right"> 网站描述 </label>
 
-                    <div class="col-sm-7">
+                    <div class="col-md-9">
 						<textarea name="description" class="form-control col-xs-12 col-sm-6" rows="5"
                                   placeholder="" id="form-field-2">${webs.description}</textarea>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-sm-3 control-label no-padding-right">
+                    <label class="col-md-3 control-label no-padding-right">
                         网站&nbsp;Logo </label>
-                    <div class="col-sm-6">
-                        <input type="text" class="col-xs-12 col-sm-6" id="logo" name="logo" value="${webs.logo }">
+                    <div class="col-md-9">
+                        <input type="text" class="col-md-6" id="logo" name="logo" value="${webs.logo }">
                         <input type="file" name="imgFile" id="id-input-file-1"
-                               class="col-xs-12 col-sm-6 fileUpload" value="上传"/>
+                               class="col-md-6 fileUpload" value="上传"/>
                     </div>
                 </div>
                 <div class="ln_solid"></div>
@@ -86,31 +86,22 @@
 
             </form>
         </div>
-        <div class="tab-pane" id="other" style="padding: 10px">
+        <div class="tab-pane col-md-6" id="other" style="padding: 10px">
             <h4 class="header blue">ICP，网站统计等信息</h4>
             <form role="form" class="form-horizontal" checkBox="pseudo_staticStatus,article_thumbnail"
                   id="otherMsgAjax">
                 <div class="form-group">
-                    <label class="col-sm-3 control-label no-padding-right"> ICP备案信息 </label>
+                    <label class="col-md-3 control-label no-padding-right"> 会话过期时间（分钟） </label>
 
-                    <div class="col-sm-7">
-						<textarea name="icp" class="form-control col-xs-12 col-sm-6" cols="30" rows="3"
-                        >${webs.icp}</textarea>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="col-sm-3 control-label no-padding-right"> 会话过期时间（分钟） </label>
-
-                    <div class="col-sm-7">
+                    <div class="col-md-3">
                         <input name="session_timeout" class="form-control col-xs-12 col-sm-6"
                                value="${webs.session_timeout}">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-sm-3 control-label no-padding-right"> 编辑器主题 </label>
+                    <label class="col-md-3 control-label no-padding-right"> 编辑器主题 </label>
 
-                    <span class="col-sm-2">
+                    <span class="col-md-4">
                     <select name="editorMdTheme" class="form-control select2_single">
                         <option
                                 <c:if test="${webs.editorMdTheme eq 'default'}">selected="selected"</c:if>
@@ -121,19 +112,26 @@
                     </select>
                     </span>
                 </div>
+                <div class="form-group">
+                    <label class="col-md-3 control-label no-padding-right"> ICP备案信息 </label>
 
+                    <div class="col-md-9">
+						<textarea name="icp" class="form-control col-md-6" cols="30" rows="3"
+                        >${webs.icp}</textarea>
+                    </div>
+                </div>
                 <div class="form-group">
                     <label class="col-sm-3 control-label no-padding-right"> 网站统计 </label>
 
-                    <div class="col-sm-7">
+                    <div class="col-md-9">
 						<textarea name="webCm" class="form-control col-xs-12 col-sm-6" cols="30" rows="8"
                         >${webs.webCm}</textarea>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="col-sm-3 control-label no-padding-right"> 静态化文章页 </label>
-                    <div class="col-sm-5">
+                    <label class="col-md-3 control-label no-padding-right"> 静态化文章页 </label>
+                    <div class="col-md-9">
 						<span class="col-sm-1">
 						<input type="hidden" id="pseudo_staticStatus" value="off">
 						<label>
@@ -177,13 +175,13 @@
                     scrolling="no" style="border: 0px;" width="100%" height="600px">
             </iframe>
         </div>
-        <div class="tab-pane" id="blackList-tab" style="padding: 10px">
+        <div class="tab-pane col-md-6" id="blackList-tab" style="padding: 10px">
             <form role="form" class="form-horizontal" id="blackListAjax">
                 <h4 class="header blue">IP 黑名单</h4>
                 <div class="form-group">
-                    <label class="col-sm-1 control-label no-padding-right"></label>
+                    <label class="col-md-3 control-label no-padding-right"></label>
 
-                    <div class="col-sm-11">
+                    <div class="col-md-9">
 						<textarea name="blackList" class="form-control col-xs-12 col-sm-6" cols="30" rows="8"
                         >${webs.blackList}</textarea>
                     </div>

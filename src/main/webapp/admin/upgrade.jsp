@@ -16,14 +16,14 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-xs-12">
+    <div class="col-md-6">
         <form role="form" action="api/admin/upgrade/setting" class="form-horizontal" id="upgradeAjax"
               checkBox="upgradeCanPreview">
             <div class="form-group">
                 <label class="col-sm-3 control-label no-padding-right"> ${_res['admin.upgrade.autoCheckCycle']} </label>
 
-                <div class="col-sm-3">
-			<span class="col-sm-9">
+                <div class="col-md-4">
+			<span class="col-sm-9" id="cycle-select-parent">
 			<select name="autoUpgradeVersion" class="form-control select2_single">
 				<!--
 				<option <c:if test="${webs.autoUpgradeVersion == 60}">selected="selected"</c:if> value="60">${_res['admin.upgrade.cycle.oneMinute']}</option>
@@ -46,10 +46,10 @@
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-sm-3 control-label no-padding-right"
+                <label class="col-md-3 control-label no-padding-right"
                 > ${_res['admin.upgrade.canPreview']} </label>
 
-                <div class="col-sm-5">
+                <div class="col-md-5">
 			<span class="col-sm-1">
             <input type="hidden" id="upgradeCanPreview" value="off">
             <label>

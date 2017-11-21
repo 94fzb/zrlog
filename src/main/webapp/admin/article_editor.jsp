@@ -37,7 +37,6 @@
 <div class="row">
     <div class="x_content">
         <form target="_blank" class="form-horizontal form-label-left" id="article-form">
-
             <textarea editormdTheme='${webs.editorMdTheme}' id="markdown"
                       style="display: none;">${log.mdContent}</textarea>
             <input type="hidden" id="logId" name="logId" value="${log.logId}">
@@ -62,11 +61,11 @@
                 <div class="form-group">
                     <div class="row">
                         <div class="col-xs-7">
-                            <input name="title" id="title" size="60" maxlength="60" value="${log.title}"
+                            <input required name="title" id="title" maxlength="254" value="${log.title}"
                                    class="form-control"
                                    type="text" placeholder="请输入文章标题"/>
                         </div>
-                        <div class="col-xs-2">
+                        <div class="col-xs-2" id="type-select-parent">
                             <select name="typeId" class="form-control select2_single">
                                 <c:forEach items="${init.types}" var="type">
                                     <option
@@ -76,8 +75,7 @@
                             </select>
                         </div>
                         <div class="col-xs-3">
-                            <input id="alias" type="text" class="form-control" placeholder="请输入别名" name="alias"
-                                   value="${log.alias}">
+                            <input id="alias" type="text" class="form-control" placeholder="请输入别名" name="alias" value="${log.alias}">
                         </div>
                     </div>
                 </div>
