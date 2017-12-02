@@ -1,4 +1,4 @@
-<%@ page session="false"  pageEncoding="UTF-8" %>
+<%@ page session="false" pageEncoding="UTF-8" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 </section>
 <aside>
@@ -35,7 +35,7 @@
                                     </div>
                                 </div>
                             </c:when>
-                            <c:when test="${plugin.pluginName eq 'links' and pageLevel>=plugin.level}">
+                            <c:when test="${plugin.pluginName eq 'links' and pageLevel>=plugin.level and not empty init.links}">
                                 <div class="widget">
                                     <h3>${_res.link}</h3>
                                     <ul>

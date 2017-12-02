@@ -63,7 +63,7 @@
                         <div class="col-xs-7">
                             <input required name="title" id="title" maxlength="254" value="${log.title}"
                                    class="form-control"
-                                   type="text" placeholder="请输入文章标题"/>
+                                   type="text" placeholder="${_res['inputArticleTitle']}"/>
                         </div>
                         <div class="col-xs-2" id="type-select-parent">
                             <select name="typeId" class="form-control select2_single">
@@ -75,7 +75,7 @@
                             </select>
                         </div>
                         <div class="col-xs-3">
-                            <input id="alias" type="text" class="form-control" placeholder="请输入别名" name="alias" value="${log.alias}">
+                            <input id="alias" type="text" class="form-control" placeholder="${_res['inputArticleAlias']}" name="alias" value="${log.alias}">
                         </div>
                     </div>
                 </div>
@@ -86,7 +86,7 @@
                     <a id="preview-link" target="_blank" style="display:none">
                         <button class="btn btn-black" id="preview" type="button">
                             <i class="fa fa-eye bigger-110"></i>
-                            预览一下
+                            ${_res['preview']}
                         </button>
                     </a>
                     <button class="btn btn-primary" id="saveToRubbish" type="button">
@@ -97,7 +97,7 @@
                 <div class="form-group col-xs-12">
                     <div class="row">
                         <div class="col-xs-4">
-                            <label><span style="font-size: 15px">允许评论</span>
+                            <label><span style="font-size: 15px">${_res['commentAble']}</span>
                                 <input type="checkbox" name="canComment"
                                        <c:if test="${log == null}">checked="checked"</c:if>
                                        <c:if test="${log['canComment']}">checked="checked"</c:if> class="js-switch"
@@ -106,7 +106,7 @@
                             </label>
                         </div>
                         <div class="col-xs-4">
-                            <label><span style="font-size: 15px">推荐</span>
+                            <label><span style="font-size: 15px">${_res['recommendable']}</span>
                                 <input type="checkbox" name="recommended"
                                        <c:if test="${log.recommended}">checked="checked"</c:if> class="js-switch"
                                        style="display: none;" data-switchery="true">
@@ -114,7 +114,7 @@
                             </label>
                         </div>
                         <div class="col-xs-4">
-                            <label><span style="font-size: 15px">不公开</span>
+                            <label><span style="font-size: 15px">${_res['private']}</span>
                                 <input type="checkbox" name="private"
                                        <c:if test="${log['private']}">checked="checked"</c:if> class="js-switch"
                                        style="display: none;" data-switchery="true">
@@ -124,7 +124,7 @@
                     </div>
                 </div>
                 <div class="form-group col-xs-12">
-                    <input value="${log.keywords}" class="form-control" placeholder="设置关键字，用逗号隔开，建议不超过5个"
+                    <input value="${log.keywords}" class="form-control" placeholder="${_res["tagTips"]}"
                            type="text"
                            name="keywords" id="inp" size="60" maxlength="60"/>
                     <div class="tagsinput" id="tag" style="max-height: 300px;width: 100%">
@@ -137,7 +137,7 @@
                 <div class="form-group col-xs-12">
                     <div class="x_panel">
                         <div class="x_title">
-                            <h2>摘要</h2>
+                            <h2>${_res['digest']}</h2>
                             <ul class="nav navbar-right panel_toolbox">
                                 <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
                             </ul>
@@ -145,7 +145,7 @@
                         </div>
                         <div class="x_content">
                             <div class="form-group">
-                            <textarea name="digest" class="form-control" placeholder="一段好的摘要，能为你的读者提供一个非常好的引导"
+                            <textarea name="digest" class="form-control" placeholder="${_res['digestTips']}"
                                       cols="100" rows="3"
                                       style="width:100%; height:200px; z-index: 9999;">${log.digest}</textarea>
                             </div>
