@@ -218,9 +218,8 @@ public class Log extends Model<Log> implements Serializable {
         return findFirst(sql).getBigDecimal("sum(click)");
     }
 
-    @Override
     public Map<String, Object> getAttrs() {
-        return super.getAttrs();
+        return super._getAttrs();
     }
 
     public long getTotalArticleSize() {

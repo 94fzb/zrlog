@@ -11,13 +11,23 @@ $(function () {
         }
 
     });
+
+    function validator(el) {
+        el.validator('validate');
+        return el.find(".has-error").length === 0;
+    }
+
     $(".btn-info").click(function () {
         var formId = $(this).attr("id") + "Ajax";
-        if ($("#" + formId).attr("checkBox")) {
+        var formEl = $("#" + formId);
+        if (!validator(formEl)) {
+            return false;
+        }
+        if (formEl.attr("checkBox")) {
             var checkBoxNames = $("#" + formId).attr("checkBox").split(",");
             for (var i = 0; i < checkBoxNames.length; i++) {
-                checkBoxName = checkBoxNames[i];
-                if ($("[name='" + checkBoxName + "']").size() && $("[name='" + checkBoxName + "']")[0].checked == true) {
+                var checkBoxName = checkBoxNames[i];
+                if ($("[name='" + checkBoxName + "']").size() && $("[name='" + checkBoxName + "']")[0].checked === true) {
                     $("#" + checkBoxName).attr("name", checkBoxName).attr("value", "on");
                 }
                 else {
@@ -26,15 +36,15 @@ $(function () {
             }
         }
         var uri;
-        if ($("#" + formId).attr("action") != null) {
+        if (formEl.attr("action") !== null) {
             uri = $("#" + formId).attr("action");
         } else {
             uri = 'api/admin/website/update'
         }
-        $.post(uri, $("#" + formId).serialize(), function (data) {
-            if (data.error == 0) {
+        $.post(uri, formEl.serialize(), function (data) {
+            if (data.error === 0) {
                 var message;
-                if (data.message != null && data.message != '') {
+                if (data.message !== null && data.message !== '') {
                     message = data.message;
                 } else {
                     message = "操作成功...";
@@ -48,7 +58,7 @@ $(function () {
                 });
             } else {
                 var message;
-                if (data.message != null && data.message != '') {
+                if (data.message !== null && data.message !== '') {
                     message = data.message;
                 } else {
                     message = "发生了一些异常...";

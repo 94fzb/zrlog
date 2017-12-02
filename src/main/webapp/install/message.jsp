@@ -1,9 +1,8 @@
-<%@ page language="java" session="false" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ page session="false"  pageEncoding="UTF-8"%>
 <jsp:include page="header.jsp" />
 <div id="step2">
 	<div class="main">
-		<form method="post" action="${basePath}install/installZrlog"
-			id="validation-form" class="form-horizontal" novalidate="novalidate">
+		<form method="post" action="${basePath}install/installZrlog" class="form-horizontal" data-toggle="validator">
 			<div class="center">
 				<h3 class="green">${_res.installInputWebSiteInfo}</h3>
 			</div>
@@ -14,7 +13,7 @@
 				<div class="col-xs-6 col-sm-3">
 					<div class="clearfix">
 						<input type="text" value="admin" class="form-control"
-							name="username">
+							name="username" required>
 					</div>
 				</div>
 			</div>
@@ -26,7 +25,7 @@
 
 				<div class="col-xs-6 col-sm-3">
 					<div class="clearfix">
-						<input type="password" autocomplete="off" class="form-control" name="password">
+						<input type="password" autocomplete="off" class="form-control" name="password" required>
 					</div>
 				</div>
 			</div>
@@ -37,8 +36,7 @@
 
 				<div class="col-xs-6 col-sm-3">
 					<div class="clearfix">
-						<input type="text" value="admin@example.com"
-							class="form-control" name="email">
+						<input type="text" class="form-control" name="email">
 					</div>
 				</div>
 			</div>
@@ -50,7 +48,7 @@
 				<div class="col-xs-8 col-sm-4">
 					<div class="clearfix">
 						<input type="text" value="" placeholder="${_res.installWebSiteTitleTip}" class="form-control"
-							name="title">
+							name="title" required>
 					</div>
 				</div>
 			</div>

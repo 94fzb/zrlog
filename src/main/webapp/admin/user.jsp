@@ -41,7 +41,7 @@
                 <label class="col-md-3 control-label no-padding-right">${_res['headPortrait']}</label>
                 <div class="col-md-9">
                     <input id="logo" class="col-md-7" name="header" value="${user.header}"/>
-                    <input type="file" class="col-md-5 fileUpload" name="imgFile" value="上传"/>
+                    <input type="file" class="col-md-5 fileUpload" name="imgFile" value=""/>
                 </div>
             </div>
             <div class="ln_solid"></div>
