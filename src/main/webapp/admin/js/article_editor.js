@@ -33,6 +33,12 @@ $(function () {
         width: "100%",
         height: 760,
         path: editorMdPath,
+        toolbarIcons:function() {
+            return ["undo", "redo", "|", "bold", "del", "italic", "quote", "|", "h1", "h2", "h3", "h4", "|", "list-ul", "list-ol", "hr", "|", "link", "reference-link", "image","file", "code", "preformatted-text", "code-block", "table", "datetime", "emoji", "html-entities", "pagebreak", "|", "goto-line", "watch", "fullscreen", "search", "|", "help", "info"]
+        },
+        toolbarCustomIcons : {
+            file   : '<a href="javascript:;" id="fileDialog"  title="添加附件" unselectable="on"><i class="fa fa-paperclip" unselectable="on"></i></a>'
+        },
         codeFold: true,
         appendMarkdown: $("#markdown").val(),
         saveHTMLToTextarea: true,
@@ -47,7 +53,7 @@ $(function () {
         dialogMaskOpacity: 0,    // 设置透明遮罩层的透明度，全局通用，默认值为0.1
         dialogMaskBgColor: "#000", // 设置透明遮罩层的背景颜色，全局通用，默认为#fff
         imageUpload: true,
-        imageFormats: ["zip", "rar", "tar.gz", "jpg", "jpeg", "gif", "png", "ico", "bmp", "webp"],
+        imageFormats: ["jpg", "jpeg", "gif", "png", "ico", "bmp", "webp"],
         imageUploadURL: uploadUrl,
         theme: dark ? "dark" : "default",
         previewTheme: dark ? "dark" : "default",
@@ -66,6 +72,10 @@ $(function () {
             }
             this.addKeyMap(keyMap);
             setInterval(checkResize, 200);
+            $("#fileDialog").on("click",function () {
+                mdEditor.executePlugin("fileDialog", "../plugins/file-dialog/file-dialog");
+            });
+
         },
         onfullscreen: function () {
             $("#editormd").css("z-index", "9999")

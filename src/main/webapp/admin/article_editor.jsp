@@ -66,7 +66,7 @@
                 </div>
             </c:if>
 
-            <div class=" col-md-12 col-lg-9">
+            <div class="col-md-12 col-sm-12 col-xs-12 col-lg-9">
                 <div class="form-group">
                     <div class="row">
                         <div class="col-xs-7">

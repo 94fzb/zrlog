@@ -1,15 +1,14 @@
 $(function () {
-    PNotify.prototype.options.delay == 3000;
+    PNotify.prototype.options.delay = 3000;
     $('.switchery').on("click", function () {
         var input = $(this).previousSibling();
-        if (input.val() == 'off') {
+        if (input.val() === 'off') {
             input.val("on");
             input.checked = true;
         } else {
             input.val("off");
             input.checked = on;
         }
-
     });
 
     function validator(el) {
@@ -36,15 +35,15 @@ $(function () {
             }
         }
         var uri;
-        if (formEl.attr("action") !== null) {
-            uri = $("#" + formId).attr("action");
+        if (formEl.attr("action")) {
+            uri = formEl.attr("action");
         } else {
             uri = 'api/admin/website/update'
         }
         $.post(uri, formEl.serialize(), function (data) {
             if (data.error === 0) {
                 var message;
-                if (data.message !== null && data.message !== '') {
+                if (data.message) {
                     message = data.message;
                 } else {
                     message = "操作成功...";
@@ -58,7 +57,7 @@ $(function () {
                 });
             } else {
                 var message;
-                if (data.message !== null && data.message !== '') {
+                if (data.message) {
                     message = data.message;
                 } else {
                     message = "发生了一些异常...";

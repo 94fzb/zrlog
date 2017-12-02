@@ -8,7 +8,7 @@
     if (res.get("title") == null) {
         String host = request.getHeader("host");
         System.out.println(host);
-        if (host.indexOf(":") != -1) {
+        if (host.contains(":")) {
             host = host.substring(0, host.indexOf(":"));
         }
         res.put("title", host);
@@ -21,14 +21,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;"/>
     <link rel="stylesheet" type="text/css" media="screen" href="${templateUrl}/css/style.css"/>
     <link rel="stylesheet" type="text/css" media="screen" href="${templateUrl}/css/editormd.css"/>
-    <script src="${templateUrl }/js/lib/jquery-1.10.2.min.js"></script>
-    <script src="${templateUrl}/js/lib/modernizr.custom.16617.js"></script>
+    <script src="${templateUrl}/js/lib/jquery-1.10.2.min.js"></script>
+    <script src="${templateUrl}/js/lib/modernizr.min.js"></script>
+    <script src="${templateUrl }/js/sheshui.js"></script>
     <!--[if lt IE 9]>
     <script src="${templateUrl}/js/html5shiv.js"></script>
     <script src="${templateUrl}/js/css3-mediaqueries.js"></script>
     <link rel="stylesheet" type="text/css" media="screen" href="${templateUrl}/css/style-ie7.css"/>
     <![endif]-->
-    <script src="${templateUrl }/js/sheshui.js"></script>
     <style>
         header .avatar {
             display: block;
@@ -43,6 +43,7 @@
             background-size: cover;
             overflow: hidden;
         }
+
         .gn-menu-main li.sitename .gn-icon {
             width: 50px;
             height: 50px;
@@ -70,8 +71,7 @@
                         <c:forEach var="lognav" items="${init.logNavs}">
                             <c:choose>
                                 <c:when test="${lognav.current}">
-                                    <li class="active"><a href="${lognav.url}"><c:out value="${lognav.navName}"/></a>
-                                    </li>
+                                    <li class="active"><a href="${lognav.url}"><c:out value="${lognav.navName}"/></a></li>
                                 </c:when>
                                 <c:otherwise>
                                     <li><a href="${lognav.url}"><c:out value="${lognav.navName}"/></a></li>
@@ -96,7 +96,7 @@
                                         <a class="gn-icon icon-article">${_res.category}</a>
                                         <ul class="gn-submenu">
                                             <c:forEach var="type" items="${init.types}">
-                                                <li><a class="gn-icon icon-tag"
+                                                <li><a class="gn-icon icon-star"
                                                        href="${rurl}post/sort/${type.alias}">${type.typeName}
                                                     (${type.typeamount})</a></li>
                                             </c:forEach>
@@ -106,13 +106,14 @@
                             </div>
                         </nav>
                     </li>
-                    <li class="sitename"><a class="gn-icon icon-info"
-                                            href="/"><span><%=request.getHeader("host") %></span></a></li>
+                    <li class="sitename">
+                        <a class="gn-icon icon-info" href="${rurl}">
+                            <span>${_res.title}</span>
+                        </a>
+                    </li>
                 </ul>
             </header>
         </div>
     </div>
     <div class="breadcrumb"></div>
     <div class="main clearfloat">
-        <section>
-            <%@ include file="update_browser.jsp" %>

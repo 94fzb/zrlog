@@ -4,10 +4,8 @@
 <div class="page-header">
     <h3>${_res['admin.changePassword']}</h3>
 </div>
-<!-- /.page-header -->
 <div class="row">
     <div class="col-md-6">
-        <!-- PAGE CONTENT BEGINS -->
         <form role="form" action="api/admin/changePassword" data-toggle="validator" id="updatePasswordAjax" class="form-horizontal"
               method="post">
             <div class="form-group">
