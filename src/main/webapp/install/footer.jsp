@@ -1,4 +1,4 @@
-<%@ page language="java" session="false" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ page session="false"  pageEncoding="UTF-8"%>
 </div>
 <hr/>
 <div class="main">

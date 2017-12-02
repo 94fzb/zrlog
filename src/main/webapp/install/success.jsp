@@ -1,4 +1,4 @@
-<%@ page language="java" session="false" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ page session="false"  pageEncoding="UTF-8"%>
 <jsp:include page="header.jsp" />
 <div id="step3">
 	<div class="main">

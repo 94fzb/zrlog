@@ -1,4 +1,4 @@
-<%@ page language="java" session="false" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ page session="false"  pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%
 	request.setCharacterEncoding("UTF-8");
@@ -16,6 +16,9 @@
 <link href="${basePath}assets/css/bootstrap.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="${basePath}assets/css/custom.min.css" />
 <link rel="stylesheet" href="${basePath}assets/css/font-awesome.min.css" />
+<script src="${basePath}assets/js/jquery.min.js"></script>
+<script src="${basePath}/assets/js/bootstrap.min.js"></script>
+<script src="${basePath}/assets/js/validator.min.js"></script>
 </head>
 
 <body style="">
