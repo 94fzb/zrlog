@@ -1,5 +1,6 @@
 package com.zrlog.web.interceptor;
 
+import com.hibegin.common.util.StringUtils;
 import com.zrlog.common.BaseDataInitVO;
 import com.zrlog.common.Constants;
 import com.zrlog.common.response.ExceptionResponse;
@@ -16,7 +17,6 @@ import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
 import com.jfinal.render.ViewType;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +58,7 @@ class AdminInterceptor implements Interceptor {
                 ai.getController().getRequest().setAttribute("webs", webSite);
                 try {
                     User user = User.dao.findById(adminToken.getUserId());
-                    if (StringUtils.isBlank(user.getStr("header"))) {
+                    if (StringUtils.isEmpty(user.getStr("header"))) {
                         user.set("header", "assets/images/default-portrait.gif");
                     }
                     controller.setAttr("user", user);
@@ -118,7 +118,7 @@ class AdminInterceptor implements Interceptor {
                 String url = request.getRequestURL().toString();
                 if (WebTools.getRealScheme(request).equals("https")) {
                     url = "https://" + request.getHeader("Host") + request.getRequestURI();
-                    if (!StringUtils.isEmpty(request.getQueryString())) {
+                    if (StringUtils.isNotEmpty(request.getQueryString())) {
                         url += "?" + request.getQueryString();
                     }
                 }

@@ -1,6 +1,7 @@
 package com.zrlog.web.token;
 
 import com.hibegin.common.util.SecurityUtils;
+import com.hibegin.common.util.StringUtils;
 import com.zrlog.common.Constants;
 import com.zrlog.model.WebSite;
 import com.zrlog.model.User;
@@ -8,7 +9,6 @@ import com.google.gson.Gson;
 import com.hibegin.common.util.ByteUtils;
 import com.jfinal.core.JFinal;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import javax.crypto.Cipher;
@@ -64,7 +64,7 @@ public class AdminTokenService {
                 }
             }
             try {
-                if (StringUtils.isNotBlank(decTokenString)) {
+                if (StringUtils.isNotEmpty(decTokenString)) {
                     int userId = Integer.valueOf(decTokenString.substring(0, decTokenString.indexOf(TOKEN_SPLIT_CHAR)));
                     User user = User.dao.findById(userId);
                     if (user != null) {

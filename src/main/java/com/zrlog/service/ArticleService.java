@@ -1,24 +1,23 @@
 package com.zrlog.service;
 
-import com.zrlog.common.response.PageableResponse;
-import com.zrlog.model.Log;
-import com.zrlog.web.token.AdminTokenThreadLocal;
+import com.hibegin.common.util.IOUtil;
+import com.hibegin.common.util.StringUtils;
+import com.hibegin.common.util.http.HttpUtil;
+import com.hibegin.common.util.http.handle.HttpFileHandle;
+import com.jfinal.core.JFinal;
+import com.jfinal.kit.PathKit;
 import com.zrlog.common.Constants;
 import com.zrlog.common.request.PageableRequest;
 import com.zrlog.common.response.ArticleResponseEntry;
 import com.zrlog.common.response.CreateOrUpdateLogResponse;
+import com.zrlog.common.response.PageableResponse;
+import com.zrlog.model.Log;
 import com.zrlog.model.Tag;
 import com.zrlog.util.BeanUtil;
 import com.zrlog.util.ParseUtil;
 import com.zrlog.util.ThumbnailUtil;
 import com.zrlog.web.token.AdminToken;
-import com.hibegin.common.util.IOUtil;
-import com.hibegin.common.util.http.HttpUtil;
-import com.hibegin.common.util.http.handle.HttpFileHandle;
-import com.jfinal.core.JFinal;
-import com.jfinal.kit.PathKit;
-import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
+import com.zrlog.web.token.AdminTokenThreadLocal;
 import org.jsoup.Jsoup;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
@@ -51,7 +50,7 @@ public class ArticleService {
 
     private CreateOrUpdateLogResponse add(Integer userId, Map<String, String[]> createArticleRequestMap) {
         Log log = getLog(userId, createArticleRequestMap);
-        if (BooleanUtils.isFalse(log.getBoolean("rubbish"))) {
+        if (!log.getBoolean("rubbish")) {
             Tag.dao.insertTag(log.getStr("keywords"));
         }
         CreateOrUpdateLogResponse createOrUpdateLogResponse = getCreateOrUpdateLogResponse(log);
@@ -103,7 +102,7 @@ public class ArticleService {
         log.set("recommended", createArticleRequestMap.get("recommended") != null);
         log.set("private", createArticleRequestMap.get("private") != null);
         log.set("rubbish", createArticleRequestMap.get("rubbish") != null);
-        if (StringUtils.isBlank((String) log.get("thumbnail"))) {
+        if (StringUtils.isEmpty((String) log.get("thumbnail"))) {
             log.set("thumbnail", getFirstImgUrl(content, userId));
         }
         // 自动摘要
@@ -131,7 +130,7 @@ public class ArticleService {
      * 高亮用户检索的关键字
      */
     private void wrapperSearchKeyword(Map<String, Object> data, String keywords) {
-        if (StringUtils.isNotBlank(keywords)) {
+        if (StringUtils.isNotEmpty(keywords)) {
             List<Object> logs = (List<Object>) data.get("rows");
             if (logs != null && !logs.isEmpty()) {
                 for (Object tLog : logs) {

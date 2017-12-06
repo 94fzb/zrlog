@@ -1,11 +1,11 @@
 package com.zrlog.util;
 
+import com.hibegin.common.util.StringUtils;
 import com.zrlog.web.interceptor.InitDataInterceptor;
 import com.zrlog.common.Constants;
 import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,7 +102,7 @@ public class I18NUtil {
             request.setAttribute(I18N_FILE_NAME, i18nFile);
         }
         Map<String, Object> i18nMap = I18N_RES_MAP.get(i18nFile);
-        if (!StringUtils.isBlank(locale)) {
+        if (StringUtils.isNotEmpty(locale)) {
             if (!locale.startsWith("zh")) {
                 Map<String, Object> zhI18nMap = I18N_RES_MAP.get(Constants.I18N + "_" + "zh_CN");
                 for (Map.Entry<String, Object> entry : zhI18nMap.entrySet()) {
