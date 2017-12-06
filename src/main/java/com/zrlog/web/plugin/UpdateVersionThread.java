@@ -1,10 +1,7 @@
 package com.zrlog.web.plugin;
 
+import com.hibegin.common.util.*;
 import com.zrlog.common.Constants;
-import com.hibegin.common.util.ExceptionUtils;
-import com.hibegin.common.util.IOUtil;
-import com.hibegin.common.util.JarPackageUtil;
-import com.hibegin.common.util.ZipUtil;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
 import org.apache.log4j.Logger;
@@ -57,12 +54,12 @@ public class UpdateVersionThread extends Thread implements Serializable {
             String backupFolder = new File(PathKit.getWebRootPath()).getParentFile().getParentFile() + File.separator + "backup" + File.separator + new SimpleDateFormat("yyyy-MM-dd_HH_mm").format(new Date()) + File.separator;
             updateProcessMsg("历史版本备份在 " + backupFolder);
             new File(backupFolder).mkdirs();
-            IOUtil.moveOrCopy(new File(PathKit.getWebRootPath()).getParent() + File.separator + folderName, backupFolder, false);
-            IOUtil.moveOrCopy(new File(PathKit.getWebRootPath()).getParent() + File.separator + warName, backupFolder, false);
+            FileUtils.moveOrCopy(new File(PathKit.getWebRootPath()).getParent() + File.separator + folderName, backupFolder, false);
+            FileUtils.moveOrCopy(new File(PathKit.getWebRootPath()).getParent() + File.separator + warName, backupFolder, false);
             updateProcessMsg("生成临时文件");
             File tempFilePath = new File(filePath);
             tempFilePath.mkdirs();
-            IOUtil.moveOrCopy(file.toString(), tempFilePath.getParentFile().toString(), false);
+            FileUtils.moveOrCopy(file.toString(), tempFilePath.getParentFile().toString(), false);
             String tempFile = tempFilePath.getParentFile() + File.separator + file.getName();
             ZipUtil.unZip(tempFile, filePath + File.separator);
             updateProcessMsg("解压完成");
@@ -70,8 +67,8 @@ public class UpdateVersionThread extends Thread implements Serializable {
             fileList.add(new File(filePath));
             File tempWarFile = new File(tempFilePath.getParent() + File.separator + warName);
             LOGGER.info(tempWarFile);
-            IOUtil.moveOrCopy(PathKit.getWebRootPath() + "/WEB-INF/db.properties", filePath + "/WEB-INF/", false);
-            IOUtil.moveOrCopy(PathKit.getWebRootPath() + "/WEB-INF/install.lock", filePath + "/WEB-INF/", false);
+            FileUtils.moveOrCopy(PathKit.getWebRootPath() + "/WEB-INF/db.properties", filePath + "/WEB-INF/", false);
+            FileUtils.moveOrCopy(PathKit.getWebRootPath() + "/WEB-INF/install.lock", filePath + "/WEB-INF/", false);
             File templatePath = new File(PathKit.getWebRootPath() + Constants.TEMPLATE_BASE_PATH);
             File[] templates = templatePath.listFiles();
             if (templates != null && templates.length > 0) {
@@ -80,11 +77,11 @@ public class UpdateVersionThread extends Thread implements Serializable {
                         LOGGER.info("skip default template folder");
                         continue;
                     }
-                    IOUtil.moveOrCopy(template.toString(), filePath + File.separator + Constants.TEMPLATE_BASE_PATH, false);
+                    FileUtils.moveOrCopy(template.toString(), filePath + File.separator + Constants.TEMPLATE_BASE_PATH, false);
                 }
             }
             if (new File(PathKit.getWebRootPath() + "/attached").exists()) {
-                IOUtil.moveOrCopy(PathKit.getWebRootPath() + "/attached", filePath, false);
+                FileUtils.moveOrCopy(PathKit.getWebRootPath() + "/attached", filePath, false);
             }
             //使用系统提供的工具打包jar(.war)包，仅限有jdk可用。
             //System.out.println(CmdUtil.sendCmd("jar ", "-cvf", tempWarFile.toString(),"-C "+ filePath + "/ ."));
@@ -93,7 +90,7 @@ public class UpdateVersionThread extends Thread implements Serializable {
             updateProcessMsg("覆盖安装包文件");
             finalFile.delete();
             LOGGER.info("finalFile " + finalFile);
-            IOUtil.moveOrCopy(tempWarFile.toString(), finalFile.getParentFile().toString(), false);
+            FileUtils.moveOrCopy(tempWarFile.toString(), finalFile.getParentFile().toString(), false);
         } catch (Exception e) {
             LOGGER.error("", e);
             updateProcessErrorMsg(e);

@@ -1,5 +1,6 @@
 package com.zrlog.service;
 
+import com.hibegin.common.util.FileUtils;
 import com.hibegin.common.util.IOUtil;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
@@ -43,7 +44,7 @@ public class CacheService {
     }
 
     public void removeCachedStaticFile() {
-        IOUtil.deleteFile(PathKit.getWebRootPath() + "/post");
+        FileUtils.deleteFile(PathKit.getWebRootPath() + "/post");
     }
 
     private void initCache(BaseController baseController) {
@@ -80,7 +81,7 @@ public class CacheService {
             JFinal.me().getServletContext().setAttribute("webSite", website);
             JFinal.me().getServletContext().setAttribute(Constants.CACHE_KEY, cacheInit);
             List<File> staticFiles = new ArrayList<>();
-            IOUtil.getAllFiles(PathKit.getWebRootPath(), staticFiles);
+            FileUtils.getAllFiles(PathKit.getWebRootPath(), staticFiles);
             for (File file : staticFiles) {
                 String uri = file.toString().substring(PathKit.getWebRootPath().length());
                 cacheFileMap.put(uri, uri + "?t=" + file.lastModified());

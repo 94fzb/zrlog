@@ -11,8 +11,9 @@ function status() {
     if (!downloadRequestPending) {
         downloadRequestPending = true;
         $.get('api/admin/upgrade/download', function (data) {
-            $("#progress").attr("data-percent", data.download + "%");
-            $("#progress2").width(data.process + "%");
+            $("#downloadFileProcessBar").attr("aria-valuenow", data.process + "%");
+            $("#downloadFileProcessBar").width(data.process + "%");
+            $("#downloadFileProcessBar").text(data.process + "%");
             if (data.process == 100) {
                 downloadSuccess = true;
                 clearInterval(timer);
@@ -70,10 +71,8 @@ $(function () {
 
     function leaveAStepCallback(obj, context) {
         if (context.fromStep == 1) {
-            $("#progress").attr("data-percent", "0%");
-            $("#progress2").width("0%");
-            $("#progress").show();
             $("#processbar-title").text("更新包下载中");
+            $("#progress").show();
             timer = setInterval("status()", 500);
             return true;
         }

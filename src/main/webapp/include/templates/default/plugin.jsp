@@ -50,7 +50,7 @@
                                     <h3>${_res.archive}</h3>
                                     <ul>
                                         <c:forEach var="archive" items="${init.archiveList}">
-                                            <li><a href="${archive.url}" rel="nofollow">${archive.text}
+                                            <li><a href="${archive.url}">${archive.text}
                                                 (${archive.count})</a>
                                             </li>
                                         </c:forEach>

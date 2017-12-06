@@ -1,5 +1,6 @@
 package com.zrlog.web.controller.admin.api;
 
+import com.hibegin.common.util.FileUtils;
 import com.zrlog.common.Constants;
 import com.zrlog.common.response.UpdateRecordResponse;
 import com.zrlog.common.response.UploadTemplateResponse;
@@ -44,7 +45,7 @@ public class TemplateController extends BaseController {
         String template = getPara("template");
         File file = new File(PathKit.getWebRootPath() + template);
         if (file.exists()) {
-            IOUtil.deleteFile(file.toString());
+            FileUtils.deleteFile(file.toString());
         }
         return new WebSiteSettingUpdateResponse();
     }
@@ -75,14 +76,14 @@ public class TemplateController extends BaseController {
         String templateName = getFile(uploadFieldName).getOriginalFileName();
         String finalPath = PathKit.getWebRootPath() + Constants.TEMPLATE_BASE_PATH;
         String finalFile = finalPath + templateName;
-        IOUtil.deleteFile(finalFile);
+        FileUtils.deleteFile(finalFile);
         //start extract template file
-        IOUtil.moveOrCopyFile(getFile(uploadFieldName).getFile().toString(), finalFile, true);
+        FileUtils.moveOrCopyFile(getFile(uploadFieldName).getFile().toString(), finalFile, true);
         UploadTemplateResponse response = new UploadTemplateResponse();
         response.setMessage(I18NUtil.getStringFromRes("templateDownloadSuccess", getRequest()));
         try {
             String extractFolder = finalPath + templateName.replace(".zip", "") + "/";
-            IOUtil.deleteFile(extractFolder);
+            FileUtils.deleteFile(extractFolder);
             ZipUtil.unZip(finalFile, extractFolder);
         } catch (IOException e) {
             e.printStackTrace();
