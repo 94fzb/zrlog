@@ -1,10 +1,10 @@
 package com.zrlog.web.plugin;
 
+import com.hibegin.common.util.StringUtils;
 import com.zrlog.common.Constants;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.google.gson.Gson;
 import com.hibegin.common.util.http.HttpUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -49,7 +49,7 @@ class UpdateVersionTimerTask extends TimerTask {
         LOGGER.info(txtContent);
         //手动设置对应ChangeLog。
         String changeLogHtml = HttpUtil.getInstance().getSuccessTextByUrl("http://www.zrlog.com/changelog/" + tLastVersion.getVersion() + "-" + tLastVersion.getBuildId() + ".html");
-        if (StringUtils.isNotBlank(changeLogHtml)) {
+        if (StringUtils.isNotEmpty(changeLogHtml)) {
             tLastVersion.setChangeLog(changeLogHtml);
         } else {
             String commitCompareLink = "https://git.oschina.net/94fzb/zrlog/compare/" + BlogBuildInfoUtil.getBuildId() + "..." + tLastVersion.getBuildId();

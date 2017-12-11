@@ -1,5 +1,6 @@
 package com.zrlog.web.controller.admin.api;
 
+import com.hibegin.common.util.FileUtils;
 import com.zrlog.common.Constants;
 import com.zrlog.service.UploadService;
 import com.zrlog.common.response.UploadFileResponse;
@@ -33,7 +34,7 @@ public class UploadController extends BaseController {
                 + new Random().nextInt(1000) + "." + fileExt;
         String finalFilePath = PathKit.getWebRootPath() + uri;
 
-        IOUtil.moveOrCopyFile(PathKit.getWebRootPath() + Constants.ATTACHED_FOLDER + getFile(uploadFieldName).getFileName(), finalFilePath, true);
+        FileUtils.moveOrCopyFile(PathKit.getWebRootPath() + Constants.ATTACHED_FOLDER + getFile(uploadFieldName).getFileName(), finalFilePath, true);
         UploadFileResponse uploadFileResponse = new UploadFileResponse();
         uploadFileResponse.setError(0);
         uploadFileResponse.setUrl(new UploadService().getCloudUrl(getRequest().getContextPath(), uri, finalFilePath, getRequest()));
@@ -63,7 +64,7 @@ public class UploadController extends BaseController {
         } else {
             IOUtil.writeBytesToFile(bytes, thumbnailFile);
         }
-        IOUtil.moveOrCopyFile(thumbnailFile.toString(), finalFilePath, true);
+        FileUtils.moveOrCopyFile(thumbnailFile.toString(), finalFilePath, true);
         UploadFileResponse uploadFileResponse = new UploadFileResponse();
         uploadFileResponse.setError(0);
         uploadFileResponse.setUrl(new UploadService().getCloudUrl(getRequest().getContextPath(), uri, finalFilePath, getRequest()) + "?h=" + height + "&w=" + width);

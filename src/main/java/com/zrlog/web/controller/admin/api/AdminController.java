@@ -1,5 +1,6 @@
 package com.zrlog.web.controller.admin.api;
 
+import com.hibegin.common.util.StringUtils;
 import com.zrlog.common.response.LoginResponse;
 import com.zrlog.common.response.UpdateRecordResponse;
 import com.zrlog.util.I18NUtil;
@@ -9,7 +10,6 @@ import com.zrlog.web.controller.BaseController;
 import com.zrlog.web.token.AdminTokenService;
 import com.hibegin.common.util.SecurityUtils;
 import com.jfinal.plugin.activerecord.Db;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -24,7 +24,7 @@ public class AdminController extends BaseController {
         String password = getPara("password");
         String userName = getPara("userName");
         LoginResponse loginResponse = new LoginResponse();
-        if (StringUtils.isNotBlank(userName) && StringUtils.isNotBlank(password) && StringUtils.isNotBlank(key)) {
+        if (StringUtils.isNotEmpty(userName) && StringUtils.isNotEmpty(password) && StringUtils.isNotEmpty(key)) {
             String dbPassword = User.dao.getPasswordByUserName(userName.toLowerCase());
             if (dbPassword != null && SecurityUtils.md5(key + ":" + dbPassword).equals(password)) {
                 adminTokenService.setAdminToken(User.dao.getIdByUserName(userName.toLowerCase()), sessionAtomicInteger.incrementAndGet(), getRequest(), getResponse());

@@ -1,6 +1,5 @@
 <%@ page session="false" pageEncoding="UTF-8" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-</section>
 <aside>
     <div class="widget search">
         <form id="searchform" action="${searchUrl}" method="post">
@@ -51,7 +50,7 @@
                                     <h3>${_res.archive}</h3>
                                     <ul>
                                         <c:forEach var="archive" items="${init.archiveList}">
-                                            <li><a href="${archive.url}" rel="nofollow">${archive.text}
+                                            <li><a href="${archive.url}">${archive.text}
                                                 (${archive.count})</a>
                                             </li>
                                         </c:forEach>

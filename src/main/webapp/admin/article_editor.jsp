@@ -33,6 +33,15 @@
         height: 15px;
         width: 38px;
     }
+
+    .x_content {
+        clear: both;
+        float: left;
+        margin-top: 5px;
+         padding: 0;
+        position: relative;
+        width: 100%;
+    }
 </style>
 <div class="row">
     <div class="x_content">
@@ -57,7 +66,7 @@
                 </div>
             </c:if>
 
-            <div class=" col-md-12 col-lg-9">
+            <div class="col-md-12 col-sm-12 col-xs-12 col-lg-9">
                 <div class="form-group">
                     <div class="row">
                         <div class="col-xs-7">

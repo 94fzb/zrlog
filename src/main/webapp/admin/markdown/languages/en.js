@@ -75,6 +75,16 @@
                     uploadFileEmpty: "Error: upload pictures cannot be empty!",
                     formatNotAllowed: "Error: only allows to upload pictures file, upload allowed image file format:"
                 },
+                file: {
+                    title: "File",
+                    url: "Address",
+                    link: "Link",
+                    alt: "Title",
+                    uploadButton: "Upload",
+                    fileURLEmpty: "Error: picture url address can't be empty.",
+                    uploadFileEmpty: "Error: upload pictures cannot be empty!",
+                    formatNotAllowed: "Error: only allows to upload pictures file, upload allowed image file format:"
+                },
                 preformattedText: {
                     title: "Preformatted text / Codes",
                     emptyAlert: "Error: Please fill in the Preformatted text or content of the codes."

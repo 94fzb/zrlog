@@ -1,5 +1,7 @@
 package com.zrlog.web.controller.admin.page;
 
+import com.hibegin.common.util.FileUtils;
+import com.hibegin.common.util.StringUtils;
 import com.zrlog.common.Constants;
 import com.zrlog.common.TemplateVO;
 import com.zrlog.model.WebSite;
@@ -76,9 +78,9 @@ public class AdminTemplatePageController extends BaseController {
                         templateVO.setVersion("");
                     }
                     if (templateVO.getPreviewImages() == null || templateVO.getPreviewImages().isEmpty()) {
-                        templateVO.setPreviewImages(Collections.singletonList("assets/images/template-default-preview.png"));
+                        templateVO.setPreviewImages(Collections.singletonList("assets/images/template-default-preview.jpg"));
                     }
-                    if (org.apache.commons.lang3.StringUtils.isEmpty(templateVO.getDigest())) {
+                    if (StringUtils.isEmpty(templateVO.getDigest())) {
                         templateVO.setDigest("无简介");
                     }
                     templateVO.setTemplate(templatePath);
@@ -146,7 +148,7 @@ public class AdminTemplatePageController extends BaseController {
                 HttpFileHandle fileHandle = (HttpFileHandle) HttpUtil.getInstance().sendGetRequest(getPara("host") + "/template/download?id=" + getParaToInt("id"),
                         new HttpFileHandle(PathKit.getWebRootPath() + Constants.TEMPLATE_BASE_PATH), new HashMap<String, String>());
                 String target = fileHandle.getT().getParent() + "/" + fileName;
-                IOUtil.moveOrCopyFile(fileHandle.getT().toString(), target, true);
+                FileUtils.moveOrCopyFile(fileHandle.getT().toString(), target, true);
                 ZipUtil.unZip(target, path.toString() + "/");
                 setAttr("message", I18NUtil.getStringFromRes("templateDownloadSuccess", getRequest()));
             } else {
