@@ -29,7 +29,7 @@ public class UploadService {
             } else {
                 url = contextPath + uri;
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             url = contextPath + uri;
             LOGGER.error(e);
         }
