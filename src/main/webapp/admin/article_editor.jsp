@@ -60,7 +60,7 @@
                             <i id="camera-icon" class="WriteCover-uploadIcon fa fa-camera fa-3"></i>
                             <input type="file" accept=".jpeg, .jpg, .png" id="thumbnail-upload" name="imgFile" value="${log.thumbnail}"
                                    class="WriteCover-uploadInput">
-                            <input type="hidden" name="thumbnail" id="thumbnail">
+                            <input type="hidden" name="thumbnail" value="${log.thumbnail}" id="thumbnail">
                         </div>
                     </div>
                 </div>
