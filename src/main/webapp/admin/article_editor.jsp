@@ -11,6 +11,7 @@
 </c:if>
 <script src="${cacheFile['/assets/js/jquery.liteuploader.min.js']}"></script>
 <script src="${cacheFile['/assets/js/select2/select2.min.js']}"></script>
+<script src="${cacheFile['/assets/js/jquery.tagsinput.js']}"></script>
 <script src="${cacheFile['/admin/js/article_editor.js']}"></script>
 <style>
     .CodeMirror-scroll {
@@ -38,11 +39,18 @@
         clear: both;
         float: left;
         margin-top: 5px;
-         padding: 0;
+        padding: 0;
         position: relative;
         width: 100%;
     }
 </style>
+<c:if test="${'off' eq webSite['article_thumbnail']}">
+    <div class="page-header">
+        <h3>
+            ${_res['admin.log.edit']}
+        </h3>
+    </div>
+</c:if>
 <div class="row">
     <div class="x_content">
         <form target="_blank" class="form-horizontal form-label-left" id="article-form">
@@ -58,7 +66,8 @@
                              style="background: url('${log.thumbnail}')"
                              class="thumbnail-img img-responsive WriteCover-previewWrapper WriteCover-previewWrapper--empty">
                             <i id="camera-icon" class="WriteCover-uploadIcon fa fa-camera fa-3"></i>
-                            <input type="file" accept=".jpeg, .jpg, .png" id="thumbnail-upload" name="imgFile" value="${log.thumbnail}"
+                            <input type="file" accept=".jpeg, .jpg, .png" id="thumbnail-upload" name="imgFile"
+                                   value="${log.thumbnail}"
                                    class="WriteCover-uploadInput">
                             <input type="hidden" name="thumbnail" value="${log.thumbnail}" id="thumbnail">
                         </div>
@@ -84,7 +93,8 @@
                             </select>
                         </div>
                         <div class="col-xs-3">
-                            <input id="alias" type="text" class="form-control" placeholder="${_res['inputArticleAlias']}" name="alias" value="${log.alias}">
+                            <input id="alias" type="text" class="form-control"
+                                   placeholder="${_res['inputArticleAlias']}" name="alias" value="${log.alias}">
                         </div>
                     </div>
                 </div>
@@ -133,13 +143,23 @@
                     </div>
                 </div>
                 <div class="form-group col-xs-12">
-                    <input value="${log.keywords}" class="form-control" placeholder="${_res["tagTips"]}"
-                           type="text"
-                           name="keywords" id="inp" size="60" maxlength="60"/>
-                    <div class="tagsinput" id="tag" style="max-height: 300px;width: 100%">
-                        <c:forEach items="${init.tags}" var="tags">
-                            <span class="tag2"><i class="fa fa-tag"></i>${tags.text}</span>
-                        </c:forEach>
+                    <input value="${log.keywords}" class="form-control" placeholder="${_res["tagTips"]}" type="hidden"
+                           name="keywords" id="keywordsVal" size="60" maxlength="60"/>
+                    <div class="tagsinput" id="keywords"></div>
+                </div>
+                <div class="form-group col-xs-12">
+                    <div class="x_panel">
+                        <div class="x_title">
+                            <h2>${_res['allTag']}</h2>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="x_content">
+                            <div class="tagsinput" id="unCheckedTag" style="max-height: 300px;width: 100%">
+                                <c:forEach items="${init.tags}" var="tags">
+                                    <span class="tag2"><i class="fa fa-tag"></i>${tags.text}</span>
+                                </c:forEach>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -147,9 +167,6 @@
                     <div class="x_panel">
                         <div class="x_title">
                             <h2>${_res['digest']}</h2>
-                            <ul class="nav navbar-right panel_toolbox">
-                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a></li>
-                            </ul>
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content">

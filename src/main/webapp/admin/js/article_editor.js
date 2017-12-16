@@ -8,6 +8,22 @@ $(function () {
         dropdownParent: $("#type-select-parent")
     });
 
+    var keywordsEl = $("#keywords");
+    keywordsEl.tagsInput({
+        height: '68px',
+        width: 'auto'
+    });
+    keywordsEl.importTags($("#keywordsVal").val());
+    var tags = $("#keywordsVal").val().split(",");
+    for (var tag in tags) {
+        var unCheckedTag = $("#unCheckedTag").children("span");
+        for (var t in unCheckedTag) {
+            if (tags[tag] === $(unCheckedTag[t]).text()) {
+                $(unCheckedTag[t]).remove();
+            }
+        }
+    }
+
     var divW = $("#left_col").width();
 
     function checkResize() {
@@ -31,13 +47,13 @@ $(function () {
     var dark = editormdTheme === 'dark';
     mdEditor = editormd("editormd", {
         width: "100%",
-        height: 760,
+        height: 840,
         path: editorMdPath,
-        toolbarIcons:function() {
-            return ["undo", "redo", "|", "bold", "del", "italic", "quote", "|", "h1", "h2", "h3", "h4", "|", "list-ul", "list-ol", "hr", "|", "link", "reference-link", "image","file", "code", "preformatted-text", "code-block", "table", "datetime", "emoji", "html-entities", "pagebreak", "|", "goto-line", "watch", "fullscreen", "search", "|", "help", "info"]
+        toolbarIcons: function () {
+            return ["undo", "redo", "|", "bold", "del", "italic", "quote", "|", "h1", "h2", "h3", "h4", "|", "list-ul", "list-ol", "hr", "|", "link", "reference-link", "image", "file", "code", "preformatted-text", "code-block", "table", "datetime", "emoji", "html-entities", "pagebreak", "|", "goto-line", "watch", "fullscreen", "search", "|", "help", "info"]
         },
-        toolbarCustomIcons : {
-            file   : '<a href="javascript:;" id="fileDialog"  title="添加附件" unselectable="on"><i class="fa fa-paperclip" unselectable="on"></i></a>'
+        toolbarCustomIcons: {
+            file: '<a href="javascript:;" id="fileDialog"  title="添加附件" unselectable="on"><i class="fa fa-paperclip" unselectable="on"></i></a>'
         },
         codeFold: true,
         appendMarkdown: $("#markdown").val(),
@@ -72,7 +88,7 @@ $(function () {
             }
             this.addKeyMap(keyMap);
             setInterval(checkResize, 200);
-            $("#fileDialog").on("click",function () {
+            $("#fileDialog").on("click", function () {
                 mdEditor.executePlugin("fileDialog", "../plugins/file-dialog/file-dialog");
             });
 
@@ -151,46 +167,70 @@ $(function () {
 
     var saving = false;
     var xhr;
+    var lastChangeRequestBody;
 
     function autoSave() {
         if (change && validationPost()) {
             if (xhr !== null && saving) {
                 xhr.abort();
             }
-            saving = true;
-            xhr = $.post('api/admin/article/createOrUpdate?rubbish=1', $('#article-form').serialize(), function (data) {
-                var date = new Date();
-                saving = false;
-                tips(data, "自动保存成功 " + zeroPad(date.getHours(), 2) + ":" + zeroPad(date.getMinutes(), 2) + ":" + zeroPad(date.getSeconds(), 2))
-            });
+            refreshKeywords();
+            var tLastChangeRequestBody = $('#article-form').serialize();
+            if (tLastChangeRequestBody !== lastChangeRequestBody) {
+                saving = true;
+                xhr = $.post('api/admin/article/createOrUpdate?rubbish=1', tLastChangeRequestBody, function (data) {
+                    var date = new Date();
+                    saving = false;
+                    tips(data, "自动保存成功 " + zeroPad(date.getHours(), 2) + ":" + zeroPad(date.getMinutes(), 2) + ":" + zeroPad(date.getSeconds(), 2));
+                    lastChangeRequestBody = tLastChangeRequestBody;
+                });
+            }
             change = 0;
         }
     }
 
     setInterval(autoSave, 1000 * 6);
 
-    var $tags = $("#inp");
-    $(".tag2").click(function (e) {
-        $tags.val($tags.val() + $(this).text() + ",");
+    $(document.body).on('click', '#unCheckedTag .tag2', function (e) {
+        keywordsEl.importTags($(this).text());
         $(this).remove();
         e.preventDefault();
+        refreshKeywords();
+    });
+    $(document.body).on('click', "#keywords_tagsinput .tag2 a", function () {
+        var text = $(this).siblings().text().trim();
+        $(this).parent().remove();
+        $("#unCheckedTag").append('<span class="tag2"><i class="fa fa-tag">' + text + '</i></span>');
+        refreshKeywords();
+        return false;
     });
 
-    $("#saveToRubbish").click(function () {
-        if (validationPost()) {
-            $.post('api/admin/article/createOrUpdate?rubbish=1', $('#article-form').serialize(), function (data) {
-                tips(data, "保存成功...")
-            });
+    function refreshKeywords() {
+        var ts = $("#keywords_tagsinput .tag2").children("span");
+        var keywordsVal = "";
+        for (var i = 0; i < ts.length; i++) {
+            keywordsVal = keywordsVal + $(ts[i]).text().trim() + ",";
         }
+        $("#keywordsVal").val(keywordsVal);
+    }
+
+    $("#saveToRubbish").click(function () {
+        saveArticle(true)
     });
 
     $("#createOrUpdate").click(function () {
+        saveArticle(false);
+    });
+
+    function saveArticle(rubbish) {
         if (validationPost()) {
-            $.post('api/admin/article/createOrUpdate', $('#article-form').serialize(), function (data) {
-                tips(data, "保存成功...")
+            refreshKeywords();
+            lastChangeRequestBody = $('#article-form').serialize();
+            $.post('api/admin/article/createOrUpdate' + (rubbish ? "?rubbish=1" : ""), lastChangeRequestBody, function (data) {
+                tips(data, "保存" + (rubbish ? "草稿" : "") + "成功...")
             });
         }
-    });
+    }
 
     $('#thumbnail-upload').liteUploader({
         script: 'api/admin/upload/thumbnail?dir=thumbnail'
