@@ -118,4 +118,20 @@ public class I18NUtil {
     public static String getStringFromRes(String key, HttpServletRequest request) {
         return ((Map) request.getAttribute("_res")).get(key).toString();
     }
+
+    public static String getStringFromRes(String key) {
+        Map<String, Object> webSite = (Map<String, Object>) JFinal.me().getServletContext().getAttribute("webSite");
+        String locale;
+        if (webSite != null && webSite.get("language") != null) {
+            locale = (String) webSite.get("language");
+        } else {
+            locale = "zh_CN";
+        }
+        String result = (String) I18N_RES_MAP.get(Constants.I18N + "_" + locale).get(key);
+        if (result != null) {
+            return result;
+        } else {
+            return "";
+        }
+    }
 }

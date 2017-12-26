@@ -1460,6 +1460,10 @@ article img {
     width: auto;
 }
 
+article img.thumbnail-img {
+    padding: 10px;
+}
+
 article p img.img660 {
     margin: 0 auto;
     padding: 10px;
@@ -3035,6 +3039,7 @@ ul.comments_error li {
         left: 190px;
     }
 }
+
 .taglist a {
     padding: 0;
     display: inline-block;

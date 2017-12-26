@@ -140,6 +140,8 @@ public class ZrlogConfig extends JFinalConfig {
         con.setError500View("/error/500.html");
         con.setError403View("/error/403.html");
         con.setBaseUploadPath(PathKit.getWebRootPath() + com.zrlog.common.Constants.ATTACHED_FOLDER);
+        //最大的提交的body的大小
+        con.setMaxPostSize(128 * 1024 * 1024);
     }
 
     /**

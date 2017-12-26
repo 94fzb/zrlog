@@ -5,6 +5,7 @@ import com.zrlog.common.Constants;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.google.gson.Gson;
 import com.hibegin.common.util.http.HttpUtil;
+import com.zrlog.util.I18NUtil;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -46,14 +47,13 @@ class UpdateVersionTimerTask extends TimerTask {
         }
         String txtContent = HttpUtil.getInstance().getTextByUrl(versionUrl + "?_" + System.currentTimeMillis()).trim();
         Version tLastVersion = new Gson().fromJson(txtContent, Version.class);
-        LOGGER.info(txtContent);
         //手动设置对应ChangeLog。
         String changeLogHtml = HttpUtil.getInstance().getSuccessTextByUrl("http://www.zrlog.com/changelog/" + tLastVersion.getVersion() + "-" + tLastVersion.getBuildId() + ".html");
         if (StringUtils.isNotEmpty(changeLogHtml)) {
             tLastVersion.setChangeLog(changeLogHtml);
         } else {
             String commitCompareLink = "https://gitee.com/94fzb/zrlog/compare/" + BlogBuildInfoUtil.getBuildId() + "..." + tLastVersion.getBuildId();
-            tLastVersion.setChangeLog("<h4>Not found change log,Please see commit: <a target='_blank' href='" + commitCompareLink + "'>" + commitCompareLink + "</a></h4>");
+            tLastVersion.setChangeLog("<h4> " + I18NUtil.getStringFromRes("notFoundChangeLog") + " <a target='_blank' href='" + commitCompareLink + "'>" + commitCompareLink + "</a></h4>");
         }
         Date buildDate = new SimpleDateFormat("yyyy-MM-dd hh:mm").parse(tLastVersion.getReleaseDate());
         if (!tLastVersion.getBuildId().equals(BlogBuildInfoUtil.getBuildId()) && buildDate.after(BlogBuildInfoUtil.getTime())) {

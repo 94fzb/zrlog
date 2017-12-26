@@ -2,19 +2,6 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <jsp:include page="include/menu.jsp"/>
 <script type="text/javascript" src="${cacheFile['/admin/js/set_update.js']}"></script>
-<script src="${cacheFile['/assets/js/jquery.liteuploader.min.js']}"></script>
-<script>
-    $(document).ready(function () {
-        $('.fileUpload').liteUploader({
-            script: 'api/admin/upload?dir=image'
-        }).on('lu:success', function (e, response) {
-            $('.file-name').attr("data-title", response.url);
-            $("#logo").val(response.url);
-            $("a .remove").remove();
-        });
-    });
-</script>
-
 <div class="page-header">
     <h3>${_res['admin.website.manage']}</h3>
 </div>
@@ -64,15 +51,6 @@
                     <div class="col-md-9">
 						<textarea name="description" class="form-control col-xs-12 col-sm-6" rows="5"
                                   placeholder="" id="form-field-2">${webs.description}</textarea>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-3 control-label no-padding-right">
-                        网站&nbsp;Logo </label>
-                    <div class="col-md-9">
-                        <input type="text" class="col-md-6" id="logo" name="logo" value="${webs.logo }">
-                        <input type="file" name="imgFile" id="id-input-file-1"
-                               class="col-md-6 fileUpload" value="上传"/>
                     </div>
                 </div>
                 <div class="ln_solid"></div>
