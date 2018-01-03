@@ -1,0 +1,6 @@
+.sub-nav {/*background:url(../images/subnavbar.gif) no-repeat scroll 0 0 #999999;*/}
+.search_input input{border: 1px solid #CCC; height: 18px; line-height:18px; padding: 4px 2px; vertical-align: middle; outline: none; width: 194px;}
+aside .search .search_input input.btn{}
+.top{background-color: #4B4B4B;}
+article,aside{background-color: #FDFDFD;}
+a:active,input{outline:none;hide-focus: expression(this.hideFocus=true);}
