@@ -13,6 +13,8 @@
 <script src="${cacheFile['/assets/js/select2/select2.min.js']}"></script>
 <script src="${cacheFile['/assets/js/jquery.tagsinput.js']}"></script>
 <script src="${cacheFile['/admin/js/article_editor.js']}"></script>
+<link href="${cacheFile['/assets/css/video-js.css']}" rel="stylesheet">
+<script src="${cacheFile['/assets/js/video.js']}"></script>
 <style>
     .CodeMirror-scroll {
         box-sizing: content-box;

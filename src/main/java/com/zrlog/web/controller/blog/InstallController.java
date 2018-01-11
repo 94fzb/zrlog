@@ -1,5 +1,6 @@
 package com.zrlog.web.controller.blog;
 
+import com.zrlog.common.type.TestConnectDbResult;
 import com.zrlog.service.InstallService;
 import com.zrlog.util.I18NUtil;
 import com.zrlog.web.config.ZrlogConfig;
@@ -29,11 +30,12 @@ public class InstallController extends Controller {
         dbConn.put("password", getPara("dbpwd"));
         dbConn.put("driverClass", "com.mysql.jdbc.Driver");
         JFinal.me().getServletContext().setAttribute("dbConn", dbConn);
-        if (new InstallService(PathKit.getWebRootPath() + "/WEB-INF", dbConn).testDbConn()) {
-            render("/install/message.jsp");
-        } else {
-            setAttr("errorMsg", I18NUtil.getStringFromRes("connectDbError", getRequest()));
+        TestConnectDbResult testConnectDbResult = new InstallService(PathKit.getWebRootPath() + "/WEB-INF", dbConn).testDbConn();
+        if (testConnectDbResult.getError() != 0) {
+            setAttr("errorMsg", "[Error-" + testConnectDbResult.getError() + "] - " + I18NUtil.getStringFromRes("connectDbError_" + testConnectDbResult.getError(), getRequest()));
             index();
+        } else {
+            render("/install/message.jsp");
         }
     }
 

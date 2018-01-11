@@ -4,6 +4,7 @@
 <c:when test="${log.canComment}">
 <c:choose>
 <c:when test="${init.webSite.changyan_status eq 'on'}">
+<div id="cwrapper">
 <!--PC和WAP自适应版-->
 <div id="SOHUCS" sid="${log.logId}" ></div>
 <style>
@@ -11,6 +12,7 @@
 background-color: #fff;
 }
 </style>
+</div>
 <script type="text/javascript">
 (function(){
 var appid = '${init.webSite.changyan_appId}';

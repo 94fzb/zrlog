@@ -1,5 +1,8 @@
 package com.zrlog.util;
 
+import org.jsoup.Jsoup;
+import org.jsoup.select.Elements;
+
 /**
  * 一些常见的转化的工具方法。
  */
@@ -17,11 +20,15 @@ public class ParseUtil {
         if (digest.length() > size) {
             digest = digest.substring(0, size) + "  ...";
         }
-        return digest;
+        Elements elements = Jsoup.parse(str).body().select("video");
+        if (elements != null && !elements.isEmpty()) {
+            digest = elements.get(0).toString() +"<br/>" + digest;
+        }
+        return digest.trim();
     }
 
     public static String removeHtmlElement(String str) {
-        return str.replaceAll("<[^>]*>", "").replaceAll("\t|\r|", "").replace("\n", " ");
+        return Jsoup.parse(str).body().text();
     }
 
     /**

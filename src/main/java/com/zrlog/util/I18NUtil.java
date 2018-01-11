@@ -116,7 +116,11 @@ public class I18NUtil {
     }
 
     public static String getStringFromRes(String key, HttpServletRequest request) {
-        return ((Map) request.getAttribute("_res")).get(key).toString();
+        Object obj = ((Map) request.getAttribute("_res")).get(key);
+        if (obj != null) {
+            return obj.toString();
+        }
+        return "";
     }
 
     public static String getStringFromRes(String key) {

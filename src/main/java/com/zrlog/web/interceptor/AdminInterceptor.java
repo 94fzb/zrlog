@@ -22,7 +22,10 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Map;
 
@@ -118,14 +121,13 @@ class AdminInterceptor implements Interceptor {
                 String url = request.getRequestURL().toString();
                 if (WebTools.getRealScheme(request).equals("https")) {
                     url = "https://" + request.getHeader("Host") + request.getRequestURI();
-                    if (StringUtils.isNotEmpty(request.getQueryString())) {
-                        url += "?" + request.getQueryString();
-                    }
                 }
-                ai.getController().redirect(request.getContextPath()
+                URL tUrl = new URL(url);
+                ai.getController().redirect(tUrl.getProtocol() + "://" + tUrl.getHost() +
+                        (tUrl.getPort() != -1 ? ":" + tUrl.getPort() : "") + request.getContextPath()
                         + "/admin/login?redirectFrom="
                         + url + URLEncoder.encode(request.getQueryString() != null ? "?" + request.getQueryString() : "", "UTF-8"));
-            } catch (UnsupportedEncodingException e) {
+            } catch (IOException e) {
                 LOGGER.error("", e);
             }
         }

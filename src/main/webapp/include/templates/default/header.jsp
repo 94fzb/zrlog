@@ -19,11 +19,13 @@
 <head>
     <%@ include file="../../core/core_mate.jsp" %>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;"/>
+    <link rel="stylesheet" type="text/css" href="${baseUrl}assets/css/video-js.css"/>
     <link rel="stylesheet" type="text/css" media="screen" href="${templateUrl}/css/style.css"/>
     <link rel="stylesheet" type="text/css" media="screen" href="${templateUrl}/css/editormd.css"/>
     <script src="${templateUrl}/js/lib/jquery-1.10.2.min.js"></script>
     <script src="${templateUrl}/js/lib/modernizr.min.js"></script>
     <script src="${templateUrl }/js/sheshui.js"></script>
+    <script src="${baseUrl }assets/js/video.js"></script>
     <!--[if lt IE 9]>
     <script src="${templateUrl}/js/html5shiv.js"></script>
     <script src="${templateUrl}/js/css3-mediaqueries.js"></script>
@@ -53,6 +55,49 @@
             background: #f0f0f0 url('${_res.avatar}') no-repeat center center;
             display: inline-block;
         }
+
+        .vjs-default-skin .vjs-control-bar {
+            font-size: 60%;
+            height: 39px;
+        }
+
+        .vjs-default-skin .vjs-control {
+            color: #ffffff;
+        }
+
+        .vjs-default-skin .vjs-slider-handle {
+            color: #ffffff;
+
+        }
+
+        .vjs-default-skin .vjs-duration-display {
+            color: #ffffff;
+            padding-top: 10px;
+        }
+
+        .vjs-default-skin .vjs-current-time-display {
+            color: #ffffff;
+            padding-top: 10px;
+
+        }
+
+        .vjs-time-divider {
+            float: left;
+            line-height: 3em;
+            margin-top: 9px;
+            padding-left: 8px;
+            padding-right: 8px;
+        }
+
+        .vjs-control-bar div span {
+            color: #ffffff;
+            padding-top: 12px;
+        }
+
+        .vjs-default-skin .vjs-seek-handle {
+            top: -5px;
+        }
+
     </style>
 
 </head>
@@ -71,7 +116,8 @@
                         <c:forEach var="lognav" items="${init.logNavs}">
                             <c:choose>
                                 <c:when test="${lognav.current}">
-                                    <li class="active"><a href="${lognav.url}"><c:out value="${lognav.navName}"/></a></li>
+                                    <li class="active"><a href="${lognav.url}"><c:out value="${lognav.navName}"/></a>
+                                    </li>
                                 </c:when>
                                 <c:otherwise>
                                     <li><a href="${lognav.url}"><c:out value="${lognav.navName}"/></a></li>

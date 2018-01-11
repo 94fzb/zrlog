@@ -1,6 +1,8 @@
 package com.zrlog.service;
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException;
 import com.zrlog.common.Constants;
+import com.zrlog.common.type.TestConnectDbResult;
 import com.zrlog.util.ZrlogUtil;
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.SecurityUtils;
@@ -11,6 +13,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.sql.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -67,14 +70,29 @@ public class InstallService {
      *
      * @return false 表示建立连接失败，true 表示成功
      */
-    public boolean testDbConn() {
+    public TestConnectDbResult testDbConn() {
+        TestConnectDbResult testConnectDbResult = null;
         try {
             Connection connection = getConnection();
             connection.close();
+            testConnectDbResult = TestConnectDbResult.SUCCESS;
+        } catch (ClassNotFoundException e) {
+            testConnectDbResult = TestConnectDbResult.MISSING_MYSQL_DRIVER;
+        } catch (MySQLSyntaxErrorException e) {
+            if (e.getMessage().contains("Access denied for user ")) {
+                testConnectDbResult = TestConnectDbResult.DB_NOT_EXISTS;
+            }
+        } catch (SQLException e) {
+            if (e.getCause() instanceof ConnectException) {
+                testConnectDbResult = TestConnectDbResult.CREATE_CONNECT_ERROR;
+            } else {
+                testConnectDbResult = TestConnectDbResult.USERNAME_OR_PASSWORD_ERROR;
+            }
         } catch (Exception e) {
-            return false;
+            LOGGER.error("", e);
+            testConnectDbResult = TestConnectDbResult.UNKNOWN;
         }
-        return true;
+        return testConnectDbResult;
     }
 
     private Connection getConnection() throws ClassNotFoundException, SQLException {
@@ -128,14 +146,14 @@ public class InstallService {
             File sqlFile = new File(basePath + "/install.sql");
             String s = IOUtil.getStringInputStream(new FileInputStream(sqlFile));
             String[] sql = s.split("\n");
-            String tempSqlStr = "";
+            StringBuilder tempSqlStr = new StringBuilder();
             for (String sqlSt : sql) {
                 if (sqlSt.startsWith("#") || sqlSt.startsWith("/*")) {
                     continue;
                 }
-                tempSqlStr += sqlSt;
+                tempSqlStr.append(sqlSt);
             }
-            sql = tempSqlStr.split(";");
+            sql = tempSqlStr.toString().split(";");
             for (String sqlSt : sql) {
                 if (!"".equals(sqlSt)) {
                     st = connect.createStatement();

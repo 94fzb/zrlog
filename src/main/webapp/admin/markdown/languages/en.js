@@ -81,9 +81,19 @@
                     link: "Link",
                     alt: "Title",
                     uploadButton: "Upload",
-                    fileURLEmpty: "Error: picture url address can't be empty.",
-                    uploadFileEmpty: "Error: upload pictures cannot be empty!",
-                    formatNotAllowed: "Error: only allows to upload pictures file, upload allowed image file format:"
+                    fileURLEmpty: "Error: file url address can't be empty.",
+                    uploadFileEmpty: "Error: upload file cannot be empty!",
+                    formatNotAllowed: "Error: upload allowed file format:"
+                },
+                video: {
+                    title: "Video",
+                    url: "Address",
+                    link: "Link",
+                    alt: "Title",
+                    uploadButton: "Upload",
+                    fileURLEmpty: "Error: video url address can't be empty.",
+                    uploadFileEmpty: "Error: upload video cannot be empty!",
+                    formatNotAllowed: "Error: only allows to upload video file, upload allowed video file format:"
                 },
                 preformattedText: {
                     title: "Preformatted text / Codes",
