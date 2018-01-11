@@ -26,7 +26,6 @@
 <div class="post">
 <h2 class="post-title"><a rel="bookmark" href="${log.url}">${log.title}</a></h2>
 <div class="content">
-<a rel="bookmark" href="${log.url}">
 <c:if test="${not empty log.thumbnail}">
 <p>
 ${log.digest}
@@ -37,7 +36,6 @@ ${log.digest}
 ${log.digest}
 </p>
 </c:if>
-</a>
 </div>
 <div class="meta">
 <p class="category"><a rel="tag" href="${log.typeUrl}">${log.typeName}</a> </p>

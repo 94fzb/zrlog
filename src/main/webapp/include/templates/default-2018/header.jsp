@@ -1,4 +1,4 @@
-﻿<%@ page language="java" session="false" import="java.util.*" pageEncoding="UTF-8" %>
+﻿﻿<%@ page language="java" session="false" import="java.util.*" pageEncoding="UTF-8" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
     Map<String, Object> res = (Map<String, Object>) request.getAttribute("_res");
@@ -11,6 +11,7 @@
 <head>
     <jsp:include page="../../core/core_mate.jsp"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <link rel="stylesheet" type="text/css" href="${baseUrl}assets/css/video-js.css"/>
     <link rel="stylesheet" type="text/css" media="screen" href="${templateUrl}/css/common_2018.css"/>
     <link rel="stylesheet" type="text/css" media="screen" href="${templateUrl}/css/style_2018.css"/>
 
@@ -18,6 +19,7 @@
     <link rel="stylesheet" type="text/css" media="screen" href="${templateUrl}/css/editormd.css"/>
 
     <script src="${templateUrl}/js/jquery-1.10.2.min.js"></script>
+    <script src="${baseUrl }assets/js/video.js"></script>
     <script src="${templateUrl}/js/modernizr.custom.16617.js"></script>
     <script src="${templateUrl}/js/classie.js"></script>
     <script src="${templateUrl}/js/jquery.lazyload.min.js"></script>
@@ -49,6 +51,47 @@
             background-size: cover;
             border-radius: 50%;
             overflow: hidden;
+        }
+        .vjs-default-skin .vjs-control-bar {
+            font-size: 60%;
+            height: 39px;
+        }
+
+        .vjs-default-skin .vjs-control {
+            color: #ffffff;
+        }
+
+        .vjs-default-skin .vjs-slider-handle {
+            color: #ffffff;
+
+        }
+
+        .vjs-default-skin .vjs-duration-display {
+            color: #ffffff;
+            padding-top: 10px;
+        }
+
+        .vjs-default-skin .vjs-current-time-display {
+            color: #ffffff;
+            padding-top: 10px;
+
+        }
+
+        .vjs-time-divider {
+            float: left;
+            line-height: 3em;
+            margin-top: 9px;
+            padding-left: 8px;
+            padding-right: 8px;
+        }
+
+        .vjs-control-bar div span {
+            color: #ffffff;
+            padding-top: 12px;
+        }
+
+        .vjs-default-skin .vjs-seek-handle {
+            top: -5px;
         }
     </style>
 </head>

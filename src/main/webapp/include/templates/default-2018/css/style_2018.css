@@ -111,7 +111,7 @@ article .slide img{max-width:100%;}
 article .subtag {float:right;height: 30px;padding:0 15px 0 15px;position: absolute;right:0;background-color: #E91E63;box-shadow:2px 1px 2px rgba(198,198,198,1)}
 article .subtag a{position: relative;display: block;height: 30px;line-height: 30px;color:#FFF;}
 article .subtag a:before{position: absolute; left: -45px;top: 0px;border: 15px solid transparent;content: " ";height: 0;width: 0;pointer-events: none;border-right-color:#E91E63;}
-article.entry{max-height:300px; margin: 0 0 15px; background-color: rgba(255,255,255,0.86);}
+article.entry{ margin: 0 0 15px; background-color: rgba(255,255,255,0.86);}
 article.entry:after {clear: both;content: "";display: block;}
 article.text-entry .post-title{margin-top: 0;}
 article.text-entry .content blockquote p{margin:0;}
