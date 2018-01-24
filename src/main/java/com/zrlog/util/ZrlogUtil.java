@@ -1,5 +1,6 @@
 package com.zrlog.util;
 
+import com.google.gson.Gson;
 import com.zrlog.util.version.UpgradeVersionHandler;
 import com.zrlog.web.token.AdminToken;
 import com.zrlog.web.token.AdminTokenThreadLocal;
@@ -9,10 +10,12 @@ import com.hibegin.common.util.IOUtil;
 import com.jfinal.core.JFinal;
 import org.apache.log4j.Logger;
 
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.*;
 import java.util.*;
 
@@ -25,6 +28,16 @@ public class ZrlogUtil {
 
     private ZrlogUtil() {
 
+    }
+
+    public static <T> T convertRequestBody(ServletRequest request, Class<T> clazz) {
+        try {
+            String jsonStr = IOUtil.getStringInputStream(request.getInputStream());
+            return new Gson().fromJson(jsonStr, clazz);
+        } catch (IOException e) {
+            LOGGER.info("", e);
+            return null;
+        }
     }
 
     public static String getPluginServer() {

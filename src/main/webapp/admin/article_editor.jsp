@@ -49,7 +49,7 @@
 <c:if test="${'off' eq webSite['article_thumbnail']}">
     <div class="page-header">
         <h3>
-            ${_res['admin.log.edit']}
+                ${_res['admin.log.edit']}
         </h3>
     </div>
 </c:if>
@@ -58,7 +58,7 @@
         <form target="_blank" class="form-horizontal form-label-left" id="article-form">
             <textarea editormdTheme='${webs.editorMdTheme}' id="markdown"
                       style="display: none;">${log.mdContent}</textarea>
-            <input type="hidden" id="logId" name="logId" value="${log.logId}">
+            <input type="hidden" id="id" name="id" value="${log.logId}">
             <textarea placeholder="${_res.editorPlaceholder}" id="content" name="content"
                       style="display: none;">${log.content}</textarea>
             <c:if test="${'off' ne webSite['article_thumbnail']}">
@@ -136,7 +136,7 @@
                         </div>
                         <div class="col-xs-4">
                             <label><span style="font-size: 15px">${_res['private']}</span>
-                                <input type="checkbox" name="private"
+                                <input type="checkbox" name="_private"
                                        <c:if test="${log['private']}">checked="checked"</c:if> class="js-switch"
                                        style="display: none;" data-switchery="true">
 
@@ -173,7 +173,7 @@
                         </div>
                         <div class="x_content">
                             <div class="form-group">
-                            <textarea name="digest" class="form-control" placeholder="${_res['digestTips']}"
+                            <textarea id="digest" name="digest" class="form-control" placeholder="${_res['digestTips']}"
                                       cols="100" rows="3"
                                       style="width:100%; height:200px; z-index: 9999;">${log.digest}</textarea>
                             </div>
@@ -183,7 +183,7 @@
                 </div>
                 <div class="form-group col-xs-12">
 
-                    <button class="btn btn-info" id="createOrUpdate" type="button">
+                    <button class="btn btn-info" id="save" type="button">
                         <i class="fa fa-paper-plane bigger-110"></i>
                         ${_res['save']}
                     </button>

@@ -1,4 +1,3 @@
-var change = 0;
 var uploadUrl = 'api/admin/upload/';
 var mdEditor;
 $(function () {
@@ -77,16 +76,15 @@ $(function () {
         editorTheme: dark ? "pastel-on-dark" : "default",
 
         onchange: function () {
-            change = 1;
+            $("#content").val(mdEditor.getPreviewedHTML());
         },
         onload: function () {
             $("#content").val(mdEditor.getPreviewedHTML());
             var keyMap = {
-                "Ctrl-S": function (cm) {
-                    change = 1;
-                    autoSave();
+                "Ctrl-S": function () {
+                    save(true, false);
                 }
-            }
+            };
             this.addKeyMap(keyMap);
             setInterval(checkResize, 200);
             $("#fileDialog").on("click", function () {
@@ -95,7 +93,9 @@ $(function () {
             $("#videoDialog").on("click", function () {
                 mdEditor.executePlugin("videoDialog", "../plugins/video-dialog/video-dialog");
             });
-
+            setInterval(function () {
+                save(true, true);
+            }, 1000 * 6);
         },
         onfullscreen: function () {
             $("#editormd").css("z-index", "9999")
@@ -121,11 +121,12 @@ $(function () {
 
     function updatePreviewLink(id) {
         $("#preview-link").attr("href", "admin/article/preview?id=" + id);
-        $("#preview").removeClass("btn-")
+        $("#preview").removeClass("btn-");
         $("#preview-link").show();
     }
 
     function tips(data, message) {
+        PNotify.removeAll();
         if (data.error === 0) {
             new PNotify({
                 title: message,
@@ -134,14 +135,13 @@ $(function () {
                 delay: 3000,
                 styling: 'bootstrap3'
             });
-            $("#logId").val(data.logId);
+            $("#id").val(data.id);
             $("#alias").val(data.alias);
-            currentThumbnail = $("#thumbnail").val();
-            if (data.thumbnail != currentThumbnail) {
-                $("#thumbnail-img").attr("src", data.thumbnail);
-                $("#thumbnail").val(data.thumbnail);
+            $("#digest").val(data.digest);
+            if (data.thumbnail !== $("#thumbnail").val()) {
+               fillThumbnail(data.thumbnail);
             }
-            updatePreviewLink(data.logId);
+            updatePreviewLink(data.id);
         } else {
             new PNotify({
                 title: data.message,
@@ -153,10 +153,10 @@ $(function () {
         }
     }
 
+
     function validationPost() {
-        $("input[name='table-align']").remove();
-        $("#content").val(mdEditor.getPreviewedHTML());
-        if ($("#title").val() == "" || $("#content").val() == "") {
+        if ($("#title").val() === "" || $("#content").val() === "") {
+            PNotify.removeAll()
             new PNotify({
                 title: '文章的标题和内容都不能为空...',
                 delay: 3000,
@@ -173,27 +173,56 @@ $(function () {
     var xhr;
     var lastChangeRequestBody;
 
-    function autoSave() {
-        if (change && validationPost()) {
-            if (xhr !== null && saving) {
-                xhr.abort();
+    function getArticleRequestBody() {
+        var formFields = $('#article-form').serializeArray();
+        var requestBody = {};
+        for (var i = 0; i < formFields.length; i++) {
+            var el = $('#article-form').find("input[name='" + formFields[i]['name'] + "']");
+            if (el.attr("type") === "checkbox") {
+                requestBody[formFields[i]['name']] = formFields[i]['value'] !== undefined;
+            } else {
+                if (!formFields[i]['value']) {
+                    requestBody[formFields[i]['name']] = null;
+                } else {
+                    requestBody[formFields[i]['name']] = formFields[i]['value'];
+                }
             }
-            refreshKeywords();
-            var tLastChangeRequestBody = $('#article-form').serialize();
-            if (tLastChangeRequestBody !== lastChangeRequestBody) {
-                saving = true;
-                xhr = $.post('api/admin/article/createOrUpdate?rubbish=1', tLastChangeRequestBody, function (data) {
-                    var date = new Date();
-                    saving = false;
-                    tips(data, "自动保存成功 " + zeroPad(date.getHours(), 2) + ":" + zeroPad(date.getMinutes(), 2) + ":" + zeroPad(date.getSeconds(), 2));
-                    lastChangeRequestBody = tLastChangeRequestBody;
-                });
-            }
-            change = 0;
         }
+        return requestBody;
     }
 
-    setInterval(autoSave, 1000 * 6);
+    function save(rubbish, timer) {
+        if (xhr !== null && saving) {
+            xhr.abort();
+        }
+        refreshKeywords();
+        var body = getArticleRequestBody();
+        var tLastChangeRequestBody = JSON.stringify(body);
+        if ((!timer || tLastChangeRequestBody !== lastChangeRequestBody) && validationPost()) {
+            body['rubbish'] = rubbish;
+            var url;
+            if ($("#id").val() !== '') {
+                url = "api/admin/article/update";
+            } else {
+                url = "api/admin/article/create";
+            }
+            saving = true;
+            xhr = $.ajax({
+                    url: url,
+                    data: JSON.stringify(body),
+                    method: "POST",
+                    dataType: "json",
+                    contentType: "application/json",
+                    success: function (data) {
+                        var date = new Date();
+                        saving = false;
+                        tips(data, (timer ? "自动" : "") + (rubbish ? "草稿" : "") + "保存成功 " + zeroPad(date.getHours(), 2) + ":" + zeroPad(date.getMinutes(), 2) + ":" + zeroPad(date.getSeconds(), 2));
+                        lastChangeRequestBody = JSON.stringify(getArticleRequestBody());
+                    }
+                }
+            );
+        }
+    }
 
     $(document.body).on('click', '#unCheckedTag .tag2', function (e) {
         keywordsEl.importTags($(this).text());
@@ -219,22 +248,12 @@ $(function () {
     }
 
     $("#saveToRubbish").click(function () {
-        saveArticle(true)
+        save(true, false)
     });
 
-    $("#createOrUpdate").click(function () {
-        saveArticle(false);
+    $("#save").click(function () {
+        save(false, false);
     });
-
-    function saveArticle(rubbish) {
-        if (validationPost()) {
-            refreshKeywords();
-            lastChangeRequestBody = $('#article-form').serialize();
-            $.post('api/admin/article/createOrUpdate' + (rubbish ? "?rubbish=1" : ""), lastChangeRequestBody, function (data) {
-                tips(data, "保存" + (rubbish ? "草稿" : "") + "成功...")
-            });
-        }
-    }
 
     $('#thumbnail-upload').liteUploader({
         script: 'api/admin/upload/thumbnail?dir=thumbnail'
@@ -242,18 +261,21 @@ $(function () {
         if (response.error) {
             alert(response.message);
         } else {
-            $("#thumbnail-img").css('background-image', "url('" + response.url + "')");
-            var w = gup("w", response.url);
-            var h = gup("h", response.url);
-            if (w < 660) {
-                h = 660.0 / w * h;
-            }
-            $("#thumbnail-img").height(h);
-            $("#thumbnail").val(response.url);
-            $("#camera-icon").hide()
+            fillThumbnail(response.url);
         }
-
     });
+
+    function fillThumbnail(url) {
+        $("#thumbnail-img").css('background-image', "url('" + url + "')");
+        var w = gup("w", url);
+        var h = gup("h", url);
+        if (w < 660) {
+            h = 660.0 / w * h;
+        }
+        $("#thumbnail-img").height(h);
+        $("#thumbnail").val(url);
+        $("#camera-icon").hide()
+    }
 });
 
 function gup(name, url) {

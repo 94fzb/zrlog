@@ -3,9 +3,10 @@ package com.zrlog.common.response;
 public class CreateOrUpdateLogResponse {
 
     private int error;
-    private int logId;
+    private int id;
     private String alias;
     private String thumbnail;
+    private String digest;
 
     public int getError() {
         return error;
@@ -15,12 +16,12 @@ public class CreateOrUpdateLogResponse {
         this.error = error;
     }
 
-    public int getLogId() {
-        return logId;
+    public int getId() {
+        return id;
     }
 
-    public void setLogId(int logId) {
-        this.logId = logId;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getAlias() {
@@ -37,5 +38,13 @@ public class CreateOrUpdateLogResponse {
 
     public void setThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
+    }
+
+    public String getDigest() {
+        return digest;
+    }
+
+    public void setDigest(String digest) {
+        this.digest = digest;
     }
 }

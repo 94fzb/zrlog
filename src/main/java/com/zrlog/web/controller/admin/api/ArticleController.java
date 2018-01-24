@@ -1,10 +1,13 @@
 package com.zrlog.web.controller.admin.api;
 
+import com.zrlog.common.request.CreateArticleRequest;
+import com.zrlog.common.request.UpdateArticleRequest;
 import com.zrlog.common.response.*;
 import com.zrlog.model.Log;
 import com.zrlog.model.Tag;
 import com.zrlog.service.ArticleService;
 import com.zrlog.service.CacheService;
+import com.zrlog.util.ZrlogUtil;
 import com.zrlog.web.controller.BaseController;
 import com.zrlog.web.token.AdminTokenThreadLocal;
 
@@ -35,12 +38,20 @@ public class ArticleController extends BaseController {
         return new UpdateRecordResponse();
     }
 
-    public CreateOrUpdateLogResponse createOrUpdate() {
+    public CreateOrUpdateLogResponse create() {
         // 移除缓存文件
         if (getStaticHtmlStatus()) {
             cacheService.removeCachedStaticFile();
         }
-        return articleService.createOrUpdate(AdminTokenThreadLocal.getUserId(), getRequest().getParameterMap());
+        return articleService.create(AdminTokenThreadLocal.getUserId(), ZrlogUtil.convertRequestBody(getRequest(), CreateArticleRequest.class));
+    }
+
+    public CreateOrUpdateLogResponse update() {
+        // 移除缓存文件
+        if (getStaticHtmlStatus()) {
+            cacheService.removeCachedStaticFile();
+        }
+        return articleService.update(AdminTokenThreadLocal.getUserId(), ZrlogUtil.convertRequestBody(getRequest(), UpdateArticleRequest.class));
     }
 
     public PageableResponse<ArticleResponseEntry> index() {

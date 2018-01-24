@@ -7,7 +7,9 @@ import com.hibegin.common.util.http.handle.HttpFileHandle;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
 import com.zrlog.common.Constants;
+import com.zrlog.common.request.CreateArticleRequest;
 import com.zrlog.common.request.PageableRequest;
+import com.zrlog.common.request.UpdateArticleRequest;
 import com.zrlog.common.response.ArticleResponseEntry;
 import com.zrlog.common.response.CreateOrUpdateLogResponse;
 import com.zrlog.common.response.PageableResponse;
@@ -23,6 +25,8 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -39,77 +43,73 @@ public class ArticleService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ArticleService.class);
 
-    public CreateOrUpdateLogResponse createOrUpdate(Integer userId, Map<String, String[]> createArticleRequestMap) {
-        String[] logId = createArticleRequestMap.get("logId");
-        if (logId == null || StringUtils.isEmpty(logId[0])) {
-            return add(userId, createArticleRequestMap);
-        } else {
-            return update(userId, createArticleRequestMap);
-        }
+    public CreateOrUpdateLogResponse create(Integer userId, CreateArticleRequest createArticleRequest) {
+        return save(userId, createArticleRequest);
     }
 
-    private CreateOrUpdateLogResponse add(Integer userId, Map<String, String[]> createArticleRequestMap) {
-        Log log = getLog(userId, createArticleRequestMap);
-        if (!log.getBoolean("rubbish")) {
+    public CreateOrUpdateLogResponse update(Integer userId, UpdateArticleRequest updateArticleRequest) {
+        return save(userId, updateArticleRequest);
+    }
+
+    private CreateOrUpdateLogResponse save(Integer userId, CreateArticleRequest createArticleRequest) {
+        Log log = getLog(userId, createArticleRequest);
+        if (!createArticleRequest.isRubbish() && StringUtils.isNotEmpty(log.getStr("keywords"))) {
             Tag.dao.insertTag(log.getStr("keywords"));
         }
-        CreateOrUpdateLogResponse createOrUpdateLogResponse = getCreateOrUpdateLogResponse(log);
-        createOrUpdateLogResponse.setError(log.save() ? 0 : 1);
-        return createOrUpdateLogResponse;
-    }
-
-    private CreateOrUpdateLogResponse update(Integer userId, Map<String, String[]> createArticleRequestMap) {
-        Log log = getLog(userId, createArticleRequestMap);
-        String oldTagStr = Log.dao.findById(log.getInt("logId")).get("keywords");
-        Tag.dao.update(log.getStr("keywords"), oldTagStr);
-        CreateOrUpdateLogResponse updateLogResponse = getCreateOrUpdateLogResponse(log);
-        updateLogResponse.setError(log.update() ? 0 : 1);
-        return updateLogResponse;
-    }
-
-    private CreateOrUpdateLogResponse getCreateOrUpdateLogResponse(Log log) {
         CreateOrUpdateLogResponse updateLogResponse = new CreateOrUpdateLogResponse();
-        updateLogResponse.setLogId(log.getInt("logId"));
+        updateLogResponse.setId(log.getInt("logId"));
         updateLogResponse.setAlias(log.getStr("alias"));
+        updateLogResponse.setDigest(log.getStr("digest"));
+        if (createArticleRequest instanceof UpdateArticleRequest) {
+            updateLogResponse.setError(log.update() ? 0 : 1);
+        } else {
+            updateLogResponse.setError(log.save() ? 0 : 1);
+        }
         updateLogResponse.setThumbnail(log.getStr("thumbnail"));
         return updateLogResponse;
     }
 
-    private Log getLog(Integer userId, Map<String, String[]> createArticleRequestMap) {
+    private Log getLog(Integer userId, CreateArticleRequest createArticleRequest) {
         Log log = new Log();
-        for (Map.Entry<String, String[]> map : createArticleRequestMap.entrySet()) {
-            if (map.getValue().length > 0) {
-                log.set(map.getKey(), map.getValue()[0]);
-            }
-        }
-        Object logId = log.get("logId");
-        String content = log.get("content");
-        if (StringUtils.isEmpty(logId + "")) {
-            logId = Log.dao.getMaxRecord() + 1;
-            log.set("logId", logId);
-            log.set("releaseTime", new Date());
-        } else {
-            log.set("logId", Integer.valueOf(logId.toString()));
-        }
-        if (log.get("alias") == null || "".equals((log.get("alias") + "").trim())) {
-            log.set("alias", logId + "");
-        } else {
-            log.set("alias", (log.get("alias") + "").trim().replace(" ", "-"));
-        }
+        log.set("content", createArticleRequest.getContent());
+        log.set("title", createArticleRequest.getTitle());
+        log.set("keywords", createArticleRequest.getKeywords());
+        log.set("mdContent", createArticleRequest.getMdContent());
+        log.set("content", createArticleRequest.getContent());
         log.set("userId", userId);
+        log.set("typeId", createArticleRequest.getTypeId());
         log.set("last_update_date", new Date());
-        log.set("canComment", createArticleRequestMap.get("canComment") != null);
-        log.set("recommended", createArticleRequestMap.get("recommended") != null);
-        log.set("private", createArticleRequestMap.get("private") != null);
-        log.set("rubbish", createArticleRequestMap.get("rubbish") != null);
-        if (StringUtils.isEmpty((String) log.get("thumbnail"))) {
-            log.set("thumbnail", getFirstImgUrl(content, userId));
+        log.set("canComment", createArticleRequest.isCanComment());
+        log.set("recommended", createArticleRequest.isRecommended());
+        log.set("private", createArticleRequest.is_private());
+        log.set("rubbish", createArticleRequest.isRubbish());
+        if (StringUtils.isEmpty(createArticleRequest.getThumbnail())) {
+            log.set("thumbnail", getFirstImgUrl(createArticleRequest.getContent(), userId));
+        } else {
+            log.set("thumbnail", createArticleRequest.getThumbnail());
         }
         // 自动摘要
-        if (log.get("digest") == null || "".equals(log.get("digest"))) {
+        if (StringUtils.isEmpty(createArticleRequest.getDigest())) {
             log.set("digest", ParseUtil.autoDigest(log.get("content").toString(), 200));
+        } else {
+            log.set("digest", createArticleRequest.getDigest());
         }
         log.set("plain_content", getPlainSearchTxt((String) log.get("content")));
+        int articleId;
+        String alias;
+        if (createArticleRequest instanceof UpdateArticleRequest) {
+            articleId = ((UpdateArticleRequest) createArticleRequest).getId();
+        } else {
+            articleId = Log.dao.getMaxRecord() + 1;
+            log.set("releaseTime", new Date());
+        }
+        if (createArticleRequest.getAlias() == null) {
+            alias = articleId + "";
+        } else {
+            alias = createArticleRequest.getAlias().trim().replace(" ", "-");
+        }
+        log.set("logId", articleId);
+        log.set("alias", alias);
         return log;
     }
 
@@ -230,6 +230,9 @@ public class ArticleService {
                 if (url.startsWith("https://") || url.startsWith("http://")) {
                     HttpFileHandle fileHandler = new HttpFileHandle(JFinal.me().getConstants().getBaseUploadPath());
                     path = new URL(url).getPath();
+                    if (!path.startsWith(Constants.ATTACHED_FOLDER)) {
+                        path = (Constants.ATTACHED_FOLDER + path).replace("//", "/");
+                    }
                     path = path.substring(0, path.indexOf(".")) + "_thumbnail" + path.substring(path.indexOf("."));
                     HttpUtil.getInstance().sendGetRequest(url, new HashMap<String, String[]>(), fileHandler, new HashMap<String, String>());
                     bytes = IOUtil.getByteByInputStream(new FileInputStream(fileHandler.getT().getPath()));
@@ -240,11 +243,16 @@ public class ArticleService {
                     thumbnailFile = new File(PathKit.getWebRootPath() + path);
                     bytes = IOUtil.getByteByInputStream(new FileInputStream(PathKit.getWebRootPath() + url));
                 }
+                int height = -1;
+                int width = -1;
                 if (bytes.length > 0) {
                     try {
                         String extName = thumbnailFile.getName().substring(thumbnailFile.getName().lastIndexOf("."));
                         if (!extName.equalsIgnoreCase(".gif")) {
                             IOUtil.writeBytesToFile(ThumbnailUtil.jpeg(bytes, 1f), thumbnailFile);
+                            BufferedImage bimg = ImageIO.read(thumbnailFile);
+                            height = bimg.getHeight();
+                            width = bimg.getWidth();
                         } else {
                             IOUtil.writeBytesToFile(bytes, thumbnailFile);
                         }
@@ -252,7 +260,7 @@ public class ArticleService {
                         LOGGER.error("generation jpeg thumbnail error ", e);
                         return url;
                     }
-                    return new UploadService().getCloudUrl(JFinal.me().getContextPath(), path, thumbnailFile.getPath(), null) + "?v=1";
+                    return new UploadService().getCloudUrl(JFinal.me().getContextPath(), path, thumbnailFile.getPath(), null) + "?h=" + height + "&w=" + width;
                 }
             } catch (Exception e) {
                 LOGGER.error("", e);

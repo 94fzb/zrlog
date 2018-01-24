@@ -156,11 +156,13 @@ public class Log extends Model<Log> implements Serializable {
         List<Timestamp> lo = Db.query("select  releaseTime from log  where rubbish=? and private=? order by logId desc", rubbish, pre);
         Map<String, Long> archives = new LinkedHashMap<>();
         for (Timestamp objects : lo) {
-            String key = new SimpleDateFormat("yyyy_MM").format(new Date(objects.getTime()));
-            if (archives.containsKey(key)) {
-                archives.put(key, archives.get(key) + 1);
-            } else {
-                archives.put(key, 1L);
+            if (objects != null) {
+                String key = new SimpleDateFormat("yyyy_MM").format(new Date(objects.getTime()));
+                if (archives.containsKey(key)) {
+                    archives.put(key, archives.get(key) + 1);
+                } else {
+                    archives.put(key, 1L);
+                }
             }
         }
         return archives;
