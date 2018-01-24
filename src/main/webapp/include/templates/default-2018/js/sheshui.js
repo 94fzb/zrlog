@@ -68,6 +68,7 @@ window.onload = function(){
 }
 
 $(document).ready(function() {
+    $(".video-js").height(427);
     // check where the shoppingcart-div is
     var offset = $('.top').offset();
     $(window).scroll(function () {
@@ -90,6 +91,7 @@ $(document).ready(function() {
             threshold : 200
         });
     });
+
 
 
 });

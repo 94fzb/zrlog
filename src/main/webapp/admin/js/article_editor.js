@@ -110,10 +110,10 @@ $(function () {
     $(".editormd-html-textarea").removeAttr("name");
 
     function checkPreviewLink() {
-        if ($("#logId").val() == null || $("#logId").val() == '') {
+        if ($("#id").val() === null || $("#id").val() === '') {
             $("#preview").attr("disable", "disable");
         } else {
-            updatePreviewLink($("#logId").val());
+            updatePreviewLink($("#id").val());
         }
     }
 
@@ -138,8 +138,8 @@ $(function () {
             $("#id").val(data.id);
             $("#alias").val(data.alias);
             $("#digest").val(data.digest);
-            if (data.thumbnail !== $("#thumbnail").val()) {
-               fillThumbnail(data.thumbnail);
+            if (data.thumbnail !== null) {
+                fillThumbnail(data.thumbnail);
             }
             updatePreviewLink(data.id);
         } else {

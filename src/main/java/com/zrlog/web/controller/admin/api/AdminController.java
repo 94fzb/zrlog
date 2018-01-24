@@ -1,9 +1,11 @@
 package com.zrlog.web.controller.admin.api;
 
 import com.hibegin.common.util.StringUtils;
+import com.zrlog.common.request.LoginRequest;
 import com.zrlog.common.response.LoginResponse;
 import com.zrlog.common.response.UpdateRecordResponse;
 import com.zrlog.util.I18NUtil;
+import com.zrlog.util.ZrlogUtil;
 import com.zrlog.web.token.AdminTokenThreadLocal;
 import com.zrlog.model.User;
 import com.zrlog.web.controller.BaseController;
@@ -20,14 +22,13 @@ public class AdminController extends BaseController {
     private static AtomicInteger sessionAtomicInteger = new AtomicInteger();
 
     public LoginResponse login() {
-        String key = getPara("key");
-        String password = getPara("password");
-        String userName = getPara("userName");
+        LoginRequest loginRequest = ZrlogUtil.convertRequestBody(getRequest(), LoginRequest.class);
         LoginResponse loginResponse = new LoginResponse();
-        if (StringUtils.isNotEmpty(userName) && StringUtils.isNotEmpty(password) && StringUtils.isNotEmpty(key)) {
-            String dbPassword = User.dao.getPasswordByUserName(userName.toLowerCase());
-            if (dbPassword != null && SecurityUtils.md5(key + ":" + dbPassword).equals(password)) {
-                adminTokenService.setAdminToken(User.dao.getIdByUserName(userName.toLowerCase()), sessionAtomicInteger.incrementAndGet(), getRequest(), getResponse());
+        if (loginRequest != null && StringUtils.isNotEmpty(loginRequest.getUserName()) &&
+                StringUtils.isNotEmpty(loginRequest.getPassword()) && StringUtils.isNotEmpty(loginRequest.getKey())) {
+            String dbPassword = User.dao.getPasswordByUserName(loginRequest.getUserName().toLowerCase());
+            if (dbPassword != null && SecurityUtils.md5(loginRequest.getKey() + ":" + dbPassword).equals(loginRequest.getPassword())) {
+                adminTokenService.setAdminToken(User.dao.getIdByUserName(loginRequest.getUserName().toLowerCase()), sessionAtomicInteger.incrementAndGet(), getRequest(), getResponse());
             } else {
                 loginResponse.setError(1);
                 loginResponse.setMessage(I18NUtil.getStringFromRes("userNameOrPasswordError", getRequest()));

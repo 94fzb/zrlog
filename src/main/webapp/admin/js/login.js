@@ -65,7 +65,6 @@ MD5 = function (e) {
     return (p(a) + p(b) + p(c) + p(d)).toLowerCase()
 };
 $(function () {
-    var baseUrl = $("base").attr("href");
     $("#userName").focus();
 
     function login() {
@@ -77,32 +76,38 @@ $(function () {
                 loginFromArr[i]['value'] = MD5(key + ":" + MD5(loginFromArr[i]['value']));
             }
         }
-        var requestBody = "";
+        var requestBody = {};
         for (var i = 0; i < loginFromArr.length; i++) {
-            requestBody += loginFromArr[i]['name'] + "=" + loginFromArr[i]['value'] + "&";
+            requestBody[loginFromArr[i]['name']] = loginFromArr[i]['value'];
         }
-        requestBody += "key=" + key;
-        $.post(url, requestBody, function (e) {
-            if (!e.error) {
-                var redirectTo = "";
-                if ($("#redirectFrom").val().length != 0) {
-                    redirectTo = $("#redirectFrom").val();
-                } else {
-                    var baseUrl = $("base").attr("href");
-                    redirectTo = baseUrl + "admin/index";
-                }
-                location.href = redirectTo;
+        requestBody["key"] = key;
+        $.ajax({
+            url: url,
+            method: "POST",
+            data: JSON.stringify(requestBody),
+            dataType: "json",
+            contentType: "application/json",
+            success: function (e) {
+                if (!e.error) {
+                    var redirectTo = "";
+                    if ($("#redirectFrom").val().length !== 0) {
+                        redirectTo = $("#redirectFrom").val();
+                    } else {
+                        redirectTo =  $("base").attr("href") + "admin/index";
+                    }
+                    location.href = redirectTo;
 
-            } else {
-                new PNotify({
-                    title: e.message,
-                    type: 'error',
-                    delay: 3000,
-                    hide: true,
-                    styling: 'bootstrap3'
-                });
+                } else {
+                    new PNotify({
+                        title: e.message,
+                        type: 'error',
+                        delay: 3000,
+                        hide: true,
+                        styling: 'bootstrap3'
+                    });
+                }
             }
-        })
+        });
         return false;
     }
 
@@ -110,9 +115,9 @@ $(function () {
         login();
     });
     $("body").keypress(function (e) {
-        if (e.which == 13) {
+        if (e.which === 13) {
             login();
         }
     });
 
-})
+});
