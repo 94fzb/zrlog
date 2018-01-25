@@ -72,7 +72,7 @@ $(function () {
         var loginFromArr = $('#login_form').serializeArray();
         var key = new Date().getTime();
         for (var i = 0; i < loginFromArr.length; i++) {
-            if (loginFromArr[i]['name'] == 'password') {
+            if (loginFromArr[i]['name'] === 'password') {
                 loginFromArr[i]['value'] = MD5(key + ":" + MD5(loginFromArr[i]['value']));
             }
         }
@@ -93,7 +93,7 @@ $(function () {
                     if ($("#redirectFrom").val().length !== 0) {
                         redirectTo = $("#redirectFrom").val();
                     } else {
-                        redirectTo =  $("base").attr("href") + "admin/index";
+                        redirectTo = $("base").attr("href") + "admin/index";
                     }
                     location.href = redirectTo;
 

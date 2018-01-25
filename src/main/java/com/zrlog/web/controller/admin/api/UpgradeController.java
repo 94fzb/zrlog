@@ -1,9 +1,10 @@
 package com.zrlog.web.controller.admin.api;
 
+import com.zrlog.common.request.UpgradeSettingRequest;
 import com.zrlog.service.CacheService;
+import com.zrlog.util.ZrlogUtil;
 import com.zrlog.web.plugin.UpdateVersionThread;
 import com.zrlog.web.token.AdminTokenThreadLocal;
-import com.zrlog.common.Constants;
 import com.zrlog.common.response.CheckVersionResponse;
 import com.zrlog.common.response.DownloadUpdatePackageResponse;
 import com.zrlog.common.response.UpdateRecordResponse;
@@ -35,16 +36,13 @@ public class UpgradeController extends BaseController {
     private CacheService cacheService = new CacheService();
 
     public UpdateRecordResponse setting() {
-        Map<String, String[]> tmpParamMap = getParaMap();
-        for (Map.Entry<String, String[]> param : tmpParamMap.entrySet()) {
-            new WebSite().updateByKV(param.getKey(), param.getValue()[0]);
-        }
-        cacheService.refreshInitDataCache(this, true);
-        cacheService.removeCachedStaticFile();
         UpdateRecordResponse recordResponse = new UpdateRecordResponse();
+        UpgradeSettingRequest upgradeSettingRequest = ZrlogUtil.convertRequestBody(getRequest(), UpgradeSettingRequest.class);
+        new WebSite().updateByKV("autoUpgradeVersion", upgradeSettingRequest.getAutoUpgradeVersion());
+        new WebSite().updateByKV("upgradePreview", upgradeSettingRequest.isUpgradePreview());
         recordResponse.setError(0);
         Plugins plugins = (Plugins) JFinal.me().getServletContext().getAttribute("plugins");
-        if (AutoUpgradeVersionType.cycle(getParaToInt(Constants.AUTO_UPGRADE_VERSION_KEY)) == AutoUpgradeVersionType.NEVER) {
+        if (AutoUpgradeVersionType.cycle(upgradeSettingRequest.getAutoUpgradeVersion()) == AutoUpgradeVersionType.NEVER) {
             for (IPlugin plugin : plugins.getPluginList()) {
                 if (plugin instanceof UpdateVersionPlugin) {
                     plugin.stop();
@@ -57,6 +55,8 @@ public class UpgradeController extends BaseController {
                 }
             }
         }
+        cacheService.refreshInitDataCache(this, true);
+        cacheService.removeCachedStaticFile();
         return recordResponse;
     }
 

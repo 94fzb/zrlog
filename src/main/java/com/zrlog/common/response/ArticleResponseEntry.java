@@ -10,6 +10,7 @@ public class ArticleResponseEntry {
     private int click;
     private String keywords;
     private Date releaseTime;
+    private Date lastUpdateDate;
     private String typeName;
     private boolean rubbish;
     private boolean _private;
@@ -84,5 +85,13 @@ public class ArticleResponseEntry {
 
     public void set_private(boolean _private) {
         this._private = _private;
+    }
+
+    public Date getLastUpdateDate() {
+        return lastUpdateDate;
+    }
+
+    public void setLastUpdateDate(Date lastUpdateDate) {
+        this.lastUpdateDate = lastUpdateDate;
     }
 }

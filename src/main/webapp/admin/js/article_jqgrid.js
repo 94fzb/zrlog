@@ -4,7 +4,7 @@ jQuery(function ($) {
     jqGrid = jQuery(grid_selector).jqGrid({
         url: articleUrl,
         datatype: "json",
-        colNames: ['', 'ID', '标题', '关键词', '作者', '分类', '发布时间', '查看数', '草稿', '私有', '编辑', '浏览'],
+        colNames: ['', 'ID', '标题', '关键词', '作者', '分类', '创建时间', '最后更新时间', '查看数', '草稿', '私有', '编辑', '浏览'],
         colModel: [
             {
                 name: 'delete', width: 28, index: 'id', sortable: false,
@@ -22,6 +22,7 @@ jQuery(function ($) {
             {name: 'userName', index: 'userName', width: 60, sortable: false},
             {name: 'typeName', index: 'typeName', width: 90},
             {name: 'releaseTime', index: 'releaseTime', width: 90, sorttype: "date"},
+            {name: 'lastUpdateDate', index: 'lastUpdateDate', width: 90, sorttype: "date"},
             {name: 'click', index: 'click', width: 50, editable: false},
             {name: 'rubbish', index: 'rubbish', width: 50, editable: false, formatter: renderRubbish},
             {name: '_private', index: '_private', width: 50, editable: false, formatter: renderPrivate},

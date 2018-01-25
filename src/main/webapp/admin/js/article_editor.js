@@ -76,7 +76,15 @@ $(function () {
         editorTheme: dark ? "pastel-on-dark" : "default",
 
         onchange: function () {
-            $("#content").val(mdEditor.getPreviewedHTML());
+            var content = mdEditor.getPreviewedHTML();
+            $("#content").val(content);
+            if (content === '') {
+                $("#editormd").addClass("has-error");
+                $("#editormd").css("border-color", "#a94442");
+            } else {
+                $("#editormd").removeClass("has-error");
+                $("#editormd").css("border-color", "#ccc");
+            }
         },
         onload: function () {
             $("#content").val(mdEditor.getPreviewedHTML());
@@ -153,42 +161,27 @@ $(function () {
         }
     }
 
-
-    function validationPost() {
-        if ($("#title").val() === "" || $("#content").val() === "") {
-            PNotify.removeAll()
-            new PNotify({
-                title: '文章的标题和内容都不能为空...',
-                delay: 3000,
-                type: 'warn',
-                hide: true,
-                styling: 'bootstrap3'
-            });
-            return false;
-        }
-        return true;
-    }
-
     var saving = false;
     var lastChangeRequestBody;
 
-    function getArticleRequestBody() {
-        var formFields = $('#article-form').serializeArray();
-        var requestBody = {};
-        for (var i = 0; i < formFields.length; i++) {
-            var el = $('#article-form').find("input[name='" + formFields[i]['name'] + "']");
-            if (el.attr("type") === "checkbox") {
-                requestBody[formFields[i]['name']] = formFields[i]['value'] !== undefined;
-            } else {
-                if (!formFields[i]['value']) {
-                    requestBody[formFields[i]['name']] = null;
-                } else {
-                    requestBody[formFields[i]['name']] = formFields[i]['value'];
-                }
-            }
+    function validator(el) {
+        if ($("#title").val() === '') {
+            $("#title-parent").addClass("has-error");
         }
-        return requestBody;
+        if ($("#content").val() === '') {
+            $("#editormd").addClass("has-error");
+            $("#editormd").css("border-color", "#a94442");
+        }
+        return el.find(".has-error").length === 0;
     }
+
+    $("#title").on("change keyup paste click", function () {
+        if ($(this).val() !== '') {
+            $("#title-parent").removeClass("has-error");
+        } else {
+            $("#title-parent").addClass("has-error");
+        }
+    });
 
     function save(rubbish, timer) {
         //如果是还在保存文章状态，跳过保存
@@ -204,9 +197,10 @@ $(function () {
             return;
         }
         refreshKeywords();
-        var body = getArticleRequestBody();
+        var body = getFormRequestBody("#article-form");
         var tLastChangeRequestBody = JSON.stringify(body);
-        if ((!timer || tLastChangeRequestBody !== lastChangeRequestBody) && validationPost()) {
+        var changed = tLastChangeRequestBody !== lastChangeRequestBody;
+        if (validator($("#article-form")) && (!timer || changed)) {
             body['rubbish'] = rubbish;
             var url;
             if ($("#id").val() !== '') {
@@ -225,13 +219,15 @@ $(function () {
                         var date = new Date();
                         saving = false;
                         tips(data, (timer ? "自动" : "") + (rubbish ? "草稿" : "") + "保存成功 " + zeroPad(date.getHours(), 2) + ":" + zeroPad(date.getMinutes(), 2) + ":" + zeroPad(date.getSeconds(), 2));
-                        lastChangeRequestBody = JSON.stringify(getArticleRequestBody());
+                        lastChangeRequestBody = JSON.stringify(getFormRequestBody("#article-form"));
                     },
                     error: function () {
                         saving = true;
                     }
                 }
             );
+        } else {
+            lastChangeRequestBody = JSON.stringify(getFormRequestBody("#article-form"));
         }
     }
 

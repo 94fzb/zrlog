@@ -66,7 +66,7 @@
         </div>
         <div class="tab-pane col-md-6" id="other" style="padding: 10px">
             <h4 class="header blue">ICP，网站统计等信息</h4>
-            <form role="form" class="form-horizontal" checkBox="pseudo_staticStatus,article_thumbnail"
+            <form role="form" class="form-horizontal" checkBox="pseudo_static_status,article_thumbnail"
                   id="otherMsgAjax">
                 <div class="form-group">
                     <label class="col-md-3 control-label no-padding-right"> 会话过期时间（分钟） </label>
@@ -111,12 +111,10 @@
                     <label class="col-md-3 control-label no-padding-right"> 静态化文章页 </label>
                     <div class="col-md-9">
 						<span class="col-sm-1">
-						<input type="hidden" id="pseudo_staticStatus" value="off">
 						<label>
 							<input type="checkbox" class="js-switch" style="display: none;" data-switchery="true"
-                                   name="pseudo_staticStatus"
-                                   <c:if test="${webs.pseudo_staticStatus eq 'on'}">checked="checked"</c:if>
-                                   value="off">
+                                   name="generator_html_status"
+                                   <c:if test="${webs.generator_html_status == 1}">checked="checked"</c:if>>
 						</label>
 						</span>
                     </div>
@@ -126,11 +124,12 @@
                     <label class="col-sm-3 control-label no-padding-right"> 文章封面 </label>
                     <div class="col-sm-5">
 						<span class="col-sm-1">
-						<input type="hidden" id="article_thumbnail" value="off">
 						<label>
-							<input type="checkbox" class="js-switch" style="display: none;" data-switchery="true"
-                                   name="article_thumbnail"
-                                   <c:if test="${webs.article_thumbnail eq 'on'}">checked="checked"</c:if> value="off">
+							<input type="checkbox" name="article_thumbnail_status" class="js-switch"
+                                   style="display: none;"
+                                   data-switchery="true"
+                                   name="article_thumbnail_status"
+                                   <c:if test="${webs.article_thumbnail_status == 1}">checked="checked"</c:if>>
 						</label>
 						</span>
                     </div>

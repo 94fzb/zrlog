@@ -233,7 +233,7 @@ public class ZrlogConfig extends JFinalConfig {
             LOGGER.warn("Not found lock file(" + PathKit.getWebRootPath() + "/WEB-INF/install.lock), Please visit the http://yourHostName:port" + JFinal.me().getContextPath() + "/install installation");
         } else {
             //检查数据文件是否需要更新
-            String sqlVersion = WebSite.dao.getValueByName(com.zrlog.common.Constants.ZRLOG_SQL_VERSION_KEY);
+            String sqlVersion = WebSite.dao.getStringValueByName(com.zrlog.common.Constants.ZRLOG_SQL_VERSION_KEY);
             Integer updatedVersion = ZrlogUtil.doUpgrade(sqlVersion, PathKit.getWebRootPath() + "/WEB-INF/update-sql", dbProperties.getProperty("jdbcUrl"), dbProperties.getProperty("user"),
                     dbProperties.getProperty("password"), dbProperties.getProperty("driverClass"));
             if (updatedVersion > 0) {

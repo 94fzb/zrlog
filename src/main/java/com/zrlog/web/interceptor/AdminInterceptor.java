@@ -58,6 +58,10 @@ class AdminInterceptor implements Interceptor {
                 if (webSite.get("admin_dashboard_naver") == null) {
                     webSite.put("admin_dashboard_naver", "nav-md");
                 }
+                //默认开启文章封面
+                if (webSite.get("article_thumbnail_status") == null) {
+                    webSite.put("article_thumbnail_status", 1);
+                }
                 ai.getController().getRequest().setAttribute("webs", webSite);
                 try {
                     User user = User.dao.findById(adminToken.getUserId());

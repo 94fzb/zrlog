@@ -1,5 +1,7 @@
-<%@ page language="java" session="false" import="java.util.*" pageEncoding="UTF-8" %>
+<%@ page session="false" pageEncoding="UTF-8" %>
 <script src="assets/js/jquery.liteuploader.min.js"></script>
+<script src="${cacheFile['/admin/js/common.js']}"></script>
+<script src="${cacheFile['/admin/js/set_update.js']}"></script>
 <script>
     $(document).ready(function () {
         $('.fileUpload').liteUploader({
@@ -8,39 +10,6 @@
             $('.file-name').attr("data-title", response.url)
             $("#logo").val(response.url);
             $("a .remove").remove();
-        });
-        $("#template").click(function (e) {
-            $.post('api/admin/template/setting', $("#template-form").serialize(), function (data) {
-                if (data.error == 0) {
-                    var message;
-                    if (data.message != null && data.message != '') {
-                        message = data.message;
-                    } else {
-                        message = "操作成功...";
-                    }
-                    new PNotify({
-                        title: message,
-                        type: 'success',
-                        delay: 3000,
-                        hide: true,
-                        styling: 'bootstrap3'
-                    });
-                } else {
-                    var message;
-                    if (data.message != null && data.message != '') {
-                        message = data.message;
-                    } else {
-                        message = "发生了一些异常...";
-                    }
-                    new PNotify({
-                        title: message,
-                        delay: 3000,
-                        type: 'error',
-                        hide: true,
-                        styling: 'bootstrap3'
-                    });
-                }
-            });
         });
     });
 </script>
@@ -53,7 +22,7 @@
 <!-- PAGE CONTENT BEGINS -->
 <div class="row">
     <div class="col-md-6">
-        <form id="template-form" class="form-horizontal">
+        <form id="templateAjax" action="api/admin/template/config" class="form-horizontal">
             <input type="hidden" name="template" value="${template}">
             <div class="form-group">
                 <label class="col-sm-3 control-label no-padding-right"> 标题 </label>

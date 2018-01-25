@@ -14,7 +14,7 @@ public class WebSite extends Model<WebSite> {
     public static final WebSite dao = new WebSite();
 
     public Map<String, Object> getWebSite() {
-        Map<String, Object> webSites = new HashMap<String, Object>();
+        Map<String, Object> webSites = new HashMap<>();
         List<WebSite> lw = find("select * from website");
         for (WebSite webSite : lw) {
             webSites.put(webSite.getStr("name"), webSite.get("value"));
@@ -23,7 +23,7 @@ public class WebSite extends Model<WebSite> {
         return webSites;
     }
 
-    public boolean updateByKV(String name, String value) {
+    public boolean updateByKV(String name, Object value) {
         if (Db.queryInt("select siteId from website where name=?", name) != null) {
             Db.update("update website set value=? where name=?", value, name);
         } else {
@@ -32,11 +32,22 @@ public class WebSite extends Model<WebSite> {
         return true;
     }
 
-    public String getValueByName(String name) {
+    public String getStringValueByName(String name) {
         WebSite webSite = findFirst("select value from website where name=?", name);
         if (webSite != null) {
             return webSite.get("value");
         }
         return "";
+    }
+
+    public boolean getBoolValueByName(String name) {
+        WebSite webSite = findFirst("select value from website where name=?", name);
+        if (webSite != null) {
+            //数据库varchar导致这里使用1进行比较
+            if (webSite.get("value") instanceof String) {
+                return "1".equals(webSite.get("value"));
+            }
+        }
+        return false;
     }
 }

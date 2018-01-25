@@ -4,6 +4,7 @@ import com.zrlog.common.response.WebSiteSettingUpdateResponse;
 import com.zrlog.service.CacheService;
 import com.zrlog.model.WebSite;
 import com.zrlog.util.BlogBuildInfoUtil;
+import com.zrlog.util.ZrlogUtil;
 import com.zrlog.web.controller.BaseController;
 
 import java.util.HashMap;
@@ -15,9 +16,9 @@ public class WebSiteController extends BaseController {
     private CacheService cacheService = new CacheService();
 
     public WebSiteSettingUpdateResponse update() {
-        Map<String, String[]> tmpParamMap = getParaMap();
-        for (Entry<String, String[]> param : tmpParamMap.entrySet()) {
-            new WebSite().updateByKV(param.getKey(), param.getValue()[0]);
+        Map<String, Object> requestMap = ZrlogUtil.convertRequestBody(getRequest(), Map.class);
+        for (Entry<String, Object> param : requestMap.entrySet()) {
+            new WebSite().updateByKV(param.getKey(), param.getValue());
         }
 
         WebSiteSettingUpdateResponse updateResponse = new WebSiteSettingUpdateResponse();

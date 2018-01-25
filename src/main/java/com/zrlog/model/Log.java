@@ -103,6 +103,16 @@ public class Log extends Model<Log> implements Serializable {
         return data;
     }
 
+    /**
+     * 管理员查询文章
+     *
+     * @param page
+     * @param pageSize
+     * @param keywords
+     * @param order
+     * @param field
+     * @return
+     */
     public Map<String, Object> queryAll(int page, int pageSize, String keywords, String order, String field) {
         Map<String, Object> data = new HashMap<>();
         String searchKeywords = "";
@@ -120,9 +130,12 @@ public class Log extends Model<Log> implements Serializable {
             if ("_private".equals(field)) {
                 field = "private";
             }
+            if ("lastUpdateDate".equals(field)) {
+                field = "last_update_date";
+            }
             pageSort = "l." + field + " " + order;
         }
-        String sql = "select l.*,l.private _private,t.typeName,l.logId as id,t.alias as typeAlias,u.userName,(select count(commentId) from comment where logId=l.logId ) commentSize from log l inner join user u inner join type t where u.userId=l.userId" + searchKeywords + " and t.typeid=l.typeid order by " + pageSort + " limit ?,?";
+        String sql = "select l.*,l.private _private,t.typeName,l.logId as id,l.last_update_date as lastUpdateDate,t.alias as typeAlias,u.userName,(select count(commentId) from comment where logId=l.logId ) commentSize from log l inner join user u inner join type t where u.userId=l.userId" + searchKeywords + " and t.typeid=l.typeid order by " + pageSort + " limit ?,?";
         data.put("rows", findEntry(sql, ParseUtil.getFirstRecord(page, pageSize), pageSize));
         fillData(page, pageSize, "from log l inner join user u where u.userId=l.userId " + searchKeywords, data, new Object[]{});
         return data;

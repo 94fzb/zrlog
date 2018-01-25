@@ -6,7 +6,8 @@
 </div>
 <div class="row">
     <div class="col-md-6">
-        <form role="form" action="api/admin/changePassword" data-toggle="validator" id="updatePasswordAjax" class="form-horizontal"
+        <form role="form" action="api/admin/changePassword" data-toggle="validator" id="updatePasswordAjax"
+              class="form-horizontal"
               method="post">
             <div class="form-group">
                 <label class="col-sm-3 control-label no-padding-right"> ${_res['admin.oldPassword']}</label>
@@ -22,16 +23,6 @@
                 <div class="col-sm-5">
                     <input type="password" name="newPassword" value="" class="form-control col-xs-12 col-sm-6"
                            required="" placeholder="" id="newPassword1">
-
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="col-sm-3 control-label no-padding-right"> ${_res['admin.newPassword']}</label>
-
-                <div class="col-sm-5">
-                    <input type="password" name="newPassword2" value="" class="form-control col-xs-12 col-sm-6"
-                           required="" placeholder="" id="newPassword2">
 
                 </div>
             </div>

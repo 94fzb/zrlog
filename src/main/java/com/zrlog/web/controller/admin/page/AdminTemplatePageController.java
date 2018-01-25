@@ -5,10 +5,8 @@ import com.hibegin.common.util.StringUtils;
 import com.zrlog.common.Constants;
 import com.zrlog.common.TemplateVO;
 import com.zrlog.model.WebSite;
-import com.zrlog.service.CacheService;
 import com.zrlog.util.I18NUtil;
 import com.zrlog.web.controller.BaseController;
-import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.ZipUtil;
 import com.hibegin.common.util.http.HttpUtil;
 import com.hibegin.common.util.http.handle.HttpFileHandle;
@@ -21,7 +19,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class AdminTemplatePageController extends BaseController {
@@ -116,7 +113,7 @@ public class AdminTemplatePageController extends BaseController {
             setAttr("template", templateName);
             setAttr("menu", "1");
             I18NUtil.addToRequest(PathKit.getWebRootPath() + templateName + "/language/", this);
-            String jsonStr = new WebSite().getValueByName(templateName + templateConfigSuffix);
+            String jsonStr = new WebSite().getStringValueByName(templateName + templateConfigSuffix);
             fullTemplateSetting(jsonStr);
             return "/admin/blank";
         } else {

@@ -1,10 +1,11 @@
 package com.zrlog.web.controller;
 
-import com.zrlog.common.Constants;
-import com.zrlog.common.request.PageableRequest;
 import com.google.gson.Gson;
 import com.jfinal.core.Controller;
 import com.jfinal.kit.PathKit;
+import com.zrlog.common.Constants;
+import com.zrlog.common.request.PageableRequest;
+import com.zrlog.model.WebSite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,20 +68,6 @@ public class BaseController extends Controller {
         return this.rows;
     }
 
-    public Object getValueByKey(String key) {
-        if (webSite.get(key) != null) {
-            return webSite.get(key).toString();
-        }
-        return null;
-    }
-
-    public String getStrValueByKey(String key) {
-        if (webSite.get(key) != null) {
-            return webSite.get(key).toString();
-        }
-        return null;
-    }
-
     public boolean isNotNullOrNotEmptyStr(Object... args) {
         for (Object arg : args) {
             if (arg == null || "".equals(arg)) {
@@ -90,9 +77,8 @@ public class BaseController extends Controller {
         return true;
     }
 
-    public boolean getStaticHtmlStatus() {
-        Object obj = getStrValueByKey("pseudo_staticStatus");
-        return obj != null && "on".equals(obj.toString());
+    public boolean isStaticHtmlStatus() {
+        return WebSite.dao.getBoolValueByName("generator_html_status");
     }
 
     /**

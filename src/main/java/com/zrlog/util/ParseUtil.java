@@ -22,7 +22,7 @@ public class ParseUtil {
         }
         Elements elements = Jsoup.parse(str).body().select("video");
         if (elements != null && !elements.isEmpty()) {
-            digest = elements.get(0).toString() +"<br/>" + digest;
+            digest = elements.get(0).toString() + "<br/>" + digest;
         }
         return digest.trim();
     }

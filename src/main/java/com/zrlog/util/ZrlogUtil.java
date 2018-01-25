@@ -36,7 +36,7 @@ public class ZrlogUtil {
             return new Gson().fromJson(jsonStr, clazz);
         } catch (IOException e) {
             LOGGER.info("", e);
-            return null;
+            throw new RuntimeException(e);
         }
     }
 

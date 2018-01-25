@@ -88,7 +88,14 @@ public class TemplateHelper {
         } else if (request.getAttribute("log") != null) {
             data = request.getAttribute("log");
         }
-        staticHtml(data, baseUrl, suffix, webSite.get("article_thumbnail") == null || "on".equals(webSite.get("article_thumbnail")));
+        boolean thumbnailEnableArticle = true;
+        Object tT = webSite.get("article_thumbnail_status");
+        if (tT != null) {
+            if (tT instanceof Boolean) {
+                thumbnailEnableArticle = (Boolean) tT;
+            }
+        }
+        staticHtml(data, baseUrl, suffix, thumbnailEnableArticle);
         if (request.getAttribute("pager") != null && !((List<Map<String, Object>>) ((Map) request.getAttribute("pager")).get("pageList")).isEmpty()) {
             List<Map<String, Object>> pageList = ((List<Map<String, Object>>) ((Map) request.getAttribute("pager")).get("pageList"));
             for (Map<String, Object> pageMap : pageList) {
@@ -163,7 +170,7 @@ public class TemplateHelper {
             controller.getRequest().setAttribute("template", basePath);
             I18NUtil.addToRequest(PathKit.getWebRootPath() + basePath + "/language/", controller);
             baseController.fullTemplateSetting();
-            TemplateHelper.fullInfo(controller.getRequest(), baseController.getStaticHtmlStatus());
+            TemplateHelper.fullInfo(controller.getRequest(), baseController.isStaticHtmlStatus());
             return basePath;
         }
         return Constants.DEFAULT_TEMPLATE_PATH;

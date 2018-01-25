@@ -131,7 +131,7 @@ public class PostController extends BaseController {
         setAttr("key", WebTools.htmlEncode(key));
 
         setAttr("tipsType", I18NUtil.getStringFromRes("search", getRequest()));
-        setAttr("tipsName",  WebTools.htmlEncode(key));
+        setAttr("tipsName", WebTools.htmlEncode(key));
 
         setPageInfo("post/search/" + key + "-", data, getParaToInt(1, 1));
         return "page";
@@ -163,7 +163,7 @@ public class PostController extends BaseController {
                 }
                 String alias = URLEncoder.encode(log.getStr("alias"), "UTF-8");
                 String ext = "";
-                if (getStaticHtmlStatus()) {
+                if (isStaticHtmlStatus()) {
                     ext = ".html";
                     new CacheService().clearStaticPostFileByLogId(logId + "");
                 }

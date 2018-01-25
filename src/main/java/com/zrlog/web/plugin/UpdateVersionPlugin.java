@@ -21,8 +21,8 @@ public class UpdateVersionPlugin implements IPlugin {
 
     @Override
     public boolean start() {
-        String value = WebSite.dao.getValueByName(Constants.AUTO_UPGRADE_VERSION_KEY);
-        boolean checkPreview = "on".equals(WebSite.dao.getValueByName("upgradeCanPreview"));
+        String value = WebSite.dao.getStringValueByName(Constants.AUTO_UPGRADE_VERSION_KEY);
+        boolean checkPreview = previewAble();
         if (value != null && !"".equals(value)) {
             AutoUpgradeVersionType autoUpgradeVersionType = AutoUpgradeVersionType.cycle(Integer.parseInt(value));
             if (timer != null) {
@@ -47,6 +47,10 @@ public class UpdateVersionPlugin implements IPlugin {
         return true;
     }
 
+    private boolean previewAble() {
+        return WebSite.dao.getBoolValueByName("upgradePreview_status");
+    }
+
     /**
      * 获取最新的版本信息。
      *
@@ -54,7 +58,7 @@ public class UpdateVersionPlugin implements IPlugin {
      * @return
      */
     public Version getLastVersion(boolean fetch) {
-        boolean checkPreview = "on".equals(WebSite.dao.getValueByName("upgradeCanPreview"));
+        boolean checkPreview = previewAble();
         if (updateVersionTimerTask == null) {
             updateVersionTimerTask = new UpdateVersionTimerTask(checkPreview);
         }

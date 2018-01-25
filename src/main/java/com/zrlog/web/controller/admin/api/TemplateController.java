@@ -1,6 +1,7 @@
 package com.zrlog.web.controller.admin.api;
 
 import com.hibegin.common.util.FileUtils;
+import com.hibegin.common.util.StringUtils;
 import com.zrlog.common.Constants;
 import com.zrlog.common.response.UpdateRecordResponse;
 import com.zrlog.common.response.UploadTemplateResponse;
@@ -8,6 +9,7 @@ import com.zrlog.common.response.WebSiteSettingUpdateResponse;
 import com.zrlog.model.WebSite;
 import com.zrlog.service.CacheService;
 import com.zrlog.util.I18NUtil;
+import com.zrlog.util.ZrlogUtil;
 import com.zrlog.web.controller.BaseController;
 import com.google.gson.Gson;
 import com.hibegin.common.util.IOUtil;
@@ -91,6 +93,7 @@ public class TemplateController extends BaseController {
         return response;
     }
 
+    @Deprecated//主题设置建议直接使用config方法
     public UpdateRecordResponse setting() {
         Map<String, String[]> param = getRequest().getParameterMap();
         String template = getPara("template");
@@ -104,6 +107,20 @@ public class TemplateController extends BaseController {
                 }
             }
         }
+        return save(template, settingMap);
+    }
+
+    public UpdateRecordResponse config() {
+        Map<String, Object> param = ZrlogUtil.convertRequestBody(getRequest(), Map.class);
+        String template = (String) param.get("template");
+        if (StringUtils.isNotEmpty(template)) {
+            param.remove("template");
+            return save(template, param);
+        }
+        return new UpdateRecordResponse();
+    }
+
+    private UpdateRecordResponse save(String template, Map<String, Object> settingMap) {
         new WebSite().updateByKV(template + templateConfigSuffix, new Gson().toJson(settingMap));
         cacheService.refreshInitDataCache(this, true);
         cacheService.removeCachedStaticFile();

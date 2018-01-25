@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="${cacheFile['/assets/css/pnotify.css']}"/>
     <script src="${cacheFile['/assets/js/jquery.min.js']}"></script>
     <script src="${cacheFile['/assets/js/pnotify.js']}"></script>
+    <script src="${cacheFile['/admin/js/common.js']}"></script>
     <script src="${cacheFile['/admin/js/login.js']}"></script>
 </head>
 

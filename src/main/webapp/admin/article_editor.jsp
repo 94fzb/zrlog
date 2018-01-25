@@ -46,7 +46,7 @@
         width: 100%;
     }
 </style>
-<c:if test="${'off' eq webSite['article_thumbnail']}">
+<c:if test="${1 ne webSite['article_thumbnail_status']}">
     <div class="page-header">
         <h3>
                 ${_res['admin.log.edit']}
@@ -55,13 +55,13 @@
 </c:if>
 <div class="row">
     <div class="x_content">
-        <form target="_blank" class="form-horizontal form-label-left" id="article-form">
+        <form class="form-horizontal form-label-left" id="article-form">
             <textarea editormdTheme='${webs.editorMdTheme}' id="markdown"
                       style="display: none;">${log.mdContent}</textarea>
             <input type="hidden" id="id" name="id" value="${log.logId}">
             <textarea placeholder="${_res.editorPlaceholder}" id="content" name="content"
                       style="display: none;">${log.content}</textarea>
-            <c:if test="${'off' ne webSite['article_thumbnail']}">
+            <c:if test="${0 ne webSite['article_thumbnail_status']}">
                 <div class="form-group">
                     <div class="WriteCover-wrapper">
                         <div id="thumbnail-img" title="${_res['writeCover']}"
@@ -80,7 +80,7 @@
             <div class="col-md-12 col-sm-12 col-xs-12 col-lg-9">
                 <div class="form-group">
                     <div class="row">
-                        <div class="col-xs-7">
+                        <div class="col-xs-7" id="title-parent">
                             <input required name="title" id="title" maxlength="254" value="${log.title}"
                                    class="form-control"
                                    type="text" placeholder="${_res['inputArticleTitle']}"/>

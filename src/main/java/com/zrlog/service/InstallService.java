@@ -57,7 +57,7 @@ public class InstallService {
         map.put("rows", 10);
         map.put("template", Constants.DEFAULT_TEMPLATE_PATH);
         map.put(Constants.AUTO_UPGRADE_VERSION_KEY, Constants.DEFAULT_AUTO_UPGRADE_VERSION_TYPE.getCycle());
-        map.put("pseudo_staticStatus", false);
+        map.put("pseudo_static_status", false);
         map.put("title", webSite.get("title"));
         map.put("second_title", webSite.get("second_title"));
         map.put("home", webSite.get("home"));

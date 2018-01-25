@@ -40,7 +40,7 @@ public class ArticleController extends BaseController {
 
     public CreateOrUpdateLogResponse create() {
         // 移除缓存文件
-        if (getStaticHtmlStatus()) {
+        if (isStaticHtmlStatus()) {
             cacheService.removeCachedStaticFile();
         }
         return articleService.create(AdminTokenThreadLocal.getUserId(), ZrlogUtil.convertRequestBody(getRequest(), CreateArticleRequest.class));
@@ -48,7 +48,7 @@ public class ArticleController extends BaseController {
 
     public CreateOrUpdateLogResponse update() {
         // 移除缓存文件
-        if (getStaticHtmlStatus()) {
+        if (isStaticHtmlStatus()) {
             cacheService.removeCachedStaticFile();
         }
         return articleService.update(AdminTokenThreadLocal.getUserId(), ZrlogUtil.convertRequestBody(getRequest(), UpdateArticleRequest.class));

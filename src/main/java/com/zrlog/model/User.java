@@ -34,4 +34,8 @@ public class User extends Model<User> {
         return Db.update("update user set password=? where userId=?", password, userId) > 0;
     }
 
+    public void updateEmailUserNameHeaderByUserId(String email, String userName, String header, int userId) {
+        Db.update("update user set header=?,email=?,userName=? where userId=?", header, email, userName, userId);
+    }
+
 }

@@ -18,7 +18,7 @@
 <div class="row">
     <div class="col-md-6">
         <form role="form" action="api/admin/upgrade/setting" class="form-horizontal" id="upgradeAjax"
-              checkBox="upgradeCanPreview">
+              checkBox="upgradePreview">
             <div class="form-group">
                 <label class="col-sm-3 control-label no-padding-right"> ${_res['admin.upgrade.autoCheckCycle']} </label>
 
@@ -51,11 +51,10 @@
 
                 <div class="col-md-5">
 			<span class="col-sm-1">
-            <input type="hidden" id="upgradeCanPreview" value="off">
             <label>
-                <input type="checkbox" class="form-control js-switch" style="display: none;" data-switchery="true"
-                       name="upgradeCanPreview"
-                       <c:if test="${webs.upgradeCanPreview eq 'on'}">checked="checked"</c:if> value="off">
+                <input type="checkbox" class="form-control js-switch" style="display: none;" data-switchery="upgradePreview"
+                       name="upgradePreview"
+                       <c:if test="${webs.upgradePreview == 1}">checked="checked"</c:if>>
             </label>
             </span>
                 </div>
