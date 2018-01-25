@@ -223,31 +223,33 @@ public class ArticleService {
                 AdminToken adminToken = new AdminToken();
                 adminToken.setUserId(userId);
                 AdminTokenThreadLocal.setAdminToken(adminToken);
+                //检查默认目录是否存在
                 new File(JFinal.me().getConstants().getBaseUploadPath()).mkdirs();
                 String path = url;
                 File thumbnailFile;
                 byte[] bytes;
                 if (url.startsWith("https://") || url.startsWith("http://")) {
-                    HttpFileHandle fileHandler = new HttpFileHandle(JFinal.me().getConstants().getBaseUploadPath());
                     path = new URL(url).getPath();
                     if (!path.startsWith(Constants.ATTACHED_FOLDER)) {
                         path = (Constants.ATTACHED_FOLDER + path).replace("//", "/");
+                    } else {
+                        path = path.replace("//", "/");
                     }
+                    bytes = getRequestBodyBytes(url);
                     path = path.substring(0, path.indexOf(".")) + "_thumbnail" + path.substring(path.indexOf("."));
-                    HttpUtil.getInstance().sendGetRequest(url, new HashMap<String, String[]>(), fileHandler, new HashMap<String, String>());
-                    bytes = IOUtil.getByteByInputStream(new FileInputStream(fileHandler.getT().getPath()));
-                    File tmpFile = new File(fileHandler.getT().getPath());
-                    thumbnailFile = new File(tmpFile.getParent() + "/tmp-" + tmpFile.getName());
+                    thumbnailFile = new File(PathKit.getWebRootPath() + path);
                 } else {
+                    bytes = IOUtil.getByteByInputStream(new FileInputStream(PathKit.getWebRootPath() + url));
                     path = url.substring(0, url.indexOf(".")) + "_thumbnail" + url.substring(path.indexOf("."));
                     thumbnailFile = new File(PathKit.getWebRootPath() + path);
-                    bytes = IOUtil.getByteByInputStream(new FileInputStream(PathKit.getWebRootPath() + url));
                 }
                 int height = -1;
                 int width = -1;
                 if (bytes.length > 0) {
                     try {
                         String extName = thumbnailFile.getName().substring(thumbnailFile.getName().lastIndexOf("."));
+                        //创建文件夹，避免保存失败
+                        thumbnailFile.getParentFile().mkdirs();
                         if (!extName.equalsIgnoreCase(".gif")) {
                             IOUtil.writeBytesToFile(ThumbnailUtil.jpeg(bytes, 1f), thumbnailFile);
                             BufferedImage bimg = ImageIO.read(thumbnailFile);
@@ -267,6 +269,12 @@ public class ArticleService {
             }
         }
         return null;
+    }
+
+    private byte[] getRequestBodyBytes(String url) throws IOException {
+        HttpFileHandle fileHandler = new HttpFileHandle(JFinal.me().getConstants().getBaseUploadPath());
+        HttpUtil.getInstance().sendGetRequest(url, new HashMap<String, String[]>(), fileHandler, new HashMap<String, String>());
+        return IOUtil.getByteByInputStream(new FileInputStream(fileHandler.getT().getPath()));
     }
 
     public String getPlainSearchTxt(String content) {

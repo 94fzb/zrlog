@@ -170,7 +170,6 @@ $(function () {
     }
 
     var saving = false;
-    var xhr;
     var lastChangeRequestBody;
 
     function getArticleRequestBody() {
@@ -192,8 +191,17 @@ $(function () {
     }
 
     function save(rubbish, timer) {
-        if (xhr !== null && saving) {
-            xhr.abort();
+        //如果是还在保存文章状态，跳过保存
+        if (saving) {
+            PNotify.removeAll();
+            new PNotify({
+                title: '正在保存中，请稍等...',
+                delay: 3000,
+                type: 'warn',
+                hide: true,
+                styling: 'bootstrap3'
+            });
+            return;
         }
         refreshKeywords();
         var body = getArticleRequestBody();
@@ -207,7 +215,7 @@ $(function () {
                 url = "api/admin/article/create";
             }
             saving = true;
-            xhr = $.ajax({
+            $.ajax({
                     url: url,
                     data: JSON.stringify(body),
                     method: "POST",
@@ -218,6 +226,9 @@ $(function () {
                         saving = false;
                         tips(data, (timer ? "自动" : "") + (rubbish ? "草稿" : "") + "保存成功 " + zeroPad(date.getHours(), 2) + ":" + zeroPad(date.getMinutes(), 2) + ":" + zeroPad(date.getSeconds(), 2));
                         lastChangeRequestBody = JSON.stringify(getArticleRequestBody());
+                    },
+                    error: function () {
+                        saving = true;
                     }
                 }
             );

@@ -1,15 +1,14 @@
 package com.zrlog.service;
 
-import com.zrlog.common.Constants;
-import com.zrlog.util.ZrlogUtil;
 import com.hibegin.common.util.http.HttpUtil;
 import com.hibegin.common.util.http.handle.HttpJsonArrayHandle;
+import com.zrlog.util.ZrlogUtil;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class UploadService {
 
