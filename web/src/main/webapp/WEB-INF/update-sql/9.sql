@@ -1,0 +1,1 @@
+alter table `log` modify COLUMN `last_update_date` datetime DEFAULT NULL;
