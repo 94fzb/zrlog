@@ -15,16 +15,16 @@ logs
 .settings
 target
 hs_err*.log
-src/main/webapp/post
-src/main/webapp/attached
-src/main/webapp/WEB-INF/classes
-src/main/webapp/WEB-INF/plugins/*
-src/main/webapp/include/templates/template*
+web/src/main/webapp/post
+web/src/main/webapp/attached
+web/src/main/webapp/WEB-INF/classes
+web/src/main/webapp/WEB-INF/plugins/*
+web/src/main/webapp/include/templates/template*
 
-src/main/webapp/include/templates/README.md
-src/main/webapp/include/templates/*.sh
-src/main/webapp/include/templates/.gitignore
-src/main/resources/rebel.xml
+web/src/main/webapp/include/templates/README.md
+web/src/main/webapp/include/templates/*.sh
+web/src/main/webapp/include/templates/.gitignore
+rebel.xml
 tomcat.*
 *.jar
 !.mvn/wrapper/maven-wrapper.jar

@@ -4,16 +4,20 @@
     <groupId>com.zrlog</groupId>
     <artifactId>zrlog</artifactId>
     <version>1.9.0-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <modules>
+        <module>web</module>
+        <module>service</module>
+        <module>common</module>
+        <module>data</module>
+    </modules>
+    <packaging>pom</packaging>
     <name>zrlog</name>
     <description>ZrLog是使用Java开发的博客/CMS程序，具有简约，易用，组件化，内存占用低等特点。自带Markdown编辑器，让更多的精力放在写作上，而不是花费大量时间在学习程序的使用上。
     </description>
     <url>https://www.zrlog.com</url>
 
     <properties>
-        <tomcat7Version>7.0.47</tomcat7Version>
         <java.version>1.7</java.version>
-        <tomcat-scope>compile</tomcat-scope>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -49,36 +53,10 @@
             <version>3.3</version>
         </dependency>
         <dependency>
-            <groupId>com.jfinal</groupId>
-            <artifactId>cos</artifactId>
-            <version>26Dec2008</version>
-        </dependency>
-        <dependency>
-            <groupId>jstl</groupId>
-            <artifactId>jstl</artifactId>
-            <version>1.2</version>
-        </dependency>
-        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>3.1.0</version>
             <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.3.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.mchange</groupId>
-            <artifactId>c3p0</artifactId>
-            <version>0.9.2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.20</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -96,68 +74,10 @@
             <version>1.2.17</version>
         </dependency>
         <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.8.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jsoup</groupId>
-            <artifactId>jsoup</artifactId>
-            <version>1.8.1</version>
-        </dependency>
-        <dependency>
-            <groupId>net.coobird</groupId>
-            <artifactId>thumbnailator</artifactId>
-            <version>0.4.8</version>
-        </dependency>
-        <dependency>
-            <groupId>com.hibegin</groupId>
-            <artifactId>common-util</artifactId>
-            <version>0.0.3</version>
-        </dependency>
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.2</version>
+            <version>4.12</version>
             <scope>test</scope>
-        </dependency>
-
-        <!--tomcat embed mode-->
-        <dependency>
-            <groupId>org.apache.tomcat.embed</groupId>
-            <artifactId>tomcat-embed-core</artifactId>
-            <version>${tomcat7Version}</version>
-            <scope>${tomcat-scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tomcat.embed</groupId>
-            <artifactId>tomcat-embed-logging-juli</artifactId>
-            <version>${tomcat7Version}</version>
-            <scope>${tomcat-scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tomcat.embed</groupId>
-            <artifactId>tomcat-embed-jasper</artifactId>
-            <version>${tomcat7Version}</version>
-            <scope>${tomcat-scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tomcat</groupId>
-            <artifactId>tomcat-jasper</artifactId>
-            <version>${tomcat7Version}</version>
-            <scope>${tomcat-scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tomcat</groupId>
-            <artifactId>tomcat-jasper-el</artifactId>
-            <version>${tomcat7Version}</version>
-            <scope>${tomcat-scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tomcat</groupId>
-            <artifactId>tomcat-jsp-api</artifactId>
-            <version>${tomcat7Version}</version>
-            <scope>${tomcat-scope}</scope>
         </dependency>
     </dependencies>
 
@@ -174,37 +94,6 @@
                 </configuration>
                 <version>2.3.2</version>
             </plugin>
-            <plugin>
-                <groupId>org.apache.tomcat.maven</groupId>
-                <artifactId>tomcat7-maven-plugin</artifactId>
-                <version>2.2</version>
-                <configuration>
-                    <port>8080</port>
-                    <path>/</path>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>2.3</version>
-                <configuration>
-                    <resourceEncoding>UTF-8</resourceEncoding>
-                    <warSourceDirectory>src/main/webapp</warSourceDirectory>
-                    <failOnMissingWebXml>false</failOnMissingWebXml>
-                    <packagingExcludes>
-                        WEB-INF/classes/rebel.xml,
-                        WEB-INF/classes/com/zrlog/web/Application.class,
-                        include/templates/.idea/**,
-                        include/templates/*.zip,
-                        attached/**,
-                        WEB-INF/plugins/**,
-                        WEB-INF/update-temp/**,
-                        WEB-INF/lib/tomcat*,
-                        WEB-INF/lib/ecj*,
-                        post/**
-                    </packagingExcludes>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 </project>
-

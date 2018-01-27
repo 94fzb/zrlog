@@ -1,1 +1,1 @@
-mvnw.cmd clean compile tomcat7:run -Dtomcat-scope=provided
+cd web  && ../mvnw.cmd clean compile tomcat7:run -Dtomcat-scope=provided
