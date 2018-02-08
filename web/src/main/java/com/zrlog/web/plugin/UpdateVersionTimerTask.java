@@ -26,7 +26,7 @@ class UpdateVersionTimerTask extends TimerTask {
     private boolean checkPreview;
     private Version version;
 
-    public UpdateVersionTimerTask(boolean checkPreview) {
+    UpdateVersionTimerTask(boolean checkPreview) {
         this.checkPreview = checkPreview;
     }
 
@@ -46,16 +46,12 @@ class UpdateVersionTimerTask extends TimerTask {
         } else {
             versionUrl = Constants.ZRLOG_RESOURCE_DOWNLOAD_URL + "/release/last.version.json";
         }
-        String txtContent = HttpUtil.getInstance().getTextByUrl(versionUrl + "?_" + System.currentTimeMillis()).trim();
+        String txtContent = HttpUtil.getInstance().getTextByUrl(versionUrl + "?_" + System.currentTimeMillis() + "&v=" + BlogBuildInfoUtil.getBuildId()).trim();
         Version tLastVersion = new Gson().fromJson(txtContent, Version.class);
-        //手动设置对应ChangeLog。
-        String changeLogHtml = HttpUtil.getInstance().getSuccessTextByUrl("http://www.zrlog.com/changelog/" + tLastVersion.getVersion() + "-" + tLastVersion.getBuildId() + ".html");
-        if (StringUtils.isNotEmpty(changeLogHtml)) {
-            tLastVersion.setChangeLog(changeLogHtml);
-        } else {
-            String commitCompareLink = "https://gitee.com/94fzb/zrlog/compare/" + BlogBuildInfoUtil.getBuildId() + "..." + tLastVersion.getBuildId();
-            tLastVersion.setChangeLog("<h4> " + I18NUtil.getStringFromRes("notFoundChangeLog") + " <a target='_blank' href='" + commitCompareLink + "'>" + commitCompareLink + "</a></h4>");
-        }
+        //手动设置对应ChangeLog
+        tLastVersion.setChangeLog(HttpUtil.getInstance().getSuccessTextByUrl("http://www.zrlog.com/changelog/" +
+                tLastVersion.getVersion() + "-" + tLastVersion.getBuildId() + ".html?lang=" +
+                I18NUtil.getCurrentLocale() + "&v=" + BlogBuildInfoUtil.getBuildId()));
         Date buildDate = new SimpleDateFormat("yyyy-MM-dd hh:mm").parse(tLastVersion.getReleaseDate());
         if (!tLastVersion.getBuildId().equals(BlogBuildInfoUtil.getBuildId()) && buildDate.after(BlogBuildInfoUtil.getTime())) {
             LOGGER.info("ZrLog New update found new [" + tLastVersion.getVersion() + "-" + tLastVersion.getBuildId() + "]");

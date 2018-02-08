@@ -1,4 +1,4 @@
-package com.zrlog.web.plugin;
+package com.zrlog.service;
 
 import com.hibegin.common.util.CmdUtil;
 import org.apache.log4j.Logger;
@@ -6,15 +6,20 @@ import org.apache.log4j.Logger;
 import java.io.*;
 import java.util.Random;
 
-/**
- * 通过调用系统命令启动Zrlog的插件服务
- */
-public class PluginConfig {
+public class PluginCoreProcess {
 
-    private static final Logger LOGGER = Logger.getLogger(PluginConfig.class);
+    private static final Logger LOGGER = Logger.getLogger(PluginCoreProcess.class);
 
-    private static Process pr;
-    private static boolean canStart = true;
+    private Process pr;
+    private boolean canStart = true;
+    private static PluginCoreProcess instance = new PluginCoreProcess();
+
+    private PluginCoreProcess() {
+    }
+
+    public static PluginCoreProcess getInstance() {
+        return instance;
+    }
 
     /**
      * plugin-core 目前会监听2个TCP端口，一个用于和Zrlog通信，另一个用于和插件通信
@@ -26,8 +31,8 @@ public class PluginConfig {
      * @param runTimeVersion zrlog目前的版本
      * @return
      */
-    public static int pluginServerStart(final File serverFileName, final String dbProperties, final String pluginJvmArgs,
-                                        final String runtimePath, final String runTimeVersion) {
+    public int pluginServerStart(final File serverFileName, final String dbProperties, final String pluginJvmArgs,
+                                 final String runtimePath, final String runTimeVersion) {
         canStart = true;
         //简单处理，为了能在一个服务器上面启动多个Zrlog程序，使用Random端口的方式，（感兴趣可以算算概率）
         final int randomServerPort = new Random().nextInt(10000) + 20000;
@@ -94,7 +99,7 @@ public class PluginConfig {
     /**
      * Zrlog异常终止后，停止对应的插件服务。
      */
-    private static void registerShutdownHook() {
+    private void registerShutdownHook() {
         Runtime rt = Runtime.getRuntime();
         rt.addShutdownHook(new Thread() {
             @Override
@@ -104,7 +109,7 @@ public class PluginConfig {
         });
     }
 
-    public static void stopPluginCore() {
+    public void stopPluginCore() {
         if (pr != null) {
             pr.destroy();
         }
