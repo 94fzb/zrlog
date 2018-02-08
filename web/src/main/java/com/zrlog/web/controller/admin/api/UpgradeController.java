@@ -14,6 +14,7 @@ import com.zrlog.common.type.AutoUpgradeVersionType;
 import com.zrlog.common.vo.Version;
 import com.zrlog.model.WebSite;
 import com.zrlog.service.CacheService;
+import com.zrlog.service.PluginCoreProcess;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.controller.BaseController;
 import com.zrlog.web.plugin.*;
@@ -103,7 +104,7 @@ public class UpgradeController extends BaseController {
         if (updateVersionThread == null) {
             updateVersionThread = new UpdateVersionThread(file);
             updateVersionThreadMap.put(AdminTokenThreadLocal.getUser().getSessionId(), updateVersionThread);
-            PluginConfig.stopPluginCore();
+            PluginCoreProcess.getInstance().stopPluginCore();
             updateVersionThread.start();
         }
         upgradeProcessResponse.setMessage(updateVersionThread.getMessage());

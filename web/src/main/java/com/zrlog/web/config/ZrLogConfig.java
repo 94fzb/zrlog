@@ -12,6 +12,7 @@ import com.jfinal.render.ViewType;
 import com.jfinal.template.Engine;
 import com.zrlog.model.*;
 import com.zrlog.service.InstallService;
+import com.zrlog.service.PluginCoreProcess;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.version.UpgradeVersionHandler;
@@ -24,7 +25,6 @@ import com.zrlog.web.interceptor.BlackListInterceptor;
 import com.zrlog.web.interceptor.InitDataInterceptor;
 import com.zrlog.web.interceptor.MyI18NInterceptor;
 import com.zrlog.web.interceptor.RouterInterceptor;
-import com.zrlog.web.plugin.PluginConfig;
 import com.zrlog.web.plugin.UpdateVersionPlugin;
 import org.apache.log4j.Logger;
 
@@ -86,7 +86,6 @@ public class ZrLogConfig extends JFinalConfig {
         new Thread() {
             @Override
             public void run() {
-                PluginConfig.stopPluginCore();
                 //加载 zrlog 提供的插件
                 File pluginCoreFile = new File(PathKit.getWebRootPath() + "/WEB-INF/plugins/plugin-core.jar");
                 if (!pluginCoreFile.exists()) {
@@ -99,7 +98,7 @@ public class ZrLogConfig extends JFinalConfig {
                         LOGGER.warn("download plugin core error", e);
                     }
                 }
-                int port = PluginConfig.pluginServerStart(pluginCoreFile, dbPropertiesPath, pluginJvmArgs, PathKit.getWebRootPath(), BlogBuildInfoUtil.getVersion());
+                int port = PluginCoreProcess.getInstance().pluginServerStart(pluginCoreFile, dbPropertiesPath, pluginJvmArgs, PathKit.getWebRootPath(), BlogBuildInfoUtil.getVersion());
                 JFinal.me().getServletContext().setAttribute("pluginServerPort", port);
                 JFinal.me().getServletContext().setAttribute("pluginServer", "http://localhost:" + port);
             }
@@ -300,7 +299,7 @@ public class ZrLogConfig extends JFinalConfig {
      */
     @Override
     public void beforeJFinalStop() {
-        PluginConfig.stopPluginCore();
+        PluginCoreProcess.getInstance().stopPluginCore();
         for (IPlugin plugin : plugins.getPluginList()) {
             plugin.stop();
         }
