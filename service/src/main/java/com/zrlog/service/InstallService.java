@@ -182,14 +182,22 @@ public class InstallService {
         }
         return false;
     }
+    
+    private String firstPostContent = "Hello World 中文意思是『世界，你好』。因为《The C Programme Language》中使用它做为第一个演示程序，非常著名，所以后来的程序员在学习编程或进行设备调试时延续了这一习惯。";
+    private String firstPostTitle = "你好，世界！";
 
     private void insertFirstArticle(Connection connect) throws SQLException {
-        String insetLog = "INSERT INTO `log`(`logId`,`canComment`,`keywords`,`alias`,`typeId`,`userId`,`title`,`content`,`digest`,`releaseTime`,`rubbish`,`private`) VALUES (1,?,'记录','first',1,1,'记录学习记录','每天进步一点','每天进步一点',?,?,?)";
+        String insetLog = "INSERT INTO `log`(`logId`,`canComment`,`keywords`,`alias`,`typeId`,`userId`,`title`,`content`,`mdContent`,`digest`,`releaseTime`,`last_update_date`,`rubbish`,`private`) VALUES (1,?,'记录','hello-world',1,1,?,?,?,?,?,?,?,?)";
         PreparedStatement ps = connect.prepareStatement(insetLog);
         ps.setBoolean(1, true);
-        ps.setObject(2, new java.util.Date());
-        ps.setBoolean(3, false);
-        ps.setBoolean(4, false);
+        ps.setString(2,firstPostTitle);
+        ps.setString(3,firstPostContent);
+        ps.setString(4,firstPostContent);
+	ps.setString(5,firstPostContent);
+        ps.setObject(6, new java.util.Date());
+        ps.setObject(7, new java.util.Date());
+        ps.setBoolean(8, false);
+        ps.setBoolean(9, false);
         ps.executeUpdate();
         ps.close();
     }

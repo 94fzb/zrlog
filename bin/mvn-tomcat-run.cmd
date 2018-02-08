@@ -1,1 +1,1 @@
-cd web  && ../mvnw.cmd clean compile tomcat7:run -Dtomcat-scope=provided
+mvn clean install -Dmaven.test.skip=true && cd web  && ../mvnw.cmd tomcat7:run -Dtomcat-scope=provided

@@ -91,8 +91,8 @@ $(document).ready(function() {
             threshold : 200
         });
     });
-
-
-
+    $("img").error(function(){
+        $(this).hide();
+    });
 });
 

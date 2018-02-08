@@ -13,6 +13,25 @@
         });
     });
 </script>
+<style>
+    input {
+        height: 34px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+    }
+
+    input[type="file"] {
+        display: none;
+    }
+
+    .custom-file-upload {
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        display: inline-block;
+        padding: 6px 12px;
+        cursor: pointer;
+    }
+</style>
 <div class="page-header">
     <h3>
         ${_res['admin.user.info']}
@@ -20,7 +39,8 @@
 </div>
 <div class="row">
     <div class="col-md-6">
-        <form role="form" method="post" data-toggle="validator" class="form-horizontal" id="userAjax" action="api/admin/update">
+        <form role="form" method="post" data-toggle="validator" class="form-horizontal" id="userAjax"
+              action="api/admin/update">
             <div class="form-group">
                 <label class="col-md-3 control-label no-padding-right"> ${_res.userName} </label>
 
@@ -41,7 +61,10 @@
                 <label class="col-md-3 control-label no-padding-right">${_res['headPortrait']}</label>
                 <div class="col-md-9">
                     <input id="logo" class="col-md-7" name="header" value="${user.header}"/>
-                    <input type="file" class="col-md-5 fileUpload" name="imgFile" value=""/>
+                    <label for="fileUpload" class="custom-file-upload">
+                        ${_res['upload']}
+                    </label>
+                    <input id="fileUpload" type="file" class="col-md-5 fileUpload" name="imgFile" value=""/>
                 </div>
             </div>
             <div class="ln_solid"></div>

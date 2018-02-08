@@ -13,6 +13,19 @@
         });
     });
 </script>
+<style>
+    input[type="file"] {
+        display: none;
+    }
+
+    .custom-file-upload {
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        display: inline-block;
+        padding: 6px 12px;
+        cursor: pointer;
+    }
+</style>
 <div class="page-header">
     <h3>
         主题设置
@@ -46,7 +59,11 @@
                 <div class="col-sm-6">
                     <input id="logo" class="form-control col-sm-10" name="avatar" value="${_res.avatar}">
                 </div>
-                <div class="col-sm-2"><input type="file" class="fileUpload icon-upload-alt" name="imgFile" value="上传"/>
+                <div class="col-sm-2">
+                    <label for="fileUpload" class="custom-file-upload">
+                        ${_res['upload']}
+                    </label>
+                    <input type="file" id="fileUpload" class="fileUpload icon-upload-alt" name="imgFile" value="上传"/>
                 </div>
             </div>
             <div class="ln_solid"></div>
