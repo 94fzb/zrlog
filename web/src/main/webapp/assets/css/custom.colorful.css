@@ -23,6 +23,10 @@
     color: #fff;
 }
 
+.nav-sm ul.nav.child_menu {
+    background: #20293d
+}
+
 .site_title {
     color: #fff;
     padding-left: 10px;
@@ -33,7 +37,7 @@
 }
 
 body {
-    background: #f7f7f7;
+    background: #19202F;
     color: #394d63;
 }
 
@@ -41,6 +45,14 @@ body {
     background: #1F283D;
     box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25), 0 1px 0 rgba(255, 255, 255, 0.16) inset;
     text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+
+.current-page {
+    border-right: 6px solid #337ab7;
+}
+
+.nav-sm .nav.child_menu li.active, .nav-sm .nav.side-menu li.active-sm {
+    border-right: 6px solid #337ab7;
 }
 
 .nav.side-menu > li.current-page, .nav.side-menu > li.active {
@@ -65,4 +77,17 @@ body {
 
 .page-header {
     margin: 66px 0 20px;
+}
+
+#nprogress .bar {
+    background: #337ab7 none repeat scroll 0 0;
+}
+
+#nprogress .peg {
+    box-shadow: 0 0 10px #337ab7, 0 0 5px #337ab7;
+}
+
+#nprogress .spinner-icon {
+    border-left-color: #337ab7;
+    border-top-color: #337ab7;
 }

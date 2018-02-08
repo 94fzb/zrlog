@@ -108,7 +108,7 @@ public class I18NUtil {
         return "";
     }
 
-    public static String getStringFromRes(String key) {
+    public static String getCurrentLocale() {
         Map<String, Object> webSite = (Map<String, Object>) JFinal.me().getServletContext().getAttribute("webSite");
         String locale;
         if (webSite != null && webSite.get("language") != null) {
@@ -116,11 +116,6 @@ public class I18NUtil {
         } else {
             locale = "zh_CN";
         }
-        String result = (String) I18N_RES_MAP.get(Constants.I18N + "_" + locale).get(key);
-        if (result != null) {
-            return result;
-        } else {
-            return "";
-        }
+        return locale;
     }
 }

@@ -17,7 +17,7 @@
       </div>
     </div>
   </div> <!-- //page -->
-<script src="${url}/js/sheshui.js?20160528"></script>
+<script src="${url}/js/sheshui.js?20180210"></script>
 <div style="display:none">${webs.webCm}</div>
 </body>
 </html>

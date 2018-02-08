@@ -3,14 +3,27 @@
 <jsp:include page="include/menu.jsp"/>
 <script src="${cacheFile['/assets/js/jquery.liteuploader.min.js']}"></script>
 <script src="${cacheFile['/admin/js/template.js']}"></script>
+<style>
+    input[type="file"] {
+        display: none;
+    }
+
+    .custom-file-upload {
+        cursor: pointer;
+    }
+</style>
 <div class="page-header">
     <h3>
         ${_res['admin.template.manage']}
     </h3>
 </div>
 <div class="row">
-    <div class="form-group col-sm-offset-10 col-sm-2">
-        <input type="file" class="fileUpload" name="file" value=""/>
+    <div class="form-group col-sm-offset-11 col-sm-1">
+        <label for="fileUpload" class="custom-file-upload btn btn-primary btn-round">
+            <i class="fa fa-cloud-upload"></i>&nbsp;${_res['upload']}
+        </label>
+
+        <input type="file" id="fileUpload" class="fileUpload" name="file" value=""/>
     </div>
 </div>
 <div class="row">

@@ -237,6 +237,7 @@ input[type=text], textarea {
 .main section {
     float: left;
     width: 720px;
+    min-height:780px;
 }
 
 .main aside {
