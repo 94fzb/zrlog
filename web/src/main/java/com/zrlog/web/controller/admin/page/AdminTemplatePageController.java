@@ -78,7 +78,7 @@ public class AdminTemplatePageController extends BaseController {
 
         List<TemplateVO> sortTemplates = new ArrayList<>();
         for (TemplateVO templateVO : templates) {
-            if (templateVO.getTemplate().equals(Constants.DEFAULT_TEMPLATE_PATH)) {
+            if (templateVO.getTemplate().startsWith(Constants.DEFAULT_TEMPLATE_PATH)) {
                 templateVO.setDeleteAble(false);
                 sortTemplates.add(templateVO);
             } else {
@@ -86,7 +86,7 @@ public class AdminTemplatePageController extends BaseController {
             }
         }
         for (TemplateVO templateVO : templates) {
-            if (!templateVO.getTemplate().equals(Constants.DEFAULT_TEMPLATE_PATH)) {
+            if (!templateVO.getTemplate().startsWith(Constants.DEFAULT_TEMPLATE_PATH)) {
                 sortTemplates.add(templateVO);
             }
         }
