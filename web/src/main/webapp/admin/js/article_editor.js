@@ -229,6 +229,7 @@ $(function () {
     }
 
     $(document.body).on('click', '#unCheckedTag .tag2', function (e) {
+        $("#keywords_tagsinput").find('span[val='+$(this).text()+']').remove();
         keywordsEl.importTags($(this).text());
         $(this).remove();
         e.preventDefault();
@@ -236,8 +237,9 @@ $(function () {
     });
     $(document.body).on('click', "#keywords_tagsinput .tag2 a", function () {
         var text = $(this).siblings().text().trim();
+        $("#unCheckedTag").find('span[val='+text+']').remove();
         $(this).parent().remove();
-        $("#unCheckedTag").append('<span class="tag2"><i class="fa fa-tag">' + text + '</i></span>');
+        $("#unCheckedTag").append('<span class="tag2" val="'+text+'"><i class="fa fa-tag">' + text + '</i></span>');
         refreshKeywords();
         return false;
     });

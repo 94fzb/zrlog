@@ -98,7 +98,7 @@
             }
 
             if (value != '' && skipTag != true) {
-                $('<span>').addClass('tag2').append(
+                $('<span>').attr("val", value).addClass('tag2').append(
                     $('<span>').text(value).append('&nbsp;&nbsp;'),
                     $('<a>', {
                         href: '#',
@@ -143,7 +143,7 @@
 
             var old = $(this).val().split(delimiter[id]);
 
-            $('#' + id + '_tagsinput .tag').remove();
+            $('#' + id + '_tagsinput .tag2').remove();
             str = '';
             for (i = 0; i < old.length; i++) {
                 if (old[i] != value) {
@@ -170,8 +170,6 @@
 
     // clear all existing tags and import new ones from a string
     $.fn.importTags = function (str) {
-        var id = $(this).attr('id');
-        $('#' + id + '_tagsinput .tag').remove();
         $.fn.tagsInput.importTags(this, str);
     }
 
@@ -323,7 +321,7 @@
                 data.removeWithBackspace && $(data.fake_input).bind('keydown', function (event) {
                     if (event.keyCode == 8 && $(this).val() == '') {
                         event.preventDefault();
-                        var last_tag = $(this).closest('.tagsinput').find('.tag:last').text();
+                        var last_tag = $(this).closest('.tagsinput').find('.tag2:last').text();
                         var id = $(this).attr('id').replace(/_tag$/, '');
                         last_tag = last_tag.replace(/[\s]+x$/, '');
                         $('#' + id).removeTag(escape(last_tag));

@@ -199,7 +199,7 @@ public class ZrLogConfig extends JFinalConfig {
                 LOGGER.warn("configPlugin exception ", e);
             }
         } else {
-            LOGGER.warn("Not found lock file(" + PathKit.getWebRootPath() + "/WEB-INF/install.lock), Please visit the http://yourHostName:port" + JFinal.me().getContextPath() + "/ installation");
+            LOGGER.warn("Not found lock file(" + PathKit.getWebRootPath() + "/WEB-INF/install.lock), Please visit the http://yourHostName:port" + JFinal.me().getContextPath() + "/install start installation");
         }
 
         JFinal.me().getServletContext().setAttribute("plugins", plugins);
@@ -216,7 +216,7 @@ public class ZrLogConfig extends JFinalConfig {
             systemProp.put("dbServer.version", ZrLogUtil.getDatabaseServerVersion(dbProperties.getProperty("jdbcUrl"), dbProperties.getProperty("user"),
                     dbProperties.getProperty("password"), dbProperties.getProperty("driverClass")));
         }
-        systemProp.setProperty("zrlog.runtime.path", JFinal.me().getServletContext().getRealPath("/"));
+        systemProp.setProperty("zrlog.runtime.path", PathKit.getWebRootPath());
         systemProp.setProperty("server.info", JFinal.me().getServletContext().getServerInfo());
         JFinal.me().getServletContext().setAttribute("system", systemProp);
         systemProperties.put("version", BlogBuildInfoUtil.getVersion());

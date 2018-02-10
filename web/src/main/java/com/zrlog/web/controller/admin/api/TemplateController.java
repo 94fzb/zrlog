@@ -53,7 +53,7 @@ public class TemplateController extends BaseController {
     }
 
     public Map loadFile() throws FileNotFoundException {
-        String file = getRequest().getServletContext().getRealPath("/") + getPara("file");
+        String file = PathKit.getWebRootPath() + getPara("file");
         Map<String, Object> map = new HashMap<>();
         String fileContent = IOUtil.getStringInputStream(new FileInputStream(file));
         map.put("fileContent", fileContent);
@@ -61,7 +61,7 @@ public class TemplateController extends BaseController {
     }
 
     public Map saveFile() {
-        String file = getRequest().getServletContext().getRealPath("/") + getPara("file");
+        String file = PathKit.getWebRootPath() + getPara("file");
         IOUtil.writeBytesToFile(getPara("content").getBytes(), new File(file));
         Map<String, Object> map = new HashMap<>();
         map.put("status", 200);

@@ -10,9 +10,10 @@
 
 ### 一图胜千言
 
-![](http://static.blog.zrlog.com/attached/image/20171211/20171211215306_12.png)
+![](http://static.blog.zrlog.com/attached/image/20180210/20180210150116_800.png)
 
-![](http://static.blog.zrlog.com/attached/image/20171211/20171211215327_655.png)
+![](http://static.blog.zrlog.com/attached/image/20180210/20180210150133_99.png)
+
 ### 功能
 * 1.提供日志，分类，标签，评论的管理
 * 2.支持插件模式 [如何编写一个插件](http://blog.zrlog.com/post/zrlog-plugin-dev)

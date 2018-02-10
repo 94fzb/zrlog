@@ -15,13 +15,14 @@
 <title>${_res.installWizard}</title>
 <link href="${basePath}assets/css/bootstrap.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="${basePath}assets/css/custom.min.css" />
+<link href="${basePath}/assets/css/custom.colorful.css" rel="stylesheet">
 <link rel="stylesheet" href="${basePath}assets/css/font-awesome.min.css" />
 <script src="${basePath}assets/js/jquery.min.js"></script>
 <script src="${basePath}/assets/js/bootstrap.min.js"></script>
 <script src="${basePath}/assets/js/validator.min.js"></script>
 </head>
 
-<body style="">
+<body style="background:#fff">
 	<div class="col-md-2"></div>
 	<div class="col-md-8">
 	<div class="x_panel">
