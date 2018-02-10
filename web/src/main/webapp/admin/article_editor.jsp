@@ -159,7 +159,7 @@
                         <div class="x_content">
                             <div class="tagsinput" id="unCheckedTag" style="max-height: 300px;width: 100%">
                                 <c:forEach items="${init.tags}" var="tags">
-                                    <span class="tag2"><i class="fa fa-tag"></i>${tags.text}</span>
+                                    <span class="tag2" val="${tags.text}" ><i class="fa fa-tag"></i>${tags.text}</span>
                                 </c:forEach>
                             </div>
                         </div>

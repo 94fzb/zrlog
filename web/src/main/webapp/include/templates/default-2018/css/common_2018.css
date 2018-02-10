@@ -97,7 +97,7 @@ input[type=text],textarea {border-width: 1px; border-style: solid; border-color:
 .top, .main, .bottom{ clear:both;width:100%}
 .top header,
 .main{flex-grow: 1;}
-.main{ max-width: 800px; margin: 0 auto; padding:84px 0 0 0;}
+.main{ max-width: 800px;min-height: 780px; margin: 0 auto; padding:84px 0 0 0;}
 .top .avatar{background: url(../images/avatar240_240.jpg) scroll center center #FFFFFF;background-size: cover;border-radius: 50%; overflow: hidden;}
 .bottom footer { margin:0 auto; }
 .main section {min-width: 720px; margin: 0 auto; }
@@ -144,7 +144,7 @@ input[type=text],textarea {border-width: 1px; border-style: solid; border-color:
   border-top:3px solid rgba(33,150,243,1);
   background-color:#FFFFFF;
 }
-footer{max-width: 1280px; /*height: 144px;*/min-height: 64px;position: relative;}
+footer{width: 880px; /*height: 144px;*/min-height: 64px;position: relative;}
 footer h2{font-size:14px; font-weight:bold; margin-bottom:2px;}
 footer li{padding: 0.2em 0 0.2em 10px; background: url(../images/dot.gif) no-repeat scroll 2px 9px transparent;}
 .footer-left{float:left; width:720px; padding: 0;}

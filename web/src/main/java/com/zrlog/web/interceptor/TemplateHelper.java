@@ -52,7 +52,7 @@ public class TemplateHelper {
 
     public static List<String> getFiles(String path) {
         List<String> fileList = new ArrayList<>();
-        fillFileInfo(JFinal.me().getServletContext().getRealPath("/") + path, fileList, ".jsp", ".js", ".css", ".html");
+        fillFileInfo(PathKit.getWebRootPath() + path, fileList, ".jsp", ".js", ".css", ".html");
         String webPath = JFinal.me().getServletContext().getRealPath("/");
         List<String> strFile = new ArrayList<>();
         for (String aFileList : fileList) {
