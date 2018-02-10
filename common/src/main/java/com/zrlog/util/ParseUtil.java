@@ -45,4 +45,24 @@ public class ParseUtil {
         }
         return defaultValue;
     }
+
+    public static boolean isGarbageComment(String str) {
+        // TODO　如何过滤垃圾信息
+        return !containsHanScript(str);
+    }
+
+    private static boolean containsHanScript(String s) {
+        for (int i = 0; i < s.length(); ) {
+            int codepoint = s.codePointAt(i);
+            i += Character.charCount(codepoint);
+            if (Character.UnicodeScript.of(codepoint) == Character.UnicodeScript.HAN) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static void main(String[] args) {
+        System.out.println("check = " + isGarbageComment("what is the best insurance company for auto"));
+    }
 }

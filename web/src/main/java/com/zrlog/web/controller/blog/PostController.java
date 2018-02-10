@@ -151,8 +151,7 @@ public class PostController extends BaseController {
             Log log = Log.dao.findById(logId);
             if (log != null && log.getBoolean("canComment")) {
                 String comment = Jsoup.clean(getPara("userComment"), Whitelist.basic());
-                if (comment.length() > 0) {
-                    // TODO　如何过滤垃圾信息
+                if (comment.length() > 0 && !ParseUtil.isGarbageComment(comment)) {
                     new Comment().set("userHome", getPara("userHome"))
                             .set("userMail", getPara("userMail"))
                             .set("userIp", WebTools.getRealIp(getRequest()))
