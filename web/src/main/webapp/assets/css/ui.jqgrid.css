@@ -401,6 +401,7 @@ tr.ui-search-toolbar select {margin: 1px 0 0 0}
 }
 .ui-jqgrid .ui-jqgrid-bdiv {
     border-top: 1px solid #e1e1e1;
+    overflow-x: hidden;
 }
 .ui-jqgrid .loading {
     background-color: #fff;
