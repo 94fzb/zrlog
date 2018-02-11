@@ -7,6 +7,24 @@ $(function () {
         dropdownParent: $("#type-select-parent")
     });
 
+    $("#right_col").on('resize', function () {
+        thumbnailImgResize();
+    });
+
+    function thumbnailImgResize() {
+        var rightWidth = $("#right_col").width();
+        if (rightWidth < 660) {
+            $("#thumbnail-img").width(rightWidth - 10);
+            $("#thumbnail-img").height(((rightWidth - 10) / 660) * 192);
+            $("#camera-icon").css("margin-top", 20);
+        } else {
+            $("#camera-icon").css("margin-top", 80);
+        }
+    }
+
+    jQuery(window).resize(thumbnailImgResize);
+    var timer = setInterval(thumbnailImgResize, 100);
+
     var keywordsEl = $("#keywords");
     keywordsEl.tagsInput({
         height: '68px',
@@ -229,7 +247,7 @@ $(function () {
     }
 
     $(document.body).on('click', '#unCheckedTag .tag2', function (e) {
-        $("#keywords_tagsinput").find('span[val='+$(this).text()+']').remove();
+        $("#keywords_tagsinput").find('span[val=' + $(this).text() + ']').remove();
         keywordsEl.importTags($(this).text());
         $(this).remove();
         e.preventDefault();
@@ -237,9 +255,9 @@ $(function () {
     });
     $(document.body).on('click', "#keywords_tagsinput .tag2 a", function () {
         var text = $(this).siblings().text().trim();
-        $("#unCheckedTag").find('span[val='+text+']').remove();
+        $("#unCheckedTag").find('span[val=' + text + ']').remove();
         $(this).parent().remove();
-        $("#unCheckedTag").append('<span class="tag2" val="'+text+'"><i class="fa fa-tag">' + text + '</i></span>');
+        $("#unCheckedTag").append('<span class="tag2" val="' + text + '"><i class="fa fa-tag">' + text + '</i></span>');
         refreshKeywords();
         return false;
     });

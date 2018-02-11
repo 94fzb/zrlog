@@ -45,6 +45,7 @@ function beforeEditCallback(e) {
 
 //replace icons with FontAwesome icons like above
 function updatePagerIcons(table) {
+    resizeJqGrid();
     var replacement =
         {
             'ui-icon-seek-first': 'icon-double-angle-left bigger-140',
@@ -66,26 +67,23 @@ function enableTooltips(table) {
 }
 
 function resizeJqGrid() {
-    var leftWidth = $("#left_col").width();
-    if (leftWidth > 0) {
-        leftWidth += 36;
-    } else {
-        leftWidth += 20;
-    }
     if (jqGrid) {
-        jqGrid.setGridWidth($(window).width() - leftWidth);
+        var minWidth = $("#grid-table").attr("min-width");
+        if (minWidth && $("#right_col").width() < minWidth) {
+            jqGrid.setGridWidth(minWidth);
+            $(".ui-jqgrid-bdiv").css("background-color", $("#right_col").css("background-color"));
+        } else {
+            jqGrid.setGridWidth($("#right_col").width());
+        }
     }
 }
 
-var divW = jQuery("#left_col").width();
-var divH = jQuery("#left_col").height();
+var divW = jQuery("#right_col").width();
 
 function checkResize() {
-    var w = jQuery("#left_col").width();
-    var h = jQuery("#left_col").height();
-    if (w != divW || h != divH) {
+    var w = jQuery("#right_col").width();
+    if (w !== divW) {
         resizeJqGrid();
-        divH = h;
         divW = w;
     }
 }

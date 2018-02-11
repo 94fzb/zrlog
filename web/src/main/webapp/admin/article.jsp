@@ -35,7 +35,7 @@
 
 <div class="row">
     <div id="jqgrid" class="col-xs-12">
-        <table id="grid-table"></table>
+        <table id="grid-table" min-width="1200"></table>
         <div id="grid-pager"></div>
     </div>
 </div>

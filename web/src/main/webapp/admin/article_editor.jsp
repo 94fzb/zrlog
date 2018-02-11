@@ -64,16 +64,15 @@
                       style="display: none;">${log.content}</textarea>
             <c:if test="${0 ne webSite['article_thumbnail_status']}">
                 <div class="form-group">
-                    <div class="WriteCover-wrapper">
-                        <div id="thumbnail-img" title="${_res['writeCover']}"
-                             style="background: url('${log.thumbnail}')"
-                             class="thumbnail-img img-responsive WriteCover-previewWrapper WriteCover-previewWrapper--empty">
-                            <i id="camera-icon" class="WriteCover-uploadIcon fa fa-camera fa-3"></i>
-                            <input type="file" accept=".jpeg, .jpg, .png" id="thumbnail-upload" name="imgFile"
-                                   value="${log.thumbnail}"
-                                   class="WriteCover-uploadInput">
-                            <input type="hidden" name="thumbnail" value="${log.thumbnail}" id="thumbnail">
-                        </div>
+                    <div id="thumbnail-img" title="${_res['writeCover']}"
+                         style="background-color:rgba(0,0,0,.075);<c:if
+                                 test="${log!=null and log.thumbnail ne ''}">background: url('${log.thumbnail}')</c:if>"
+                         class="thumbnail-img img-responsive WriteCover-wrapper WriteCover-previewWrapper">
+                        <i id="camera-icon" class="WriteCover-uploadIcon fa fa-camera fa-3"></i>
+                        <input type="file" accept=".jpeg, .jpg, .png" id="thumbnail-upload" name="imgFile"
+                               value="${log.thumbnail}"
+                               class="WriteCover-uploadInput">
+                        <input type="hidden" name="thumbnail" value="${log.thumbnail}" id="thumbnail">
                     </div>
                 </div>
             </c:if>
@@ -159,7 +158,7 @@
                         <div class="x_content">
                             <div class="tagsinput" id="unCheckedTag" style="max-height: 300px;width: 100%">
                                 <c:forEach items="${init.tags}" var="tags">
-                                    <span class="tag2" val="${tags.text}" ><i class="fa fa-tag"></i>${tags.text}</span>
+                                    <span class="tag2" val="${tags.text}"><i class="fa fa-tag"></i>${tags.text}</span>
                                 </c:forEach>
                             </div>
                         </div>

@@ -4881,7 +4881,7 @@ ul.notifications {
 }
 .WriteCover-wrapper {
     background: rgba(0,0,0,.075);
-    line-height: 192px;
+    height: 192px;
     background-size: 100% auto;
     width: 660px;
     color: #808080;
@@ -4901,7 +4901,8 @@ ul.notifications {
     z-index: 2;
 }
 .fa-3 {
-    width: 60px;
-    height: 60px;
+    margin-top: 80px;
+    width: 40px;
+    height: 40px;
     font-size: 35px !important;
 }

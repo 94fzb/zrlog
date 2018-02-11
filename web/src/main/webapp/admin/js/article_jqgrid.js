@@ -2,7 +2,7 @@ jQuery(function ($) {
     var articleUrl = 'api/admin/article';
     var deleteUrl = "api/admin/article/delete";
     jqGrid = jQuery(grid_selector).jqGrid({
-        url: articleUrl,
+        url: articleUrl + "?keywords=" + $.trim($("#keywords").val()),
         datatype: "json",
         colNames: ['', 'ID', lang.title, lang.keywords, lang.author, lang.type,
             lang.viewCount, lang.rubbish, lang.private, lang.createTime, lang.lastUpdateDate, lang.edit, lang.view],
@@ -107,15 +107,10 @@ jQuery(function ($) {
     );
 
     $("#searchArticleBtn").click(function () {
-        var keywords = $.trim($("#keywords").val());
-        if (keywords === "") {
-            alert(_res['searchTip']);
-            $("#searchArticleBtn").val("").focus();
-        }
-        else {
-            jqGrid.jqGrid('setGridParam', {url: articleUrl + '?keywords=' + keywords});
-            jqGrid.jqGrid('setGridParam', {datatype: 'json'}).trigger('reloadGrid');
-        }
+        var queryStr = '?keywords=' + $.trim($("#keywords").val());
+        jqGrid.jqGrid('setGridParam', {url: articleUrl + queryStr});
+        window.history.replaceState({}, "", window.location.pathname + queryStr);
+        jqGrid.jqGrid('setGridParam', {datatype: 'json'}).trigger('reloadGrid');
         return false;
     })
 });
