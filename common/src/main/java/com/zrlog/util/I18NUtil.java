@@ -3,15 +3,12 @@ package com.zrlog.util;
 import com.hibegin.common.util.StringUtils;
 import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
-import com.jfinal.kit.PathKit;
 import com.zrlog.common.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -22,41 +19,55 @@ public class I18NUtil {
     private static final String I18N_FILE_NAME = "_i18nFileName";
     private static final Logger LOGGER = LoggerFactory.getLogger(I18NUtil.class);
     private static final Map<String, Map<String, Object>> I18N_RES_MAP = new HashMap<>();
-    private static final Set<String> loadSet = new HashSet<>();
 
     static {
-        loadI18N(PathKit.getRootClassPath());
+        reloadSystemI18N();
     }
 
-    private static boolean loadI18N(String path) {
-        File[] files = new File(path).listFiles();
-        if (files != null) {
-            for (File file : files) {
-                if (file.getName().startsWith(Constants.I18N) && file.getName().endsWith(".properties")) {
-                    String key = file.getName().replace(".properties", "");
-                    Map<String, Object> map = I18N_RES_MAP.get(key);
-                    if (map == null) {
-                        map = new HashMap<>();
-                        I18N_RES_MAP.put(key, map);
-                    }
-                    Properties properties = new Properties();
-                    try (FileInputStream in = new FileInputStream(file)) {
-                        properties.load(in);
-                        for (Map.Entry<Object, Object> entry : properties.entrySet()) {
-                            map.put(entry.getKey().toString(), entry.getValue());
-                        }
-                    } catch (IOException e) {
-                        LOGGER.error("load properties error", e);
-                    }
+    private static void reloadSystemI18N() {
+        loadI18N(I18NUtil.class.getResourceAsStream("/i18n_en_US.properties"), "i18n_en_US.properties");
+        loadI18N(I18NUtil.class.getResourceAsStream("/i18n_zh_CN.properties"), "i18n_zh_CN.properties");
+    }
+
+    private static void loadI18N(InputStream inputStream, String name) {
+        if (name.startsWith(Constants.I18N) && name.endsWith(".properties")) {
+            String key = name.replace(".properties", "");
+            Map<String, Object> map = I18N_RES_MAP.get(key);
+            if (map == null) {
+                map = new HashMap<>();
+                I18N_RES_MAP.put(key, map);
+            }
+            Properties properties = new Properties();
+            try {
+                properties.load(inputStream);
+                for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+                    map.put(entry.getKey().toString(), entry.getValue());
+                }
+            } catch (IOException e) {
+                LOGGER.error("load properties error", e);
+            } finally {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    LOGGER.error("", e);
                 }
             }
         }
-        return files != null;
     }
 
     public static void addToRequest(String path, Controller controller) {
-        if ((JFinal.me().getConstants().getDevMode() || !loadSet.contains(path)) && loadI18N(path)) {
-            loadSet.add(path);
+        if (JFinal.me().getConstants().getDevMode()) {
+            reloadSystemI18N();
+        }
+        File[] propertiesFiles = new File(path).listFiles();
+        if (propertiesFiles != null) {
+            for (File propertiesFile : propertiesFiles) {
+                try {
+                    loadI18N(new FileInputStream(propertiesFile), propertiesFile.getName());
+                } catch (FileNotFoundException e) {
+                    //ignore
+                }
+            }
         }
         String i18nFile;
         String locale = null;

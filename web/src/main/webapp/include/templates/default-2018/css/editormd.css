@@ -3078,8 +3078,8 @@
 .editormd-logo-7x:before,
 .editormd-logo-8x:before {
   content: "\e1987";
-  /* 
-  HTML Entity &#xe1987; 
+  /*
+  HTML Entity &#xe1987;
   example: <span class="editormd-logo">&#xe1987;</span>
   */
 }
@@ -3977,10 +3977,12 @@ li.L0,
 li.L1,
 li.L2,
 li.L3,
+li.L4,
 li.L5,
 li.L6,
 li.L7,
-li.L8 {
+li.L8,
+li.L9 {
   /*list-style-type: none;*/
 }
 
@@ -4006,7 +4008,7 @@ li.L9 {
   background: none;
   padding: 0;
 }
-.editormd-preview-container li.L0, .editormd-preview-container li.L1, .editormd-preview-container li.L2, .editormd-preview-container li.L3, .editormd-preview-container li.L5, .editormd-preview-container li.L6, .editormd-preview-container li.L7, .editormd-preview-container li.L8, .editormd-html-preview li.L0, .editormd-html-preview li.L1, .editormd-html-preview li.L2, .editormd-html-preview li.L3, .editormd-html-preview li.L5, .editormd-html-preview li.L6, .editormd-html-preview li.L7, .editormd-html-preview li.L8 {
+.editormd-preview-container li.L0, .editormd-preview-container li.L1, .editormd-preview-container li.L2, .editormd-preview-container li.L3,.editormd-preview-container li.L4, .editormd-preview-container li.L5, .editormd-preview-container li.L6, .editormd-preview-container li.L7, .editormd-preview-container li.L8, .editormd-preview-container li.L9, .editormd-html-preview li.L0, .editormd-html-preview li.L1, .editormd-html-preview li.L2, .editormd-html-preview li.L3, .editormd-html-preview li.L5, .editormd-html-preview li.L6, .editormd-html-preview li.L7, .editormd-html-preview li.L8, .editormd-html-preview li.L9 {
   list-style-type: decimal;
 }
 

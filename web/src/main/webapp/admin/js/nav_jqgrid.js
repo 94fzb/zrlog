@@ -12,7 +12,7 @@ jQuery(function ($) {
                     delOptions: {recreateForm: true, beforeShowForm: beforeDeleteCallback, url: "api/admin/nav/delete"}
                 }
             },
-            {name: 'id', index: 'id', width: 60, sorttype: "int", editable: false},
+            {name: 'id', index: 'id', width: 60, sorttype: "int", editable: false, sortable: false},
             {
                 name: 'url',
                 index: 'url',
@@ -23,8 +23,17 @@ jQuery(function ($) {
                 formatter: 'link',
                 editoptions: {rows: "2", cols: "20"}
             },
-            {name: 'navName', index: 'navName', width: 150, editable: true, editoptions: {size: "20", maxlength: "30"}},
-            {name: 'sort', index: 'sort', width: 70, editable: true},
+            {
+                name: 'navName',
+                index: 'navName',
+                width: 150,
+                editable: true,
+                editoptions: {size: "20", maxlength: "30"},
+                sortable: false
+            },
+            {
+                name: 'sort', index: 'sort', width: 70, editable: true, sortable: false
+            },
 
         ],
 

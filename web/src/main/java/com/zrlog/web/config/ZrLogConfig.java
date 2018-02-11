@@ -213,8 +213,7 @@ public class ZrLogConfig extends JFinalConfig {
     public void afterJFinalStart() {
         super.afterJFinalStart();
         if (isInstalled()) {
-            systemProp.put("dbServer.version", ZrLogUtil.getDatabaseServerVersion(dbProperties.getProperty("jdbcUrl"), dbProperties.getProperty("user"),
-                    dbProperties.getProperty("password"), dbProperties.getProperty("driverClass")));
+            initDatabaseVersion();
         }
         systemProp.setProperty("zrlog.runtime.path", PathKit.getWebRootPath());
         systemProp.setProperty("server.info", JFinal.me().getServletContext().getServerInfo());
@@ -231,6 +230,12 @@ public class ZrLogConfig extends JFinalConfig {
                 WebSite.dao.updateByKV(com.zrlog.common.Constants.ZRLOG_SQL_VERSION_KEY, updatedVersion + "");
             }
         }
+    }
+
+    private void initDatabaseVersion() {
+        systemProp.put("dbServer.version", ZrLogUtil.getDatabaseServerVersion(dbProperties.getProperty("jdbcUrl"), dbProperties.getProperty("user"),
+                dbProperties.getProperty("password"), dbProperties.getProperty("driverClass")));
+
     }
 
     /**
@@ -336,5 +341,6 @@ public class ZrLogConfig extends JFinalConfig {
         for (IPlugin plugin : pluginList) {
             plugin.start();
         }
+        initDatabaseVersion();
     }
 }
