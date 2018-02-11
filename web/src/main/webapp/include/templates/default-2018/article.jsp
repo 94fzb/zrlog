@@ -7,7 +7,13 @@
 <p class="category">${_res['category']}：<a href="${log.typeUrl}" rel="tag">${log.typeName}</a> /</p>
 <p class="published">${_res['date']}：<time datetime="${log.releaseTime}">&nbsp;${log.releaseTime.year+1900}-${log.releaseTime.month+1}-${log.releaseTime.date}</time></p>
 </div>
-<div class="content markdown-body">
+
+    <style>
+        .prettyprint .linenums li:before {
+            content: "";
+        }
+    </style>
+<div class="content markdown-body editormd-preview-container" style="padding:0">
 ${log.content }
 </div>
 </div>

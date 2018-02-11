@@ -9,6 +9,11 @@
 <div class="page-header">
     <h3>${_res['admin.tag.manage']}</h3>
 </div>
+<style>
+    .ui-jqgrid tr.jqgrow, .ui-jqgrid tr.ui-row-ltr, .ui-jqgrid tr.ui-row-rtl {
+        height: 42px;
+    }
+</style>
 <div class="row">
     <div class="col-xs-12">
         <table id="grid-table"></table>

@@ -31,15 +31,7 @@ $(function () {
         width: 'auto'
     });
     keywordsEl.importTags($("#keywordsVal").val());
-    var tags = $("#keywordsVal").val().split(",");
-    for (var tag in tags) {
-        var unCheckedTag = $("#unCheckedTag").children("span");
-        for (var t in unCheckedTag) {
-            if (tags[tag] === $(unCheckedTag[t]).text()) {
-                $(unCheckedTag[t]).remove();
-            }
-        }
-    }
+    refreshKeywords();
 
     function zeroPad(num, places) {
         var zero = places - num.toString().length + 1;

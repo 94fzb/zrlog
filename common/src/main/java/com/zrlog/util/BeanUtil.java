@@ -1,6 +1,7 @@
 package com.zrlog.util;
 
 import com.google.gson.Gson;
+import com.hibegin.common.util.IOUtil;
 import com.zrlog.common.response.PageableResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +44,10 @@ public class BeanUtil {
     private static <T> T convert(Object obj, Class<T> tClass) {
         String jsonStr = new Gson().toJson(obj);
         return new Gson().fromJson(jsonStr, tClass);
+    }
+
+    public static <T> T convert(InputStream inputStream, Class<T> tClass) {
+        return new Gson().fromJson(IOUtil.getStringInputStream(inputStream), tClass);
     }
 
     public static <T> T cloneObject(Object obj) {

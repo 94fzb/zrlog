@@ -4,6 +4,7 @@ import com.jfinal.aop.Interceptor;
 import com.jfinal.aop.Invocation;
 import com.jfinal.core.JFinal;
 import com.zrlog.model.WebSite;
+import com.zrlog.web.config.ZrLogConfig;
 import com.zrlog.web.util.WebTools;
 import com.zrlog.web.controller.BaseController;
 
@@ -18,22 +19,26 @@ public class BlackListInterceptor implements Interceptor {
 
     @Override
     public void intercept(Invocation invocation) {
-        if (invocation.getController() instanceof BaseController) {
-            BaseController baseController = (BaseController) invocation.getController();
-            String ipStr = WebSite.dao.getStringValueByName("blackList");
-            if (ipStr != null) {
-                Set<String> ipSet = new HashSet<>(Arrays.asList(ipStr.split(",")));
-                String requestIP = WebTools.getRealIp(baseController.getRequest());
-                if (ipSet.contains(requestIP)) {
-                    baseController.render(JFinal.me().getConstants().getErrorView(403));
+        if (!ZrLogConfig.isInstalled() && "/".equals(invocation.getController().getRequest().getRequestURI())) {
+            invocation.getController().render("/install/index.jsp");
+        } else {
+            if (invocation.getController() instanceof BaseController) {
+                BaseController baseController = (BaseController) invocation.getController();
+                String ipStr = WebSite.dao.getStringValueByName("blackList");
+                if (ipStr != null) {
+                    Set<String> ipSet = new HashSet<>(Arrays.asList(ipStr.split(",")));
+                    String requestIP = WebTools.getRealIp(baseController.getRequest());
+                    if (ipSet.contains(requestIP)) {
+                        baseController.render(JFinal.me().getConstants().getErrorView(403));
+                    } else {
+                        invocation.invoke();
+                    }
                 } else {
                     invocation.invoke();
                 }
             } else {
                 invocation.invoke();
             }
-        } else {
-            invocation.invoke();
         }
     }
 }

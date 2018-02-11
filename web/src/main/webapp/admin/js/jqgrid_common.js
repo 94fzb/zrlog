@@ -46,6 +46,7 @@ function beforeEditCallback(e) {
 //replace icons with FontAwesome icons like above
 function updatePagerIcons(table) {
     resizeJqGrid();
+    $(".ui-jqgrid-titlebar-close").remove();
     var replacement =
         {
             'ui-icon-seek-first': 'icon-double-angle-left bigger-140',

@@ -16,7 +16,7 @@ public class WebSite extends Model<WebSite> {
 
     public Map<String, Object> getWebSite() {
         Map<String, Object> webSites = new HashMap<>();
-        List<WebSite> lw = find("select * from website");
+        List<WebSite> lw = find("select * from " + TABLE_NAME);
         for (WebSite webSite : lw) {
             webSites.put(webSite.getStr("name"), webSite.get("value"));
             webSites.put(webSite.getStr("name") + "Remark", webSite.get("remark"));
@@ -25,18 +25,22 @@ public class WebSite extends Model<WebSite> {
     }
 
     public boolean updateByKV(String name, Object value) {
-        if (Db.queryInt("select siteId from website where name=?", name) != null) {
-            Db.update("update website set value=? where name=?", value, name);
+        if (Db.queryInt("select siteId from " + TABLE_NAME + " where name=?", name) != null) {
+            Db.update("update " + TABLE_NAME + " set value=? where name=?", value, name);
         } else {
-            Db.update("insert website(`value`,`name`) value(?,?)", value, name);
+            Db.update("insert " + TABLE_NAME + "(`value`,`name`) value(?,?)", value, name);
         }
         return true;
     }
 
     public String getStringValueByName(String name) {
-        WebSite webSite = findFirst("select value from website where name=?", name);
-        if (webSite != null) {
-            return webSite.get("value");
+        try {
+            WebSite webSite = findFirst("select value from " + TABLE_NAME + " where name=?", name);
+            if (webSite != null) {
+                return webSite.get("value");
+            }
+        } catch (NullPointerException e) {
+            //ignore，比如在未安装时，会有该异常但是不影响逻辑
         }
         return "";
     }

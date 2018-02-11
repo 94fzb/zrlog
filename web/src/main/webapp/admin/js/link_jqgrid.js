@@ -13,7 +13,7 @@ jQuery(function ($) {
                     delOptions: {recreateForm: true, beforeShowForm: beforeDeleteCallback, url: "api/admin/link/delete"}
                 }
             },
-            {name: 'id', index: 'id', width: 60, sorttype: "int", editable: false},
+            {name: 'id', index: 'id', width: 60, sorttype: "int", editable: false, sortable: false},
             {
                 name: 'url',
                 index: 'url',
@@ -29,14 +29,22 @@ jQuery(function ($) {
                 index: 'linkName',
                 width: 150,
                 editable: true,
+                sortable: false,
                 editoptions: {size: "20", maxlength: "30"}
             },
-            {name: 'alt', index: 'alt', width: 150, editable: true, editoptions: {size: "20", maxlength: "30"}},
-            {name: 'sort', index: 'sort', width: 70, editable: true},
+            {
+                name: 'alt',
+                index: 'alt',
+                width: 150,
+                editable: true,
+                sortable: false,
+                editoptions: {size: "20", maxlength: "30"}
+            },
+            {name: 'sort', index: 'sort', width: 70, editable: true, sortable: false}
 
         ],
 
-        viewrecords: false,
+        viewrecords: true,
         rowNum: 10,
         rowList: [10, 20, 30],
         pager: pager_selector,
@@ -112,11 +120,10 @@ jQuery(function ($) {
                 style_delete_form(form);
 
                 form.data('styled', true);
-            },
-            onClick: function (e) {
-                alert(1);
             }
         },
+        {},
+        {},
         {}
     );
 });

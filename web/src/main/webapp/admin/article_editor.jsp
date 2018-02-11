@@ -66,7 +66,7 @@
                 <div class="form-group">
                     <div id="thumbnail-img" title="${_res['writeCover']}"
                          style="background-color:rgba(0,0,0,.075);<c:if
-                                 test="${log!=null and log.thumbnail ne ''}">background: url('${log.thumbnail}')</c:if>"
+                                 test="${log!=null and not empty log.thumbnail}">background: url('${log.thumbnail}')</c:if>"
                          class="thumbnail-img img-responsive WriteCover-wrapper WriteCover-previewWrapper">
                         <i id="camera-icon" class="WriteCover-uploadIcon fa fa-camera fa-3"></i>
                         <input type="file" accept=".jpeg, .jpg, .png" id="thumbnail-upload" name="imgFile"

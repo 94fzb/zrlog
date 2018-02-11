@@ -6,6 +6,8 @@ import com.jfinal.kit.PathKit;
 import com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException;
 import com.zrlog.common.Constants;
 import com.zrlog.common.type.TestConnectDbResult;
+import com.zrlog.common.vo.InitFirstArticleVO;
+import com.zrlog.util.BeanUtil;
 import com.zrlog.util.ZrLogUtil;
 import org.apache.log4j.Logger;
 
@@ -182,22 +184,24 @@ public class InstallService {
         }
         return false;
     }
-    
-    private String firstPostContent = "Hello World 中文意思是『世界，你好』。因为《The C Programme Language》中使用它做为第一个演示程序，非常著名，所以后来的程序员在学习编程或进行设备调试时延续了这一习惯。";
-    private String firstPostTitle = "你好，世界！";
+
 
     private void insertFirstArticle(Connection connect) throws SQLException {
-        String insetLog = "INSERT INTO `log`(`logId`,`canComment`,`keywords`,`alias`,`typeId`,`userId`,`title`,`content`,`mdContent`,`digest`,`releaseTime`,`last_update_date`,`rubbish`,`private`) VALUES (1,?,'记录','hello-world',1,1,?,?,?,?,?,?,?,?)";
+        String insetLog = "INSERT INTO `log`(`logId`,`canComment`,`keywords`,`alias`,`typeId`,`userId`,`title`,`content`,`plain_content`,`mdContent`,`digest`,`releaseTime`,`last_update_date`,`rubbish`,`private`) VALUES (1,?,?,?,1,1,?,?,?,?,?,?,?,?,?)";
         PreparedStatement ps = connect.prepareStatement(insetLog);
         ps.setBoolean(1, true);
-        ps.setString(2,firstPostTitle);
-        ps.setString(3,firstPostContent);
-        ps.setString(4,firstPostContent);
-	ps.setString(5,firstPostContent);
-        ps.setObject(6, new java.util.Date());
-        ps.setObject(7, new java.util.Date());
-        ps.setBoolean(8, false);
-        ps.setBoolean(9, false);
+        InitFirstArticleVO initFirstArticleVO = BeanUtil.convert(InstallService.class.getResourceAsStream("/init-blog.json"), InitFirstArticleVO.class);
+        ps.setString(2, initFirstArticleVO.getKeywords());
+        ps.setString(3, initFirstArticleVO.getAlias());
+        ps.setString(4, initFirstArticleVO.getTitle());
+        ps.setString(5, initFirstArticleVO.getContent());
+        ps.setString(6, initFirstArticleVO.getPlainContent());
+        ps.setString(7, initFirstArticleVO.getMdContent());
+        ps.setString(8, initFirstArticleVO.getDigest());
+        ps.setObject(9, new java.util.Date());
+        ps.setObject(10, new java.util.Date());
+        ps.setBoolean(11, false);
+        ps.setBoolean(12, false);
         ps.executeUpdate();
         ps.close();
     }

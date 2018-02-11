@@ -2,7 +2,7 @@ jQuery(function ($) {
     var grid_selector = "#grid-table";
     var pager_selector = "#grid-pager";
 
-    jQuery(grid_selector).jqGrid({
+    jqGrid = jQuery(grid_selector).jqGrid({
         url: 'api/admin/type',
         datatype: "json",
         colNames: [' ', 'ID', lang.typeName, lang.alias, lang.mark],
@@ -19,16 +19,24 @@ jQuery(function ($) {
                     }
                 }
             },
-            {name: 'id', index: 'id', width: 60, sorttype: "int", editable: false},
+            {name: 'id', index: 'id', width: 60, sorttype: "int", editable: false, sortable: false},
             {name: 'typeName', index: 'typeName', width: 150, sortable: false, editable: true},
-            {name: 'alias', index: 'alias', width: 150, editable: true, editoptions: {size: "20", maxlength: "30"}},
+            {
+                name: 'alias',
+                index: 'alias',
+                width: 150,
+                editable: true,
+                sortable: false,
+                editoptions: {size: "20", maxlength: "30"}
+            },
             {
                 name: 'remark',
                 index: 'remark',
                 width: 150,
                 editable: true,
                 edittype: "textarea",
-                editoptions: {rows: "3", cols: "20"}
+                editoptions: {rows: "3", cols: "20"},
+                sortable: false
             }
 
         ],
