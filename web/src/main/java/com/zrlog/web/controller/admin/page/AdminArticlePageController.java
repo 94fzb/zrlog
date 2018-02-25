@@ -22,13 +22,16 @@ public class AdminArticlePageController extends BaseController {
     }
 
     public String edit() {
+        boolean skipFirstRubbishSave = false;
         if (getPara("id") != null) {
             Integer logId = Integer.parseInt(getPara("id"));
             Log log = Log.dao.adminFindLogByLogId(logId);
             if (log != null) {
                 setAttr("log", log.getAttrs());
+                skipFirstRubbishSave = true;
             }
         }
+        setAttr("skipFirstRubbishSave", skipFirstRubbishSave);
         return "/admin/edit";
     }
 }
