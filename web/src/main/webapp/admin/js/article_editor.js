@@ -270,10 +270,12 @@ $(function () {
     }
 
     $("#saveToRubbish").click(function () {
+        skipFirstRubbishSave = false;
         save(true, false)
     });
 
     $("#save").click(function () {
+        skipFirstRubbishSave = false;
         save(false, false);
     });
 
