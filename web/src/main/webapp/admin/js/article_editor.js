@@ -216,23 +216,29 @@ $(function () {
                 url = "api/admin/article/create";
             }
             saving = true;
-            $.ajax({
-                    url: url,
-                    data: JSON.stringify(body),
-                    method: "POST",
-                    dataType: "json",
-                    contentType: "application/json",
-                    success: function (data) {
-                        var date = new Date();
-                        saving = false;
-                        tips(data, (timer ? lang.auto : "") + (rubbish ? lang.rubbish : "") + " " + lang.saveSuccess + " " + zeroPad(date.getHours(), 2) + ":" + zeroPad(date.getMinutes(), 2) + ":" + zeroPad(date.getSeconds(), 2));
-                        lastChangeRequestBody = JSON.stringify(getFormRequestBody("#article-form"));
-                    },
-                    error: function () {
-                        saving = true;
+            if (!skipFirstRubbishSave) {
+                $.ajax({
+                        url: url,
+                        data: JSON.stringify(body),
+                        method: "POST",
+                        dataType: "json",
+                        contentType: "application/json",
+                        success: function (data) {
+                            var date = new Date();
+                            saving = false;
+                            tips(data, (timer ? lang.auto : "") + (rubbish ? lang.rubbish : "") + " " + lang.saveSuccess + " " + zeroPad(date.getHours(), 2) + ":" + zeroPad(date.getMinutes(), 2) + ":" + zeroPad(date.getSeconds(), 2));
+                            lastChangeRequestBody = JSON.stringify(getFormRequestBody("#article-form"));
+                        },
+                        error: function () {
+                            saving = true;
+                        }
                     }
-                }
-            );
+                )
+            } else {
+                skipFirstRubbishSave = false;
+                saving = false;
+                lastChangeRequestBody = JSON.stringify(getFormRequestBody("#article-form"));
+            }
         } else {
             lastChangeRequestBody = JSON.stringify(getFormRequestBody("#article-form"));
         }

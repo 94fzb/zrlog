@@ -16,6 +16,9 @@
 <script src="${cacheFile['/admin/js/article_editor.js']}"></script>
 <link href="${cacheFile['/assets/css/video-js.css']}" rel="stylesheet">
 <script src="${cacheFile['/assets/js/video.js']}"></script>
+<script>
+    var skipFirstRubbishSave = ${skipFirstRubbishSave};
+</script>
 <style>
     .CodeMirror-scroll {
         box-sizing: content-box;
