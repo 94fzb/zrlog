@@ -262,12 +262,17 @@ public class InstallService {
         StringBuilder sb = new StringBuilder();
         sb.append("INSERT INTO `website` (`name`, `value`, `remark`) VALUES ");
         Map<String, Object> defaultMap = getDefaultWebSiteSettingMap(configMsg);
-        for (Map.Entry e : defaultMap.entrySet()) {
-            sb.append("('").append(e.getKey()).append("','").append(e.getValue()).append("',NULL),");
+        for (int i = 0; i < defaultMap.size(); i++) {
+            sb.append("(").append("?").append(",").append("?").append(",NULL),");
         }
         String insertWebSql = sb.toString().substring(0, sb.toString().length() - 1);
-
         PreparedStatement ps = connect.prepareStatement(insertWebSql);
+        int i = 1;
+        for (Map.Entry<String, Object> e : defaultMap.entrySet()) {
+            ps.setString(i++, e.getKey());
+            ps.setObject(i++, e.getValue());
+        }
+
         ps.executeUpdate();
         ps.close();
     }
