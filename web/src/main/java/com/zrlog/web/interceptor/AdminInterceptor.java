@@ -146,7 +146,7 @@ class AdminInterceptor implements Interceptor {
         boolean rendered = false;
         if (returnValue != null) {
             if (ai.getActionKey().startsWith("/api/admin")) {
-                controller.renderJson(ai.getReturnValue());
+                controller.renderJson((Object) ai.getReturnValue());
                 rendered = true;
             } else if (ai.getActionKey().startsWith("/admin") && returnValue instanceof String && JFinal.me().getConstants().getViewType() == ViewType.JSP) {
                 String templatePath = returnValue.toString() + ".jsp";

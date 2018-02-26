@@ -93,9 +93,9 @@ class VisitorInterceptor implements Interceptor {
     private void apiPermission(Invocation ai) {
         ai.invoke();
         if (ai.getController().getAttr("log") != null) {
-            ai.getController().renderJson(ai.getController().getAttr("log"));
+            ai.getController().renderJson((Object) ai.getController().getAttr("log"));
         } else if (ai.getController().getAttr("data") != null) {
-            ai.getController().renderJson(ai.getController().getAttr("data"));
+            ai.getController().renderJson((Object) ai.getController().getAttr("data"));
         } else {
             Map<String, Object> error = new HashMap<>();
             error.put("status", 500);
