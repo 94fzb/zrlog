@@ -2,9 +2,9 @@ package com.zrlog.web.controller.admin.api;
 
 import com.zrlog.common.response.WebSiteSettingUpdateResponse;
 import com.zrlog.model.WebSite;
-import com.zrlog.service.CacheService;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.ZrLogUtil;
+import com.zrlog.web.annotation.RefreshCache;
 import com.zrlog.web.controller.BaseController;
 
 import java.util.HashMap;
@@ -13,8 +13,7 @@ import java.util.Map.Entry;
 
 public class WebSiteController extends BaseController {
 
-    private CacheService cacheService = new CacheService();
-
+    @RefreshCache
     public WebSiteSettingUpdateResponse update() {
         Map<String, Object> requestMap = ZrLogUtil.convertRequestBody(getRequest(), Map.class);
         for (Entry<String, Object> param : requestMap.entrySet()) {
@@ -23,8 +22,6 @@ public class WebSiteController extends BaseController {
 
         WebSiteSettingUpdateResponse updateResponse = new WebSiteSettingUpdateResponse();
         updateResponse.setError(0);
-        cacheService.refreshInitDataCache(this, true);
-        cacheService.removeCachedStaticFile();
         return updateResponse;
     }
 

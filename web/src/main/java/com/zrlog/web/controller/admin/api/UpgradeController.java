@@ -13,9 +13,9 @@ import com.zrlog.common.response.UpgradeProcessResponse;
 import com.zrlog.common.type.AutoUpgradeVersionType;
 import com.zrlog.common.vo.Version;
 import com.zrlog.model.WebSite;
-import com.zrlog.service.CacheService;
 import com.zrlog.service.PluginCoreProcess;
 import com.zrlog.util.ZrLogUtil;
+import com.zrlog.web.annotation.RefreshCache;
 import com.zrlog.web.controller.BaseController;
 import com.zrlog.web.plugin.*;
 import com.zrlog.service.AdminTokenThreadLocal;
@@ -31,8 +31,7 @@ public class UpgradeController extends BaseController {
     private static Map<Integer, DownloadProcessHandle> downloadProcessHandleMap = new ConcurrentHashMap<>();
     private static Map<Integer, UpdateVersionThread> updateVersionThreadMap = new ConcurrentHashMap<>();
 
-    private CacheService cacheService = new CacheService();
-
+    @RefreshCache
     public UpdateRecordResponse setting() {
         UpdateRecordResponse recordResponse = new UpdateRecordResponse();
         UpgradeSettingRequest upgradeSettingRequest = ZrLogUtil.convertRequestBody(getRequest(), UpgradeSettingRequest.class);
@@ -53,8 +52,6 @@ public class UpgradeController extends BaseController {
                 }
             }
         }
-        cacheService.refreshInitDataCache(this, true);
-        cacheService.removeCachedStaticFile();
         return recordResponse;
     }
 

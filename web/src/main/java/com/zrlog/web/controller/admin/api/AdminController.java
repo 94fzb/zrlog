@@ -10,6 +10,7 @@ import com.zrlog.common.response.UpdateRecordResponse;
 import com.zrlog.model.User;
 import com.zrlog.util.I18NUtil;
 import com.zrlog.util.ZrLogUtil;
+import com.zrlog.web.annotation.RefreshCache;
 import com.zrlog.web.controller.BaseController;
 import com.zrlog.service.AdminTokenService;
 import com.zrlog.service.AdminTokenThreadLocal;
@@ -41,6 +42,7 @@ public class AdminController extends BaseController {
         return loginResponse;
     }
 
+    @RefreshCache
     public UpdateRecordResponse update() {
         UpdateAdminRequest updateAdminRequest = ZrLogUtil.convertRequestBody(getRequest(), UpdateAdminRequest.class);
         UpdateRecordResponse updateRecordResponse = new UpdateRecordResponse();

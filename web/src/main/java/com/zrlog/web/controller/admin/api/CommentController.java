@@ -4,6 +4,7 @@ import com.zrlog.common.request.ReadCommentRequest;
 import com.zrlog.common.response.UpdateRecordResponse;
 import com.zrlog.model.Comment;
 import com.zrlog.util.ZrLogUtil;
+import com.zrlog.web.annotation.RefreshCache;
 import com.zrlog.web.controller.BaseController;
 
 import java.util.HashMap;
@@ -11,6 +12,7 @@ import java.util.Map;
 
 public class CommentController extends BaseController {
 
+    @RefreshCache
     public Map delete() {
         String[] ids = getPara("id").split(",");
         for (String id : ids) {
@@ -29,6 +31,7 @@ public class CommentController extends BaseController {
         return Comment.dao.find(getPageable());
     }
 
+    @RefreshCache
     public UpdateRecordResponse update() {
         //TODO
         return new UpdateRecordResponse(true);

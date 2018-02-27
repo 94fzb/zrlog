@@ -8,15 +8,17 @@ import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
 import com.jfinal.render.ViewType;
-import com.zrlog.model.BaseDataInitVO;
 import com.zrlog.common.Constants;
 import com.zrlog.common.response.ExceptionResponse;
-import com.zrlog.model.User;
-import com.zrlog.util.I18NUtil;
-import com.zrlog.web.util.WebTools;
 import com.zrlog.common.vo.AdminTokenVO;
+import com.zrlog.model.BaseDataInitVO;
+import com.zrlog.model.User;
 import com.zrlog.service.AdminTokenService;
 import com.zrlog.service.AdminTokenThreadLocal;
+import com.zrlog.service.CacheService;
+import com.zrlog.util.I18NUtil;
+import com.zrlog.web.annotation.RefreshCache;
+import com.zrlog.web.util.WebTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +36,7 @@ class AdminInterceptor implements Interceptor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AdminInterceptor.class);
     private AdminTokenService adminTokenService = new AdminTokenService();
+    private CacheService cacheService = new CacheService();
 
     @Override
     public void intercept(Invocation inv) {
@@ -143,6 +146,13 @@ class AdminInterceptor implements Interceptor {
      */
     private boolean tryDoRender(Invocation ai, Controller controller) {
         Object returnValue = ai.getReturnValue();
+        if (ai.getMethod().getAnnotation(RefreshCache.class) != null) {
+            cacheService.refreshInitDataCache(controller, true);
+            cacheService.removeCachedStaticFile();
+            if (JFinal.me().getConstants().getDevMode()) {
+                LOGGER.info(controller.getRequest().getRequestURI() + " trigger refresh cache");
+            }
+        }
         boolean rendered = false;
         if (returnValue != null) {
             if (ai.getActionKey().startsWith("/api/admin")) {
