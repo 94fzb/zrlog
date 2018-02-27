@@ -11,9 +11,9 @@ import com.zrlog.common.response.UpdateRecordResponse;
 import com.zrlog.common.response.UploadTemplateResponse;
 import com.zrlog.common.response.WebSiteSettingUpdateResponse;
 import com.zrlog.model.WebSite;
-import com.zrlog.service.CacheService;
 import com.zrlog.util.I18NUtil;
 import com.zrlog.util.ZrLogUtil;
+import com.zrlog.web.annotation.RefreshCache;
 import com.zrlog.web.controller.BaseController;
 
 import javax.servlet.http.Cookie;
@@ -26,8 +26,7 @@ import java.util.Map;
 
 public class TemplateController extends BaseController {
 
-    private CacheService cacheService = new CacheService();
-
+    @RefreshCache
     public WebSiteSettingUpdateResponse apply() {
         String template = getPara("template");
         new WebSite().updateByKV("template", template);
@@ -37,9 +36,6 @@ public class TemplateController extends BaseController {
         cookie.setPath("/");
         cookie.setMaxAge(0);
         getResponse().addCookie(cookie);
-        // 更新缓存数据
-        cacheService.refreshInitDataCache(this, true);
-        cacheService.removeCachedStaticFile();
         return webSiteSettingUpdateResponse;
     }
 
@@ -90,6 +86,7 @@ public class TemplateController extends BaseController {
      * @deprecated 主题设置建议直接使用config方法
      */
     @Deprecated
+    @RefreshCache
     public UpdateRecordResponse setting() {
         Map<String, String[]> param = getRequest().getParameterMap();
         String template = getPara("template");
@@ -106,6 +103,7 @@ public class TemplateController extends BaseController {
         return save(template, settingMap);
     }
 
+    @RefreshCache
     public UpdateRecordResponse config() {
         Map<String, Object> param = ZrLogUtil.convertRequestBody(getRequest(), Map.class);
         String template = (String) param.get("template");
@@ -116,10 +114,9 @@ public class TemplateController extends BaseController {
         return new UpdateRecordResponse();
     }
 
+    @RefreshCache
     private UpdateRecordResponse save(String template, Map<String, Object> settingMap) {
         new WebSite().updateByKV(template + templateConfigSuffix, new Gson().toJson(settingMap));
-        cacheService.refreshInitDataCache(this, true);
-        cacheService.removeCachedStaticFile();
         UpdateRecordResponse updateRecordResponse = new UpdateRecordResponse();
         updateRecordResponse.setMessage("变更成功");
         return updateRecordResponse;
