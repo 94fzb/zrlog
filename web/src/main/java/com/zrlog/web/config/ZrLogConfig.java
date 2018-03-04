@@ -15,7 +15,6 @@ import com.zrlog.service.InstallService;
 import com.zrlog.service.PluginCoreProcess;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.ZrLogUtil;
-import com.zrlog.web.version.UpgradeVersionHandler;
 import com.zrlog.web.controller.blog.APIController;
 import com.zrlog.web.controller.blog.InstallController;
 import com.zrlog.web.controller.blog.PostController;
@@ -26,6 +25,7 @@ import com.zrlog.web.interceptor.InitDataInterceptor;
 import com.zrlog.web.interceptor.MyI18NInterceptor;
 import com.zrlog.web.interceptor.RouterInterceptor;
 import com.zrlog.web.plugin.UpdateVersionPlugin;
+import com.zrlog.web.version.UpgradeVersionHandler;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -53,7 +53,10 @@ public class ZrLogConfig extends JFinalConfig {
     //存放为config的属性，是为了安装完成后还获得JFinal的插件列表对象
     private Plugins plugins;
     private boolean haveSqlUpdated = false;
-    private String upgradeSqlBasePath = PathKit.getWebRootPath() + "/WEB-INF/update-sql";
+
+    private String getUpgradeSqlBasePath() {
+        return PathKit.getWebRootPath() + "/WEB-INF/update-sql";
+    }
 
     /**
      * 读取Zrlog的一些配置，主要是避免硬编码的问题
@@ -178,7 +181,7 @@ public class ZrLogConfig extends JFinalConfig {
             String dbPropertiesFile = PathKit.getWebRootPath() + "/WEB-INF/db.properties";
             try (FileInputStream in = new FileInputStream(dbPropertiesFile)) {
                 dbProperties.load(in);
-                tryDoUpgrade(upgradeSqlBasePath, dbProperties.getProperty("jdbcUrl"), dbProperties.getProperty("user"),
+                tryDoUpgrade(getUpgradeSqlBasePath(), dbProperties.getProperty("jdbcUrl"), dbProperties.getProperty("user"),
                         dbProperties.getProperty("password"), dbProperties.getProperty("driverClass"));
 
                 // 启动时候进行数据库连接
@@ -225,7 +228,7 @@ public class ZrLogConfig extends JFinalConfig {
         JFinal.me().getServletContext().setAttribute("zrlog", systemProperties);
         JFinal.me().getServletContext().setAttribute("config", this);
         if (haveSqlUpdated) {
-            int updatedVersion = ZrLogUtil.getSqlVersion(upgradeSqlBasePath);
+            int updatedVersion = ZrLogUtil.getSqlVersion(getUpgradeSqlBasePath());
             if (updatedVersion > 0) {
                 WebSite.dao.updateByKV(com.zrlog.common.Constants.ZRLOG_SQL_VERSION_KEY, updatedVersion + "");
             }

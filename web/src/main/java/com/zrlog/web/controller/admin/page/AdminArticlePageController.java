@@ -4,6 +4,7 @@ import com.zrlog.common.Constants;
 import com.zrlog.model.Log;
 import com.zrlog.util.I18NUtil;
 import com.zrlog.web.controller.BaseController;
+import com.zrlog.web.interceptor.TemplateHelper;
 
 public class AdminArticlePageController extends BaseController {
 
@@ -15,6 +16,7 @@ public class AdminArticlePageController extends BaseController {
             log.put("nextLog", Log.dao.findNextLog(logId, I18NUtil.getStringFromRes("noNextLog", getRequest())));
 
             setAttr("log", log.getAttrs());
+            TemplateHelper.fillArticleInfo(log, TemplateHelper.setBaseUrl(getRequest(), false, Constants.webSite), "");
             return getTemplatePath() + "/detail";
         } else {
             return Constants.ADMIN_NOT_FOUND_PAGE;
