@@ -3,15 +3,12 @@ package com.zrlog.web.interceptor;
 import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
-import com.zrlog.model.BaseDataInitVO;
 import com.zrlog.common.Constants;
+import com.zrlog.common.vo.OutlineVO;
 import com.zrlog.model.*;
-import com.zrlog.util.BeanUtil;
-import com.zrlog.util.I18NUtil;
-import com.zrlog.util.ParseUtil;
-import com.zrlog.util.ZrLogUtil;
-import com.zrlog.web.util.WebTools;
+import com.zrlog.util.*;
 import com.zrlog.web.controller.BaseController;
+import com.zrlog.web.util.WebTools;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -174,7 +171,7 @@ public class TemplateHelper {
         return Constants.DEFAULT_TEMPLATE_PATH;
     }
 
-    private static String setBaseUrl(HttpServletRequest request, boolean staticBlog, Map webSite) {
+    public static String setBaseUrl(HttpServletRequest request, boolean staticBlog, Map webSite) {
         String templateUrl;
         String scheme = WebTools.getRealScheme(request);
         String baseUrl = scheme + "://" + request.getHeader("host") + request.getContextPath() + "/";
@@ -214,14 +211,7 @@ public class TemplateHelper {
 
     private static void staticHtml(Object data, String baseUrl, String suffix, boolean thumbnailEnableArticle) {
         if (data instanceof Log) {
-            Log log = (Log) data;
-            log.put("alias", log.get("alias") + suffix);
-            log.put("url", baseUrl + "post/" + log.get("alias"));
-            log.put("typeUrl", baseUrl + "post/sort/" + log.get("typeAlias") + suffix);
-            Log lastLog = log.get("lastLog");
-            Log nextLog = log.get("nextLog");
-            nextLog.put("url", baseUrl + "post/" + nextLog.get("alias") + suffix);
-            lastLog.put("url", baseUrl + "post/" + lastLog.get("alias") + suffix);
+            fillArticleInfo((Log) data, baseUrl, suffix);
         } else if (data instanceof Map) {
             Map map = (Map) data;
             List<Log> logList = (List<Log>) map.get("rows");
@@ -236,6 +226,24 @@ public class TemplateHelper {
                     log.put("typeUrl", baseUrl + "post/sort/" + log.get("typeAlias") + suffix);
                 }
             }
+        }
+    }
+
+    public static void fillArticleInfo(Log data, String baseUrl, String suffix) {
+        data.put("alias", data.get("alias") + suffix);
+        data.put("url", baseUrl + "post/" + data.get("alias"));
+        data.put("typeUrl", baseUrl + "post/sort/" + data.get("typeAlias") + suffix);
+        Log lastLog = data.get("lastLog");
+        Log nextLog = data.get("nextLog");
+        nextLog.put("url", baseUrl + "post/" + nextLog.get("alias") + suffix);
+        lastLog.put("url", baseUrl + "post/" + lastLog.get("alias") + suffix);
+        String mdContent = data.getStr("mdContent").toLowerCase();
+        //没有使用md的toc目录的文章才尝试使用系统提取的目录
+        if (!mdContent.contains("[toc]") && !mdContent.contains("[tocm]")) {
+            //最基础的实现方式，若需要更强大的实现方式建议使用JavaScript完成（页面输入toc对象）
+            OutlineVO outlineVO = OutlineUtil.extractOutline(data.getStr("content"));
+            data.put("tocHtml", OutlineUtil.buildTocHtml(outlineVO, ""));
+            data.put("toc", outlineVO);
         }
     }
 }

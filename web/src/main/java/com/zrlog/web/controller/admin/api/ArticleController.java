@@ -5,18 +5,17 @@ import com.zrlog.common.request.UpdateArticleRequest;
 import com.zrlog.common.response.*;
 import com.zrlog.model.Log;
 import com.zrlog.model.Tag;
-import com.zrlog.service.ArticleService;
-import com.zrlog.service.CacheService;
-import com.zrlog.util.ZrLogUtil;
-import com.zrlog.web.controller.BaseController;
 import com.zrlog.service.AdminTokenThreadLocal;
+import com.zrlog.service.ArticleService;
+import com.zrlog.util.ZrLogUtil;
+import com.zrlog.web.annotation.RefreshCache;
+import com.zrlog.web.controller.BaseController;
 
 public class ArticleController extends BaseController {
 
-    private CacheService cacheService = new CacheService();
-
     private ArticleService articleService = new ArticleService();
 
+    @RefreshCache
     public DeleteLogResponse delete() {
         String[] ids = getPara("id").split(",");
         for (String id : ids) {
@@ -38,19 +37,13 @@ public class ArticleController extends BaseController {
         return new UpdateRecordResponse();
     }
 
+    @RefreshCache
     public CreateOrUpdateLogResponse create() {
-        // 移除缓存文件
-        if (isStaticHtmlStatus()) {
-            cacheService.removeCachedStaticFile();
-        }
         return articleService.create(AdminTokenThreadLocal.getUserId(), ZrLogUtil.convertRequestBody(getRequest(), CreateArticleRequest.class));
     }
 
+    @RefreshCache
     public CreateOrUpdateLogResponse update() {
-        // 移除缓存文件
-        if (isStaticHtmlStatus()) {
-            cacheService.removeCachedStaticFile();
-        }
         return articleService.update(AdminTokenThreadLocal.getUserId(), ZrLogUtil.convertRequestBody(getRequest(), UpdateArticleRequest.class));
     }
 

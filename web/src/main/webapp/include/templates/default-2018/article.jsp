@@ -13,6 +13,9 @@
             content: "";
         }
     </style>
+    <div class="post" style="top: 150px;left:1366px;position: fixed">
+        ${log.tocHtml}
+    </div>
 <div class="content markdown-body editormd-preview-container" style="padding:0">
 ${log.content }
 </div>
