@@ -2,7 +2,6 @@ package com.zrlog.service;
 
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.SecurityUtils;
-import com.jfinal.kit.PathKit;
 import com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException;
 import com.zrlog.common.Constants;
 import com.zrlog.common.type.TestConnectDbResult;
@@ -12,7 +11,6 @@ import com.zrlog.util.ZrLogUtil;
 import org.apache.log4j.Logger;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.net.ConnectException;
 import java.sql.*;
@@ -52,7 +50,7 @@ public class InstallService {
      * @param webSite
      * @return
      */
-    private static Map<String, Object> getDefaultWebSiteSettingMap(Map<String, String> webSite) {
+    private Map<String, Object> getDefaultWebSiteSettingMap(Map<String, String> webSite) {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("rows", 10);
         map.put("template", Constants.DEFAULT_TEMPLATE_PATH);
@@ -61,7 +59,7 @@ public class InstallService {
         map.put("title", webSite.get("title"));
         map.put("second_title", webSite.get("second_title"));
         map.put("home", webSite.get("home"));
-        map.put(Constants.ZRLOG_SQL_VERSION_KEY, ZrLogUtil.getSqlVersion(PathKit.getWebRootPath() + "/WEB-INF/update-sql"));
+        map.put(Constants.ZRLOG_SQL_VERSION_KEY, ZrLogUtil.getSqlVersion(basePath + "/update-sql"));
         return map;
     }
 
@@ -141,8 +139,7 @@ public class InstallService {
             prop.putAll(dbConn);
             prop.store(out, "This is a database configuration file");
             out.close();
-            File sqlFile = new File(basePath + "/install.sql");
-            String s = IOUtil.getStringInputStream(new FileInputStream(sqlFile));
+            String s = IOUtil.getStringInputStream(InstallService.class.getResourceAsStream("/init-table-structure.sql"));
             String[] sql = s.split("\n");
             StringBuilder tempSqlStr = new StringBuilder();
             for (String sqlSt : sql) {
