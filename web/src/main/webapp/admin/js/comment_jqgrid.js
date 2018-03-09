@@ -16,7 +16,14 @@ $(function ($) {
                     }
                 }
             },
-            {name: 'userComment', index: 'userComment', width: 250, editable: true, sortable: false},
+            {
+                name: 'userComment',
+                index: 'userComment',
+                edittype: "textarea",
+                width: 250,
+                editable: true,
+                sortable: false
+            },
             {name: 'userName', index: 'userName', width: 70, editable: true, sortable: false},
             {
                 name: 'userHome',
@@ -24,16 +31,13 @@ $(function ($) {
                 width: 70,
                 sortable: false,
                 editable: false,
-                edittype: "textarea",
-                formatter: 'link',
-                editoptions: {rows: "2", cols: "20"}
+                formatter: 'link'
             },
             {
                 name: 'userIp',
                 index: 'userIp',
                 width: 70,
                 editable: false,
-                editoptions: {size: "20", maxlength: "30"},
                 sortable: false
             },
             {name: 'userMail', index: 'userMail', width: 70, editable: false, sortable: false},
@@ -42,7 +46,6 @@ $(function ($) {
                 index: 'commTime',
                 width: 70,
                 editable: false,
-                editoptions: {size: "20", maxlength: "30"},
                 sortable: false
             },
             {name: 'logId', index: 'logId', width: 20, editable: false, formatter: viewLog, sortable: false}
@@ -71,7 +74,7 @@ $(function ($) {
     });
 
     function viewLog(cellvalue, options, rowObject) {
-        return '<a target="_blank" href="admin/article/preview?id=' + rowObject.logId + '"><div id="jEditButton_2" class="ui-pg-div ui-inline-edit" onmouseout="jQuery(this).removeClass(\'ui-state-hover\')" onmouseover="jQuery(this).addClass(\'ui-state-hover\');" style="float: left; cursor: pointer; display: block;" title="" data-original-title="'+lang.view+'"><span class="ui-icon icon-zoom-in grey"></span></div></a>'
+        return '<a target="_blank" href="admin/article/preview?id=' + rowObject.logId + '"><div id="jEditButton_2" class="ui-pg-div ui-inline-edit" onmouseout="jQuery(this).removeClass(\'ui-state-hover\')" onmouseover="jQuery(this).addClass(\'ui-state-hover\');" style="float: left; cursor: pointer; display: block;" title="" data-original-title="' + lang.view + '"><span class="ui-icon icon-zoom-in grey"></span></div></a>'
     }
 
     //navButtons

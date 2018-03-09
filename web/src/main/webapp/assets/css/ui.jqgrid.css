@@ -744,3 +744,8 @@ th[aria-selected="true"] .ui-jqgrid-sortable {
 .ui-jqdialog .ui-jqdialog-titlebar {
     border-bottom: 1px solid #ddd !important;
 }
+#closedialog{
+    border-radius: 3px;
+    color: #fff;
+    background-color: #73879b;;
+}

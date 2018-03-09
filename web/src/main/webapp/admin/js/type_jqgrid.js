@@ -19,15 +19,23 @@ jQuery(function ($) {
                     }
                 }
             },
-            {name: 'id', index: 'id', width: 60, sorttype: "int", editable: false, sortable: false},
-            {name: 'typeName', index: 'typeName', width: 150, sortable: false, editable: true},
+            {name: 'id', index: 'id', width: 60, editable: false, sortable: false},
+            {
+                name: 'typeName',
+                index: 'typeName',
+                width: 150,
+                sortable: false,
+                editable: true,
+                editrules: {required: true}
+            },
             {
                 name: 'alias',
                 index: 'alias',
                 width: 150,
                 editable: true,
                 sortable: false,
-                editoptions: {size: "20", maxlength: "30"}
+                editoptions: {size: "20", maxlength: "30"},
+                editrules: {required: true}
             },
             {
                 name: 'remark',
@@ -35,7 +43,6 @@ jQuery(function ($) {
                 width: 150,
                 editable: true,
                 edittype: "textarea",
-                editoptions: {rows: "3", cols: "20"},
                 sortable: false
             }
 
