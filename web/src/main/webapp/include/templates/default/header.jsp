@@ -54,6 +54,7 @@
             background-size: cover;
             background: #f0f0f0 url('${_res.avatar}') no-repeat center center;
             display: inline-block;
+            background-size: cover;
         }
 
         .vjs-default-skin .vjs-control-bar {
