@@ -13,7 +13,7 @@ jQuery(function ($) {
                     delOptions: {recreateForm: true, beforeShowForm: beforeDeleteCallback, url: "api/admin/link/delete"}
                 }
             },
-            {name: 'id', index: 'id', width: 60, sorttype: "int", editable: false, sortable: false},
+            {name: 'id', index: 'id', width: 60, editable: false, sortable: false},
             {
                 name: 'url',
                 index: 'url',
@@ -21,8 +21,8 @@ jQuery(function ($) {
                 sortable: false,
                 editable: true,
                 edittype: "textarea",
-                editoptions: {rows: "3", cols: "20"},
-                formatter: 'link'
+                formatter: 'link',
+                editrules: {required: true}
             },
             {
                 name: 'linkName',
@@ -30,7 +30,8 @@ jQuery(function ($) {
                 width: 150,
                 editable: true,
                 sortable: false,
-                editoptions: {size: "20", maxlength: "30"}
+                edittype: "textarea",
+                editrules: {required: true}
             },
             {
                 name: 'alt',
@@ -38,9 +39,17 @@ jQuery(function ($) {
                 width: 150,
                 editable: true,
                 sortable: false,
-                editoptions: {size: "20", maxlength: "30"}
+                edittype: "textarea",
+                editrules: {required: true}
             },
-            {name: 'sort', index: 'sort', width: 70, editable: true, sortable: false}
+            {
+                name: 'sort',
+                index: 'sort',
+                width: 70,
+                editable: true,
+                sortable: false,
+                editrules: {required: true, number: true}
+            }
 
         ],
 
@@ -49,10 +58,8 @@ jQuery(function ($) {
         rowList: [10, 20, 30],
         pager: pager_selector,
         altRows: true,
-        //toppager: true,
 
         multiselect: false,
-        //multikey: "ctrlKey",
         multiboxonly: false,
 
         loadComplete: function () {

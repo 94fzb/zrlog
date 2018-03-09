@@ -25,8 +25,8 @@ jQuery(function ($) {
             {name: 'click', index: 'click', width: 50, editable: false},
             {name: 'rubbish', index: 'rubbish', width: 50, editable: false, formatter: renderRubbish},
             {name: '_private', index: '_private', width: 50, editable: false, formatter: renderPrivate},
-            {name: 'releaseTime', index: 'releaseTime', width: 90, sorttype: "date"},
-            {name: 'lastUpdateDate', index: 'lastUpdateDate', width: 90, sorttype: "date"},
+            {name: 'releaseTime', index: 'releaseTime', width: 90},
+            {name: 'lastUpdateDate', index: 'lastUpdateDate', width: 90},
             {name: 'id', width: 50, index: 'id', sortable: false, formatter: editFormat},
             {name: 'id', width: 50, index: 'id', sortable: false, formatter: viewLog}
         ],

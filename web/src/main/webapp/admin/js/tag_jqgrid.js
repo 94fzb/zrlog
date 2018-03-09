@@ -4,7 +4,7 @@ $(function () {
         datatype: "json",
         colNames: ['ID', lang.tag, lang.count],
         colModel: [
-            {name: 'id', index: 'id', width: 60, sorttype: "int", sortable: false},
+            {name: 'id', index: 'id', width: 60, sortable: false},
             {name: 'text', index: 'text', width: 150, sortable: false},
             {name: 'count', index: 'count', width: 70, sortable: false}
         ],

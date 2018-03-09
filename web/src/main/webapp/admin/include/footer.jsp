@@ -1,6 +1,7 @@
 <%@ page session="false" pageEncoding="utf-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 </div>
+</div>
 <c:if test="${currentPage != 'admin/edit'}">
     <footer>
         <strong>${_res.copyright} <a href="https://www.zrlog.com"> ZrLog . </a></strong>
