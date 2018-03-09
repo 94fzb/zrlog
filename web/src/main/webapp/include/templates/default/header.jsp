@@ -1,4 +1,4 @@
-﻿<%@ page session="false" import="java.util.*" pageEncoding="UTF-8" %>
+﻿<%@ page session="false" import="java.util.Map" pageEncoding="UTF-8" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
     Map<String, Object> res = (Map<String, Object>) request.getAttribute("_res");
@@ -129,7 +129,7 @@
                 </nav>
                 <ul id="gn-menu" class="gn-menu-main">
                     <li class="gn-trigger">
-                        <a class="gn-icon gn-icon-menu"><span>Menu</span></a>
+                        <a class="gn-icon gn-icon-menu"></a>
                         <nav class="gn-menu-wrapper">
                             <div class="gn-scroller">
                                 <ul class="gn-menu">
@@ -154,9 +154,7 @@
                         </nav>
                     </li>
                     <li class="sitename">
-                        <a class="gn-icon icon-info" href="${rurl}">
-                            <span>${_res.title}</span>
-                        </a>
+                        <a class="gn-icon icon-info" href="${rurl}"></a>
                     </li>
                 </ul>
             </header>

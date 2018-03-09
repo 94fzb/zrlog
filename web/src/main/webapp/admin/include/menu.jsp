@@ -212,5 +212,5 @@
                 </nav>
             </div>
         </div>
-        <div class="right_col" id="right_col" role="main">
+        <div class="right_col" id="right_col" role="main" style="min-height: 1080px">
             <div style="min-height: 600px">
