@@ -7,12 +7,12 @@ import com.zrlog.service.ArticleService;
 import com.zrlog.service.CacheService;
 import com.zrlog.util.I18NUtil;
 import com.zrlog.util.ParseUtil;
-import com.zrlog.web.util.WebTools;
 import com.zrlog.web.controller.BaseController;
+import com.zrlog.web.util.WebTools;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
 
-import java.io.UnsupportedEncodingException;
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.*;
 
@@ -145,7 +145,7 @@ public class PostController extends BaseController {
         return "page";
     }
 
-    public void addComment() throws UnsupportedEncodingException {
+    public void addComment() throws IOException {
         Integer logId = getParaToInt("logId");
         if (logId != null && getPara("userComment") != null) {
             Log log = Log.dao.findById(logId);
@@ -166,11 +166,7 @@ public class PostController extends BaseController {
                     ext = ".html";
                     new CacheService().clearStaticPostFileByLogId(logId.toString());
                 }
-                if (getRequest().getContextPath().isEmpty()) {
-                    redirect("/post/" + alias + ext);
-                } else {
-                    redirect(getRequest().getContextPath() + "post/" + alias + ext);
-                }
+                redirect("/post/" + alias + ext);
             } else {
                 renderError(404);
             }
