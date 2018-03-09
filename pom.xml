@@ -26,11 +26,25 @@
             <name>xiaochun</name>
             <email>xchun90@163.com</email>
             <url>http://blog.94fzb.com</url>
+            <roles>
+                <role>owner</role>
+            </roles>
         </developer>
         <developer>
             <name>weekdragon</name>
             <email>790774717@qq.com</email>
             <url>https://www.weekdragon.cn</url>
+            <roles>
+                <role>developer</role>
+            </roles>
+        </developer>
+        <developer>
+            <name>e-lionel</name>
+            <email>lionel0724@163.com</email>
+            <url>https://github.com/e-lionel</url>
+            <roles>
+                <role>reporter</role>
+            </roles>
         </developer>
     </developers>
 
