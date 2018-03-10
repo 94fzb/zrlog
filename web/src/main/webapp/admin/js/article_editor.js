@@ -45,11 +45,12 @@ $(function () {
         height: 840,
         path: editorMdPath,
         toolbarIcons: function () {
-            return ["undo", "redo", "|", "bold", "del", "italic", "quote", "|", "h1", "h2", "h3", "h4", "|", "list-ul", "list-ol", "hr", "|", "link", "reference-link", "image", "file", "video", "code", "preformatted-text", "code-block", "table", "datetime", "emoji", "html-entities", "pagebreak", "|", "goto-line", "watch", "fullscreen", "search", "|", "help", "info"]
+            return ["undo", "redo", "|", "bold", "del", "italic", "quote", "|", "h1", "h2", "h3", "h4", "|", "list-ul", "list-ol", "hr", "|", "link", "reference-link", "image", "file", "video", "code", "preformatted-text", "code-block", "table", "copyPreviewHtml", "emoji", "html-entities", "pagebreak", "|", "goto-line", "watch", "fullscreen", "search", "|", "help", "info"]
         },
         toolbarCustomIcons: {
             file: '<a href="javascript:;" id="fileDialog"  title=' + lang.addAttachment + ' unselectable="on"><i class="fa fa-paperclip" unselectable="on"></i></a>',
-            video: '<a href="javascript:;" id="videoDialog"  title="' + lang.addVideo + '" unselectable="on"><i class="fa fa-file-video-o" unselectable="on"></i></a>'
+            video: '<a href="javascript:;" id="videoDialog"  title="' + lang.addVideo + '" unselectable="on"><i class="fa fa-file-video-o" unselectable="on"></i></a>',
+            copyPreviewHtml: '<a href="javascript:;" id="copPreviewHtmlToClipboard"  title="' + lang.copPreviewHtmlToClipboard + '" unselectable="on"><i class="fa fa-clipboard" unselectable="on"></i></a>'
         },
         codeFold: true,
         appendMarkdown: $("#markdown").val(),
@@ -95,6 +96,25 @@ $(function () {
             });
             $("#videoDialog").on("click", function () {
                 mdEditor.executePlugin("videoDialog", "../plugins/video-dialog/video-dialog");
+            });
+            $("#copPreviewHtmlToClipboard").on("click",function () {
+                function copyToClipboard(html) {
+                    var $temp = $("<input>");
+                    $("body").append($temp);
+                    $temp.val(html).select();
+                    document.execCommand("copy");
+                    $temp.remove();
+                }
+
+                copyToClipboard('<div class="markdown-body" style="padding:0">' +mdEditor.getPreviewedHTML()+"</div>");
+
+                new PNotify({
+                    title: lang.copPreviewHtmlToClipboardSuccess,
+                    type: 'info',
+                    hide: true,
+                    delay: 3000,
+                    styling: 'bootstrap3'
+                });
             });
             setInterval(function () {
                 save(true, true);

@@ -31,7 +31,9 @@ var allLang = {
         "auto": "自动",
         "saveSuccess": "保存成功",
         "addAttachment": "添加附件",
-        "addVideo": "添加视频"
+        "addVideo": "添加视频",
+        "copPreviewHtmlToClipboard": "拷贝预览HTML到粘贴板",
+        "copPreviewHtmlToClipboardSuccess": "已成功拷贝预览HTML到粘贴板"
     },
     "en": {
         "title": "Title",
@@ -65,7 +67,9 @@ var allLang = {
         "auto": "Auto",
         "saveSuccess": "save success",
         "addAttachment": "Attachment",
-        "addVideo": "Video"
+        "addVideo": "Video",
+        "copPreviewHtmlToClipboard": "Copy preview html to clipboard",
+        "copPreviewHtmlToClipboardSuccess": "Copy preview html to clipboard success"
     }
 };
 var lang;
