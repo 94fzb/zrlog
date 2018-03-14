@@ -53,7 +53,7 @@ $(function () {
             copyPreviewHtml: '<a href="javascript:;" id="copPreviewHtmlToClipboard"  title="' + lang.copPreviewHtmlToClipboard + '" unselectable="on"><i class="fa fa-clipboard" unselectable="on"></i></a>'
         },
         codeFold: true,
-        appendMarkdown: $("#markdown").val(),
+        appendMarkdown: $("#markdown").html(),
         saveHTMLToTextarea: true,
         searchReplace: true,
         htmlDecode: "iframe,pre",
