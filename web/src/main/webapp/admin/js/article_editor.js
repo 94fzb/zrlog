@@ -97,7 +97,7 @@ $(function () {
             $("#videoDialog").on("click", function () {
                 mdEditor.executePlugin("videoDialog", "../plugins/video-dialog/video-dialog");
             });
-            $("#copPreviewHtmlToClipboard").on("click",function () {
+            $("#copPreviewHtmlToClipboard").on("click", function () {
                 function copyToClipboard(html) {
                     var $temp = $("<input>");
                     $("body").append($temp);
@@ -106,7 +106,7 @@ $(function () {
                     $temp.remove();
                 }
 
-                copyToClipboard('<div class="markdown-body" style="padding:0">' +mdEditor.getPreviewedHTML()+"</div>");
+                copyToClipboard('<div class="markdown-body" style="padding:0">' + mdEditor.getPreviewedHTML() + "</div>");
 
                 new PNotify({
                     title: lang.copPreviewHtmlToClipboardSuccess,
@@ -192,6 +192,12 @@ $(function () {
     var lastChangeRequestBody;
 
     function validator(el) {
+        //仅在2个输入框都不为空的情况，标记为又文本需要输入
+        if ($("#title").val() === '' && $("#content").val() === '') {
+            $("#title-parent").removeClass("has-error");
+            $("#editormd").removeClass("has-error");
+            return false;
+        }
         if ($("#title").val() === '') {
             $("#title-parent").addClass("has-error");
         }
@@ -206,7 +212,14 @@ $(function () {
         if ($(this).val() !== '') {
             $("#title-parent").removeClass("has-error");
         } else {
-            $("#title-parent").addClass("has-error");
+            if ($("#content").val() === '') {
+                $("#editormd").removeClass("has-error");
+                $("#title-parent").removeClass("has-error");
+                $("#editormd").css("border-color", "");
+            } else {
+                $("#title-parent").addClass("has-error");
+            }
+
         }
     });
 
