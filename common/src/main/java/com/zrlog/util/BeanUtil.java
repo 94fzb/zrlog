@@ -41,7 +41,7 @@ public class BeanUtil {
         return response;
     }
 
-    private static <T> T convert(Object obj, Class<T> tClass) {
+    public static <T> T convert(Object obj, Class<T> tClass) {
         String jsonStr = new Gson().toJson(obj);
         return new Gson().fromJson(jsonStr, tClass);
     }

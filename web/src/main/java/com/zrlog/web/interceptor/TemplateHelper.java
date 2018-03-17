@@ -6,6 +6,7 @@ import com.jfinal.kit.PathKit;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.OutlineVO;
 import com.zrlog.model.*;
+import com.zrlog.service.CommentService;
 import com.zrlog.util.*;
 import com.zrlog.web.controller.BaseController;
 import com.zrlog.web.util.WebTools;
@@ -163,7 +164,7 @@ public class TemplateHelper {
             BaseController baseController = (BaseController) controller;
             String basePath = baseController.getTemplatePath();
             controller.getRequest().setAttribute("template", basePath);
-            I18NUtil.addToRequest(PathKit.getWebRootPath() + basePath + "/language/", controller);
+            I18NUtil.addToRequest(PathKit.getWebRootPath() + basePath + "/language/", controller.getRequest(), JFinal.me().getConstants().getDevMode());
             baseController.fullTemplateSetting();
             TemplateHelper.fullInfo(controller.getRequest(), baseController.isStaticHtmlStatus());
             return basePath;
@@ -244,6 +245,9 @@ public class TemplateHelper {
             OutlineVO outlineVO = OutlineUtil.extractOutline(data.getStr("content"));
             data.put("tocHtml", OutlineUtil.buildTocHtml(outlineVO, ""));
             data.put("toc", outlineVO);
+        }
+        if (!new CommentService().isAllowComment()) {
+            data.set("canComment", false);
         }
     }
 }

@@ -32,7 +32,7 @@ public class InstallController extends Controller {
         JFinal.me().getServletContext().setAttribute("dbConn", dbConn);
         TestConnectDbResult testConnectDbResult = new InstallService(PathKit.getWebRootPath() + "/WEB-INF", dbConn).testDbConn();
         if (testConnectDbResult.getError() != 0) {
-            setAttr("errorMsg", "[Error-" + testConnectDbResult.getError() + "] - " + I18NUtil.getStringFromRes("connectDbError_" + testConnectDbResult.getError(), getRequest()));
+            setAttr("errorMsg", "[Error-" + testConnectDbResult.getError() + "] - " + I18NUtil.getStringFromRes("connectDbError_" + testConnectDbResult.getError()));
             index();
         } else {
             render("/install/message.jsp");

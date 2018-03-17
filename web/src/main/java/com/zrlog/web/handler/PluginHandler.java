@@ -5,6 +5,7 @@ import com.hibegin.common.util.http.HttpUtil;
 import com.hibegin.common.util.http.handle.CloseResponseHandle;
 import com.jfinal.core.JFinal;
 import com.jfinal.handler.Handler;
+import com.zrlog.common.Constants;
 import com.zrlog.service.PluginHelper;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.common.vo.AdminTokenVO;
@@ -120,7 +121,7 @@ public class PluginHandler extends Handler {
      * @throws InstantiationException
      */
     private boolean accessPlugin(String uri, HttpServletRequest request, HttpServletResponse response) throws IOException, InstantiationException {
-        String pluginServerHttp = ZrLogUtil.getPluginServer();
+        String pluginServerHttp = Constants.pluginServer;
         CloseableHttpResponse httpResponse;
         CloseResponseHandle handle = new CloseResponseHandle();
         Map<String, String[]> paramMap = request.getParameterMap();

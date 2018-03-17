@@ -1,34 +1,30 @@
 package com.zrlog.web.controller.admin.api;
 
 import com.zrlog.common.request.ReadCommentRequest;
+import com.zrlog.common.response.StandardResponse;
 import com.zrlog.common.response.UpdateRecordResponse;
-import com.zrlog.model.Comment;
+import com.zrlog.service.CommentService;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.annotation.RefreshCache;
 import com.zrlog.web.controller.BaseController;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class CommentController extends BaseController {
 
+    private CommentService commentService = new CommentService();
+
     @RefreshCache
-    public Map delete() {
-        String[] ids = getPara("id").split(",");
-        for (String id : ids) {
-            Comment.dao.deleteById(id);
-        }
-        return new HashMap<String, Object>();
+    public StandardResponse delete() {
+        return commentService.delete(getPara("id").split(","));
     }
 
     public UpdateRecordResponse read() {
-        ReadCommentRequest commentRequest = ZrLogUtil.convertRequestBody(getRequest(), ReadCommentRequest.class);
-        Comment.dao.doRead(commentRequest.getId());
-        return new UpdateRecordResponse();
+        return commentService.read(ZrLogUtil.convertRequestBody(getRequest(), ReadCommentRequest.class));
     }
 
     public Map index() {
-        return Comment.dao.find(getPageable());
+        return commentService.page(getPageable());
     }
 
     @RefreshCache

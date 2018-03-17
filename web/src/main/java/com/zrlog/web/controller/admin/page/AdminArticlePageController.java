@@ -12,8 +12,8 @@ public class AdminArticlePageController extends BaseController {
         Integer logId = getParaToInt("id");
         if (logId != null) {
             Log log = new Log().adminFindLogByLogId(logId);
-            log.put("lastLog", Log.dao.findLastLog(logId, I18NUtil.getStringFromRes("noLastLog", getRequest())));
-            log.put("nextLog", Log.dao.findNextLog(logId, I18NUtil.getStringFromRes("noNextLog", getRequest())));
+            log.put("lastLog", Log.dao.findLastLog(logId, I18NUtil.getStringFromRes("noLastLog")));
+            log.put("nextLog", Log.dao.findNextLog(logId, I18NUtil.getStringFromRes("noNextLog")));
 
             setAttr("log", log.getAttrs());
             TemplateHelper.fillArticleInfo(log, TemplateHelper.setBaseUrl(getRequest(), false, Constants.webSite), "");

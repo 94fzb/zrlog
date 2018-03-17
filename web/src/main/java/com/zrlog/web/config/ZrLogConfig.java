@@ -102,8 +102,7 @@ public class ZrLogConfig extends JFinalConfig {
                     }
                 }
                 int port = PluginCoreProcess.getInstance().pluginServerStart(pluginCoreFile, dbPropertiesPath, pluginJvmArgs, PathKit.getWebRootPath(), BlogBuildInfoUtil.getVersion());
-                JFinal.me().getServletContext().setAttribute("pluginServerPort", port);
-                JFinal.me().getServletContext().setAttribute("pluginServer", "http://localhost:" + port);
+                com.zrlog.common.Constants.pluginServer = "http://localhost:" + port;
             }
         }.start();
 

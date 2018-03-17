@@ -116,7 +116,7 @@ class AdminInterceptor implements Interceptor {
         if (ai.getActionKey().startsWith("/api")) {
             ExceptionResponse exceptionResponse = new ExceptionResponse();
             exceptionResponse.setError(1);
-            exceptionResponse.setMessage(I18NUtil.getStringFromRes("admin.session.timeout", ai.getController().getRequest()));
+            exceptionResponse.setMessage(I18NUtil.getStringFromRes("admin.session.timeout"));
             ai.getController().renderJson(exceptionResponse);
         } else {
             //在重定向到登陆页面时，同时携带了当前的请求路径，方便登陆成功后的跳转

@@ -74,7 +74,7 @@ public class TemplateController extends BaseController {
         //start extract template file
         FileUtils.moveOrCopyFile(getFile(uploadFieldName).getFile().toString(), finalFile, true);
         UploadTemplateResponse response = new UploadTemplateResponse();
-        response.setMessage(I18NUtil.getStringFromRes("templateDownloadSuccess", getRequest()));
+        response.setMessage(I18NUtil.getStringFromRes("templateDownloadSuccess"));
         String extractFolder = finalPath + templateName.replace(".zip", "") + "/";
         FileUtils.deleteFile(extractFolder);
         ZipUtil.unZip(finalFile, extractFolder);

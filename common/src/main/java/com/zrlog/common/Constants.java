@@ -29,4 +29,6 @@ public class Constants {
     public static final String ATTACHED_FOLDER = "/attached/";
     public static final AutoUpgradeVersionType DEFAULT_AUTO_UPGRADE_VERSION_TYPE = AutoUpgradeVersionType.ONE_DAY;
     public static final Map<String, Object> webSite = new HashMap<>();
+
+    public static String pluginServer;
 }

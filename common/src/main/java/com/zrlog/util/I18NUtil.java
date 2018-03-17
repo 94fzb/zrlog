@@ -1,15 +1,15 @@
 package com.zrlog.util;
 
 import com.hibegin.common.util.StringUtils;
-import com.jfinal.core.Controller;
-import com.jfinal.core.JFinal;
 import com.zrlog.common.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * 多语言的工具类
@@ -19,6 +19,7 @@ public class I18NUtil {
     private static final String I18N_FILE_NAME = "_i18nFileName";
     private static final Logger LOGGER = LoggerFactory.getLogger(I18NUtil.class);
     private static final Map<String, Map<String, Object>> I18N_RES_MAP = new HashMap<>();
+    private static ThreadLocal<Map<String, Object>> threadLocal = new ThreadLocal<>();
 
     static {
         reloadSystemI18N();
@@ -55,8 +56,8 @@ public class I18NUtil {
         }
     }
 
-    public static void addToRequest(String path, Controller controller) {
-        if (JFinal.me().getConstants().getDevMode()) {
+    public static void addToRequest(String path, HttpServletRequest request, boolean devMode) {
+        if (devMode) {
             reloadSystemI18N();
         }
         File[] propertiesFiles = new File(path).listFiles();
@@ -71,13 +72,12 @@ public class I18NUtil {
         }
         String i18nFile;
         String locale = null;
-        HttpServletRequest request = controller.getRequest();
         if (request.getAttribute(I18N_FILE_NAME) != null) {
             i18nFile = request.getAttribute(I18N_FILE_NAME).toString();
         } else {
             //try get locale info for HTTP header
             if (request.getRequestURI().contains("/admin")) {
-                Map<String, Object> webSite = (Map<String, Object>) JFinal.me().getServletContext().getAttribute("webSite");
+                Map<String, Object> webSite = Constants.webSite;
                 if (webSite != null && webSite.get("language") != null) {
                     String tmpLocale = (String) webSite.get("language");
                     locale = I18N_RES_MAP.get(Constants.I18N + "_" + tmpLocale) != null ? tmpLocale : null;
@@ -108,11 +108,13 @@ public class I18NUtil {
                 }
             }
         }
-        controller.setAttr("_res", i18nMap);
+        i18nMap.put("_locale", locale);
+        request.setAttribute("_res", i18nMap);
+        threadLocal.set(i18nMap);
     }
 
-    public static String getStringFromRes(String key, HttpServletRequest request) {
-        Object obj = ((Map) request.getAttribute("_res")).get(key);
+    public static String getStringFromRes(String key) {
+        Object obj = threadLocal.get().get(key);
         if (obj != null) {
             return obj.toString();
         }
@@ -120,12 +122,15 @@ public class I18NUtil {
     }
 
     public static String getCurrentLocale() {
-        Map<String, Object> webSite = (Map<String, Object>) JFinal.me().getServletContext().getAttribute("webSite");
         String locale;
-        if (webSite != null && webSite.get("language") != null) {
-            locale = (String) webSite.get("language");
+        if (threadLocal.get() != null) {
+            locale = (String) threadLocal.get().get("_locale");
         } else {
-            locale = "zh_CN";
+            if (Constants.webSite != null && Constants.webSite.get("language") != null) {
+                locale = (String) Constants.webSite.get("language");
+            } else {
+                locale = "zh_CN";
+            }
         }
         return locale;
     }

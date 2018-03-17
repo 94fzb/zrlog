@@ -1,24 +1,30 @@
 package com.zrlog.web.controller.blog;
 
+import com.zrlog.common.request.CreateCommentRequest;
+import com.zrlog.common.response.CreateCommentResponse;
 import com.zrlog.model.Comment;
 import com.zrlog.model.Log;
 import com.zrlog.model.Type;
 import com.zrlog.service.ArticleService;
 import com.zrlog.service.CacheService;
+import com.zrlog.service.CommentService;
 import com.zrlog.util.I18NUtil;
 import com.zrlog.util.ParseUtil;
+import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.controller.BaseController;
 import com.zrlog.web.util.WebTools;
-import org.jsoup.Jsoup;
-import org.jsoup.safety.Whitelist;
 
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class PostController extends BaseController {
 
     private ArticleService articleService = new ArticleService();
+
+    private CommentService commentService = new CommentService();
 
     /**
      * add page info for template more easy
@@ -43,7 +49,7 @@ public class PostController extends BaseController {
         Map<String, Object> pager = new HashMap<>();
         List<Map<String, Object>> pageList = new ArrayList<>();
         if (currentPage != 1) {
-            pageList.add(pageEntity(currentUri, currentPage, I18NUtil.getStringFromRes("prevPage", getRequest()), currentPage - 1));
+            pageList.add(pageEntity(currentUri, currentPage, I18NUtil.getStringFromRes("prevPage"), currentPage - 1));
         }
         if (total > 10) {
             if (currentPage < 3 || total - 4 < currentPage) {
@@ -70,7 +76,7 @@ public class PostController extends BaseController {
             }
         }
         if (currentPage != total) {
-            pageList.add(pageEntity(currentUri, currentPage, I18NUtil.getStringFromRes("nextPage", getRequest()), currentPage + 1));
+            pageList.add(pageEntity(currentUri, currentPage, I18NUtil.getStringFromRes("nextPage"), currentPage + 1));
         }
         pager.put("pageList", pageList);
         pager.put("pageStartUrl", currentUri + 1);
@@ -130,7 +136,7 @@ public class PostController extends BaseController {
         // 记录回话的Key
         setAttr("key", WebTools.htmlEncode(key));
 
-        setAttr("tipsType", I18NUtil.getStringFromRes("search", getRequest()));
+        setAttr("tipsType", I18NUtil.getStringFromRes("search"));
         setAttr("tipsName", WebTools.htmlEncode(key));
 
         setPageInfo("post/search/" + key + "-", data, getParaToInt(1, 1));
@@ -138,7 +144,7 @@ public class PostController extends BaseController {
     }
 
     public String record() {
-        setAttr("tipsType", I18NUtil.getStringFromRes("archive", getRequest()));
+        setAttr("tipsType", I18NUtil.getStringFromRes("archive"));
         setAttr("tipsName", getPara(0));
 
         setPageInfo("post/record/" + getPara(0) + "-", Log.dao.findByDate(getParaToInt(1, 1), getDefaultRows(), getPara(0)), getParaToInt(1, 1));
@@ -146,30 +152,19 @@ public class PostController extends BaseController {
     }
 
     public void addComment() throws IOException {
-        Integer logId = getParaToInt("logId");
-        if (logId != null && getPara("userComment") != null) {
-            Log log = Log.dao.findById(logId);
-            if (log != null && log.getBoolean("canComment")) {
-                String comment = Jsoup.clean(getPara("userComment"), Whitelist.basic());
-                if (comment.length() > 0 && !ParseUtil.isGarbageComment(comment)) {
-                    new Comment().set("userHome", getPara("userHome"))
-                            .set("userMail", getPara("userMail"))
-                            .set("userIp", WebTools.getRealIp(getRequest()))
-                            .set("userName", getPara("userName"))
-                            .set("logId", logId)
-                            .set("userComment", comment)
-                            .set("commTime", new Date()).set("hide", 1).save();
-                }
-                String alias = URLEncoder.encode(log.getStr("alias"), "UTF-8");
-                String ext = "";
-                if (isStaticHtmlStatus()) {
-                    ext = ".html";
-                    new CacheService().clearStaticPostFileByLogId(logId.toString());
-                }
-                redirect("/post/" + alias + ext);
-            } else {
-                renderError(404);
+        CreateCommentRequest createCommentRequest = ZrLogUtil.convertRequestParam(getRequest().getParameterMap(), CreateCommentRequest.class);
+        createCommentRequest.setIp(WebTools.getRealIp(getRequest()));
+        createCommentRequest.setUserAgent(getHeader("User-Agent"));
+        CreateCommentResponse response = commentService.save(createCommentRequest);
+        if (response.getError() == 0) {
+            String ext = "";
+            if (isStaticHtmlStatus()) {
+                ext = ".html";
+                new CacheService().clearStaticPostFileByLogId(createCommentRequest.getLogId());
             }
+            redirect("/post/" + response.getAlias() + ext);
+        } else {
+            renderError(404);
         }
     }
 
@@ -182,8 +177,8 @@ public class PostController extends BaseController {
         if (log != null) {
             Integer logId = log.get("logId");
             Log.dao.incrClick(logId);
-            log.put("lastLog", Log.dao.findLastLog(logId, I18NUtil.getStringFromRes("noLastLog", getRequest())));
-            log.put("nextLog", Log.dao.findNextLog(logId, I18NUtil.getStringFromRes("noNextLog", getRequest())));
+            log.put("lastLog", Log.dao.findLastLog(logId, I18NUtil.getStringFromRes("noLastLog")));
+            log.put("nextLog", Log.dao.findNextLog(logId, I18NUtil.getStringFromRes("noNextLog")));
             log.put("comments", Comment.dao.findAllByLogId(logId));
             setAttr("log", log);
         }
@@ -196,7 +191,7 @@ public class PostController extends BaseController {
 
         Type type = Type.dao.findByAlias(typeStr);
         setAttr("type", type);
-        setAttr("tipsType", I18NUtil.getStringFromRes("category", getRequest()));
+        setAttr("tipsType", I18NUtil.getStringFromRes("category"));
         if (type != null) {
             setAttr("tipsName", type.getStr("typeName"));
         }
@@ -208,7 +203,7 @@ public class PostController extends BaseController {
             String tag = convertRequestParam(getPara(0));
             setPageInfo("post/tag/" + getPara(0) + "-", Log.dao.findByTag(getParaToInt(1, 1), getDefaultRows(), tag), getParaToInt(1, 1));
 
-            setAttr("tipsType", I18NUtil.getStringFromRes("tag", getRequest()));
+            setAttr("tipsType", I18NUtil.getStringFromRes("tag"));
             setAttr("tipsName", tag);
         }
         return "page";

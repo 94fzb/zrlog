@@ -147,6 +147,8 @@ CREATE TABLE `comment` (
   `logId` int(11) DEFAULT NULL,
   `postId` varchar(128) DEFAULT NULL COMMENT '多说评论使用',
   `header` varchar(1024) DEFAULT NULL COMMENT '评论者头像',
+  `user_agent` varchar(1024) DEFAULT NULL COMMENT '浏览器信息',
+  `reply_id` int(11) DEFAULT NULL COMMENT '回复评论的ID',
   PRIMARY KEY (`commentId`),
   UNIQUE KEY `postId` (`postId`),
   KEY `logId` (`logId`),

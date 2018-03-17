@@ -2,7 +2,7 @@ package com.zrlog.service;
 
 import com.hibegin.common.util.http.HttpUtil;
 import com.hibegin.common.util.http.handle.HttpJsonArrayHandle;
-import com.zrlog.util.ZrLogUtil;
+import com.zrlog.common.Constants;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,7 +21,7 @@ public class UploadService {
         map.put("name", new String[]{"uploadService"});
         String url;
         try {
-            List<Map> urls = HttpUtil.getInstance().sendGetRequest(ZrLogUtil.getPluginServer() + "/service", map
+            List<Map> urls = HttpUtil.getInstance().sendGetRequest(Constants.pluginServer + "/service", map
                     , new HttpJsonArrayHandle<Map>(), PluginHelper.genHeaderMapByRequest(request)).getT();
             if (urls != null && !urls.isEmpty()) {
                 url = (String) urls.get(0).get("url");

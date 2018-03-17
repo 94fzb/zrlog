@@ -2,6 +2,7 @@ package com.zrlog.service;
 
 import com.jfinal.core.JFinal;
 import com.zrlog.model.User;
+import com.zrlog.util.I18NUtil;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.util.WebTools;
 import com.zrlog.common.vo.AdminTokenVO;
@@ -21,6 +22,7 @@ public class PluginHelper {
             map.put("LoginUserId", adminTokenVO.getUserId() + "");
         }
         map.put("IsLogin", (adminTokenVO != null) + "");
+        map.put("Current-Locale", I18NUtil.getCurrentLocale());
         map.put("Blog-Version", ((Map) JFinal.me().getServletContext().getAttribute("zrlog")).get("version").toString());
         if (request != null) {
             String fullUrl = ZrLogUtil.getFullUrl(request);

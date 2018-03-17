@@ -2,7 +2,6 @@ package com.zrlog.util;
 
 import com.google.gson.Gson;
 import com.hibegin.common.util.IOUtil;
-import com.jfinal.core.JFinal;
 import com.zrlog.common.Constants;
 import com.zrlog.web.util.WebTools;
 import org.apache.log4j.Logger;
@@ -37,8 +36,18 @@ public class ZrLogUtil {
         }
     }
 
-    public static String getPluginServer() {
-        return JFinal.me().getServletContext().getAttribute("pluginServer").toString();
+    public static <T> T convertRequestParam(Map<String, String[]> requestParam, Class<T> clazz) {
+        Map<String, Object> tempMap = new HashMap<>();
+        for (Map.Entry<String, String[]> entry : requestParam.entrySet()) {
+            if (entry.getValue() != null && entry.getValue().length > 0) {
+                if (entry.getValue().length > 1) {
+                    tempMap.put(entry.getKey(), Arrays.asList(entry.getValue()));
+                } else {
+                    tempMap.put(entry.getKey(), entry.getValue()[0]);
+                }
+            }
+        }
+        return BeanUtil.convert(tempMap, clazz);
     }
 
     public static boolean isStaticBlogPlugin(HttpServletRequest httpServletRequest) {

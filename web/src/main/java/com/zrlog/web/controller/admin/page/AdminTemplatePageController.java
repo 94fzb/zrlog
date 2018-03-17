@@ -5,6 +5,7 @@ import com.hibegin.common.util.StringUtils;
 import com.hibegin.common.util.ZipUtil;
 import com.hibegin.common.util.http.HttpUtil;
 import com.hibegin.common.util.http.handle.HttpFileHandle;
+import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.TemplateVO;
@@ -102,7 +103,7 @@ public class AdminTemplatePageController extends BaseController {
             setAttr("include", templateName + "/setting/index");
             setAttr("template", templateName);
             setAttr("menu", "1");
-            I18NUtil.addToRequest(PathKit.getWebRootPath() + templateName + "/language/", this);
+            I18NUtil.addToRequest(PathKit.getWebRootPath() + templateName + "/language/", getRequest(), JFinal.me().getConstants().getDevMode());
             String jsonStr = new WebSite().getStringValueByName(templateName + templateConfigSuffix);
             fullTemplateSetting(jsonStr);
             return "/admin/blank";
@@ -121,7 +122,7 @@ public class AdminTemplatePageController extends BaseController {
             String basePath = getRequest().getScheme() + "://" + getRequest().getHeader("host") + path + "/";
             redirect(basePath);
         } else {
-            setAttr("message", I18NUtil.getStringFromRes("templatePathNotNull", getRequest()));
+            setAttr("message", I18NUtil.getStringFromRes("templatePathNotNull"));
         }
     }
 
@@ -137,13 +138,13 @@ public class AdminTemplatePageController extends BaseController {
                 String target = fileHandle.getT().getParent() + "/" + fileName;
                 FileUtils.moveOrCopyFile(fileHandle.getT().toString(), target, true);
                 ZipUtil.unZip(target, path.toString() + "/");
-                setAttr("message", I18NUtil.getStringFromRes("templateDownloadSuccess", getRequest()));
+                setAttr("message", I18NUtil.getStringFromRes("templateDownloadSuccess"));
             } else {
-                setAttr("message", I18NUtil.getStringFromRes("templateExists", getRequest()));
+                setAttr("message", I18NUtil.getStringFromRes("templateExists"));
             }
         } catch (Exception e) {
             LOGGER.error("download error ", e);
-            setAttr("message", I18NUtil.getStringFromRes("someError", getRequest()));
+            setAttr("message", I18NUtil.getStringFromRes("someError"));
         }
     }
 }
