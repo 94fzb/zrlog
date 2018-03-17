@@ -1,5 +1,6 @@
 package com.zrlog.model;
 
+import com.hibegin.common.util.StringUtils;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Model;
 import com.zrlog.common.request.PageableRequest;
@@ -100,14 +101,16 @@ public class Tag extends Model<Tag> {
     public void refreshTag() {
         Db.update("delete from " + TABLE_NAME + "");
         Map<String, Integer> countMap = new HashMap<>();
-        List<Log> logs = Log.dao.find("select * from log where rubbish=? and private=? ", false, false);
+        List<Log> logs = Log.dao.find("select keywords from " + Log.TABLE_NAME + " where rubbish=? and private=? ", false, false);
         for (Log log : logs) {
-            Set<String> tagSet = strToSet(log.getStr("keywords") + ",");
-            for (String tag : tagSet) {
-                if (countMap.get(tag) != null) {
-                    countMap.put(tag, countMap.get(tag) + 1);
-                } else {
-                    countMap.put(tag, 1);
+            if (StringUtils.isNotEmpty(log.getStr("keywords")) && log.getStr("keywords").trim().length() > 0) {
+                Set<String> tagSet = strToSet(log.getStr("keywords") + ",");
+                for (String tag : tagSet) {
+                    if (countMap.get(tag) != null) {
+                        countMap.put(tag, countMap.get(tag) + 1);
+                    } else {
+                        countMap.put(tag, 1);
+                    }
                 }
             }
         }
