@@ -1,5 +1,6 @@
 package com.zrlog.web.plugin;
 
+import com.hibegin.common.util.SecurityUtils;
 import com.hibegin.common.util.http.handle.HttpHandle;
 import com.zrlog.common.vo.Version;
 import org.apache.http.HttpResponse;
@@ -44,9 +45,13 @@ public class DownloadProcessHandle extends HttpHandle<Integer> implements Serial
                             LOGGER.info("process = " + process);
                         }
                     }
+                    if (!SecurityUtils.md5(new FileInputStream(file)).equals(version.getMd5sum())) {
+                        file.delete();
+                    }
                 } catch (IOException e) {
                     LOGGER.error("", e);
                 }
+
             }
         }.start();
         return false;

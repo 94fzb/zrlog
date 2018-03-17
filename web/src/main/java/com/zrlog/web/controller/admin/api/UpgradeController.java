@@ -13,12 +13,14 @@ import com.zrlog.common.response.UpgradeProcessResponse;
 import com.zrlog.common.type.AutoUpgradeVersionType;
 import com.zrlog.common.vo.Version;
 import com.zrlog.model.WebSite;
+import com.zrlog.service.AdminTokenThreadLocal;
 import com.zrlog.service.PluginCoreProcess;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.annotation.RefreshCache;
 import com.zrlog.web.controller.BaseController;
-import com.zrlog.web.plugin.*;
-import com.zrlog.service.AdminTokenThreadLocal;
+import com.zrlog.web.plugin.DownloadProcessHandle;
+import com.zrlog.web.plugin.UpdateVersionPlugin;
+import com.zrlog.web.plugin.UpdateVersionThread;
 
 import java.io.File;
 import java.io.IOException;
@@ -95,19 +97,26 @@ public class UpgradeController extends BaseController {
 
     public UpgradeProcessResponse doUpgrade() {
         DownloadProcessHandle handle = downloadProcessHandleMap.get(AdminTokenThreadLocal.getUser().getSessionId());
-        File file = handle.getFile();
         UpgradeProcessResponse upgradeProcessResponse = new UpgradeProcessResponse();
-        UpdateVersionThread updateVersionThread = updateVersionThreadMap.get(AdminTokenThreadLocal.getUser().getSessionId());
-        if (updateVersionThread == null) {
-            updateVersionThread = new UpdateVersionThread(file);
-            updateVersionThreadMap.put(AdminTokenThreadLocal.getUser().getSessionId(), updateVersionThread);
-            PluginCoreProcess.getInstance().stopPluginCore();
-            updateVersionThread.start();
+        if (handle != null) {
+            File file = handle.getFile();
+            UpdateVersionThread updateVersionThread = updateVersionThreadMap.get(AdminTokenThreadLocal.getUser().getSessionId());
+            if (updateVersionThread == null) {
+                if (file.exists()) {
+                    updateVersionThread = new UpdateVersionThread(file);
+                    updateVersionThreadMap.put(AdminTokenThreadLocal.getUser().getSessionId(), updateVersionThread);
+                    PluginCoreProcess.getInstance().stopPluginCore();
+                    updateVersionThread.start();
+                    upgradeProcessResponse.setMessage(updateVersionThread.getMessage());
+                    upgradeProcessResponse.setFinish(updateVersionThread.isFinish());
+                } else {
+                    upgradeProcessResponse.setMessage("更新文件下载失败，请重新手动执行更新向导");
+                    downloadProcessHandleMap.remove(AdminTokenThreadLocal.getUser().getSessionId());
+                }
+            }
+            upgradeProcessResponse.setBuildId(handle.getVersion().getBuildId());
+            upgradeProcessResponse.setVersion(handle.getVersion().getVersion());
         }
-        upgradeProcessResponse.setMessage(updateVersionThread.getMessage());
-        upgradeProcessResponse.setFinish(updateVersionThread.isFinish());
-        upgradeProcessResponse.setBuildId(handle.getVersion().getBuildId());
-        upgradeProcessResponse.setVersion(handle.getVersion().getVersion());
         return upgradeProcessResponse;
     }
 
