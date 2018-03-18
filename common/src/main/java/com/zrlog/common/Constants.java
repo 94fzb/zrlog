@@ -31,4 +31,20 @@ public class Constants {
     public static final Map<String, Object> webSite = new HashMap<>();
 
     public static String pluginServer;
+
+    public static boolean isStaticHtmlStatus() {
+        return "1".equals(webSite.get("generator_html_status"));
+    }
+
+    public static int getMaxCacheHtmlSize() {
+        Object dbSettingSize = webSite.get("cache_html_size");
+        if (dbSettingSize != null) {
+            try {
+                return Integer.valueOf(dbSettingSize.toString());
+            } catch (Exception e) {
+                //ignore
+            }
+        }
+        return 20 * 1024 * 1024;
+    }
 }

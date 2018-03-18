@@ -22,3 +22,21 @@ function getFormRequestBody(fromSelector) {
     }
     return requestBody;
 }
+
+function formatErrorMessage(jqXHR, exception) {
+    if (jqXHR.status === 0) {
+        return (lang.connectError);
+    } else if (jqXHR.status === 404) {
+        return (lang.response404);
+    } else if (jqXHR.status === 500) {
+        return (lang.response500);
+    } else if (exception === 'parsererror') {
+        return (lang.responseJsonError);
+    } else if (exception === 'timeout') {
+        return (lang.responseTimeout);
+    } else if (exception === 'abort') {
+        return (lang.requestAbort);
+    } else {
+        return (lang.uncaughtError + '\n' + jqXHR.responseText);
+    }
+}

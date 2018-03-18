@@ -24,6 +24,8 @@ web/src/main/webapp/include/templates/template*
 web/src/main/webapp/include/templates/README.md
 web/src/main/webapp/include/templates/*.sh
 web/src/main/webapp/include/templates/.gitignore
+web/log
+web/logs
 rebel.xml
 tomcat.*
 *.jar

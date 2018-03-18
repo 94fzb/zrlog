@@ -1,5 +1,6 @@
 package com.zrlog.web.controller.blog;
 
+import com.zrlog.common.Constants;
 import com.zrlog.common.request.CreateCommentRequest;
 import com.zrlog.common.response.CreateCommentResponse;
 import com.zrlog.model.Comment;
@@ -158,7 +159,7 @@ public class PostController extends BaseController {
         CreateCommentResponse response = commentService.save(createCommentRequest);
         if (response.getError() == 0) {
             String ext = "";
-            if (isStaticHtmlStatus()) {
+            if (Constants.isStaticHtmlStatus()) {
                 ext = ".html";
                 new CacheService().clearStaticPostFileByLogId(createCommentRequest.getLogId());
             }

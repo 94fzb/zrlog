@@ -166,7 +166,7 @@ public class TemplateHelper {
             controller.getRequest().setAttribute("template", basePath);
             I18NUtil.addToRequest(PathKit.getWebRootPath() + basePath + "/language/", controller.getRequest(), JFinal.me().getConstants().getDevMode());
             baseController.fullTemplateSetting();
-            TemplateHelper.fullInfo(controller.getRequest(), baseController.isStaticHtmlStatus());
+            TemplateHelper.fullInfo(controller.getRequest(), Constants.isStaticHtmlStatus());
             return basePath;
         }
         return Constants.DEFAULT_TEMPLATE_PATH;

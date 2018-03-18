@@ -157,11 +157,11 @@ $(function () {
         $("#preview-link").show();
     }
 
-    function tips(data, message) {
+    function tips(data) {
         PNotify.removeAll();
         if (data.error === 0) {
             new PNotify({
-                title: message,
+                title: data.message,
                 type: 'success',
                 hide: true,
                 delay: 3000,
@@ -257,13 +257,15 @@ $(function () {
                         dataType: "json",
                         contentType: "application/json",
                         success: function (data) {
-                            var date = new Date();
                             saving = false;
-                            tips(data, (timer ? lang.auto : "") + (rubbish ? lang.rubbish : "") + " " + lang.saveSuccess + " " + zeroPad(date.getHours(), 2) + ":" + zeroPad(date.getMinutes(), 2) + ":" + zeroPad(date.getSeconds(), 2));
+                            var date = new Date();
+                            data.message = (timer ? lang.auto : "") + (rubbish ? lang.rubbish : "") + " " + lang.saveSuccess + " " + zeroPad(date.getHours(), 2) + ":" + zeroPad(date.getMinutes(), 2) + ":" + zeroPad(date.getSeconds(), 2);
+                            tips(data);
                             lastChangeRequestBody = JSON.stringify(getFormRequestBody("#article-form"));
                         },
-                        error: function () {
-                            saving = true;
+                        error: function (xhr, err) {
+                            saving = false;
+                            tips({"error": 1, "message": formatErrorMessage(xhr, err)});
                         }
                     }
                 )

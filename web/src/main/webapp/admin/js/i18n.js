@@ -33,7 +33,14 @@ var allLang = {
         "addAttachment": "添加附件",
         "addVideo": "添加视频",
         "copPreviewHtmlToClipboard": "拷贝预览HTML到粘贴板",
-        "copPreviewHtmlToClipboardSuccess": "已成功拷贝预览HTML到粘贴板"
+        "copPreviewHtmlToClipboardSuccess": "已成功拷贝预览HTML到粘贴板",
+        "connectError": "请检查网络是否正常",
+        "response404": "请求资源不存在，或已被移出",
+        "response500": "程序内部错误",
+        "responseJsonError": "响应数据不是JSON",
+        "responseTimeout": "响应超时",
+        "requestAbort": "请求被放弃",
+        "uncaughtError": "未知错误"
     },
     "en": {
         "title": "Title",
@@ -69,7 +76,15 @@ var allLang = {
         "addAttachment": "Attachment",
         "addVideo": "Video",
         "copPreviewHtmlToClipboard": "Copy preview html to clipboard",
-        "copPreviewHtmlToClipboardSuccess": "Copy preview html to clipboard success"
+        "copPreviewHtmlToClipboardSuccess": "Copy preview html to clipboard success",
+        "connectError": "Not connected.\nPlease verify your network connection.",
+        "response404": "The requested page not found. [404]",
+        "response500": "Internal Server Error [500].",
+        "responseJsonError": "Requested JSON parse failed.",
+        "responseTimeout": "Time out error.",
+        "requestAbort": "abort",
+        "uncaughtError": "Uncaught Error"
+
     }
 };
 var lang;

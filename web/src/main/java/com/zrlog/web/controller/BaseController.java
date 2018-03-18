@@ -68,10 +68,6 @@ public class BaseController extends Controller {
         return true;
     }
 
-    public boolean isStaticHtmlStatus() {
-        return WebSite.dao.getBoolValueByName("generator_html_status");
-    }
-
     /**
      * 用于转化 GET 的中文乱码
      *
