@@ -13,12 +13,12 @@ import com.zrlog.common.request.UpdateArticleRequest;
 import com.zrlog.common.response.ArticleResponseEntry;
 import com.zrlog.common.response.CreateOrUpdateLogResponse;
 import com.zrlog.common.response.PageableResponse;
+import com.zrlog.common.vo.AdminTokenVO;
 import com.zrlog.model.Log;
 import com.zrlog.model.Tag;
 import com.zrlog.util.BeanUtil;
 import com.zrlog.util.ParseUtil;
 import com.zrlog.util.ThumbnailUtil;
-import com.zrlog.common.vo.AdminTokenVO;
 import org.jsoup.Jsoup;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
@@ -142,74 +142,20 @@ public class ArticleService {
                         String title = log.get("title").toString();
                         String content = log.get("content").toString();
                         String digest = log.get("digest").toString();
-                        log.put("title", wrapper(title, keywords));
-                        String tryWrapperDigest = wrapper(digest, keywords);
+                        log.put("title", ParseUtil.wrapperKeyword(title, keywords));
+                        String tryWrapperDigest = ParseUtil.wrapperKeyword(digest, keywords);
                         boolean findInDigest = tryWrapperDigest.length() != digest.length();
 
                         if (findInDigest) {
                             log.put("digest", tryWrapperDigest);
                         } else {
-                            String wrapperContent = wrapper(ParseUtil.removeHtmlElement(content), keywords);
-                            log.put("digest", wrapperContent);
+                            log.put("digest", ParseUtil.wrapperKeyword(ParseUtil.removeHtmlElement(content), keywords));
                         }
                     }
                 }
             }
         }
 
-    }
-
-    private String wrapper(String content, String keyword) {
-        String newContent = content;
-        if (content.contains(keyword)) {
-            newContent = content.replace(keyword, wrapperFontRed(keyword));
-        } else {
-            String lowerContent = content.toLowerCase();
-            if (lowerContent.contains(keyword.toLowerCase())) {
-                String[] strings = lowerContent.split(keyword.toLowerCase());
-                StringBuilder sb = new StringBuilder();
-                int count = 0;
-                if (strings.length > 1) {
-                    for (int i = 0; i < strings.length - 1; i++) {
-                        count += strings[i].length();
-                        String str = wrapperFontRed(content.substring(count, count + keyword.length()));
-                        sb.append(content.substring(count - strings[i].length(), count));
-                        sb.append(str);
-                        count += keyword.length();
-                    }
-                    // 添加最后一段数据
-                    sb.append(content.substring(count).replace(keyword.toLowerCase(), wrapperFontRed(keyword)));
-                    newContent = sb.toString();
-                } else if (strings.length > 0) {
-                    sb.append(content.substring(0, strings[0].length()));
-                    sb.append(lowerContent.substring(strings[0].length()).replace(keyword.toLowerCase(), wrapperFontRed(content.substring(strings[0].length()))));
-                    newContent = sb.toString();
-                } else {
-                    newContent = wrapperFontRed(content);
-                }
-            }
-        }
-        if (newContent.length() != content.length()) {
-            int first = newContent.indexOf("<font") - 5;
-            if (first > -1 && newContent.length() > Constants.DEFAULT_ARTICLE_DIGEST_LENGTH) {
-                String[] fontArr = (newContent.substring(first)).split("</font>");
-                newContent = "";
-                for (String str : fontArr) {
-                    if (!"".equals(newContent) && newContent.length() + str.length() > Constants.DEFAULT_ARTICLE_DIGEST_LENGTH) {
-                        if (newContent.length() < 100) {
-                            newContent += str.substring(0, 100);
-                        }
-                        break;
-                    }
-                    newContent += str + "</font>";
-                }
-            }
-        }
-        return newContent;
-    }
-
-    private String wrapperFontRed(String content) {
-        return "<font color=\"#CC0000\">" + content + "</font>";
     }
 
     public String getFirstImgUrl(String htmlContent, int userId) {

@@ -6,11 +6,10 @@ import com.hibegin.common.util.http.handle.CloseResponseHandle;
 import com.jfinal.core.JFinal;
 import com.jfinal.handler.Handler;
 import com.zrlog.common.Constants;
-import com.zrlog.service.PluginHelper;
-import com.zrlog.util.ZrLogUtil;
 import com.zrlog.common.vo.AdminTokenVO;
 import com.zrlog.service.AdminTokenService;
 import com.zrlog.service.AdminTokenThreadLocal;
+import com.zrlog.service.PluginHelper;
 import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.log4j.Logger;
@@ -146,7 +145,7 @@ public class PluginHandler extends Handler {
             //防止多次被Transfer-Encoding
             headerMap.remove("Transfer-Encoding");
             if (JFinal.me().getConstants().getDevMode()) {
-                LOGGER.info("--------------------------------- response");
+                LOGGER.info(request.getRequestURI() + " --------------------------------- response");
             }
             for (Map.Entry<String, String> t : headerMap.entrySet()) {
                 response.addHeader(t.getKey(), t.getValue());
