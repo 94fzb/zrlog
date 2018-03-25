@@ -5,7 +5,6 @@ import com.zrlog.common.request.LoginRequest;
 import com.zrlog.common.request.UpdateAdminRequest;
 import com.zrlog.common.response.LoginResponse;
 import com.zrlog.common.response.UpdateRecordResponse;
-import com.zrlog.model.User;
 import com.zrlog.service.AdminTokenThreadLocal;
 import com.zrlog.service.UserService;
 import com.zrlog.util.I18NUtil;
@@ -26,9 +25,8 @@ public class AdminController extends BaseController {
         UpdateAdminRequest updateAdminRequest = ZrLogUtil.convertRequestBody(getRequest(), UpdateAdminRequest.class);
         UpdateRecordResponse updateRecordResponse = new UpdateRecordResponse();
         if (updateAdminRequest != null) {
-            Integer userId = AdminTokenThreadLocal.getUserId();
-            User.dao.updateEmailUserNameHeaderByUserId(updateAdminRequest.getEmail(), updateAdminRequest.getUserName(), updateAdminRequest.getHeader(), userId);
-            getRequest().setAttribute("user", User.dao.findById(userId));
+            updateAdminRequest.setUserId(AdminTokenThreadLocal.getUserId());
+            getRequest().setAttribute("user", userService.update(updateAdminRequest));
         }
         updateRecordResponse.setMessage(I18NUtil.getStringFromRes("updatePersonInfoSuccess"));
         return updateRecordResponse;

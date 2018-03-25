@@ -13,6 +13,7 @@ import com.zrlog.common.request.UpdateArticleRequest;
 import com.zrlog.common.response.ArticleResponseEntry;
 import com.zrlog.common.response.CreateOrUpdateLogResponse;
 import com.zrlog.common.response.PageableResponse;
+import com.zrlog.common.response.UpdateRecordResponse;
 import com.zrlog.common.vo.AdminTokenVO;
 import com.zrlog.model.Log;
 import com.zrlog.model.Tag;
@@ -66,6 +67,17 @@ public class ArticleService {
         }
         updateLogResponse.setThumbnail(log.getStr("thumbnail"));
         return updateLogResponse;
+    }
+
+    public UpdateRecordResponse delete(Object logId) {
+        if (logId != null) {
+            Log log = Log.dao.adminFindLogByLogId(logId);
+            if (log != null && log.get("keywords") != null) {
+                Tag.dao.deleteTag(log.get("keywords").toString());
+            }
+            Log.dao.deleteById(logId);
+        }
+        return new UpdateRecordResponse();
     }
 
     private Log getLog(Integer userId, CreateArticleRequest createArticleRequest) {
@@ -205,7 +217,7 @@ public class ArticleService {
                         LOGGER.error("generation jpeg thumbnail error ", e);
                         return url;
                     }
-                    return new UploadService().getCloudUrl(JFinal.me().getContextPath(), path, thumbnailFile.getPath(), null) + "?h=" + height + "&w=" + width;
+                    return new UploadService().getCloudUrl(JFinal.me().getContextPath(), path, thumbnailFile.getPath(), null).getUrl() + "?h=" + height + "&w=" + width;
                 }
             } catch (Exception e) {
                 LOGGER.error("", e);

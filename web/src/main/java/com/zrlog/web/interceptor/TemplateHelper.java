@@ -12,6 +12,7 @@ import com.zrlog.web.controller.BaseController;
 import com.zrlog.web.util.WebTools;
 import org.apache.log4j.Logger;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileInputStream;
@@ -229,6 +230,19 @@ public class TemplateHelper {
                 }
             }
         }
+    }
+
+    public static String getTemplatePathByCookie(Cookie[] cookies) {
+        String previewTemplate = null;
+        if (cookies != null && cookies.length > 0) {
+            for (Cookie cookie : cookies) {
+                if ("template".equals(cookie.getName()) && cookie.getValue().startsWith(Constants.TEMPLATE_BASE_PATH)) {
+                    previewTemplate = cookie.getValue();
+                    break;
+                }
+            }
+        }
+        return previewTemplate;
     }
 
     public static void fillArticleInfo(Log data, String baseUrl, String suffix) {

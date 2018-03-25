@@ -5,6 +5,7 @@ public class UpdateAdminRequest {
     private String userName;
     private String email;
     private String header;
+    private int userId;
 
     public String getUserName() {
         return userName;
@@ -28,5 +29,13 @@ public class UpdateAdminRequest {
 
     public void setHeader(String header) {
         this.header = header;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 }

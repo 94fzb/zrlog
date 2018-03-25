@@ -4,6 +4,7 @@ import com.hibegin.common.util.SecurityUtils;
 import com.hibegin.common.util.StringUtils;
 import com.zrlog.common.request.ChangePasswordRequest;
 import com.zrlog.common.request.LoginRequest;
+import com.zrlog.common.request.UpdateAdminRequest;
 import com.zrlog.common.response.LoginResponse;
 import com.zrlog.common.response.UpdateRecordResponse;
 import com.zrlog.model.User;
@@ -55,5 +56,11 @@ public class UserService {
             loginResponse.setMessage(I18NUtil.getStringFromRes("userNameAndPasswordRequired"));
         }
         return loginResponse;
+    }
+
+
+    public Object update(UpdateAdminRequest updateAdminRequest) {
+        User.dao.updateEmailUserNameHeaderByUserId(updateAdminRequest.getEmail(), updateAdminRequest.getUserName(), updateAdminRequest.getHeader(), updateAdminRequest.getUserId());
+        return User.dao.findById(updateAdminRequest.getUserId());
     }
 }

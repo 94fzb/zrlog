@@ -18,7 +18,7 @@ import com.zrlog.service.PluginCoreProcess;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.annotation.RefreshCache;
 import com.zrlog.web.controller.BaseController;
-import com.zrlog.web.plugin.DownloadProcessHandle;
+import com.zrlog.util.http.DownloadProcessHandle;
 import com.zrlog.web.plugin.UpdateVersionPlugin;
 import com.zrlog.web.plugin.UpdateVersionThread;
 

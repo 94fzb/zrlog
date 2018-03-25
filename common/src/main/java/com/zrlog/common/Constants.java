@@ -3,8 +3,8 @@ package com.zrlog.common;
 
 import com.zrlog.common.type.AutoUpgradeVersionType;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 存放全局的静态变量，有多个地方使用一个key时，存放在这里，方便代码的维护。
@@ -27,8 +27,9 @@ public class Constants {
     public static final long DEFAULT_SESSION_TIMEOUT = 1000 * 20 * 60L;
     public static final String SESSION_TIMEOUT_KEY = "session_timeout";
     public static final String ATTACHED_FOLDER = "/attached/";
+    public static String TEMPLATE_CONFIG_SUFFIX = "_setting";
     public static final AutoUpgradeVersionType DEFAULT_AUTO_UPGRADE_VERSION_TYPE = AutoUpgradeVersionType.ONE_DAY;
-    public static final Map<String, Object> webSite = new HashMap<>();
+    public static final Map<String, Object> webSite = new ConcurrentHashMap<>();
 
     public static String pluginServer;
 

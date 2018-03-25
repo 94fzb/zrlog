@@ -1,9 +1,9 @@
 $(function () {
     var editor;
     $("#saveFile").click(function () {
-        $("#code").val(editor.getValue());
+        $("#content").val(editor.getValue());
         $.post("api/admin/template/saveFile", $("#saveFileForm").serialize(), function (data) {
-            if (data.status) {
+            if (!data.error) {
                 new PNotify({
                     title: '操作成功...',
                     type: 'success',
@@ -36,7 +36,7 @@ $(function () {
             $("#editing").text("> " + path);
             $("#file").val(path);
             $("div").remove(".CodeMirror");
-            $("#code").text(data.fileContent);
+            $("#code").text(data['fileContent']);
             editor = CodeMirror.fromTextArea(document.getElementById("code"), {
                 lineNumbers: true
             });
@@ -56,7 +56,7 @@ $(function () {
             } else {
                 mode = spec = val;
             }
-            if (spec == 'application/x-jsp') {
+            if (spec === 'application/x-jsp') {
                 spec = 'text/html';
             }
             if (mode) {

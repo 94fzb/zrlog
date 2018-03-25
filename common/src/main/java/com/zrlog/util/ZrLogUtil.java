@@ -32,7 +32,7 @@ public class ZrLogUtil {
         try {
             String jsonStr = IOUtil.getStringInputStream(request.getInputStream());
             return new Gson().fromJson(jsonStr, clazz);
-        } catch (IOException e) {
+        } catch (Exception e) {
             LOGGER.info("", e);
             throw new RuntimeException(e);
         }

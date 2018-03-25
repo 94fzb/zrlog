@@ -3,6 +3,7 @@ package com.zrlog.service;
 import com.hibegin.common.util.http.HttpUtil;
 import com.hibegin.common.util.http.handle.HttpJsonArrayHandle;
 import com.zrlog.common.Constants;
+import com.zrlog.common.response.UploadFileResponse;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,7 +15,8 @@ public class UploadService {
 
     private static final Logger LOGGER = Logger.getLogger(UploadService.class);
 
-    public String getCloudUrl(String contextPath, String uri, String finalFilePath, HttpServletRequest request) {
+    public UploadFileResponse getCloudUrl(String contextPath, String uri, String finalFilePath, HttpServletRequest request) {
+        UploadFileResponse uploadFileResponse = new UploadFileResponse();
         // try push to cloud
         Map<String, String[]> map = new HashMap<>();
         map.put("fileInfo", new String[]{finalFilePath + "," + uri});
@@ -32,6 +34,7 @@ public class UploadService {
             url = contextPath + uri;
             LOGGER.error(e);
         }
-        return url;
+        uploadFileResponse.setUrl(url);
+        return uploadFileResponse;
     }
 }

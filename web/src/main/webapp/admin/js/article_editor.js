@@ -261,7 +261,9 @@ $(function () {
                         success: function (data) {
                             saving = false;
                             var date = new Date();
-                            data.message = (timer ? lang.auto : "") + (rubbish ? lang.rubbish : "") + " " + lang.saveSuccess + " " + zeroPad(date.getHours(), 2) + ":" + zeroPad(date.getMinutes(), 2) + ":" + zeroPad(date.getSeconds(), 2);
+                            if (!data.error) {
+                                data.message = (timer ? lang.auto : "") + (rubbish ? lang.rubbish : "") + " " + lang.saveSuccess + " " + zeroPad(date.getHours(), 2) + ":" + zeroPad(date.getMinutes(), 2) + ":" + zeroPad(date.getSeconds(), 2);
+                            }
                             tips(data);
                             lastChangeRequestBody = JSON.stringify(getFormRequestBody("#article-form"));
                         },

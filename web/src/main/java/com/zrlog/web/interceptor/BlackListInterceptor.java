@@ -3,10 +3,10 @@ package com.zrlog.web.interceptor;
 import com.jfinal.aop.Interceptor;
 import com.jfinal.aop.Invocation;
 import com.jfinal.core.JFinal;
-import com.zrlog.model.WebSite;
+import com.zrlog.common.Constants;
 import com.zrlog.web.config.ZrLogConfig;
-import com.zrlog.web.util.WebTools;
 import com.zrlog.web.controller.BaseController;
+import com.zrlog.web.util.WebTools;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -24,7 +24,7 @@ public class BlackListInterceptor implements Interceptor {
         } else {
             if (invocation.getController() instanceof BaseController) {
                 BaseController baseController = (BaseController) invocation.getController();
-                String ipStr = WebSite.dao.getStringValueByName("blackList");
+                String ipStr = (String) Constants.webSite.get("blackList");
                 if (ipStr != null) {
                     Set<String> ipSet = new HashSet<>(Arrays.asList(ipStr.split(",")));
                     String requestIP = WebTools.getRealIp(baseController.getRequest());

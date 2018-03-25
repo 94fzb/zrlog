@@ -25,8 +25,8 @@ class PluginSocketThread extends Thread {
     @Override
     public void run() {
         //使用Socket的方式进行监听，如果插件服务停止后，那么SocketServer也会被关闭，方法堵塞结束，标记插件服务停止。
-        Socket socket;
-        while (true) {
+        Socket socket = null;
+        while (!stop) {
             try {
                 Thread.sleep(1000);
                 socket = new Socket(host, port);
@@ -36,7 +36,9 @@ class PluginSocketThread extends Thread {
             }
         }
         try {
-            IOUtil.getByteByInputStream(socket.getInputStream());
+            if (socket != null) {
+                IOUtil.getByteByInputStream(socket.getInputStream());
+            }
             stop = true;
         } catch (IOException e) {
             LOGGER.warn("plugin exception stop ", e);
@@ -45,5 +47,9 @@ class PluginSocketThread extends Thread {
 
     public boolean isStop() {
         return stop;
+    }
+
+    public void setStop(boolean stop) {
+        this.stop = stop;
     }
 }

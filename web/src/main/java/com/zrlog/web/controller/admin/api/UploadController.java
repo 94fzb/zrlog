@@ -22,30 +22,22 @@ public class UploadController extends BaseController {
 
     public UploadFileResponse index() {
         String uploadFieldName = "imgFile";
-
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        String fileExt = getFile().getFileName().substring(
-                getFile(uploadFieldName).getFileName().lastIndexOf(".") + 1)
-                .toLowerCase();
-        SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
-        String uri = Constants.ATTACHED_FOLDER + getPara("dir") + "/"
-                + sdf.format(new Date()) + "/" + df.format(new Date()) + "_"
-                + new Random().nextInt(1000) + "." + fileExt;
+        String uri = generatorUri(uploadFieldName, "");
         String finalFilePath = PathKit.getWebRootPath() + uri;
-
         FileUtils.moveOrCopyFile(PathKit.getWebRootPath() + Constants.ATTACHED_FOLDER + getFile(uploadFieldName).getFileName(), finalFilePath, true);
-        UploadFileResponse uploadFileResponse = new UploadFileResponse();
-        uploadFileResponse.setError(0);
-        uploadFileResponse.setUrl(new UploadService().getCloudUrl(getRequest().getContextPath(), uri, finalFilePath, getRequest()));
-        return uploadFileResponse;
+        return new UploadService().getCloudUrl(getRequest().getContextPath(), uri, finalFilePath, getRequest());
+    }
+
+    private String generatorUri(String uploadFieldName, String alias) {
+        String fileExt = getFile().getFileName().substring(getFile(uploadFieldName).getFileName().lastIndexOf(".") + 1).toLowerCase();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
+        return Constants.ATTACHED_FOLDER + getPara("dir") + "/" + sdf.format(new Date()) + "/" + df.format(new Date()) + "_" + new Random().nextInt(1000) + alias + "." + fileExt;
     }
 
     public UploadFileResponse thumbnail() throws IOException {
         String uploadFieldName = "imgFile";
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        String fileExt = getFile().getFileName().substring(getFile(uploadFieldName).getFileName().lastIndexOf(".") + 1).toLowerCase();
-        SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
-        String uri = Constants.ATTACHED_FOLDER + getPara("dir") + "/" + sdf.format(new Date()) + "/" + df.format(new Date()) + new Random().nextInt(1000) + "_thumbnail" + "." + fileExt;
+        String uri = generatorUri(uploadFieldName, "_thumbnail");
         File imgFile = getFile(uploadFieldName).getFile();
         String finalFilePath = PathKit.getWebRootPath() + uri;
         File thumbnailFile = new File(finalFilePath);
@@ -55,7 +47,7 @@ public class UploadController extends BaseController {
         if (!thumbnailFile.getParentFile().exists()) {
             thumbnailFile.getParentFile().mkdirs();
         }
-        if (!"gif".equalsIgnoreCase(fileExt)) {
+        if (!".gif".endsWith(uri)) {
             IOUtil.writeBytesToFile(ThumbnailUtil.jpeg(bytes, 1f), thumbnailFile);
             BufferedImage bimg = ImageIO.read(thumbnailFile);
             height = bimg.getHeight();
@@ -64,11 +56,9 @@ public class UploadController extends BaseController {
             IOUtil.writeBytesToFile(bytes, thumbnailFile);
         }
         FileUtils.moveOrCopyFile(thumbnailFile.toString(), finalFilePath, true);
-        UploadFileResponse uploadFileResponse = new UploadFileResponse();
-        uploadFileResponse.setError(0);
-        uploadFileResponse.setUrl(new UploadService().getCloudUrl(getRequest().getContextPath(), uri, finalFilePath, getRequest()) + "?h=" + height + "&w=" + width);
+        UploadFileResponse uploadFileResponse = new UploadService().getCloudUrl(getRequest().getContextPath(), uri, finalFilePath, getRequest());
+        uploadFileResponse.setUrl(uploadFileResponse.getUrl() + "?h=" + height + "&w=" + width);
         return uploadFileResponse;
     }
-
 
 }

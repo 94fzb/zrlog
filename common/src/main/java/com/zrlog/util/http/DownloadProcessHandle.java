@@ -1,4 +1,4 @@
-package com.zrlog.web.plugin;
+package com.zrlog.util.http;
 
 import com.hibegin.common.util.SecurityUtils;
 import com.hibegin.common.util.http.handle.HttpHandle;

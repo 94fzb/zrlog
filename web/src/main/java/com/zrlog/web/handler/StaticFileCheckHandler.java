@@ -138,7 +138,7 @@ public class StaticFileCheckHandler extends Handler {
                     body = builder.toString();
                 }
                 try {
-                    if (body.endsWith("</html>")) {
+                    if (body.trim().endsWith("</html>")) {
                         body = body + "<!--" + (System.currentTimeMillis() - startTime) + "ms-->";
                     }
                     out.write(body);

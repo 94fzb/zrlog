@@ -10,12 +10,10 @@ import com.zrlog.common.Constants;
 import org.apache.log4j.Logger;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * 更新Zrlog，具体的流程看 run() 里面有详细流程。本质就是合成新war包，然后替换掉war包。
@@ -27,78 +25,106 @@ public class UpdateVersionThread extends Thread implements Serializable {
     private File file;
     private StringBuilder sb = new StringBuilder();
     private boolean finish;
+    private File tempFilePath;
 
     public UpdateVersionThread(File file) {
         this.file = file;
+        tempFilePath = new File(System.getProperty("java.io.tmpdir") + File.separator + UUID.randomUUID().toString());
+        tempFilePath.mkdirs();
     }
 
     private void updateProcessMsg(String str) {
+        LOGGER.info(str);
         sb.append("<p>").append(str).append("</p>");
     }
 
     private void updateProcessErrorMsg(Throwable e) {
+        LOGGER.error(e);
         sb.append("<pre style='color:red'>").append(ExceptionUtils.recordStackTraceMsg(e)).append("</pre>");
     }
 
     @Override
     public void run() {
         try {
-            String warName;
-            String contextPath = JFinal.me().getServletContext().getContextPath();
-            String folderName;
-            if ("/".equals(contextPath) || "".equals(contextPath)) {
-                warName = "/ROOT.war";
-                folderName = "ROOT/";
-            } else {
-                warName = contextPath + ".war";
-                folderName = contextPath;
-            }
-            String filePath = System.getProperty("java.io.tmpdir") + File.separator + UUID.randomUUID().toString();
-            String backupFolder = new File(PathKit.getWebRootPath()).getParentFile().getParentFile() + File.separator + "backup" + File.separator + new SimpleDateFormat("yyyy-MM-dd_HH_mm").format(new Date()) + File.separator;
-            updateProcessMsg("历史版本备份在 " + backupFolder);
-            new File(backupFolder).mkdirs();
-            FileUtils.moveOrCopy(new File(PathKit.getWebRootPath()).getParent() + File.separator + folderName, backupFolder, false);
-            FileUtils.moveOrCopy(new File(PathKit.getWebRootPath()).getParent() + File.separator + warName, backupFolder, false);
-            updateProcessMsg("生成临时文件");
-            File tempFilePath = new File(filePath);
-            tempFilePath.mkdirs();
-            FileUtils.moveOrCopy(file.toString(), tempFilePath.getParentFile().toString(), false);
-            String tempFile = tempFilePath.getParentFile() + File.separator + file.getName();
-            ZipUtil.unZip(tempFile, filePath + File.separator);
-            updateProcessMsg("解压完成");
-            List<File> fileList = new ArrayList<>();
-            fileList.add(new File(filePath));
-            File tempWarFile = new File(tempFilePath.getParent() + File.separator + warName);
-            LOGGER.info(tempWarFile);
-            FileUtils.moveOrCopy(PathKit.getWebRootPath() + "/WEB-INF/db.properties", filePath + "/WEB-INF/", false);
-            FileUtils.moveOrCopy(PathKit.getWebRootPath() + "/WEB-INF/install.lock", filePath + "/WEB-INF/", false);
-            File templatePath = new File(PathKit.getWebRootPath() + Constants.TEMPLATE_BASE_PATH);
-            File[] templates = templatePath.listFiles();
-            if (templates != null && templates.length > 0) {
-                for (File template : templates) {
-                    if (template.isDirectory() && template.toString().substring(PathKit.getWebRootPath().length()).startsWith(Constants.DEFAULT_TEMPLATE_PATH)) {
-                        LOGGER.info("skip default template folder");
-                        continue;
-                    }
-                    FileUtils.moveOrCopy(template.toString(), filePath + File.separator + Constants.TEMPLATE_BASE_PATH, false);
-                }
-            }
-            if (new File(PathKit.getWebRootPath() + "/attached").exists()) {
-                FileUtils.moveOrCopy(PathKit.getWebRootPath() + "/attached", filePath, false);
-            }
-            //使用系统提供的工具打包jar(.war)包，仅限有jdk可用。
-            //System.out.println(CmdUtil.sendCmd("jar ", "-cvf", tempWarFile.toString(),"-C "+ filePath + "/ ."));
-            JarPackageUtil.inJar(fileList, filePath + File.separator, tempWarFile.toString());
-            File finalFile = new File(new File(PathKit.getWebRootPath()).getParentFile() + warName);
-            updateProcessMsg("覆盖安装包文件");
-            finalFile.delete();
-            LOGGER.info("finalFile " + finalFile);
-            FileUtils.moveOrCopy(tempWarFile.toString(), finalFile.getParentFile().toString(), false);
+            String warName = getWarNameAndBackup();
+            File upgradeWarFile = generatorUpgradeWarFile(warName);
+            doUpgrade(warName, upgradeWarFile);
         } catch (Exception e) {
             LOGGER.error("", e);
             updateProcessErrorMsg(e);
+        } finally {
+            FileUtils.deleteFile(tempFilePath.toString());
         }
         finish = true;
+    }
+
+    private void doUpgrade(String warName, File upgradeWarFile) {
+        File currentRunWarFile = new File(new File(PathKit.getWebRootPath()).getParentFile() + warName);
+        currentRunWarFile.delete();
+        FileUtils.moveOrCopy(upgradeWarFile.toString(), currentRunWarFile.getParentFile().toString(), false);
+        updateProcessMsg("覆盖更新包 " + currentRunWarFile);
+        upgradeWarFile.delete();
+    }
+
+
+    private File generatorUpgradeWarFile(String warName) throws IOException {
+        ZipUtil.unZip(file.toString(), tempFilePath + File.separator);
+        updateProcessMsg("解压安装包 " + file);
+        Map<String, String> copyFileMap = new LinkedHashMap<>();
+        copyFileMap.put(PathKit.getWebRootPath() + "/WEB-INF/db.properties", tempFilePath + "/WEB-INF/");
+        copyFileMap.put(PathKit.getWebRootPath() + "/WEB-INF/install.lock", tempFilePath + "/WEB-INF/");
+        copyFileMap.put(PathKit.getWebRootPath() + "/attached", tempFilePath.toString());
+        copyFileMap.put(PathKit.getWebRootPath() + "/favicon.ico", tempFilePath.toString());
+        copyFileMap.put(PathKit.getWebRootPath() + "/error", tempFilePath.toString());
+        fillTemplateCopyInfo(tempFilePath, copyFileMap);
+        doCopy(copyFileMap);
+        List<File> fileList = new ArrayList<>();
+        fileList.add(tempFilePath);
+        File tempWarFile = new File(tempFilePath.getParent() + File.separator + warName);
+        JarPackageUtil.inJar(fileList, tempFilePath + File.separator, tempWarFile.toString());
+        updateProcessMsg("合成更新包 " + tempWarFile);
+        return tempWarFile;
+    }
+
+    private void fillTemplateCopyInfo(File tempFilePath, Map<String, String> copyFileMap) {
+        File templatePath = new File(PathKit.getWebRootPath() + Constants.TEMPLATE_BASE_PATH);
+        File[] templates = templatePath.listFiles();
+        if (templates != null && templates.length > 0) {
+            for (File template : templates) {
+                if (template.isDirectory() && template.toString().substring(PathKit.getWebRootPath().length()).startsWith(Constants.DEFAULT_TEMPLATE_PATH)) {
+                    //skip default template folder
+                    continue;
+                }
+                copyFileMap.put(template.toString(), tempFilePath + File.separator + Constants.TEMPLATE_BASE_PATH);
+            }
+        }
+    }
+
+    private void doCopy(Map<String, String> pathMap) {
+        for (Map.Entry<String, String> entry : pathMap.entrySet()) {
+            if (new File(entry.getKey()).exists()) {
+                FileUtils.moveOrCopy(entry.getKey(), entry.getValue(), false);
+            }
+        }
+    }
+
+    private String getWarNameAndBackup() {
+        String warName;
+        String contextPath = JFinal.me().getServletContext().getContextPath();
+        if ("/".equals(contextPath) || "".equals(contextPath)) {
+            warName = "/ROOT.war";
+        } else {
+            warName = contextPath + ".war";
+        }
+        String backupFolder = new File(PathKit.getWebRootPath()).getParentFile().getParentFile() + File.separator + "backup" + File.separator + new SimpleDateFormat("yyyy-MM-dd_HH_mm").format(new Date()) + File.separator;
+        new File(backupFolder).mkdirs();
+        FileUtils.moveOrCopy(PathKit.getWebRootPath(), backupFolder, false);
+        String warPath = new File(PathKit.getWebRootPath()).getParent() + File.separator + warName;
+        if (new File(warPath).exists()) {
+            FileUtils.moveOrCopy(warPath, backupFolder, false);
+        }
+        updateProcessMsg("备份当前版本到 " + backupFolder);
+        return warName;
     }
 
     /**

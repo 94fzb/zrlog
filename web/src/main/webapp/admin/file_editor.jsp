@@ -48,7 +48,7 @@
 </style>
 <div class="page-header">
     <h3>
-        文件编辑
+        ${_res['fileEdit']}
         <small id="editing"></small>
     </h3>
 </div>
@@ -56,10 +56,11 @@
 <form id="saveFileForm">
     <input type="hidden" id="basePath" value="${param.path}">
     <input type="hidden" name="file" id="file">
+    <textarea name="content" id="content" hidden></textarea>
     <div class="form-group">
         <div class="row">
             <div class="col-md-10">
-                    <textarea id="code" name="content">${fileContent}</textarea>
+                <textarea id="code"></textarea>
             </div>
             <div class="col-md-2">
                 <select multiple style="height: 600px" id="form-field-select-6"

@@ -5,11 +5,10 @@ import com.jfinal.core.Controller;
 import com.jfinal.kit.PathKit;
 import com.zrlog.common.Constants;
 import com.zrlog.common.request.PageableRequest;
-import com.zrlog.model.WebSite;
+import com.zrlog.web.interceptor.TemplateHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.Cookie;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -21,7 +20,6 @@ import java.util.Map;
 public class BaseController extends Controller {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseController.class);
-    protected String templateConfigSuffix = "_setting";
 
     /**
      * 获取主题的相对于程序的路径，当Cookie中有值的情况下，优先使用Cookie里面的数据（仅当主题存在的情况下，否则返回默认的主题），
@@ -31,7 +29,7 @@ public class BaseController extends Controller {
     public String getTemplatePath() {
         String templatePath = Constants.webSite.get("template").toString();
         templatePath = templatePath == null ? Constants.DEFAULT_TEMPLATE_PATH : templatePath;
-        String previewTheme = getTemplatePathByCookie();
+        String previewTheme = TemplateHelper.getTemplatePathByCookie(getRequest().getCookies());
         if (previewTheme != null) {
             templatePath = previewTheme;
         }
@@ -39,20 +37,6 @@ public class BaseController extends Controller {
             templatePath = Constants.DEFAULT_TEMPLATE_PATH;
         }
         return templatePath;
-    }
-
-    protected String getTemplatePathByCookie() {
-        String previewTemplate = null;
-        Cookie[] cookies = getRequest().getCookies();
-        if (cookies != null && cookies.length > 0) {
-            for (Cookie cookie : cookies) {
-                if ("template".equals(cookie.getName()) && cookie.getValue().startsWith(Constants.TEMPLATE_BASE_PATH)) {
-                    previewTemplate = cookie.getValue();
-                    break;
-                }
-            }
-        }
-        return previewTemplate;
     }
 
     public Integer getDefaultRows() {
@@ -93,7 +77,7 @@ public class BaseController extends Controller {
     }
 
     public void fullTemplateSetting() {
-        Object jsonStr = Constants.webSite.get(getTemplatePath() + templateConfigSuffix);
+        Object jsonStr = Constants.webSite.get(getTemplatePath() + Constants.TEMPLATE_CONFIG_SUFFIX);
         fullTemplateSetting(jsonStr);
     }
 

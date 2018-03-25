@@ -1,8 +1,6 @@
 package com.zrlog.web.config;
 
 import com.hibegin.common.util.FileUtils;
-import com.hibegin.common.util.http.HttpUtil;
-import com.hibegin.common.util.http.handle.HttpFileHandle;
 import com.jfinal.config.*;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
@@ -36,7 +34,10 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Random;
 
 /**
  * JFinal核心一些参数的配置。
@@ -44,13 +45,11 @@ import java.util.*;
 public class ZrLogConfig extends JFinalConfig {
 
     private static final Logger LOGGER = Logger.getLogger(ZrLogConfig.class);
-    //插件服务的下载地址
-    private static final String PLUGIN_CORE_DOWNLOAD_URL = com.zrlog.common.Constants.ZRLOG_RESOURCE_DOWNLOAD_URL + "/plugin/core/plugin-core.jar";
     //存放Zrlog的一些系统参数
     private Properties systemProperties = new Properties();
     private Properties dbProperties = new Properties();
     // 读取系统参数
-    private Properties systemProp = System.getProperties();
+    private static final Properties systemProp = System.getProperties();
     //存放为config的属性，是为了安装完成后还获得JFinal的插件列表对象
     private Plugins plugins;
     private boolean haveSqlUpdated = false;
@@ -66,7 +65,6 @@ public class ZrLogConfig extends JFinalConfig {
         //bae磁盘空间有限，且无管理方式，删掉升级过程中产生的备份文件
         if (ZrLogUtil.isBae()) {
             FileUtils.deleteFile("/home/bae/backup");
-            FileUtils.deleteFile("/tmp/tomcat");
         }
         try {
             systemProperties.load(ZrLogConfig.class.getResourceAsStream("/zrlog.properties"));
@@ -96,18 +94,8 @@ public class ZrLogConfig extends JFinalConfig {
             @Override
             public void run() {
                 //加载 zrlog 提供的插件
-                File pluginCoreFile = new File(PathKit.getWebRootPath() + "/WEB-INF/plugins/plugin-core.jar");
-                if (!pluginCoreFile.exists()) {
-                    pluginCoreFile.getParentFile().mkdirs();
-                    String filePath = pluginCoreFile.getParentFile().toString();
-                    try {
-                        LOGGER.info("plugin-core.jar not exists will download from " + PLUGIN_CORE_DOWNLOAD_URL);
-                        HttpUtil.getInstance().sendGetRequest(PLUGIN_CORE_DOWNLOAD_URL + "?_=" + System.currentTimeMillis(), new HashMap<String, String[]>(), new HttpFileHandle(filePath), new HashMap<String, String>());
-                    } catch (IOException e) {
-                        LOGGER.warn("download plugin core error", e);
-                    }
-                }
-                int port = PluginCoreProcess.getInstance().pluginServerStart(pluginCoreFile, dbPropertiesPath, pluginJvmArgs, PathKit.getWebRootPath(), BlogBuildInfoUtil.getVersion());
+                int port = PluginCoreProcess.getInstance().pluginServerStart(new File(PathKit.getWebRootPath() + "/WEB-INF/plugins/plugin-core.jar"),
+                        dbPropertiesPath, pluginJvmArgs, PathKit.getWebRootPath(), BlogBuildInfoUtil.getVersion());
                 com.zrlog.common.Constants.pluginServer = "http://localhost:" + port;
             }
         }.start();
@@ -199,7 +187,7 @@ public class ZrLogConfig extends JFinalConfig {
                 if (pluginJvmArgsObj == null) {
                     pluginJvmArgsObj = "";
                 }
-                if (!"junit-test".equals(systemProp.getProperty("env"))) {
+                if (!isTest()) {
                     runBlogPlugin(dbPropertiesFile, pluginJvmArgsObj.toString());
                     plugins.add(new UpdateVersionPlugin());
                 }
@@ -350,5 +338,9 @@ public class ZrLogConfig extends JFinalConfig {
             plugin.start();
         }
         initDatabaseVersion();
+    }
+
+    public static boolean isTest() {
+        return "junit-test".equals(systemProp.getProperty("env"));
     }
 }

@@ -2,9 +2,10 @@ package com.zrlog.web.controller.admin.api;
 
 import com.zrlog.common.request.CreateArticleRequest;
 import com.zrlog.common.request.UpdateArticleRequest;
-import com.zrlog.common.response.*;
-import com.zrlog.model.Log;
-import com.zrlog.model.Tag;
+import com.zrlog.common.response.ArticleResponseEntry;
+import com.zrlog.common.response.CreateOrUpdateLogResponse;
+import com.zrlog.common.response.DeleteLogResponse;
+import com.zrlog.common.response.PageableResponse;
 import com.zrlog.service.AdminTokenThreadLocal;
 import com.zrlog.service.ArticleService;
 import com.zrlog.util.ZrLogUtil;
@@ -19,22 +20,11 @@ public class ArticleController extends BaseController {
     public DeleteLogResponse delete() {
         String[] ids = getPara("id").split(",");
         for (String id : ids) {
-            delete(id);
+            articleService.delete(id);
         }
         DeleteLogResponse deleteLogResponse = new DeleteLogResponse();
         deleteLogResponse.setDelete(true);
         return deleteLogResponse;
-    }
-
-    private UpdateRecordResponse delete(Object logId) {
-        if (logId != null) {
-            Log log = Log.dao.adminFindLogByLogId(logId);
-            if (log != null && log.get("keywords") != null) {
-                Tag.dao.deleteTag(log.get("keywords").toString());
-            }
-            Log.dao.deleteById(logId);
-        }
-        return new UpdateRecordResponse();
     }
 
     @RefreshCache
