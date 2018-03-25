@@ -1,5 +1,6 @@
 package com.zrlog.web.config;
 
+import com.hibegin.common.util.FileUtils;
 import com.hibegin.common.util.http.HttpUtil;
 import com.hibegin.common.util.http.handle.HttpFileHandle;
 import com.jfinal.config.*;
@@ -62,6 +63,11 @@ public class ZrLogConfig extends JFinalConfig {
      * 读取Zrlog的一些配置，主要是避免硬编码的问题
      */
     public ZrLogConfig() {
+        //bae磁盘空间有限，且无管理方式，删掉升级过程中产生的备份文件
+        if (ZrLogUtil.isBae()) {
+            FileUtils.deleteFile("/home/bae/backup");
+            FileUtils.deleteFile("/tmp/tomcat");
+        }
         try {
             systemProperties.load(ZrLogConfig.class.getResourceAsStream("/zrlog.properties"));
         } catch (IOException e) {

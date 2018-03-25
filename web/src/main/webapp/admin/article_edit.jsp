@@ -161,7 +161,7 @@
                             <div class="clearfix"></div>
                         </div>
                         <div class="x_content">
-                            <div class="tagsinput" id="unCheckedTag" style="max-height: 300px;width: 100%">
+                            <div class="tagsinput" id="unCheckedTag" style="max-height: 240px;width: 100%">
                                 <c:forEach items="${init.tags}" var="tags">
                                     <span class="tag2" val="${tags.text}"><i class="fa fa-tag"></i>${tags.text}</span>
                                 </c:forEach>

@@ -196,4 +196,9 @@ public class ZrLogUtil {
             return result > 0;
         }
     }
+
+    public static boolean isBae() {
+        String value = System.getenv("SERVER_SOFTWARE");
+        return value != null && value.startsWith("bae");
+    }
 }
