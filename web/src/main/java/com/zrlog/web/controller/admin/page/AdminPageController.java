@@ -21,6 +21,7 @@ public class AdminPageController extends BaseController {
             JFinal.me().getServletContext().setAttribute("commCount", Comment.dao.count());
             JFinal.me().getServletContext().setAttribute("toDayCommCount", Comment.dao.countToDayComment());
             JFinal.me().getServletContext().setAttribute("clickCount", Log.dao.sumAllClick());
+            JFinal.me().getServletContext().setAttribute("articleCount", Log.dao.adminCount());
             JFinal.me().getServletContext().setAttribute("lastVersion", new UpgradeController().lastVersion());
             if (getPara(0) == null || getRequest().getRequestURI().endsWith("admin/") || "login".equals(getPara(0))) {
                 redirect("/admin/index");

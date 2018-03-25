@@ -224,4 +224,8 @@ public class Log extends Model<Log> implements Serializable {
     public long count() {
         return findFirst("select count(1) as count from " + TABLE_NAME + " where rubbish=? and private=?", false, false).getLong("count");
     }
+
+    public long adminCount() {
+        return findFirst("select count(1) as count from " + TABLE_NAME).getLong("count");
+    }
 }

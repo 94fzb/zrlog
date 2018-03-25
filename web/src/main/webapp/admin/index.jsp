@@ -1,6 +1,7 @@
 <%@ page session="false" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="f" %>
-<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <jsp:include page="include/menu.jsp"/>
 <div class="page-header">
     <h3>
@@ -56,19 +57,15 @@
                             <td>
                                 操作系统
                             </td>
-                            <td>${system['os.name']} - ${system['os.arch']} - ${system['os.version']}</td>
+                            <td><i class="fa fa-${fn:toLowerCase(system['os.name'])}"></i> ${system['os.name']}
+                                - ${system['os.arch']}
+                                - ${system['os.version']}</td>
                         </tr>
                         <tr>
                             <td>
-                                操作系统时区
+                                系统时区 - 地域/语言
                             </td>
-                            <td>${system['user.timezone']}</td>
-                        </tr>
-                        <tr>
-                            <td>
-                                操作系统地域/语言
-                            </td>
-                            <td>${system['user.country']}/${system['user.language']}</td>
+                            <td>${system['user.timezone']} - ${system['user.country']}/${system['user.language']}</td>
                         </tr>
                         <tr>
                             <td>
@@ -88,7 +85,6 @@
                             </td>
                             <td>${zrlog.version} - ${zrlog.buildId} (${zrlog.buildTime})</td>
                         </tr>
-
                         </tbody>
                     </table>
                 </div>
@@ -118,6 +114,13 @@
                                 <div class="icon"><i class="fa fa-comments-o"></i></div>
                                 <div class="count">${commCount }</div>
                                 <h3>总评论</h3>
+                            </div>
+                        </div>
+                        <div class="animated flipInY col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div class="tile-stats">
+                                <div class="icon"><i class="fa fa-newspaper-o"></i></div>
+                                <div class="count">${articleCount }</div>
+                                <h3>文章总数</h3>
                             </div>
                         </div>
                         <div class="animated flipInY col-lg-6 col-md-6 col-sm-6 col-xs-12">
