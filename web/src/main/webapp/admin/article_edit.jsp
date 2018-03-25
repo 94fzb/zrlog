@@ -20,6 +20,7 @@
 <script src="${cacheFile['/assets/js/video.js']}"></script>
 <script>
     var skipFirstRubbishSave = ${skipFirstRubbishSave};
+    var article = ${article};
 </script>
 <style>
     .CodeMirror-scroll {
@@ -62,11 +63,9 @@
 <div class="row">
     <div class="x_content">
         <form class="form-horizontal form-label-left" id="article-form">
-            <pre editormdTheme='${webs.editorMdTheme}' id="markdown"
-                      style="display: none;">${log.mdContent}</pre>
             <input type="hidden" id="id" name="id" value="${log.logId}">
             <textarea placeholder="${_res.editorPlaceholder}" id="content" name="content"
-                      style="display: none;">${log.content}</textarea>
+                      style="display: none;"></textarea>
             <c:if test="${0 ne webSite['article_thumbnail_status']}">
                 <div class="form-group">
                     <div id="thumbnail-img" title="${_res['writeCover']}"

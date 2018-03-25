@@ -1,6 +1,8 @@
 var uploadUrl = 'api/admin/upload/';
 var mdEditor;
 $(function () {
+    $("#content").val(article['content']);
+
     $(".select2_single").select2({
         minimumResultsForSearch: -1,
         allowClear: true,
@@ -53,7 +55,7 @@ $(function () {
             copyPreviewHtml: '<a href="javascript:;" id="copPreviewHtmlToClipboard"  title="' + lang.copPreviewHtmlToClipboard + '" unselectable="on"><i class="fa fa-clipboard" unselectable="on"></i></a>'
         },
         codeFold: true,
-        appendMarkdown: $("#markdown").text(),
+        appendMarkdown: article['mdContent'],
         saveHTMLToTextarea: true,
         searchReplace: true,
         htmlDecode: "iframe,pre",

@@ -1,7 +1,9 @@
 package com.zrlog.web.handler;
 
+import com.googlecode.htmlcompressor.compressor.HtmlCompressor;
 import com.hibegin.common.util.FileUtils;
 import com.hibegin.common.util.IOUtil;
+import com.jfinal.core.JFinal;
 import com.jfinal.handler.Handler;
 import com.jfinal.kit.PathKit;
 import com.zrlog.common.Constants;
@@ -40,60 +42,126 @@ public class StaticFileCheckHandler extends Handler {
                 ext = name.substring(name.lastIndexOf('.'));
             }
         }
-        if (ext != null) {
-            if (!FORBIDDEN_URI_EXT_SET.contains(ext)) {
-                // 处理静态化文件,仅仅缓存文章页(变化较小)
-                if (target.endsWith(".html") && target.startsWith("/post/")) {
-                    target = target.substring(0, target.lastIndexOf("."));
-                    if (Constants.isStaticHtmlStatus()) {
-                        try {
+        try {
+            final TrimPrintWriter trimPrintWriter = new TrimPrintWriter(response.getOutputStream(), !JFinal.me().getConstants().getDevMode());
+            response = new HttpServletResponseWrapper(response) {
+                @Override
+                public PrintWriter getWriter() throws IOException {
+                    return trimPrintWriter;
+                }
+            };
+            if (ext != null) {
+                if (!FORBIDDEN_URI_EXT_SET.contains(ext)) {
+                    // 处理静态化文件,仅仅缓存文章页(变化较小)
+                    if (target.endsWith(".html") && target.startsWith("/post/")) {
+                        target = target.substring(0, target.lastIndexOf("."));
+                        if (Constants.isStaticHtmlStatus()) {
                             String path = new String(request.getServletPath().getBytes("ISO-8859-1"), "UTF-8");
                             File htmlFile = new File(PathKit.getWebRootPath() + path);
                             response.setContentType("text/html;charset=UTF-8");
                             if (htmlFile.exists() && !ZrLogUtil.isStaticBlogPlugin(request)) {
                                 isHandled[0] = true;
                                 response.getOutputStream().write(IOUtil.getByteByInputStream(new FileInputStream(htmlFile)));
-                                this.next.handle(target, request, response, isHandled);
                             } else {
-                                final CopyPrintWriter writer = new CopyPrintWriter(response.getWriter());
-                                response = new HttpServletResponseWrapper(response) {
-                                    @Override
-                                    public PrintWriter getWriter() throws IOException {
-                                        return writer;
-                                    }
-                                };
                                 this.next.handle(target, request, response, isHandled);
-                                saveResponseBodyToHtml(PathKit.getWebRootPath(), htmlFile, writer);
+                                saveResponseBodyToHtml(PathKit.getWebRootPath(), htmlFile, trimPrintWriter.getResponseBody());
                             }
-                        } catch (Exception e) {
-                            LOGGER.error("error", e);
+                        } else {
+                            this.next.handle(target, request, response, isHandled);
                         }
                     } else {
                         this.next.handle(target, request, response, isHandled);
                     }
                 } else {
-                    this.next.handle(target, request, response, isHandled);
+                    try {
+                        //非法请求, 返回403
+                        request.getSession();
+                        response.sendError(403);
+                    } catch (IOException e) {
+                        LOGGER.error("", e);
+                    }
                 }
             } else {
-                try {
-                    //非法请求, 返回403
-                    request.getSession();
-                    response.sendError(403);
-                } catch (IOException e) {
-                    LOGGER.error("", e);
-                }
+                this.next.handle(target, request, response, isHandled);
             }
-        } else {
-            this.next.handle(target, request, response, isHandled);
+        } catch (Exception e) {
+            LOGGER.error("", e);
+        }
+    }
+
+    class TrimPrintWriter extends PrintWriter {
+
+        private final StringBuilder builder = new StringBuilder();
+        HtmlCompressor compressor = new HtmlCompressor();
+        private String body;
+        private boolean compress;
+        private long startTime = System.currentTimeMillis();
+
+        TrimPrintWriter(OutputStream out, boolean compress) {
+            super(out);
+            this.compress = compress;
+            compressor.setRemoveIntertagSpaces(true);
+            compressor.setRemoveComments(true);
+        }
+
+        private void tryFlush() {
+            if (builder.indexOf("</html>") > 0 || builder.indexOf("</partial-response>") > 0) {
+                flush();
+            }
+        }
+
+        @Override
+        public void write(int c) {
+            builder.append((char) c); // It is actually a char, not an int.
+            tryFlush();
+        }
+
+        @Override
+        public void write(char[] chars, int offset, int length) {
+            builder.append(chars, offset, length);
+            tryFlush();
+        }
+
+        @Override
+        public void write(String string, int offset, int length) {
+            builder.append(string, offset, length);
+            tryFlush();
+        }
+
+        // Finally override the flush method so that it trims whitespace.
+        @Override
+        public void flush() {
+            synchronized (builder) {
+                if (compress) {
+                    body = compressor.compress(builder.toString());
+                } else {
+                    body = builder.toString();
+                }
+                try {
+                    if (body.endsWith("</html>")) {
+                        body = body + "<!--" + (System.currentTimeMillis() - startTime) + "ms-->";
+                    }
+                    out.write(body);
+                } catch (IOException ex) {
+                    LOGGER.error("", ex);
+                }
+                // Reset the local StringBuilder and issue real flush.
+                builder.setLength(0);
+                super.flush();
+            }
+        }
+
+        public String getResponseBody() {
+            return body;
         }
     }
 
     /**
      * 将一个网页转化对应文件，用于静态化文章页
      */
-    private void saveResponseBodyToHtml(String webRoot, final File file, CopyPrintWriter printStream) {
+    private void saveResponseBodyToHtml(String webRoot, final File file, String copy) {
         try {
-            byte[] bytes = printStream.getCopy().getBytes("UTF-8");
+            byte[] bytes = copy.getBytes("UTF-8");
             tryResizeDiskSpace(webRoot, bytes.length);
             if (!file.exists()) {
                 file.getParentFile().mkdirs();
@@ -135,35 +203,4 @@ public class StaticFileCheckHandler extends Handler {
         }
     }
 
-    class CopyPrintWriter extends PrintWriter {
-
-        private StringBuilder copy = new StringBuilder();
-
-        CopyPrintWriter(Writer writer) {
-            super(writer);
-        }
-
-        @Override
-        public void write(int c) {
-            copy.append((char) c); // It is actually a char, not an int.
-            super.write(c);
-        }
-
-        @Override
-        public void write(char[] chars, int offset, int length) {
-            copy.append(chars, offset, length);
-            super.write(chars, offset, length);
-        }
-
-        @Override
-        public void write(String string, int offset, int length) {
-            copy.append(string, offset, length);
-            super.write(string, offset, length);
-        }
-
-        public String getCopy() {
-            return copy.toString();
-        }
-
-    }
 }
