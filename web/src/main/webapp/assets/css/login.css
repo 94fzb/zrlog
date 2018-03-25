@@ -57,7 +57,6 @@ button:hover {
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-box;
-  display: -ms-flexbox;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -72,7 +71,6 @@ button:hover {
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-box;
-  display: -ms-flexbox;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -97,11 +95,11 @@ button:hover {
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-box;
-  display: -ms-flexbox;
   display: flex;
   flex-wrap: wrap;
   flex-direction: column;
   align-items: center;
+  text-align: center;
 
   background-repeat: no-repeat;
   background-size: cover;
@@ -139,7 +137,6 @@ button:hover {
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-box;
-  display: -ms-flexbox;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
@@ -226,7 +223,6 @@ input.input100 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-box;
-  display: -ms-flexbox;
   display: flex;
   flex-wrap: wrap;
 }
@@ -235,7 +231,6 @@ input.input100 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-box;
-  display: -ms-flexbox;
   display: flex;
   justify-content: center;
   align-items: center;
