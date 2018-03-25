@@ -56,7 +56,7 @@ public class BlogBuildInfoUtil {
             buildId = "0000000";
         }
         if (version == null) {
-            version = "1.x-dev";
+            version = "1.0.0-SNAPSHOT";
         }
         if (time == null) {
             time = new Date();

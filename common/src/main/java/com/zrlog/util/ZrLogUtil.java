@@ -2,6 +2,7 @@ package com.zrlog.util;
 
 import com.google.gson.Gson;
 import com.hibegin.common.util.IOUtil;
+import com.hibegin.common.util.VersionComparator;
 import com.zrlog.common.Constants;
 import com.zrlog.web.util.WebTools;
 import org.apache.log4j.Logger;
@@ -14,6 +15,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.*;
 import java.util.*;
+import java.util.Date;
 
 /**
  * Zrlog特有的一些工具方法
@@ -183,4 +185,15 @@ public class ZrLogUtil {
     }
 
 
+    public static boolean greatThenCurrentVersion(String buildId, Date releaseDate, String fetchedVersion) {
+        if (buildId.equals(BlogBuildInfoUtil.getBuildId())) {
+            return false;
+        }
+        int result = new VersionComparator().compare(fetchedVersion, BlogBuildInfoUtil.getVersion());
+        if (result == 0) {
+            return releaseDate.after(BlogBuildInfoUtil.getTime());
+        } else {
+            return result > 0;
+        }
+    }
 }

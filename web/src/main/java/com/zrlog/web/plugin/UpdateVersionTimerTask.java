@@ -1,12 +1,12 @@
 package com.zrlog.web.plugin;
 
 import com.google.gson.Gson;
-import com.hibegin.common.util.StringUtils;
 import com.hibegin.common.util.http.HttpUtil;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.Version;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.I18NUtil;
+import com.zrlog.util.ZrLogUtil;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -46,19 +46,19 @@ class UpdateVersionTimerTask extends TimerTask {
         } else {
             versionUrl = Constants.ZRLOG_RESOURCE_DOWNLOAD_URL + "/release/last.version.json";
         }
-        String txtContent = HttpUtil.getInstance().getTextByUrl(versionUrl + "?_" + System.currentTimeMillis() + "&v=" + BlogBuildInfoUtil.getBuildId()).trim();
-        Version tLastVersion = new Gson().fromJson(txtContent, Version.class);
-        //手动设置对应ChangeLog
-        tLastVersion.setChangeLog(HttpUtil.getInstance().getSuccessTextByUrl("http://www.zrlog.com/changelog/" +
-                tLastVersion.getVersion() + "-" + tLastVersion.getBuildId() + ".html?lang=" +
-                I18NUtil.getCurrentLocale() + "&v=" + BlogBuildInfoUtil.getBuildId()));
-        Date buildDate = new SimpleDateFormat("yyyy-MM-dd hh:mm").parse(tLastVersion.getReleaseDate());
-        if (!tLastVersion.getBuildId().equals(BlogBuildInfoUtil.getBuildId()) && buildDate.after(BlogBuildInfoUtil.getTime())) {
-            LOGGER.info("ZrLog New update found new [" + tLastVersion.getVersion() + "-" + tLastVersion.getBuildId() + "]");
+        Version lastVersion = getVersion(versionUrl);
+        Date buildDate = new SimpleDateFormat("yyyy-MM-dd hh:mm").parse(lastVersion.getReleaseDate());
+        //如果已是最新预览版，那么尝试检查正式版本
+        if (checkPreview && !ZrLogUtil.greatThenCurrentVersion(lastVersion.getBuildId(), buildDate, lastVersion.getVersion())) {
+            lastVersion = getVersion(Constants.ZRLOG_RESOURCE_DOWNLOAD_URL + "/release/last.version.json");
+            buildDate = new SimpleDateFormat("yyyy-MM-dd hh:mm").parse(lastVersion.getReleaseDate());
+        }
+        if (ZrLogUtil.greatThenCurrentVersion(lastVersion.getBuildId(), buildDate, lastVersion.getVersion())) {
+            LOGGER.info("ZrLog New update found new [" + lastVersion.getVersion() + "-" + lastVersion.getBuildId() + "]");
             if (BlogBuildInfoUtil.isDev()) {
-                LOGGER.info("Maybe need clone again from git repo");
+                LOGGER.info("Maybe need pull from git repo");
             }
-            this.version = tLastVersion;
+            this.version = lastVersion;
             //不包含时区信息
             if (version.getReleaseDate().contains("+")) {
                 version.setReleaseDate(version.getReleaseDate().substring(0, version.getReleaseDate().lastIndexOf("+")));
@@ -66,6 +66,16 @@ class UpdateVersionTimerTask extends TimerTask {
             return version;
         }
         return null;
+    }
+
+    private Version getVersion(String versionUrl) throws IOException {
+        String txtContent = HttpUtil.getInstance().getTextByUrl(versionUrl + "?_" + System.currentTimeMillis() + "&v=" + BlogBuildInfoUtil.getBuildId()).trim();
+        Version tLastVersion = new Gson().fromJson(txtContent, Version.class);
+        //手动设置对应ChangeLog
+        tLastVersion.setChangeLog(HttpUtil.getInstance().getSuccessTextByUrl("http://www.zrlog.com/changelog/" +
+                tLastVersion.getVersion() + "-" + tLastVersion.getBuildId() + ".html?lang=" +
+                I18NUtil.getCurrentLocale() + "&v=" + BlogBuildInfoUtil.getBuildId()));
+        return tLastVersion;
     }
 
     public Version getVersion() {
