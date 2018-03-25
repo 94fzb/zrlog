@@ -55,9 +55,6 @@ class UpdateVersionTimerTask extends TimerTask {
         }
         if (ZrLogUtil.greatThenCurrentVersion(lastVersion.getBuildId(), buildDate, lastVersion.getVersion())) {
             LOGGER.info("ZrLog New update found new [" + lastVersion.getVersion() + "-" + lastVersion.getBuildId() + "]");
-            if (BlogBuildInfoUtil.isDev()) {
-                LOGGER.info("Maybe need pull from git repo");
-            }
             this.version = lastVersion;
             //不包含时区信息
             if (version.getReleaseDate().contains("+")) {

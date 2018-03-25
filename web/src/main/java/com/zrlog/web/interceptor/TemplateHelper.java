@@ -34,14 +34,15 @@ public class TemplateHelper {
     private static void fillFileInfo(String path, List<String> fileList, String... prefix) {
         File[] files = new File(path).listFiles();
 
-        assert files != null;
-        for (File file : files) {
-            if (file.isDirectory() && new File(file.getAbsolutePath()).listFiles() != null) {
-                fillFileInfo(file.getAbsolutePath(), fileList, prefix);
-            } else {
-                for (String pre : prefix) {
-                    if (file.getAbsoluteFile().toString().endsWith(pre)) {
-                        fileList.add(file.getAbsoluteFile().toString());
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory() && new File(file.getAbsolutePath()).listFiles() != null) {
+                    fillFileInfo(file.getAbsolutePath(), fileList, prefix);
+                } else {
+                    for (String pre : prefix) {
+                        if (file.getAbsoluteFile().toString().endsWith(pre)) {
+                            fileList.add(file.getAbsoluteFile().toString());
+                        }
                     }
                 }
             }
@@ -54,7 +55,7 @@ public class TemplateHelper {
         String webPath = JFinal.me().getServletContext().getRealPath("/");
         List<String> strFile = new ArrayList<>();
         for (String aFileList : fileList) {
-            strFile.add(aFileList.substring(webPath.length() - 1).replace('\\', '/'));
+            strFile.add(aFileList.substring(webPath.length() - 1 + path.length()).replace('\\', '/'));
         }
         return strFile;
     }

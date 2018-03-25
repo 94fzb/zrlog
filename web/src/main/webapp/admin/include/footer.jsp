@@ -2,14 +2,13 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 </div>
 </div>
-<c:if test="${currentPage != 'admin/edit'}">
+<c:if test="${currentPage != 'admin/article_edit'}">
     <footer>
         <strong>${_res.copyright} <a href="https://www.zrlog.com"> ZrLog . </a></strong>
         All rights reserved.
         <div class="pull-right">
             <strong>Version</strong> ${zrlog.version}
         </div>
-        <div class="clearfix"></div>
     </footer>
 </c:if>
 </div>

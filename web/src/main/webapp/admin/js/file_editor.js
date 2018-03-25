@@ -22,15 +22,19 @@ $(function () {
             }
         });
     });
-    $("#form-field-select-6").children('option:first').attr("selected", "selected");
-    loadFile($("#form-field-select-6").children('option:selected').val());
+    if ($("#form-field-select-6 option").length > 0) {
+        $("#form-field-select-6").children('option:first').attr("selected", "selected");
+        loadFile($("#form-field-select-6").children('option:selected').val());
+    }
     $("#form-field-select-6").change(function () {
         loadFile($(this).children('option:selected').val());
     });
 
     function loadFile(file) {
-        $.get("api/admin/template/loadFile?file=" + file, function (data) {
-            $("#editing").text("> " + file);
+        var path = $("#basePath").val() + file;
+        $.get("api/admin/template/loadFile?file=" + path, function (data) {
+            $("#editing").text("> " + path);
+            $("#file").val(path);
             $("div").remove(".CodeMirror");
             $("#code").text(data.fileContent);
             editor = CodeMirror.fromTextArea(document.getElementById("code"), {

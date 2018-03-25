@@ -186,7 +186,7 @@ public class ZrLogUtil {
 
 
     public static boolean greatThenCurrentVersion(String buildId, Date releaseDate, String fetchedVersion) {
-        if (buildId.equals(BlogBuildInfoUtil.getBuildId())) {
+        if (buildId.equals(BlogBuildInfoUtil.getBuildId()) || releaseDate.before(BlogBuildInfoUtil.getTime())) {
             return false;
         }
         int result = new VersionComparator().compare(fetchedVersion, BlogBuildInfoUtil.getVersion());

@@ -113,6 +113,9 @@ public class UpgradeController extends BaseController {
                     upgradeProcessResponse.setMessage("更新文件下载失败，请重新手动执行更新向导");
                     downloadProcessHandleMap.remove(AdminTokenThreadLocal.getUser().getSessionId());
                 }
+            } else {
+                upgradeProcessResponse.setMessage(updateVersionThread.getMessage());
+                upgradeProcessResponse.setFinish(updateVersionThread.isFinish());
             }
             upgradeProcessResponse.setBuildId(handle.getVersion().getBuildId());
             upgradeProcessResponse.setVersion(handle.getVersion().getVersion());

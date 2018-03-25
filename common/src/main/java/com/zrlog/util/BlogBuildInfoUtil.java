@@ -58,10 +58,6 @@ public class BlogBuildInfoUtil {
         if (version == null) {
             version = "1.0.0-SNAPSHOT";
         }
-        if (time == null) {
-            time = new Date();
-        }
-
     }
 
     public static String getBuildId() {
@@ -73,6 +69,10 @@ public class BlogBuildInfoUtil {
     }
 
     public static Date getTime() {
+        //仅存在开发环境为空
+        if (time == null) {
+            return new Date();
+        }
         return time;
     }
 
@@ -94,8 +94,8 @@ public class BlogBuildInfoUtil {
 
     public static void main(String[] args) {
         LOGGER.info("isRelease = " + isRelease());
-        LOGGER.info("version = " + version);
-        LOGGER.info("buildId = " + buildId);
-        LOGGER.info("time = " + time);
+        LOGGER.info("version = " + getVersion());
+        LOGGER.info("buildId = " + getBuildId());
+        LOGGER.info("time = " + getTime());
     }
 }

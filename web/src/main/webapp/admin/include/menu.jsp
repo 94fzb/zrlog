@@ -176,25 +176,14 @@
                                     <span class="badge bg-green">新</span>
                                 </a>
                                 <ul id="bell" class="dropdown-menu list-unstyled msg_list" role="menu">
-                                    <li>
+                                    <li style="padding-left: 0;padding-right: 0;">
                                         <a href="admin/do_upgrade?buildId=${lastVersion.version.buildId}">
-                                            <div class="row">
-                                                <div class="col-sm-4">
-                                                    <span>版本号:</span>
-                                                </div>
-                                                <div class="col-sm-8">
-                                                    v${lastVersion.version.version}-${lastVersion.version.buildId}(${lastVersion.version.type})
-                                                </div>
-
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-sm-4">
-                                                    <span>发布时间:</span>
-                                                </div>
-                                                <div class="col-sm-8">
-                                                        ${lastVersion.version.releaseDate}
-                                                </div>
-                                            </div>
+                                                                    <span>
+                          版本号：&nbsp;&nbsp;V${lastVersion.version.version}-${lastVersion.version.buildId}（${lastVersion.version.type}）
+                        </span>
+                                            <span class="message">
+                             发布时间：${lastVersion.version.releaseDate}
+                        </span>
                                         </a>
                                     </li>
                                 </ul>

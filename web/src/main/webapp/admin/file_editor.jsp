@@ -4,7 +4,7 @@
     String scheme = com.zrlog.web.util.WebTools.getRealScheme(request);
     request.setAttribute("url", scheme + "://" + request.getHeader("host") + request.getContextPath());
     if ("template".equals(request.getParameter("editType"))) {
-        request.setAttribute("tips", "主题编辑功能建议仅用于临时变更");
+        request.setAttribute("tips", "主题编辑建议仅用于临时变更");
     }
     request.setAttribute("filePaths", com.zrlog.web.interceptor.TemplateHelper.getFiles(request.getParameter("path")));
 %>
@@ -54,15 +54,15 @@
 </div>
 <h4 class="text-right">${tips}</h4>
 <form id="saveFileForm">
+    <input type="hidden" id="basePath" value="${param.path}">
+    <input type="hidden" name="file" id="file">
     <div class="form-group">
         <div class="row">
-            <div class="col-md-9">
-                    <textarea id="code" name="content">
-                        ${fileContent}
-                    </textarea>
+            <div class="col-md-10">
+                    <textarea id="code" name="content">${fileContent}</textarea>
             </div>
-            <div class="col-md-3">
-                <select multiple style="height: 600px" name="file" id="form-field-select-6"
+            <div class="col-md-2">
+                <select multiple style="height: 600px" id="form-field-select-6"
                         class="form-control select2_single">
                     <c:forEach var="filePath" items="${filePaths}">
                         <option value="${filePath}">${filePath}</option>
