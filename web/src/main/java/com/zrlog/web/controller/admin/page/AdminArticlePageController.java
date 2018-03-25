@@ -34,6 +34,6 @@ public class AdminArticlePageController extends BaseController {
             }
         }
         setAttr("skipFirstRubbishSave", skipFirstRubbishSave);
-        return "/admin/edit";
+        return "/admin/article_edit";
     }
 }

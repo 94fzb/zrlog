@@ -21,40 +21,61 @@
 <script src="${cacheFile['/admin/js/file_editor.js']}"></script>
 <style>
     .CodeMirror {
-        border-top: 1px solid black;
-        border-bottom: 1px solid black;
+        border: 1px solid #ccc;
+        height: 600px;
+        border-radius: 4px;
+        width: 100%;
+    }
+
+    #code {
+        border: 1px solid #ccc;
+        height: 600px;
+        border-radius: 4px;
+        width: 100%;
     }
 
     dt {
         font-family: monospace;
         color: #666;
     }
+
+    option {
+        padding-top: 8px;
+        height: 30px;
+
+    }
+
 </style>
 <div class="page-header">
     <h3>
         文件编辑
+        <small id="editing"></small>
     </h3>
 </div>
 <h4 class="text-right">${tips}</h4>
 <form id="saveFileForm">
     <div class="form-group">
-        <select name="file" id="form-field-select-6" class="form-control">
-            <c:forEach var="filePath" items="${filePaths}">
-                <option value="${filePath}">${filePath}</option>
-            </c:forEach>
-        </select>
+        <div class="row">
+            <div class="col-md-9">
+                    <textarea id="code" name="content">
+                        ${fileContent}
+                    </textarea>
+            </div>
+            <div class="col-md-3">
+                <select multiple style="height: 600px" name="file" id="form-field-select-6"
+                        class="form-control select2_single">
+                    <c:forEach var="filePath" items="${filePaths}">
+                        <option value="${filePath}">${filePath}</option>
+                    </c:forEach>
+                </select>
+            </div>
+        </div>
     </div>
-    <div class="form-group">
-<textarea id="code" name="content">
-    ${fileContent}
-</textarea>
-    </div>
-</form>
-<div class="ln_solid"></div>
-<div class="form-group">
+
+    <div class="ln_solid"></div>
     <div class="col-md-offset-1">
         <button class="btn btn-info" type="button" id="saveFile">
             <i class="fa fa-check bigger-110"></i> ${_res['submit']}
         </button>
     </div>
-</div>
+</form>

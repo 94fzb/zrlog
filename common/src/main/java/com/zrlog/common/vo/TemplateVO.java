@@ -12,6 +12,7 @@ public class TemplateVO {
     private boolean deleteAble;
     private List<String> previewImages;
     private String author;
+    private boolean configAble;
 
     public String getTemplate() {
         return template;
@@ -75,5 +76,13 @@ public class TemplateVO {
 
     public void setDigest(String digest) {
         this.digest = digest;
+    }
+
+    public boolean isConfigAble() {
+        return configAble;
+    }
+
+    public void setConfigAble(boolean configAble) {
+        this.configAble = configAble;
     }
 }

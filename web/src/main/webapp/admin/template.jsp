@@ -59,7 +59,7 @@
                     <c:forEach items="${template.previewImages}" var="image">
                         <img style="width: 100%" src="${image}">
                     </c:forEach>
-                    <p>${template.digest }</p>
+                    <p style="padding-top: 10px">${template.digest }</p>
                     <div class="divider"></div>
                     <div class="caption">
                         <div class="tools tools-bottom text-center" style="font-size: 16px;">
@@ -69,8 +69,10 @@
                             <a target="_blank"
                                href="admin/template/preview?template=${template.template}"><i
                                     class="fa fa-eye"></i></a>
-                            <a href="admin/template/config?template=${template.template}"><i
-                                    class="fa fa-cog"></i></a>
+                            <c:if test="${template.configAble}">
+                                <a href="admin/template/config?template=${template.template}"><i
+                                        class="fa fa-cog"></i></a>
+                            </c:if>
                             <c:if test="${template.deleteAble}"><a href="#" class="delete-btn"
                                                                    template="${template.template}"><i
                                     class="fa fa-remove"></i></a></c:if>

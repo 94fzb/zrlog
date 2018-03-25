@@ -4,6 +4,8 @@
     request.setAttribute("url", scheme + "://" + request.getHeader("host") + request.getContextPath());
 %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<c:set scope="request" var="subTitle" value="${_res['admin.log.edit']}"/>
+<jsp:include page="include/menu.jsp"/>
 <link rel="stylesheet" href="${cacheFile['/admin/markdown/css/editormd.min.css']}"/>
 <script src="${cacheFile['/assets/js/screenfull.min.js']}"></script>
 <script src="${cacheFile['/admin/markdown/js/editormd.min.js']}"></script>
@@ -196,3 +198,4 @@
         </form>
     </div>
 </div>
+<jsp:include page="include/footer.jsp"/>

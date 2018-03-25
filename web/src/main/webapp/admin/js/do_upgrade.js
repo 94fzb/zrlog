@@ -90,7 +90,7 @@ $(function () {
         }
     }
 
-    $('.buttonNext').addClass('btn btn-success');
-    $('.buttonPrevious').addClass('btn btn-primary');
-    $('.buttonFinish').addClass('btn btn-default');
+    $('.buttonNext').addClass('btn btn-success').text(lang.labelNext);
+    $('.buttonPrevious').addClass('btn btn-primary').text(lang.labelPrevious);
+    $('.buttonFinish').addClass('btn btn-default').text(lang.labelFinish);
 });

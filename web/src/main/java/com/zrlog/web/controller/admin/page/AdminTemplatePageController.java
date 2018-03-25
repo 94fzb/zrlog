@@ -69,8 +69,10 @@ public class AdminTemplatePageController extends BaseController {
                         templateVO.setPreviewImages(Collections.singletonList("assets/images/template-default-preview.jpg"));
                     }
                     if (StringUtils.isEmpty(templateVO.getDigest())) {
-                        templateVO.setDigest("无简介");
+                        templateVO.setDigest(I18NUtil.getStringFromRes("noIntroduction"));
                     }
+                    File settingFile = new File(PathKit.getWebRootPath() + templatePath + "/setting/index.jsp");
+                    templateVO.setConfigAble(settingFile.exists());
                     templateVO.setTemplate(templatePath);
                     templates.add(templateVO);
                 }

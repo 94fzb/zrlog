@@ -107,7 +107,7 @@
         </div>
         <div class="tab-pane" id="errorPageEdit" style="padding: 10px">
             <iframe src="admin/blank?include=file_editor&path=/error/&editType=错误页面"
-                    scrolling="no" style="border: 0px;" width="100%" height="600px">
+                    scrolling="no" style="border: 0;" width="100%" height="900px">
             </iframe>
         </div>
         <div class="tab-pane col-md-6" id="blogTab" style="padding: 10px">

@@ -22,7 +22,7 @@ $(function () {
             }
         });
     });
-
+    $("#form-field-select-6").children('option:first').attr("selected", "selected");
     loadFile($("#form-field-select-6").children('option:selected').val());
     $("#form-field-select-6").change(function () {
         loadFile($(this).children('option:selected').val());
@@ -30,6 +30,7 @@ $(function () {
 
     function loadFile(file) {
         $.get("api/admin/template/loadFile?file=" + file, function (data) {
+            $("#editing").text("> " + file);
             $("div").remove(".CodeMirror");
             $("#code").text(data.fileContent);
             editor = CodeMirror.fromTextArea(document.getElementById("code"), {

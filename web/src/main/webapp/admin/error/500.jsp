@@ -23,7 +23,7 @@
                         <i class="fa fa-arrow-left"></i>
                         ${_res.goBack}
                     </a>
-                    <a class="btn btn-primary" href="#">
+                    <a class="btn btn-primary" href="${basePath}/admin/">
                         <i class="fa fa-dashboard"></i>
                         ${_res.dashboard}
                     </a>

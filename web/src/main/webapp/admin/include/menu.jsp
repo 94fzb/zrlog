@@ -19,7 +19,7 @@
                                     <i class="fa fa-dashboard"></i>${_res.dashboard}
                                 </a>
                             </li>
-                            <li <c:if test='${currentPage=="admin/edit"}'>class="current-page"</c:if>>
+                            <li <c:if test='${currentPage=="admin/article_edit"}'>class="current-page"</c:if>>
                                 <a href="admin/article/edit<c:if test='${not empty pageContext.request.queryString}'>?${pageContext.request.queryString}</c:if>">
                                     <i class="fa fa-edit"></i>${_res['admin.log.edit']}
                                 </a>
@@ -126,16 +126,16 @@
                         </li>
 
                         <c:if test="${fn:length(noReadComments) > 0}">
-                        <li role="presentation" class="dropdown">
-                            <a href="javascript:" class="dropdown-toggle info-number" data-toggle="dropdown"
-                               aria-expanded="false">
-                                <i class="fa fa-envelope-o"></i>
-                                <span class="badge bg-green" id="commentNum">${fn:length(noReadComments)}</span>
-                            </a>
-                            <ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
-                                <c:forEach items="${noReadComments}" var="comment">
-                                    <li>
-                                        <a target="_blank" class="haveRead" id="${comment.id}">
+                            <li role="presentation" class="dropdown">
+                                <a href="javascript:" class="dropdown-toggle info-number" data-toggle="dropdown"
+                                   aria-expanded="false">
+                                    <i class="fa fa-envelope-o"></i>
+                                    <span class="badge bg-green" id="commentNum">${fn:length(noReadComments)}</span>
+                                </a>
+                                <ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
+                                    <c:forEach items="${noReadComments}" var="comment">
+                                        <li>
+                                            <a target="_blank" class="haveRead" id="${comment.id}">
                         <span class="image">
                         <c:choose>
                             <c:when test='${not empty comment.header}'>
@@ -146,26 +146,26 @@
                             </c:otherwise>
                         </c:choose>
                         </span>
-                                            <span>
+                                                <span>
                           <span>${comment.userName}</span>
                           <span class="time"></span>
                         </span>
-                                            <span class="message">
-                                                    ${comment.userComment}
-                                            </span>
-                                        </a>
+                                                <span class="message">
+                                                        ${comment.userComment}
+                                                </span>
+                                            </a>
+                                        </li>
+                                    </c:forEach>
+                                    <li>
+                                        <div class="text-center">
+                                            <a href="admin/comment">
+                                                    ${_res['admin.viewAllComment']}
+                                                <i class="fa fa-angle-right"></i>
+                                            </a>
+                                        </div>
                                     </li>
-                                </c:forEach>
-                                <li>
-                                    <div class="text-center">
-                                        <a href="admin/comment">
-                                            ${_res['admin.viewAllComment']}
-                                            <i class="fa fa-angle-right"></i>
-                                        </a>
-                                    </div>
-                                </li>
-                            </ul>
-                        </li>
+                                </ul>
+                            </li>
                         </c:if>
                         <c:if test="${lastVersion.upgrade}">
                             <li role="presentation"
@@ -178,12 +178,23 @@
                                 <ul id="bell" class="dropdown-menu list-unstyled msg_list" role="menu">
                                     <li>
                                         <a href="admin/do_upgrade?buildId=${lastVersion.version.buildId}">
-                        <span>
-                          <span>版本号:v${lastVersion.version.version}-${lastVersion.version.buildId}(${lastVersion.version.type})</span>
-                        </span>
-                                            <span class="message">
-                             发布时间:${lastVersion.version.releaseDate}
-                        </span>
+                                            <div class="row">
+                                                <div class="col-sm-4">
+                                                    <span>版本号:</span>
+                                                </div>
+                                                <div class="col-sm-8">
+                                                    v${lastVersion.version.version}-${lastVersion.version.buildId}(${lastVersion.version.type})
+                                                </div>
+
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-sm-4">
+                                                    <span>发布时间:</span>
+                                                </div>
+                                                <div class="col-sm-8">
+                                                        ${lastVersion.version.releaseDate}
+                                                </div>
+                                            </div>
                                         </a>
                                     </li>
                                 </ul>
