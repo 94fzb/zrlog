@@ -173,7 +173,7 @@ public class PostController extends BaseController {
         return detail(convertRequestParam(getPara()));
     }
 
-    private String detail(Object id) {
+    protected String detail(Object id) {
         Log log = Log.dao.findById(id);
         if (log != null) {
             Integer logId = log.get("logId");

@@ -139,13 +139,13 @@ public class ParseUtil {
         String newContent = content;
         for (String stopWord : stopWords) {
             if (newContent.contains(stopWord) && newContent.indexOf(stopWord) < newContent.indexOf(keyword)) {
-                newContent = content.substring(content.indexOf(stopWord) + 1);
+                newContent = newContent.substring(content.indexOf(stopWord) + 1);
                 break;
             }
         }
         for (String stopWord : stopWord2) {
             if (newContent.contains(stopWord) && newContent.lastIndexOf(stopWord) > newContent.lastIndexOf(keyword)) {
-                newContent = newContent.substring(0, content.lastIndexOf(stopWord) + 1);
+                newContent = newContent.substring(0, newContent.lastIndexOf(stopWord) + 1);
                 break;
             }
         }

@@ -7,11 +7,11 @@ import com.jfinal.core.JFinal;
 import com.jfinal.json.Json;
 import com.jfinal.kit.PathKit;
 import com.jfinal.render.ViewType;
+import com.zrlog.common.response.ApiStandardResponse;
 import com.zrlog.web.config.ZrLogConfig;
 
 import java.io.File;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -92,16 +92,16 @@ class VisitorInterceptor implements Interceptor {
 
     private void apiPermission(Invocation ai) {
         ai.invoke();
+        ApiStandardResponse apiStandardResponse = new ApiStandardResponse();
         if (ai.getController().getAttr("log") != null) {
-            ai.getController().renderJson((Object) ai.getController().getAttr("log"));
+            apiStandardResponse.setData((Object) ai.getController().getAttr("log"));
         } else if (ai.getController().getAttr("data") != null) {
-            ai.getController().renderJson((Object) ai.getController().getAttr("data"));
+            apiStandardResponse.setData((Object) ai.getController().getAttr("data"));
         } else {
-            Map<String, Object> error = new HashMap<>();
-            error.put("status", 500);
-            error.put("message", "unSupport");
-            ai.getController().renderJson(error);
+            apiStandardResponse.setError(1);
+            apiStandardResponse.setMessage("not found");
         }
+        ai.getController().renderJson(apiStandardResponse);
     }
 
     private void installPermission(Invocation ai) {
