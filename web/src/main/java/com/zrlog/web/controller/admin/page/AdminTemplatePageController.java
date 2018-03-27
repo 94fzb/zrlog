@@ -70,7 +70,7 @@ public class AdminTemplatePageController extends BaseController {
                 HttpFileHandle fileHandle = (HttpFileHandle) HttpUtil.getInstance().sendGetRequest(getPara("host") + "/template/download?id=" + getParaToInt("id"),
                         new HttpFileHandle(PathKit.getWebRootPath() + Constants.TEMPLATE_BASE_PATH), new HashMap<String, String>());
                 String target = fileHandle.getT().getParent() + "/" + fileName;
-                FileUtils.moveOrCopy(fileHandle.getT().toString(), target, true);
+                FileUtils.moveOrCopyFile(fileHandle.getT().toString(), target, true);
                 ZipUtil.unZip(target, path.toString() + "/");
                 setAttr("message", I18NUtil.getStringFromRes("templateDownloadSuccess"));
             } else {

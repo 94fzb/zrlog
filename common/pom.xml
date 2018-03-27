@@ -15,7 +15,7 @@
         <dependency>
             <groupId>com.hibegin</groupId>
             <artifactId>common-util</artifactId>
-            <version>0.0.5</version>
+            <version>0.0.6</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>

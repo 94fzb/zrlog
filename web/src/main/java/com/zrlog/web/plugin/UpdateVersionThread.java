@@ -61,7 +61,7 @@ public class UpdateVersionThread extends Thread implements Serializable {
     private void doUpgrade(String warName, File upgradeWarFile) {
         File currentRunWarFile = new File(new File(PathKit.getWebRootPath()).getParentFile() + warName);
         currentRunWarFile.delete();
-        FileUtils.moveOrCopy(upgradeWarFile.toString(), currentRunWarFile.getParentFile().toString(), true);
+        FileUtils.moveOrCopyFile(upgradeWarFile.toString(), currentRunWarFile.toString(), true);
         updateProcessMsg("覆盖更新包 " + currentRunWarFile);
     }
 
@@ -102,7 +102,7 @@ public class UpdateVersionThread extends Thread implements Serializable {
     private void doCopy(Map<String, String> pathMap) {
         for (Map.Entry<String, String> entry : pathMap.entrySet()) {
             if (new File(entry.getKey()).exists()) {
-                FileUtils.moveOrCopy(entry.getKey(), entry.getValue(), false);
+                FileUtils.moveOrCopyFolder(entry.getKey(), entry.getValue(), false);
             }
         }
     }
@@ -117,10 +117,10 @@ public class UpdateVersionThread extends Thread implements Serializable {
         }
         String backupFolder = new File(PathKit.getWebRootPath()).getParentFile().getParentFile() + File.separator + "backup" + File.separator + new SimpleDateFormat("yyyy-MM-dd_HH_mm").format(new Date()) + File.separator;
         new File(backupFolder).mkdirs();
-        FileUtils.moveOrCopy(PathKit.getWebRootPath(), backupFolder, false);
+        FileUtils.moveOrCopyFolder(PathKit.getWebRootPath(), backupFolder, false);
         String warPath = new File(PathKit.getWebRootPath()).getParent() + File.separator + warName;
         if (new File(warPath).exists()) {
-            FileUtils.moveOrCopy(warPath, backupFolder, false);
+            FileUtils.moveOrCopyFolder(warPath, backupFolder, false);
         }
         updateProcessMsg("备份当前版本到 " + backupFolder);
         return warName;

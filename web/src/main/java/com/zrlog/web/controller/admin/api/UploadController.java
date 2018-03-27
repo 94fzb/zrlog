@@ -22,31 +22,32 @@ public class UploadController extends BaseController {
 
     public UploadFileResponse index() {
         String uploadFieldName = "imgFile";
-        String uri = generatorUri(uploadFieldName, "");
+        String uri = generatorUri(uploadFieldName);
+        File imgFile = getFile(uploadFieldName).getFile();
         String finalFilePath = PathKit.getWebRootPath() + uri;
-        FileUtils.moveOrCopy(PathKit.getWebRootPath() + Constants.ATTACHED_FOLDER + getFile(uploadFieldName).getFileName(), finalFilePath, true);
+        FileUtils.moveOrCopyFile(imgFile.toString(), finalFilePath, true);
         return new UploadService().getCloudUrl(getRequest().getContextPath(), uri, finalFilePath, getRequest());
     }
 
-    private String generatorUri(String uploadFieldName, String alias) {
+    private String generatorUri(String uploadFieldName) {
         String fileExt = getFile().getFileName().substring(getFile(uploadFieldName).getFileName().lastIndexOf(".") + 1).toLowerCase();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
-        return Constants.ATTACHED_FOLDER + getPara("dir") + "/" + sdf.format(new Date()) + "/" + df.format(new Date()) + "_" + new Random().nextInt(1000) + alias + "." + fileExt;
+        return Constants.ATTACHED_FOLDER + getPara("dir") + "/" + sdf.format(new Date()) + "/" + df.format(new Date()) + "_" + new Random().nextInt(1000) + "." + fileExt;
     }
 
     public UploadFileResponse thumbnail() throws IOException {
         String uploadFieldName = "imgFile";
-        String uri = generatorUri(uploadFieldName, "_thumbnail");
+        String uri = generatorUri(uploadFieldName);
         File imgFile = getFile(uploadFieldName).getFile();
         String finalFilePath = PathKit.getWebRootPath() + uri;
-        File thumbnailFile = new File(finalFilePath);
-        int height = -1;
-        int width = -1;
         byte[] bytes = IOUtil.getByteByInputStream(new FileInputStream(imgFile));
+        File thumbnailFile = new File(finalFilePath);
         if (!thumbnailFile.getParentFile().exists()) {
             thumbnailFile.getParentFile().mkdirs();
         }
+        int height = -1;
+        int width = -1;
         if (!".gif".endsWith(uri)) {
             IOUtil.writeBytesToFile(ThumbnailUtil.jpeg(bytes, 1f), thumbnailFile);
             BufferedImage bimg = ImageIO.read(thumbnailFile);
@@ -55,9 +56,9 @@ public class UploadController extends BaseController {
         } else {
             IOUtil.writeBytesToFile(bytes, thumbnailFile);
         }
-        FileUtils.moveOrCopy(thumbnailFile.toString(), finalFilePath, true);
         UploadFileResponse uploadFileResponse = new UploadService().getCloudUrl(getRequest().getContextPath(), uri, finalFilePath, getRequest());
         uploadFileResponse.setUrl(uploadFileResponse.getUrl() + "?h=" + height + "&w=" + width);
+        imgFile.delete();
         return uploadFileResponse;
     }
 
