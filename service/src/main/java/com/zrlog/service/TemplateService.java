@@ -32,7 +32,7 @@ public class TemplateService {
         String finalFile = finalPath + templateName;
         FileUtils.deleteFile(finalFile);
         //start extract template file
-        FileUtils.moveOrCopyFile(file.toString(), finalFile, true);
+        FileUtils.moveOrCopy(file.toString(), finalFile, true);
         UploadTemplateResponse response = new UploadTemplateResponse();
         response.setMessage(I18NUtil.getStringFromRes("templateDownloadSuccess"));
         String extractFolder = finalPath + templateName.replace(".zip", "") + "/";

@@ -61,9 +61,8 @@ public class UpdateVersionThread extends Thread implements Serializable {
     private void doUpgrade(String warName, File upgradeWarFile) {
         File currentRunWarFile = new File(new File(PathKit.getWebRootPath()).getParentFile() + warName);
         currentRunWarFile.delete();
-        FileUtils.moveOrCopy(upgradeWarFile.toString(), currentRunWarFile.getParentFile().toString(), false);
+        FileUtils.moveOrCopy(upgradeWarFile.toString(), currentRunWarFile.getParentFile().toString(), true);
         updateProcessMsg("覆盖更新包 " + currentRunWarFile);
-        upgradeWarFile.delete();
     }
 
 

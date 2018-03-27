@@ -24,7 +24,7 @@ public class UploadController extends BaseController {
         String uploadFieldName = "imgFile";
         String uri = generatorUri(uploadFieldName, "");
         String finalFilePath = PathKit.getWebRootPath() + uri;
-        FileUtils.moveOrCopyFile(PathKit.getWebRootPath() + Constants.ATTACHED_FOLDER + getFile(uploadFieldName).getFileName(), finalFilePath, true);
+        FileUtils.moveOrCopy(PathKit.getWebRootPath() + Constants.ATTACHED_FOLDER + getFile(uploadFieldName).getFileName(), finalFilePath, true);
         return new UploadService().getCloudUrl(getRequest().getContextPath(), uri, finalFilePath, getRequest());
     }
 
@@ -55,7 +55,7 @@ public class UploadController extends BaseController {
         } else {
             IOUtil.writeBytesToFile(bytes, thumbnailFile);
         }
-        FileUtils.moveOrCopyFile(thumbnailFile.toString(), finalFilePath, true);
+        FileUtils.moveOrCopy(thumbnailFile.toString(), finalFilePath, true);
         UploadFileResponse uploadFileResponse = new UploadService().getCloudUrl(getRequest().getContextPath(), uri, finalFilePath, getRequest());
         uploadFileResponse.setUrl(uploadFileResponse.getUrl() + "?h=" + height + "&w=" + width);
         return uploadFileResponse;

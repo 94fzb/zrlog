@@ -1,6 +1,7 @@
 package com.zrlog.web.controller.admin.api;
 
 import com.hibegin.common.util.http.HttpUtil;
+import com.hibegin.common.util.http.handle.DownloadProcessHandle;
 import com.jfinal.config.Plugins;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
@@ -18,7 +19,6 @@ import com.zrlog.service.PluginCoreProcess;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.annotation.RefreshCache;
 import com.zrlog.web.controller.BaseController;
-import com.zrlog.util.http.DownloadProcessHandle;
 import com.zrlog.web.plugin.UpdateVersionPlugin;
 import com.zrlog.web.plugin.UpdateVersionThread;
 
@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class UpgradeController extends BaseController {
 
     private static Map<Integer, DownloadProcessHandle> downloadProcessHandleMap = new ConcurrentHashMap<>();
+    private static Map<Integer, Version> versionMap = new ConcurrentHashMap<>();
     private static Map<Integer, UpdateVersionThread> updateVersionThreadMap = new ConcurrentHashMap<>();
 
     @RefreshCache
@@ -63,10 +64,11 @@ public class UpgradeController extends BaseController {
             File file = new File(PathKit.getWebRootPath() + "/WEB-INF/update-temp/" + "zrlog.war");
             file.getParentFile().mkdir();
             Version version = lastVersion().getVersion();
-            handle = new DownloadProcessHandle(version, file);
+            handle = new DownloadProcessHandle(file, version.getFileSize(), version.getMd5sum());
             HttpUtil.getInstance().sendGetRequest(version.getDownloadUrl(), handle, new HashMap<String, String>());
+            versionMap.put(AdminTokenThreadLocal.getUser().getSessionId(), version);
+            downloadProcessHandleMap.put(AdminTokenThreadLocal.getUser().getSessionId(), handle);
         }
-        downloadProcessHandleMap.put(AdminTokenThreadLocal.getUser().getSessionId(), handle);
         DownloadUpdatePackageResponse downloadUpdatePackageResponse = new DownloadUpdatePackageResponse();
         downloadUpdatePackageResponse.setProcess(handle.getProcess());
         return downloadUpdatePackageResponse;
@@ -100,7 +102,8 @@ public class UpgradeController extends BaseController {
         UpgradeProcessResponse upgradeProcessResponse = new UpgradeProcessResponse();
         if (handle != null) {
             File file = handle.getFile();
-            UpdateVersionThread updateVersionThread = updateVersionThreadMap.get(AdminTokenThreadLocal.getUser().getSessionId());
+            int sessionId = AdminTokenThreadLocal.getUser().getSessionId();
+            UpdateVersionThread updateVersionThread = updateVersionThreadMap.get(sessionId);
             if (updateVersionThread == null) {
                 if (file.exists()) {
                     updateVersionThread = new UpdateVersionThread(file);
@@ -117,8 +120,8 @@ public class UpgradeController extends BaseController {
                 upgradeProcessResponse.setMessage(updateVersionThread.getMessage());
                 upgradeProcessResponse.setFinish(updateVersionThread.isFinish());
             }
-            upgradeProcessResponse.setBuildId(handle.getVersion().getBuildId());
-            upgradeProcessResponse.setVersion(handle.getVersion().getVersion());
+            upgradeProcessResponse.setBuildId(versionMap.get(sessionId).getBuildId());
+            upgradeProcessResponse.setVersion(versionMap.get(sessionId).getVersion());
         }
         return upgradeProcessResponse;
     }

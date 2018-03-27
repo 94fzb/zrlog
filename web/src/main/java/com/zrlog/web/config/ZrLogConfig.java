@@ -14,7 +14,7 @@ import com.zrlog.service.InstallService;
 import com.zrlog.service.PluginCoreProcess;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.ZrLogUtil;
-import com.zrlog.web.controller.blog.ApiController;
+import com.zrlog.web.controller.blog.ApiPostController;
 import com.zrlog.web.controller.blog.InstallController;
 import com.zrlog.web.controller.blog.PostController;
 import com.zrlog.web.handler.PluginHandler;
@@ -316,7 +316,7 @@ public class ZrLogConfig extends JFinalConfig {
     public void configRoute(Routes routes) {
         // 添加浏览者能访问Control 路由
         routes.add("/post", PostController.class);
-        routes.add("/api", ApiController.class);
+        routes.add("/api/v1/post", ApiPostController.class);
         routes.add("/", PostController.class);
         routes.add("/install", InstallController.class);
         // 后台管理者

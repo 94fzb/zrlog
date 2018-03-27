@@ -15,7 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 import java.io.*;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 用于对静态文件的请求的检查，和静态化文章页，加快文章页的响应。
@@ -64,7 +65,7 @@ public class StaticFileCheckHandler extends Handler {
                                 response.getOutputStream().write(IOUtil.getByteByInputStream(new FileInputStream(htmlFile)));
                             } else {
                                 this.next.handle(target, request, response, isHandled);
-                                saveResponseBodyToHtml(PathKit.getWebRootPath(), htmlFile, trimPrintWriter.getResponseBody());
+                                saveResponseBodyToHtml(htmlFile, trimPrintWriter.getResponseBody());
                             }
                         } else {
                             this.next.handle(target, request, response, isHandled);
@@ -159,47 +160,16 @@ public class StaticFileCheckHandler extends Handler {
     /**
      * 将一个网页转化对应文件，用于静态化文章页
      */
-    private void saveResponseBodyToHtml(String webRoot, final File file, String copy) {
+    private void saveResponseBodyToHtml(File file, String copy) {
         try {
             byte[] bytes = copy.getBytes("UTF-8");
-            tryResizeDiskSpace(webRoot, bytes.length);
+            FileUtils.tryResizeDiskSpace(PathKit.getWebRootPath() + "/post", bytes.length, Constants.getMaxCacheHtmlSize());
             if (!file.exists()) {
                 file.getParentFile().mkdirs();
             }
             IOUtil.writeBytesToFile(bytes, file);
         } catch (IOException e) {
             LOGGER.error("saveResponseBodyToHtml error", e);
-        }
-    }
-
-    /**
-     * 避免过多磁盘资源占用,超过阀值时,情况比较旧的文件
-     *
-     * @param webRoot
-     * @param currentLength
-     */
-    private void tryResizeDiskSpace(String webRoot, int currentLength) {
-        List<File> fileList = new ArrayList<>();
-        FileUtils.getAllFiles(webRoot + "/post", fileList);
-        int totalSize = currentLength;
-        for (File tFile : fileList) {
-            totalSize += tFile.length();
-        }
-        if (totalSize >= Constants.getMaxCacheHtmlSize()) {
-            Collections.sort(fileList, new Comparator<File>() {
-                @Override
-                public int compare(File o1, File o2) {
-                    return Long.compare(o1.lastModified(), o2.lastModified());
-                }
-            });
-            int needRemoveSize = totalSize - Constants.getMaxCacheHtmlSize();
-            for (File tFile : fileList) {
-                needRemoveSize -= tFile.length();
-                tFile.delete();
-                if (needRemoveSize <= 0) {
-                    break;
-                }
-            }
         }
     }
 
