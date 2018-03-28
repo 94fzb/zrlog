@@ -18,7 +18,7 @@ $(function () {
                 type: 'info',
                 delay: 3000,
                 hide: true,
-                styling: 'bootstrap3'
+                styling: 'fontawesome'
             });
             if (e.upgrade) {
                 location.href = location.href;

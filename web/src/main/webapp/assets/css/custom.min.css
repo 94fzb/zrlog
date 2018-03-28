@@ -2494,8 +2494,12 @@ input.parsley-error, textarea.parsley-error, select.parsley-error {
     border-radius: 3px;
 }
 
-a.btn-success, a.btn-primary, a.btn-warning, a.btn-danger {
+a.btn-success, a.btn-primary, a.btn-warning {
     color: #fff;
+}
+
+a.btn-danger {
+    color: #d43f3a;
 }
 
 .btn-success {
@@ -4905,4 +4909,12 @@ ul.notifications {
     width: 40px;
     height: 40px;
     font-size: 35px !important;
+}
+.select2-selection__clear {
+    display: none;
+}
+
+[class^="icon-"],
+[class*="icon-"] {
+    background: none;
 }

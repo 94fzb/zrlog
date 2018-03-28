@@ -11,6 +11,9 @@
     .custom-file-upload {
         cursor: pointer;
     }
+    .fix_button {
+        width: 69px;
+    }
 </style>
 <div class="page-header">
     <h3>
@@ -18,11 +21,10 @@
     </h3>
 </div>
 <div class="row">
-    <div class="form-group col-sm-offset-11 col-sm-1">
-        <label for="fileUpload" class="custom-file-upload btn btn-primary btn-round">
+    <div class="col-md-12">
+        <label for="fileUpload" class="custom-file-upload btn btn-primary btn-round col-md-offset-11 col-md-1 fix_button">
             <i class="fa fa-cloud-upload"></i>&nbsp;${_res['upload']}
         </label>
-
         <input type="file" id="fileUpload" class="fileUpload" name="file" value=""/>
     </div>
 </div>
@@ -89,9 +91,9 @@
     <div class="divider"></div>
 </div>
 <div class="row">
-    <div class="col-md-2">
+    <div class="col-md-12">
         <a href="admin/template_center">
-            <button class="btn btn-dark btn-round"><i
+            <button class="btn btn-dark btn-round  col-md-1 fix_button"><i
                     class="fa fa-cloud-download"></i>&nbsp;${_res['admin.theme.download']}</button>
         </a>
     </div>

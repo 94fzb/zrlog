@@ -113,7 +113,7 @@
                             <div class="tile-stats">
                                 <div class="icon"><i class="fa fa-comments-o"></i></div>
                                 <div class="count">${commCount }</div>
-                                <h3>总评论</h3>
+                                <h3>评论总数</h3>
                             </div>
                         </div>
                         <div class="animated flipInY col-lg-6 col-md-6 col-sm-6 col-xs-12">
@@ -127,7 +127,7 @@
                             <div class="tile-stats">
                                 <div class="icon"><i class="fa fa-eye"></i></div>
                                 <div class="count">${clickCount }</div>
-                                <h3>文章总浏览次数</h3>
+                                <h3>文章浏览总数</h3>
                             </div>
                         </div>
                     </div>

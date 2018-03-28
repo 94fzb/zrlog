@@ -57,8 +57,8 @@
     <input type="hidden" id="basePath" value="${param.path}">
     <input type="hidden" name="file" id="file">
     <textarea name="content" id="content" hidden></textarea>
-    <div class="form-group">
-        <div class="row">
+    <div class="row">
+        <div class="form-group">
             <div class="col-md-10">
                 <textarea id="code"></textarea>
             </div>

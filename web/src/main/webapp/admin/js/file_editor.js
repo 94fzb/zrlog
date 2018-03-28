@@ -9,7 +9,7 @@ $(function () {
                     type: 'success',
                     delay: 3000,
                     hide: true,
-                    styling: 'bootstrap3'
+                    styling: 'fontawesome'
                 });
             } else {
                 new PNotify({
@@ -17,7 +17,7 @@ $(function () {
                     type: 'error',
                     delay: 3000,
                     hide: true,
-                    styling: 'bootstrap3'
+                    styling: 'fontawesome'
                 });
             }
         });

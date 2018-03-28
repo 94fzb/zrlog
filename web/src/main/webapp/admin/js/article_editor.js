@@ -115,7 +115,7 @@ $(function () {
                     type: 'info',
                     hide: true,
                     delay: 3000,
-                    styling: 'bootstrap3'
+                    styling: 'fontawesome'
                 });
             });
             setInterval(function () {
@@ -167,7 +167,7 @@ $(function () {
                 type: 'success',
                 hide: true,
                 delay: 3000,
-                styling: 'bootstrap3'
+                styling: 'fontawesome'
             });
             $("#id").val(data.id);
             $("#alias").val(data.alias);
@@ -185,7 +185,7 @@ $(function () {
                 type: 'error',
                 hide: true,
                 delay: 3000,
-                styling: 'bootstrap3'
+                styling: 'fontawesome'
             });
         }
     }
@@ -234,7 +234,7 @@ $(function () {
                 delay: 3000,
                 type: 'warn',
                 hide: true,
-                styling: 'bootstrap3'
+                styling: 'fontawesome'
             });
             return;
         }

@@ -20,10 +20,10 @@
         <form role="form" action="api/admin/upgrade/setting" class="form-horizontal" id="upgradeAjax"
               checkBox="upgradePreview">
             <div class="form-group">
-                <label class="col-sm-3 control-label no-padding-right"> ${_res['admin.upgrade.autoCheckCycle']} </label>
+                <label class="col-md-3 control-label no-padding-right"> ${_res['admin.upgrade.autoCheckCycle']} </label>
 
                 <div class="col-md-4">
-			<span class="col-sm-9" id="cycle-select-parent">
+			<span class="col-sm-12" id="cycle-select-parent">
 			<select name="autoUpgradeVersion" class="form-control select2_single">
 				<!--
 				<option <c:if test="${webs.autoUpgradeVersion == 60}">selected="selected"</c:if> value="60">${_res['admin.upgrade.cycle.oneMinute']}</option>
@@ -49,8 +49,8 @@
                 <label class="col-md-3 control-label no-padding-right"
                 > ${_res['admin.upgrade.canPreview']} </label>
 
-                <div class="col-md-5">
-			<span class="col-sm-1">
+                <div class="col-md-4">
+			<span class="col-sm-12">
             <label>
                 <input type="checkbox" class="form-control js-switch" style="display: none;" data-switchery="upgradePreview"
                        name="upgradePreview"

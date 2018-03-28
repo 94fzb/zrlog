@@ -53,7 +53,7 @@
                 <label class="col-md-3 control-label no-padding-right"> ${_res['email']} </label>
 
                 <div class="col-md-6">
-                    <input type="text" name="email" value="${user.email }"
+                    <input type="email" name="email" value="${user.email }"
                            class="form-control" placeholder="">
                 </div>
             </div>

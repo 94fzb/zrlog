@@ -35,7 +35,7 @@ $(function () {
                         type: 'success',
                         delay: 3000,
                         hide: true,
-                        styling: 'bootstrap3'
+                        styling: 'fontawesome'
                     });
                 } else {
                     if (data.message) {
@@ -48,7 +48,7 @@ $(function () {
                         delay: 3000,
                         type: 'error',
                         hide: true,
-                        styling: 'bootstrap3'
+                        styling: 'fontawesome'
                     });
                 }
             }

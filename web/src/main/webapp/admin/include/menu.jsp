@@ -8,7 +8,7 @@
         <div class="col-md-3 left_col">
             <div id="left_col" class="left_col scroll-view">
                 <div class="navbar nav_title" style="border: 0;">
-                    <a href="${url}" class="site_title"><i class="fa fa-home"></i> <span>${webs.title}</span></a>
+                    <a href="${url}" target="_blank" title="${webs.title}" class="site_title"><i class="fa fa-home"></i> <span>${webs.title}</span></a>
                 </div>
                 <div class="clearfix"></div>
                 <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">

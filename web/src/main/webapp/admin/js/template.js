@@ -14,7 +14,7 @@ $(document).ready(function () {
                 title: '保存成功...',
                 type: 'success',
                 hide: true,
-                styling: 'bootstrap3'
+                styling: 'fontawesome'
             });
             location.href = location.href;
         });
@@ -30,7 +30,7 @@ $(document).ready(function () {
                     title: '删除成功...',
                     type: 'success',
                     hide: true,
-                    styling: 'bootstrap3'
+                    styling: 'fontawesome'
                 });
                 location.href = location.href;
             });
