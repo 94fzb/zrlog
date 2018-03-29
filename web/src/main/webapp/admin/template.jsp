@@ -1,8 +1,8 @@
 <%@ page session="false" pageEncoding="UTF-8" %>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <jsp:include page="include/menu.jsp"/>
-<script src="${cacheFile['/assets/js/jquery.liteuploader.min.js']}"></script>
-<script src="${cacheFile['/admin/js/template.js']}"></script>
+<script src="${basePath}assets/js/jquery.liteuploader.min.js"></script>
+<script src="${basePath}admin/js/template.js"></script>
 <style>
     input[type="file"] {
         display: none;

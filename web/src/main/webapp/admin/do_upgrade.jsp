@@ -1,10 +1,10 @@
 <%@ page session="false" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <jsp:include page="include/menu.jsp"/>
-<script type="text/javascript" src="${cacheFile['/admin/js/set_update.js']}"></script>
-<script src="${cacheFile['/assets/js/switchery.min.js']}"></script>
-<script src="${cacheFile['/assets/js/jquery.smartWizard.js']}"></script>
-<script src="${cacheFile['/admin/js/do_upgrade.js']}"></script>
+<script type="text/javascript" src="${basePath}admin/js/set_update.js"></script>
+<script src="${basePath}assets/js/switchery.min.js"></script>
+<script src="${basePath}assets/js/jquery.smartWizard.js"></script>
+<script src="${basePath}admin/js/do_upgrade.js"></script>
 <div class="page-header">
     <h3>
         ${_res['upgradeWizard']}

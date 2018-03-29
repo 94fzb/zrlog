@@ -8,17 +8,17 @@
     }
     request.setAttribute("filePaths", com.zrlog.web.interceptor.TemplateHelper.getFiles(request.getParameter("path")));
 %>
-<link rel="stylesheet" href="${cacheFile['/admin/markdown/lib/codemirror/codemirror.min.css']}">
-<link rel="stylesheet" href="${cacheFile['/admin/markdown/lib/codemirror/addon/dialog/dialog.css']}">
-<link rel="stylesheet" href="${cacheFile['/admin/markdown/lib/codemirror/addon/search/matchesonscrollbar.css']}">
-<script src="${cacheFile['/admin/markdown/lib/codemirror/codemirror.min.js']}"></script>
-<script src="${cacheFile['/admin/markdown/lib/codemirror/modes.min.js']}"></script>
-<script src="${cacheFile['/admin/markdown/lib/codemirror/addon/dialog/dialog.js']}"></script>
-<script src="${cacheFile['/admin/markdown/lib/codemirror/addon/search/searchcursor.js']}"></script>
-<script src="${cacheFile['/admin/markdown/lib/codemirror/addon/search/search.js']}"></script>
-<script src="${cacheFile['/admin/markdown/lib/codemirror/addon/scroll/annotatescrollbar.js']}"></script>
-<script src="${cacheFile['/admin/markdown/lib/codemirror/addon/search/matchesonscrollbar.js']}"></script>
-<script src="${cacheFile['/admin/js/file_editor.js']}"></script>
+<link rel="stylesheet" href="${basePath}admin/markdown/lib/codemirror/codemirror.min.css"/>
+<link rel="stylesheet" href="${basePath}admin/markdown/lib/codemirror/addon/dialog/dialog.css"/>
+<link rel="stylesheet" href="${basePath}admin/markdown/lib/codemirror/addon/search/matchesonscrollbar.css"/>
+<script src="${basePath}admin/markdown/lib/codemirror/codemirror.min.js"></script>
+<script src="${basePath}admin/markdown/lib/codemirror/modes.min.js"></script>
+<script src="${basePath}admin/markdown/lib/codemirror/addon/dialog/dialog.js"></script>
+<script src="${basePath}admin/markdown/lib/codemirror/addon/search/searchcursor.js"></script>
+<script src="${basePath}admin/markdown/lib/codemirror/addon/search/search.js"></script>
+<script src="${basePath}admin/markdown/lib/codemirror/addon/scroll/annotatescrollbar.js"></script>
+<script src="${basePath}admin/markdown/lib/codemirror/addon/search/matchesonscrollbar.js"></script>
+<script src="${basePath}admin/js/file_editor.js"></script>
 <style>
     .CodeMirror {
         border: 1px solid #ccc;

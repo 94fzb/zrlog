@@ -1,6 +1,5 @@
 package com.zrlog.web.handler;
 
-import com.googlecode.htmlcompressor.compressor.HtmlCompressor;
 import com.hibegin.common.util.FileUtils;
 import com.hibegin.common.util.IOUtil;
 import com.jfinal.core.JFinal;
@@ -8,22 +7,26 @@ import com.jfinal.handler.Handler;
 import com.jfinal.kit.PathKit;
 import com.zrlog.common.Constants;
 import com.zrlog.util.ZrLogUtil;
+import com.zrlog.web.util.WebTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  * 用于对静态文件的请求的检查，和静态化文章页，加快文章页的响应。
  */
-public class StaticFileCheckHandler extends Handler {
+public class StaticResourceHandler extends Handler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(StaticFileCheckHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StaticResourceHandler.class);
 
     //不希望部分技术人走后门，拦截一些不合法的请求
     private static final Set<String> FORBIDDEN_URI_EXT_SET = new HashSet<>();
@@ -36,6 +39,8 @@ public class StaticFileCheckHandler extends Handler {
     }
 
     public void handle(String target, HttpServletRequest request, HttpServletResponse response, boolean[] isHandled) {
+        String url = WebTools.getRealScheme(request) + "://" + request.getHeader("host") + request.getContextPath() + "/";
+        request.setAttribute("basePath", url);
         String ext = null;
         if (target.contains("/")) {
             String name = target.substring(target.lastIndexOf('/'));
@@ -44,7 +49,7 @@ public class StaticFileCheckHandler extends Handler {
             }
         }
         try {
-            final TrimPrintWriter trimPrintWriter = new TrimPrintWriter(response.getOutputStream(), !JFinal.me().getConstants().getDevMode());
+            final TrimPrintWriter trimPrintWriter = new TrimPrintWriter(response.getOutputStream(), !JFinal.me().getConstants().getDevMode(), url);
             response = new HttpServletResponseWrapper(response) {
                 @Override
                 public PrintWriter getWriter() throws IOException {
@@ -90,76 +95,10 @@ public class StaticFileCheckHandler extends Handler {
         }
     }
 
-    class TrimPrintWriter extends PrintWriter {
-
-        private final StringBuilder builder = new StringBuilder();
-        HtmlCompressor compressor = new HtmlCompressor();
-        private String body;
-        private boolean compress;
-        private long startTime = System.currentTimeMillis();
-
-        TrimPrintWriter(OutputStream out, boolean compress) {
-            super(out);
-            this.compress = compress;
-            compressor.setRemoveIntertagSpaces(true);
-            compressor.setRemoveComments(true);
-        }
-
-        private void tryFlush() {
-            if (builder.indexOf("</html>") > 0 || builder.indexOf("</partial-response>") > 0) {
-                flush();
-            }
-        }
-
-        @Override
-        public void write(int c) {
-            builder.append((char) c); // It is actually a char, not an int.
-            tryFlush();
-        }
-
-        @Override
-        public void write(char[] chars, int offset, int length) {
-            builder.append(chars, offset, length);
-            tryFlush();
-        }
-
-        @Override
-        public void write(String string, int offset, int length) {
-            builder.append(string, offset, length);
-            tryFlush();
-        }
-
-        // Finally override the flush method so that it trims whitespace.
-        @Override
-        public void flush() {
-            synchronized (builder) {
-                if (compress) {
-                    body = compressor.compress(builder.toString());
-                } else {
-                    body = builder.toString();
-                }
-                try {
-                    if (body.trim().endsWith("</html>")) {
-                        body = body + "<!--" + (System.currentTimeMillis() - startTime) + "ms-->";
-                    }
-                    out.write(body);
-                } catch (IOException ex) {
-                    LOGGER.error("", ex);
-                }
-                // Reset the local StringBuilder and issue real flush.
-                builder.setLength(0);
-                super.flush();
-            }
-        }
-
-        public String getResponseBody() {
-            return body;
-        }
-    }
-
     /**
      * 将一个网页转化对应文件，用于静态化文章页
      */
+
     private void saveResponseBodyToHtml(File file, String copy) {
         try {
             byte[] bytes = copy.getBytes("UTF-8");

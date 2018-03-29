@@ -108,7 +108,6 @@ class VisitorInterceptor implements Interceptor {
         if (!ZrLogConfig.isInstalled()) {
             ai.invoke();
         } else {
-            ai.getController().getRequest().getSession();
             ai.getController().render("/install/forbidden.jsp");
         }
     }

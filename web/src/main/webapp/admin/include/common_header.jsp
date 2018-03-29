@@ -2,10 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page session="false" pageEncoding="UTF-8" %>
 <%
-    String path = request.getContextPath();
-    String scheme = com.zrlog.web.util.WebTools.getRealScheme(request);
-    String basePath = scheme + "://" + request.getHeader("host") + path + "/";
-    request.setAttribute("url", scheme + "://" + request.getHeader("host") + request.getContextPath());
+    String basePath = (String) request.getAttribute("basePath");
     if (request.getAttribute("currentPath") == null) {
         request.setAttribute("currentPath", ZrLogUtil.getFullUrl(request).substring((basePath + "admin/").length()));
     }
@@ -16,25 +13,25 @@
 %>
 <!DOCTYPE html>
 <html>
-<base href="<%=basePath%>">
+<base href="${basePath}">
 <head>
     <title>${webs.title} | <c:if test="${not empty subTitle}"> ${subTitle} | </c:if> ${_res['admin.management']}</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" href="${cacheFile['/favicon.ico']}"/>
-    <link href="${cacheFile['/assets/css/bootstrap.min.css']}" rel="stylesheet">
-    <link href="${cacheFile['/assets/css/font-awesome.min.css']}" rel="stylesheet">
-    <link href="${cacheFile['/assets/css/nprogress.css']}" rel="stylesheet">
-    <link href="${cacheFile['/assets/css/select2.min.css']}" rel="stylesheet">
-    <link href="${cacheFile['/assets/css/switchery.min.css']}" rel="stylesheet">
-    <link href="${cacheFile['/assets/css/pnotify.css']}" rel="stylesheet"/>
-    <link href="${cacheFile['/assets/css/custom.min.css']}" rel="stylesheet">
-    <link href="${cacheFile['/assets/css/custom.colorful.css']}" rel="stylesheet">
-    <script src="${cacheFile['/assets/js/jquery.min.js']}"></script>
-    <script src="${cacheFile['/admin/js/dashboard.js']}"></script>
-    <script src="${cacheFile['/admin/js/common.js']}"></script>
-    <script src="${cacheFile['/admin/js/i18n.js']}"></script>
+    <link rel="shortcut icon" href="${basePath}favicon.ico"/>
+    <link href="${basePath}assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="${basePath}assets/css/font-awesome.min.css" rel="stylesheet">
+    <link href="${basePath}assets/css/nprogress.css" rel="stylesheet">
+    <link href="${basePath}assets/css/select2.min.css" rel="stylesheet">
+    <link href="${basePath}assets/css/switchery.min.css" rel="stylesheet">
+    <link href="${basePath}assets/css/pnotify.css" rel="stylesheet"/>
+    <link href="${basePath}assets/css/custom.min.css" rel="stylesheet">
+    <link href="${basePath}assets/css/custom.colorful.css" rel="stylesheet">
+    <script src="${basePath}assets/js/jquery.min.js"></script>
+    <script src="${basePath}admin/js/dashboard.js"></script>
+    <script src="${basePath}admin/js/common.js"></script>
+    <script src="${basePath}admin/js/i18n.js"></script>
     <script>
         var _res = ${res};
         var editorMdPath = "admin/markdown/lib/";

@@ -8,12 +8,11 @@
     }
 %>
 <jsp:include page="include/menu.jsp"/>
-
-<link rel="stylesheet" href="${cacheFile['/assets/css/ui.jqgrid.css']}"/>
-<script src="${cacheFile['/assets/js/jqGrid/jquery.jqGrid.min.js']}"></script>
-<script src="${url}/assets/js/jqGrid/i18n/grid.locale-${lang}.js"></script>
-<script src="${cacheFile['/admin/js/jqgrid_common.js']}"></script>
-<script src="${cacheFile['/admin/js/article_jqgrid.js']}"></script>
+<link rel="stylesheet" href="${basePath}assets/css/ui.jqgrid.css"/>
+<script src="${basePath}assets/js/jqGrid/jquery.jqGrid.min.js"></script>
+<script src="${basePath}assets/js/jqGrid/i18n/grid.locale-${lang}.js"></script>
+<script src="${basePath}admin/js/jqgrid_common.js"></script>
+<script src="${basePath}admin/js/article_jqgrid.js"></script>
 <div class="page-title">
     <div class="title_left">
         <h3>${_res.blogManage}</h3>

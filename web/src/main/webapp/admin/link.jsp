@@ -1,12 +1,12 @@
 <%@ page session="false" pageEncoding="UTF-8" %>
 <jsp:include page="include/menu.jsp"/>
-<link rel="stylesheet" href="${cacheFile['/assets/css/ui.jqgrid.css']}"/>
+<link rel="stylesheet" href="${basePath}assets/css/ui.jqgrid.css"/>
 
-<script src="${cacheFile['/assets/js/date-time/bootstrap-datepicker.min.js']}"></script>
-<script src="${cacheFile['/assets/js/jqGrid/jquery.jqGrid.min.js']}"></script>
-<script src="${url}/assets/js/jqGrid/i18n/grid.locale-${lang}.js"></script>
-<script src="${cacheFile['/admin/js/jqgrid_common.js']}"></script>
-<script src="${cacheFile['/admin/js/link_jqgrid.js']}"></script>
+<script src="${basePath}assets/js/date-time/bootstrap-datepicker.min.js"></script>
+<script src="${basePath}assets/js/jqGrid/jquery.jqGrid.min.js"></script>
+<script src="${basePath}assets/js/jqGrid/i18n/grid.locale-${lang}.js"></script>
+<script src="${basePath}admin/js/jqgrid_common.js"></script>
+<script src="${basePath}admin/js/link_jqgrid.js"></script>
 <div class="page-header">
     <h3>
         ${_res['admin.link.manage']}

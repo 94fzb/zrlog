@@ -1,23 +1,19 @@
 <%@ page session="false" pageEncoding="UTF-8" %>
-<%
-    String scheme = com.zrlog.web.util.WebTools.getRealScheme(request);
-    request.setAttribute("url", scheme + "://" + request.getHeader("host") + request.getContextPath());
-%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <c:set scope="request" var="subTitle" value="${_res['admin.log.edit']}"/>
 <jsp:include page="include/menu.jsp"/>
-<link rel="stylesheet" href="${cacheFile['/admin/markdown/css/editormd.min.css']}"/>
-<script src="${cacheFile['/assets/js/screenfull.min.js']}"></script>
-<script src="${cacheFile['/admin/markdown/js/editormd.min.js']}"></script>
+<link rel="stylesheet" href="${basePath}admin/markdown/css/editormd.min.css"/>
+<script src="${basePath}assets/js/screenfull.min.js"></script>
+<script src="${basePath}admin/markdown/js/editormd.min.js"></script>
 <c:if test='${lang eq "en"}'>
-    <script src="${cacheFile['/admin/markdown/languages/en.js']}"></script>
+    <script src="${basePath}admin/markdown/languages/en.js"></script>
 </c:if>
-<script src="${cacheFile['/assets/js/jquery.liteuploader.min.js']}"></script>
-<script src="${cacheFile['/assets/js/select2/select2.min.js']}"></script>
-<script src="${cacheFile['/assets/js/jquery.tagsinput.js']}"></script>
-<script src="${cacheFile['/admin/js/article_editor.js']}"></script>
-<link href="${cacheFile['/assets/css/video-js.css']}" rel="stylesheet">
-<script src="${cacheFile['/assets/js/video.js']}"></script>
+<script src="${basePath}assets/js/jquery.liteuploader.min.js"></script>
+<script src="${basePath}assets/js/select2/select2.min.js"></script>
+<script src="${basePath}assets/js/jquery.tagsinput.js"></script>
+<script src="${basePath}admin/js/article_editor.js"></script>
+<link href="${basePath}assets/css/video-js.css" rel="stylesheet">
+<script src="${basePath}assets/js/video.js"></script>
 <script>
     var skipFirstRubbishSave = ${skipFirstRubbishSave};
     var article = ${article};
@@ -186,7 +182,6 @@
 
                 </div>
                 <div class="form-group col-xs-12">
-
                     <button class="btn btn-info" id="save" type="button">
                         <i class="fa fa-paper-plane bigger-110"></i>
                         ${_res['save']}

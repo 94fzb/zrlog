@@ -1157,3 +1157,10 @@ th[aria-selected="true"] .ui-jqgrid-sortable {
     color: #fff;
     background-color: #73879b;;
 }
+a.btn-primary{
+    color: #286090;
+}
+
+a.btn-danger {
+    color: #d43f3a;
+}

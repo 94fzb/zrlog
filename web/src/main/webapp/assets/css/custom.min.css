@@ -2494,12 +2494,8 @@ input.parsley-error, textarea.parsley-error, select.parsley-error {
     border-radius: 3px;
 }
 
-a.btn-success, a.btn-primary, a.btn-warning {
+a.btn-success,  a.btn-warning a.btn-primary a.btn-danger {
     color: #fff;
-}
-
-a.btn-danger {
-    color: #d43f3a;
 }
 
 .btn-success {
@@ -4917,4 +4913,8 @@ ul.notifications {
 [class^="icon-"],
 [class*="icon-"] {
     background: none;
+}
+
+.ui-jqgrid .ui-pg-selbox {
+    background-color: white;
 }

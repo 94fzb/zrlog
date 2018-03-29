@@ -13,7 +13,7 @@
     ${_res['admin.index.welcomeTips']}
 </div>
 <div class="row">
-    <div class="col-sm-7">
+    <div class="col-md-7  col-sm-12">
         <div class="widget-box">
             <div class="widget-header">
                 <h4>
@@ -91,7 +91,7 @@
             </div>
         </div>
     </div>
-    <div class="col-sm-5">
+    <div class="col-md-5 col-sm-12">
         <div class="widget-box">
             <div class="widget-header">
                 <h4>
@@ -102,28 +102,30 @@
             <div class="widget-body">
                 <div class="widget-main">
                     <div class="row">
-                        <div class="animated flipInY col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                        <div class="col-md-6 col-sm-12 col-xs-12">
                             <div class="tile-stats">
                                 <div class="icon"><i class="fa fa-comments-o"></i></div>
                                 <div class="count">${toDayCommCount}</div>
                                 <h3>今天评论</h3>
                             </div>
                         </div>
-                        <div class="animated flipInY col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                        <div class="col-md-6 col-sm-12 col-xs-12">
                             <div class="tile-stats">
                                 <div class="icon"><i class="fa fa-comments-o"></i></div>
                                 <div class="count">${commCount }</div>
                                 <h3>评论总数</h3>
                             </div>
                         </div>
-                        <div class="animated flipInY col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 col-sm-12 col-xs-12">
                             <div class="tile-stats">
                                 <div class="icon"><i class="fa fa-newspaper-o"></i></div>
                                 <div class="count">${articleCount }</div>
                                 <h3>文章总数</h3>
                             </div>
                         </div>
-                        <div class="animated flipInY col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                        <div class="col-md-6 col-sm-12 col-xs-12">
                             <div class="tile-stats">
                                 <div class="icon"><i class="fa fa-eye"></i></div>
                                 <div class="count">${clickCount }</div>

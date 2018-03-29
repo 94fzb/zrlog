@@ -4,9 +4,8 @@ import com.hibegin.common.util.FileUtils;
 import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
-import com.zrlog.model.*;
 import com.zrlog.common.Constants;
-import com.zrlog.web.util.WebTools;
+import com.zrlog.model.*;
 
 import java.io.File;
 import java.util.*;
@@ -82,20 +81,20 @@ public class CacheService {
             FileUtils.getAllFiles(PathKit.getWebRootPath(), staticFiles);
             for (File file : staticFiles) {
                 String uri = file.toString().substring(PathKit.getWebRootPath().length());
-                cacheFileMap.put(uri, uri + "?t=" + file.lastModified());
+                cacheFileMap.put(uri, file.lastModified() + "");
             }
         }
         if (baseController != null) {
             baseController.setAttr("init", cacheInit);
             Constants.webSite.clear();
             Constants.webSite.putAll(cacheInit.getWebSite());
-
-            String host = WebTools.getRealScheme(baseController.getRequest()) + "://" + baseController.getRequest().getHeader("host") + baseController.getRequest().getContextPath();
-            Map<String, String> tempStaticFileMap = new HashMap<>();
-            for (Map.Entry<String, String> entry : cacheFileMap.entrySet()) {
-                tempStaticFileMap.put(entry.getKey().replace("\\", "/"), host + entry.getValue().replace("\\", "/"));
-            }
-            baseController.setAttr("cacheFile", tempStaticFileMap);
         }
+    }
+
+    public static String getFileFlag(String uri) {
+        if (JFinal.me().getConstants().getDevMode()) {
+            return new File(PathKit.getWebRootPath() + uri).lastModified() + "";
+        }
+        return cacheFileMap.get(uri);
     }
 }

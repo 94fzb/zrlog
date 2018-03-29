@@ -1,39 +1,33 @@
 ﻿<jsp:useBean id="init" scope="request" type="com.zrlog.model.BaseDataInitVO"/>
 <%@ page session="false" pageEncoding="UTF-8" %>
-<%
-    String path = request.getContextPath();
-    String scheme = com.zrlog.web.util.WebTools.getRealScheme(request);
-    String basePath = scheme + "://" + request.getHeader("host") + path + "/";
-    request.setAttribute("url", scheme + "://" + request.getHeader("host") + request.getContextPath());
-%>
 <!DOCTYPE html>
 <html>
-<base href="<%=basePath%>">
+<base href="${basePath}">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>${init.webSite.title} - ${_res.login}</title>
-    <link rel="shortcut icon" href="${cacheFile['/favicon.ico']}"/>
-    <link rel="stylesheet" href="${cacheFile['/assets/css/pnotify.css']}"/>
-    <link rel="stylesheet" type="text/css" href="${cacheFile['/assets/css/login.css']}">
-    <script src="${cacheFile['/assets/js/jquery.min.js']}"></script>
-    <script src="${cacheFile['/assets/js/pnotify.js']}"></script>
-    <script src="${cacheFile['/admin/js/common.js']}"></script>
-    <script src="${cacheFile['/admin/js/login.js']}"></script>
+    <link rel="shortcut icon" href="${basePath}favicon.ico"/>
+    <link rel="stylesheet" href="${basePath}assets/css/pnotify.css"/>
+    <link rel="stylesheet" type="text/css" href="${basePath}assets/css/login.css"/>
+    <script src="${basePath}assets/js/jquery.min.js"></script>
+    <script src="${basePath}assets/js/pnotify.js"></script>
+    <script src="${basePath}admin/js/common.js"></script>
+    <script src="${basePath}admin/js/login.js"></script>
 </head>
 <body>
 <div class="limiter">
     <div class="container-login95">
         <div class="wrap-login100">
             <div class="login100-form-title"
-                 style="background-image: url(${cacheFile['/assets/images/login-bg.jpg']});">
+                 style="background-image: url('${basePath}assets/images/login-bg.jpg');">
 					<span class="login100-form-title-1">
                         ${_res.userNameAndPassword}
                     </span>
             </div>
 
-            <form class="login100-form validate-form" id="login_form" action="${url}/api/admin/login">
+            <form class="login100-form validate-form" id="login_form" action="${basePath}api/admin/login">
                 <input type="hidden" id="redirectFrom" value="${param.redirectFrom}">
                 <div class="wrap-input100 validate-input m-b-26">
                     <span class="label-input100">${_res.userName}</span>
