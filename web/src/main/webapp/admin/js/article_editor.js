@@ -301,11 +301,15 @@ $(function () {
 
     function refreshKeywords() {
         var ts = $("#keywords_tagsinput .tag2").children("span");
-        var keywordsVal = "";
+        var tagArr = [];
         for (var i = 0; i < ts.length; i++) {
-            keywordsVal = keywordsVal + $(ts[i]).text().trim() + ",";
+            tagArr[i] = $(ts[i]).text().trim();
         }
-        $("#keywordsVal").val(keywordsVal);
+        if (tagArr.length > 0) {
+            $("#keywordsVal").val(tagArr.join(","));
+        } else {
+            $("#keywordsVal").val("");
+        }
     }
 
     $("#saveToRubbish").click(function () {

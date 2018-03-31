@@ -16,7 +16,7 @@ $(function () {
             new PNotify({
                 title: message,
                 type: 'info',
-                delay: 300000,
+                delay: 3000,
                 hide: true,
                 styling: 'fontawesome'
             });

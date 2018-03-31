@@ -47,11 +47,11 @@ class UpdateVersionTimerTask extends TimerTask {
             versionUrl = Constants.ZRLOG_RESOURCE_DOWNLOAD_URL + "/release/last.version.json";
         }
         Version lastVersion = getVersion(versionUrl);
-        Date buildDate = new SimpleDateFormat("yyyy-MM-dd hh:mm").parse(lastVersion.getReleaseDate());
+        Date buildDate = new SimpleDateFormat(Constants.IGNORE_SECONDS_DATE_FORMAT_PATTERN).parse(lastVersion.getReleaseDate());
         //如果已是最新预览版，那么尝试检查正式版本
         if (checkPreview && !ZrLogUtil.greatThenCurrentVersion(lastVersion.getBuildId(), buildDate, lastVersion.getVersion())) {
             lastVersion = getVersion(Constants.ZRLOG_RESOURCE_DOWNLOAD_URL + "/release/last.version.json");
-            buildDate = new SimpleDateFormat("yyyy-MM-dd hh:mm").parse(lastVersion.getReleaseDate());
+            buildDate = new SimpleDateFormat(Constants.IGNORE_SECONDS_DATE_FORMAT_PATTERN).parse(lastVersion.getReleaseDate());
         }
         if (ZrLogUtil.greatThenCurrentVersion(lastVersion.getBuildId(), buildDate, lastVersion.getVersion())) {
             LOGGER.info("ZrLog New update found new [" + lastVersion.getVersion() + "-" + lastVersion.getBuildId() + "]");

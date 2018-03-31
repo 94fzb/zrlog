@@ -19,7 +19,7 @@ jQuery(function ($) {
             },
             {name: 'id', index: 'id', width: 50},
             {name: 'title', index: 'title', width: 300, sortable: false},
-            {name: 'keywords', index: 'keywords', width: 180},
+            {name: 'keywords', index: 'keywords', width: 150},
             {name: 'userName', index: 'userName', width: 60, sortable: false},
             {name: 'typeName', index: 'typeName', width: 90},
             {name: 'click', index: 'click', width: 50, editable: false},

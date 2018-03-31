@@ -30,6 +30,7 @@ public class Constants {
     public static final String ATTACHED_FOLDER = "/attached/";
     public static String TEMPLATE_CONFIG_SUFFIX = "_setting";
     public static final AutoUpgradeVersionType DEFAULT_AUTO_UPGRADE_VERSION_TYPE = AutoUpgradeVersionType.ONE_DAY;
+    public static String IGNORE_SECONDS_DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm";
     public static final Map<String, Object> webSite = Collections.synchronizedMap(new HashMap<String, Object>());
 
     public static String pluginServer;

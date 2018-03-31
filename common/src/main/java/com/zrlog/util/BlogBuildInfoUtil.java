@@ -1,6 +1,7 @@
 package com.zrlog.util;
 
 
+import com.zrlog.common.Constants;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -37,7 +38,7 @@ public class BlogBuildInfoUtil {
                     version = properties.get("version").toString();
                 }
                 if (properties.get("buildTime") != null && !"".equals(properties.get("buildTime"))) {
-                    time = new SimpleDateFormat("yyyy-MM-dd hh:mm").parse(properties.get("buildTime").toString());
+                    time = new SimpleDateFormat(Constants.IGNORE_SECONDS_DATE_FORMAT_PATTERN).parse(properties.get("buildTime").toString());
                 }
                 if (properties.get("runMode") != null && !"".equals(properties.get("runMode"))) {
                     runMode = properties.get("runMode").toString();

@@ -32,3 +32,5 @@ tomcat.*
 *.jar
 !.mvn/wrapper/maven-wrapper.jar
 *.hprof
+log/
+web/sim.pid
