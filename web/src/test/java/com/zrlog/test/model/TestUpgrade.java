@@ -4,7 +4,6 @@ import com.hibegin.common.util.http.HttpUtil;
 import com.hibegin.common.util.http.handle.HttpFileHandle;
 import com.zrlog.test.TestApplication;
 import com.zrlog.web.plugin.UpdateVersionThread;
-import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;

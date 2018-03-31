@@ -3,7 +3,7 @@ package com.zrlog.common.vo;
 public class InitFirstArticleVO {
 
     private String title;
-    private String mdContent;
+    private String markdown;
     private String content;
     private String digest;
     private String plainContent;
@@ -18,12 +18,12 @@ public class InitFirstArticleVO {
         this.title = title;
     }
 
-    public String getMdContent() {
-        return mdContent;
+    public String getMarkdown() {
+        return markdown;
     }
 
-    public void setMdContent(String mdContent) {
-        this.mdContent = mdContent;
+    public void setMarkdown(String markdown) {
+        this.markdown = markdown;
     }
 
     public String getContent() {

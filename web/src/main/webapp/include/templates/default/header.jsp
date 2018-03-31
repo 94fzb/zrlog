@@ -56,49 +56,9 @@
             display: inline-block;
             background-size: cover;
         }
-
-        .vjs-default-skin .vjs-control-bar {
-            font-size: 60%;
-            height: 39px;
+        .markdown-body ul, .markdown-body ol {
+            padding-left: 0;
         }
-
-        .vjs-default-skin .vjs-control {
-            color: #ffffff;
-        }
-
-        .vjs-default-skin .vjs-slider-handle {
-            color: #ffffff;
-
-        }
-
-        .vjs-default-skin .vjs-duration-display {
-            color: #ffffff;
-            padding-top: 10px;
-        }
-
-        .vjs-default-skin .vjs-current-time-display {
-            color: #ffffff;
-            padding-top: 10px;
-
-        }
-
-        .vjs-time-divider {
-            float: left;
-            line-height: 3em;
-            margin-top: 9px;
-            padding-left: 8px;
-            padding-right: 8px;
-        }
-
-        .vjs-control-bar div span {
-            color: #ffffff;
-            padding-top: 12px;
-        }
-
-        .vjs-default-skin .vjs-seek-handle {
-            top: -5px;
-        }
-
     </style>
 
 </head>

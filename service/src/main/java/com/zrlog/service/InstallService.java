@@ -1,12 +1,12 @@
 package com.zrlog.service;
 
+import com.hibegin.common.util.BeanUtil;
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.SecurityUtils;
 import com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException;
 import com.zrlog.common.Constants;
 import com.zrlog.common.type.TestConnectDbResult;
 import com.zrlog.common.vo.InitFirstArticleVO;
-import com.zrlog.util.BeanUtil;
 import com.zrlog.util.ZrLogUtil;
 import org.apache.log4j.Logger;
 
@@ -193,7 +193,7 @@ public class InstallService {
         ps.setString(4, initFirstArticleVO.getTitle());
         ps.setString(5, initFirstArticleVO.getContent());
         ps.setString(6, initFirstArticleVO.getPlainContent());
-        ps.setString(7, initFirstArticleVO.getMdContent());
+        ps.setString(7, initFirstArticleVO.getMarkdown());
         ps.setString(8, initFirstArticleVO.getDigest());
         ps.setObject(9, new java.util.Date());
         ps.setObject(10, new java.util.Date());

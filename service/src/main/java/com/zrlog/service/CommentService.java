@@ -42,7 +42,6 @@ public class CommentService {
                             .set("user_agent", createCommentRequest.getUserAgent())
                             .set("reply_id", createCommentRequest.getReplyId())
                             .set("commTime", new Date()).set("hide", 1).save();
-                    createCommentResponse.setAlias(Log.dao.findById(Integer.valueOf(createCommentRequest.getLogId())).getStr("alias"));
                 } else {
                     createCommentResponse.setError(1);
                     createCommentResponse.setMessage("");
@@ -54,6 +53,10 @@ public class CommentService {
         } else {
             createCommentResponse.setError(1);
             createCommentResponse.setMessage("");
+        }
+        Log log = Log.dao.findById(createCommentRequest.getLogId());
+        if (log != null) {
+            createCommentResponse.setAlias(log.getStr("alias"));
         }
         return createCommentResponse;
     }
@@ -71,6 +74,6 @@ public class CommentService {
     }
 
     public Map page(PageableRequest pageable) {
-         return Comment.dao.find(pageable);
+        return Comment.dao.find(pageable);
     }
 }

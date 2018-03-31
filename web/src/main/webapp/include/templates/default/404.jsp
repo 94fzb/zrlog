@@ -15,12 +15,9 @@
 <section id="primary">
     <div id="content" role="main">
         <article id="post-0" class="post no-results not-found">
-            <header class="entry-header">
-                <h1 class="entry-title">未找到</h1>
-            </header>
             <!-- .entry-header -->
             <div class="widget search">
-                <p>抱歉，没有符合您搜索条件的结果。请换其它关键词再试。</p>
+                <p>${_res.notFound}</p>
                 <form method="post"  action="${rurl }post/search">
                     <input type="text" class="field" name="key" id="s" placeholder="${_res.searchTip}"/>
                     <input type="submit" class="btn" name="submit" value="${_res.search}"/>

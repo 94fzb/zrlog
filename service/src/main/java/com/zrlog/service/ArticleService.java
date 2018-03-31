@@ -17,9 +17,9 @@ import com.zrlog.common.response.UpdateRecordResponse;
 import com.zrlog.common.vo.AdminTokenVO;
 import com.zrlog.model.Log;
 import com.zrlog.model.Tag;
-import com.zrlog.util.BeanUtil;
 import com.zrlog.util.ParseUtil;
 import com.zrlog.util.ThumbnailUtil;
+import com.zrlog.util.ZrLogUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
@@ -85,7 +85,7 @@ public class ArticleService {
         log.set("content", createArticleRequest.getContent());
         log.set("title", createArticleRequest.getTitle());
         log.set("keywords", createArticleRequest.getKeywords());
-        log.set("mdContent", createArticleRequest.getMdContent());
+        log.set("markdown", createArticleRequest.getMarkdown());
         log.set("content", createArticleRequest.getContent());
         log.set("userId", userId);
         log.set("typeId", createArticleRequest.getTypeId());
@@ -101,7 +101,7 @@ public class ArticleService {
         }
         // 自动摘要
         if (StringUtils.isEmpty(createArticleRequest.getDigest())) {
-            log.set("digest", ParseUtil.autoDigest(log.get("content").toString(), 200));
+            log.set("digest", ParseUtil.autoDigest(log.get("content").toString(), 100));
         } else {
             log.set("digest", createArticleRequest.getDigest());
         }
@@ -117,17 +117,17 @@ public class ArticleService {
         if (createArticleRequest.getAlias() == null) {
             alias = Integer.valueOf(articleId).toString();
         } else {
-            alias = createArticleRequest.getAlias().trim().replace(" ", "-");
+            alias = createArticleRequest.getAlias();
         }
         log.set("logId", articleId);
-        log.set("alias", alias);
+        log.set("alias", alias.trim().replace(" ", "-").replace(".", "-"));
         return log;
     }
 
     public PageableResponse<ArticleResponseEntry> page(PageableRequest pageableRequest, String keywords) {
         Map<String, Object> data = Log.dao.find(pageableRequest.getPage(), pageableRequest.getRows(), keywords, pageableRequest.getOrder(), pageableRequest.getSort());
         wrapperSearchKeyword(data, keywords);
-        return BeanUtil.convertPageable(data, ArticleResponseEntry.class);
+        return ZrLogUtil.convertPageable(data, ArticleResponseEntry.class);
     }
 
     public Map<String, Object> searchArticle(int page, int row, String keywords) {

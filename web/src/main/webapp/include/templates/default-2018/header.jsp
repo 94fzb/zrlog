@@ -123,7 +123,7 @@
                         <a class="" href="#search"><i class="material-icons">search</i></a>
                         <form method="get" action="${rurl}post/search" id="searchform">
                             <p class="search_input"><input class="inputtext" name="key" type="text"
-                                                           value='${_res.searchTip}' title="输入关键字，敲回车搜索" name="q"
+                                                           value='${_res.searchTip}' title="输入关键字，敲回车搜索"
                                                            size="15" onfocus="OnEnter(this)" onblur="OnExit(this)"></p>
                         </form>
                     </div>

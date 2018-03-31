@@ -7,7 +7,7 @@ public class CreateArticleRequest {
     private String title;
     private String typeId;
     private String alias;
-    private String mdContent;
+    private String markdown;
     private boolean canComment;
     private boolean _private;
     private boolean recommended;
@@ -55,12 +55,12 @@ public class CreateArticleRequest {
         this.alias = alias;
     }
 
-    public String getMdContent() {
-        return mdContent;
+    public String getMarkdown() {
+        return markdown;
     }
 
-    public void setMdContent(String mdContent) {
-        this.mdContent = mdContent;
+    public void setMarkdown(String markdown) {
+        this.markdown = markdown;
     }
 
     public boolean isCanComment() {

@@ -107,7 +107,7 @@ CREATE TABLE `log` (
   `click` int(11) DEFAULT '0',
   `content` longtext,
   `plain_content` longtext,
-  `mdContent` longtext,
+  `markdown` longtext,
   `digest` text,
   `keywords` varchar(255) DEFAULT NULL,
   `thumbnail` varchar(255) DEFAULT NULL,

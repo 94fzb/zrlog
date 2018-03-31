@@ -11,8 +11,13 @@
     .custom-file-upload {
         cursor: pointer;
     }
+
     .fix_button {
-        width: 69px;
+        width: auto;
+    }
+
+    .tools a {
+        padding-right: 6px;
     }
 </style>
 <div class="page-header">
@@ -22,7 +27,8 @@
 </div>
 <div class="row">
     <div class="col-md-12">
-        <label for="fileUpload" class="custom-file-upload btn btn-primary btn-round col-md-offset-11 col-md-1 fix_button">
+        <label for="fileUpload"
+               class="custom-file-upload btn btn-primary btn-round col-md-offset-11 col-md-1 fix_button">
             <i class="fa fa-cloud-upload"></i>&nbsp;${_res['upload']}
         </label>
         <input type="file" id="fileUpload" class="fileUpload" name="file" value=""/>

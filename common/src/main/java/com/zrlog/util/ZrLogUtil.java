@@ -1,9 +1,11 @@
 package com.zrlog.util;
 
 import com.google.gson.Gson;
+import com.hibegin.common.util.BeanUtil;
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.VersionComparator;
 import com.zrlog.common.Constants;
+import com.zrlog.common.response.PageableResponse;
 import com.zrlog.web.util.WebTools;
 import org.apache.log4j.Logger;
 
@@ -12,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.sql.*;
 import java.util.*;
 import java.util.Date;
@@ -36,6 +37,30 @@ public class ZrLogUtil {
             LOGGER.info("", e);
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * 将输入的分页过后的对象，转化PageableResponse的对象
+     *
+     * @param object
+     * @param toClazz
+     * @param <T>
+     * @return
+     */
+    public static <T> PageableResponse<T> convertPageable(Object object, Class<T> toClazz) {
+        String jsonStr = new Gson().toJson(object);
+        PageableResponse pageableResponse = new Gson().fromJson(jsonStr, PageableResponse.class);
+        List<T> dataList = new ArrayList<>();
+        List oldDataList = pageableResponse.getRows();
+        for (Object obj : oldDataList) {
+            dataList.add(BeanUtil.convert(obj, toClazz));
+        }
+        PageableResponse<T> response = new PageableResponse<>();
+        response.setPage(pageableResponse.getPage());
+        response.setTotal(pageableResponse.getTotal());
+        response.setRecords(pageableResponse.getRecords());
+        response.setRows(dataList);
+        return response;
     }
 
     public static <T> T convertRequestParam(Map<String, String[]> requestParam, Class<T> clazz) {

@@ -4918,3 +4918,6 @@ ul.notifications {
 .ui-jqgrid .ui-pg-selbox {
     background-color: white;
 }
+.ui-pnotify-icon .fa {
+    font-size: 18px;
+}

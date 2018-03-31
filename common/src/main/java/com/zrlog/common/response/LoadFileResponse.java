@@ -1,6 +1,6 @@
 package com.zrlog.common.response;
 
-public class LoadFileResponse extends StandardResponse{
+public class LoadFileResponse extends StandardResponse {
 
     private String fileContent;
 

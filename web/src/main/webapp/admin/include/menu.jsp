@@ -8,7 +8,8 @@
         <div class="col-md-3 left_col">
             <div id="left_col" class="left_col scroll-view">
                 <div class="navbar nav_title" style="border: 0;">
-                    <a href="${basePath}" target="_blank" title="${webs.title}" class="site_title"><i class="fa fa-home"></i> <span>${webs.title}</span></a>
+                    <a href="${basePath}" target="_blank" title="${webs.title}" class="site_title"><i
+                            class="fa fa-home"></i> <span>${webs.title}</span></a>
                 </div>
                 <div class="clearfix"></div>
                 <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
@@ -100,7 +101,7 @@
                             <a href="javascript:" class="user-profile dropdown-toggle" data-toggle="dropdown"
                                aria-expanded="false">
                                 <img src="${user.header}" alt="">${user.userName}
-                                <span class=" fa fa-angle-down"></span>
+                                <i class=" fa fa-angle-down"></i>
                             </a>
                             <ul class="dropdown-menu dropdown-usermenu pull-right">
                                 <li>

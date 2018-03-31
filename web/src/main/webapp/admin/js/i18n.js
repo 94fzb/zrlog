@@ -40,7 +40,9 @@ var allLang = {
         "responseJsonError": "响应数据不是JSON",
         "responseTimeout": "响应超时",
         "requestAbort": "请求被放弃",
-        "uncaughtError": "未知错误"
+        "uncaughtError": "未知错误",
+        "notFoundNewVersion": "暂时没有新版本",
+        "newVersion": "新版本"
     },
     "en": {
         "title": "Title",
@@ -83,7 +85,9 @@ var allLang = {
         "responseJsonError": "Requested JSON parse failed.",
         "responseTimeout": "Time out error.",
         "requestAbort": "abort",
-        "uncaughtError": "Uncaught Error"
+        "uncaughtError": "Uncaught Error",
+        "notFoundNewVersion": "No new version",
+        "newVersion": "New version"
 
     }
 };

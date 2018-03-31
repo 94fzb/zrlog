@@ -55,7 +55,7 @@ $(function () {
             copyPreviewHtml: '<a href="javascript:;" id="copPreviewHtmlToClipboard"  title="' + lang.copPreviewHtmlToClipboard + '" unselectable="on"><i class="fa fa-clipboard" unselectable="on"></i></a>'
         },
         codeFold: true,
-        appendMarkdown: article['mdContent'],
+        appendMarkdown: article['markdown'],
         saveHTMLToTextarea: true,
         searchReplace: true,
         htmlDecode: "iframe,pre",
@@ -140,7 +140,7 @@ $(function () {
 
     });
 
-    $(".editormd-markdown-textarea").attr("name", "mdContent");
+    $(".editormd-markdown-textarea").attr("name", "markdown");
     $(".editormd-html-textarea").removeAttr("name");
 
     function checkPreviewLink() {

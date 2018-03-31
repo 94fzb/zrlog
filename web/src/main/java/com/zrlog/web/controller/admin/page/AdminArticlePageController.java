@@ -16,11 +16,12 @@ public class AdminArticlePageController extends BaseController {
         Integer logId = getParaToInt("id");
         if (logId != null) {
             Log log = new Log().adminFindLogByLogId(logId);
-            log.put("lastLog", Log.dao.findLastLog(logId, I18NUtil.getStringFromRes("noLastLog")));
-            log.put("nextLog", Log.dao.findNextLog(logId, I18NUtil.getStringFromRes("noNextLog")));
-
-            setAttr("log", log.getAttrs());
-            TemplateHelper.fillArticleInfo(log, TemplateHelper.setBaseUrl(getRequest(), false, Constants.webSite), "");
+            if (log != null) {
+                log.put("lastLog", Log.dao.findLastLog(logId, I18NUtil.getStringFromRes("noLastLog")));
+                log.put("nextLog", Log.dao.findNextLog(logId, I18NUtil.getStringFromRes("noNextLog")));
+                setAttr("log", log.getAttrs());
+                TemplateHelper.fillArticleInfo(log, TemplateHelper.setBaseUrl(getRequest(), false, Constants.webSite), "");
+            }
             return getTemplatePath() + "/detail";
         } else {
             return Constants.ADMIN_NOT_FOUND_PAGE;
@@ -35,7 +36,7 @@ public class AdminArticlePageController extends BaseController {
             Log log = Log.dao.adminFindLogByLogId(logId);
             if (log != null) {
                 setAttr("log", log.getAttrs());
-                articleContent.put("mdContent", log.getStr("mdContent"));
+                articleContent.put("markdown", log.getStr("markdown"));
                 articleContent.put("content", log.getStr("content"));
                 skipFirstRubbishSave = true;
             }

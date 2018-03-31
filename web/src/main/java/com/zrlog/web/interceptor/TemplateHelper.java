@@ -1,5 +1,6 @@
 package com.zrlog.web.interceptor;
 
+import com.hibegin.common.util.BeanUtil;
 import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
@@ -7,7 +8,10 @@ import com.zrlog.common.Constants;
 import com.zrlog.common.vo.OutlineVO;
 import com.zrlog.model.*;
 import com.zrlog.service.CommentService;
-import com.zrlog.util.*;
+import com.zrlog.util.I18NUtil;
+import com.zrlog.util.OutlineUtil;
+import com.zrlog.util.ParseUtil;
+import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.controller.BaseController;
 import com.zrlog.web.util.WebTools;
 import org.apache.log4j.Logger;
@@ -253,9 +257,9 @@ public class TemplateHelper {
         Log nextLog = data.get("nextLog");
         nextLog.put("url", baseUrl + "post/" + nextLog.get("alias") + suffix);
         lastLog.put("url", baseUrl + "post/" + lastLog.get("alias") + suffix);
-        String mdContent = data.getStr("mdContent").toLowerCase();
+        String markdown = data.getStr("markdown").toLowerCase();
         //没有使用md的toc目录的文章才尝试使用系统提取的目录
-        if (!mdContent.contains("[toc]") && !mdContent.contains("[tocm]")) {
+        if (!markdown.contains("[toc]") && !markdown.contains("[tocm]")) {
             //最基础的实现方式，若需要更强大的实现方式建议使用JavaScript完成（页面输入toc对象）
             OutlineVO outlineVO = OutlineUtil.extractOutline(data.getStr("content"));
             data.put("tocHtml", OutlineUtil.buildTocHtml(outlineVO, ""));
