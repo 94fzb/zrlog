@@ -39,7 +39,7 @@
 
 .nav-sm .navbar.nav_title a i {
     font-size: 27px;
-    margin: 13px 0 0 3px;
+    margin: 0 0 0 3px;
 }
 
 .site_title i {
@@ -2494,7 +2494,7 @@ input.parsley-error, textarea.parsley-error, select.parsley-error {
     border-radius: 3px;
 }
 
-a.btn-success,  a.btn-warning a.btn-primary a.btn-danger {
+a.btn-success, a.btn-warning a.btn-primary a.btn-danger {
     color: #fff;
 }
 
@@ -4879,8 +4879,9 @@ ul.notifications {
     position: relative;
     border-radius: 4px;
 }
+
 .WriteCover-wrapper {
-    background: rgba(0,0,0,.075);
+    background: rgba(0, 0, 0, .075);
     height: 192px;
     background-size: 100% auto;
     width: 660px;
@@ -4889,6 +4890,7 @@ ul.notifications {
     border-radius: 4px;
     margin-left: 12px;
 }
+
 .WriteCover-uploadInput {
     position: absolute;
     display: block;
@@ -4900,12 +4902,14 @@ ul.notifications {
     cursor: pointer;
     z-index: 2;
 }
+
 .fa-3 {
     margin-top: 80px;
     width: 40px;
     height: 40px;
     font-size: 35px !important;
 }
+
 .select2-selection__clear {
     display: none;
 }
@@ -4918,6 +4922,7 @@ ul.notifications {
 .ui-jqgrid .ui-pg-selbox {
     background-color: white;
 }
+
 .ui-pnotify-icon span.fa {
     font-size: 18px;
     display: inherit;

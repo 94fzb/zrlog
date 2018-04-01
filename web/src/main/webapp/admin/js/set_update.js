@@ -1,5 +1,6 @@
 $(function () {
     PNotify.prototype.options.delay = 3000;
+
     function validator(el) {
         el.validator('validate');
         return el.find(".has-error").length === 0;
@@ -28,7 +29,7 @@ $(function () {
                     if (data.message) {
                         message = data.message;
                     } else {
-                        message = "操作成功...";
+                        message = lang.updateSuccess;
                     }
                     new PNotify({
                         title: message,
@@ -41,7 +42,7 @@ $(function () {
                     if (data.message) {
                         message = data.message;
                     } else {
-                        message = "发生了一些异常...";
+                        message = lang.updateError;
                     }
                     new PNotify({
                         title: message,

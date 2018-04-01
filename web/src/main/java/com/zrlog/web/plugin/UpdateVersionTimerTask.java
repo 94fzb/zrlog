@@ -47,19 +47,16 @@ class UpdateVersionTimerTask extends TimerTask {
             versionUrl = Constants.ZRLOG_RESOURCE_DOWNLOAD_URL + "/release/last.version.json";
         }
         Version lastVersion = getVersion(versionUrl);
-        Date buildDate = new SimpleDateFormat(Constants.IGNORE_SECONDS_DATE_FORMAT_PATTERN).parse(lastVersion.getReleaseDate());
+        Date buildDate = new SimpleDateFormat(Constants.DATE_FORMAT_PATTERN).parse(lastVersion.getReleaseDate());
         //如果已是最新预览版，那么尝试检查正式版本
         if (checkPreview && !ZrLogUtil.greatThenCurrentVersion(lastVersion.getBuildId(), buildDate, lastVersion.getVersion())) {
             lastVersion = getVersion(Constants.ZRLOG_RESOURCE_DOWNLOAD_URL + "/release/last.version.json");
-            buildDate = new SimpleDateFormat(Constants.IGNORE_SECONDS_DATE_FORMAT_PATTERN).parse(lastVersion.getReleaseDate());
+            buildDate = new SimpleDateFormat(Constants.DATE_FORMAT_PATTERN).parse(lastVersion.getReleaseDate());
         }
         if (ZrLogUtil.greatThenCurrentVersion(lastVersion.getBuildId(), buildDate, lastVersion.getVersion())) {
             LOGGER.info("ZrLog New update found new [" + lastVersion.getVersion() + "-" + lastVersion.getBuildId() + "]");
             this.version = lastVersion;
-            //不包含时区信息
-            if (version.getReleaseDate().contains("+")) {
-                version.setReleaseDate(version.getReleaseDate().substring(0, version.getReleaseDate().lastIndexOf("+")));
-            }
+            version.setReleaseDate(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(buildDate));
             return version;
         }
         return null;

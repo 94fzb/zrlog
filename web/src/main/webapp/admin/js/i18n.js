@@ -42,7 +42,9 @@ var allLang = {
         "requestAbort": "请求被放弃",
         "uncaughtError": "未知错误",
         "notFoundNewVersion": "暂时没有新版本",
-        "newVersion": "新版本"
+        "newVersion": "新版本",
+        "updateSuccess": "操作成功 ...",
+        "updateError": "发生了一些异常 ..."
     },
     "en": {
         "title": "Title",
@@ -87,7 +89,9 @@ var allLang = {
         "requestAbort": "abort",
         "uncaughtError": "Uncaught Error",
         "notFoundNewVersion": "No new version",
-        "newVersion": "New version"
+        "newVersion": "New version",
+        "updateSuccess": "Update success ...",
+        "updateError": "Some error ..."
 
     }
 };

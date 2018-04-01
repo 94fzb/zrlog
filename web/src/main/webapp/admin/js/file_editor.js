@@ -5,7 +5,7 @@ $(function () {
         $.post("api/admin/template/saveFile", $("#saveFileForm").serialize(), function (data) {
             if (!data.error) {
                 new PNotify({
-                    title: '操作成功...',
+                    title: lang.updateSuccess,
                     type: 'success',
                     delay: 3000,
                     hide: true,
@@ -13,7 +13,7 @@ $(function () {
                 });
             } else {
                 new PNotify({
-                    title: '发生了一些异常...',
+                    title: lang.updateError,
                     type: 'error',
                     delay: 3000,
                     hide: true,

@@ -20,9 +20,6 @@ public class Application {
 
         tomcat.setPort(Integer.valueOf(webPort));
 
-        //StandardContext ctx = (StandardContext) tomcat.addWebapp("/", );
-        //System.out.println("configuring app with basedir: " + new File("/" + webappDirLocation).getAbsolutePath());
-
         // Declare an alternative location for your "WEB-INF/classes" dir
         // Servlet 3.0 annotation will work
         File additionWebInfClasses = new File("target/classes");
