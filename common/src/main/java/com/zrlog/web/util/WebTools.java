@@ -36,11 +36,18 @@ public class WebTools {
 
     public static String getRealScheme(HttpServletRequest request) {
         if (request != null) {
-            String scheme = request.getHeader("X-Forwarded-Protocol");
+            String scheme = request.getHeader("X-Forwarded-Proto");
             if (scheme == null) {
-                scheme = request.getScheme();
+                scheme = request.getHeader("X-Forwarded-Protocol");
             }
-            return scheme;
+            if (scheme != null) {
+                //检查是否合法
+                if ("http".equals(scheme) || "https".equals(scheme)) {
+                    return scheme;
+                }
+            } else {
+                return request.getScheme();
+            }
         }
         return "http";
     }
