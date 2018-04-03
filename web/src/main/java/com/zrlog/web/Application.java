@@ -10,7 +10,7 @@ import java.io.IOException;
 public class Application {
 
     public static void main(String[] args) throws ServletException, LifecycleException, IOException {
-        String webappDirLocation = "web/src/main/webapp/";
+        String webappDirLocation = "src/main/webapp/";
         Tomcat tomcat = new Tomcat();
 
         String webPort = System.getenv("PORT");
@@ -27,6 +27,10 @@ public class Application {
         //ctx.setResources(resources);
 
         tomcat.setBaseDir(additionWebInfClasses.toString());
+        //idea的路径eclipse启动的路径有区别
+        if (!new File("").getAbsolutePath().endsWith(File.separator + "web")) {
+            webappDirLocation = "web/" + webappDirLocation;
+        }
         tomcat.addWebapp("", new File(webappDirLocation).getAbsolutePath());
         tomcat.start();
         tomcat.getServer().await();
