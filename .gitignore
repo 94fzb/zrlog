@@ -34,3 +34,4 @@ tomcat.*
 *.hprof
 log/
 web/sim.pid
+sim.pid

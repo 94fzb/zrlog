@@ -145,7 +145,7 @@
                     </div>
                 </div>
                 <div class="form-group col-xs-12">
-                    <input value="${log.keywords}" class="form-control" placeholder="${_res["tagTips"]}" type="hidden"
+                    <input value="${log.keywords}" class="form-control" placeholder="${_res['tagTips']}" type="hidden"
                            name="keywords" id="keywordsVal" size="60" maxlength="60"/>
                     <div class="tagsinput" id="keywords"></div>
                 </div>

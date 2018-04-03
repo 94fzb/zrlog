@@ -13,7 +13,7 @@
     <packaging>war</packaging>
 
     <properties>
-        <tomcat7Version>7.0.47</tomcat7Version>
+        <tomcat7Version>7.0.85</tomcat7Version>
         <tomcat-scope>compile</tomcat-scope>
     </properties>
 
