@@ -40,3 +40,35 @@ function formatErrorMessage(jqXHR, exception) {
         return (lang.uncaughtError + '\n' + jqXHR.responseText);
     }
 }
+
+/**
+ *
+ * @param response
+ * @param type 可选值 warn/info/success 默认 success
+ */
+function notify(response, type) {
+    PNotify.removeAll();
+    if (response.error) {
+        if (response.stack) {
+            console.info(response.stack);
+        }
+        new PNotify({
+            title: response.message,
+            type: 'error',
+            delay: 3000,
+            hide: true,
+            styling: 'fontawesome'
+        });
+    } else {
+        if (!type) {
+            type = "success";
+        }
+        new PNotify({
+            title: response.message,
+            type: type,
+            delay: 3000,
+            hide: true,
+            styling: 'fontawesome'
+        });
+    }
+}

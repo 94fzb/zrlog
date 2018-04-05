@@ -1,5 +1,4 @@
 <%@ page session="false" pageEncoding="UTF-8" %>
-<jsp:include page="include/menu.jsp"/>
 <script type="text/javascript" src="${basePath}admin/js/set_update.js"></script>
 <script src="${basePath}assets/js/jquery.liteuploader.min.js"></script>
 <script>
@@ -78,4 +77,3 @@
         </form>
     </div>
 </div>
-<jsp:include page="include/footer.jsp"/>

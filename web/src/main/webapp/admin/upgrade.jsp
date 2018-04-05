@@ -1,10 +1,9 @@
 <%@ page session="false" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<jsp:include page="include/menu.jsp"/>
 <script type="text/javascript" src="${basePath}admin/js/set_update.js"></script>
-<script type="text/javascript" src="${basePath}admin/js/upgrade.js"></script>
 <script src="${basePath}assets/js/select2/select2.min.js"></script>
 <script src="${basePath}assets/js/switchery.min.js"></script>
+<script src="${basePath}admin/js/upgrade.js"></script>
 <div class="page-header">
     <h3>
         ${_res['admin.upgrade.manage']}
@@ -72,5 +71,3 @@
         </form>
     </div>
 </div>
-
-<jsp:include page="include/footer.jsp"/>

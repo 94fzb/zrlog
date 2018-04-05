@@ -31,27 +31,15 @@ $(function () {
                     } else {
                         message = lang.updateSuccess;
                     }
-                    new PNotify({
-                        title: message,
-                        type: 'success',
-                        delay: 3000,
-                        hide: true,
-                        styling: 'fontawesome'
-                    });
                 } else {
                     if (data.message) {
                         message = data.message;
                     } else {
                         message = lang.updateError;
                     }
-                    new PNotify({
-                        title: message,
-                        delay: 3000,
-                        type: 'error',
-                        hide: true,
-                        styling: 'fontawesome'
-                    });
                 }
+                data.message = message;
+                notify(data);
             }
         });
     });

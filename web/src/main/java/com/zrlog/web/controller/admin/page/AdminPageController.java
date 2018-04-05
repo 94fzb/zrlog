@@ -24,7 +24,7 @@ public class AdminPageController extends BaseController {
             JFinal.me().getServletContext().setAttribute("articleCount", Log.dao.adminCount());
             JFinal.me().getServletContext().setAttribute("lastVersion", new UpgradeController().lastVersion());
             if (getPara(0) == null || getRequest().getRequestURI().endsWith("admin/") || "login".equals(getPara(0))) {
-                redirect("/admin/index");
+                redirect(Constants.ADMIN_INDEX);
                 return null;
             } else {
                 return "/admin/" + getPara(0);
@@ -36,7 +36,7 @@ public class AdminPageController extends BaseController {
 
     public String login() {
         if (AdminTokenThreadLocal.getUser() != null) {
-            redirect("/admin/index");
+            redirect(Constants.ADMIN_INDEX);
             return null;
         } else {
             return "/admin/login";

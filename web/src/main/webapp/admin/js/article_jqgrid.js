@@ -51,7 +51,7 @@ jQuery(function ($) {
     });
 
     function editFormat(cellvalue, options, rowObject) {
-        return '<a href="admin/article/edit?id=' + rowObject.id + '"><div id="jEditButton_2" class="ui-pg-div ui-inline-edit" onmouseout="jQuery(this).removeClass(\'ui-state-hover\')" onmouseover="jQuery(this).addClass(\'ui-state-hover\');" style="float: left; cursor: pointer; display: block;" title="" data-original-title="' + lang.edit + '"><span class="ui-icon ui-icon-pencil"></span></div></a>'
+        return '<a href="admin/index?id=' + rowObject.id + '#article_edit"><div id="jEditButton_2" class="ui-pg-div ui-inline-edit" onmouseout="jQuery(this).removeClass(\'ui-state-hover\')" onmouseover="jQuery(this).addClass(\'ui-state-hover\');" style="float: left; cursor: pointer; display: block;" title="" data-original-title="' + lang.edit + '"><span class="ui-icon ui-icon-pencil"></span></div></a>'
     }
 
     function viewLog(cellvalue, options, rowObject) {
@@ -109,7 +109,7 @@ jQuery(function ($) {
     $("#searchArticleBtn").click(function () {
         var queryStr = '?keywords=' + $.trim($("#keywords").val());
         jqGrid.jqGrid('setGridParam', {url: articleUrl + queryStr});
-        window.history.replaceState({}, "", window.location.pathname + queryStr);
+        window.history.replaceState({}, "", window.location.pathname + queryStr + window.location.hash);
         jqGrid.jqGrid('setGridParam', {datatype: 'json'}).trigger('reloadGrid');
         return false;
     })

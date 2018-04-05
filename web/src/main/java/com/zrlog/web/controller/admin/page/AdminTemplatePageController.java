@@ -36,11 +36,11 @@ public class AdminTemplatePageController extends BaseController {
         if (file.exists()) {
             setAttr("include", templateName + "/setting/index");
             setAttr("template", templateName);
-            setAttr("menu", "1");
+            setAttr("templateInfo", templateService.getTemplateVO(JFinal.me().getContextPath(), file.getParentFile().getParentFile()));
             I18NUtil.addToRequest(PathKit.getWebRootPath() + templateName + "/language/", getRequest(), JFinal.me().getConstants().getDevMode());
             String jsonStr = new WebSite().getStringValueByName(templateName + Constants.TEMPLATE_CONFIG_SUFFIX);
             fullTemplateSetting(jsonStr);
-            return "/admin/blank";
+            return "/admin/template_config";
         } else {
             return Constants.ADMIN_NOT_FOUND_PAGE;
         }

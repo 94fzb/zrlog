@@ -53,30 +53,32 @@
     </h3>
 </div>
 <h4 class="text-right">${tips}</h4>
-<form id="saveFileForm">
-    <input type="hidden" id="basePath" value="${param.path}">
-    <input type="hidden" name="file" id="file">
-    <textarea name="content" id="content" hidden></textarea>
-    <div class="row">
-        <div class="form-group">
-            <div class="col-md-10">
-                <textarea id="code"></textarea>
-            </div>
-            <div class="col-md-2">
-                <select multiple style="height: 600px" id="form-field-select-6"
-                        class="form-control select2_single">
-                    <c:forEach var="filePath" items="${filePaths}">
-                        <option value="${filePath}">${filePath}</option>
-                    </c:forEach>
-                </select>
+<div>
+    <form id="saveFileForm">
+        <input type="hidden" id="basePath" value="${param.path}">
+        <input type="hidden" name="file" id="file">
+        <textarea name="content" id="content" hidden></textarea>
+        <div class="row">
+            <div class="form-group">
+                <div class="col-md-10">
+                    <textarea id="code"></textarea>
+                </div>
+                <div class="col-md-2">
+                    <select multiple style="height: 600px" id="form-field-select-6"
+                            class="form-control">
+                        <c:forEach var="filePath" items="${filePaths}">
+                            <option value="${filePath}">${filePath}</option>
+                        </c:forEach>
+                    </select>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="ln_solid"></div>
-    <div class="col-md-offset-1">
-        <button class="btn btn-info" type="button" id="saveFile">
-            <i class="fa fa-check bigger-110"></i> ${_res['submit']}
-        </button>
-    </div>
-</form>
+        <div class="ln_solid"></div>
+        <div class="col-md-offset-1">
+            <button class="btn" type="button" id="saveFile" style="color: #fff;background-color: #5bc0de;border-color: #46b8da;">
+                <i class="fa fa-check bigger-110"></i> ${_res['submit']}
+            </button>
+        </div>
+    </form>
+</div>

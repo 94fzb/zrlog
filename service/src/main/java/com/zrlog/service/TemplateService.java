@@ -34,7 +34,7 @@ public class TemplateService {
         //start extract template file
         FileUtils.moveOrCopyFile(file.toString(), finalFile, true);
         UploadTemplateResponse response = new UploadTemplateResponse();
-        response.setMessage(I18NUtil.getStringFromRes("templateDownloadSuccess"));
+        response.setMessage(I18NUtil.getStringFromRes("templateUploadSuccess"));
         String extractFolder = finalPath + templateName.replace(".zip", "") + "/";
         FileUtils.deleteFile(extractFolder);
         ZipUtil.unZip(finalFile, extractFolder);
@@ -42,52 +42,12 @@ public class TemplateService {
     }
 
     public List<TemplateVO> getAllTemplates(String contextPath) {
-        String webPath = PathKit.getWebRootPath();
-        File[] templatesFile = new File(webPath + Constants.TEMPLATE_BASE_PATH).listFiles();
+        File[] templatesFile = new File(PathKit.getWebRootPath() + Constants.TEMPLATE_BASE_PATH).listFiles();
         List<TemplateVO> templates = new ArrayList<>();
         if (templatesFile != null) {
             for (File file : templatesFile) {
                 if (file.isDirectory() && !file.isHidden()) {
-                    String templatePath = file.toString().substring(webPath.length()).replace("\\", "/");
-                    TemplateVO templateVO = new TemplateVO();
-                    File templateInfo = new File(file.toString() + "/template.properties");
-                    if (templateInfo.exists()) {
-                        Properties properties = new Properties();
-                        try (InputStream in = new FileInputStream(templateInfo)) {
-                            properties.load(in);
-                            templateVO.setAuthor(properties.getProperty("author"));
-                            templateVO.setName(properties.getProperty("name"));
-                            templateVO.setDigest(properties.getProperty("digest"));
-                            templateVO.setVersion(properties.getProperty("version"));
-                            templateVO.setUrl(properties.getProperty("url"));
-                            if (properties.get("previewImages") != null) {
-                                String[] images = properties.get("previewImages").toString().split(",");
-                                for (int i = 0; i < images.length; i++) {
-                                    String image = images[i];
-                                    if (!image.startsWith("https://") && !image.startsWith("http://")) {
-                                        images[i] = contextPath + templatePath + "/" + image;
-                                    }
-                                }
-                                templateVO.setPreviewImages(Arrays.asList(images));
-                            }
-                        } catch (IOException e) {
-                            //LOGGER.error("", e);
-                        }
-                    } else {
-                        templateVO.setAuthor("");
-                        templateVO.setName(templatePath.substring(Constants.TEMPLATE_BASE_PATH.length()));
-                        templateVO.setUrl("");
-                        templateVO.setVersion("");
-                    }
-                    if (templateVO.getPreviewImages() == null || templateVO.getPreviewImages().isEmpty()) {
-                        templateVO.setPreviewImages(Collections.singletonList("assets/images/template-default-preview.jpg"));
-                    }
-                    if (StringUtils.isEmpty(templateVO.getDigest())) {
-                        templateVO.setDigest(I18NUtil.getStringFromRes("noIntroduction"));
-                    }
-                    File settingFile = new File(PathKit.getWebRootPath() + templatePath + "/setting/index.jsp");
-                    templateVO.setConfigAble(settingFile.exists());
-                    templateVO.setTemplate(templatePath);
+                    TemplateVO templateVO = getTemplateVO(contextPath, file);
                     templates.add(templateVO);
                 }
             }
@@ -108,5 +68,49 @@ public class TemplateService {
             }
         }
         return sortTemplates;
+    }
+
+    public TemplateVO getTemplateVO(String contextPath, File file) {
+        String templatePath = file.toString().substring(PathKit.getWebRootPath().length()).replace("\\", "/");
+        TemplateVO templateVO = new TemplateVO();
+        File templateInfo = new File(file.toString() + "/template.properties");
+        if (templateInfo.exists()) {
+            Properties properties = new Properties();
+            try (InputStream in = new FileInputStream(templateInfo)) {
+                properties.load(in);
+                templateVO.setAuthor(properties.getProperty("author"));
+                templateVO.setName(properties.getProperty("name"));
+                templateVO.setDigest(properties.getProperty("digest"));
+                templateVO.setVersion(properties.getProperty("version"));
+                templateVO.setUrl(properties.getProperty("url"));
+                if (properties.get("previewImages") != null) {
+                    String[] images = properties.get("previewImages").toString().split(",");
+                    for (int i = 0; i < images.length; i++) {
+                        String image = images[i];
+                        if (!image.startsWith("https://") && !image.startsWith("http://")) {
+                            images[i] = contextPath + templatePath + "/" + image;
+                        }
+                    }
+                    templateVO.setPreviewImages(Arrays.asList(images));
+                }
+            } catch (IOException e) {
+                //LOGGER.error("", e);
+            }
+        } else {
+            templateVO.setAuthor("");
+            templateVO.setName(templatePath.substring(Constants.TEMPLATE_BASE_PATH.length()));
+            templateVO.setUrl("");
+            templateVO.setVersion("");
+        }
+        if (templateVO.getPreviewImages() == null || templateVO.getPreviewImages().isEmpty()) {
+            templateVO.setPreviewImages(Collections.singletonList("assets/images/template-default-preview.jpg"));
+        }
+        if (StringUtils.isEmpty(templateVO.getDigest())) {
+            templateVO.setDigest(I18NUtil.getStringFromRes("noIntroduction"));
+        }
+        File settingFile = new File(PathKit.getWebRootPath() + templatePath + "/setting/index.jsp");
+        templateVO.setConfigAble(settingFile.exists());
+        templateVO.setTemplate(templatePath);
+        return templateVO;
     }
 }

@@ -80,7 +80,7 @@ class AdminInterceptor implements Interceptor {
                         controller.render("/admin/message.jsp");
                     } else {
                         if (!tryDoRender(ai, controller)) {
-                            controller.render(Constants.ADMIN_NOT_FOUND_PAGE + ".jsp");
+                            controller.redirect(Constants.ADMIN_NOT_FOUND_PAGE);
                         }
                     }
                 } catch (Exception e) {
@@ -107,7 +107,7 @@ class AdminInterceptor implements Interceptor {
             ai.getController().renderJson(exceptionResponse);
         } else {
             if (JFinal.me().getConstants().getViewType() == ViewType.JSP) {
-                ai.getController().render(Constants.ADMIN_ERROR_PAGE + ".jsp");
+                ai.getController().redirect(Constants.ADMIN_ERROR_PAGE);
             }
         }
     }

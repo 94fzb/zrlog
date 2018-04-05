@@ -1,6 +1,6 @@
-var uploadUrl = 'api/admin/upload/';
-var mdEditor;
 $(function () {
+    var uploadUrl = 'api/admin/upload/';
+    var mdEditor;
     $("#content").val(article['content']);
 
     $(".select2_single").select2({
@@ -109,14 +109,8 @@ $(function () {
                 }
 
                 copyToClipboard('<div class="markdown-body" style="padding:0">' + mdEditor.getPreviewedHTML() + "</div>");
-
-                new PNotify({
-                    title: lang.copPreviewHtmlToClipboardSuccess,
-                    type: 'info',
-                    hide: true,
-                    delay: 3000,
-                    styling: 'fontawesome'
-                });
+                var e = {"message": lang.copPreviewHtmlToClipboardSuccess, "error": 0};
+                notify(e, "info");
             });
             setInterval(function () {
                 save(true, true);
@@ -160,15 +154,7 @@ $(function () {
     }
 
     function tips(data) {
-        PNotify.removeAll();
         if (data.error === 0) {
-            new PNotify({
-                title: data.message,
-                type: 'success',
-                hide: true,
-                delay: 3000,
-                styling: 'fontawesome'
-            });
             $("#id").val(data.id);
             $("#alias").val(data.alias);
             $("#digest").val(data.digest);
@@ -177,17 +163,10 @@ $(function () {
             }
             updatePreviewLink(data.id);
             if (window.location.href.indexOf('?') === -1) {
-                window.history.replaceState({}, "", window.location.pathname + "?id=" + data.id);
+                window.history.replaceState({}, "", window.location.pathname + "?id=" + data.id + window.location.hash);
             }
-        } else {
-            new PNotify({
-                title: data.message,
-                type: 'error',
-                hide: true,
-                delay: 3000,
-                styling: 'fontawesome'
-            });
         }
+        notify(data);
     }
 
     var saving = false;
@@ -228,14 +207,7 @@ $(function () {
     function save(rubbish, timer) {
         //如果是还在保存文章状态，跳过保存
         if (saving) {
-            PNotify.removeAll();
-            new PNotify({
-                title: lang.saving,
-                delay: 3000,
-                type: 'warn',
-                hide: true,
-                styling: 'fontawesome'
-            });
+            notify(lang.saving, "warn");
             return;
         }
         refreshKeywords();

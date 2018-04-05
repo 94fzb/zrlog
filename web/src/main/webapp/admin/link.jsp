@@ -1,5 +1,4 @@
 <%@ page session="false" pageEncoding="UTF-8" %>
-<jsp:include page="include/menu.jsp"/>
 <link rel="stylesheet" href="${basePath}assets/css/ui.jqgrid.css"/>
 
 <script src="${basePath}assets/js/date-time/bootstrap-datepicker.min.js"></script>
@@ -18,4 +17,3 @@
         <div id="grid-pager"></div>
     </div>
 </div>
-<jsp:include page="include/footer.jsp"/>

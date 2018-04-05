@@ -13,15 +13,12 @@ $(function () {
             } else {
                 message = lang.notFoundNewVersion;
             }
-            new PNotify({
-                title: message,
-                type: 'info',
-                delay: 3000,
-                hide: true,
-                styling: 'fontawesome'
-            });
+            if (!e.error) {
+                e.message = message;
+            }
+            notify(e, "info");
             if (e.upgrade) {
-                window.location.href = location.href;
+                window.location.reload();
             }
         });
         return false;

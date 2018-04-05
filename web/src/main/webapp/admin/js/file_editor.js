@@ -3,23 +3,14 @@ $(function () {
     $("#saveFile").click(function () {
         $("#content").val(editor.getValue());
         $.post("api/admin/template/saveFile", $("#saveFileForm").serialize(), function (data) {
+            var message = "";
             if (!data.error) {
-                new PNotify({
-                    title: lang.updateSuccess,
-                    type: 'success',
-                    delay: 3000,
-                    hide: true,
-                    styling: 'fontawesome'
-                });
+                message = lang.updateSuccess;
             } else {
-                new PNotify({
-                    title: lang.updateError,
-                    type: 'error',
-                    delay: 3000,
-                    hide: true,
-                    styling: 'fontawesome'
-                });
+                message = lang.updateError;
             }
+            data.message = message;
+            notify(data);
         });
     });
     if ($("#form-field-select-6 option").length > 0) {
@@ -64,6 +55,7 @@ $(function () {
             } else {
                 alert("Could not find a mode corresponding to " + val);
             }
+            $(".CodeMirror").focus();
         });
     }
 });

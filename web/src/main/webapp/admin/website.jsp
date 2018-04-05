@@ -1,6 +1,5 @@
 <%@ page session="false" pageEncoding="UTF-8" %>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<jsp:include page="include/menu.jsp"/>
 <script type="text/javascript" src="${basePath}admin/js/set_update.js"></script>
 <script type="text/javascript" src="${basePath}assets/js/select2/select2.min.js"></script>
 <div class="page-header">
@@ -124,9 +123,7 @@
             </div>
             <div class="tab-pane" id="errorPageEdit">
                 <div class="col-md-12">
-                    <iframe src="admin/blank?include=file_editor&path=/error/&editType=错误页面"
-                            scrolling="no" style="border: 0;" width="100%" height="900px">
-                    </iframe>
+                    <jsp:include page="file_editor.jsp?path=/error/&editType=错误页面"/>
                 </div>
             </div>
             <div class="tab-pane col-md-6" id="blogTab" style="padding: 10px">
@@ -208,4 +205,3 @@
         </div>
     </div>
 </div>
-<jsp:include page="include/footer.jsp"/>

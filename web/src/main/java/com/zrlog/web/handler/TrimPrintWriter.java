@@ -5,6 +5,7 @@ import com.zrlog.service.CacheService;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.parser.Parser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +30,10 @@ class TrimPrintWriter extends PrintWriter {
         return body;
     }
 
+    public boolean isEndTag(String str){
+        return str.trim().endsWith("</div>") || str.trim().endsWith("</html>") || str.trim().endsWith("</iframe>");
+    }
+
     TrimPrintWriter(OutputStream out, boolean compress, String baseUrl) {
         super(out);
         this.compress = compress;
@@ -38,7 +43,7 @@ class TrimPrintWriter extends PrintWriter {
     }
 
     private void tryFlush() {
-        if (builder.indexOf("</html>") > 0 || builder.indexOf("</partial-response>") > 0) {
+        if (isEndTag(builder.toString())) {
             flush();
         }
     }
@@ -67,8 +72,8 @@ class TrimPrintWriter extends PrintWriter {
         synchronized (builder) {
             try {
                 body = builder.toString();
-                if (body.trim().endsWith("</html>")) {
-                    Document document = Jsoup.parse(body);
+                if (isEndTag(body)) {
+                    Document document = Jsoup.parse(body, "", Parser.xmlParser());
                     List<ReplaceVo> replaceVoList = new ArrayList<>();
 
                     for (Element element : document.select("link")) {
@@ -85,7 +90,7 @@ class TrimPrintWriter extends PrintWriter {
                 if (compress) {
                     body = compressor.compress(body);
                 }
-                if (body.trim().endsWith("</html>")) {
+                if (isEndTag(body)) {
                     body = body + "<!--" + (System.currentTimeMillis() - startTime) + "ms-->";
                 }
                 out.write(body);

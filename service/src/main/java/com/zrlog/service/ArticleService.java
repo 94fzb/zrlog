@@ -171,6 +171,9 @@ public class ArticleService {
     }
 
     public String getFirstImgUrl(String htmlContent, int userId) {
+        if (StringUtils.isEmpty(htmlContent)) {
+            return "";
+        }
         Elements elements = Jsoup.parse(htmlContent).select("img");
         if (!elements.isEmpty()) {
             String url = elements.first().attr("src");

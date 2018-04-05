@@ -1,8 +1,13 @@
 <%@ page session="false" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<c:set scope="request" var="subTitle" value="${_res['admin.log.edit']}"/>
-<jsp:include page="include/menu.jsp"/>
 <link rel="stylesheet" href="${basePath}admin/markdown/css/editormd.min.css"/>
+<link rel="stylesheet" href="${basePath}assets/css/video-js.css"/>
+<script>
+    var editorMdPath = "admin/markdown/lib/";
+    var skipFirstRubbishSave = ${skipFirstRubbishSave};
+    var article = ${article};
+</script>
+
 <script src="${basePath}assets/js/screenfull.min.js"></script>
 <script src="${basePath}admin/markdown/js/editormd.min.js"></script>
 <c:if test='${lang eq "en"}'>
@@ -12,12 +17,7 @@
 <script src="${basePath}assets/js/select2/select2.min.js"></script>
 <script src="${basePath}assets/js/jquery.tagsinput.js"></script>
 <script src="${basePath}admin/js/article_editor.js"></script>
-<link href="${basePath}assets/css/video-js.css" rel="stylesheet">
 <script src="${basePath}assets/js/video.js"></script>
-<script>
-    var skipFirstRubbishSave = ${skipFirstRubbishSave};
-    var article = ${article};
-</script>
 <style>
     .CodeMirror-scroll {
         box-sizing: content-box;
@@ -30,13 +30,7 @@
         position: relative;
     }
 
-    .switchery > small {
-        width: 15px;
-        height: 15px;
-    }
-
     .switchery {
-        height: 15px;
         width: 38px;
     }
 
@@ -192,4 +186,3 @@
         </form>
     </div>
 </div>
-<jsp:include page="include/footer.jsp"/>
