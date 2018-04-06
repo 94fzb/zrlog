@@ -17,9 +17,9 @@ public class Constants {
     public static final String TEMPLATE_BASE_PATH = "/include/templates/";
     public static final String DEFAULT_TEMPLATE_PATH = TEMPLATE_BASE_PATH + "default";
     public static final String ADMIN_INDEX = "/admin/index#dashboard";
-    public static final String ADMIN_ERROR_PAGE = "/error/500.html";
-    public static final String ADMIN_FORBRION_PAGE = "/error/403.html";
-    public static final String ADMIN_NOT_FOUND_PAGE = "/error/404.html";
+    public static final String ERROR_PAGE = "/error/500.html";
+    public static final String FORBIDDEN_PAGE = "/error/403.html";
+    public static final String NOT_FOUND_PAGE = "/error/404.html";
     public static final String ZRLOG_RESOURCE_DOWNLOAD_URL = "http://dl.zrlog.com";
     public static final String AUTO_UPGRADE_VERSION_KEY = "autoUpgradeVersion";
     public static final int DEFAULT_ARTICLE_DIGEST_LENGTH = 200;

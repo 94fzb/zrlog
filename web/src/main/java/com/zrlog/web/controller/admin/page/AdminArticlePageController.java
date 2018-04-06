@@ -24,7 +24,7 @@ public class AdminArticlePageController extends BaseController {
             }
             return getTemplatePath() + "/detail";
         } else {
-            return Constants.ADMIN_NOT_FOUND_PAGE;
+            return Constants.NOT_FOUND_PAGE;
         }
     }
 

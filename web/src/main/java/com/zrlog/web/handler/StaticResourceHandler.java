@@ -27,6 +27,7 @@ import java.util.Set;
 public class StaticResourceHandler extends Handler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StaticResourceHandler.class);
+    private static final String PAGE_END_TAG = "<none id='SP_" + System.currentTimeMillis() + "'></none>";
 
     //不希望部分技术人走后门，拦截一些不合法的请求
     private static final Set<String> FORBIDDEN_URI_EXT_SET = new HashSet<>();
@@ -41,6 +42,7 @@ public class StaticResourceHandler extends Handler {
     public void handle(String target, HttpServletRequest request, HttpServletResponse response, boolean[] isHandled) {
         String url = WebTools.getRealScheme(request) + "://" + request.getHeader("host") + request.getContextPath() + "/";
         request.setAttribute("basePath", url);
+        request.setAttribute("pageEndTag", PAGE_END_TAG);
         String ext = null;
         if (target.contains("/")) {
             String name = target.substring(target.lastIndexOf('/'));
@@ -49,7 +51,7 @@ public class StaticResourceHandler extends Handler {
             }
         }
         try {
-            final TrimPrintWriter trimPrintWriter = new TrimPrintWriter(response.getOutputStream(), !JFinal.me().getConstants().getDevMode(), url);
+            final TrimPrintWriter trimPrintWriter = new TrimPrintWriter(response.getOutputStream(), !JFinal.me().getConstants().getDevMode(), url, PAGE_END_TAG);
             response = new HttpServletResponseWrapper(response) {
                 @Override
                 public PrintWriter getWriter() throws IOException {

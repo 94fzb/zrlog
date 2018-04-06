@@ -74,16 +74,16 @@ jQuery(function ($) {
     //navButtons
     jQuery(grid_selector).jqGrid('navGrid', pager_selector,
         { 	//navbar options
-            edit: true,
+            edit: false,
             editicon: 'icon-pencil blue',
             add: true,
-            addicon: 'icon-plus-sign purple',
+            addicon: 'fa fa-plus-circle purple',
             del: false,
             delicon: 'icon-trash red',
             search: false,
             searchicon: 'icon-search orange',
             refresh: true,
-            refreshicon: 'icon-refresh green',
+            refreshicon: 'fa fa-refresh green',
             view: false,
             viewicon: 'icon-zoom-in grey'
         },

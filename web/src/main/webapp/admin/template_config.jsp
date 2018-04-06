@@ -10,3 +10,4 @@
         <jsp:include page="${include}.jsp"/>
     </div>
 </div>
+${pageEndTag}

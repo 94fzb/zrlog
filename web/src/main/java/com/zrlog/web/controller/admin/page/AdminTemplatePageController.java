@@ -42,7 +42,7 @@ public class AdminTemplatePageController extends BaseController {
             fullTemplateSetting(jsonStr);
             return "/admin/template_config";
         } else {
-            return Constants.ADMIN_NOT_FOUND_PAGE;
+            return Constants.NOT_FOUND_PAGE;
         }
     }
 

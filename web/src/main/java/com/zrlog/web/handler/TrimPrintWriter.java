@@ -25,25 +25,27 @@ class TrimPrintWriter extends PrintWriter {
     private boolean compress;
     private long startTime = System.currentTimeMillis();
     private String baseUrl;
+    private String endFlag;
 
     public String getResponseBody() {
         return body;
     }
 
-    public boolean isEndTag(String str){
-        return str.trim().endsWith("</div>") || str.trim().endsWith("</html>") || str.trim().endsWith("</iframe>");
+    public boolean isIncludePageEndTag(String str) {
+        return str.trim().endsWith("</html>") || str.trim().endsWith(endFlag);
     }
 
-    TrimPrintWriter(OutputStream out, boolean compress, String baseUrl) {
+    TrimPrintWriter(OutputStream out, boolean compress, String baseUrl, String endFlag) {
         super(out);
         this.compress = compress;
         compressor.setRemoveIntertagSpaces(true);
         compressor.setRemoveComments(true);
         this.baseUrl = baseUrl;
+        this.endFlag = endFlag;
     }
 
     private void tryFlush() {
-        if (isEndTag(builder.toString())) {
+        if (isIncludePageEndTag(builder.toString())) {
             flush();
         }
     }
@@ -72,7 +74,11 @@ class TrimPrintWriter extends PrintWriter {
         synchronized (builder) {
             try {
                 body = builder.toString();
-                if (isEndTag(body)) {
+                boolean includeEndTag = isIncludePageEndTag(body);
+                if (includeEndTag) {
+                    if (body.endsWith(endFlag)) {
+                        body = body.substring(0, body.length() - endFlag.length());
+                    }
                     Document document = Jsoup.parse(body, "", Parser.xmlParser());
                     List<ReplaceVo> replaceVoList = new ArrayList<>();
 
@@ -90,7 +96,7 @@ class TrimPrintWriter extends PrintWriter {
                 if (compress) {
                     body = compressor.compress(body);
                 }
-                if (isEndTag(body)) {
+                if (includeEndTag) {
                     body = body + "<!--" + (System.currentTimeMillis() - startTime) + "ms-->";
                 }
                 out.write(body);

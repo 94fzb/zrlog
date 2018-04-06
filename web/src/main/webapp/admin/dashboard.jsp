@@ -93,7 +93,7 @@
         <div class="widget-box">
             <div class="widget-header">
                 <h4>
-                    <i class="fa fa-comments"></i>
+                    <i class="fa fa-pie-chart"></i>
                     ${_res['admin.index.outline']}
                 </h4>
             </div>
@@ -136,3 +136,4 @@
         </div>
     </div>
 </div>
+${pageEndTag}
