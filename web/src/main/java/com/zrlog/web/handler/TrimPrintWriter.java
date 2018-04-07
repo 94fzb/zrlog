@@ -1,19 +1,21 @@
 package com.zrlog.web.handler;
 
 import com.googlecode.htmlcompressor.compressor.HtmlCompressor;
+import com.hibegin.common.util.IOUtil;
+import com.hibegin.common.util.http.handle.CloseResponseHandle;
 import com.zrlog.service.CacheService;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.parser.Parser;
+import org.htmlcleaner.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 class TrimPrintWriter extends PrintWriter {
 
@@ -26,6 +28,7 @@ class TrimPrintWriter extends PrintWriter {
     private long startTime = System.currentTimeMillis();
     private String baseUrl;
     private String endFlag;
+    private HttpServletRequest request;
 
     public String getResponseBody() {
         return body;
@@ -35,13 +38,14 @@ class TrimPrintWriter extends PrintWriter {
         return str.trim().endsWith("</html>") || str.trim().endsWith(endFlag);
     }
 
-    TrimPrintWriter(OutputStream out, boolean compress, String baseUrl, String endFlag) {
+    TrimPrintWriter(OutputStream out, boolean compress, String baseUrl, String endFlag, HttpServletRequest request) {
         super(out);
         this.compress = compress;
         compressor.setRemoveIntertagSpaces(true);
         compressor.setRemoveComments(true);
         this.baseUrl = baseUrl;
         this.endFlag = endFlag;
+        this.request = request;
     }
 
     private void tryFlush() {
@@ -79,19 +83,62 @@ class TrimPrintWriter extends PrintWriter {
                     if (body.endsWith(endFlag)) {
                         body = body.substring(0, body.length() - endFlag.length());
                     }
-                    Document document = Jsoup.parse(body, "", Parser.xmlParser());
-                    List<ReplaceVo> replaceVoList = new ArrayList<>();
+                    HtmlCleaner htmlCleaner = new HtmlCleaner();
+                    htmlCleaner.getProperties().setUseCdataForScriptAndStyle(false);
+                    TagNode tagNode = htmlCleaner.clean(body);
+                    TagNode[] tagNodes = tagNode.getAllElements(true);
+                    Map<String, String> plugin = new HashMap<>();
+                    for (TagNode tag : tagNodes) {
+                        if (tag != null) {
+                            String tagName = tag.getName();
+                            if ("script".equals(tagName)) {
+                                String src = tag.getAttributeByName("src");
+                                if (src != null) {
+                                    tag.setForeignMarkup(true);
+                                    Map<String, String> tmp = new LinkedHashMap<>(tag.getAttributes());
+                                    tmp.put("src", tryReplace(src));
+                                    tag.setAttributes(tmp);
+                                }
+                            }
+                            if ("link".equals(tagName)) {
+                                String src = tag.getAttributeByName("href");
+                                if (src != null) {
+                                    tag.setForeignMarkup(true);
+                                    Map<String, String> tmp = new LinkedHashMap<>(tag.getAttributes());
+                                    tmp.put("href", tryReplace(src));
+                                    tag.setAttributes(tmp);
+                                }
+                            }
+                            if ("plugin".equals(tagName) && tag.hasAttribute("src")) {
+                                tag.setForeignMarkup(true);
+                                Map<String, String> tmp = new LinkedHashMap<>(tag.getAttributes());
+                                tmp.put("_tmp", System.currentTimeMillis() + "");
+                                tag.setAttributes(tmp);
+                                SimpleHtmlSerializer serializer = new SimpleHtmlSerializer(htmlCleaner.getProperties());
+                                StringWriter stringWriter = new StringWriter();
+                                tag.serialize(serializer, stringWriter);
+                                String content = stringWriter.toString();
+                                try {
+                                    CloseResponseHandle handle = PluginHandler.getContext(tag.getAttributeByName("src"), "GET", request, false);
+                                    byte[] bytes = IOUtil.getByteByInputStream(handle.getT().getEntity().getContent());
+                                    plugin.put(content, new String(bytes, "UTF-8"));
+                                } catch (InstantiationException e) {
+                                    LOGGER.error("", e);
+                                }
+                            }
+                        }
+                    }
 
-                    for (Element element : document.select("link")) {
-                        tryReplace(replaceVoList, element, "href", element.attr("href"));
+                    SimpleHtmlSerializer serializer = new SimpleHtmlSerializer(htmlCleaner.getProperties());
+                    StringWriter stringWriter = new StringWriter();
+                    tagNode.serialize(serializer, stringWriter);
+                    body = stringWriter.toString();
+                    if (tagNode.getDocType() != null) {
+                        body = tagNode.getDocType() + body;
                     }
-                    for (Element element : document.select("script")) {
-                        tryReplace(replaceVoList, element, "src", element.attr("src"));
+                    for (Map.Entry<String, String> entry : plugin.entrySet()) {
+                        body = body.replace(entry.getKey(), entry.getValue());
                     }
-                    for (ReplaceVo replaceVo : replaceVoList) {
-                        replaceVo.getElement().attr(replaceVo.getAttr(), replaceVo.getNewVal());
-                    }
-                    body = document.outputSettings(new Document.OutputSettings().prettyPrint(false)).outerHtml();
                 }
                 if (compress) {
                     body = compressor.compress(body);
@@ -110,7 +157,7 @@ class TrimPrintWriter extends PrintWriter {
         }
     }
 
-    private void tryReplace(List<ReplaceVo> replaceVoList, Element element, String attr, String href) {
+    private String tryReplace(String href) {
         if (href.startsWith(baseUrl) || href.startsWith("admin/js") || href.startsWith("admin/markdwon") || href.startsWith("assets")) {
             String uriPath = href;
             if (href.startsWith(baseUrl)) {
@@ -127,45 +174,9 @@ class TrimPrintWriter extends PrintWriter {
                 } else {
                     href = href + "?t=" + flag;
                 }
-                replaceVoList.add(new ReplaceVo(element, attr, href));
             }
         }
-    }
-
-    class ReplaceVo {
-        Element element;
-        String attr;
-        String newVal;
-
-        ReplaceVo(Element element, String attr, String newVal) {
-            this.element = element;
-            this.attr = attr;
-            this.newVal = newVal;
-        }
-
-        public Element getElement() {
-            return element;
-        }
-
-        public void setElement(Element element) {
-            this.element = element;
-        }
-
-        public String getAttr() {
-            return attr;
-        }
-
-        public void setAttr(String attr) {
-            this.attr = attr;
-        }
-
-        public String getNewVal() {
-            return newVal;
-        }
-
-        public void setNewVal(String newVal) {
-            this.newVal = newVal;
-        }
+        return href;
     }
 
 }

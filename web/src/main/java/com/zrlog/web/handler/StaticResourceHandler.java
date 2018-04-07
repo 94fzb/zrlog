@@ -51,7 +51,7 @@ public class StaticResourceHandler extends Handler {
             }
         }
         try {
-            final TrimPrintWriter trimPrintWriter = new TrimPrintWriter(response.getOutputStream(), !JFinal.me().getConstants().getDevMode(), url, PAGE_END_TAG);
+            final TrimPrintWriter trimPrintWriter = new TrimPrintWriter(response.getOutputStream(), !JFinal.me().getConstants().getDevMode(), url, PAGE_END_TAG, request);
             response = new HttpServletResponseWrapper(response) {
                 @Override
                 public PrintWriter getWriter() throws IOException {
@@ -83,7 +83,6 @@ public class StaticResourceHandler extends Handler {
                 } else {
                     try {
                         //非法请求, 返回403
-                        request.getSession();
                         response.sendError(403);
                     } catch (IOException e) {
                         LOGGER.error("", e);
