@@ -61,7 +61,7 @@
     <div class="form-group">
         <div class="col-md-offset-3 col-md-9">
             <button id="template" type="button" class="btn btn-info">
-                <i class="fa fa-check bigger-110"></i> 提交
+                ${_res['submit']}
             </button>
         </div>
     </div>

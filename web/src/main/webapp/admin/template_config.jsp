@@ -6,7 +6,7 @@
     </h3>
 </div>
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-6 col-xs-12 col-sm-12">
         <jsp:include page="${include}.jsp"/>
     </div>
 </div>

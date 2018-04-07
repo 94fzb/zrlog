@@ -18,8 +18,8 @@ import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.controller.blog.ApiPostController;
 import com.zrlog.web.controller.blog.InstallController;
 import com.zrlog.web.controller.blog.PostController;
+import com.zrlog.web.handler.GlobalResourceHandler;
 import com.zrlog.web.handler.PluginHandler;
-import com.zrlog.web.handler.StaticResourceHandler;
 import com.zrlog.web.interceptor.BlackListInterceptor;
 import com.zrlog.web.interceptor.InitDataInterceptor;
 import com.zrlog.web.interceptor.MyI18NInterceptor;
@@ -150,7 +150,7 @@ public class ZrLogConfig extends JFinalConfig {
      */
     public void configHandler(Handlers handlers) {
         handlers.add(new PluginHandler());
-        handlers.add(new StaticResourceHandler());
+        handlers.add(new GlobalResourceHandler());
     }
 
     /**

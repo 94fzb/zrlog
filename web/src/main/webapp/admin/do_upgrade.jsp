@@ -9,7 +9,7 @@
     </h3>
 </div>
 <div class="row">
-    <div class="col-md-8">
+    <div class="col-md-6 col-xs-12 col-sm-12">
         <div id="wizard_verticle" class="form_wizard wizard_horizontal">
             <ul class="list-unstyled wizard_steps anchor">
                 <li>

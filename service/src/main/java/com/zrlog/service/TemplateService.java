@@ -23,7 +23,7 @@ public class TemplateService {
     public UpdateRecordResponse save(String template, Map<String, Object> settingMap) {
         new WebSite().updateByKV(template + Constants.TEMPLATE_CONFIG_SUFFIX, new Gson().toJson(settingMap));
         UpdateRecordResponse updateRecordResponse = new UpdateRecordResponse();
-        updateRecordResponse.setMessage("变更成功");
+        updateRecordResponse.setMessage(I18NUtil.getStringFromRes("templateUpdateSuccess"));
         return updateRecordResponse;
     }
 

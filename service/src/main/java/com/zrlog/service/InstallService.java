@@ -184,7 +184,7 @@ public class InstallService {
 
 
     private void insertFirstArticle(Connection connect) throws SQLException {
-        String insetLog = "INSERT INTO `log`(`logId`,`canComment`,`keywords`,`alias`,`typeId`,`userId`,`title`,`content`,`plain_content`,`mdContent`,`digest`,`releaseTime`,`last_update_date`,`rubbish`,`private`) VALUES (1,?,?,?,1,1,?,?,?,?,?,?,?,?,?)";
+        String insetLog = "INSERT INTO `log`(`logId`,`canComment`,`keywords`,`alias`,`typeId`,`userId`,`title`,`content`,`plain_content`,`markdown`,`digest`,`releaseTime`,`last_update_date`,`rubbish`,`private`) VALUES (1,?,?,?,1,1,?,?,?,?,?,?,?,?,?)";
         PreparedStatement ps = connect.prepareStatement(insetLog);
         ps.setBoolean(1, true);
         InitFirstArticleVO initFirstArticleVO = BeanUtil.convert(InstallService.class.getResourceAsStream("/init-blog.json"), InitFirstArticleVO.class);

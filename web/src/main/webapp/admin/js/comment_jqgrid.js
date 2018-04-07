@@ -74,7 +74,7 @@ $(function ($) {
     });
 
     function viewLog(cellvalue, options, rowObject) {
-        return '<a target="_blank" href="admin/article/preview?id=' + rowObject.logId + '"><div id="jEditButton_2" class="ui-pg-div ui-inline-edit" onmouseout="jQuery(this).removeClass(\'ui-state-hover\')" onmouseover="jQuery(this).addClass(\'ui-state-hover\');" style="float: left; cursor: pointer; display: block;" title="" data-original-title="' + lang.view + '"><span class="ui-icon fa fa-search-plus grey"></span></div></a>'
+        return '<a target="_blank" href="admin/article/preview?id=' + rowObject.logId + '"><div id="jEditButton_2" class="ui-pg-div ui-inline-edit" onmouseout="jQuery(this).removeClass(\'ui-state-hover\')" onmouseover="jQuery(this).addClass(\'ui-state-hover\');" style="float: left; cursor: pointer; display: block;" title="" data-original-title="' + lang.view + '"><i class="ui-icon fa fa-search-plus grey"></i></div></a>'
     }
 
     //navButtons

@@ -30,7 +30,7 @@
     </ul>
     <div class="row">
         <div class="tab-content">
-            <div class="tab-pane in active col-md-6" id="basic">
+            <div class="tab-pane in active col-md-6 col-xs-12 col-sm-12" id="basic">
                 <h4 class="header blue">认真输入，有助于网站被收录</h4>
                 <form role="form" class="form-horizontal" id="baseMsgAjax">
                     <div class="form-group">
@@ -73,7 +73,7 @@
                     <div class="form-group">
                         <div class="col-md-offset-3 col-md-9">
                             <button id="baseMsg" type="button" class="btn btn-info">
-                                <i class="fa fa-check bigger-110"></i> ${_res['submit']}
+                                 ${_res['submit']}
                             </button>
                         </div>
                     </div>
@@ -114,7 +114,7 @@
                     <div class="form-group">
                         <div class="col-md-offset-3 col-md-9">
                             <button id="otherMsg" type="button" class="btn btn-info">
-                                <i class="fa fa-check bigger-110"></i> ${_res['submit']}
+                                 ${_res['submit']}
                             </button>
                         </div>
                     </div>
@@ -128,7 +128,7 @@
             </div>
             <div class="tab-pane col-md-6" id="blogTab" style="padding: 10px">
                 <h4 class="header blue">博客设置</h4>
-                <form role="form" class="form-horizontal" id="blogAjax">
+                <form role="form" class="form-horizontal" id="blogAjax" data-toggle="validator">
                     <div class="form-group">
                         <label class="col-md-3 control-label no-padding-right">会话过期时间（分钟）</label>
 
@@ -196,7 +196,7 @@
                     <div class="form-group">
                         <div class="col-md-offset-3 col-md-9">
                             <button id="blog" type="button" class="btn btn-info">
-                                <i class="fa fa-check bigger-110"></i> ${_res['submit']}
+                                 ${_res['submit']}
                             </button>
                         </div>
                     </div>

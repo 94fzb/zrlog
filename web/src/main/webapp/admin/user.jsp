@@ -37,7 +37,7 @@
     </h3>
 </div>
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-6 col-xs-12 col-sm-12">
         <form role="form" method="post" data-toggle="validator" class="form-horizontal" id="userAjax"
               action="api/admin/update">
             <div class="form-group">
@@ -70,7 +70,7 @@
             <div class="form-group">
                 <div class="col-md-offset-3 col-md-9">
                     <button id="user" type="button" class="btn btn-info">
-                        <i class="fa fa-check bigger-110"></i> ${_res['submit']}
+                         ${_res['submit']}
                     </button>
                 </div>
             </div>

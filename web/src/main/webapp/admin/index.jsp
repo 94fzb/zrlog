@@ -3,30 +3,28 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="f" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
-<html>
+<html lang="${lang}">
 <base href="${basePath}"/>
 <head>
     <title>${webs.title} | ${_res['admin.management']}</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <link rel="shortcut icon" href="${basePath}favicon.ico"/>
-    <link href="${basePath}assets/css/bootstrap.min.css" rel="stylesheet">
-    <link href="${basePath}assets/css/font-awesome.min.css" rel="stylesheet">
-    <link href="${basePath}assets/css/nprogress.css" rel="stylesheet">
-    <link href="${basePath}assets/css/select2.min.css" rel="stylesheet">
-    <link href="${basePath}assets/css/switchery.min.css" rel="stylesheet">
+    <link href="${basePath}assets/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="${basePath}assets/css/font-awesome.min.css" rel="stylesheet"/>
+    <link href="${basePath}assets/css/nprogress.css" rel="stylesheet"/>
+    <link href="${basePath}assets/css/select2.min.css" rel="stylesheet"/>
+    <link href="${basePath}assets/css/switchery.min.css" rel="stylesheet"/>
     <link href="${basePath}assets/css/pnotify.css" rel="stylesheet"/>
-    <link href="${basePath}assets/css/custom.min.css" rel="stylesheet">
-    <link href="${basePath}assets/css/custom.colorful.css" rel="stylesheet">
+    <link href="${basePath}assets/css/custom.min.css" rel="stylesheet"/>
+    <link href="${basePath}assets/css/custom.colorful.css" rel="stylesheet"/>
     <script src="${basePath}assets/js/route.min.js"></script>
     <script src="${basePath}assets/js/jquery.min.js"></script>
-    <script src="${basePath}admin/js/dashboard.js"></script>
+    <script src="${basePath}admin/js/index.js"></script>
     <script src="${basePath}admin/js/common.js"></script>
-    <script src="${basePath}admin/js/i18n.js"></script>
     <script>
         var _res = ${res};
-        initLang('${lang}');
     </script>
 </head>
 <body class="${webs.admin_dashboard_naver}">
@@ -89,10 +87,7 @@
                             </li>
                             <li>
                                 <a>
-                                    <i class="fa fa-list"></i>
-                                    <span class="menu-text">
-                                        ${_res['admin.more']}
-                                    </span>
+                                    <i class="fa fa-list"></i>${_res['admin.more']}
                                     <span class="fa fa-chevron-down"></span>
                                 </a>
                                 <ul class="nav child_menu">
@@ -233,11 +228,12 @@
                                 </li>
                             </ul>
                         </li>
-                        <li role="presentation">
+                        <li role="presentation" class="hidden-xs">
                             <a target="_blank" href="http://blog.zrlog.com/post/feedback"
                                class="dropdown-toggle info-number">
                                 <i class="fa fa-support"></i>&nbsp;${_res['suggestAndFeedback']}
                             </a>
+                        </li>
                     </ul>
                 </nav>
             </div>
@@ -248,7 +244,7 @@
         <footer>
             <strong>${_res.copyright} <a href="https://www.zrlog.com"> ZrLog . </a></strong>
             All rights reserved.
-            <div class="pull-right">
+            <div class="pull-right hidden-xs">
                 <strong>Version</strong> ${zrlog.version}
             </div>
         </footer>

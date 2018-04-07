@@ -6,6 +6,7 @@ import com.jfinal.core.JFinal;
 import com.jfinal.handler.Handler;
 import com.jfinal.kit.PathKit;
 import com.zrlog.common.Constants;
+import com.zrlog.service.AdminTokenThreadLocal;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.util.WebTools;
 import org.slf4j.Logger;
@@ -24,9 +25,9 @@ import java.util.Set;
 /**
  * 用于对静态文件的请求的检查，和静态化文章页，加快文章页的响应。
  */
-public class StaticResourceHandler extends Handler {
+public class GlobalResourceHandler extends Handler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(StaticResourceHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalResourceHandler.class);
     private static final String PAGE_END_TAG = "<none id='SP_" + System.currentTimeMillis() + "'></none>";
 
     //不希望部分技术人走后门，拦截一些不合法的请求
@@ -93,6 +94,8 @@ public class StaticResourceHandler extends Handler {
             }
         } catch (Exception e) {
             LOGGER.error("", e);
+        } finally {
+            AdminTokenThreadLocal.remove();
         }
     }
 

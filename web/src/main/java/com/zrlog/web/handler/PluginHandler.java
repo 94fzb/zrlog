@@ -3,7 +3,6 @@ package com.zrlog.web.handler;
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.http.HttpUtil;
 import com.hibegin.common.util.http.handle.CloseResponseHandle;
-import com.hibegin.common.util.http.handle.HttpHandle;
 import com.jfinal.core.JFinal;
 import com.jfinal.handler.Handler;
 import com.zrlog.common.Constants;
@@ -15,11 +14,9 @@ import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.log4j.Logger;
 
-import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -71,7 +68,6 @@ public class PluginHandler extends Handler {
                 }
             } finally {
                 isHandled[0] = true;
-                AdminTokenThreadLocal.remove();
             }
         } else {
             this.next.handle(target, request, response, isHandled);

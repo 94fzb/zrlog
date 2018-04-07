@@ -11,7 +11,7 @@
     ${_res['admin.index.welcomeTips']}
 </div>
 <div class="row">
-    <div class="col-md-7  col-sm-12">
+    <div class="col-md-7 col-xs-12 col-sm-12">
         <div class="widget-box">
             <div class="widget-header">
                 <h4>
@@ -89,7 +89,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-5 col-sm-12">
+    <div class="col-md-5 col-xs-12 col-sm-12">
         <div class="widget-box">
             <div class="widget-header">
                 <h4>

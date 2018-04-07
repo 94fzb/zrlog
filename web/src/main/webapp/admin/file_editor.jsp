@@ -77,7 +77,7 @@
         <div class="ln_solid"></div>
         <div class="col-md-offset-1">
             <button class="btn" type="button" id="saveFile" style="color: #fff;background-color: #5bc0de;border-color: #46b8da;">
-                <i class="fa fa-check bigger-110"></i> ${_res['submit']}
+                 ${_res['submit']}
             </button>
         </div>
     </form>
