@@ -5,7 +5,7 @@
     <c:when test="${log.canComment}">
         <c:choose>
             <c:when test="${init.webSite.changyan_status eq 'on'}">
-                <plugin src="/changyan/widget?articleId=${log.logId}"></plugin>
+                <plugin name="changyan" view="widget" param="articleId=${log.logId}"></plugin>
             </c:when>
             <c:otherwise>
                 <c:if test="${not empty log.comments}">

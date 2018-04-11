@@ -23,7 +23,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * 用于对静态文件的请求的检查，和静态化文章页，加快文章页的响应。
+ * 用于对静态文件的请求的检查，和静态化文章页，加快文章页的响应，压缩html文本，提供自定义插件标签的解析，静态资源文件的浏览器缓存问题
  */
 public class GlobalResourceHandler extends Handler {
 
@@ -52,11 +52,11 @@ public class GlobalResourceHandler extends Handler {
             }
         }
         try {
-            final TrimPrintWriter trimPrintWriter = new TrimPrintWriter(response.getOutputStream(), !JFinal.me().getConstants().getDevMode(), url, PAGE_END_TAG, request);
+            final ResponseRenderPrintWriter responseRenderPrintWriter = new ResponseRenderPrintWriter(response.getOutputStream(), !JFinal.me().getConstants().getDevMode(), url, PAGE_END_TAG, request);
             response = new HttpServletResponseWrapper(response) {
                 @Override
                 public PrintWriter getWriter() throws IOException {
-                    return trimPrintWriter;
+                    return responseRenderPrintWriter;
                 }
             };
             if (ext != null) {
@@ -73,7 +73,7 @@ public class GlobalResourceHandler extends Handler {
                                 response.getOutputStream().write(IOUtil.getByteByInputStream(new FileInputStream(htmlFile)));
                             } else {
                                 this.next.handle(target, request, response, isHandled);
-                                saveResponseBodyToHtml(htmlFile, trimPrintWriter.getResponseBody());
+                                saveResponseBodyToHtml(htmlFile, responseRenderPrintWriter.getResponseBody());
                             }
                         } else {
                             this.next.handle(target, request, response, isHandled);

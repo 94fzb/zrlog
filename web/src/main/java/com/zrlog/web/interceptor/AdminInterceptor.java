@@ -14,7 +14,6 @@ import com.zrlog.common.vo.AdminTokenVO;
 import com.zrlog.model.BaseDataInitVO;
 import com.zrlog.model.User;
 import com.zrlog.service.AdminTokenService;
-import com.zrlog.service.AdminTokenThreadLocal;
 import com.zrlog.service.CacheService;
 import com.zrlog.util.I18NUtil;
 import com.zrlog.web.annotation.RefreshCache;

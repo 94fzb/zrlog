@@ -5,7 +5,7 @@
         <c:choose>
             <c:when test="${init.webSite.changyan_status eq 'on'}">
                 <div id="cwrapper">
-                    <plugin src="/changyan/widget?articleId=${log.logId}"></plugin>
+                    <plugin name="changyan" view="widget" param="articleId=${log.logId}"></plugin>
                 </div>
             </c:when>
             <c:otherwise>

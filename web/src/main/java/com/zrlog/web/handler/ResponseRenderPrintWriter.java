@@ -4,7 +4,9 @@ import com.googlecode.htmlcompressor.compressor.HtmlCompressor;
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.http.handle.CloseResponseHandle;
 import com.zrlog.service.CacheService;
-import org.htmlcleaner.*;
+import org.htmlcleaner.HtmlCleaner;
+import org.htmlcleaner.SimpleHtmlSerializer;
+import org.htmlcleaner.TagNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,9 +19,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-class TrimPrintWriter extends PrintWriter {
+class ResponseRenderPrintWriter extends PrintWriter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TrimPrintWriter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResponseRenderPrintWriter.class);
 
     private final StringBuilder builder = new StringBuilder();
     private HtmlCompressor compressor = new HtmlCompressor();
@@ -38,7 +40,7 @@ class TrimPrintWriter extends PrintWriter {
         return str.trim().endsWith("</html>") || str.trim().endsWith(endFlag);
     }
 
-    TrimPrintWriter(OutputStream out, boolean compress, String baseUrl, String endFlag, HttpServletRequest request) {
+    ResponseRenderPrintWriter(OutputStream out, boolean compress, String baseUrl, String endFlag, HttpServletRequest request) {
         super(out);
         this.compress = compress;
         compressor.setRemoveIntertagSpaces(true);
@@ -109,7 +111,7 @@ class TrimPrintWriter extends PrintWriter {
                                     tag.setAttributes(tmp);
                                 }
                             }
-                            if ("plugin".equals(tagName) && tag.hasAttribute("src")) {
+                            if ("plugin".equals(tagName) && tag.hasAttribute("name")) {
                                 tag.setForeignMarkup(true);
                                 Map<String, String> tmp = new LinkedHashMap<>(tag.getAttributes());
                                 tmp.put("_tmp", System.currentTimeMillis() + "");
@@ -119,10 +121,14 @@ class TrimPrintWriter extends PrintWriter {
                                 tag.serialize(serializer, stringWriter);
                                 String content = stringWriter.toString();
                                 try {
-                                    CloseResponseHandle handle = PluginHandler.getContext(tag.getAttributeByName("src"), "GET", request, false);
+                                    String url = "/" + tag.getAttributeByName("name") + "/" + tag.getAttributeByName("view");
+                                    if (tag.hasAttribute("param")) {
+                                        url += "?" + tag.getAttributeByName("param");
+                                    }
+                                    CloseResponseHandle handle = PluginHandler.getContext(url, "GET", request, false);
                                     byte[] bytes = IOUtil.getByteByInputStream(handle.getT().getEntity().getContent());
                                     plugin.put(content, new String(bytes, "UTF-8"));
-                                } catch (InstantiationException e) {
+                                } catch (Exception e) {
                                     LOGGER.error("", e);
                                 }
                             }
