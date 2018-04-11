@@ -73,7 +73,7 @@
                     <div class="form-group">
                         <div class="col-md-offset-3 col-md-9">
                             <button id="baseMsg" type="button" class="btn btn-info">
-                                 ${_res['submit']}
+                                ${_res['submit']}
                             </button>
                         </div>
                     </div>
@@ -82,8 +82,7 @@
             </div>
             <div class="tab-pane col-md-6" id="other">
                 <h4 class="header blue">ICP，网站统计等信息</h4>
-                <form role="form" class="form-horizontal" checkBox="pseudo_static_status,article_thumbnail"
-                      id="otherMsgAjax">
+                <form role="form" class="form-horizontal" id="otherMsgAjax">
                     <div class="form-group">
                         <label class="col-md-3 control-label no-padding-right"> ICP备案信息 </label>
 
@@ -114,7 +113,7 @@
                     <div class="form-group">
                         <div class="col-md-offset-3 col-md-9">
                             <button id="otherMsg" type="button" class="btn btn-info">
-                                 ${_res['submit']}
+                                ${_res['submit']}
                             </button>
                         </div>
                     </div>
@@ -196,7 +195,7 @@
                     <div class="form-group">
                         <div class="col-md-offset-3 col-md-9">
                             <button id="blog" type="button" class="btn btn-info">
-                                 ${_res['submit']}
+                                ${_res['submit']}
                             </button>
                         </div>
                     </div>

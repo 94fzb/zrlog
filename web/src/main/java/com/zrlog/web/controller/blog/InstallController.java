@@ -23,18 +23,17 @@ public class InstallController extends Controller {
      */
     public void testDbConn() {
         Map<String, String> dbConn = new HashMap<>();
-        dbConn.put("jdbcUrl", "jdbc:mysql://" + getPara("dbhost") + ":"
-                + getPara("port") + "/" + getPara("dbname")
-                + "?&characterEncoding=UTF-8");
+        dbConn.put("jdbcUrl", "jdbc:mysql://" + getPara("dbhost") + ":" + getPara("port") + "/" + getPara("dbname")
+                + "?characterEncoding=UTF-8");
         dbConn.put("user", getPara("dbuser"));
         dbConn.put("password", getPara("dbpwd"));
         dbConn.put("driverClass", "com.mysql.jdbc.Driver");
-        JFinal.me().getServletContext().setAttribute("dbConn", dbConn);
         TestConnectDbResult testConnectDbResult = new InstallService(PathKit.getWebRootPath() + "/WEB-INF", dbConn).testDbConn();
         if (testConnectDbResult.getError() != 0) {
             setAttr("errorMsg", "[Error-" + testConnectDbResult.getError() + "] - " + I18NUtil.getStringFromRes("connectDbError_" + testConnectDbResult.getError()));
             index();
         } else {
+            JFinal.me().getServletContext().setAttribute("dbConn", dbConn);
             render("/install/message.jsp");
         }
     }
@@ -42,8 +41,7 @@ public class InstallController extends Controller {
     /**
      * 数据库检查通过后，根据填写信息，执行数据表，表数据的初始化
      */
-    public void installZrlog() {
-        String home = getRequest().getScheme() + "://" + getRequest().getHeader("host") + getRequest().getContextPath() + "/";
+    public void install() {
         Map<String, String> dbConn = (Map<String, String>) JFinal.me().getServletContext().getAttribute("dbConn");
         Map<String, String> configMsg = new HashMap<>();
         configMsg.put("title", getPara("title"));
@@ -51,7 +49,6 @@ public class InstallController extends Controller {
         configMsg.put("username", getPara("username"));
         configMsg.put("password", getPara("password"));
         configMsg.put("email", getPara("email"));
-        configMsg.put("home", home);
         if (new InstallService(PathKit.getWebRootPath() + "/WEB-INF", dbConn, configMsg).install()) {
             render("/install/success.jsp");
             ZrLogConfig config = (ZrLogConfig) JFinal.me().getServletContext().getAttribute("config");
