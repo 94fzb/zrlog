@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.sql.*;
 import java.util.*;
 import java.util.Date;
@@ -225,5 +227,16 @@ public class ZrLogUtil {
     public static boolean isBae() {
         String value = System.getenv("SERVER_SOFTWARE");
         return value != null && value.startsWith("bae");
+    }
+
+    public static boolean isInternalHostName(String name) {
+        InetAddress address;
+        try {
+            address = InetAddress.getByName(name);
+            return address.isSiteLocalAddress() || address.isLoopbackAddress();
+        } catch (UnknownHostException e) {
+            //ignore 可能没有网络. 认为不是内网地址
+            return false;
+        }
     }
 }

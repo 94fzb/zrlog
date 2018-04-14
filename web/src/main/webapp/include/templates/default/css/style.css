@@ -1256,6 +1256,7 @@ section h5, section h5 span {
 section p {
     margin-bottom: 1em;
     text-align: left;
+    word-wrap: break-word;
 }
 
 section p em {

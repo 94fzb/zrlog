@@ -2,6 +2,9 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="f" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%
+    request.setAttribute("previewDb", com.zrlog.web.config.ZrLogConfig.isPreviewDb());
+%>
 <!DOCTYPE html>
 <html lang="${lang}">
 <base href="${basePath}"/>
@@ -28,6 +31,13 @@
     </script>
 </head>
 <body class="${webs.admin_dashboard_naver}">
+<c:if test="${previewDb}">
+    <div class="container">
+        <div class="col-md-12 bg-red text-center">
+            <h3><i class="fa fa-warning"></i> ${_res['defaultDbTips']}</h3>
+        </div>
+    </div>
+</c:if>
 <div class="container body">
     <div class="main_container">
         <div class="col-md-3 left_col">

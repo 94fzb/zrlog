@@ -13,4 +13,14 @@ public class TestCommon {
         System.out.println("result = " + result);
         assert result;
     }
+
+    @Test
+    public void ipTest() {
+        assert ZrLogUtil.isInternalHostName("127.0.0.1");
+        assert ZrLogUtil.isInternalHostName("127.0.0.2");
+        assert ZrLogUtil.isInternalHostName("192.168.0.1");
+        assert ZrLogUtil.isInternalHostName("172.16.0.1");
+        assert ZrLogUtil.isInternalHostName("10.0.0.1");
+        assert !ZrLogUtil.isInternalHostName("www.baidu.com");
+    }
 }

@@ -46,6 +46,8 @@ import java.util.Random;
 public class ZrLogConfig extends JFinalConfig {
 
     private static final Logger LOGGER = Logger.getLogger(ZrLogConfig.class);
+    private static final String DEFAULT_PREVIEW_DB_HOST = "demo.blog.zrlog.com";
+    private static String jdbcUrl;
     //存放Zrlog的一些系统参数
     private Properties systemProperties = new Properties();
     private Properties dbProperties = new Properties();
@@ -177,6 +179,7 @@ public class ZrLogConfig extends JFinalConfig {
                 dbProperties.load(in);
                 tryDoUpgrade(getUpgradeSqlBasePath(), dbProperties.getProperty("jdbcUrl"), dbProperties.getProperty("user"),
                         dbProperties.getProperty("password"), dbProperties.getProperty("driverClass"));
+                jdbcUrl = dbProperties.getProperty("jdbcUrl");
 
                 // 启动时候进行数据库连接
                 C3p0Plugin dataSourcePlugin = new C3p0Plugin(dbProperties.getProperty("jdbcUrl"),
@@ -343,5 +346,9 @@ public class ZrLogConfig extends JFinalConfig {
 
     public static boolean isTest() {
         return "junit-test".equals(systemProp.getProperty("env"));
+    }
+
+    public static boolean isPreviewDb() {
+        return jdbcUrl != null && jdbcUrl.contains(DEFAULT_PREVIEW_DB_HOST) && !ZrLogUtil.isInternalHostName(DEFAULT_PREVIEW_DB_HOST);
     }
 }
