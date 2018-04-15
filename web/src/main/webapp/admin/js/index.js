@@ -151,6 +151,11 @@ $(function () {
         });
         return false;
     });
+
+    route(function (path) {
+        loadPage(path);
+    });
+    route.start(true);
 });
 
 function loadHTML(url, id) {
@@ -193,6 +198,7 @@ function clear(path) {
     }
     $("body").find(".tooltip").remove();
     $("body").find(".ui-widget").remove();
+    $("body").find(".ui-pnotify").remove();
 }
 
 function loadPage(path) {
@@ -223,11 +229,6 @@ function reloadPage() {
         loadPage(window.location.hash.substr(1));
     }
 }
-
-route(function (path) {
-    loadPage(path);
-});
-route.start(true);
 $(".js-switch").each(function (e) {
     new Switchery(e.get(0))
 });

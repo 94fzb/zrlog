@@ -16,9 +16,6 @@
     <link rel="shortcut icon" href="${basePath}favicon.ico"/>
     <link href="${basePath}assets/css/bootstrap.min.css" rel="stylesheet"/>
     <link href="${basePath}assets/css/font-awesome.min.css" rel="stylesheet"/>
-    <link href="${basePath}assets/css/nprogress.css" rel="stylesheet"/>
-    <link href="${basePath}assets/css/select2.min.css" rel="stylesheet"/>
-    <link href="${basePath}assets/css/switchery.min.css" rel="stylesheet"/>
     <link href="${basePath}assets/css/pnotify.css" rel="stylesheet"/>
     <link href="${basePath}assets/css/custom.min.css" rel="stylesheet"/>
     <link href="${basePath}assets/css/custom.colorful.css" rel="stylesheet"/>

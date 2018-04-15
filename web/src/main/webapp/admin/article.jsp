@@ -7,7 +7,6 @@
 
     }
 %>
-<link rel="stylesheet" href="${basePath}assets/css/ui.jqgrid.css"/>
 <script src="${basePath}assets/js/jqGrid/jquery.jqGrid.min.js"></script>
 <script src="${basePath}assets/js/jqGrid/i18n/grid.locale-${lang}.js"></script>
 <script src="${basePath}admin/js/jqgrid_common.js"></script>

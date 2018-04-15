@@ -18,20 +18,26 @@ public class AdminPageController extends BaseController {
     public String index() {
         if (AdminTokenThreadLocal.getUser() != null) {
             JFinal.me().getServletContext().setAttribute("noReadComments", Comment.dao.findHaveReadIsFalse());
-            JFinal.me().getServletContext().setAttribute("commCount", Comment.dao.count());
-            JFinal.me().getServletContext().setAttribute("toDayCommCount", Comment.dao.countToDayComment());
-            JFinal.me().getServletContext().setAttribute("clickCount", Log.dao.sumAllClick());
-            JFinal.me().getServletContext().setAttribute("articleCount", Log.dao.adminCount());
             JFinal.me().getServletContext().setAttribute("lastVersion", new UpgradeController().lastVersion());
             if (getPara(0) == null || getRequest().getRequestURI().endsWith("admin/") || "login".equals(getPara(0))) {
                 redirect(Constants.ADMIN_INDEX);
                 return null;
             } else {
+                if ("dashboard".equals(getPara(0))) {
+                    fillStatistics();
+                }
                 return "/admin/" + getPara(0);
             }
         } else {
             return "/admin/login";
         }
+    }
+
+    private void fillStatistics() {
+        JFinal.me().getServletContext().setAttribute("commCount", Comment.dao.count());
+        JFinal.me().getServletContext().setAttribute("toDayCommCount", Comment.dao.countToDayComment());
+        JFinal.me().getServletContext().setAttribute("clickCount", Log.dao.sumAllClick());
+        JFinal.me().getServletContext().setAttribute("articleCount", Log.dao.adminCount());
     }
 
     public String login() {
