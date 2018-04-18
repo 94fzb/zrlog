@@ -42,6 +42,9 @@
         position: relative;
         width: 100%;
     }
+    #preview-link {
+        color: #314659;
+    }
 </style>
 <c:if test="${1 ne webSite['article_thumbnail_status']}">
     <div class="page-header">

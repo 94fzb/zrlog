@@ -53,7 +53,6 @@ jQuery(function ($) {
                 enableTooltips(table);
             }, 0);
         },
-        caption: _res['admin.nav.manage'],
         height: 421,
 
         autowidth: true

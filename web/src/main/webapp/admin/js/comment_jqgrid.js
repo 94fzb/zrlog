@@ -67,7 +67,6 @@ $(function ($) {
                 enableTooltips(table);
             }, 0);
         },
-        caption: _res['admin.comment.manage'],
         height: 421,
         autowidth: true
 

@@ -20,7 +20,6 @@ $(function () {
                 enableTooltips(table);
             }, 0);
         },
-        caption: _res['admin.tag.manage'],
         height: 422,
         autowidth: true
     });

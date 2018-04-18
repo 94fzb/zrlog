@@ -64,7 +64,6 @@ jQuery(function ($) {
                 enableTooltips(table);
             }, 0);
         },
-        caption: _res['admin.type.manage'],
         height: 421,
 
         autowidth: true

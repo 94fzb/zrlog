@@ -31,7 +31,7 @@
     <div class="row">
         <div class="tab-content">
             <div class="tab-pane in active col-md-6 col-xs-12 col-sm-12" id="basic">
-                <h4 class="header blue">认真输入，有助于网站被收录</h4>
+                <h4 class="header">认真输入，有助于网站被收录</h4>
                 <form role="form" class="form-horizontal" id="baseMsgAjax">
                     <div class="form-group">
                         <label class="col-md-3 control-label no-padding-right"> 网站标题 </label>
@@ -81,7 +81,7 @@
                 </form>
             </div>
             <div class="tab-pane col-md-6" id="other">
-                <h4 class="header blue">ICP，网站统计等信息</h4>
+                <h4 class="header">ICP，网站统计等信息</h4>
                 <form role="form" class="form-horizontal" id="otherMsgAjax">
                     <div class="form-group">
                         <label class="col-md-3 control-label no-padding-right"> ICP备案信息 </label>
@@ -126,7 +126,7 @@
                 </div>
             </div>
             <div class="tab-pane col-md-6" id="blogTab" style="padding: 10px">
-                <h4 class="header blue">博客设置</h4>
+                <h4 class="header">博客设置</h4>
                 <form role="form" class="form-horizontal" id="blogAjax" data-toggle="validator">
                     <div class="form-group">
                         <label class="col-md-3 control-label no-padding-right">会话过期时间（分钟）</label>

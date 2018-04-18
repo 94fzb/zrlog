@@ -7,8 +7,8 @@
     </h3>
 </div>
 <div class="alert alert-block alert-info">
-    <i class="fa fa-info">&nbsp;</i>
-    ${_res['admin.index.welcomeTips']}
+    <i class="fa fa-info"></i>
+    <span style="padding-left: 5px">${_res['admin.index.welcomeTips']}</span>
 </div>
 <div class="row">
     <div class="col-md-7 col-xs-12 col-sm-12">

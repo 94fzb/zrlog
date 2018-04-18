@@ -30,8 +30,8 @@
 <body class="${webs.admin_dashboard_naver}">
 <c:if test="${previewDb}">
     <div class="container">
-        <div class="col-md-12 bg-red text-center">
-            <h3><i class="fa fa-warning"></i> ${_res['defaultDbTips']}</h3>
+        <div class="col-md-12 bg-info text-center">
+            <h3 style="color: red"><i class="fa fa-warning"></i> ${_res['defaultDbTips']}</h3>
         </div>
     </div>
 </c:if>
@@ -238,18 +238,18 @@
                         <li role="presentation" class="hidden-xs">
                             <a target="_blank" href="http://blog.zrlog.com/post/feedback"
                                class="dropdown-toggle info-number">
-                                <i class="fa fa-support"></i>&nbsp;${_res['suggestAndFeedback']}
+                                <i class="fa fa-support"></i><span style="padding-left: 5px">${_res['suggestAndFeedback']}</span>
                             </a>
                         </li>
                     </ul>
                 </nav>
             </div>
         </div>
-        <div class="right_col" id="right_col" role="main" style="min-height: 1080px">
+        <div class="right_col" id="right_col" role="main" style="min-height: 1440px">
             <div style="min-height: 600px"></div>
         </div>
         <footer>
-            <strong>${_res.copyright} <a href="https://www.zrlog.com"> ZrLog . </a></strong>
+            <strong>${_res.copyright} <a href="https://www.zrlog.com" target="_blank" rel="noopener"> ZrLog . </a></strong>
             All rights reserved.
             <div class="pull-right hidden-xs">
                 <strong>Version</strong> ${zrlog.version}

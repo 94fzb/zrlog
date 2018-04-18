@@ -3,6 +3,11 @@
 <script src="${basePath}assets/js/switchery.min.js"></script>
 <script src="${basePath}assets/js/jquery.smartWizard.js"></script>
 <script src="${basePath}admin/js/do_upgrade.js"></script>
+<style>
+    a.btn-primary {
+         color: #fff;
+    }
+</style>
 <div class="page-header">
     <h3>
         ${_res['upgradeWizard']}

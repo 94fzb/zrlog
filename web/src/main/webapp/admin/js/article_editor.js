@@ -207,7 +207,7 @@ $(function () {
     function save(rubbish, timer) {
         //如果是还在保存文章状态，跳过保存
         if (saving) {
-            notify(lang.saving, "warn");
+            notify({"message": lang.saving}, "warn");
             return;
         }
         refreshKeywords();

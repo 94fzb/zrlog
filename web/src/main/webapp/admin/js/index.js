@@ -98,6 +98,7 @@ var allLang = {
     }
 };
 var lang = allLang[document.getElementsByTagName("html")[0]["lang"]];
+var mainColor = "#1890ff";
 
 $(function () {
     $('#menu_toggle').on('click', function () {
@@ -160,11 +161,15 @@ $(function () {
 
 function loadHTML(url, id) {
     $.ajaxSetup({'cache': true});
-    $("#" + id).load(url, function (e) {
+    $("#" + id).load(url, function (responseText, textStatus, req) {
         NProgress.done();
-        $(".js-switch").each(function (e) {
-            new Switchery($(".js-switch").get(e), {color: "#26B99A"})
-        })
+        if (textStatus === "error") {
+            return $("#" + id).html(formatErrorMessage(req, textStatus));
+        } else {
+            $(".js-switch").each(function (e) {
+                new Switchery($(".js-switch").get(e), {color: mainColor})
+            })
+        }
     });
     after();
 }
@@ -229,6 +234,7 @@ function reloadPage() {
         loadPage(window.location.hash.substr(1));
     }
 }
+
 $(".js-switch").each(function (e) {
     new Switchery(e.get(0))
 });

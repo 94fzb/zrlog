@@ -45,7 +45,6 @@ jQuery(function ($) {
                 enableTooltips(table);
             }, 0);
         },
-        caption: _res.blogManage,
         height: 421,
         autowidth: true
     });
