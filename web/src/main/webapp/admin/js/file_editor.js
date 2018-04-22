@@ -13,13 +13,21 @@ $(function () {
             notify(data);
         });
     });
-    if ($("#form-field-select-6 option").length > 0) {
-        $("#form-field-select-6").children('option:first').attr("selected", "selected");
-        loadFile($("#form-field-select-6").children('option:selected').val());
-    }
-    $("#form-field-select-6").change(function () {
-        loadFile($(this).children('option:selected').val());
+    $.get("api/admin/template/files?path=" + path, function (e) {
+        var files = e.files;
+        var selectEl = "#form-field-select-6";
+        for (var i = 0; i < files.length; i++) {
+            $("<option></option>").text(files[i]).val(files[i]).appendTo($(selectEl));
+        }
+        if ($(selectEl + " option").length > 0) {
+            $(selectEl).children('option:first').attr("selected", "selected");
+            loadFile($(selectEl).children('option:selected').val());
+        }
+        $(selectEl).change(function () {
+            loadFile($(this).children('option:selected').val());
+        });
     });
+
 
     function loadFile(file) {
         var path = $("#basePath").val() + file;

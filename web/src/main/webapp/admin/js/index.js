@@ -45,7 +45,8 @@ var allLang = {
         "newVersion": "新版本",
         "updateSuccess": "更新成功",
         "updateError": "发生了一些异常",
-        "deleteError": "删除失败"
+        "deleteError": "删除失败",
+        "close": "关闭"
     },
     "en": {
         "title": "Title",
@@ -93,7 +94,8 @@ var allLang = {
         "newVersion": "New version",
         "updateSuccess": "Update success",
         "updateError": "Some error",
-        "deleteError": "Delete error"
+        "deleteError": "Delete error",
+        "close": "Close"
 
     }
 };
@@ -157,6 +159,32 @@ $(function () {
         loadPage(path);
     });
     route.start(true);
+
+    var lastClick = new Date();
+    var i = 0;
+    $(".nav_menu").click(function (e) {
+        egg(1, e);
+    }).dblclick(function (e) {
+        egg(2, e);
+    });
+
+    function egg(plus, e) {
+        if ($(e.target).attr("id") === 'nav_menu' && new Date().getTime() - lastClick.getTime() < 1000) {
+            if (i >= 3) {
+                $.get("api/admin/website/version", function (e) {
+                    e.message = e['changelog'];
+                    $("#info-title").text(e.version + " - " + e.buildId);
+                    $("#info-body").html(e.changelog);
+                    $("#closeBtn").text(lang.close);
+                    $("#info").modal('show');
+                    i = 0;
+                });
+            } else {
+                i += plus;
+            }
+        }
+        lastClick = new Date();
+    }
 });
 
 function loadHTML(url, id) {

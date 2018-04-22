@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.hibegin.common.util.FileUtils;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.common.util.ZipUtil;
+import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
 import com.zrlog.common.Constants;
 import com.zrlog.common.response.UpdateRecordResponse;
@@ -112,5 +113,41 @@ public class TemplateService {
         templateVO.setConfigAble(settingFile.exists());
         templateVO.setTemplate(templatePath);
         return templateVO;
+    }
+
+    /**
+     * 根据文件后缀 查找符合要求文件列表
+     *
+     * @param path
+     * @param prefix
+     */
+    private static void fillFileInfo(String path, List<String> fileList, String... prefix) {
+        File[] files = new File(path).listFiles();
+
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory() && new File(file.getAbsolutePath()).listFiles() != null) {
+                    fillFileInfo(file.getAbsolutePath(), fileList, prefix);
+                } else {
+                    for (String pre : prefix) {
+                        if (file.getAbsoluteFile().toString().endsWith(pre)) {
+                            fileList.add(file.getAbsoluteFile().toString());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public List<String> getFiles(String path) {
+        List<String> fileList = new ArrayList<>();
+        fillFileInfo(PathKit.getWebRootPath() + path, fileList, ".jsp", ".js", ".css", ".html");
+        String webPath = JFinal.me().getServletContext().getRealPath("/");
+        List<String> strFile = new ArrayList<>();
+        for (String aFileList : fileList) {
+            strFile.add(aFileList.substring(webPath.length() - 1 + path.length()).replace('\\', '/'));
+        }
+        //使用字典序
+        return new ArrayList<>(new TreeSet<>(strFile));
     }
 }

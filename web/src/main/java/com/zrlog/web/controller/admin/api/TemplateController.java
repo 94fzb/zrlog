@@ -63,6 +63,12 @@ public class TemplateController extends BaseController {
         return templateService.upload(templateName, getFile(uploadFieldName).getFile());
     }
 
+    public ListFileResponse files() {
+        ListFileResponse listFileResponse = new ListFileResponse();
+        listFileResponse.setFiles(templateService.getFiles(getPara("path")));
+        return listFileResponse;
+    }
+
     /**
      * @return
      * @deprecated 主题设置建议直接使用config方法

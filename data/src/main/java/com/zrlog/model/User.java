@@ -19,10 +19,10 @@ public class User extends Model<User> {
         return null;
     }
 
-    public Integer getIdByUserName(String userName) {
+    public User getIdByUserName(String userName) {
         User user = findFirst("select * from " + TABLE_NAME + " where username=?", userName);
         if (user != null) {
-            return user.getInt("userId");
+            return user;
         }
         return null;
     }

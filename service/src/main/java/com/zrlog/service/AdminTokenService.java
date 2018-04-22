@@ -8,7 +8,6 @@ import com.jfinal.core.JFinal;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.AdminTokenVO;
 import com.zrlog.model.User;
-import com.zrlog.model.WebSite;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 
@@ -19,6 +18,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
+import java.util.AbstractMap;
+import java.util.Map;
 
 public class AdminTokenService {
 
@@ -55,7 +56,7 @@ public class AdminTokenService {
         return cipher.doFinal(encrypted);
     }
 
-    public AdminTokenVO getAdminToken(HttpServletRequest request) {
+    public Map.Entry<AdminTokenVO, User> getAdminTokenVOUserEntry(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             String decTokenString = null;
@@ -72,8 +73,8 @@ public class AdminTokenService {
                         byte[] adminTokenEncryptAfter = ByteUtils.hexString2Bytes(decTokenString.substring(decTokenString.indexOf(TOKEN_SPLIT_CHAR) + 1, decTokenString.length()));
                         String base64Encode = new String(decrypt(user.getStr("secretKey"), Base64.decodeBase64(adminTokenEncryptAfter)));
                         AdminTokenVO adminTokenVO = new Gson().fromJson(base64Encode, AdminTokenVO.class);
-                        if (adminTokenVO.getCreatedDate() + getSessionTimeout() > System.currentTimeMillis()) {
-                            return adminTokenVO;
+                        if (adminTokenVO.getCreatedDate() + Constants.getSessionTimeout() > System.currentTimeMillis()) {
+                            return new AbstractMap.SimpleEntry<>(adminTokenVO, user);
                         }
                     } else {
                         return null;
@@ -86,9 +87,7 @@ public class AdminTokenService {
         return null;
     }
 
-    public void setAdminToken(int userId, int sessionId, HttpServletRequest request, HttpServletResponse response) {
-        User user = User.dao.findById(userId);
-        long sessionTimeout = getSessionTimeout();
+    public void setAdminToken(User user, int sessionId, HttpServletRequest request, HttpServletResponse response) {
         AdminTokenVO adminTokenVO = new AdminTokenVO();
         adminTokenVO.setUserId(user.getInt("userId"));
         adminTokenVO.setSessionId(sessionId);
@@ -101,28 +100,13 @@ public class AdminTokenService {
             String encryptAfterString = ByteUtils.bytesToHexString(base64Bytes);
             String finalTokenString = adminTokenVO.getUserId() + TOKEN_SPLIT_CHAR + encryptAfterString;
             Cookie cookie = new Cookie(Constants.ADMIN_TOKEN, finalTokenString);
-            cookie.setMaxAge((int) (sessionTimeout / 1000));
+            cookie.setMaxAge((int) (Constants.getSessionTimeout() / 1000));
             setCookieDomain(request, cookie);
             cookie.setPath("/");
             response.addCookie(cookie);
         } catch (Exception e) {
             LOGGER.error("", e);
         }
-    }
-
-    public Long getSessionTimeout() {
-        String sessionTimeoutString = WebSite.dao.getStringValueByName(Constants.SESSION_TIMEOUT_KEY);
-        Long sessionTimeout;
-        if (!StringUtils.isEmpty(sessionTimeoutString)) {
-            //*60， Cookie过期时间单位为分钟
-            sessionTimeout = Long.valueOf(sessionTimeoutString) * 60 * 1000;
-            if (sessionTimeout <= 0) {
-                sessionTimeout = Constants.DEFAULT_SESSION_TIMEOUT;
-            }
-        } else {
-            sessionTimeout = Constants.DEFAULT_SESSION_TIMEOUT;
-        }
-        return sessionTimeout;
     }
 
     private String getDomain(HttpServletRequest request) {

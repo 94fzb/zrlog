@@ -31,6 +31,10 @@ public class I18NUtil {
         loadI18N(I18NUtil.class.getResourceAsStream("/i18n_zh_CN.properties"), "i18n_zh_CN.properties");
     }
 
+    public static void removeI18n() {
+        threadLocal.remove();
+    }
+
     private static void loadI18N(InputStream inputStream, String name) {
         if (name.startsWith(Constants.I18N) && name.endsWith(".properties")) {
             String key = name.replace(".properties", "");
@@ -57,62 +61,64 @@ public class I18NUtil {
         }
     }
 
-    public static void addToRequest(String path, HttpServletRequest request, boolean devMode) {
-        if (devMode) {
-            reloadSystemI18N();
-        }
-        File[] propertiesFiles = new File(path).listFiles();
-        if (propertiesFiles != null) {
-            for (File propertiesFile : propertiesFiles) {
-                try {
-                    loadI18N(new FileInputStream(propertiesFile), propertiesFile.getName());
-                } catch (FileNotFoundException e) {
-                    //ignore
+    public static void addToRequest(String path, HttpServletRequest request, boolean devMode, boolean reload) {
+        if (threadLocal.get() == null || reload) {
+            if (devMode) {
+                reloadSystemI18N();
+            }
+            File[] propertiesFiles = new File(path).listFiles();
+            if (propertiesFiles != null) {
+                for (File propertiesFile : propertiesFiles) {
+                    try {
+                        loadI18N(new FileInputStream(propertiesFile), propertiesFile.getName());
+                    } catch (FileNotFoundException e) {
+                        //ignore
+                    }
                 }
             }
-        }
-        String i18nFile;
-        String locale = null;
-        if (request.getAttribute(I18N_FILE_NAME) != null) {
-            i18nFile = request.getAttribute(I18N_FILE_NAME).toString();
-        } else {
-            //try get locale info for HTTP header
-            if (request.getRequestURI().contains("/admin")) {
-                Map<String, Object> webSite = Constants.webSite;
-                if (webSite != null && webSite.get("language") != null) {
-                    String tmpLocale = (String) webSite.get("language");
-                    locale = I18N_RES_MAP.get(Constants.I18N + "_" + tmpLocale) != null ? tmpLocale : null;
-                }
+            String i18nFile;
+            String locale = null;
+            if (request.getAttribute(I18N_FILE_NAME) != null) {
+                i18nFile = request.getAttribute(I18N_FILE_NAME).toString();
             } else {
-                if (request.getHeader("Accept-Language") != null) {
-                    String tmpLocale = request.getHeader("Accept-Language").split(";")[0].replace("-", "_").split(",")[0];
-                    locale = I18N_RES_MAP.get(Constants.I18N + "_" + tmpLocale) != null ? tmpLocale : null;
+                //try get locale info for HTTP header
+                if (request.getRequestURI().contains("/admin")) {
+                    Map<String, Object> webSite = Constants.webSite;
+                    if (webSite.get("language") != null) {
+                        String tmpLocale = (String) webSite.get("language");
+                        locale = I18N_RES_MAP.get(Constants.I18N + "_" + tmpLocale) != null ? tmpLocale : null;
+                    }
+                } else {
+                    if (request.getHeader("Accept-Language") != null) {
+                        String tmpLocale = request.getHeader("Accept-Language").split(";")[0].replace("-", "_").split(",")[0];
+                        locale = I18N_RES_MAP.get(Constants.I18N + "_" + tmpLocale) != null ? tmpLocale : null;
+                    }
                 }
-            }
 
-            if (locale == null) {
-                locale = "zh_CN";
+                if (locale == null) {
+                    locale = "zh_CN";
+                }
+                request.setAttribute("local", locale);
+                if (locale.contains("_")) {
+                    request.setAttribute("lang", locale.substring(0, locale.indexOf('_')));
+                }
+                i18nFile = Constants.I18N + "_" + locale;
+                request.setAttribute(I18N_FILE_NAME, i18nFile);
             }
-            request.setAttribute("local", locale);
-            if (locale.contains("_")) {
-                request.setAttribute("lang", locale.substring(0, locale.indexOf('_')));
-            }
-            i18nFile = Constants.I18N + "_" + locale;
-            request.setAttribute(I18N_FILE_NAME, i18nFile);
-        }
-        Map<String, Object> i18nMap = I18N_RES_MAP.get(i18nFile);
-        if (StringUtils.isNotEmpty(locale) && !locale.startsWith("zh")) {
-            Map<String, Object> zhI18nMap = I18N_RES_MAP.get(Constants.I18N + "_" + "zh_CN");
-            for (Map.Entry<String, Object> entry : zhI18nMap.entrySet()) {
-                if (!i18nMap.containsKey(entry.getKey())) {
-                    i18nMap.put(entry.getKey(), entry.getValue());
+            Map<String, Object> i18nMap = I18N_RES_MAP.get(i18nFile);
+            if (StringUtils.isNotEmpty(locale) && !locale.startsWith("zh")) {
+                Map<String, Object> zhI18nMap = I18N_RES_MAP.get(Constants.I18N + "_" + "zh_CN");
+                for (Map.Entry<String, Object> entry : zhI18nMap.entrySet()) {
+                    if (!i18nMap.containsKey(entry.getKey())) {
+                        i18nMap.put(entry.getKey(), entry.getValue());
+                    }
                 }
             }
+            i18nMap.put("_locale", locale);
+            request.setAttribute("_res", i18nMap);
+            request.setAttribute("res", new Gson().toJson(i18nMap));
+            threadLocal.set(i18nMap);
         }
-        i18nMap.put("_locale", locale);
-        request.setAttribute("_res", i18nMap);
-        request.setAttribute("res", new Gson().toJson(i18nMap));
-        threadLocal.set(i18nMap);
     }
 
     public static String getStringFromRes(String key) {
@@ -128,7 +134,7 @@ public class I18NUtil {
         if (threadLocal.get() != null) {
             locale = (String) threadLocal.get().get("_locale");
         } else {
-            if (Constants.webSite != null && Constants.webSite.get("language") != null) {
+            if (Constants.webSite.get("language") != null) {
                 locale = (String) Constants.webSite.get("language");
             }
         }

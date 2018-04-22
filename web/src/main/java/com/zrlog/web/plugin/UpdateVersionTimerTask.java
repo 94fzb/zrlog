@@ -5,7 +5,6 @@ import com.hibegin.common.util.http.HttpUtil;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.Version;
 import com.zrlog.util.BlogBuildInfoUtil;
-import com.zrlog.util.I18NUtil;
 import com.zrlog.util.ZrLogUtil;
 import org.apache.log4j.Logger;
 
@@ -66,9 +65,7 @@ class UpdateVersionTimerTask extends TimerTask {
         String txtContent = HttpUtil.getInstance().getTextByUrl(versionUrl + "?_" + System.currentTimeMillis() + "&v=" + BlogBuildInfoUtil.getBuildId()).trim();
         Version tLastVersion = new Gson().fromJson(txtContent, Version.class);
         //手动设置对应ChangeLog
-        tLastVersion.setChangeLog(HttpUtil.getInstance().getSuccessTextByUrl("http://www.zrlog.com/changelog/" +
-                tLastVersion.getVersion() + "-" + tLastVersion.getBuildId() + ".html?lang=" +
-                I18NUtil.getCurrentLocale() + "&v=" + BlogBuildInfoUtil.getBuildId()));
+        tLastVersion.setChangeLog(UpdateVersionPlugin.getChangeLog(tLastVersion.getVersion(), tLastVersion.getBuildId()));
         return tLastVersion;
     }
 

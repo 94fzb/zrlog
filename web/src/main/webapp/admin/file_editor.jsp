@@ -1,13 +1,12 @@
-<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page session="false" pageEncoding="UTF-8" %>
 <%
-    String scheme = com.zrlog.web.util.WebTools.getRealScheme(request);
-    request.setAttribute("url", scheme + "://" + request.getHeader("host") + request.getContextPath());
     if ("template".equals(request.getParameter("editType"))) {
         request.setAttribute("tips", "主题编辑建议仅用于临时变更");
     }
-    request.setAttribute("filePaths", com.zrlog.web.interceptor.TemplateHelper.getFiles(request.getParameter("path")));
 %>
+<script>
+    var path = '${param['path']}';
+</script>
 <link rel="stylesheet" href="${basePath}admin/markdown/lib/codemirror/codemirror.min.css"/>
 <link rel="stylesheet" href="${basePath}admin/markdown/lib/codemirror/addon/dialog/dialog.css"/>
 <link rel="stylesheet" href="${basePath}admin/markdown/lib/codemirror/addon/search/matchesonscrollbar.css"/>
@@ -64,11 +63,7 @@
                     <textarea id="code"></textarea>
                 </div>
                 <div class="col-md-2">
-                    <select multiple style="height: 600px" id="form-field-select-6"
-                            class="form-control">
-                        <c:forEach var="filePath" items="${filePaths}">
-                            <option value="${filePath}">${filePath}</option>
-                        </c:forEach>
+                    <select multiple style="height: 600px" id="form-field-select-6" class="form-control">
                     </select>
                 </div>
             </div>

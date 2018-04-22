@@ -6,6 +6,7 @@ import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.annotation.RefreshCache;
 import com.zrlog.web.controller.BaseController;
+import com.zrlog.web.plugin.UpdateVersionPlugin;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +30,7 @@ public class WebSiteController extends BaseController {
         Map<String, Object> map = new HashMap<>();
         map.put("version", BlogBuildInfoUtil.getVersion());
         map.put("buildId", BlogBuildInfoUtil.getBuildId());
+        map.put("changelog", UpdateVersionPlugin.getChangeLog(BlogBuildInfoUtil.getVersion(), BlogBuildInfoUtil.getBuildId()));
         return map;
     }
 }

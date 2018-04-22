@@ -90,6 +90,10 @@ public class UpgradeController extends BaseController {
                 }
             }
         }
+        if (checkVersionResponse.getVersion() != null) {
+            //不在页面展示SNAPSHOT
+            checkVersionResponse.getVersion().setVersion(checkVersionResponse.getVersion().getVersion().replaceAll("-SNAPSHOT", ""));
+        }
         return checkVersionResponse;
     }
 
@@ -105,7 +109,7 @@ public class UpgradeController extends BaseController {
             int sessionId = AdminTokenThreadLocal.getUser().getSessionId();
             UpdateVersionThread updateVersionThread = updateVersionThreadMap.get(sessionId);
             if (updateVersionThread == null) {
-                if (file.exists()) {
+                if (handle.isMatch()) {
                     updateVersionThread = new UpdateVersionThread(file);
                     updateVersionThreadMap.put(AdminTokenThreadLocal.getUser().getSessionId(), updateVersionThread);
                     PluginCoreProcess.getInstance().stopPluginCore();

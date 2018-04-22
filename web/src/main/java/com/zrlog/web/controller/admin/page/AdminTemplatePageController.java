@@ -37,7 +37,7 @@ public class AdminTemplatePageController extends BaseController {
             setAttr("include", templateName + "/setting/index");
             setAttr("template", templateName);
             setAttr("templateInfo", templateService.getTemplateVO(JFinal.me().getContextPath(), file.getParentFile().getParentFile()));
-            I18NUtil.addToRequest(PathKit.getWebRootPath() + templateName + "/language/", getRequest(), JFinal.me().getConstants().getDevMode());
+            I18NUtil.addToRequest(PathKit.getWebRootPath() + templateName + "/language/", getRequest(), JFinal.me().getConstants().getDevMode(), true);
             String jsonStr = new WebSite().getStringValueByName(templateName + Constants.TEMPLATE_CONFIG_SUFFIX);
             fullTemplateSetting(jsonStr);
             return "/admin/template_config";

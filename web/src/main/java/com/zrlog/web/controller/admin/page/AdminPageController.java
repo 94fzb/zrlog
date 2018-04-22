@@ -20,10 +20,6 @@ public class AdminPageController extends BaseController {
         if (AdminTokenThreadLocal.getUser() != null) {
             JFinal.me().getServletContext().setAttribute("noReadComments", Comment.dao.findHaveReadIsFalse());
             CheckVersionResponse response = new UpgradeController().lastVersion();
-            if (response != null && response.getVersion() != null) {
-                //不在页面展示SNAPSHOT
-                response.getVersion().setVersion(response.getVersion().getVersion().replaceAll("-SNAPSHOT", ""));
-            }
             JFinal.me().getServletContext().setAttribute("lastVersion", response);
             if (getPara(0) == null || getRequest().getRequestURI().endsWith("admin/") || "login".equals(getPara(0))) {
                 redirect(Constants.ADMIN_INDEX);
@@ -42,7 +38,7 @@ public class AdminPageController extends BaseController {
     private void fillStatistics() {
         JFinal.me().getServletContext().setAttribute("commCount", Comment.dao.count());
         JFinal.me().getServletContext().setAttribute("toDayCommCount", Comment.dao.countToDayComment());
-        JFinal.me().getServletContext().setAttribute("clickCount", Log.dao.sumAllClick());
+        JFinal.me().getServletContext().setAttribute("clickCount", Log.dao.sumClick());
         JFinal.me().getServletContext().setAttribute("articleCount", Log.dao.adminCount());
     }
 
@@ -60,12 +56,12 @@ public class AdminPageController extends BaseController {
         for (Cookie cookie : cookies) {
             if ("zId".equals(cookie.getName())) {
                 cookie.setValue("");
-                cookie.setMaxAge(adminTokenService.getSessionTimeout().intValue());
+                cookie.setMaxAge(Constants.getSessionTimeout().intValue());
                 getResponse().addCookie(cookie);
             }
             if (Constants.ADMIN_TOKEN.equals(cookie.getName())) {
                 cookie.setValue("");
-                cookie.setMaxAge(adminTokenService.getSessionTimeout().intValue());
+                cookie.setMaxAge(Constants.getSessionTimeout().intValue());
                 cookie.setPath("/");
                 adminTokenService.setCookieDomain(getRequest(), cookie);
                 getResponse().addCookie(cookie);

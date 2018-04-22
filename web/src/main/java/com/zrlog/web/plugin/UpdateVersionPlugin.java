@@ -1,12 +1,16 @@
 package com.zrlog.web.plugin;
 
+import com.hibegin.common.util.http.HttpUtil;
 import com.jfinal.plugin.IPlugin;
 import com.zrlog.common.Constants;
 import com.zrlog.common.type.AutoUpgradeVersionType;
 import com.zrlog.common.vo.Version;
 import com.zrlog.model.WebSite;
+import com.zrlog.util.BlogBuildInfoUtil;
+import com.zrlog.util.I18NUtil;
 import org.apache.log4j.Logger;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.Timer;
 
@@ -71,5 +75,17 @@ public class UpdateVersionPlugin implements IPlugin {
             }
         }
         return updateVersionTimerTask.getVersion();
+    }
+
+
+    public static String getChangeLog(String version, String buildId) {
+        try {
+            return HttpUtil.getInstance().getSuccessTextByUrl("http://www.zrlog.com/changelog/" +
+                    version + "-" + buildId + ".html?lang=" +
+                    I18NUtil.getCurrentLocale() + "&v=" + BlogBuildInfoUtil.getBuildId());
+        } catch (IOException e) {
+            LOGGER.error("", e);
+        }
+        return "";
     }
 }

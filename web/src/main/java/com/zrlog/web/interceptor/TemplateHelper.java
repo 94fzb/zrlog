@@ -30,41 +30,6 @@ public class TemplateHelper {
 
     private static final Logger LOGGER = Logger.getLogger(TemplateHelper.class);
 
-    /**
-     * 根据文件后缀 查找符合要求文件列表
-     *
-     * @param path
-     * @param prefix
-     */
-    private static void fillFileInfo(String path, List<String> fileList, String... prefix) {
-        File[] files = new File(path).listFiles();
-
-        if (files != null) {
-            for (File file : files) {
-                if (file.isDirectory() && new File(file.getAbsolutePath()).listFiles() != null) {
-                    fillFileInfo(file.getAbsolutePath(), fileList, prefix);
-                } else {
-                    for (String pre : prefix) {
-                        if (file.getAbsoluteFile().toString().endsWith(pre)) {
-                            fileList.add(file.getAbsoluteFile().toString());
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    public static List<String> getFiles(String path) {
-        List<String> fileList = new ArrayList<>();
-        fillFileInfo(PathKit.getWebRootPath() + path, fileList, ".jsp", ".js", ".css", ".html");
-        String webPath = JFinal.me().getServletContext().getRealPath("/");
-        List<String> strFile = new ArrayList<>();
-        for (String aFileList : fileList) {
-            strFile.add(aFileList.substring(webPath.length() - 1 + path.length()).replace('\\', '/'));
-        }
-        return strFile;
-    }
-
     public static void fullInfo(HttpServletRequest request, boolean staticHtml) {
         boolean staticBlog = ZrLogUtil.isStaticBlogPlugin(request);
         // 模板地址
@@ -165,12 +130,12 @@ public class TemplateHelper {
         }
     }
 
-    public static String fullTemplateInfo(Controller controller) {
+    public static String fullTemplateInfo(Controller controller, boolean reload) {
         if (controller instanceof BaseController) {
             BaseController baseController = (BaseController) controller;
             String basePath = baseController.getTemplatePath();
             controller.getRequest().setAttribute("template", basePath);
-            I18NUtil.addToRequest(PathKit.getWebRootPath() + basePath + "/language/", controller.getRequest(), JFinal.me().getConstants().getDevMode());
+            I18NUtil.addToRequest(PathKit.getWebRootPath() + basePath + "/language/", controller.getRequest(), JFinal.me().getConstants().getDevMode(), reload);
             baseController.fullTemplateSetting();
             TemplateHelper.fullInfo(controller.getRequest(), Constants.isStaticHtmlStatus());
             return basePath;

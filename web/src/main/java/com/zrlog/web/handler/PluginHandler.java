@@ -7,6 +7,7 @@ import com.jfinal.core.JFinal;
 import com.jfinal.handler.Handler;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.AdminTokenVO;
+import com.zrlog.model.User;
 import com.zrlog.service.AdminTokenService;
 import com.zrlog.service.AdminTokenThreadLocal;
 import com.zrlog.service.PluginHelper;
@@ -49,9 +50,9 @@ public class PluginHandler extends Handler {
         }
         if (isPluginPath) {
             try {
-                AdminTokenVO adminTokenVO = adminTokenService.getAdminToken(request);
-                if (adminTokenVO != null) {
-                    adminTokenService.setAdminToken(adminTokenVO.getUserId(), adminTokenVO.getSessionId(), request, response);
+                Map.Entry<AdminTokenVO, User> entry = adminTokenService.getAdminTokenVOUserEntry(request);
+                if (entry != null) {
+                    adminTokenService.setAdminToken(entry.getValue(), entry.getKey().getSessionId(), request, response);
                 }
                 if (target.startsWith("/admin/plugins/")) {
                     try {

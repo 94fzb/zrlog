@@ -3,9 +3,10 @@
 <link rel="stylesheet" href="${basePath}admin/markdown/css/editormd.min.css"/>
 <link rel="stylesheet" href="${basePath}assets/css/video-js.css"/>
 <script>
-    var editorMdPath = "admin/markdown/lib/";
     var skipFirstRubbishSave = ${skipFirstRubbishSave};
     var article = ${article};
+    var uploadUrl = 'api/admin/upload/';
+    var editorMdPath = "admin/markdown/lib/";
 </script>
 
 <script src="${basePath}assets/js/screenfull.min.js"></script>
@@ -16,7 +17,8 @@
 <script src="${basePath}assets/js/jquery.liteuploader.min.js"></script>
 <script src="${basePath}assets/js/select2/select2.min.js"></script>
 <script src="${basePath}assets/js/jquery.tagsinput.js"></script>
-<script src="${basePath}admin/js/article_editor.js"></script>
+<script src="${basePath}admin/js/mdeditor.js"></script>
+<script src="${basePath}admin/js/article_edit.js"></script>
 <script src="${basePath}assets/js/video.js"></script>
 <style>
     .CodeMirror-scroll {
@@ -42,8 +44,23 @@
         position: relative;
         width: 100%;
     }
+
     #preview-link {
         color: #314659;
+    }
+
+    .save-btn-full-screen {
+        position: fixed;
+        z-index: 100000;
+        top: 2px;
+        right: 20px;
+    }
+
+    .saveToRubbish-btn-full-screen {
+        position: fixed;
+        z-index: 100000;
+        top: 2px;
+        right: 180px;
     }
 </style>
 <c:if test="${1 ne webSite['article_thumbnail_status']}">
@@ -97,7 +114,7 @@
                         </div>
                     </div>
                 </div>
-                <div id="editormd"></div>
+                <div id="editormd" theme="${webSite.editorMdTheme}"></div>
             </div>
             <div class="col-md-12 row col-lg-3">
                 <div class="form-group col-xs-12 text-right">
@@ -107,10 +124,13 @@
                             ${_res['preview']}
                         </button>
                     </a>
-                    <button class="btn btn-primary" id="saveToRubbish" type="button">
-                        <i class="fa fa-save  bigger-110"></i>
-                        ${_res['saveAsDraft']}
-                    </button>
+                    <div id="saveToRubbish-bar" style="display: inline">
+                        <button class="btn btn-primary" id="saveToRubbish" type="button">
+                            <i class="fa fa-save  bigger-110"></i>
+                            ${_res['saveAsDraft']}
+                        </button>
+                        Ctrl+S
+                    </div>
                 </div>
                 <div class="form-group col-xs-12">
                     <div class="row">
@@ -179,10 +199,13 @@
 
                 </div>
                 <div class="form-group col-xs-12">
-                    <button class="btn btn-info" id="save" type="button">
-                        <i class="fa fa-paper-plane bigger-110"></i>
-                        ${_res['save']}
-                    </button>
+                    <div id="save-bar">
+                        <button class="btn btn-info" id="save" type="button">
+                            <i class="fa fa-paper-plane bigger-110"></i>
+                            ${_res['save']}
+                        </button>
+                        Ctrl+Enter
+                    </div>
                 </div>
 
             </div>

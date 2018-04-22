@@ -1,6 +1,4 @@
 $(function () {
-    var uploadUrl = 'api/admin/upload/';
-    var mdEditor;
     $("#content").val(article['content']);
 
     $(".select2_single").select2({
@@ -39,103 +37,6 @@ $(function () {
         var zero = places - num.toString().length + 1;
         return Array(+(zero > 0 && zero)).join("0") + num;
     }
-
-    var editormdTheme = $("#markdown").attr("editormdTheme");
-    var dark = editormdTheme === 'dark';
-    mdEditor = editormd("editormd", {
-        width: "100%",
-        height: 840,
-        path: editorMdPath,
-        toolbarIcons: function () {
-            return ["undo", "redo", "|", "bold", "del", "italic", "quote", "|", "h1", "h2", "h3", "h4", "|", "list-ul", "list-ol", "hr", "|", "link", "reference-link", "image", "file", "video", "code", "preformatted-text", "code-block", "table", "emoji", "html-entities", "pagebreak", "|", "goto-line", "watch", "fullscreen", "search", "copyPreviewHtml", "|", "help", "info"]
-        },
-        toolbarCustomIcons: {
-            file: '<a href="javascript:;" id="fileDialog"  title=' + lang.addAttachment + ' unselectable="on"><i class="fa fa-paperclip" unselectable="on"></i></a>',
-            video: '<a href="javascript:;" id="videoDialog"  title="' + lang.addVideo + '" unselectable="on"><i class="fa fa-file-video-o" unselectable="on"></i></a>',
-            copyPreviewHtml: '<a href="javascript:;" id="copPreviewHtmlToClipboard"  title="' + lang.copPreviewHtmlToClipboard + '" unselectable="on"><i class="fa fa-clipboard" unselectable="on"></i></a>'
-        },
-        codeFold: true,
-        appendMarkdown: article['markdown'],
-        saveHTMLToTextarea: true,
-        searchReplace: true,
-        htmlDecode: "iframe,pre",
-        emoji: true,
-        taskList: true,
-        tocm: true,         // Using [TOCM]
-        tex: true,                   // 开启科学公式TeX语言支持，默认关闭
-        flowChart: true,             // 开启流程图支持，默认关闭
-        sequenceDiagram: true,       // 开启时序/序列图支持，默认关闭,
-        dialogMaskOpacity: 0,    // 设置透明遮罩层的透明度，全局通用，默认值为0.1
-        dialogMaskBgColor: "#000", // 设置透明遮罩层的背景颜色，全局通用，默认为#fff
-        imageUpload: true,
-        imageFormats: ["jpg", "jpeg", "gif", "png", "ico", "bmp", "webp"],
-        imageUploadURL: uploadUrl,
-        theme: dark ? "dark" : "default",
-        previewTheme: dark ? "dark" : "default",
-        editorTheme: dark ? "pastel-on-dark" : "default",
-
-        onchange: function () {
-            var content = mdEditor.getPreviewedHTML();
-            $("#content").val(content);
-            if (content === '') {
-                $("#editormd").addClass("has-error");
-                $("#editormd").css("border-color", "#a94442");
-            } else {
-                $("#editormd").removeClass("has-error");
-                $("#editormd").css("border-color", "#ccc");
-            }
-        },
-        onload: function () {
-            $("#content").val(mdEditor.getPreviewedHTML());
-            var keyMap = {
-                "Ctrl-S": function () {
-                    save(true, false);
-                }
-            };
-            this.addKeyMap(keyMap);
-            $("#fileDialog").on("click", function () {
-                mdEditor.executePlugin("fileDialog", "../plugins/file-dialog/file-dialog");
-            });
-            $("#videoDialog").on("click", function () {
-                mdEditor.executePlugin("videoDialog", "../plugins/video-dialog/video-dialog");
-            });
-            $("#copPreviewHtmlToClipboard").on("click", function () {
-                function copyToClipboard(html) {
-                    var $temp = $("<input>");
-                    $("body").append($temp);
-                    $temp.val(html).select();
-                    document.execCommand("copy");
-                    $temp.remove();
-                }
-
-                copyToClipboard('<div class="markdown-body" style="padding:0">' + mdEditor.getPreviewedHTML() + "</div>");
-                var e = {"message": lang.copPreviewHtmlToClipboardSuccess, "error": 0};
-                notify(e, "info");
-            });
-            setInterval(function () {
-                save(true, true);
-            }, 1000 * 6);
-        },
-        onfullscreen: function () {
-            $("#editormd").css("z-index", "9999");
-            mdEditor.width("100%");
-            if (screenfull.enabled) {
-                screenfull.request();
-            }
-        },
-
-        onfullscreenExit: function () {
-            $("#editormd").css("z-index", 0);
-            mdEditor.width("100%");
-            if (screenfull.enabled) {
-                screenfull.exit();
-            }
-        }
-
-    });
-
-    $(".editormd-markdown-textarea").attr("name", "markdown");
-    $(".editormd-html-textarea").removeAttr("name");
 
     function checkPreviewLink() {
         if ($("#id").val() === null || $("#id").val() === '') {
@@ -176,15 +77,15 @@ $(function () {
         //仅在2个输入框都不为空的情况，标记为又文本需要输入
         if ($("#title").val() === '' && $("#content").val() === '') {
             $("#title-parent").removeClass("has-error");
-            $("#editormd").removeClass("has-error");
+            editorEl.removeClass("has-error");
             return false;
         }
         if ($("#title").val() === '') {
             $("#title-parent").addClass("has-error");
         }
         if ($("#content").val() === '') {
-            $("#editormd").addClass("has-error");
-            $("#editormd").css("border-color", "#a94442");
+            editorEl.addClass("has-error");
+            editorEl.css("border-color", "#a94442");
         }
         return el.find(".has-error").length === 0;
     }
@@ -194,9 +95,9 @@ $(function () {
             $("#title-parent").removeClass("has-error");
         } else {
             if ($("#content").val() === '') {
-                $("#editormd").removeClass("has-error");
+                editorEl.removeClass("has-error");
                 $("#title-parent").removeClass("has-error");
-                $("#editormd").css("border-color", "");
+                editorEl.css("border-color", "");
             } else {
                 $("#title-parent").addClass("has-error");
             }
@@ -204,7 +105,7 @@ $(function () {
         }
     });
 
-    function save(rubbish, timer) {
+    window.saveArticle = function (rubbish, timer) {
         //如果是还在保存文章状态，跳过保存
         if (saving) {
             notify({"message": lang.saving}, "warn");
@@ -231,17 +132,18 @@ $(function () {
                         dataType: "json",
                         contentType: "application/json",
                         success: function (data) {
-                            saving = false;
                             var date = new Date();
                             if (!data.error) {
                                 data.message = (timer ? lang.auto : "") + (rubbish ? lang.rubbish : "") + " " + lang.saveSuccess + " " + zeroPad(date.getHours(), 2) + ":" + zeroPad(date.getMinutes(), 2) + ":" + zeroPad(date.getSeconds(), 2);
                             }
-                            tips(data);
+                            preTips(data);
                             lastChangeRequestBody = JSON.stringify(getFormRequestBody("#article-form"));
                         },
                         error: function (xhr, err) {
-                            saving = false;
-                            tips({"error": 1, "message": formatErrorMessage(xhr, err)});
+                            preTips({"error": 1, "message": formatErrorMessage(xhr, err)});
+                        },
+                        always: function (xhr, err) {
+                            preTips({"error": 1, "message": formatErrorMessage(xhr, err)});
                         }
                     }
                 )
@@ -252,6 +154,13 @@ $(function () {
             }
         } else {
             lastChangeRequestBody = JSON.stringify(getFormRequestBody("#article-form"));
+        }
+    }
+
+    function preTips(message) {
+        if (saving) {
+            saving = false;
+            tips(message);
         }
     }
 
@@ -286,12 +195,12 @@ $(function () {
 
     $("#saveToRubbish").click(function () {
         skipFirstRubbishSave = false;
-        save(true, false)
+        saveArticle(true, false)
     });
 
     $("#save").click(function () {
         skipFirstRubbishSave = false;
-        save(false, false);
+        saveArticle(false, false);
     });
 
     $('#thumbnail-upload').liteUploader({
@@ -322,6 +231,19 @@ $(function () {
     if (thumbnailImg !== "") {
         fillThumbnail(thumbnailImg);
     }
+
+    $("body").keydown(function (e) {
+        if (e.ctrlKey && e.which === 13 || e.which === 10) {
+            saveArticle(false, false);
+        } else {
+            if (!(String.fromCharCode(event.which).toLowerCase() === 's' && event.ctrlKey) && !(event.which === 19)) {
+                return true
+            }
+            event.preventDefault();
+            saveArticle(true, false);
+            return false;
+        }
+    });
 
 });
 

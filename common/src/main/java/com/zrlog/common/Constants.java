@@ -1,6 +1,7 @@
 package com.zrlog.common;
 
 
+import com.hibegin.common.util.StringUtils;
 import com.zrlog.common.type.AutoUpgradeVersionType;
 
 import java.util.Collections;
@@ -27,8 +28,8 @@ public class Constants {
     //字符长度必须要大于16个字符
     public static final String AES_PUBLIC_KEY = "_BLOG_BLOG_BLOG_";
     //20分钟
-    public static final long DEFAULT_SESSION_TIMEOUT = 1000 * 20 * 60L;
-    public static final String SESSION_TIMEOUT_KEY = "session_timeout";
+    private static final long DEFAULT_SESSION_TIMEOUT = 1000 * 20 * 60L;
+    private static final String SESSION_TIMEOUT_KEY = "session_timeout";
     public static final String ATTACHED_FOLDER = "/attached/";
     public static String TEMPLATE_CONFIG_SUFFIX = "_setting";
     public static final AutoUpgradeVersionType DEFAULT_AUTO_UPGRADE_VERSION_TYPE = AutoUpgradeVersionType.ONE_DAY;
@@ -51,5 +52,20 @@ public class Constants {
             }
         }
         return 20 * 1024 * 1024;
+    }
+
+    public static Long getSessionTimeout() {
+        String sessionTimeoutString = (String) Constants.webSite.get(Constants.SESSION_TIMEOUT_KEY);
+        Long sessionTimeout;
+        if (!StringUtils.isEmpty(sessionTimeoutString)) {
+            //*60， Cookie过期时间单位为分钟
+            sessionTimeout = Long.valueOf(sessionTimeoutString) * 60 * 1000;
+            if (sessionTimeout <= 0) {
+                sessionTimeout = Constants.DEFAULT_SESSION_TIMEOUT;
+            }
+        } else {
+            sessionTimeout = Constants.DEFAULT_SESSION_TIMEOUT;
+        }
+        return sessionTimeout;
     }
 }

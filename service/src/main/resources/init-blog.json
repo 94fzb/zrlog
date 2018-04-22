@@ -1,7 +1,7 @@
 {
-  "content": "Hello World 中文意思是『世界，你好』。因为《The C Programme Language》中使用它做为第一个演示程序，非常著名，所以后来的程序员在学习编程或进行设备调试时延续了这一习惯。",
+  "content": "<p>Hello World 中文意思是『世界，你好』。因为《The C Programme Language》中使用它做为第一个演示程序，非常著名，所以后来的程序员在学习编程或进行设备调试时延续了这一习惯。</p>",
   "markdown": "Hello World 中文意思是『世界，你好』。因为《The C Programme Language》中使用它做为第一个演示程序，非常著名，所以后来的程序员在学习编程或进行设备调试时延续了这一习惯。",
-  "digest": "Hello World 中文意思是『世界，你好』。因为《The C Programme Language》中使用它做为第一个演示程序，非常著名，所以后来的程序员在学习编程或进行设备调试时延续了这一习惯。",
+  "digest": "<p>Hello World 中文意思是『世界，你好』。因为《The C Programme Language》中使用它做为第一个演示程序，非常著名，所以后来的程序员在学习编程或进行设备调试时延续了这一习惯。</p>",
   "plainContent": "Hello World 中文意思是『世界，你好』。因为《The C Programme Language》中使用它做为第一个演示程序，非常著名，所以后来的程序员在学习编程或进行设备调试时延续了这一习惯。",
   "title": "你好，世界！",
   "alias": "hello-world",

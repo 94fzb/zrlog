@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -31,6 +32,7 @@ class ResponseRenderPrintWriter extends PrintWriter {
     private String baseUrl;
     private String endFlag;
     private HttpServletRequest request;
+    private HttpServletResponse response;
 
     public String getResponseBody() {
         return body;
@@ -40,7 +42,7 @@ class ResponseRenderPrintWriter extends PrintWriter {
         return str.trim().endsWith("</html>") || str.trim().endsWith(endFlag);
     }
 
-    ResponseRenderPrintWriter(OutputStream out, boolean compress, String baseUrl, String endFlag, HttpServletRequest request) {
+    ResponseRenderPrintWriter(OutputStream out, boolean compress, String baseUrl, String endFlag, HttpServletRequest request, HttpServletResponse response) {
         super(out);
         this.compress = compress;
         compressor.setRemoveIntertagSpaces(true);
@@ -48,6 +50,7 @@ class ResponseRenderPrintWriter extends PrintWriter {
         this.baseUrl = baseUrl;
         this.endFlag = endFlag;
         this.request = request;
+        this.response = response;
     }
 
     private void tryFlush() {
@@ -74,83 +77,14 @@ class ResponseRenderPrintWriter extends PrintWriter {
         tryFlush();
     }
 
-    // Finally override the flush method so that it trims whitespace.
     @Override
     public void flush() {
         synchronized (builder) {
             try {
                 body = builder.toString();
                 boolean includeEndTag = isIncludePageEndTag(body);
-                if (includeEndTag) {
-                    if (body.endsWith(endFlag)) {
-                        body = body.substring(0, body.length() - endFlag.length());
-                    }
-                    HtmlCleaner htmlCleaner = new HtmlCleaner();
-                    htmlCleaner.getProperties().setUseCdataForScriptAndStyle(false);
-                    TagNode tagNode = htmlCleaner.clean(body);
-                    TagNode[] tagNodes = tagNode.getAllElements(true);
-                    Map<String, String> plugin = new HashMap<>();
-                    for (TagNode tag : tagNodes) {
-                        if (tag != null) {
-                            String tagName = tag.getName();
-                            if ("script".equals(tagName)) {
-                                String src = tag.getAttributeByName("src");
-                                if (src != null) {
-                                    tag.setForeignMarkup(true);
-                                    Map<String, String> tmp = new LinkedHashMap<>(tag.getAttributes());
-                                    tmp.put("src", tryReplace(src));
-                                    tag.setAttributes(tmp);
-                                }
-                            }
-                            if ("link".equals(tagName)) {
-                                String src = tag.getAttributeByName("href");
-                                if (src != null) {
-                                    tag.setForeignMarkup(true);
-                                    Map<String, String> tmp = new LinkedHashMap<>(tag.getAttributes());
-                                    tmp.put("href", tryReplace(src));
-                                    tag.setAttributes(tmp);
-                                }
-                            }
-                            if ("plugin".equals(tagName) && tag.hasAttribute("name")) {
-                                tag.setForeignMarkup(true);
-                                Map<String, String> tmp = new LinkedHashMap<>(tag.getAttributes());
-                                tmp.put("_tmp", System.currentTimeMillis() + "");
-                                tag.setAttributes(tmp);
-                                SimpleHtmlSerializer serializer = new SimpleHtmlSerializer(htmlCleaner.getProperties());
-                                StringWriter stringWriter = new StringWriter();
-                                tag.serialize(serializer, stringWriter);
-                                String content = stringWriter.toString();
-                                try {
-                                    String url = "/" + tag.getAttributeByName("name") + "/" + tag.getAttributeByName("view");
-                                    if (tag.hasAttribute("param")) {
-                                        url += "?" + tag.getAttributeByName("param");
-                                    }
-                                    CloseResponseHandle handle = PluginHandler.getContext(url, "GET", request, false);
-                                    byte[] bytes = IOUtil.getByteByInputStream(handle.getT().getEntity().getContent());
-                                    plugin.put(content, new String(bytes, "UTF-8"));
-                                } catch (Exception e) {
-                                    LOGGER.error("", e);
-                                }
-                            }
-                        }
-                    }
-
-                    SimpleHtmlSerializer serializer = new SimpleHtmlSerializer(htmlCleaner.getProperties());
-                    StringWriter stringWriter = new StringWriter();
-                    tagNode.serialize(serializer, stringWriter);
-                    body = stringWriter.toString();
-                    if (tagNode.getDocType() != null) {
-                        body = tagNode.getDocType() + body;
-                    }
-                    for (Map.Entry<String, String> entry : plugin.entrySet()) {
-                        body = body.replace(entry.getKey(), entry.getValue());
-                    }
-                }
-                if (compress) {
-                    body = compressor.compress(body);
-                }
-                if (includeEndTag) {
-                    body = body + "<!--" + (System.currentTimeMillis() - startTime) + "ms-->";
+                if (includeEndTag && response.getContentType().contains("text/html")) {
+                    body = getCompressAndParseHtml(body);
                 }
                 out.write(body);
 
@@ -159,6 +93,89 @@ class ResponseRenderPrintWriter extends PrintWriter {
                 super.flush();
             } catch (IOException ex) {
                 LOGGER.error("", ex);
+            }
+        }
+    }
+
+    private String getCompressAndParseHtml(String inputBody) throws IOException {
+        String currentBody = inputBody;
+
+        //不显示none标签
+        if (currentBody.endsWith(endFlag)) {
+            currentBody = currentBody.substring(0, currentBody.length() - endFlag.length());
+        }
+        HtmlCleaner htmlCleaner = new HtmlCleaner();
+        htmlCleaner.getProperties().setUseCdataForScriptAndStyle(false);
+        TagNode tagNode = htmlCleaner.clean(currentBody);
+        TagNode[] tagNodes = tagNode.getAllElements(true);
+        Map<String, String> plugin = new HashMap<>();
+        for (TagNode tag : tagNodes) {
+            if (tag != null) {
+                String tagName = tag.getName();
+                addStaticResourceFlag(tag, tagName);
+                parseCustomHtmlTag(htmlCleaner, plugin, tag, tagName);
+            }
+        }
+
+        SimpleHtmlSerializer serializer = new SimpleHtmlSerializer(htmlCleaner.getProperties());
+        StringWriter stringWriter = new StringWriter();
+        tagNode.serialize(serializer, stringWriter);
+        currentBody = stringWriter.toString();
+        if (tagNode.getDocType() != null) {
+            currentBody = tagNode.getDocType() + currentBody;
+        }
+        for (Map.Entry<String, String> entry : plugin.entrySet()) {
+            currentBody = currentBody.replace(entry.getKey(), entry.getValue());
+        }
+        if (compress) {
+            currentBody = compressor.compress(currentBody);
+        }
+        currentBody = currentBody + "<!--" + (System.currentTimeMillis() - startTime) + "ms-->";
+        return currentBody;
+
+    }
+
+    private void parseCustomHtmlTag(HtmlCleaner htmlCleaner, Map<String, String> plugin, TagNode tag, String tagName) throws IOException {
+        if ("plugin".equals(tagName) && tag.hasAttribute("name")) {
+            tag.setForeignMarkup(true);
+            Map<String, String> tmp = new LinkedHashMap<>(tag.getAttributes());
+            tmp.put("_tmp", System.currentTimeMillis() + "");
+            tag.setAttributes(tmp);
+            SimpleHtmlSerializer serializer = new SimpleHtmlSerializer(htmlCleaner.getProperties());
+            StringWriter stringWriter = new StringWriter();
+            tag.serialize(serializer, stringWriter);
+            String content = stringWriter.toString();
+            try {
+                String url = "/" + tag.getAttributeByName("name") + "/" + tag.getAttributeByName("view");
+                if (tag.hasAttribute("param")) {
+                    url += "?" + tag.getAttributeByName("param");
+                }
+                CloseResponseHandle handle = PluginHandler.getContext(url, "GET", request, false);
+                byte[] bytes = IOUtil.getByteByInputStream(handle.getT().getEntity().getContent());
+                plugin.put(content, new String(bytes, "UTF-8"));
+            } catch (Exception e) {
+                LOGGER.error("", e);
+            }
+        }
+    }
+
+    private void addStaticResourceFlag(TagNode tag, String tagName) {
+        if ("script".equals(tagName)) {
+            String src = tag.getAttributeByName("src");
+            if (src != null) {
+                tag.setForeignMarkup(true);
+                Map<String, String> tmp = new LinkedHashMap<>(tag.getAttributes());
+                tmp.put("src", tryReplace(src));
+                tag.setAttributes(tmp);
+            }
+        }
+        if ("link".equals(tagName)) {
+            String src = tag.getAttributeByName("href");
+            if (src != null) {
+                tag.setForeignMarkup(true);
+                Map<String, String> tmp = new LinkedHashMap<>(tag.getAttributes());
+                tmp.put("href", tryReplace(src));
+                tag.setAttributes(tmp);
             }
         }
     }

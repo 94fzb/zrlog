@@ -50,8 +50,8 @@ class AdminInterceptor implements Interceptor {
      */
     private void adminPermission(Invocation ai) {
         Controller controller = ai.getController();
-        AdminTokenVO adminTokenVO = adminTokenService.getAdminToken(controller.getRequest());
-        if (adminTokenVO != null) {
+        Map.Entry<AdminTokenVO, User> entry = adminTokenService.getAdminTokenVOUserEntry(controller.getRequest());
+        if (entry != null) {
             BaseDataInitVO init = (BaseDataInitVO) ai.getController().getRequest().getAttribute("init");
             Map<String, Object> webSite = init.getWebSite();
             if (webSite.get("admin_dashboard_naver") == null) {
@@ -63,14 +63,14 @@ class AdminInterceptor implements Interceptor {
             }
             ai.getController().getRequest().setAttribute("webs", webSite);
             try {
-                User user = User.dao.findById(adminTokenVO.getUserId());
+                User user = entry.getValue();
                 if (StringUtils.isEmpty(user.getStr("header"))) {
                     user.set("header", "assets/images/default-portrait.gif");
                 }
                 controller.setAttr("user", user);
-                TemplateHelper.fullTemplateInfo(controller);
+                TemplateHelper.fullTemplateInfo(controller, false);
                 if (!"/admin/logout".equals(ai.getActionKey())) {
-                    adminTokenService.setAdminToken(adminTokenVO.getUserId(), adminTokenVO.getSessionId(), controller.getRequest(), controller.getResponse());
+                    adminTokenService.setAdminToken(entry.getValue(), entry.getKey().getSessionId(), controller.getRequest(), controller.getResponse());
                 }
                 ai.invoke();
                 // 存在消息提示

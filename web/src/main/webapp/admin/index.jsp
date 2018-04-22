@@ -122,7 +122,7 @@
             </div>
         </div>
         <div class="top_nav">
-            <div class="nav_menu">
+            <div class="nav_menu" id="nav_menu">
                 <nav>
                     <div class="nav toggle">
                         <a id="menu_toggle"><i class="fa fa-bars"></i></a>
@@ -238,7 +238,8 @@
                         <li role="presentation" class="hidden-xs">
                             <a target="_blank" href="http://blog.zrlog.com/post/feedback"
                                class="dropdown-toggle info-number">
-                                <i class="fa fa-support"></i><span style="padding-left: 5px">${_res['suggestAndFeedback']}</span>
+                                <i class="fa fa-support"></i><span
+                                    style="padding-left: 5px">${_res['suggestAndFeedback']}</span>
                             </a>
                         </li>
                     </ul>
@@ -249,12 +250,29 @@
             <div style="min-height: 600px"></div>
         </div>
         <footer>
-            <strong>${_res.copyright} <a href="https://www.zrlog.com" target="_blank" rel="noopener"> ZrLog . </a></strong>
+            <strong>${_res.copyright} <a href="https://www.zrlog.com" target="_blank" rel="noopener"> ZrLog
+                . </a></strong>
             All rights reserved.
             <div class="pull-right hidden-xs">
-                <strong>Version</strong> ${zrlog.version}
+                <span><strong>Version</strong> ${zrlog.version}</span>
             </div>
         </footer>
+    </div>
+    <div class="modal fade" id="info">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 id="info-title" class="modal-title"></h4>
+                </div>
+                <div class="modal-body">
+                    <p id="info-body"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="closeBtn" class="btn btn-default" data-dismiss="modal"></button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <script src="${basePath}assets/js/bootstrap.min.js"></script>

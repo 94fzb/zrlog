@@ -213,8 +213,9 @@ public class Log extends Model<Log> implements Serializable {
         }
     }
 
-    public BigDecimal sumAllClick() {
-        return findFirst("select sum(click) from " + TABLE_NAME).getBigDecimal("sum(click)");
+    public BigDecimal sumClick() {
+        BigDecimal sum = findFirst("select sum(click) from " + TABLE_NAME).getBigDecimal("sum(click)");
+        return sum == null ? new BigDecimal(0) : sum;
     }
 
     public Map<String, Object> getAttrs() {
@@ -226,6 +227,6 @@ public class Log extends Model<Log> implements Serializable {
     }
 
     public long adminCount() {
-        return findFirst("select count(1) as count from " + TABLE_NAME).getLong("count");
+        return findFirst("select count(1) as count from " + TABLE_NAME).get("count", 0);
     }
 }

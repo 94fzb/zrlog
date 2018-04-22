@@ -3,46 +3,12 @@
 <script src="${basePath}admin/js/set_update.js"></script>
 <script>
     $(document).ready(function () {
-        var id = "";
         $('.fileUpload').liteUploader({
             script: 'api/admin/upload?dir=image'
         }).on('lu:success', function (e, response) {
             var id = "#" + $(this).attr("id") + '-field';
             $(id).attr("data-title", response.url);
             $(id).val(response.url);
-        });
-        $("#template").click(function (e) {
-            $.post('api/admin/template/setting', $("#template-form").serialize(), function (data) {
-                if (data.error == 0) {
-                    var message;
-                    if (data.message != null && data.message != '') {
-                        message = data.message;
-                    } else {
-                        message = "操作成功...";
-                    }
-                    new PNotify({
-                        title: message,
-                        type: 'success',
-                        delay: 3000,
-                        hide: true,
-                        styling: 'bootstrap3'
-                    });
-                } else {
-                    var message;
-                    if (data.message != null && data.message != '') {
-                        message = data.message;
-                    } else {
-                        message = "发生了一些异常...";
-                    }
-                    new PNotify({
-                        title: message,
-                        delay: 3000,
-                        type: 'error',
-                        hide: true,
-                        styling: 'bootstrap3'
-                    });
-                }
-            });
         });
     });
 </script>

@@ -54,7 +54,7 @@ class VisitorInterceptor implements Interceptor {
         if (JFinal.me().getConstants().getViewType() == ViewType.JSP) {
             ext = ".jsp";
         }
-        String basePath = TemplateHelper.fullTemplateInfo(ai.getController());
+        String basePath = TemplateHelper.fullTemplateInfo(ai.getController(), true);
         if (ai.getController().getAttr("log") != null) {
             ai.getController().setAttr("pageLevel", 1);
         } else if (ai.getController().getAttr("data") != null) {

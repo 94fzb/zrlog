@@ -7,6 +7,7 @@ import com.jfinal.handler.Handler;
 import com.jfinal.kit.PathKit;
 import com.zrlog.common.Constants;
 import com.zrlog.service.AdminTokenThreadLocal;
+import com.zrlog.util.I18NUtil;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.util.WebTools;
 import org.slf4j.Logger;
@@ -52,7 +53,7 @@ public class GlobalResourceHandler extends Handler {
             }
         }
         try {
-            final ResponseRenderPrintWriter responseRenderPrintWriter = new ResponseRenderPrintWriter(response.getOutputStream(), !JFinal.me().getConstants().getDevMode(), url, PAGE_END_TAG, request);
+            final ResponseRenderPrintWriter responseRenderPrintWriter = new ResponseRenderPrintWriter(response.getOutputStream(), !JFinal.me().getConstants().getDevMode(), url, PAGE_END_TAG, request, response);
             response = new HttpServletResponseWrapper(response) {
                 @Override
                 public PrintWriter getWriter() throws IOException {
@@ -96,6 +97,7 @@ public class GlobalResourceHandler extends Handler {
             LOGGER.error("", e);
         } finally {
             AdminTokenThreadLocal.remove();
+            I18NUtil.removeI18n();
         }
     }
 
