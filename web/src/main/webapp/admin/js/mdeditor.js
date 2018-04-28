@@ -5,7 +5,7 @@ $(function () {
     var dark = editormdTheme === 'dark';
     var editor = editormd("editormd", {
         width: "100%",
-        height: 840,
+        height: 1040,
         path: editorMdPath,
         toolbarIcons: function () {
             return ["bold", "del", "italic", "quote", "|", "h1", "h2", "h3", "h4", "h5", "|", "list-ul", "list-ol", "hr", "pagebreak", "|", "link", "reference-link", "image", "file", "video", "|", "code", "preformatted-text", "code-block", "table", "emoji", "|", "watch", "fullscreen", "search", "copyPreviewHtml", "|", "help", "info"]
@@ -74,8 +74,8 @@ $(function () {
         onfullscreen: function () {
             editorEl.css("z-index", "9999");
             editor.width("100%");
-            $("#save-bar").addClass("save-btn-full-screen").addClass("hidden-xs");
-            $("#saveToRubbish-bar").addClass("saveToRubbish-btn-full-screen").addClass("hidden-xs");
+            $("#save").addClass("save-btn-full-screen").addClass("hidden-xs");
+            $("#saveToRubbish").addClass("saveToRubbish-btn-full-screen").addClass("hidden-xs");
             if (screenfull.enabled) {
                 screenfull.request();
             }
@@ -83,8 +83,8 @@ $(function () {
 
         onfullscreenExit: function () {
             editorEl.css("z-index", 0);
-            $("#save-bar").removeClass("save-btn-full-screen").removeClass("hidden-xs");
-            $("#saveToRubbish-bar").removeClass("saveToRubbish-btn-full-screen").removeClass("hidden-xs");
+            $("#save").removeClass("save-btn-full-screen").removeClass("hidden-xs");
+            $("#saveToRubbish").removeClass("saveToRubbish-btn-full-screen").removeClass("hidden-xs");
             editor.width("100%");
             if (screenfull.enabled) {
                 screenfull.exit();

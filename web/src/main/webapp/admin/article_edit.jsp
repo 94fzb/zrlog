@@ -2,11 +2,17 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <link rel="stylesheet" href="${basePath}admin/markdown/css/editormd.min.css"/>
 <link rel="stylesheet" href="${basePath}assets/css/video-js.css"/>
+<link rel="stylesheet" href="${basePath}assets/css/icheck-blue.css"/>
+<script src="${basePath}assets/js/icheck.min.js"></script>
 <script>
     var skipFirstRubbishSave = ${skipFirstRubbishSave};
     var article = ${article};
     var uploadUrl = 'api/admin/upload/';
     var editorMdPath = "admin/markdown/lib/";
+    $('.icheck').iCheck({
+        checkboxClass: 'icheckbox_flat-blue',
+        radioClass: 'iradio_flat-blue'
+    });
 </script>
 
 <script src="${basePath}assets/js/screenfull.min.js"></script>
@@ -60,156 +66,187 @@
         position: fixed;
         z-index: 100000;
         top: 2px;
-        right: 180px;
+        right: 120px;
+    }
+
+    .col-lg-9 {
+        max-width: 1436px;
+        width: 100%;
+    }
+
+    .col-lg-3 {
+        max-width: 330px;
+    }
+
+    .editormd-html-preview, .editormd-preview-container {
+        padding: 5px;
     }
 </style>
-<c:if test="${1 ne webSite['article_thumbnail_status']}">
-    <div class="page-header">
-        <h3>
-                ${_res['admin.log.edit']}
-        </h3>
-    </div>
-</c:if>
-<div class="row">
-    <div class="x_content">
-        <form class="form-horizontal form-label-left" id="article-form">
-            <input type="hidden" id="id" name="id" value="${log.logId}">
-            <textarea placeholder="${_res.editorPlaceholder}" id="content" name="content"
-                      style="display: none;"></textarea>
-            <c:if test="${0 ne webSite['article_thumbnail_status']}">
-                <div class="form-group">
-                    <div id="thumbnail-img" title="${_res['writeCover']}"
-                         style="background-color:rgba(0,0,0,.075);<c:if
-                                 test="${log!=null and not empty log.thumbnail}">background: url('${log.thumbnail}')</c:if>"
-                         class="thumbnail-img img-responsive WriteCover-wrapper WriteCover-previewWrapper">
-                        <i id="camera-icon" class="WriteCover-uploadIcon fa fa-camera fa-3"></i>
-                        <input type="file" accept=".jpeg, .jpg, .png" id="thumbnail-upload" name="imgFile"
-                               value="${log.thumbnail}"
-                               class="WriteCover-uploadInput">
-                        <input type="hidden" name="thumbnail" value="${log.thumbnail}" id="thumbnail">
-                    </div>
-                </div>
-            </c:if>
+<div class="page-header">
+    <h3>
+        ${_res['admin.log.edit']}
+    </h3>
+</div>
 
-            <div class="col-md-12 col-sm-12 col-xs-12 col-lg-9">
-                <div class="form-group">
-                    <div class="row">
-                        <div class="col-xs-7" id="title-parent">
-                            <input required name="title" id="title" maxlength="254" value="${log.title}"
-                                   class="form-control"
-                                   type="text" placeholder="${_res['inputArticleTitle']}"/>
-                        </div>
-                        <div class="col-xs-2" id="type-select-parent">
-                            <select name="typeId" class="form-control select2_single">
-                                <c:forEach items="${init.types}" var="type">
-                                    <option
-                                            <c:if test="${type.id eq log.typeId}">selected="selected"</c:if>
-                                            value="${type.id}">${type.typeName}</option>
-                                </c:forEach>
-                            </select>
-                        </div>
-                        <div class="col-xs-3">
-                            <input id="alias" type="text" class="form-control"
-                                   placeholder="${_res['inputArticleAlias']}" name="alias" value="${log.alias}">
+<div class="row">
+    <form class="form-horizontal form-label-left" id="article-form" style="max-width: 1750px">
+        <input type="hidden" id="id" name="id" value="${log.logId}">
+        <textarea placeholder="${_res.editorPlaceholder}" id="content" name="content"
+                  style="display: none;"></textarea>
+        <div class="col-md-12 col-sm-12 col-xs-12" style="padding-bottom: 10px">
+            <div class="text-right">
+                <a id="preview-link" target="_blank" style="display:none">
+                    <button class="btn btn-black" id="preview" type="button">
+                        <i class="fa fa-eye bigger-110"></i>
+                        ${_res['preview']}
+                    </button>
+                </a>
+                <button class="btn btn-primary" id="saveToRubbish" type="button">
+                    <i class="fa fa-save  bigger-110"></i>
+                    ${_res['saveAsDraft']}
+                </button>
+                <button class="btn btn-info" id="save" type="button">
+                    <i class="fa fa-paper-plane bigger-110"></i>
+                    ${_res['save']}
+                </button>
+            </div>
+        </div>
+        <div class="col-md-12 col-sm-12 col-xs-12 col-lg-9">
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-9 col-xs-12" id="title-parent" style="padding-bottom: 5px">
+                        <input required name="title" id="title" maxlength="254" value="${log.title}"
+                               class="form-control"
+                               type="text" placeholder="${_res['inputArticleTitle']}"/>
+                    </div>
+                    <div class="col-md-3 col-xs-12" style="padding-bottom: 5px">
+                        <div class="input-group">
+                            <span class="input-group-addon" id="basic-addon3">/post/</span>
+                            <input placeholder="${_res['inputArticleAlias']}" type="text" class="form-control"
+                                   id="alias" name="alias" aria-describedby="basic-addon3" value="${log.alias}">
                         </div>
                     </div>
                 </div>
                 <div id="editormd" theme="${webSite.editorMdTheme}"></div>
             </div>
-            <div class="col-md-12 row col-lg-3">
-                <div class="form-group col-xs-12 text-right">
-                    <a id="preview-link" target="_blank" style="display:none">
-                        <button class="btn btn-black" id="preview" type="button">
-                            <i class="fa fa-eye bigger-110"></i>
-                            ${_res['preview']}
-                        </button>
-                    </a>
-                    <div id="saveToRubbish-bar" style="display: inline">
-                        <button class="btn btn-primary" id="saveToRubbish" type="button">
-                            <i class="fa fa-save  bigger-110"></i>
-                            ${_res['saveAsDraft']}
-                        </button>
-                        Ctrl+S
-                    </div>
-                </div>
-                <div class="form-group col-xs-12">
-                    <div class="row">
-                        <div class="col-xs-4">
-                            <label><span style="font-size: 15px">${_res['commentAble']}</span>
-                                <input type="checkbox" name="canComment"
-                                       <c:if test="${log == null}">checked="checked"</c:if>
-                                       <c:if test="${log['canComment']}">checked="checked"</c:if> class="js-switch"
-                                       style="display: none;" data-switchery="true">
-
-                            </label>
-                        </div>
-                        <div class="col-xs-4">
-                            <label><span style="font-size: 15px">${_res['recommendable']}</span>
-                                <input type="checkbox" name="recommended"
-                                       <c:if test="${log.recommended}">checked="checked"</c:if> class="js-switch"
-                                       style="display: none;" data-switchery="true">
-
-                            </label>
-                        </div>
-                        <div class="col-xs-4">
-                            <label><span style="font-size: 15px">${_res['private']}</span>
-                                <input type="checkbox" name="_private"
-                                       <c:if test="${log['private']}">checked="checked"</c:if> class="js-switch"
-                                       style="display: none;" data-switchery="true">
-
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group col-xs-12">
-                    <input value="${log.keywords}" class="form-control" placeholder="${_res['tagTips']}" type="hidden"
-                           name="keywords" id="keywordsVal" size="60" maxlength="60"/>
-                    <div class="tagsinput" id="keywords"></div>
-                </div>
-                <div class="form-group col-xs-12">
+        </div>
+        <div class="col-md-12 row col-lg-3 col-xs-12">
+            <div class="form-group col-xs-12">
+                <c:if test="${0 ne webSite['article_thumbnail_status']}">
                     <div class="x_panel">
-                        <div class="x_title">
-                            <h2>${_res['allTag']}</h2>
-                            <div class="clearfix"></div>
-                        </div>
                         <div class="x_content">
-                            <div class="tagsinput" id="unCheckedTag" style="max-height: 240px;width: 100%">
-                                <c:forEach items="${init.tags}" var="tags">
-                                    <span class="tag2" val="${tags.text}"><i class="fa fa-tag"></i>${tags.text}</span>
-                                </c:forEach>
+                            <div id="thumbnail-img" title="${_res['writeCover']}"
+                                 style="background-color:rgba(0,0,0,.075);<c:if
+                                         test="${log!=null and not empty log.thumbnail}">background: url('${log.thumbnail}')</c:if>"
+                                 class="thumbnail-img img-responsive WriteCover-wrapper WriteCover-previewWrapper">
+                                <i id="camera-icon" class="WriteCover-uploadIcon fa fa-camera fa-3"></i>
+                                <input type="file" accept=".jpeg, .jpg, .png" id="thumbnail-upload"
+                                       name="imgFile"
+                                       value="${log.thumbnail}"
+                                       class="WriteCover-uploadInput">
+                                <input type="hidden" name="thumbnail" value="${log.thumbnail}" id="thumbnail">
+                            </div>
+                        </div>
+                    </div>
+                </c:if>
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>${_res['admin.setting']}</h2>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <div class="row">
+                            <div class="col-xs-7">
+                                <label><span style="font-size: 16px">${_res['commentAble']}</span>
+                                    <input type="checkbox" name="canComment"
+                                           <c:if test="${log == null}">checked="checked"</c:if>
+                                           <c:if test="${log['canComment']}">checked="checked"</c:if>
+                                           class="js-switch"
+                                           style="display: none;" data-switchery="true">
+
+                                </label>
+                            </div>
+                            <div class="col-xs-5">
+                                <label><span style="font-size: 16px">${_res['recommendable']}</span>
+                                    <input type="checkbox" name="recommended"
+                                           <c:if test="${log.recommended}">checked="checked"</c:if>
+                                           class="js-switch"
+                                           style="display: none;" data-switchery="true">
+
+                                </label>
+                            </div>
+                        </div>
+                        <div class="row" style="padding-top: 10px">
+                            <div class="col-xs-6">
+                                <label><span style="font-size: 16px">${_res['private']}</span>
+                                    <input type="checkbox" name="_private"
+                                           <c:if test="${log['private']}">checked="checked"</c:if>
+                                           class="js-switch"
+                                           style="display: none;" data-switchery="true">
+
+                                </label>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="form-group col-xs-12">
-                    <div class="x_panel">
-                        <div class="x_title">
-                            <h2>${_res['digest']}</h2>
-                            <div class="clearfix"></div>
+                <div class="x_panel" id="type-select-parent">
+                    <div class="x_title">
+                        <h2>${_res['admin.type.manage']}</h2>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <div style="font-size: 16px">
+                            <c:forEach items="${init.types}" var="type">
+                                <div class="radio">
+                                    <input style="padding-top: 15px" class="icheck flat" name="typeId"
+                                           type="radio"
+                                           <c:if test="${type.id eq log.typeId}">checked="checked"</c:if>
+                                           value="${type.id}"><span style="padding-left: 5px">${type.typeName}</span>
+                                </div>
+                            </c:forEach>
                         </div>
-                        <div class="x_content">
-                            <div class="form-group">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12 row col-lg-3 col-xs-12">
+            <div class="form-group col-xs-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>${_res['tag']}</h2>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <input value="${log.keywords}" class="form-control" placeholder="${_res['tagTips']}"
+                               type="hidden"
+                               name="keywords" id="keywordsVal" size="60" maxlength="60"/>
+                        <div class="tagsinput" id="keywords"></div>
+                        <hr/>
+                        <div class="tagsinput" id="unCheckedTag" style="max-height: 240px;width: 100%">
+                            <c:forEach items="${init.tags}" var="tags">
+                                        <span class="tag2" val="${tags.text}"><i
+                                                class="fa fa-tag"></i>${tags.text}</span>
+                            </c:forEach>
+                        </div>
+                    </div>
+                </div>
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>${_res['digest']}</h2>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                        <div class="form-group">
                             <textarea id="digest" name="digest" class="form-control" placeholder="${_res['digestTips']}"
                                       cols="100" rows="3"
                                       style="width:100%; height:200px; z-index: 9999;">${log.digest}</textarea>
-                            </div>
                         </div>
                     </div>
-
                 </div>
-                <div class="form-group col-xs-12">
-                    <div id="save-bar">
-                        <button class="btn btn-info" id="save" type="button">
-                            <i class="fa fa-paper-plane bigger-110"></i>
-                            ${_res['save']}
-                        </button>
-                        Ctrl+Enter
-                    </div>
-                </div>
-
             </div>
-        </form>
-    </div>
+        </div>
+</div>
+</div>
+</form>
 </div>
 ${pageEndTag}

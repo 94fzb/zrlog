@@ -7,24 +7,6 @@ $(function () {
         dropdownParent: $("#type-select-parent")
     });
 
-    $("#right_col").on('resize', function () {
-        thumbnailImgResize();
-    });
-
-    function thumbnailImgResize() {
-        var rightWidth = $("#right_col").width();
-        if (rightWidth < 660) {
-            $("#thumbnail-img").width(rightWidth - 10);
-            $("#thumbnail-img").height(((rightWidth - 10) / 660) * 192);
-            $("#camera-icon").css("margin-top", 20);
-        } else {
-            $("#camera-icon").css("margin-top", 80);
-        }
-    }
-
-    jQuery(window).resize(thumbnailImgResize);
-    var timer = setInterval(thumbnailImgResize, 100);
-
     var keywordsEl = $("#keywords");
     keywordsEl.tagsInput({
         height: '68px',
@@ -87,6 +69,13 @@ $(function () {
             editorEl.addClass("has-error");
             editorEl.css("border-color", "#a94442");
         }
+        if ($("input[name='typeId']:checked").val() === undefined) {
+            $("#type-select-parent").addClass("has-error");
+            $("#type-select-parent").css("border-color", "#a94442");
+        } else {
+            $("#type-select-parent").removeClass("has-error");
+            $("#type-select-parent").css("border-color", "");
+        }
         return el.find(".has-error").length === 0;
     }
 
@@ -101,7 +90,6 @@ $(function () {
             } else {
                 $("#title-parent").addClass("has-error");
             }
-
         }
     });
 
@@ -214,13 +202,11 @@ $(function () {
     });
 
     function fillThumbnail(url) {
-        $("#thumbnail-img").css('background-image', "url('" + url + "')");
+        $("#thumbnail-img").css('background-image', "url('" + url + "')").css("background-size","cover");
         var w = gup("w", url);
         var h = gup("h", url);
         if (h) {
-            if (w < 660) {
-                h = 660.0 / w * h;
-            }
+            h = 211.0 / w * h;
             $("#thumbnail-img").height(h);
             $("#thumbnail").val(url);
             $("#camera-icon").hide();

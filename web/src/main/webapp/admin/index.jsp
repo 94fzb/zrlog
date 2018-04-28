@@ -27,7 +27,7 @@
         var _res = ${res};
     </script>
 </head>
-<body class="${webs.admin_dashboard_naver}">
+<body class="nav-sm">
 <c:if test="${previewDb}">
     <div class="container">
         <div class="col-md-12 bg-info text-center">
@@ -124,10 +124,6 @@
         <div class="top_nav">
             <div class="nav_menu" id="nav_menu">
                 <nav>
-                    <div class="nav toggle">
-                        <a id="menu_toggle"><i class="fa fa-bars"></i></a>
-                    </div>
-
                     <ul class="nav navbar-nav navbar-right">
                         <li class="">
                             <a href="javascript:" class="user-profile dropdown-toggle" data-toggle="dropdown"
@@ -221,27 +217,6 @@
                                 </ul>
                             </li>
                         </c:if>
-                        <li role="presentation" class="dropdown">
-                            <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown"
-                               aria-expanded="false">
-                                <i class="fa fa-globe"></i>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a tabindex="-1" class="language" id="zh_CN">${_res.languageChinese}</a>
-                                </li>
-                                <li>
-                                    <a tabindex="-1" class="language" id="en_US">${_res.languageEnglish}</a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li role="presentation" class="hidden-xs">
-                            <a target="_blank" href="http://blog.zrlog.com/post/feedback"
-                               class="dropdown-toggle info-number">
-                                <i class="fa fa-support"></i><span
-                                    style="padding-left: 5px">${_res['suggestAndFeedback']}</span>
-                            </a>
-                        </li>
                     </ul>
                 </nav>
             </div>

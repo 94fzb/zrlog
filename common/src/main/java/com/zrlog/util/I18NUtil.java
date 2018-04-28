@@ -37,19 +37,20 @@ public class I18NUtil {
 
     private static void loadI18N(InputStream inputStream, String name) {
         if (name.startsWith(Constants.I18N) && name.endsWith(".properties")) {
-            String key = name.replace(".properties", "");
-            Map<String, Object> map = I18N_RES_MAP.get(key);
-            if (map == null) {
-                map = new HashMap<>();
-                I18N_RES_MAP.put(key, map);
-            }
-            Properties properties = new Properties();
             try {
+                String key = name.replace(".properties", "");
+                Map<String, Object> map = I18N_RES_MAP.get(key);
+                if (map == null) {
+                    map = new HashMap<>();
+                    I18N_RES_MAP.put(key, map);
+                }
+                Properties properties = new Properties();
+
                 properties.load(inputStream);
                 for (Map.Entry<Object, Object> entry : properties.entrySet()) {
                     map.put(entry.getKey().toString(), entry.getValue());
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 LOGGER.error("load properties error", e);
             } finally {
                 try {

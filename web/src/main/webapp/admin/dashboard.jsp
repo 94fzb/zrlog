@@ -9,6 +9,8 @@
 <div class="alert alert-block alert-info">
     <i class="fa fa-info"></i>
     <span style="padding-left: 5px">${_res['admin.index.welcomeTips']}</span>
+    <a target="_blank" href="http://blog.zrlog.com/post/feedback" style="float: right"><i
+            class="fa fa-support"></i><span style="padding-left: 5px"> ${_res['suggestAndFeedback']}</span> </a>
 </div>
 <div class="row">
     <div class="col-md-7 col-xs-12 col-sm-12">

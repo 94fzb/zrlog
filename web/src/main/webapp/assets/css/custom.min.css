@@ -93,7 +93,7 @@
     left: 100%;
     position: absolute;
     top: 0;
-    width: 210px;
+    width: 150px;
     z-index: 4000;
 }
 
@@ -102,7 +102,7 @@
 }
 
 .nav-sm ul.nav.child_menu li a {
-    text-align: left !important;
+    /*text-align: center ;*/
 }
 
 .nav-sm .profile {
@@ -4843,13 +4843,12 @@ ul.notifications {
 
 .WriteCover-wrapper {
     background: rgba(0, 0, 0, .075);
-    height: 192px;
+    height: 62px;
     background-size: 100% auto;
     width: 660px;
     color: #808080;
     text-align: center;
     border-radius: 4px;
-    margin-left: 12px;
 }
 
 .WriteCover-uploadInput {
@@ -4865,7 +4864,7 @@ ul.notifications {
 }
 
 .fa-3 {
-    margin-top: 80px;
+    margin-top: 12px;
     width: 40px;
     height: 40px;
     font-size: 35px !important;

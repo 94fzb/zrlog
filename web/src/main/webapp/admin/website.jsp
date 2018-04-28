@@ -190,6 +190,15 @@
 						</span>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right"> 语言 </label>
+                        <div class="col-sm-2">
+                            <select name="language" class="form-control select2_single">
+                                <option <c:if test="${webs.language eq 'zh_CN'}">'selected'='selected'</c:if> value="zh_CN">${_res.languageChinese}</option>
+                                <option <c:if test="${webs.language eq 'en_US'}">'selected'='selected'</c:if> value="en_US">${_res.languageEnglish}</option>
+                            </select>
+                        </div>
+                    </div>
                     <div class="ln_solid"></div>
 
                     <div class="form-group">
