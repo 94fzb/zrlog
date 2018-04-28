@@ -7,7 +7,6 @@ import com.jfinal.kit.PathKit;
 import com.jfinal.plugin.IPlugin;
 import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
 import com.jfinal.plugin.activerecord.IDataSourceProvider;
-import com.jfinal.plugin.c3p0.C3p0Plugin;
 import com.jfinal.render.ViewType;
 import com.jfinal.template.Engine;
 import com.zrlog.model.*;
@@ -25,6 +24,7 @@ import com.zrlog.web.interceptor.InitDataInterceptor;
 import com.zrlog.web.interceptor.MyI18NInterceptor;
 import com.zrlog.web.interceptor.RouterInterceptor;
 import com.zrlog.web.plugin.UpdateVersionPlugin;
+import com.zrlog.web.plugin.ViburDBCPPlugin;
 import com.zrlog.web.version.UpgradeVersionHandler;
 import org.apache.log4j.Logger;
 
@@ -182,7 +182,7 @@ public class ZrLogConfig extends JFinalConfig {
                 jdbcUrl = dbProperties.getProperty("jdbcUrl");
 
                 // 启动时候进行数据库连接
-                C3p0Plugin dataSourcePlugin = new C3p0Plugin(dbProperties.getProperty("jdbcUrl"),
+                ViburDBCPPlugin dataSourcePlugin = new ViburDBCPPlugin(dbProperties.getProperty("jdbcUrl"),
                         dbProperties.getProperty("user"), dbProperties.getProperty("password"));
                 plugins.add(dataSourcePlugin);
                 // 添加表与实体的映射关系
