@@ -20,8 +20,7 @@
 </head>
 
 <body style="background:#fff">
-<div class="col-md-2"></div>
-<div class="col-md-8">
+<div class="container" style="max-width: 1080px">
     <div class="x_panel">
         <div class="x_title">
             <div class="widget-header widget-header-blue widget-header-flat">
@@ -31,8 +30,12 @@
         </div>
 
         <div class="x_content">
-            <div class="alert alert-danger" <c:if test="${empty errorMsg }">style="display: none;"</c:if>>
-                <b><i class="fa fa-info-circle"></i> ${errorMsg}</b>
+            <div class="col-xs-12">
+                <div class="row">
+                    <div class="alert alert-danger" <c:if test="${empty errorMsg }">style="display: none;"</c:if>>
+                        <b><i class="fa fa-info-circle"></i> ${errorMsg}</b>
+                    </div>
+                </div>
             </div>
             <c:if test="${currentViewName ne 'forbidden'}">
             <div class="col-xs-12">
@@ -41,7 +44,7 @@
                         <li>
                             <a
                                     <c:if test="${currentViewName eq 'index'}">class="selected"</c:if>
-                                    <c:if test="${currentViewName ne 'index'}">class="disable"</c:if> href="#step-1"
+                                    <c:if test="${currentViewName ne 'index'}">class="disable"</c:if>
                                     isdone="1" rel="1">
                                 <span class="step_no">1</span>
                                 <span class="step_descr">${_res.installDatabaseInfo}</span>
@@ -50,7 +53,7 @@
                         <li>
                             <a
                                     <c:if test="${currentViewName eq 'message'}">class="selected"</c:if>
-                                    <c:if test="${currentViewName ne 'message'}">class="disable"</c:if> href="#step-2"
+                                    <c:if test="${currentViewName ne 'message'}">class="disable"</c:if>
                                     isdone="0" rel="2">
                                 <span class="step_no">2</span>
                                 <span class="step_descr">${_res.installWebSiteInfo}</span>
@@ -59,7 +62,7 @@
                         <li>
                             <a
                                     <c:if test="${currentViewName eq 'success'}">class="selected"</c:if>
-                                    <c:if test="${currentViewName ne 'success'}">class="disable"</c:if> href="#step-3"
+                                    <c:if test="${currentViewName ne 'success'}">class="disable"</c:if>
                                     isdone="0" rel="3">
                                 <span class="step_no">3</span>
                                 <span class="step_descr">${_res.installComplete}</span>
@@ -68,7 +71,4 @@
                     </ul>
                 </div>
             </div>
-            <hr/>
-            <div id="step-container"
-                 class=" stepContainer row-fluid position-relative">
-                </c:if>
+            </c:if>

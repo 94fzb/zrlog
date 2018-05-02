@@ -99,11 +99,13 @@
 
             if (value != '' && skipTag != true) {
                 $('<span>').attr("val", value).addClass('tag2').append(
-                    $('<span>').text(value).append('&nbsp;&nbsp;'),
+                    $("<i style='padding-right: 5px'>").addClass("fa fa-tag"),
+                    $('<span>').text(value),
                     $('<a>', {
                         href: '#',
                         title: 'Removing tag',
-                        text: 'x'
+                        text: 'X',
+                        style: "padding-left:5px"
                     })/*.click(function () {
                             return $('#' + id).removeTag(escape(value));
                         })*/

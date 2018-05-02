@@ -65,7 +65,7 @@ public class InstallService {
      * 尝试使用填写的数据库信息连接数据库
      */
     public TestConnectDbResult testDbConn() {
-        TestConnectDbResult testConnectDbResult = null;
+        TestConnectDbResult testConnectDbResult;
         try {
             Connection connection = getConnection();
             connection.close();
@@ -75,8 +75,10 @@ public class InstallService {
             testConnectDbResult = TestConnectDbResult.MISSING_MYSQL_DRIVER;
         } catch (MySQLSyntaxErrorException e) {
             LOGGER.error("", e);
-            if (e.getMessage().contains("Access denied for user ")) {
+            if (e.getMessage().contains("Access denied for user ") || e.getMessage().contains("Unknown database")) {
                 testConnectDbResult = TestConnectDbResult.DB_NOT_EXISTS;
+            } else {
+                testConnectDbResult = TestConnectDbResult.UNKNOWN;
             }
         } catch (SQLException e) {
             LOGGER.error("", e);

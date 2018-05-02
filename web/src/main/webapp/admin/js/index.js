@@ -30,6 +30,7 @@ var allLang = {
         "saving": "正在保存中，请稍等...",
         "auto": "自动",
         "saveSuccess": "保存成功",
+        "releaseSuccess": "发布成功",
         "addAttachment": "添加附件",
         "addVideo": "添加视频",
         "copPreviewHtmlToClipboard": "拷贝预览HTML到粘贴板",
@@ -79,6 +80,7 @@ var allLang = {
         "saving": "Saving",
         "auto": "Auto",
         "saveSuccess": "save success",
+        "releaseSuccess": "release success",
         "addAttachment": "Attachment",
         "addVideo": "Video",
         "copPreviewHtmlToClipboard": "Copy preview html to clipboard",
@@ -99,7 +101,8 @@ var allLang = {
 
     }
 };
-var lang = allLang[document.getElementsByTagName("html")[0]["lang"]];
+var currentLang = document.getElementsByTagName("html")[0]["lang"];
+var lang = allLang[currentLang];
 var mainColor = "#1890ff";
 
 $(function () {

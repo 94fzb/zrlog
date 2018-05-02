@@ -7,7 +7,6 @@ import com.jfinal.aop.Invocation;
 import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
-import com.jfinal.render.ViewType;
 import com.zrlog.common.Constants;
 import com.zrlog.common.response.ExceptionResponse;
 import com.zrlog.common.vo.AdminTokenVO;
@@ -17,6 +16,7 @@ import com.zrlog.service.AdminTokenService;
 import com.zrlog.service.CacheService;
 import com.zrlog.util.I18NUtil;
 import com.zrlog.web.annotation.RefreshCache;
+import com.zrlog.web.config.ZrLogConfig;
 import com.zrlog.web.util.WebTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,7 +75,7 @@ class AdminInterceptor implements Interceptor {
                 ai.invoke();
                 // 存在消息提示
                 if (controller.getAttr("message") != null) {
-                    controller.render("/admin/message.jsp");
+                    controller.render("/admin/message" + ZrLogConfig.getTemplateExt());
                 } else {
                     if (!tryDoRender(ai, controller)) {
                         controller.redirect(Constants.NOT_FOUND_PAGE);
@@ -101,9 +101,7 @@ class AdminInterceptor implements Interceptor {
             exceptionResponse.setStack(ExceptionUtils.recordStackTraceMsg(e));
             ai.getController().renderJson(exceptionResponse);
         } else {
-            if (JFinal.me().getConstants().getViewType() == ViewType.JSP) {
-                ai.getController().redirect(Constants.ERROR_PAGE);
-            }
+            ai.getController().redirect(Constants.ERROR_PAGE);
         }
     }
 
@@ -153,8 +151,8 @@ class AdminInterceptor implements Interceptor {
             if (ai.getActionKey().startsWith("/api/admin")) {
                 controller.renderJson((Object) ai.getReturnValue());
                 rendered = true;
-            } else if (ai.getActionKey().startsWith("/admin") && returnValue instanceof String && JFinal.me().getConstants().getViewType() == ViewType.JSP) {
-                String templatePath = returnValue.toString() + ".jsp";
+            } else if (ai.getActionKey().startsWith("/admin") && returnValue instanceof String) {
+                String templatePath = returnValue.toString() + ZrLogConfig.getTemplateExt();
                 if (new File(PathKit.getWebRootPath() + templatePath).exists()) {
                     controller.render(templatePath);
                     rendered = true;

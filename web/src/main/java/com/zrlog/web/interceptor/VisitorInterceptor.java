@@ -6,7 +6,6 @@ import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.jfinal.json.Json;
 import com.jfinal.kit.PathKit;
-import com.jfinal.render.ViewType;
 import com.zrlog.common.response.ApiStandardResponse;
 import com.zrlog.web.config.ZrLogConfig;
 
@@ -50,15 +49,12 @@ class VisitorInterceptor implements Interceptor {
         if (templateName == null) {
             return;
         }
-        String ext = "";
-        if (JFinal.me().getConstants().getViewType() == ViewType.JSP) {
-            ext = ".jsp";
-        }
+
         String basePath = TemplateHelper.fullTemplateInfo(ai.getController(), true);
         if (ai.getController().getAttr("log") != null) {
             ai.getController().setAttr("pageLevel", 1);
         } else if (ai.getController().getAttr("data") != null) {
-            if ("/".equals(ai.getActionKey()) && new File(PathKit.getWebRootPath() + basePath + "/" + templateName + ext).exists()) {
+            if ("/".equals(ai.getActionKey()) && new File(PathKit.getWebRootPath() + basePath + "/" + templateName + ZrLogConfig.getTemplateExt()).exists()) {
                 ai.getController().setAttr("pageLevel", 2);
             } else {
                 templateName = "page";
@@ -68,7 +64,7 @@ class VisitorInterceptor implements Interceptor {
             ai.getController().setAttr("pageLevel", 2);
         }
         fullDevData(ai.getController());
-        ai.getController().render(basePath + "/" + templateName + ext);
+        ai.getController().render(basePath + "/" + templateName + ZrLogConfig.getTemplateExt());
     }
 
     /**
@@ -107,8 +103,9 @@ class VisitorInterceptor implements Interceptor {
     private void installPermission(Invocation ai) {
         if (!ZrLogConfig.isInstalled()) {
             ai.invoke();
+            ai.getController().render(ai.getReturnValue() + ZrLogConfig.getTemplateExt());
         } else {
-            ai.getController().render("/install/forbidden.jsp");
+            ai.getController().render("/install/forbidden" + ZrLogConfig.getTemplateExt());
         }
     }
 }

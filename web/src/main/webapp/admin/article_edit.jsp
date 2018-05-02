@@ -9,17 +9,14 @@
     var article = ${article};
     var uploadUrl = 'api/admin/upload/';
     var editorMdPath = "admin/markdown/lib/";
+    var editorLang = "admin/markdown/languages/";
     $('.icheck').iCheck({
         checkboxClass: 'icheckbox_flat-blue',
         radioClass: 'iradio_flat-blue'
     });
+    var editorMdJs = '${basePath}admin/markdown/js/editormd.min.js';
 </script>
-
 <script src="${basePath}assets/js/screenfull.min.js"></script>
-<script src="${basePath}admin/markdown/js/editormd.min.js"></script>
-<c:if test='${lang eq "en"}'>
-    <script src="${basePath}admin/markdown/languages/en.js"></script>
-</c:if>
 <script src="${basePath}assets/js/jquery.liteuploader.min.js"></script>
 <script src="${basePath}assets/js/select2/select2.min.js"></script>
 <script src="${basePath}assets/js/jquery.tagsinput.js"></script>
@@ -81,6 +78,14 @@
     .editormd-html-preview, .editormd-preview-container {
         padding: 5px;
     }
+
+    #editorDiv {
+        width: 100%;
+        min-height: 1040px;
+        border-radius: 4px;
+        background-color: #ffffff;
+        border: 1px solid #e6e9ed;
+    }
 </style>
 <div class="page-header">
     <h3>
@@ -107,7 +112,7 @@
                 </button>
                 <button class="btn btn-info" id="save" type="button">
                     <i class="fa fa-paper-plane bigger-110"></i>
-                    ${_res['save']}
+                    <span id="save_text"></span>
                 </button>
             </div>
         </div>
@@ -127,25 +132,23 @@
                         </div>
                     </div>
                 </div>
-                <div id="editormd" theme="${webSite.editorMdTheme}"></div>
+                <div id="editorDiv" theme="${webSite.editorMdTheme}"></div>
             </div>
         </div>
         <div class="col-md-12 row col-lg-3 col-xs-12">
             <div class="form-group col-xs-12">
                 <c:if test="${0 ne webSite['article_thumbnail_status']}">
                     <div class="x_panel">
-                        <div class="x_content">
-                            <div id="thumbnail-img" title="${_res['writeCover']}"
-                                 style="background-color:rgba(0,0,0,.075);<c:if
-                                         test="${log!=null and not empty log.thumbnail}">background: url('${log.thumbnail}')</c:if>"
-                                 class="thumbnail-img img-responsive WriteCover-wrapper WriteCover-previewWrapper">
-                                <i id="camera-icon" class="WriteCover-uploadIcon fa fa-camera fa-3"></i>
-                                <input type="file" accept=".jpeg, .jpg, .png" id="thumbnail-upload"
-                                       name="imgFile"
-                                       value="${log.thumbnail}"
-                                       class="WriteCover-uploadInput">
-                                <input type="hidden" name="thumbnail" value="${log.thumbnail}" id="thumbnail">
-                            </div>
+                        <div id="thumbnail-img" title="${_res['writeCover']}"
+                             style="background-color:rgba(0,0,0,.075);<c:if
+                                     test="${log!=null and not empty log.thumbnail}">background: url('${log.thumbnail}')</c:if>"
+                             class="thumbnail-img img-responsive WriteCover-wrapper WriteCover-previewWrapper">
+                            <i id="camera-icon" class="WriteCover-uploadIcon fa fa-camera fa-3"></i>
+                            <input type="file" accept=".jpeg, .jpg, .png" id="thumbnail-upload"
+                                   name="imgFile"
+                                   value="${log.thumbnail}"
+                                   class="WriteCover-uploadInput">
+                            <input type="hidden" name="thumbnail" value="${log.thumbnail}" id="thumbnail">
                         </div>
                     </div>
                 </c:if>
@@ -176,8 +179,8 @@
                                 </label>
                             </div>
                         </div>
-                        <div class="row" style="padding-top: 10px">
-                            <div class="col-xs-6">
+                        <div class="row">
+                            <div class="col-xs-6" id="privateCheckbox">
                                 <label><span style="font-size: 16px">${_res['private']}</span>
                                     <input type="checkbox" name="_private"
                                            <c:if test="${log['private']}">checked="checked"</c:if>
@@ -195,16 +198,15 @@
                         <div class="clearfix"></div>
                     </div>
                     <div class="x_content">
-                        <div style="font-size: 16px">
-                            <c:forEach items="${init.types}" var="type">
-                                <div class="radio">
-                                    <input style="padding-top: 15px" class="icheck flat" name="typeId"
-                                           type="radio"
+                        <c:forEach items="${init.types}" var="type">
+                            <div style="font-size: 16px" class="row">
+                                <div class="col-lg-12">
+                                    <input class="icheck flat" name="typeId" type="radio"
                                            <c:if test="${type.id eq log.typeId}">checked="checked"</c:if>
                                            value="${type.id}"><span style="padding-left: 5px">${type.typeName}</span>
                                 </div>
-                            </c:forEach>
-                        </div>
+                            </div>
+                        </c:forEach>
                     </div>
                 </div>
             </div>
@@ -218,14 +220,12 @@
                     </div>
                     <div class="x_content">
                         <input value="${log.keywords}" class="form-control" placeholder="${_res['tagTips']}"
-                               type="hidden"
-                               name="keywords" id="keywordsVal" size="60" maxlength="60"/>
+                               type="hidden" name="keywords" id="keywordsVal" size="60" maxlength="60"/>
                         <div class="tagsinput" id="keywords"></div>
-                        <hr/>
                         <div class="tagsinput" id="unCheckedTag" style="max-height: 240px;width: 100%">
                             <c:forEach items="${init.tags}" var="tags">
-                                        <span class="tag2" val="${tags.text}"><i
-                                                class="fa fa-tag"></i>${tags.text}</span>
+                                <span class="tag2" val="${tags.text}"><i style="padding-right: 5px"
+                                                                         class="fa fa-tag"></i>${tags.text}</span>
                             </c:forEach>
                         </div>
                     </div>
@@ -245,8 +245,6 @@
                 </div>
             </div>
         </div>
-</div>
-</div>
-</form>
+    </form>
 </div>
 ${pageEndTag}

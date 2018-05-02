@@ -8,6 +8,7 @@ $(function () {
     });
 
     var keywordsEl = $("#keywords");
+    var isPrivateCheckBoxEl = $("input[name='_private']");
     keywordsEl.tagsInput({
         height: '68px',
         width: 'auto'
@@ -122,7 +123,7 @@ $(function () {
                         success: function (data) {
                             var date = new Date();
                             if (!data.error) {
-                                data.message = (timer ? lang.auto : "") + (rubbish ? lang.rubbish : "") + " " + lang.saveSuccess + " " + zeroPad(date.getHours(), 2) + ":" + zeroPad(date.getMinutes(), 2) + ":" + zeroPad(date.getSeconds(), 2);
+                                data.message = (timer ? lang.auto : "") + (rubbish ? lang.rubbish : "") + (currentLang === 'en' ? " " : "") + (isPrivateCheckBoxEl.is(":checked") || timer || rubbish ? lang.saveSuccess : lang.releaseSuccess) + " " + zeroPad(date.getHours(), 2) + ":" + zeroPad(date.getMinutes(), 2) + ":" + zeroPad(date.getSeconds(), 2);
                             }
                             preTips(data);
                             lastChangeRequestBody = JSON.stringify(getFormRequestBody("#article-form"));
@@ -163,7 +164,7 @@ $(function () {
         var text = $(this).siblings().text().trim();
         $("#unCheckedTag").find('span[val=' + text + ']').remove();
         $(this).parent().remove();
-        $("#unCheckedTag").append('<span class="tag2" val="' + text + '"><i class="fa fa-tag">' + text + '</i></span>');
+        $("#unCheckedTag").append('<span class="tag2" val="' + text + '"><i style="padding-right: 5px" class="fa fa-tag"></i>' + text + '</span>');
         refreshKeywords();
         return false;
     });
@@ -202,7 +203,7 @@ $(function () {
     });
 
     function fillThumbnail(url) {
-        $("#thumbnail-img").css('background-image', "url('" + url + "')").css("background-size","cover");
+        $("#thumbnail-img").css('background-image', "url('" + url + "')").css("background-size", "cover");
         var w = gup("w", url);
         var h = gup("h", url);
         if (h) {
@@ -229,6 +230,20 @@ $(function () {
             saveArticle(true, false);
             return false;
         }
+    });
+
+    function saveBtnText(_private) {
+        if (_private) {
+            $("#save_text").text(_res['save']);
+        } else {
+            $("#save_text").text(_res['release']);
+        }
+    }
+
+    saveBtnText(isPrivateCheckBoxEl.is(':checked'));
+
+    $(isPrivateCheckBoxEl).click(function () {
+        saveBtnText($(this).is(':checked'));
     });
 
 });

@@ -72,7 +72,7 @@ public class UpdateVersionThread extends Thread implements Serializable {
         Map<String, String> copyFileMap = new LinkedHashMap<>();
         copyFileMap.put(PathKit.getWebRootPath() + "/WEB-INF/db.properties", tempFilePath + "/WEB-INF/");
         copyFileMap.put(PathKit.getWebRootPath() + "/WEB-INF/install.lock", tempFilePath + "/WEB-INF/");
-        copyFileMap.put(PathKit.getWebRootPath() + "/attached", tempFilePath.toString());
+        copyFileMap.put(PathKit.getWebRootPath() + Constants.ATTACHED_FOLDER, tempFilePath.toString());
         copyFileMap.put(PathKit.getWebRootPath() + "/favicon.ico", tempFilePath.toString());
         copyFileMap.put(PathKit.getWebRootPath() + "/error", tempFilePath.toString());
         fillTemplateCopyInfo(tempFilePath, copyFileMap);

@@ -4,7 +4,7 @@
     <c:when test="${log.canComment}">
         <c:choose>
             <c:when test="${init.webSite.changyan_status eq 'on'}">
-                <div id="cwrapper">
+                <div id="cwrapper" style="padding: 20px">
                     <plugin name="changyan" view="widget" param="articleId=${log.logId}"></plugin>
                 </div>
             </c:when>

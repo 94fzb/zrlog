@@ -1,7 +1,5 @@
 package com.zrlog.web.controller.blog;
 
-import java.io.IOException;
-
 /**
  * 对 PostController 的扩展，响应的数据均为Json格式
  */
@@ -12,7 +10,7 @@ public class ApiPostController extends PostController {
         return super.detail(getPara("id"));
     }
 
-    public void addComment() throws IOException {
+    public void addComment() {
         renderJson(super.saveComment());
     }
 }

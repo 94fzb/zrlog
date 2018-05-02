@@ -344,6 +344,15 @@ public class ZrLogConfig extends JFinalConfig {
         initDatabaseVersion();
     }
 
+    public static String getTemplateExt() {
+        if (JFinal.me().getConstants().getViewType() == ViewType.JSP) {
+            return ".jsp";
+        } else {
+            return ".html";
+        }
+
+    }
+
     public static boolean isTest() {
         return "junit-test".equals(systemProp.getProperty("env"));
     }

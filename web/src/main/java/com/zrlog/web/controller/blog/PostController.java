@@ -16,7 +16,6 @@ import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.controller.BaseController;
 import com.zrlog.web.util.WebTools;
 
-import java.io.IOException;
 import java.util.Map;
 
 public class PostController extends BaseController {
@@ -96,7 +95,7 @@ public class PostController extends BaseController {
         return "page";
     }
 
-    public void addComment() throws IOException {
+    public void addComment() {
         CreateCommentResponse response = saveComment();
         String ext = "";
         if (Constants.isStaticHtmlStatus()) {

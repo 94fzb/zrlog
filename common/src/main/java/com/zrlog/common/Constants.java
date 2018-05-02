@@ -27,8 +27,8 @@ public class Constants {
     public static final String ADMIN_TOKEN = "admin_token";
     //字符长度必须要大于16个字符
     public static final String AES_PUBLIC_KEY = "_BLOG_BLOG_BLOG_";
-    //20分钟
-    private static final long DEFAULT_SESSION_TIMEOUT = 1000 * 20 * 60L;
+    //1天
+    private static final long DEFAULT_SESSION_TIMEOUT = 1000 * 60 * 60 * 24L;
     private static final String SESSION_TIMEOUT_KEY = "session_timeout";
     public static final String ATTACHED_FOLDER = "/attached/";
     public static String TEMPLATE_CONFIG_SUFFIX = "_setting";

@@ -9,6 +9,7 @@ import com.zrlog.common.Constants;
 import com.zrlog.service.AdminTokenThreadLocal;
 import com.zrlog.util.I18NUtil;
 import com.zrlog.util.ZrLogUtil;
+import com.zrlog.web.config.ZrLogConfig;
 import com.zrlog.web.util.WebTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +37,7 @@ public class GlobalResourceHandler extends Handler {
 
     static {
         //由于程序的.jsp文件没有存放在WEB-INF目录，为了防止访问.jsp页面获得的没有数据的页面，或则是错误的页面。
-        FORBIDDEN_URI_EXT_SET.add(".jsp");
+        FORBIDDEN_URI_EXT_SET.add(ZrLogConfig.getTemplateExt());
         //这主要用在主题目录下面的配置文件。
         FORBIDDEN_URI_EXT_SET.add(".properties");
     }
@@ -56,7 +57,7 @@ public class GlobalResourceHandler extends Handler {
             final ResponseRenderPrintWriter responseRenderPrintWriter = new ResponseRenderPrintWriter(response.getOutputStream(), !JFinal.me().getConstants().getDevMode(), url, PAGE_END_TAG, request, response);
             response = new HttpServletResponseWrapper(response) {
                 @Override
-                public PrintWriter getWriter() throws IOException {
+                public PrintWriter getWriter() {
                     return responseRenderPrintWriter;
                 }
             };

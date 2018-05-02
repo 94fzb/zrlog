@@ -44,7 +44,7 @@ public class InitDataInterceptor implements Interceptor {
         long start = System.currentTimeMillis();
         //未安装情况下无法设置缓存
         if (!ZrLogConfig.isInstalled()) {
-            invocation.getController().render("/install/index.jsp");
+            invocation.getController().render("/install/index" + ZrLogConfig.getTemplateExt());
         } else {
             if (invocation.getController() instanceof BaseController) {
                 HttpServletRequest request = invocation.getController().getRequest();
