@@ -199,6 +199,15 @@
                             </select>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label no-padding-right"> 文章路由 </label>
+                        <div class="col-sm-2">
+                            <select name="article_route" class="form-control select2_single">
+                                <option <c:if test="${webs.article_route eq ''}">'selected'='selected'</c:if> value="">默认</option>
+                                <option <c:if test="${webs.article_route eq 'post' || empty webs.article_route}">'selected'='selected'</c:if> value="post">post</option>
+                            </select>
+                        </div>
+                    </div>
                     <div class="ln_solid"></div>
 
                     <div class="form-group">

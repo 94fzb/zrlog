@@ -1,5 +1,9 @@
+<%@ page import="com.zrlog.common.Constants" %>
 <%@ page session="false" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%
+    request.setAttribute("post", Constants.getArticleUri());
+%>
 <link rel="stylesheet" href="${basePath}admin/markdown/css/editormd.min.css"/>
 <link rel="stylesheet" href="${basePath}assets/css/video-js.css"/>
 <link rel="stylesheet" href="${basePath}assets/css/icheck-blue.css"/>
@@ -126,7 +130,7 @@
                     </div>
                     <div class="col-md-3 col-xs-12" style="padding-bottom: 5px">
                         <div class="input-group">
-                            <span class="input-group-addon" id="basic-addon3">/post/</span>
+                            <span class="input-group-addon" id="basic-addon3">/${post}</span>
                             <input placeholder="${_res['inputArticleAlias']}" type="text" class="form-control"
                                    id="alias" name="alias" aria-describedby="basic-addon3" value="${log.alias}">
                         </div>

@@ -30,7 +30,7 @@ public class TemplateHelper {
 
     private static final Logger LOGGER = Logger.getLogger(TemplateHelper.class);
 
-    public static void fullInfo(HttpServletRequest request, boolean staticHtml) {
+    private static void fullInfo(HttpServletRequest request, boolean staticHtml) {
         boolean staticBlog = ZrLogUtil.isStaticBlogPlugin(request);
         // 模板地址
         String suffix = "";
@@ -45,7 +45,7 @@ public class TemplateHelper {
         Map webSite = baseDataInitVO.getWebSite();
         String baseUrl = setBaseUrl(request, staticBlog, webSite);
         request.setAttribute("webs", webSite);
-        request.setAttribute("searchUrl", baseUrl + "post/search");
+        request.setAttribute("searchUrl", baseUrl + Constants.getArticleUri() + "search");
         String title = webSite.get("title") + " - " + webSite.get("second_title");
         if (request.getAttribute("log") != null) {
             title = ((Log) request.getAttribute("log")).get("title") + " - " + title;
@@ -59,7 +59,7 @@ public class TemplateHelper {
         }
         boolean thumbnailEnableArticle = true;
         Object tT = webSite.get("article_thumbnail_status");
-        if (tT != null && tT instanceof Boolean) {
+        if (tT instanceof Boolean) {
             thumbnailEnableArticle = (Boolean) tT;
         }
         staticHtml(data, baseUrl, suffix, thumbnailEnableArticle);
@@ -75,14 +75,14 @@ public class TemplateHelper {
         List<Tag> tags = baseDataInitVO.getTags();
         if (!tags.isEmpty()) {
             for (Tag tag : tags) {
-                String tagUri = baseUrl + "post/tag/" + tag.get("text") + suffix;
+                String tagUri = baseUrl + Constants.getArticleUri() + "tag/" + tag.get("text") + suffix;
                 tag.put("url", tagUri);
             }
         }
         List<Type> types = baseDataInitVO.getTypes();
         if (!types.isEmpty()) {
             for (Type type : types) {
-                String tagUri = baseUrl + "post/sort/" + type.get("alias") + suffix;
+                String tagUri = baseUrl + Constants.getArticleUri() + "sort/" + type.get("alias") + suffix;
                 type.put("url", tagUri);
             }
         }
@@ -92,7 +92,7 @@ public class TemplateHelper {
             Archive archive = new Archive();
             archive.setCount(entry.getValue());
             archive.setText(entry.getKey());
-            String tagUri = baseUrl + "post/record/" + entry.getKey() + suffix;
+            String tagUri = baseUrl + Constants.getArticleUri() + "record/" + entry.getKey() + suffix;
             archive.setUrl(tagUri);
             archiveList.add(archive);
         }
@@ -105,7 +105,7 @@ public class TemplateHelper {
         if (!logNavList.isEmpty()) {
             for (LogNav logNav : logNavList) {
                 String url = logNav.get("url").toString();
-                if ("/".equals(url) && ("/all-1".equals(request.getRequestURI()) || "/post/all-1".equals(request.getRequestURI()))) {
+                if ("/".equals(url) && ("/all-1".equals(request.getRequestURI()) || (Constants.getArticleUri() + "all-1").equals(request.getRequestURI()))) {
                     logNav.put("current", true);
                     continue;
                 } else if (url.startsWith("/")) {
@@ -114,7 +114,7 @@ public class TemplateHelper {
                     } else {
                         url = url.substring(1, url.length());
                     }
-                    if (url.startsWith("/post")) {
+                    if (url.startsWith("/" + Constants.getArticleUri())) {
                         url += suffix;
                     }
                     url = baseUrl + url;
@@ -194,8 +194,8 @@ public class TemplateHelper {
                     } else if (log.get("thumbnail") != null) {
                         log.put("thumbnailAlt", ParseUtil.removeHtmlElement((String) log.get("title")));
                     }
-                    log.put("url", baseUrl + "post/" + log.get("alias") + suffix);
-                    log.put("typeUrl", baseUrl + "post/sort/" + log.get("typeAlias") + suffix);
+                    log.put("url", baseUrl + Constants.getArticleUri() + log.get("alias") + suffix);
+                    log.put("typeUrl", baseUrl + Constants.getArticleUri() + "sort/" + log.get("typeAlias") + suffix);
                 }
             }
         }
@@ -216,12 +216,12 @@ public class TemplateHelper {
 
     public static void fillArticleInfo(Log data, String baseUrl, String suffix) {
         data.put("alias", data.get("alias") + suffix);
-        data.put("url", baseUrl + "post/" + data.get("alias"));
-        data.put("typeUrl", baseUrl + "post/sort/" + data.get("typeAlias") + suffix);
+        data.put("url", baseUrl + Constants.getArticleUri() + data.get("alias"));
+        data.put("typeUrl", baseUrl + Constants.getArticleUri() + "sort/" + data.get("typeAlias") + suffix);
         Log lastLog = data.get("lastLog");
         Log nextLog = data.get("nextLog");
-        nextLog.put("url", baseUrl + "post/" + nextLog.get("alias") + suffix);
-        lastLog.put("url", baseUrl + "post/" + lastLog.get("alias") + suffix);
+        nextLog.put("url", baseUrl + Constants.getArticleUri()+ nextLog.get("alias") + suffix);
+        lastLog.put("url", baseUrl + Constants.getArticleUri()+ lastLog.get("alias") + suffix);
         String markdown = data.getStr("markdown").toLowerCase();
         //没有使用md的toc目录的文章才尝试使用系统提取的目录
         if (!markdown.contains("[toc]") && !markdown.contains("[tocm]")) {

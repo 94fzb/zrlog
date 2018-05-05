@@ -17,6 +17,7 @@ target
 hs_err*.log
 web/src/backup
 web/src/main/webapp/post
+web/src/main/webapp/_cache
 web/src/main/webapp/attached
 web/src/main/webapp/WEB-INF/classes
 web/src/main/webapp/WEB-INF/plugins/*

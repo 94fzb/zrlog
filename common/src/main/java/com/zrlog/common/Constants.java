@@ -54,6 +54,24 @@ public class Constants {
         return 20 * 1024 * 1024;
     }
 
+    public static String getArticleUri() {
+        String router = getArticleRoute();
+        if (StringUtils.isNotEmpty(router)) {
+            return router + "/";
+        }
+        return "";
+    }
+
+    public static String getArticleRoute() {
+        if (webSite.containsKey("article_route")) {
+            if (webSite.get("article_route") == null) {
+                return "";
+            }
+            return (String) webSite.get("article_route");
+        }
+        return "post";
+    }
+
     public static Long getSessionTimeout() {
         String sessionTimeoutString = (String) Constants.webSite.get(Constants.SESSION_TIMEOUT_KEY);
         Long sessionTimeout;

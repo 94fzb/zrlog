@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class Application {
 
-    public static void main(String[] args) throws ServletException, LifecycleException, IOException {
+    public static void main(String[] args) throws ServletException, LifecycleException {
         String webappDirLocation = "src/main/webapp/";
         Tomcat tomcat = new Tomcat();
 

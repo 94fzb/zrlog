@@ -1,9 +1,5 @@
 <%@ page session="false" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%
-    String basePath = (String) request.getAttribute("basePath");
-    request.setAttribute("currentViewName", request.getRequestURL().substring((basePath + "install/").length()).replaceAll(".jsp", ""));
-%>
 <!DOCTYPE html>
 <html>
 <head>

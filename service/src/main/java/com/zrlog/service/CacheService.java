@@ -31,17 +31,13 @@ public class CacheService {
     public boolean clearStaticPostFileByLogId(String id) {
         Log log = Log.dao.findById(id);
         if (log != null) {
-            File file = new File(PathKit.getWebRootPath() + "/post/" + id + ".html");
+            File file = new File(PathKit.getWebRootPath() + "/" + Constants.getArticleUri() + id + ".html");
             boolean delete = file.delete();
-            File aliasFile = new File(PathKit.getWebRootPath() + "/post/" + log.get("alias") + ".html");
+            File aliasFile = new File(PathKit.getWebRootPath() + "/" + Constants.getArticleUri() + log.get("alias") + ".html");
             boolean deleteAlias = aliasFile.delete();
             return delete || deleteAlias;
         }
         return false;
-    }
-
-    public void removeCachedStaticFile() {
-        FileUtils.deleteFile(PathKit.getWebRootPath() + "/post");
     }
 
     private void initCache(Controller baseController) {

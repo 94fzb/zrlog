@@ -101,11 +101,17 @@ class VisitorInterceptor implements Interceptor {
     }
 
     private void installPermission(Invocation ai) {
+        String template = null;
         if (!ZrLogConfig.isInstalled()) {
             ai.invoke();
-            ai.getController().render(ai.getReturnValue() + ZrLogConfig.getTemplateExt());
-        } else {
-            ai.getController().render("/install/forbidden" + ZrLogConfig.getTemplateExt());
+            if (ai.getReturnValue() != null) {
+                template = ai.getReturnValue();
+            }
         }
+        if (template == null) {
+            template = "/install/forbidden";
+        }
+        ai.getController().setAttr("currentViewName", template.substring("/install/".length()));
+        ai.getController().render(template + ZrLogConfig.getTemplateExt());
     }
 }

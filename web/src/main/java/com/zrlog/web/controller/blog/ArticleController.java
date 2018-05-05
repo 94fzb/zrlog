@@ -18,7 +18,7 @@ import com.zrlog.web.util.WebTools;
 
 import java.util.Map;
 
-public class PostController extends BaseController {
+public class ArticleController extends BaseController {
 
     private ArticleService articleService = new ArticleService();
 
@@ -44,7 +44,7 @@ public class PostController extends BaseController {
     }
 
     public String index() {
-        if ((getRequest().getServletPath().startsWith("/post"))
+        if ((getRequest().getServletPath().startsWith("/" + Constants.getArticleUri()))
                 && (getPara(0) != null)) {
             if ("all".equals(getPara(0))) {
                 return all();
@@ -83,7 +83,7 @@ public class PostController extends BaseController {
         setAttr("tipsType", I18NUtil.getStringFromRes("search"));
         setAttr("tipsName", WebTools.htmlEncode(key));
 
-        setPageInfo("post/search/" + key + "-", data, getParaToInt(1, 1));
+        setPageInfo(Constants.getArticleUri() + "search/" + key + "-", data, getParaToInt(1, 1));
         return "page";
     }
 
@@ -91,7 +91,7 @@ public class PostController extends BaseController {
         setAttr("tipsType", I18NUtil.getStringFromRes("archive"));
         setAttr("tipsName", getPara(0));
 
-        setPageInfo("post/record/" + getPara(0) + "-", Log.dao.findByDate(getParaToInt(1, 1), getDefaultRows(), getPara(0)), getParaToInt(1, 1));
+        setPageInfo(Constants.getArticleUri() + "record/" + getPara(0) + "-", Log.dao.findByDate(getParaToInt(1, 1), getDefaultRows(), getPara(0)), getParaToInt(1, 1));
         return "page";
     }
 
@@ -102,7 +102,7 @@ public class PostController extends BaseController {
             ext = ".html";
             new CacheService().clearStaticPostFileByLogId(response.getAlias());
         }
-        redirect("/post/" + response.getAlias() + ext);
+        redirect("/" + Constants.getArticleUri() + response.getAlias() + ext);
     }
 
     CreateCommentResponse saveComment() {
@@ -131,7 +131,7 @@ public class PostController extends BaseController {
 
     public String sort() {
         String typeStr = convertRequestParam(getPara(0));
-        setPageInfo("post/sort/" + typeStr + "-", Log.dao.findByTypeAlias(getParaToInt(1, 1), getDefaultRows(), typeStr), getParaToInt(1, 1));
+        setPageInfo(Constants.getArticleUri() + "sort/" + typeStr + "-", Log.dao.findByTypeAlias(getParaToInt(1, 1), getDefaultRows(), typeStr), getParaToInt(1, 1));
 
         Type type = Type.dao.findByAlias(typeStr);
         setAttr("type", type);
@@ -145,7 +145,7 @@ public class PostController extends BaseController {
     public String tag() {
         if (getPara(0) != null) {
             String tag = convertRequestParam(getPara(0));
-            setPageInfo("post/tag/" + getPara(0) + "-", Log.dao.findByTag(getParaToInt(1, 1), getDefaultRows(), tag), getParaToInt(1, 1));
+            setPageInfo(Constants.getArticleUri() + "tag/" + getPara(0) + "-", Log.dao.findByTag(getParaToInt(1, 1), getDefaultRows(), tag), getParaToInt(1, 1));
 
             setAttr("tipsType", I18NUtil.getStringFromRes("tag"));
             setAttr("tipsName", tag);
@@ -160,7 +160,7 @@ public class PostController extends BaseController {
     public String all() {
         int page = ParseUtil.strToInt(getPara(1), 1);
         Map<String, Object> data = Log.dao.find(page, getDefaultRows());
-        setPageInfo("post/all-", data, page);
+        setPageInfo(Constants.getArticleUri() + "all-", data, page);
         return "index";
     }
 }

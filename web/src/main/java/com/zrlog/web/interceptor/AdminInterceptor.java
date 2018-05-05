@@ -1,6 +1,7 @@
 package com.zrlog.web.interceptor;
 
 import com.hibegin.common.util.ExceptionUtils;
+import com.hibegin.common.util.FileUtils;
 import com.hibegin.common.util.StringUtils;
 import com.jfinal.aop.Interceptor;
 import com.jfinal.aop.Invocation;
@@ -17,6 +18,7 @@ import com.zrlog.service.CacheService;
 import com.zrlog.util.I18NUtil;
 import com.zrlog.web.annotation.RefreshCache;
 import com.zrlog.web.config.ZrLogConfig;
+import com.zrlog.web.handler.GlobalResourceHandler;
 import com.zrlog.web.util.WebTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -141,7 +143,7 @@ class AdminInterceptor implements Interceptor {
         Object returnValue = ai.getReturnValue();
         if (ai.getMethod().getAnnotation(RefreshCache.class) != null) {
             cacheService.refreshInitDataCache(controller, true);
-            cacheService.removeCachedStaticFile();
+            FileUtils.deleteFile(GlobalResourceHandler.CACHE_HTML_PATH);
             if (JFinal.me().getConstants().getDevMode()) {
                 LOGGER.info(controller.getRequest().getRequestURI() + " trigger refresh cache");
             }

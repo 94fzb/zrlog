@@ -14,9 +14,9 @@ import com.zrlog.service.InstallService;
 import com.zrlog.service.PluginCoreProcess;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.ZrLogUtil;
-import com.zrlog.web.controller.blog.ApiPostController;
+import com.zrlog.web.controller.blog.ApiArticleController;
+import com.zrlog.web.controller.blog.ArticleController;
 import com.zrlog.web.controller.blog.InstallController;
-import com.zrlog.web.controller.blog.PostController;
 import com.zrlog.web.handler.GlobalResourceHandler;
 import com.zrlog.web.handler.PluginHandler;
 import com.zrlog.web.interceptor.BlackListInterceptor;
@@ -56,6 +56,7 @@ public class ZrLogConfig extends JFinalConfig {
     //存放为config的属性，是为了安装完成后还获得JFinal的插件列表对象
     private Plugins plugins;
     private boolean haveSqlUpdated = false;
+    private static Routes currentRoutes;
 
     private String getUpgradeSqlBasePath() {
         return PathKit.getWebRootPath() + "/WEB-INF/update-sql";
@@ -318,13 +319,20 @@ public class ZrLogConfig extends JFinalConfig {
      * @param routes （JFinal的Routes，类servlet的Mapper，但是JFinal是自己通过request URI path自己作的路由）
      */
     public void configRoute(Routes routes) {
-        // 添加浏览者能访问Control 路由
-        routes.add("/post", PostController.class);
-        routes.add("/api/v1/post", ApiPostController.class);
-        routes.add("/", PostController.class);
+        routes.add("/", ArticleController.class);
         routes.add("/install", InstallController.class);
         // 后台管理者
         routes.add(new AdminRoutes());
+        currentRoutes = routes;
+        initRoute();
+    }
+
+    private static void initRoute() {
+        // 添加浏览者能访问Control 路由
+        currentRoutes.add("/api/v1/" + com.zrlog.common.Constants.getArticleRoute(), ApiArticleController.class);
+        if (!"".equals(com.zrlog.common.Constants.getArticleRoute())) {
+            currentRoutes.add("/" + com.zrlog.common.Constants.getArticleRoute(), ArticleController.class);
+        }
     }
 
     @Override

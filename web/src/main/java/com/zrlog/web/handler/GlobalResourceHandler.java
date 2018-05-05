@@ -31,6 +31,7 @@ public class GlobalResourceHandler extends Handler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GlobalResourceHandler.class);
     private static final String PAGE_END_TAG = "<none id='SP_" + System.currentTimeMillis() + "'></none>";
+    public static final String CACHE_HTML_PATH = PathKit.getWebRootPath() + "/_cache/";
 
     //不希望部分技术人走后门，拦截一些不合法的请求
     private static final Set<String> FORBIDDEN_URI_EXT_SET = new HashSet<>();
@@ -64,19 +65,11 @@ public class GlobalResourceHandler extends Handler {
             if (ext != null) {
                 if (!FORBIDDEN_URI_EXT_SET.contains(ext)) {
                     // 处理静态化文件,仅仅缓存文章页(变化较小)
-                    if (target.endsWith(".html") && target.startsWith("/post/")) {
+                    if (target.endsWith(".html") && target.startsWith("/" + Constants.getArticleUri())) {
                         target = target.substring(0, target.lastIndexOf("."));
                         if (Constants.isStaticHtmlStatus()) {
                             String path = new String(request.getServletPath().getBytes("ISO-8859-1"), "UTF-8");
-                            File htmlFile = new File(PathKit.getWebRootPath() + path);
-                            response.setContentType("text/html;charset=UTF-8");
-                            if (htmlFile.exists() && !ZrLogUtil.isStaticBlogPlugin(request)) {
-                                isHandled[0] = true;
-                                response.getOutputStream().write(IOUtil.getByteByInputStream(new FileInputStream(htmlFile)));
-                            } else {
-                                this.next.handle(target, request, response, isHandled);
-                                saveResponseBodyToHtml(htmlFile, responseRenderPrintWriter.getResponseBody());
-                            }
+                            responseHtmlFile(target, request, response, isHandled, responseRenderPrintWriter, new File(CACHE_HTML_PATH + path));
                         } else {
                             this.next.handle(target, request, response, isHandled);
                         }
@@ -92,7 +85,12 @@ public class GlobalResourceHandler extends Handler {
                     }
                 }
             } else {
-                this.next.handle(target, request, response, isHandled);
+                //首页静态化
+                if (target.equals("/") && Constants.isStaticHtmlStatus()) {
+                    responseHtmlFile(target, request, response, isHandled, responseRenderPrintWriter, new File(CACHE_HTML_PATH + "index.html"));
+                } else {
+                    this.next.handle(target, request, response, isHandled);
+                }
             }
         } catch (Exception e) {
             LOGGER.error("", e);
@@ -102,14 +100,24 @@ public class GlobalResourceHandler extends Handler {
         }
     }
 
+    private void responseHtmlFile(String target, HttpServletRequest request, HttpServletResponse response, boolean[] isHandled, ResponseRenderPrintWriter responseRenderPrintWriter, File htmlFile) throws IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        if (htmlFile.exists() && !ZrLogUtil.isStaticBlogPlugin(request)) {
+            isHandled[0] = true;
+            response.getOutputStream().write(IOUtil.getByteByInputStream(new FileInputStream(htmlFile)));
+        } else {
+            this.next.handle(target, request, response, isHandled);
+            saveResponseBodyToHtml(htmlFile, responseRenderPrintWriter.getResponseBody());
+        }
+    }
+
     /**
      * 将一个网页转化对应文件，用于静态化文章页
      */
-
     private void saveResponseBodyToHtml(File file, String copy) {
         try {
             byte[] bytes = copy.getBytes("UTF-8");
-            FileUtils.tryResizeDiskSpace(PathKit.getWebRootPath() + "/post", bytes.length, Constants.getMaxCacheHtmlSize());
+            FileUtils.tryResizeDiskSpace(CACHE_HTML_PATH + Constants.getArticleUri(), bytes.length, Constants.getMaxCacheHtmlSize());
             if (!file.exists()) {
                 file.getParentFile().mkdirs();
             }

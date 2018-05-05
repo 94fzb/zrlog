@@ -1,9 +1,9 @@
 package com.zrlog.web.controller.blog;
 
 /**
- * 对 PostController 的扩展，响应的数据均为Json格式
+ * 对 ArticleController 的扩展，响应的数据均为Json格式
  */
-public class ApiPostController extends PostController {
+public class ApiArticleController extends ArticleController {
 
     @Override
     public String detail() {
