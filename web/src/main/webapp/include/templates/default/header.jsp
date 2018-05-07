@@ -7,7 +7,6 @@
     }
     if (res.get("title") == null) {
         String host = request.getHeader("host");
-        System.out.println(host);
         if (host.contains(":")) {
             host = host.substring(0, host.indexOf(":"));
         }

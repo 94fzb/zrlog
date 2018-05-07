@@ -122,6 +122,21 @@ public class I18NUtil {
         }
     }
 
+    public static String getAcceptLanguage(HttpServletRequest request) {
+        String locale = null;
+        try {
+            if (request.getHeader("Accept-Language") != null) {
+                locale = request.getHeader("Accept-Language").split(";")[0].replace("-", "_").split(",")[0];
+            }
+        } catch (Exception e) {
+            //ignore 非法HTTP请求头
+        }
+        if (StringUtils.isEmpty(locale)) {
+            locale = "zh_CN";
+        }
+        return locale;
+    }
+
     public static String getStringFromRes(String key) {
         Object obj = threadLocal.get().get(key);
         if (obj != null) {

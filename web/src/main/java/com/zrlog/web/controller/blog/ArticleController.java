@@ -14,6 +14,7 @@ import com.zrlog.util.PagerUtil;
 import com.zrlog.util.ParseUtil;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.controller.BaseController;
+import com.zrlog.web.handler.GlobalResourceHandler;
 import com.zrlog.web.util.WebTools;
 
 import java.util.Map;
@@ -100,7 +101,7 @@ public class ArticleController extends BaseController {
         String ext = "";
         if (Constants.isStaticHtmlStatus()) {
             ext = ".html";
-            new CacheService().clearStaticPostFileByLogId(response.getAlias());
+            new CacheService().refreshInitDataCache(GlobalResourceHandler.CACHE_HTML_PATH, this, true);
         }
         redirect("/" + Constants.getArticleUri() + response.getAlias() + ext);
     }

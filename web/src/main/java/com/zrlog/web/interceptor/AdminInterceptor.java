@@ -1,7 +1,6 @@
 package com.zrlog.web.interceptor;
 
 import com.hibegin.common.util.ExceptionUtils;
-import com.hibegin.common.util.FileUtils;
 import com.hibegin.common.util.StringUtils;
 import com.jfinal.aop.Interceptor;
 import com.jfinal.aop.Invocation;
@@ -142,8 +141,7 @@ class AdminInterceptor implements Interceptor {
     private boolean tryDoRender(Invocation ai, Controller controller) {
         Object returnValue = ai.getReturnValue();
         if (ai.getMethod().getAnnotation(RefreshCache.class) != null) {
-            cacheService.refreshInitDataCache(controller, true);
-            FileUtils.deleteFile(GlobalResourceHandler.CACHE_HTML_PATH);
+            cacheService.refreshInitDataCache(GlobalResourceHandler.CACHE_HTML_PATH, controller, true);
             if (JFinal.me().getConstants().getDevMode()) {
                 LOGGER.info(controller.getRequest().getRequestURI() + " trigger refresh cache");
             }

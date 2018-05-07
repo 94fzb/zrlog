@@ -7,6 +7,7 @@ import com.jfinal.handler.Handler;
 import com.jfinal.kit.PathKit;
 import com.zrlog.common.Constants;
 import com.zrlog.service.AdminTokenThreadLocal;
+import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.I18NUtil;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.config.ZrLogConfig;
@@ -44,6 +45,7 @@ public class GlobalResourceHandler extends Handler {
     }
 
     public void handle(String target, HttpServletRequest request, HttpServletResponse response, boolean[] isHandled) {
+        long start = System.currentTimeMillis();
         String url = WebTools.getRealScheme(request) + "://" + request.getHeader("host") + request.getContextPath() + "/";
         request.setAttribute("basePath", url);
         request.setAttribute("pageEndTag", PAGE_END_TAG);
@@ -69,7 +71,7 @@ public class GlobalResourceHandler extends Handler {
                         target = target.substring(0, target.lastIndexOf("."));
                         if (Constants.isStaticHtmlStatus()) {
                             String path = new String(request.getServletPath().getBytes("ISO-8859-1"), "UTF-8");
-                            responseHtmlFile(target, request, response, isHandled, responseRenderPrintWriter, new File(CACHE_HTML_PATH + path));
+                            responseHtmlFile(target, request, response, isHandled, responseRenderPrintWriter, new File(CACHE_HTML_PATH + I18NUtil.getAcceptLanguage(request) + path));
                         } else {
                             this.next.handle(target, request, response, isHandled);
                         }
@@ -87,7 +89,7 @@ public class GlobalResourceHandler extends Handler {
             } else {
                 //首页静态化
                 if (target.equals("/") && Constants.isStaticHtmlStatus()) {
-                    responseHtmlFile(target, request, response, isHandled, responseRenderPrintWriter, new File(CACHE_HTML_PATH + "index.html"));
+                    responseHtmlFile(target, request, response, isHandled, responseRenderPrintWriter, new File(CACHE_HTML_PATH + I18NUtil.getAcceptLanguage(request) + "/index.html"));
                 } else {
                     this.next.handle(target, request, response, isHandled);
                 }
@@ -97,6 +99,10 @@ public class GlobalResourceHandler extends Handler {
         } finally {
             AdminTokenThreadLocal.remove();
             I18NUtil.removeI18n();
+            //开发环境下面打印整个请求的耗时，便于优化代码
+            if (BlogBuildInfoUtil.isDev()) {
+                LOGGER.info(request.getServletPath() + " used time " + (System.currentTimeMillis() - start));
+            }
         }
     }
 

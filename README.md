@@ -10,7 +10,7 @@ ZrLog是使用Java开发的博客/CMS程序，具有简约，易用，组件化�
 
 ![](http://static.blog.zrlog.com/attached/image/20180210/20180210150116_800.png)
 
-![](http://static.blog.zrlog.com/attached/image/20180210/20180210150133_99.png)
+![](http://static.blog.zrlog.com/attached/image/20180507/20180507213444_773.png)
 
 ### 特性
 * 1.提供日志，分类，标签，评论的管理
@@ -49,11 +49,12 @@ ZrLog是使用Java开发的博客/CMS程序，具有简约，易用，组件化�
 [查看完整的ChangeLog](https://www.zrlog.com/changelog?ref=md)
 
 ### 示例网站
+ 
+* 网址 [http://demo.zrlog.com](http://demo.zrlog.com) 
+* 管理地址 [admin/login](http://demo.zrlog.com/admin/login) 
+* 用户名 admin 
+* 密码 123456
 
-* BAE : [http://xiaochun.duapp.com/](http://xiaochun.duapp.com/) 
-    * 后台地址 [http://xiaochun.duapp.com/admin/login](http://xiaochun.duapp.com/admin/login) 
-    * 用户名:admin 密码:123456
-* demo : [http://demo.blog.zrlog.com](http://demo.blog.zrlog.com)
 
 ### 获取帮助
 

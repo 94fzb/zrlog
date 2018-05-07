@@ -23,6 +23,7 @@ import com.zrlog.web.interceptor.BlackListInterceptor;
 import com.zrlog.web.interceptor.InitDataInterceptor;
 import com.zrlog.web.interceptor.MyI18NInterceptor;
 import com.zrlog.web.interceptor.RouterInterceptor;
+import com.zrlog.web.plugin.CacheCleanerPlugin;
 import com.zrlog.web.plugin.UpdateVersionPlugin;
 import com.zrlog.web.plugin.ViburDBCPPlugin;
 import com.zrlog.web.version.UpgradeVersionHandler;
@@ -195,6 +196,7 @@ public class ZrLogConfig extends JFinalConfig {
                 if (!isTest()) {
                     runBlogPlugin(dbPropertiesFile, pluginJvmArgsObj.toString());
                     plugins.add(new UpdateVersionPlugin());
+                    plugins.add(new CacheCleanerPlugin());
                 }
             } catch (Exception e) {
                 LOGGER.warn("configPlugin exception ", e);

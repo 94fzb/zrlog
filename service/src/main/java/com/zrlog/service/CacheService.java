@@ -17,27 +17,16 @@ public class CacheService {
 
     private static Map<String, String> cacheFileMap = new HashMap<>();
 
-    public void refreshInitDataCache(Controller baseController, boolean cleanAble) {
-        if (cleanAble || JFinal.me().getConstants().getDevMode()) {
+    public void refreshInitDataCache(String cachePath, Controller baseController, boolean cleanAble) {
+        if (cleanAble) {
             clearCache();
+            FileUtils.deleteFile(cachePath);
         }
         initCache(baseController);
     }
 
     private void clearCache() {
         JFinal.me().getServletContext().removeAttribute(Constants.CACHE_KEY);
-    }
-
-    public boolean clearStaticPostFileByLogId(String id) {
-        Log log = Log.dao.findById(id);
-        if (log != null) {
-            File file = new File(PathKit.getWebRootPath() + "/" + Constants.getArticleUri() + id + ".html");
-            boolean delete = file.delete();
-            File aliasFile = new File(PathKit.getWebRootPath() + "/" + Constants.getArticleUri() + log.get("alias") + ".html");
-            boolean deleteAlias = aliasFile.delete();
-            return delete || deleteAlias;
-        }
-        return false;
     }
 
     private void initCache(Controller baseController) {

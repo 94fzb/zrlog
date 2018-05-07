@@ -51,13 +51,8 @@ public class InstallController extends Controller {
         configMsg.put("email", getPara("email"));
         if (new InstallService(PathKit.getWebRootPath() + "/WEB-INF", dbConn, configMsg).install()) {
             final ZrLogConfig config = (ZrLogConfig) JFinal.me().getServletContext().getAttribute("config");
-            //异步通知启动插件，配置库连接等操作
-            new Thread() {
-                @Override
-                public void run() {
-                    config.installFinish();
-                }
-            }.start();
+            //通知启动插件，配置库连接等操作
+            config.installFinish();
             return "/install/success";
         } else {
             setAttr("errorMsg", "[Error-" + TestConnectDbResult.UNKNOWN.getError() + "] - " + I18NUtil.getStringFromRes("connectDbError_" + TestConnectDbResult.UNKNOWN.getError()));

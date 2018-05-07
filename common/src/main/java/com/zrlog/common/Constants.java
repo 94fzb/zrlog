@@ -54,6 +54,18 @@ public class Constants {
         return 20 * 1024 * 1024;
     }
 
+    public static int getMaxCacheTimeout() {
+        Object dbSettingSize = webSite.get("cache_timeout_minutes");
+        if (dbSettingSize != null) {
+            try {
+                return Integer.valueOf(dbSettingSize.toString())  * 60 * 1000;
+            } catch (Exception e) {
+                //ignore
+            }
+        }
+        return 60 * 60 * 1000;
+    }
+
     public static String getArticleUri() {
         String router = getArticleRoute();
         if (StringUtils.isNotEmpty(router)) {
