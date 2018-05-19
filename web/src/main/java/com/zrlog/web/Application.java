@@ -5,7 +5,6 @@ import org.apache.catalina.startup.Tomcat;
 
 import javax.servlet.ServletException;
 import java.io.File;
-import java.io.IOException;
 
 public class Application {
 

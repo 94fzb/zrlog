@@ -5,7 +5,6 @@ import com.zrlog.model.WebSite;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.annotation.RefreshCache;
-import com.zrlog.web.config.ZrLogConfig;
 import com.zrlog.web.controller.BaseController;
 import com.zrlog.web.plugin.UpdateVersionPlugin;
 

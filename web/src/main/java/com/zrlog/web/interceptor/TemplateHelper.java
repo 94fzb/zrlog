@@ -220,8 +220,8 @@ public class TemplateHelper {
         data.put("typeUrl", baseUrl + Constants.getArticleUri() + "sort/" + data.get("typeAlias") + suffix);
         Log lastLog = data.get("lastLog");
         Log nextLog = data.get("nextLog");
-        nextLog.put("url", baseUrl + Constants.getArticleUri()+ nextLog.get("alias") + suffix);
-        lastLog.put("url", baseUrl + Constants.getArticleUri()+ lastLog.get("alias") + suffix);
+        nextLog.put("url", baseUrl + Constants.getArticleUri() + nextLog.get("alias") + suffix);
+        lastLog.put("url", baseUrl + Constants.getArticleUri() + lastLog.get("alias") + suffix);
         String markdown = data.getStr("markdown").toLowerCase();
         //没有使用md的toc目录的文章才尝试使用系统提取的目录
         if (!markdown.contains("[toc]") && !markdown.contains("[tocm]")) {

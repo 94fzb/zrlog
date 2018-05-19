@@ -13,7 +13,7 @@ public class MyI18NInterceptor implements Interceptor {
 
     @Override
     public void intercept(Invocation inv) {
-        I18NUtil.addToRequest(PathKit.getRootClassPath(), inv.getController().getRequest(), JFinal.me().getConstants().getDevMode(),false);
+        I18NUtil.addToRequest(PathKit.getRootClassPath(), inv.getController().getRequest(), JFinal.me().getConstants().getDevMode(), false);
         inv.invoke();
     }
 }

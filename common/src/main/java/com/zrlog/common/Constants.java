@@ -58,7 +58,7 @@ public class Constants {
         Object dbSettingSize = webSite.get("cache_timeout_minutes");
         if (dbSettingSize != null) {
             try {
-                return Integer.valueOf(dbSettingSize.toString())  * 60 * 1000;
+                return Integer.valueOf(dbSettingSize.toString()) * 60 * 1000;
             } catch (Exception e) {
                 //ignore
             }
