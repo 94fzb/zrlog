@@ -96,15 +96,12 @@ public class ZrLogConfig extends JFinalConfig {
      */
     private void runBlogPlugin(final String dbPropertiesPath, final String pluginJvmArgs) {
         //这里使用独立的线程进行启动，主要是为了防止插件服务出问题后，影响整体，同时是避免启动过慢的问题。
-        new Thread() {
-            @Override
-            public void run() {
-                //加载 zrlog 提供的插件
-                int port = PluginCoreProcess.getInstance().pluginServerStart(new File(PathKit.getWebRootPath() + "/WEB-INF/plugins/plugin-core.jar"),
-                        dbPropertiesPath, pluginJvmArgs, PathKit.getWebRootPath(), BlogBuildInfoUtil.getVersion());
-                com.zrlog.common.Constants.pluginServer = "http://localhost:" + port;
-            }
-        }.start();
+        new Thread(() -> {
+            //加载 zrlog 提供的插件
+            int port = PluginCoreProcess.getInstance().pluginServerStart(new File(PathKit.getWebRootPath() + "/WEB-INF/plugins/plugin-core.jar"),
+                    dbPropertiesPath, pluginJvmArgs, PathKit.getWebRootPath(), BlogBuildInfoUtil.getVersion());
+            com.zrlog.common.Constants.pluginServer = "http://localhost:" + port;
+        }).start();
 
     }
 
@@ -221,7 +218,7 @@ public class ZrLogConfig extends JFinalConfig {
     private void tryUpgradeDbPropertiesFile(String dbFile, Properties properties) throws IOException {
         if (!"com.mysql.cj.jdbc.Driver".equals(properties.get("driverClass"))) {
             properties.put("driverClass", "com.mysql.cj.jdbc.Driver");
-            properties.put("jdbcUrl", properties.get("jdbcUrl") + "&useSSL=false");
+            properties.put("jdbcUrl", properties.get("jdbcUrl") + "&useSSL=false&serverTimezone=GMT");
             properties.store(new FileOutputStream(dbFile), "Support mysql8");
         }
     }

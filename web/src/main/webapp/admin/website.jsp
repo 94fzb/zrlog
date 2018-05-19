@@ -137,10 +137,20 @@
                         </div>
                     </div>
                     <div class="form-group" id="type-select-parent">
-                        <label class="col-md-3 control-label no-padding-right"> 编辑器主题 </label>
+                        <label class="col-md-3 control-label no-padding-right"> 编辑器 </label>
 
-                        <span class="col-md-4">
-                    <select name="editorMdTheme" class="form-control select2_single">
+                        <span class="col-md-2">
+                    类型<select name="editor_type" class="form-control select2_single">
+                        <option
+                                <c:if test="${webs.editorType eq 'html'}">selected="selected"</c:if>
+                                value="html">html</option>
+                        <option
+                                <c:if test="${webs.editorType ne 'html'}">selected="selected"</c:if>
+                                value="markdown">markdown</option>
+                    </select>
+                        </span>
+                            <span class="col-md-2">
+                    主题<select name="editorMdTheme" class="form-control select2_single">
                         <option
                                 <c:if test="${webs.editorMdTheme eq 'default'}">selected="selected"</c:if>
                                 value="default">默认</option>
@@ -194,8 +204,12 @@
                         <label class="col-sm-3 control-label no-padding-right"> 语言 </label>
                         <div class="col-sm-2">
                             <select name="language" class="form-control select2_single">
-                                <option <c:if test="${webs.language eq 'zh_CN'}">'selected'='selected'</c:if> value="zh_CN">${_res.languageChinese}</option>
-                                <option <c:if test="${webs.language eq 'en_US'}">'selected'='selected'</c:if> value="en_US">${_res.languageEnglish}</option>
+                                <option
+                                <c:if test="${webs.language eq 'zh_CN'}">'selected'='selected'</c:if>
+                                value="zh_CN">${_res.languageChinese}</option>
+                                <option
+                                <c:if test="${webs.language eq 'en_US'}">'selected'='selected'</c:if>
+                                value="en_US">${_res.languageEnglish}</option>
                             </select>
                         </div>
                     </div>
@@ -203,8 +217,12 @@
                         <label class="col-sm-3 control-label no-padding-right"> 文章路由 </label>
                         <div class="col-sm-2">
                             <select name="article_route" class="form-control select2_single">
-                                <option <c:if test="${webs.article_route eq ''}">'selected'='selected'</c:if> value="">默认</option>
-                                <option <c:if test="${webs.article_route eq 'post' || empty webs.article_route}">'selected'='selected'</c:if> value="post">post</option>
+                                <option
+                                <c:if test="${webs.article_route eq ''}">'selected'='selected'</c:if>
+                                value="">默认</option>
+                                <option
+                                <c:if test="${webs.article_route eq 'post' || empty webs.article_route}">'selected'='selected'</c:if>
+                                value="post">post</option>
                             </select>
                         </div>
                     </div>

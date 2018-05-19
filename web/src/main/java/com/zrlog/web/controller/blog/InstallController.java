@@ -24,7 +24,7 @@ public class InstallController extends Controller {
     public String testDbConn() {
         Map<String, String> dbConn = new HashMap<>();
         dbConn.put("jdbcUrl", "jdbc:mysql://" + getPara("dbhost") + ":" + getPara("port") + "/" + getPara("dbname")
-                + "?characterEncoding=UTF-8&useSSL=false");
+                + "?characterEncoding=UTF-8&useSSL=false&serverTimezone=GMT");
         dbConn.put("user", getPara("dbuser"));
         dbConn.put("password", getPara("dbpwd"));
         dbConn.put("driverClass", "com.mysql.cj.jdbc.Driver");

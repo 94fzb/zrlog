@@ -14,6 +14,7 @@ public class CreateArticleRequest {
     private boolean rubbish;
     private String keywords;
     private String digest;
+    private String editorType;
 
     public String getContent() {
         return content;
@@ -109,5 +110,13 @@ public class CreateArticleRequest {
 
     public void setRubbish(boolean rubbish) {
         this.rubbish = rubbish;
+    }
+
+    public String getEditorType() {
+        return editorType;
+    }
+
+    public void setEditorType(String editorType) {
+        this.editorType = editorType;
     }
 }

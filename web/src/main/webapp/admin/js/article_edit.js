@@ -1,5 +1,40 @@
 $(function () {
-    $("#content").val(article['content']);
+    window.contentChange = function (content, markdown) {
+        article.content = content;
+        article.markdown = markdown;
+        $("#content").val(content);
+        $("#markdown").val(markdown);
+        if (content === '') {
+            editorDivWrapper.addClass("has-error");
+            editorDivWrapper.css("border-color", "#a94442");
+        } else {
+            editorDivWrapper.removeClass("has-error");
+            editorDivWrapper.css("border-color", "#ccc");
+        }
+    };
+
+    contentChange(article.content, article.markdown);
+    editorTypeSelect(article['editorType']);
+
+
+    setInterval(function () {
+        saveArticle(true, true);
+    }, 1000 * 6);
+
+    $("#editorType .btn").click(function () {
+        editorTypeSelect($(this).find("input").val());
+    });
+
+    function editorTypeSelect(type) {
+        if (type === "html") {
+            htmlEditorCreate();
+        } else {
+            markdownEditorCreate();
+        }
+        $("#editorType .btn").removeClass("active").removeClass("btn-primary");
+        $("#editorType_" + type).addClass("active").addClass("btn-primary");
+        $("input[name='editorType']").val(type);
+    }
 
     $(".select2_single").select2({
         minimumResultsForSearch: -1,
@@ -58,17 +93,20 @@ $(function () {
 
     function validator(el) {
         //仅在2个输入框都不为空的情况，标记为又文本需要输入
-        if ($("#title").val() === '' && $("#content").val() === '') {
+        if ($("#title").val() === '' && $("#content").val() === '' && $("input[name='typeId']:checked").val() === undefined) {
             $("#title-parent").removeClass("has-error");
-            editorEl.removeClass("has-error");
+            editorDivWrapper.removeClass("has-error");
+            editorDivWrapper.css("border-color", "#ccc");
+            $("#type-select-parent").removeClass("has-error");
+            $("#type-select-parent").css("border-color", "");
             return false;
         }
         if ($("#title").val() === '') {
             $("#title-parent").addClass("has-error");
         }
         if ($("#content").val() === '') {
-            editorEl.addClass("has-error");
-            editorEl.css("border-color", "#a94442");
+            editorDivWrapper.addClass("has-error");
+            editorDivWrapper.css("border-color", "#a94442");
         }
         if ($("input[name='typeId']:checked").val() === undefined) {
             $("#type-select-parent").addClass("has-error");
@@ -85,14 +123,30 @@ $(function () {
             $("#title-parent").removeClass("has-error");
         } else {
             if ($("#content").val() === '') {
-                editorEl.removeClass("has-error");
+                editorDivWrapper.removeClass("has-error");
                 $("#title-parent").removeClass("has-error");
-                editorEl.css("border-color", "");
+                editorDivWrapper.css("border-color", "#ccc");
             } else {
                 $("#title-parent").addClass("has-error");
             }
         }
     });
+
+    window.goFullScreen = function () {
+        $("#save").addClass("save-btn-full-screen").addClass("hidden-xs");
+        $("#saveToRubbish").addClass("saveToRubbish-btn-full-screen").addClass("hidden-xs");
+        if (screenfull.enabled) {
+            screenfull.request();
+        }
+    };
+
+    window.exitFullScreen = function () {
+        $("#save").removeClass("save-btn-full-screen").removeClass("hidden-xs");
+        $("#saveToRubbish").removeClass("saveToRubbish-btn-full-screen").removeClass("hidden-xs");
+        if (screenfull.enabled) {
+            screenfull.exit();
+        }
+    };
 
     window.saveArticle = function (rubbish, timer) {
         //如果是还在保存文章状态，跳过保存
@@ -119,7 +173,7 @@ $(function () {
                         data: JSON.stringify(body),
                         method: "POST",
                         dataType: "json",
-                        timeout : 30000,
+                        timeout: 30000,
                         contentType: "application/json",
                         success: function (data) {
                             var date = new Date();
@@ -145,7 +199,7 @@ $(function () {
         } else {
             lastChangeRequestBody = JSON.stringify(getFormRequestBody("#article-form"));
         }
-    }
+    };
 
     function preTips(message) {
         if (saving) {

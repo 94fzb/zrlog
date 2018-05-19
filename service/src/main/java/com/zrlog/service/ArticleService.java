@@ -106,6 +106,7 @@ public class ArticleService {
             log.set("digest", createArticleRequest.getDigest());
         }
         log.set("plain_content", getPlainSearchTxt((String) log.get("content")));
+        log.set("editor_type", createArticleRequest.getEditorType());
         int articleId;
         String alias;
         if (createArticleRequest instanceof UpdateArticleRequest) {
@@ -231,7 +232,7 @@ public class ArticleService {
 
     private byte[] getRequestBodyBytes(String url) throws IOException {
         HttpFileHandle fileHandler = new HttpFileHandle(JFinal.me().getConstants().getBaseUploadPath());
-        HttpUtil.getInstance().sendGetRequest(url, new HashMap<String, String[]>(), fileHandler, new HashMap<String, String>());
+        HttpUtil.getInstance().sendGetRequest(url, new HashMap<>(), fileHandler, new HashMap<>());
         return IOUtil.getByteByInputStream(new FileInputStream(fileHandler.getT().getPath()));
     }
 

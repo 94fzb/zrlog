@@ -122,12 +122,14 @@ public class GlobalResourceHandler extends Handler {
      */
     private void saveResponseBodyToHtml(File file, String copy) {
         try {
-            byte[] bytes = copy.getBytes("UTF-8");
-            FileUtils.tryResizeDiskSpace(CACHE_HTML_PATH + Constants.getArticleUri(), bytes.length, Constants.getMaxCacheHtmlSize());
-            if (!file.exists()) {
-                file.getParentFile().mkdirs();
+            if (copy != null) {
+                byte[] bytes = copy.getBytes("UTF-8");
+                FileUtils.tryResizeDiskSpace(CACHE_HTML_PATH + Constants.getArticleUri(), bytes.length, Constants.getMaxCacheHtmlSize());
+                if (!file.exists()) {
+                    file.getParentFile().mkdirs();
+                }
+                IOUtil.writeBytesToFile(bytes, file);
             }
-            IOUtil.writeBytesToFile(bytes, file);
         } catch (IOException e) {
             LOGGER.error("saveResponseBodyToHtml error", e);
         }

@@ -31,7 +31,7 @@
         cursor: pointer;
     }
 </style>
-<form role="form" method="post" class="form-horizontal">
+<form role="form" id="templateAjax" method="post" action="api/admin/template/config" class="form-horizontal">
     <input type="hidden" name="template" value="${template}">
 
     <div class="form-group">

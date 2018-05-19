@@ -65,7 +65,7 @@ public class UpgradeController extends BaseController {
             file.getParentFile().mkdir();
             Version version = lastVersion().getVersion();
             handle = new DownloadProcessHandle(file, version.getFileSize(), version.getMd5sum());
-            HttpUtil.getInstance().sendGetRequest(version.getDownloadUrl(), handle, new HashMap<String, String>());
+            HttpUtil.getInstance().sendGetRequest(version.getDownloadUrl(), handle, new HashMap<>());
             versionMap.put(AdminTokenThreadLocal.getUser().getSessionId(), version);
             downloadProcessHandleMap.put(AdminTokenThreadLocal.getUser().getSessionId(), handle);
         }

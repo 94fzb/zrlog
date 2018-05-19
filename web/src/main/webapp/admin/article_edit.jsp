@@ -5,6 +5,7 @@
     request.setAttribute("post", Constants.getArticleUri());
 %>
 <link rel="stylesheet" href="${basePath}admin/markdown/css/editormd.min.css"/>
+<link rel="stylesheet" href="${basePath}admin/summernote/summernote.css"/>
 <link rel="stylesheet" href="${basePath}assets/css/video-js.css"/>
 <link rel="stylesheet" href="${basePath}assets/css/icheck-blue.css"/>
 <script src="${basePath}assets/js/icheck.min.js"></script>
@@ -14,16 +15,23 @@
     var uploadUrl = 'api/admin/upload/';
     var editorMdPath = "admin/markdown/lib/";
     var editorLang = "admin/markdown/languages/";
+    var summernoteLang = "admin/summernote/lang/";
     $('.icheck').iCheck({
         checkboxClass: 'icheckbox_flat-blue',
         radioClass: 'iradio_flat-blue'
     });
     var editorMdJs = '${basePath}admin/markdown/js/editormd.min.js';
+    var summernoteJs = '${basePath}admin/summernote/summernote.min.js';
+    var editorEl = $("#editorDiv");
+    var editorDivWrapper = $("#editorDivWrapper");
+    var editorTheme = editorEl.attr("theme");
 </script>
 <script src="${basePath}assets/js/screenfull.min.js"></script>
 <script src="${basePath}assets/js/jquery.liteuploader.min.js"></script>
 <script src="${basePath}assets/js/select2/select2.min.js"></script>
 <script src="${basePath}assets/js/jquery.tagsinput.js"></script>
+<script src="${basePath}assets/js/turndown.js"></script>
+<script src="${basePath}admin/js/summernote.js"></script>
 <script src="${basePath}admin/js/mdeditor.js"></script>
 <script src="${basePath}admin/js/article_edit.js"></script>
 <script src="${basePath}assets/js/video.js"></script>
@@ -88,7 +96,34 @@
         min-height: 1040px;
         border-radius: 4px;
         background-color: #ffffff;
-        border: 1px solid #e6e9ed;
+        border: 0;
+    }
+
+    #editorDivWrapper {
+        border-radius: 4px;
+        border: 1px solid #ccc;
+    }
+
+    .note-editor.note-frame {
+        border: #e6e9ed;
+        margin-bottom: 0;
+    }
+
+    .note-editor img {
+        max-width: 100%;
+    }
+
+    .editormd-preview-theme-dark .markdown-body h1, .editormd-preview-theme-dark .markdown-body h2,
+    .editormd-preview-theme-dark.markdown-body h3, .editormd-preview-theme-dark .markdown-body h4 {
+        color: #ccc;
+    }
+
+    .panel-default > .panel-heading {
+        background-color: #ffffff;
+
+    }
+    .panel-default > .panel-heading button {
+        color: #666;
     }
 </style>
 <div class="page-header">
@@ -100,8 +135,10 @@
 <div class="row">
     <form class="form-horizontal form-label-left" id="article-form" style="max-width: 1750px">
         <input type="hidden" id="id" name="id" value="${log.logId}">
+        <input type="hidden" name="editorType">
         <textarea placeholder="${_res.editorPlaceholder}" id="content" name="content"
                   style="display: none;"></textarea>
+        <textarea id="markdown" name="markdown" style="display: none;"></textarea>
         <div class="col-md-12 col-sm-12 col-xs-12" style="padding-bottom: 10px">
             <div class="text-right">
                 <a id="preview-link" target="_blank" style="display:none">
@@ -123,7 +160,7 @@
         <div class="col-md-12 col-sm-12 col-xs-12 col-lg-9">
             <div class="form-group">
                 <div class="row">
-                    <div class="col-md-9 col-xs-12" id="title-parent" style="padding-bottom: 5px">
+                    <div class="col-md-7 col-xs-12" id="title-parent" style="padding-bottom: 5px">
                         <input required name="title" id="title" maxlength="254" value="${log.title}"
                                class="form-control"
                                type="text" placeholder="${_res['inputArticleTitle']}"/>
@@ -135,8 +172,24 @@
                                    id="alias" name="alias" aria-describedby="basic-addon3" value="${log.alias}">
                         </div>
                     </div>
+                    <div class="col-md-2 col-xs-12">
+                        <div class="text-right">
+                            <div id="editorType" class="btn-group" data-toggle="buttons">
+                                <label class="btn btn-default" id="editorType_html" data-toggle-class="btn-primary"
+                                       data-toggle-passive-class="btn-default">
+                                    <input type="radio" value="html" data-parsley-multiple="editorType"> html
+                                </label>
+                                <label class="btn btn-default" id="editorType_markdown" data-toggle-class="btn-primary"
+                                       data-toggle-passive-class="btn-default">
+                                    <input type="radio" value="markdown" data-parsley-multiple="editorType"> markdown
+                                </label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div id="editorDiv" theme="${webSite.editorMdTheme}"></div>
+                <div id="editorDivWrapper">
+                    <div id="editorDiv" theme="${webSite.editorMdTheme}"></div>
+                </div>
             </div>
         </div>
         <div class="col-md-12 row col-lg-3 col-xs-12">
