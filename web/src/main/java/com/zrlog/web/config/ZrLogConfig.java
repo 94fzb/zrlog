@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -179,6 +180,7 @@ public class ZrLogConfig extends JFinalConfig {
             String dbPropertiesFile = PathKit.getWebRootPath() + "/WEB-INF/db.properties";
             try (FileInputStream in = new FileInputStream(dbPropertiesFile)) {
                 dbProperties.load(in);
+                tryUpgradeDbPropertiesFile(dbPropertiesFile, dbProperties);
                 tryDoUpgrade(getUpgradeSqlBasePath(), dbProperties.getProperty("jdbcUrl"), dbProperties.getProperty("user"),
                         dbProperties.getProperty("password"), dbProperties.getProperty("driverClass"));
                 jdbcUrl = dbProperties.getProperty("jdbcUrl");
@@ -207,6 +209,21 @@ public class ZrLogConfig extends JFinalConfig {
 
         JFinal.me().getServletContext().setAttribute("plugins", plugins);
         this.plugins = plugins;
+    }
+
+    /**
+     * 版本低于1.10.1进行升级
+     *
+     * @param dbFile
+     * @param properties
+     * @throws IOException
+     */
+    private void tryUpgradeDbPropertiesFile(String dbFile, Properties properties) throws IOException {
+        if (!"com.mysql.cj.jdbc.Driver".equals(properties.get("driverClass"))) {
+            properties.put("driverClass", "com.mysql.cj.jdbc.Driver");
+            properties.put("jdbcUrl", properties.get("jdbcUrl") + "&useSSL=false");
+            properties.store(new FileOutputStream(dbFile), "Support mysql8");
+        }
     }
 
     /**

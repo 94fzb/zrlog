@@ -3,7 +3,6 @@ package com.zrlog.service;
 import com.hibegin.common.util.BeanUtil;
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.SecurityUtils;
-import com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException;
 import com.zrlog.common.Constants;
 import com.zrlog.common.type.TestConnectDbResult;
 import com.zrlog.common.vo.InitFirstArticleVO;
@@ -73,19 +72,16 @@ public class InstallService {
         } catch (ClassNotFoundException e) {
             LOGGER.error("", e);
             testConnectDbResult = TestConnectDbResult.MISSING_MYSQL_DRIVER;
-        } catch (MySQLSyntaxErrorException e) {
-            LOGGER.error("", e);
-            if (e.getMessage().contains("Access denied for user ") || e.getMessage().contains("Unknown database")) {
-                testConnectDbResult = TestConnectDbResult.DB_NOT_EXISTS;
-            } else {
-                testConnectDbResult = TestConnectDbResult.UNKNOWN;
-            }
         } catch (SQLException e) {
             LOGGER.error("", e);
             if (e.getCause() instanceof ConnectException) {
                 testConnectDbResult = TestConnectDbResult.CREATE_CONNECT_ERROR;
             } else {
-                testConnectDbResult = TestConnectDbResult.USERNAME_OR_PASSWORD_ERROR;
+                if (e.getMessage().contains("Access denied for user") || e.getMessage().contains("Unknown database")) {
+                    testConnectDbResult = TestConnectDbResult.DB_NOT_EXISTS;
+                } else {
+                    testConnectDbResult = TestConnectDbResult.USERNAME_OR_PASSWORD_ERROR;
+                }
             }
         } catch (Exception e) {
             LOGGER.error("", e);

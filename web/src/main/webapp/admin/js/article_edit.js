@@ -119,6 +119,7 @@ $(function () {
                         data: JSON.stringify(body),
                         method: "POST",
                         dataType: "json",
+                        timeout : 30000,
                         contentType: "application/json",
                         success: function (data) {
                             var date = new Date();

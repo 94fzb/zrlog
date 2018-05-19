@@ -51,6 +51,7 @@ public class TemplateController extends BaseController {
         return loadFileResponse;
     }
 
+    @RefreshCache
     public StandardResponse saveFile() {
         String file = PathKit.getWebRootPath() + getPara("file");
         IOUtil.writeBytesToFile(getPara("content").getBytes(), new File(file));
