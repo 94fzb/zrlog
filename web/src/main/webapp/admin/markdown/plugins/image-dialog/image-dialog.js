@@ -122,7 +122,7 @@
                     if (fileName === "") {
                         alert(imageLang.uploadFileEmpty);
                     }
-                    else if (!isImage.test(fileName)) {
+                    else if (!isImage.test(fileName.toLowerCase())) {
                         alert(imageLang.formatNotAllowed + settings.imageFormats.join(", "));
                     }
                     else {
