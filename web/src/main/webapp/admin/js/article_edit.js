@@ -257,21 +257,34 @@ $(function () {
         }
     });
 
+    var thumbnailHieght = 192 / 660 * $("#thumbnail-img").width();
+
+    function defaultThumbnail() {
+        $("#thumbnail-img").height(thumbnailHieght);
+        $("#camera-icon").css("margin-top",thumbnailHieght/2-18);
+    }
+
     function fillThumbnail(url) {
         $("#thumbnail-img").css('background-image', "url('" + url + "')").css("background-size", "cover");
         var w = gup("w", url);
         var h = gup("h", url);
         if (h) {
-            h = 211.0 / w * h;
+            h = $("#thumbnail-img").width() / w * h;
             $("#thumbnail-img").height(h);
             $("#thumbnail").val(url);
             $("#camera-icon").hide();
+        }else{
+            defaultThumbnail();
         }
     }
+
+
 
     var thumbnailImg = $("input[name=\"thumbnail\"]").val();
     if (thumbnailImg !== "") {
         fillThumbnail(thumbnailImg);
+    }else {
+       defaultThumbnail();
     }
 
     $("body").keydown(function (e) {

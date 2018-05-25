@@ -17,7 +17,7 @@
     <div class="content markdown-body editormd-preview-container" style="padding:0">
         ${log.content }
     </div>
-    <p style="color:#D4D4D4;padding-top: 20px">${_res.reprint}
+    <p style="color:#D4D4D4;padding-top: 20px;padding-bottom: 20px;">${_res.reprint}
         <a title="${log.title }" href="${log.url}"><SPAN style="color: rgb(51, 102, 255);" span="">${log.url}</SPAN></a>
     </p>
     <div class="pager-nav">

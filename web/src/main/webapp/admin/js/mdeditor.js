@@ -20,7 +20,7 @@ $(function () {
             editor = editormd(editorEl.attr("id"), {
                 path: editorMdPath,
                 toolbarIcons: function () {
-                    return ["bold", "del", "italic", "quote", "|", "h1", "h2", "h3", "h4", "h5", "|", "list-ul", "list-ol", "hr", "pagebreak", "|", "link", "reference-link", "image", "file", "video", "|", "code", "preformatted-text", "code-block", "table", "emoji", "|", "watch", "fullscreen", "search", "copyPreviewHtml", "|", "info", "help"]
+                    return ["bold", "del", "italic", "quote", "|", "h1", "h2", "h3", "h4", "h5", "|", "list-ul", "list-ol", "hr", "pagebreak", "|", "link", "reference-link", "image", "file", "video", "|", "preformatted-text", "code-block", "table", "emoji", "|", "watch", "fullscreen", "copyPreviewHtml", "|", "info", "help"]
                 },
                 toolbarCustomIcons: {
                     file: '<a href="javascript:;" id="fileDialog"  title=' + lang.addAttachment + ' unselectable="on"><i class="fa fa-paperclip" unselectable="on"></i></a>',
@@ -73,13 +73,13 @@ $(function () {
                     });
                 },
                 onfullscreen: function () {
-                    editorEl.css("z-index", "9999");
                     editor.width("100%");
+                    $(".full-screen-hide").hide();
                     goFullScreen();
                 },
 
                 onfullscreenExit: function () {
-                    editorEl.css("z-index", 0);
+                    $(".full-screen-hide").show();
                     editor.width("100%");
                     exitFullScreen();
                 }

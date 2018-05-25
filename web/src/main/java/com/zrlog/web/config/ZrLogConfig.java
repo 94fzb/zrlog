@@ -1,6 +1,7 @@
 package com.zrlog.web.config;
 
 import com.hibegin.common.util.FileUtils;
+import com.hibegin.common.util.StringUtils;
 import com.jfinal.config.*;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
@@ -76,6 +77,13 @@ public class ZrLogConfig extends JFinalConfig {
             systemProperties.load(ZrLogConfig.class.getResourceAsStream("/zrlog.properties"));
         } catch (IOException e) {
             LOGGER.error("load systemProperties error", e);
+        }
+        if(StringUtils.isNotEmpty(systemProp.getProperty("os.name"))){
+            if(systemProp.get("os.name").toString().startsWith("Mac")){
+                systemProp.put("os.type","apple");
+            }else{
+                systemProp.put("os.type",systemProp.getProperty("os.name").toLowerCase());
+            }
         }
     }
 

@@ -71,7 +71,7 @@ jQuery(function ($) {
         },
 
         editurl: "api/admin/link/update",
-        height: 421,
+        height: 410,
 
         autowidth: true
 

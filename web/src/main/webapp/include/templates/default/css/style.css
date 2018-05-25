@@ -23,7 +23,6 @@
 }
 
 .gn-icon::before {
-    font-family: 'icomoon';
     font-weight: normal;
     font-style: normal;
     font-variant: normal;
@@ -143,8 +142,10 @@ h1, h2, h3, h4, h5, h6,
 li, blockquote, p, span,
 form, filedset, input, select, textarea {
     color: #444444;
-    font: normal 13px/1.5 'Helvetica Neue', Helvetica, Tahoma, Arial, sans-serif;
-    outline: none;
+    font-family: Monospaced Number, Chinese Quote, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Helvetica Neue, Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 22px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
@@ -601,7 +602,6 @@ header nav.mainnav .link-studio, header nav.mainnav .link-studio:hover {
     border: 1px solid #CCCCCC;
     color: #999999;
     font-size: 13px;
-    font-family: 'Helvetica Neue', Helvetica, Tahoma, Arial, sans-serif
 }
 
 header nav.mainnav .link-studio:hover {
@@ -635,7 +635,6 @@ header nav.mainnav .link-studio:hover {
 .pager-nav p {
     margin: 5px 0;
     width: 100%;
-    font-size: 16px;
     line-height: 1.5em;
     background-color: #FFFFFF;
     padding: 10px 15px;
@@ -881,7 +880,6 @@ header nav.mainnav .link-studio:hover {
     list-style: none;
     text-transform: none;
     font-weight: 300;
-    font-family: 'Lato', Arial, sans-serif;
     line-height: 60px;
     height: auto;
     z-index: 9999;
@@ -990,12 +988,10 @@ header nav.mainnav .link-studio:hover {
     padding: 0 25px;
     letter-spacing: 1px;
     font-size: 18px;
-    font-family: 'Microsoft YaHei', Helvetica, Tahoma, Arial, sans-serif;
 }
 
 .gn-menu-main > li > a > span {
     font-size: 18px;
-    font-family: 'Microsoft YaHei', Helvetica, Tahoma, Arial, sans-serif;
 }
 
 .gn-menu-main > li > a:hover span {
@@ -1066,7 +1062,6 @@ input.gn-search {
     background: transparent;
     color: #666666;
     font-weight: 300;
-    font-family: 'Microsoft YaHei', Helvetica, Tahoma, Arial, sans-serif;
     cursor: pointer;
     font-size: 18px;
     width: 300px
@@ -1238,7 +1233,6 @@ section h3,
 section h4 {
     color: #333333;
     margin-bottom: 0.6em;
-    font-family: "Microsoft Yahei", Helvetica, Tahoma, Arial, sans-serif;
 }
 
 section h3, section h3 span {
@@ -1281,11 +1275,6 @@ section p a:hover,
 section .content a:hoveraaa,
 section .content a:hover span {
     color: #FF7300;
-}
-
-section .content table {
-    border-left: 1px solid #CCCCCC;
-    border-top: 1px solid #CCCCCC;
 }
 
 section .content th,
@@ -1398,11 +1387,6 @@ article {
     -moz-transition: top 1s ease, left 1s ease;
     -o-transition: top 1s ease, left 1s ease;
     -ms-transition: top 1s ease, left 1s ease;
-}
-
-article p, article p span, article p strong, article li, article blockquote {
-    color: #333;
-    font: normal 14px/175% 'Lantinghei SC', 'Helvetica Neue', Helvetica, Tahoma, Arial, sans-serif; /*"Microsoft Yahei",Helvetica,Tahoma,Arial,sans-serif*/
 }
 
 article p {
@@ -1757,7 +1741,6 @@ aside nav li {
 
 aside li {
     margin: 0 -15px;
-    font-family: Helvetica, Tahoma, Arial, sans-serif;
     background: none no-repeat scroll 2px 8px transparent;
     border-bottom: 1px solid #E9E9E9;
 }

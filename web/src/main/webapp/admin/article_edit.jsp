@@ -78,15 +78,6 @@
         right: 120px;
     }
 
-    .col-lg-9 {
-        max-width: 1436px;
-        width: 100%;
-    }
-
-    .col-lg-3 {
-        max-width: 330px;
-    }
-
     .editormd-html-preview, .editormd-preview-container {
         padding: 5px;
     }
@@ -125,21 +116,23 @@
     .panel-default > .panel-heading button {
         color: #666;
     }
+    .full-screen-hide {
+
+    }
 </style>
 <div class="page-header">
     <h3>
         ${_res['admin.log.edit']}
     </h3>
 </div>
-
-<div class="row">
-    <form class="form-horizontal form-label-left" id="article-form" style="max-width: 1750px">
+    <form class="form-horizontal form-label-left" id="article-form" style="max-width: 1795px">
         <input type="hidden" id="id" name="id" value="${log.logId}">
         <input type="hidden" name="editorType">
         <textarea placeholder="${_res.editorPlaceholder}" id="content" name="content"
                   style="display: none;"></textarea>
         <textarea id="markdown" name="markdown" style="display: none;"></textarea>
-        <div class="col-md-12 col-sm-12 col-xs-12" style="padding-bottom: 10px">
+        <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12" style="padding-bottom: 10px;">
             <div class="text-right">
                 <a id="preview-link" target="_blank" style="display:none">
                     <button class="btn btn-black" id="preview" type="button">
@@ -151,12 +144,14 @@
                     <i class="fa fa-save  bigger-110"></i>
                     ${_res['saveAsDraft']}
                 </button>
-                <button class="btn btn-info" id="save" type="button">
+                <button class="btn btn-info" id="save" type="button" style="margin-right: 0">
                     <i class="fa fa-paper-plane bigger-110"></i>
                     <span id="save_text"></span>
                 </button>
             </div>
+            </div>
         </div>
+        <div class="row">
         <div class="col-md-12 col-sm-12 col-xs-12 col-lg-9">
             <div class="form-group">
                 <div class="row">
@@ -165,14 +160,14 @@
                                class="form-control"
                                type="text" placeholder="${_res['inputArticleTitle']}"/>
                     </div>
-                    <div class="col-md-3 col-xs-12" style="padding-bottom: 5px">
+                    <div class="col-md-3 col-xs-12 full-screen-hide" style="padding-bottom: 5px">
                         <div class="input-group">
                             <span class="input-group-addon" id="basic-addon3">/${post}</span>
                             <input placeholder="${_res['inputArticleAlias']}" type="text" class="form-control"
                                    id="alias" name="alias" aria-describedby="basic-addon3" value="${log.alias}">
                         </div>
                     </div>
-                    <div class="col-md-2 col-xs-12">
+                    <div class="col-md-2 col-xs-12 full-screen-hide">
                         <div class="text-right">
                             <div id="editorType" class="btn-group" data-toggle="buttons">
                                 <label class="btn btn-default" id="editorType_html" data-toggle-class="btn-primary"
@@ -192,7 +187,8 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-12 row col-lg-3 col-xs-12">
+        <div class="col-md-12 col-lg-3 col-xs-12 full-screen-hide">
+            <div class="row">
             <div class="form-group col-xs-12">
                 <c:if test="${0 ne webSite['article_thumbnail_status']}">
                     <div class="x_panel">
@@ -267,8 +263,10 @@
                     </div>
                 </div>
             </div>
+            </div>
         </div>
-        <div class="col-md-12 row col-lg-3 col-xs-12">
+        <div class="col-md-12 col-lg-3 col-xs-12 full-screen-hide">
+            <div class="row">
             <div class="form-group col-xs-12">
                 <div class="x_panel">
                     <div class="x_title">
@@ -302,6 +300,8 @@
                 </div>
             </div>
         </div>
+        </div>
+        </div>
+        </div>
     </form>
-</div>
 ${pageEndTag}

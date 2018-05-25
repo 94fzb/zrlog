@@ -57,7 +57,7 @@
                             <td>
                                 操作系统
                             </td>
-                            <td><i class="fa fa-${fn:toLowerCase(system['os.name'])}"></i> ${system['os.name']}
+                            <td><i class="fa fa-${system['os.type']}"></i> ${system['os.name']}
                                 - ${system['os.arch']}
                                 - ${system['os.version']}</td>
                         </tr>

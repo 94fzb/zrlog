@@ -9,7 +9,7 @@
 </div>
 <style>
     .ui-jqgrid tr.jqgrow, .ui-jqgrid tr.ui-row-ltr, .ui-jqgrid tr.ui-row-rtl {
-        height: 42px;
+        height: 41px;
     }
 </style>
 <div class="row">

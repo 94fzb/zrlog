@@ -53,7 +53,7 @@ jQuery(function ($) {
                 enableTooltips(table);
             }, 0);
         },
-        height: 421,
+        height: 410,
 
         autowidth: true
 

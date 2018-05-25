@@ -20,7 +20,7 @@ $(function () {
                 enableTooltips(table);
             }, 0);
         },
-        height: 422,
+        height: 410,
         autowidth: true
     });
 });

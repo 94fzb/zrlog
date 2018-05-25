@@ -84,6 +84,7 @@ article .post-title a:hover{color:#0D47A1; text-decoration:none; }
 article pre{font:normal 12px/1.5 Courier New,Tahoma,Arial; background-color:#f8f8f8; overflow: auto; margin-bottom: 1em; word-wrap: break-word; padding:10px;border: 1px dotted lightcoral;border-radius: 3px;}
 article pre p{margin:0;}
 article p code{ background-color: #f8f8f8;padding: 0 2px;color: #990073;font-size: 13px;}
+article code{ background-color: #f8f8f8;padding: 0 2px;color: #990073;font-size: 13px;}
 article blockquote{position:relative; border-left:3px solid #e4e4e4; padding-left:10px;margin-left: 10px; margin-bottom: 0; }
 article blockquote:before{/*content:"“"; position:absolute; left:-25px; top:5px;font-family:'\5b8b\4f53';font-size:36px;*/}
 article blockquote, article blockquote p, article blockquote span{color:#666666;}
