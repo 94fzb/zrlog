@@ -20,7 +20,7 @@ $(function ($) {
                 name: 'userComment',
                 index: 'userComment',
                 edittype: "textarea",
-                width: 250,
+                width: 240,
                 editable: true,
                 sortable: false
             },
@@ -36,7 +36,7 @@ $(function ($) {
             {
                 name: 'userIp',
                 index: 'userIp',
-                width: 70,
+                width: 60,
                 editable: false,
                 sortable: false
             },
@@ -44,11 +44,11 @@ $(function ($) {
             {
                 name: 'commTime',
                 index: 'commTime',
-                width: 70,
+                width: 80,
                 editable: false,
                 sortable: false
             },
-            {name: 'logId', index: 'logId', width: 20, editable: false, formatter: viewLog, sortable: false}
+            {name: 'logId', index: 'logId', width: 30, editable: false, formatter: viewLog, sortable: false}
 
         ],
         viewrecords: true,

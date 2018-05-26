@@ -3,10 +3,11 @@
 <article>
     <h1 class="post-title">${log.title}</h1>
     <div class="meta">
-        <p class="category"><a href="${log.typeUrl}" rel="tag">${log.typeName}</a></p>
+        <p class="category">
+            <a rel="tag" style="padding-right: 3px" href="${log.typeUrl}">${log.typeName}</a>
+        </p>
         <p class="published">/
-            <time datetime="${log.releaseTime}">
-                &nbsp;${log.releaseTime.year+1900}-${log.releaseTime.month+1}-${log.releaseTime.date}</time>
+            <time style="padding-left: 3px">${log.releaseTime.year+1900}-${log.releaseTime.month+1}-${log.releaseTime.date}</time>
         </p>
     </div>
     <style>
@@ -17,7 +18,7 @@
     <div class="content markdown-body editormd-preview-container" style="padding:0">
         ${log.content }
     </div>
-    <p style="color:#D4D4D4;padding-top: 20px;padding-bottom: 20px;">${_res.reprint}
+    <p style="color:#D4D4D4;padding-top: 20px;padding-bottom: 6px;">${_res.reprint}
         <a title="${log.title }" href="${log.url}"><SPAN style="color: rgb(51, 102, 255);" span="">${log.url}</SPAN></a>
     </p>
     <div class="pager-nav">

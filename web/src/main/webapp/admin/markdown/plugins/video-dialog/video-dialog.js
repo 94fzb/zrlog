@@ -39,8 +39,8 @@
                     action += "&callback=" + settings.uploadCallbackURL + "&dialog_id=editormd-image-dialog-" + guid;
                 }
 
-                var dialogContent = ( (settings.imageUpload) ? "<form action=\"" + action + "\" target=\"" + iframeName + "\" method=\"post\" enctype=\"multipart/form-data\" class=\"" + classPrefix + "form\">" : "<div class=\"" + classPrefix + "form\">" ) +
-                    ( (settings.imageUpload) ? "<iframe name=\"" + iframeName + "\" id=\"" + iframeName + "\" guid=\"" + guid + "\"></iframe>" : "" ) +
+                var dialogContent = ((settings.imageUpload) ? "<form action=\"" + action + "\" target=\"" + iframeName + "\" method=\"post\" enctype=\"multipart/form-data\" class=\"" + classPrefix + "form\">" : "<div class=\"" + classPrefix + "form\">") +
+                    ((settings.imageUpload) ? "<iframe name=\"" + iframeName + "\" id=\"" + iframeName + "\" guid=\"" + guid + "\"></iframe>" : "") +
                     "<label>" + fileLang.url + "</label>" +
                     "<input type=\"text\" data-url />" + (function () {
                         return (settings.imageUpload) ? "<div class=\"" + classPrefix + "file-input\">" +
@@ -55,7 +55,7 @@
                     "<label>" + fileLang.link + "</label>" +
                     "<input type=\"text\" value=\"http://\" data-link />" +
                     "<br/>" +
-                    ( (settings.imageUpload) ? "</form>" : "</div>");
+                    ((settings.imageUpload) ? "</form>" : "</div>");
 
                 //var imageFooterHTML = "<button class=\"" + classPrefix + "btn " + classPrefix + "image-manager-btn\" style=\"float:left;\">" + imageLang.managerButton + "</button>";  
 
@@ -83,14 +83,14 @@
                                 return false;
                             }
 
-                            if(alt === ""){
+                            if (alt === "") {
                                 alt = url;
                             }
                             //按大部分视频16：9换算高度不靠谱（移动端展示），还是得100%呀
                             var video = '<video controlsList="nodownload" class="video-js vjs-default-skin vjs-16-9" controls' +
                                 ' preload="auto" width="100%" height="320px"' +
                                 ' data-setup=\'{"fluid": true}\'>' +
-                                ' <source src="'+(url)+'">' +
+                                ' <source src="' + (url) + '">' +
                                 '</video><br/>';
                             if (link === "" || link === "http://") {
                                 cm.replaceSelection(video);

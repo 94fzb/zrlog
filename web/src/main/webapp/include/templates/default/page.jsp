@@ -24,10 +24,11 @@
                         <h2 class="post-title"><a rel="bookmark" href="${log.url}">${log.title}</a></h2>
                         <div class="content"><p>${log.digest}</p></div>
                         <div class="meta">
-                            <p class="category"><a rel="tag" href="${log.typeUrl}">${log.typeName}</a></p>
+                            <p class="category">
+                                <a rel="tag" style="padding-right: 3px" href="${log.typeUrl}">${log.typeName}</a>
+                            </p>
                             <p class="published">/
-                                <time>
-                                    &nbsp;${log.releaseTime.year+1900}-${log.releaseTime.month+1}-${log.releaseTime.date}</time>
+                                <time style="padding-left: 3px">${log.releaseTime.year+1900}-${log.releaseTime.month+1}-${log.releaseTime.date}</time>
                             </p>
                             <p class="commentlink">
                                 <a href="${log.url}#comment" class="comments_invite">

@@ -64,7 +64,7 @@ $(function () {
                 });
                 editorEl.summernote('code', article.content);
                 editorEl.on('summernote.change', function (we, content) {
-                    if (content === '<p><br></p>') {
+                    if (editorEl.summernote('isEmpty')) {
                         content = "";
                     }
                     var markdown = new TurndownService().turndown(content);
@@ -74,15 +74,15 @@ $(function () {
                     contentChange(content, markdown);
 
                 });
-                $(".note-statusbar").remove();
                 $(".btn-fullscreen").click(function () {
                     if ($(this).hasClass("active")) {
                         goFullScreen();
+                        $(".note-toolbar-wrapper").remove();
                     } else {
                         exitFullScreen();
                     }
                 });
-                $(".note-editable").focus();
+                $(".note-editable").addClass("markdown-body");
                 editorEl.hide();
             }
         })

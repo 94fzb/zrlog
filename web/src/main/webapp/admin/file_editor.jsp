@@ -22,14 +22,12 @@
     .CodeMirror {
         border: 1px solid #ccc;
         height: 600px;
-        border-radius: 4px;
         width: 100%;
     }
 
     #code {
         border: 1px solid #ccc;
         height: 600px;
-        border-radius: 4px;
         width: 100%;
     }
 
@@ -57,22 +55,21 @@
         <input type="hidden" id="basePath" value="${param.path}">
         <input type="hidden" name="file" id="file">
         <textarea name="content" id="content" hidden></textarea>
-        <div class="row">
-            <div class="form-group">
-                <div class="col-md-10">
-                    <textarea id="code"></textarea>
-                </div>
-                <div class="col-md-2">
-                    <select multiple style="height: 600px" id="form-field-select-6" class="form-control">
-                    </select>
-                </div>
+
+        <div class="form-group row">
+            <div class="col-md-10">
+                <textarea id="code"></textarea>
+            </div>
+            <div class="col-md-2">
+                <select multiple style="height: 600px" id="form-field-select-6" class="form-control">
+                </select>
             </div>
         </div>
 
         <div class="ln_solid"></div>
         <div class="col-md-offset-1">
-            <button class="btn" type="button" id="saveFile" style="color: #fff;background-color: #5bc0de;border-color: #46b8da;">
-                 ${_res['submit']}
+            <button class="btn btn-info" type="button" id="saveFile">
+                ${_res['submit']}
             </button>
         </div>
     </form>

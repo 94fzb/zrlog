@@ -14,8 +14,7 @@
 </script>
 <style>
     input {
-        height: 34px;
-        border-radius: 4px;
+        height: 36px;
         border: 1px solid #ccc;
     }
 
@@ -25,7 +24,6 @@
 
     .custom-file-upload {
         border: 1px solid #ccc;
-        border-radius: 4px;
         display: inline-block;
         padding: 6px 12px;
         cursor: pointer;
@@ -40,7 +38,7 @@
     <div class="col-md-6 col-xs-12 col-sm-12">
         <form role="form" method="post" data-toggle="validator" class="form-horizontal" id="userAjax"
               action="api/admin/update">
-            <div class="form-group">
+            <div class="form-group row">
                 <label class="col-md-3 control-label no-padding-right"> ${_res.userName} </label>
 
                 <div class="col-md-6">
@@ -48,7 +46,7 @@
                            class="form-control" required placeholder="">
                 </div>
             </div>
-            <div class="form-group">
+            <div class="form-group row">
                 <label class="col-md-3 control-label no-padding-right"> ${_res['email']} </label>
 
                 <div class="col-md-6">
@@ -56,7 +54,7 @@
                            class="form-control" placeholder="">
                 </div>
             </div>
-            <div class="form-group">
+            <div class="form-group row">
                 <label class="col-md-3 control-label no-padding-right">${_res['headPortrait']}</label>
                 <div class="col-md-9">
                     <input id="logo" class="col-md-7" name="header" value="${user.header}"/>
@@ -67,10 +65,10 @@
                 </div>
             </div>
             <div class="ln_solid"></div>
-            <div class="form-group">
+            <div class="form-group row">
                 <div class="col-md-offset-3 col-md-9">
                     <button id="user" type="button" class="btn btn-info">
-                         ${_res['submit']}
+                        ${_res['submit']}
                     </button>
                 </div>
             </div>

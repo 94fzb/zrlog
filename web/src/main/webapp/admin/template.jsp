@@ -27,7 +27,7 @@
 <div class="row">
     <div class="col-md-12">
         <label for="fileUpload"
-               class="custom-file-upload btn btn-primary btn-round col-md-offset-11 col-md-1 fix_button">
+               class="custom-file-upload btn btn-primary offset-md-11 col-md-1 fix_button">
             <i class="fa fa-cloud-upload"></i><span style="padding-left: 5px">${_res['upload']}</span>
         </label>
         <input type="file" id="fileUpload" class="fileUpload" name="file" value=""/>
@@ -98,8 +98,9 @@
 <div class="row">
     <div class="col-md-12">
         <a href="admin/index#template_center">
-            <button class="btn btn-dark btn-round  col-md-1 fix_button"><i
-                    class="fa fa-cloud-download"></i><span style="padding-left: 5px">${_res['admin.theme.download']}</span></button>
+            <button class="btn btn-dark col-md-1 fix_button"><i
+                    class="fa fa-cloud-download"></i><span
+                    style="padding-left: 5px">${_res['admin.theme.download']}</span></button>
         </a>
     </div>
 </div>

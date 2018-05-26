@@ -18,7 +18,7 @@
             <!-- .entry-header -->
             <div class="widget search">
                 <p>${_res.notFound}</p>
-                <form method="post"  action="${rurl }post/search">
+                <form method="post" action="${rurl }post/search">
                     <input type="text" class="field" name="key" id="s" placeholder="${_res.searchTip}"/>
                     <input type="submit" class="btn" name="submit" value="${_res.search}"/>
                 </form>

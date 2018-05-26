@@ -6,28 +6,27 @@
         ${_res.dashboard}
     </h3>
 </div>
-<div class="alert alert-block alert-info">
+<div class="alert alert-primary">
     <i class="fa fa-info"></i>
     <span style="padding-left: 5px">${_res['admin.index.welcomeTips']}</span>
-    <a target="_blank" href="http://blog.zrlog.com/post/feedback" style="float: right"><i
+    <a class="d-none d-sm-block" target="_blank" href="http://blog.zrlog.com/post/feedback" style="float: right"><i
             class="fa fa-support"></i><span style="padding-left: 5px"> ${_res['suggestAndFeedback']}</span> </a>
 </div>
 <div class="row">
     <div class="col-md-7 col-xs-12 col-sm-12">
         <div class="widget-box">
             <div class="widget-header">
-                <h4>
+                <h5>
                     <i class="fa fa-server"></i>
                     ${_res.serverInfo}
-                </h4>
+                </h5>
             </div>
             <div class="widget-body">
                 <div class="widget-main">
-                    <table id="sample-table-1" class="table table-striped table-bordered table-hover">
+                    <table class="table table-striped table-bordered table-hover" style="overflow: auto;">
                         <thead>
                         <tr>
                             <th class="hidden-480">${_res.key}</th>
-
                             <th>
                                 ${_res.value}
                             </th>
@@ -94,10 +93,10 @@
     <div class="col-md-5 col-xs-12 col-sm-12">
         <div class="widget-box">
             <div class="widget-header">
-                <h4>
+                <h5>
                     <i class="fa fa-pie-chart"></i>
                     ${_res['admin.index.outline']}
-                </h4>
+                </h5>
             </div>
             <div class="widget-body">
                 <div class="widget-main">

@@ -55,6 +55,7 @@
             display: inline-block;
             background-size: cover;
         }
+
         .markdown-body ul, .markdown-body ol {
             padding-left: 0;
         }
@@ -68,7 +69,7 @@
             <header>
                 <h1 class="site-name">
                     <i class="avatar"></i>
-                    <a href="${rurl}">${_res.title}</a>
+                    <a title="${_res.title}" href="${rurl}">${_res.title}</a>
                     <span class="slogan">${webs.title }</span>
                 </h1>
                 <nav class="mainnav">

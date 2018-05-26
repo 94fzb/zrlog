@@ -9,6 +9,7 @@ jQuery(function ($) {
                 formatter: 'actions',
                 formatoptions: {
                     keys: true,
+                    delbutton: true,
                     delOptions: {recreateForm: true, beforeShowForm: beforeDeleteCallback, url: "api/admin/nav/delete"}
                 }
             },
@@ -32,8 +33,14 @@ jQuery(function ($) {
                 sortable: false,
                 editrules: {required: true}
             },
+
             {
-                name: 'sort', index: 'sort', width: 70, editable: true, sortable: false, editrules: {required: true, number: true}
+                name: 'sort',
+                index: 'sort',
+                width: 220,
+                editable: true,
+                sortable: false,
+                editrules: {required: true, number: true}
             }
         ],
 
@@ -43,8 +50,9 @@ jQuery(function ($) {
         rowList: [10, 20, 30],
         pager: pager_selector,
         altRows: true,
+
         multiselect: false,
-        multiboxonly: true,
+        multiboxonly: false,
 
         loadComplete: function () {
             var table = this;
@@ -58,6 +66,7 @@ jQuery(function ($) {
         autowidth: true
 
     });
+
     //navButtons
     jQuery(grid_selector).jqGrid('navGrid', pager_selector,
         { 	//navbar options
@@ -82,8 +91,7 @@ jQuery(function ($) {
                 var form = $(e[0]);
                 form.closest('.ui-jqdialog').find('.ui-jqdialog-titlebar').wrapInner('<div class="widget-header" />')
                 style_edit_form(form);
-            },
-            url: "api/admin/nav/update"
+            }
         },
         {
             //new record form
@@ -99,5 +107,5 @@ jQuery(function ($) {
         },
         {},
         {}
-    )
+    );
 });

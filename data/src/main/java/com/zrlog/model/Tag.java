@@ -1,12 +1,9 @@
 package com.zrlog.model;
 
-import com.hibegin.common.util.StringUtils;
-import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Model;
 import com.zrlog.common.request.PageableRequest;
 
 import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * 统计文章中标签出现的次数，方便展示。文章的数据发生变化后，会自动更新记录，无需额外程序控制，对应数据库的tag表
@@ -96,28 +93,6 @@ public class Tag extends Model<Tag> {
             }
         }
         return true;
-    }
-
-    public void refreshTag() {
-        Db.update("delete from " + TABLE_NAME + "");
-        Map<String, Integer> countMap = new HashMap<>();
-        List<Log> logs = Log.dao.find("select keywords from " + Log.TABLE_NAME + " where rubbish=? and private=? ", false, false);
-        for (Log log : logs) {
-            if (StringUtils.isNotEmpty(log.getStr("keywords")) && log.getStr("keywords").trim().length() > 0) {
-                Set<String> tagSet = strToSet(log.getStr("keywords") + ",");
-                for (String tag : tagSet) {
-                    if (countMap.get(tag) != null) {
-                        countMap.put(tag, countMap.get(tag) + 1);
-                    } else {
-                        countMap.put(tag, 1);
-                    }
-                }
-            }
-        }
-        int count = 1;
-        for (Entry<String, Integer> tag : countMap.entrySet()) {
-            new Tag().set("tagId", count++).set("text", tag.getKey()).set("count", tag.getValue()).save();
-        }
     }
 
     public Map<String, Object> find(PageableRequest page) {

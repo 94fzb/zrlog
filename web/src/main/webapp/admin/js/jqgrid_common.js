@@ -6,7 +6,7 @@ function style_delete_form(form) {
     var buttons = form.next().find('.EditButton .fm-button');
     buttons.addClass('btn btn-sm').find('[class*="-icon"]').remove();//ui-icon, s-icon
     buttons.eq(0).addClass('btn-danger').prepend('<i class="fa fa-trash"></i>');
-    buttons.eq(1).addClass('btn-default').prepend('<i class="fa fa-remove"></i>')
+    buttons.eq(1).addClass('btn-primary').prepend('<i class="fa fa-remove"></i>')
 }
 
 function beforeDeleteCallback(e) {
@@ -29,7 +29,7 @@ function style_edit_form(form) {
     var buttons = form.next().find('.EditButton .fm-button');
     buttons.addClass('btn btn-sm').find('[class*="-icon"]').remove();//ui-icon, s-icon
     buttons.eq(0).addClass('btn-primary').prepend('<i class="fa fa-paper-plane"></i>');
-    buttons.eq(1).addClass('btn-default').prepend('<i class="fa fa-remove"></i>');
+    buttons.eq(1).addClass('btn-primary').prepend('<i class="fa fa-remove"></i>');
 
     buttons = form.next().find('.navButton a');
     buttons.find('.ui-icon').remove();

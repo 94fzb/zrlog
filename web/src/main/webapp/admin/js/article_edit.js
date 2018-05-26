@@ -31,8 +31,8 @@ $(function () {
         } else {
             markdownEditorCreate();
         }
-        $("#editorType .btn").removeClass("active").removeClass("btn-primary");
-        $("#editorType_" + type).addClass("active").addClass("btn-primary");
+        $("#editorType .btn").removeClass("active").removeClass("btn-secondary");
+        $("#editorType_" + type).addClass("active").addClass("btn-secondary");
         $("input[name='editorType']").val(type);
     }
 
@@ -132,17 +132,19 @@ $(function () {
         }
     });
 
+    var mobileHide = "d-none d-sm-block";
+
     window.goFullScreen = function () {
-        $("#save").addClass("save-btn-full-screen").addClass("hidden-xs");
-        $("#saveToRubbish").addClass("saveToRubbish-btn-full-screen").addClass("hidden-xs");
+        $("#save").addClass("save-btn-full-screen").addClass(mobileHide);
+        $("#saveToRubbish").addClass("saveToRubbish-btn-full-screen").addClass(mobileHide);
         if (screenfull.enabled) {
             screenfull.request();
         }
     };
 
     window.exitFullScreen = function () {
-        $("#save").removeClass("save-btn-full-screen").removeClass("hidden-xs");
-        $("#saveToRubbish").removeClass("saveToRubbish-btn-full-screen").removeClass("hidden-xs");
+        $("#save").removeClass("save-btn-full-screen").removeClass(mobileHide);
+        $("#saveToRubbish").removeClass("saveToRubbish-btn-full-screen").removeClass(mobileHide);
         if (screenfull.enabled) {
             screenfull.exit();
         }
@@ -261,7 +263,7 @@ $(function () {
 
     function defaultThumbnail() {
         $("#thumbnail-img").height(thumbnailHieght);
-        $("#camera-icon").css("margin-top",thumbnailHieght/2-18);
+        $("#camera-icon").css("margin-top", thumbnailHieght / 2 - 18);
     }
 
     function fillThumbnail(url) {
@@ -273,18 +275,17 @@ $(function () {
             $("#thumbnail-img").height(h);
             $("#thumbnail").val(url);
             $("#camera-icon").hide();
-        }else{
+        } else {
             defaultThumbnail();
         }
     }
 
 
-
     var thumbnailImg = $("input[name=\"thumbnail\"]").val();
     if (thumbnailImg !== "") {
         fillThumbnail(thumbnailImg);
-    }else {
-       defaultThumbnail();
+    } else {
+        defaultThumbnail();
     }
 
     $("body").keydown(function (e) {

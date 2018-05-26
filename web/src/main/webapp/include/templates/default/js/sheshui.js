@@ -188,7 +188,7 @@ $(document).ready(function () {
         var rand = parseInt(Math.random() * (x - y + 1) + y);
         $(this).addClass("size" + rand);
     });
-    $("img").error(function(){
+    $("img").error(function () {
         $(this).hide();
     });
 });

@@ -1,4 +1,5 @@
-﻿﻿<%@ page language="java" session="false" import="java.util.*" pageEncoding="UTF-8" %>
+﻿﻿
+<%@ page language="java" session="false" import="java.util.*" pageEncoding="UTF-8" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
     Map<String, Object> res = (Map<String, Object>) request.getAttribute("_res");
@@ -52,6 +53,7 @@
             border-radius: 50%;
             overflow: hidden;
         }
+
         .vjs-default-skin .vjs-control-bar {
             font-size: 60%;
             height: 39px;
@@ -136,8 +138,8 @@
     <div class="side side-left" id="drawer-pannel">
         <aside>
             <div class="side-inner">
-            <i id="collapseDrawerPannel" class="material-icons">navigate_next</i>
-            <h2 class="s-title">${webs.title}</h2>
+                <i id="collapseDrawerPannel" class="material-icons">navigate_next</i>
+                <h2 class="s-title">${webs.title}</h2>
                 <div class="widget category-list">
                     <h3>博客分类 <span class="en">Categories</span></h3>
                     <div class="list">

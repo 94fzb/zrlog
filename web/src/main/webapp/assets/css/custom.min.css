@@ -58,7 +58,7 @@
 .nav-sm .nav.side-menu li a {
     font-size: 12px;
     font-weight: 400;
-    padding: 10px 5px;
+    padding: 10px 0px;
     text-align: center !important;
 }
 
@@ -424,7 +424,6 @@ body {
 
 .page-title {
     height: 65px;
-    padding: 10px 0;
     width: 100%;
 }
 
@@ -579,7 +578,6 @@ a:hover, a:focus {
 }
 
 .top_nav .dropdown-menu li a {
-    padding: 12px 20px;
     width: 100%;
 }
 
@@ -605,11 +603,9 @@ a:hover, a:focus {
 .nav.side-menu > li {
     cursor: pointer;
     display: block;
+    width: 100%;
     position: relative;
-}
-
-.nav.side-menu > li > a {
-    margin-bottom: 5px;
+    height: 72px;
 }
 
 .nav.side-menu > li > a:hover {
@@ -677,6 +673,7 @@ a:hover, a:focus {
 
 .nav.side-menu > li.current-page, .nav.side-menu > li.active {
     border-right: 5px solid #1abb9c;
+    height: 72px;
 }
 
 .nav li.current-page {
@@ -745,7 +742,6 @@ a:hover, a:focus {
 }
 
 .top_search .form-control {
-    border: 1px solid rgba(221, 226, 232, 0.49);
     border-radius: 25px 0 0 25px;
     box-shadow: 0 1px 0 rgba(0, 0, 0, 0.075) inset;
     padding-left: 20px;
@@ -772,7 +768,6 @@ a:hover, a:focus {
     border-radius: 0 25px 25px 0;
     border-style: solid solid solid none;
     border-width: 1px 1px 1px 0;
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
     color: #93a2b2;
     margin-bottom: 0 !important;
 }
@@ -1568,7 +1563,7 @@ ul.msg_list li a .message {
     margin-top: 0;
     position: absolute;
     right: 0;
-/ / width: 220 px;
+    width: 120px;
 }
 
 .navbar-nav .open .dropdown-menu.msg_list {
@@ -4828,7 +4823,6 @@ ul.notifications {
 
 .WriteCover-previewWrapper {
     height: 100%;
-    width: 660px;
     background-size: 100% auto;
     background-position: center top;
     -webkit-box-flex: 1;
@@ -4845,7 +4839,6 @@ ul.notifications {
     background: rgba(0, 0, 0, .075);
     height: 62px;
     background-size: 100% auto;
-    width: 660px;
     color: #808080;
     text-align: center;
     border-radius: 4px;
@@ -4885,6 +4878,11 @@ ul.notifications {
 
 .ui-pnotify-icon span.fa {
     font-size: 18px;
+    display: inherit;
+}
+
+.ui-pnotify-title {
+    font-size: 16px;
     display: inherit;
 }
 
@@ -6712,7 +6710,6 @@ a.btn-danger {
 .select2-container--default .select2-selection--single {
     background-color: #fff;
     border: 1px solid #aaa;
-    border-radius: 4px
 }
 
 .select2-container--default .select2-selection--single .select2-selection__rendered {
@@ -7199,16 +7196,28 @@ a {
     color: #1890ff;
 }
 
-.btn-info {
-    background-color: #1890ff;
-    border-color: #1890ff;
-}
-
-.btn-info:hover, .btn-info:active, .btn-info:focus, .btn-info:disabled {
-    background-color: #48a7fd;
-    border-color: #48a7fd;
-}
-
 a:hover {
     color: #48a7fd;
+}
+
+.container {
+    min-width: 100%;
+}
+
+.navbar {
+    padding: 0;
+}
+
+.page-header {
+    padding-bottom: 9px;
+    margin: 40px 0 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.table th, .table td {
+    padding: 6px 4px;
+}
+
+.has-error > div > input.form-control, .has-error > input.form-control  {
+    border-color: #A94442;
 }

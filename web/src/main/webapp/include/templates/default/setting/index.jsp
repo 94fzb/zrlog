@@ -19,7 +19,6 @@
 
     .custom-file-upload {
         border: 1px solid #ccc;
-        border-radius: 4px;
         display: inline-block;
         padding: 6px 12px;
         cursor: pointer;
@@ -28,26 +27,26 @@
 
 <form id="templateAjax" action="api/admin/template/config" class="form-horizontal">
     <input type="hidden" name="template" value="${template}">
-    <div class="form-group">
+    <div class="form-group row">
         <label class="col-sm-3 control-label no-padding-right"> 标题 </label>
-        <div class="col-sm-5">
-            <input type="text" name="title" value="${_res.title}" class="form-control col-xs-10 col-sm-5"
+        <div class="col-sm-8">
+            <input type="text" name="title" value="${_res.title}" class="form-control col-xs-10"
                    placeholder="不建议大于10个字符">
         </div>
     </div>
-    <div class="form-group">
+    <div class="form-group row">
         <label
                 class="col-sm-3 control-label no-padding-right"> 底部 Slogan </label>
 
         <div class="col-sm-9">
             <input type="text" name="footerSlogan" value="${_res.footerSlogan}"
-                   class="form-control col-xs-10 col-sm-5" placeholder="放上一句自己喜欢的话语，让更多的人了解你"
+                   class="form-control col-xs-10" placeholder="放上一句自己喜欢的话语，让更多的人了解你"
             >
         </div>
     </div>
-    <div class="form-group">
+    <div class="form-group row">
         <label class="col-sm-3 control-label no-padding-right">网站&nbsp;Logo </label>
-        <div class="col-sm-6">
+        <div class="col-sm-7">
             <input id="logo" class="form-control col-sm-10" name="avatar" value="${_res.avatar}">
         </div>
         <div class="col-sm-2">
@@ -58,7 +57,7 @@
         </div>
     </div>
     <div class="ln_solid"></div>
-    <div class="form-group">
+    <div class="form-group row">
         <div class="col-md-offset-3 col-md-9">
             <button id="template" type="button" class="btn btn-info">
                 ${_res['submit']}

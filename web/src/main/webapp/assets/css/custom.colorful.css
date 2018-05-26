@@ -59,27 +59,11 @@ body {
     border-right: 5px solid #1890ff;
 }
 
-.form-control {
-    border-radius: 4px;
-}
-
-.select2-container--default .select2-selection--single {
-    border-radius: 4px;
-}
-
-.tagsinput {
-    border-radius: 4px;
-}
-
-.editormd {
-    border-radius: 4px;
-}
-
 .page-header {
     margin: 66px 0 20px;
 }
 
-h1, h2, h3 ,h4 {
+h1, h2, h3, h4 {
     color: #0d1a26;
 }
 
@@ -104,8 +88,4 @@ h1, h2, h3 ,h4 {
 #nprogress .spinner-icon {
     border-left-color: #3399dd;
     border-top-color: #3399dd;
-}
-
-.x_panel {
-    border-radius: 4px;
 }

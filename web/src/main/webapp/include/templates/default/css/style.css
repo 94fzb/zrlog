@@ -13,16 +13,13 @@
 
 @font-face {
     font-family: 'icomoon';
-    src: url('../fonts/icomoon/icomoon.eot?ibtkww');
-    src: url('../fonts/icomoon/icomoon.eot?#iefixibtkww') format('embedded-opentype'),
-    url('../fonts/icomoon/icomoon.woff?ibtkww') format('woff'),
-    url('../fonts/icomoon/icomoon.ttf?ibtkww') format('truetype'),
-    url('../fonts/icomoon/icomoon.svg?ibtkww#icomoon') format('svg');
+    src: url('../fonts/icomoon/icomoon.woff?ibtkww') format('woff');
     font-weight: normal;
     font-style: normal;
 }
 
 .gn-icon::before {
+    font-family: 'icomoon';
     font-weight: normal;
     font-style: normal;
     font-variant: normal;
@@ -238,7 +235,7 @@ input[type=text], textarea {
 .main section {
     float: left;
     width: 720px;
-    min-height:780px;
+    min-height: 780px;
 }
 
 .main aside {
@@ -486,18 +483,12 @@ header .site-name {
 header .site-name,
 header .site-name a {
     color: #333333;
-    font: normal 26px/1em "Microsoft YaHei", 'Helvetica Neue', Helvetica, Tahoma, Arial, sans-serif;
+    font: normal 26px/1em Monospaced Number, Chinese Quote, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Helvetica Neue, Helvetica, Arial, sans-serif;;
     text-shadow: 1px 1px 20x #D4D4D4;
-}
-
-header .site-name a {
-    width: 300px; /*background:url("../images/temp.svg") no-repeat scroll 0 center transparent;text-indent:-999em;*/
+    text-overflow: ellipsis;
     overflow: hidden;
-    /*box-shadow: 0 0px 1px rgba(198,198,198,1);
--webkit-transition: top 1s ease, left 1s ease;
--moz-transition: top 1s ease, left 1s ease;
--o-transition: top 1s ease, left 1s ease;
--ms-transition: top 1s ease, left 1s ease;*/
+    word-break: break-all;
+    white-space: nowrap;
 }
 
 header .site-name span {
@@ -555,7 +546,7 @@ header nav.mainnav a {
     padding: 0px 20px;
     height: 60px;
     text-align: center;
-    font: normal 18px/60px 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Tahoma, Arial, sans-serif;
+    font: normal 18px/60px Monospaced Number, Chinese Quote, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Helvetica Neue, Helvetica, Arial, sans-serif;;
     -webkit-box-sizing: initial;
     -moz-box-sizing: initial;
     box-sizing: initial;
@@ -907,7 +898,7 @@ header nav.mainnav .link-studio:hover {
     height: auto;
     width: auto;
     text-align: left;
-    font: normal 18px/1 'Microsoft YaHei', Helvetica, Tahoma, Arial, sans-serif;
+    font: normal 18px/1 Monospaced Number, Chinese Quote, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Helvetica Neue, Helvetica, Arial, sans-serif;;
 }
 
 .gn-menu-main nav a:hover, .gn-menu-main nav a:focus {
@@ -1207,7 +1198,7 @@ input.gn-search:focus {
     margin: 5px 0;
     color: #FF6D99;
     text-shadow: 1px 1px 1px #A50031;
-    font: bold 32px/1em Arial Narrow, Arial, sans-serif;
+    font: bold 32px/1em Monospaced Number, Chinese Quote, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Helvetica Neue, Helvetica, Arial, sans-serif;;
 }
 
 .main hgroup h3 {
@@ -1218,7 +1209,7 @@ input.gn-search:focus {
 
 section h2,
 section .post-title {
-    font: normal 24px/1.2 '\5FAE\8F6F\96C5\9ED1', Helvetica, Tahoma, Arial, sans-serif;
+    font: normal 24px/1.2 Monospaced Number, Chinese Quote, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Helvetica Neue, Helvetica, Arial, sans-serif;;
 }
 
 section .category-title {
@@ -1413,7 +1404,7 @@ article .post-title a:hover {
 }
 
 article pre {
-    font: normal 12px/1.5 Courier New, Tahoma, Arial;
+    font: normal 12px/1.5 Monospaced Number, Chinese Quote, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Helvetica Neue, Helvetica, Arial, sans-serif;;
     background-color: #F8F8F8;
     overflow: auto;
     margin-bottom: 1em;
@@ -3090,6 +3081,7 @@ a.size6 {
 a.size6:hover {
     color: #E13728;
 }
+
 .vjs-default-skin .vjs-control-bar {
     font-size: 60%;
     height: 39px;

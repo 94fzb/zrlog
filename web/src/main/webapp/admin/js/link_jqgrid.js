@@ -115,20 +115,6 @@ jQuery(function ($) {
             },
             url: 'api/admin/link/add'
         },
-        {
-            //delete record form
-            recreateForm: true,
-            beforeShowForm: function (e) {
-                var form = $(e[0]);
-                if (form.data('styled')) return false;
-
-                form.closest('.ui-jqdialog').find('.ui-jqdialog-titlebar').wrapInner('<div class="widget-header" />')
-                style_delete_form(form);
-
-                form.data('styled', true);
-            }
-        },
-        {},
         {},
         {}
     );

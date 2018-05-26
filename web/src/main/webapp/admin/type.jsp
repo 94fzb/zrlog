@@ -11,7 +11,7 @@
     </h3>
 </div>
 <div class="row">
-    <div class="col-xs-12">
+    <div class="col-md-12">
         <table id="grid-table"></table>
         <div id="grid-pager"></div>
     </div>

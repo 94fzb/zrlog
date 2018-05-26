@@ -78,11 +78,11 @@ public class ZrLogConfig extends JFinalConfig {
         } catch (IOException e) {
             LOGGER.error("load systemProperties error", e);
         }
-        if(StringUtils.isNotEmpty(systemProp.getProperty("os.name"))){
-            if(systemProp.get("os.name").toString().startsWith("Mac")){
-                systemProp.put("os.type","apple");
-            }else{
-                systemProp.put("os.type",systemProp.getProperty("os.name").toLowerCase());
+        if (StringUtils.isNotEmpty(systemProp.getProperty("os.name"))) {
+            if (systemProp.get("os.name").toString().startsWith("Mac")) {
+                systemProp.put("os.type", "apple");
+            } else {
+                systemProp.put("os.type", systemProp.getProperty("os.name").toLowerCase());
             }
         }
     }

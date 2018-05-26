@@ -71,6 +71,7 @@ $(function () {
                         var e = {"message": lang.copPreviewHtmlToClipboardSuccess, "error": 0};
                         notify(e, "info");
                     });
+                    $(".CodeMirror-gutters").height($(".CodeMirror-scroll").height() + 20);
                 },
                 onfullscreen: function () {
                     editor.width("100%");

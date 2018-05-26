@@ -3,6 +3,7 @@
     text-align: center;
     width: 100%;
 }
+
 .page_navi a {
     border: 1px solid #ddd;
     border-radius: 12px;
@@ -13,6 +14,7 @@
     padding: 3px 8px;
     text-decoration: none;
 }
+
 .page_navi a:hover, .page_navi a.current {
     border: 1px solid #1e90ff;
     color: #4682b4;

@@ -36,3 +36,4 @@ tomcat.*
 log/
 web/sim.pid
 sim.pid
+.DS_Store

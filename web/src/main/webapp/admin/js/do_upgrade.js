@@ -92,5 +92,5 @@ $(function () {
 
     $('.buttonNext').addClass('btn btn-success').text(lang.labelNext);
     $('.buttonPrevious').addClass('btn btn-primary').text(lang.labelPrevious);
-    $('.buttonFinish').addClass('btn btn-default').text(lang.labelFinish);
+    $('.buttonFinish').addClass('btn btn-info').text(lang.labelFinish);
 });

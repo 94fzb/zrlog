@@ -15,7 +15,6 @@
 <style>
     input {
         height: 34px;
-        border-radius: 4px;
         border: 1px solid #ccc;
     }
 
@@ -25,7 +24,6 @@
 
     .custom-file-upload {
         border: 1px solid #ccc;
-        border-radius: 4px;
         display: inline-block;
         padding: 6px 12px;
         cursor: pointer;
@@ -34,7 +32,7 @@
 <form role="form" id="templateAjax" method="post" action="api/admin/template/config" class="form-horizontal">
     <input type="hidden" name="template" value="${template}">
 
-    <div class="form-group">
+    <div class="form-group row">
         <label
                 class="col-sm-3 control-label no-padding-right"> 底部 Slogan </label>
 
@@ -44,7 +42,7 @@
         </div>
     </div>
 
-    <div class="form-group">
+    <div class="form-group row">
         <label
                 class="col-sm-3 control-label no-padding-right">
             关于页 </label>
@@ -53,7 +51,7 @@
         </div>
     </div>
 
-    <div class="form-group">
+    <div class="form-group row">
         <label
                 class="col-sm-3 control-label no-padding-right">
             头像 &nbsp;</label>
@@ -68,7 +66,7 @@
     </div>
 
     <div class="ln_solid"></div>
-    <div class="form-group">
+    <div class="form-group row">
         <div class="col-md-offset-3 col-md-9">
             <button type="button" id="template" class="btn btn-info">
                 ${_res['submit']}

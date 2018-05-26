@@ -21,7 +21,7 @@
 <div class="row">
     <div class="col-md-6 col-xs-12 col-sm-12">
         <form role="form" action="api/admin/upgrade/setting" class="form-horizontal" id="upgradeAjax">
-            <div class="form-group">
+            <div class="form-group row">
                 <label class="col-md-3 control-label no-padding-right"> ${_res['admin.upgrade.autoCheckCycle']} </label>
 
                 <div class="col-md-4">
@@ -47,7 +47,7 @@
 			</span>
                 </div>
             </div>
-            <div class="form-group">
+            <div class="form-group row">
                 <label class="col-md-3 control-label no-padding-right"
                 > ${_res['admin.upgrade.canPreview']} </label>
 
@@ -67,7 +67,7 @@
             <div class="form-group">
                 <div class="col-md-offset-3 col-md-9">
                     <button id="upgrade" type="button" class="btn btn-info">
-                         ${_res.submit}
+                        ${_res.submit}
                     </button>
                 </div>
             </div>

@@ -20,7 +20,6 @@ class AdminRoutes extends Routes {
         add("/api/admin", AdminController.class);
         add("/api/admin/link", LinkController.class);
         add("/api/admin/comment", CommentController.class);
-        add("/api/admin/tag", TagController.class);
         add("/api/admin/type", TypeController.class);
         add("/api/admin/nav", BlogNavController.class);
         add("/api/admin/article", ArticleController.class);

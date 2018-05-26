@@ -108,7 +108,7 @@
             var pos = ranges[i].head, tok = cm.getTokenAt(pos);
             var inner = CodeMirror.innerMode(cm.getMode(), tok.state), state = inner.state;
             if (typingSlash && (tok.type == "string" || tok.string.charAt(0) != "<" ||
-                    tok.start != pos.ch - 1))
+                tok.start != pos.ch - 1))
                 return CodeMirror.Pass;
             // Kludge to get around the fact that we are not in XML mode
             // when completing in JS/CSS snippet in htmlmixed mode. Does not

@@ -5,7 +5,7 @@
 <script src="${basePath}admin/js/do_upgrade.js"></script>
 <style>
     a.btn-primary {
-         color: #fff;
+        color: #fff;
     }
 </style>
 <div class="page-header">
@@ -45,7 +45,8 @@
                 <div id="step-22" class="content" style="min-height: 400px;overflow-y:auto;display: none;">
                     <h4 id="processbar-title"></h4>
                     <div class="progress">
-                      <div class="progress-bar progress-bar-striped" id="downloadFileProcessBar" role="progressbar" style="width: 0" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                        <div class="progress-bar progress-bar-striped" id="downloadFileProcessBar" role="progressbar"
+                             style="width: 0" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
                 </div>
                 <div id="step-33" class="content" style="display: none;min-height: 400px;overflow-y:auto;">

@@ -156,11 +156,12 @@ $(function () {
 
 function loadHTML(url, id) {
     $.ajaxSetup({'cache': true});
-    $("#" + id).load(url, function (responseText, textStatus, req) {
+    $.get(url, function (responseText, textStatus, req) {
         NProgress.done();
         if (textStatus === "error") {
             return $("#" + id).html(formatErrorMessage(req, textStatus));
         } else {
+            $("#" + id).html(req.responseText);
             $(".js-switch").each(function (e) {
                 new Switchery($(".js-switch").get(e), {color: mainColor})
             })
@@ -199,6 +200,7 @@ function clear(path) {
     $("body").find(".tooltip").remove();
     $("body").find(".ui-widget").remove();
     $("body").find(".ui-pnotify").remove();
+    $(".note-popover").remove()
 }
 
 function loadPage(path) {

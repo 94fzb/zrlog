@@ -26,6 +26,11 @@
     <script>
         var _res = ${res};
     </script>
+    <style>
+        .btn-group > a {
+            color: #515356;
+        }
+    </style>
 </head>
 <body class="nav-sm">
 <c:if test="${previewDb}">
@@ -48,7 +53,7 @@
                     <div class="menu_section">
                         <ul class="nav side-menu">
                             <li>
-                                <a href="admin/index#dashboard" style="margin-top: 10px">
+                                <a href="admin/index#dashboard">
                                     <i class="fa fa-dashboard"></i>${_res.dashboard}
                                 </a>
                             </li>
@@ -73,25 +78,9 @@
                                 </a>
                             </li>
                             <li>
-                                <a>
-                                    <i class="fa fa-cogs"></i>${_res['admin.setting']}
-                                    <span class="fa fa-chevron-down"></span>
-                                </a>
-                                <ul class="nav child_menu">
-                                    <li>
-                                        <a href="admin/index#user">${_res['admin.user.info']}</a>
-                                    </li>
-                                    <li>
-                                        <a href="admin/index#website">${_res['admin.website.manage']}</a>
-                                    </li>
-                                    <li>
-                                        <a href="admin/index#template">${_res['admin.template.manage']}</a>
-                                    </li>
-                                    <li>
-                                        <a href="admin/index#upgrade">${_res['admin.upgrade.manage']}</a>
-                                    </li>
-                                </ul>
+                               <a href="admin/index#website"><i class="fa fa-cogs"></i> ${_res['admin.setting']}</a>
                             </li>
+
                             <li>
                                 <a>
                                     <i class="fa fa-list"></i>${_res['admin.more']}
@@ -99,20 +88,17 @@
                                 </a>
                                 <ul class="nav child_menu">
                                     <li>
-                                        <a href="admin/index#type"
-                                           class="dropdown-toggle">${_res['admin.type.manage']}</a>
+                                        <a href="admin/index#template">${_res['admin.template.manage']}</a>
                                     </li>
                                     <li>
-                                        <a href="admin/index#tag"
-                                           class="dropdown-toggle">${_res['admin.tag.manage']}</a>
+                                        <a href="admin/index#type">${_res['admin.type.manage']}</a>
                                     </li>
                                     <li>
                                         <a href="admin/index#link"
-                                           class="dropdown-toggle">${_res['admin.link.manage']}</a>
+                                        >${_res['admin.link.manage']}</a>
                                     </li>
                                     <li>
-                                        <a href="admin/index#nav"
-                                           class="dropdown-toggle">${_res['admin.nav.manage']}</a>
+                                        <a href="admin/index#nav">${_res['admin.nav.manage']}</a>
                                     </li>
                                 </ul>
                             </li>
@@ -123,48 +109,20 @@
         </div>
         <div class="top_nav">
             <div class="nav_menu" id="nav_menu">
-                <nav>
-                    <ul class="nav navbar-nav navbar-right">
-                        <li class="">
-                            <a href="javascript:" class="user-profile dropdown-toggle" data-toggle="dropdown"
-                               aria-expanded="false">
-                                <img src="${user.header}" alt="">${user.userName}
-                                <i class=" fa fa-angle-down"></i>
-                            </a>
-                            <ul class="dropdown-menu dropdown-usermenu pull-right">
-                                <li>
-                                    <a href="admin/index#user">
-                                        <i class="fa fa-user"></i>
-                                        ${_res['admin.user.info']}
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="admin/index#change_password">
-                                        <i class="fa fa-key"></i>
-                                        ${_res['admin.changePwd']}
-                                    </a>
-                                </li>
-                                <li class="divider"></li>
-                                <li>
-                                    <a href="admin/logout">
-                                        <i class="fa fa-sign-out"></i>
-                                        ${_res['admin.user.logout']}
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-
+                <nav class="nav navbar-nav navbar-right" style="height: 57px;padding-top: 5px">
+                    <div>
                         <c:if test="${fn:length(noReadComments) > 0}">
-                            <li role="presentation" class="dropdown">
-                                <a href="javascript:" class="dropdown-toggle info-number" data-toggle="dropdown"
-                                   aria-expanded="false">
-                                    <i class="fa fa-envelope-o"></i>
-                                    <span class="badge bg-green" id="commentNum">${fn:length(noReadComments)}</span>
-                                </a>
-                                <ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
-                                    <c:forEach items="${noReadComments}" var="comment">
-                                        <li>
-                                            <a target="_blank" class="haveRead" id="${comment.id}">
+                        <div class="btn-group">
+                            <a href="javascript:" class="btn btn-default dropdown-toggle info-number"
+                               data-toggle="dropdown"
+                               aria-expanded="false">
+                                <i class="fa fa-envelope-o" style="font-size: 25px;"></i>
+                                <span class="badge bg-green" id="commentNum">${fn:length(noReadComments)}</span>
+                            </a>
+                            <ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
+                                <c:forEach items="${noReadComments}" var="comment">
+                                    <li class="dropdown-item">
+                                        <a target="_blank" class="haveRead" id="${comment.id}">
                         <span class="image">
                         <c:choose>
                             <c:when test='${not empty comment.header}'>
@@ -175,49 +133,70 @@
                             </c:otherwise>
                         </c:choose>
                         </span>
-                                                <span>
+                                            <span>
                           <span>${comment.userName}</span>
                           <span class="time"></span>
                         </span>
-                                                <span class="message">
-                                                        ${comment.userComment}
-                                                </span>
-                                            </a>
-                                        </li>
-                                    </c:forEach>
-                                    <li>
-                                        <div class="text-center">
-                                            <a href="admin/index#comment">
-                                                    ${_res['admin.viewAllComment']}
-                                                <i class="fa fa-angle-right"></i>
-                                            </a>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </li>
-                        </c:if>
-                        <c:if test="${lastVersion.upgrade}">
-                            <li role="presentation" id="version" class='dropdown'>
-                                <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown"
-                                   aria-expanded="false">
-                                    <i class="fa fa-bell"></i>
-                                    <span class="badge bg-green">新</span>
-                                </a>
-                                <ul id="bell" class="dropdown-menu list-unstyled msg_list" role="menu">
-                                    <li style="padding-left: 0;padding-right: 0;">
-                                        <a href="admin/index?buildId=${lastVersion.version.buildId}#do_upgrade">
-                                                                    <span>
-                          版本号：&nbsp;&nbsp;V${lastVersion.version.version}-${lastVersion.version.buildId}（${lastVersion.version.type}）
-                        </span>
                                             <span class="message">
-                             发布时间：${lastVersion.version.releaseDate}
-                        </span>
+                                                    ${comment.userComment}
+                                            </span>
                                         </a>
                                     </li>
-                                </ul>
-                            </li>
+                                </c:forEach>
+                                <li>
+                                    <div class="text-center">
+                                        <a href="admin/index#comment">
+                                                ${_res['admin.viewAllComment']}
+                                            <i class="fa fa-angle-right"></i>
+                                        </a>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
                         </c:if>
-                    </ul>
+                        <c:if test="${lastVersion.upgrade}">
+                        <div class="btn-group">
+                            <a href="javascript:;" class="btn btn-default dropdown-toggle info-number"
+                               data-toggle="dropdown" aria-expanded="false">
+                                <i class="fa fa-bell" style="font-size: 25px;padding-top: 7px;"></i>
+                                <span class="badge bg-green">新</span>
+                            </a>
+
+                            <ul id="bell" class="dropdown-menu list-unstyled msg_list" role="menu">
+                                <li class="dropdown-item">
+                                    <a style="padding: 0 !important"
+                                       href="admin/index?buildId=${lastVersion.version.buildId}#do_upgrade">版本号：&nbsp;&nbsp;V${lastVersion.version.version}-${lastVersion.version.buildId}（${lastVersion.version.type}）
+                                        <br/>发布时间：${lastVersion.version.releaseDate}</a>
+                                </li>
+                            </ul>
+                        </div>
+                        </c:if>
+                        <div class="btn-group">
+                            <a href="javascript:;" class="btn btn-default dropdown-toggle user-profile"
+                               data-toggle="dropdown" aria-expanded="false">
+                                <img src="${user.header}" alt="">${user.userName}</a>
+                            <ul class="dropdown-menu  dropdown-usermenu pull-right">
+                                <li class="dropdown-item">
+                                    <a href="admin/index#user">
+                                        <i class="fa fa-user"></i>
+                                        ${_res['admin.user.info']}
+                                    </a>
+                                </li>
+                                <li class="dropdown-item">
+                                    <a href="admin/index#change_password">
+                                        <i class="fa fa-key"></i>
+                                        ${_res['admin.changePwd']}
+                                    </a>
+                                </li>
+                                <li class="dropdown-divider"></li>
+                                <li class="dropdown-item">
+                                    <a href="admin/logout">
+                                        <i class="fa fa-sign-out"></i>
+                                        ${_res['admin.user.logout']}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                 </nav>
             </div>
         </div>
@@ -228,7 +207,7 @@
             <strong>${_res.copyright} <a href="https://www.zrlog.com" target="_blank" rel="noopener"> ZrLog
                 . </a></strong>
             All rights reserved.
-            <div class="pull-right hidden-xs">
+            <div class="pull-right d-none d-sm-block">
                 <span><strong>Version</strong> ${zrlog.version}</span>
             </div>
         </footer>
@@ -237,14 +216,14 @@
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     <h4 id="info-title" class="modal-title"></h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 </div>
                 <div class="modal-body">
                     <p id="info-body"></p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" id="closeBtn" class="btn btn-default" data-dismiss="modal"></button>
+                    <button type="button" id="closeBtn" class="btn btn-primary" data-dismiss="modal"></button>
                 </div>
             </div>
         </div>

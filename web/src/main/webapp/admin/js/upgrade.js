@@ -1,5 +1,5 @@
 $(function () {
-    $(".select2_single").select2({
+    $("#cycle-select").select2({
         minimumResultsForSearch: -1,
         allowClear: true,
         dropdownParent: $("#cycle-select-parent")

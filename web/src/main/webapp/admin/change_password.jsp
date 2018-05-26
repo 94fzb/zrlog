@@ -8,26 +8,26 @@
         <form role="form" action="api/admin/changePassword" data-toggle="validator" id="updatePasswordAjax"
               class="form-horizontal"
               method="post">
-            <div class="form-group">
+            <div class="form-group row">
                 <label class="col-md-3 control-label no-padding-right"> ${_res['admin.oldPassword']}</label>
 
                 <div class="col-md-5">
                     <input type="password" name="oldPassword" value="" required=""
-                           class="form-control col-xs-12 col-sm-6" placeholder="" id="orlPassword">
+                           class="form-control col-xs-12" placeholder="" id="orlPassword">
                 </div>
             </div>
 
-            <div class="form-group">
+            <div class="form-group row">
                 <label class="col-md-3 control-label no-padding-right"> ${_res['admin.newPassword']}</label>
                 <div class="col-md-5">
-                    <input type="password" name="newPassword" value="" class="form-control col-xs-12 col-md-6"
+                    <input type="password" name="newPassword" value="" class="form-control col-xs-12"
                            required="" placeholder="" id="newPassword1">
 
                 </div>
             </div>
             <div class="ln_solid"></div>
 
-            <div class="form-group">
+            <div class="form-group row">
                 <div class="col-md-offset-3 col-md-9">
                     <button id="updatePassword" type="button" class="btn btn-info">
 
