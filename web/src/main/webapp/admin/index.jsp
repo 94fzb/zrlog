@@ -78,7 +78,7 @@
                                 </a>
                             </li>
                             <li>
-                               <a href="admin/index#website"><i class="fa fa-cogs"></i> ${_res['admin.setting']}</a>
+                                <a href="admin/index#website"><i class="fa fa-cogs"></i> ${_res['admin.setting']}</a>
                             </li>
 
                             <li>
@@ -109,27 +109,28 @@
         </div>
         <div class="top_nav">
             <div class="nav_menu" id="nav_menu">
-                <nav class="nav navbar-nav navbar-right" style="height: 57px;padding-top: 5px">
+                <nav class="nav navbar-nav navbar-right" style="height: 57px;">
                     <div>
                         <c:if test="${fn:length(noReadComments) > 0}">
-                        <div class="btn-group">
-                            <a href="javascript:" class="btn btn-default dropdown-toggle info-number"
-                               data-toggle="dropdown"
-                               aria-expanded="false">
-                                <i class="fa fa-envelope-o" style="font-size: 25px;"></i>
+                        <div class="btn-group" id="commentMessages">
+                            <button class="btn btn-default dropdown-toggle info-number" data-toggle="dropdown"
+                                    aria-expanded="false">
+                                <i class="fa fa-envelope-o"></i>
                                 <span class="badge bg-green" id="commentNum">${fn:length(noReadComments)}</span>
-                            </a>
-                            <ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-right list-unstyled msg_list">
                                 <c:forEach items="${noReadComments}" var="comment">
-                                    <li class="dropdown-item">
-                                        <a target="_blank" class="haveRead" id="${comment.id}">
+                                    <li style="min-width: 240px;">
+                                        <a target="_blank" class="haveRead dropdown-item user-profile"
+                                           id="${comment.id}">
                         <span class="image">
                         <c:choose>
                             <c:when test='${not empty comment.header}'>
-                                <img class="msg-photo" src="${comment.header}">
+                                <img class="msg-photo" style="min-height: 38px;min-width: 38px" src="${comment.header}">
                             </c:when>
                             <c:otherwise>
-                                <img class="msg-photo" src="${baseUrl}assets/images/default-portrait.gif">
+                                <img class="msg-photo" style="min-height: 38px;min-width: 38px"
+                                     src="${baseUrl}assets/images/default-portrait.gif">
                             </c:otherwise>
                         </c:choose>
                         </span>
@@ -156,46 +157,42 @@
                         </c:if>
                         <c:if test="${lastVersion.upgrade}">
                         <div class="btn-group">
-                            <a href="javascript:;" class="btn btn-default dropdown-toggle info-number"
-                               data-toggle="dropdown" aria-expanded="false">
-                                <i class="fa fa-bell" style="font-size: 25px;padding-top: 7px;"></i>
+                            <button class="btn btn-default dropdown-toggle info-number" data-toggle="dropdown"
+                                    aria-expanded="false">
+                                <i class="fa fa-bell"></i>
                                 <span class="badge bg-green">新</span>
-                            </a>
-
-                            <ul id="bell" class="dropdown-menu list-unstyled msg_list" role="menu">
-                                <li class="dropdown-item">
-                                    <a style="padding: 0 !important"
-                                       href="admin/index?buildId=${lastVersion.version.buildId}#do_upgrade">版本号：&nbsp;&nbsp;V${lastVersion.version.version}-${lastVersion.version.buildId}（${lastVersion.version.type}）
+                            </button>
+                            <ul id="bell" class="dropdown-menu dropdown-menu-right list-unstyled msg_list">
+                                <li>
+                                    <a class="dropdown-item" style="padding: 0 !important"
+                                       href="admin/index?buildId=${lastVersion.version.buildId}#do_upgrade">
+                                        版本号：&nbsp;&nbsp;V${lastVersion.version.version}-${lastVersion.version.buildId}（${lastVersion.version.type}）
                                         <br/>发布时间：${lastVersion.version.releaseDate}</a>
                                 </li>
                             </ul>
                         </div>
                         </c:if>
                         <div class="btn-group">
-                            <a href="javascript:;" class="btn btn-default dropdown-toggle user-profile"
-                               data-toggle="dropdown" aria-expanded="false">
-                                <img src="${user.header}" alt="">${user.userName}</a>
-                            <ul class="dropdown-menu  dropdown-usermenu pull-right">
-                                <li class="dropdown-item">
-                                    <a href="admin/index#user">
-                                        <i class="fa fa-user"></i>
-                                        ${_res['admin.user.info']}
-                                    </a>
+                            <button class="btn btn-default dropdown-toggle user-profile" data-toggle="dropdown"
+                                    aria-expanded="false">
+                                <img src="${user.header}" alt="">${user.userName}
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <a class="dropdown-item" href="admin/index#user">
+                                    <i class="fa fa-user"></i>
+                                    ${_res['admin.user.info']}
+                                </a>
+                                <a class="dropdown-item" href="admin/index#change_password">
+                                    <i class="fa fa-key"></i>
+                                    ${_res['admin.changePwd']}
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="admin/logout">
+                                    <i class="fa fa-sign-out"></i>
+                                    ${_res['admin.user.logout']}
+                                </a>
                                 </li>
-                                <li class="dropdown-item">
-                                    <a href="admin/index#change_password">
-                                        <i class="fa fa-key"></i>
-                                        ${_res['admin.changePwd']}
-                                    </a>
-                                </li>
-                                <li class="dropdown-divider"></li>
-                                <li class="dropdown-item">
-                                    <a href="admin/logout">
-                                        <i class="fa fa-sign-out"></i>
-                                        ${_res['admin.user.logout']}
-                                    </a>
-                                </li>
-                            </ul>
+                            </div>
                         </div>
                 </nav>
             </div>

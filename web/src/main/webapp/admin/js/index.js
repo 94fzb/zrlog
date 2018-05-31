@@ -116,7 +116,13 @@ $(function () {
             data: JSON.stringify({id: commentId}),
             success: function () {
                 commentEl.parent().remove();
-                $("#commentNum").text(parseInt($("#commentNum").text() - 1));
+                var count = parseInt($("#commentNum").text() - 1);
+                if(count <= 0){
+                    $("#commentMessages").remove();
+                }else{
+                    $("#commentNum").text(count);
+                }
+
             }
         });
         return false;

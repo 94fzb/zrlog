@@ -29,9 +29,8 @@ $(function () {
                 },
                 codeFold: true,
                 appendMarkdown: article['markdown'],
-                saveHTMLToTextarea: true,
                 searchReplace: true,
-                htmlDecode: "iframe,pre",
+                htmlDecode: "pre",
                 emoji: true,
                 taskList: true,
                 tocm: true,         // Using [TOCM]
@@ -87,7 +86,6 @@ $(function () {
 
             });
             $(".editormd-markdown-textarea").removeAttr("name");
-            $(".editormd-html-textarea").removeAttr("name");
         })
     };
 

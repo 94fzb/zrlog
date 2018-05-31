@@ -45,8 +45,7 @@ public class ArticleController extends BaseController {
     }
 
     public String index() {
-        if ((getRequest().getServletPath().startsWith("/" + Constants.getArticleUri()))
-                && (getPara(0) != null)) {
+        if (getPara(0) != null) {
             if ("all".equals(getPara(0))) {
                 return all();
             } else if (getPara(0) != null) {
@@ -121,7 +120,6 @@ public class ArticleController extends BaseController {
         Log log = Log.dao.findById(id);
         if (log != null) {
             Integer logId = log.get("logId");
-            Log.dao.incrClick(logId);
             log.put("lastLog", Log.dao.findLastLog(logId, I18NUtil.getStringFromRes("noLastLog")));
             log.put("nextLog", Log.dao.findNextLog(logId, I18NUtil.getStringFromRes("noNextLog")));
             log.put("comments", Comment.dao.findAllByLogId(logId));

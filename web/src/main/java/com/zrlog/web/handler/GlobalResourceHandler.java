@@ -11,6 +11,8 @@ import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.I18NUtil;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.config.ZrLogConfig;
+import com.zrlog.web.plugin.RequestInfo;
+import com.zrlog.web.plugin.RequestStatisticsPlugin;
 import com.zrlog.web.util.WebTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +24,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -102,6 +105,16 @@ public class GlobalResourceHandler extends Handler {
             //开发环境下面打印整个请求的耗时，便于优化代码
             if (BlogBuildInfoUtil.isDev()) {
                 LOGGER.info(request.getServletPath() + " used time " + (System.currentTimeMillis() - start));
+            }
+            //仅保留非静态资源请求或者是以 .html结尾的
+            if (!target.contains(".") || target.endsWith(".html")) {
+                RequestInfo requestInfo = new RequestInfo();
+                requestInfo.setIp(WebTools.getRealIp(request));
+                requestInfo.setUrl(url);
+                requestInfo.setUserAgent(request.getHeader("User-Agent"));
+                requestInfo.setAccessTime(new Date());
+                requestInfo.setRequestUri(target);
+                RequestStatisticsPlugin.record(requestInfo);
             }
         }
     }

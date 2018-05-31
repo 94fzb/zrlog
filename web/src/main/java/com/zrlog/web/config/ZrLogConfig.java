@@ -25,6 +25,7 @@ import com.zrlog.web.interceptor.InitDataInterceptor;
 import com.zrlog.web.interceptor.MyI18NInterceptor;
 import com.zrlog.web.interceptor.RouterInterceptor;
 import com.zrlog.web.plugin.CacheCleanerPlugin;
+import com.zrlog.web.plugin.RequestStatisticsPlugin;
 import com.zrlog.web.plugin.UpdateVersionPlugin;
 import com.zrlog.web.plugin.ViburDBCPPlugin;
 import com.zrlog.web.version.UpgradeVersionHandler;
@@ -38,10 +39,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Random;
+import java.util.*;
 
 /**
  * JFinal核心一些参数的配置。
@@ -205,6 +203,7 @@ public class ZrLogConfig extends JFinalConfig {
                     plugins.add(new UpdateVersionPlugin());
                     plugins.add(new CacheCleanerPlugin());
                 }
+                plugins.add(new RequestStatisticsPlugin());
             } catch (Exception e) {
                 LOGGER.warn("configPlugin exception ", e);
             }
@@ -357,6 +356,10 @@ public class ZrLogConfig extends JFinalConfig {
         if (!"".equals(com.zrlog.common.Constants.getArticleRoute())) {
             currentRoutes.add("/" + com.zrlog.common.Constants.getArticleRoute(), ArticleController.class);
         }
+    }
+
+    public static List<String> articleRouterList() {
+        return Arrays.asList("/" + com.zrlog.common.Constants.getArticleRoute());
     }
 
     @Override

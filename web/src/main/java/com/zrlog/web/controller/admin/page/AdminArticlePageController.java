@@ -31,7 +31,7 @@ public class AdminArticlePageController extends BaseController {
 
     public String edit() {
         boolean skipFirstRubbishSave = false;
-        String editorType = "markdown";
+        String editorType = "";
         Map<String, String> articleContent = new HashMap<>();
         if (getPara("id") != null) {
             Integer logId = Integer.parseInt(getPara("id"));
@@ -43,11 +43,16 @@ public class AdminArticlePageController extends BaseController {
                 if (StringUtils.isNotEmpty(log.getStr("editor_type"))) {
                     editorType = log.getStr("editor_type");
                 } else {
-                    if (Constants.webSite.get("editor_type") != null && StringUtils.isNotEmpty(Constants.webSite.get("editor_type").toString())) {
-                        editorType = Constants.webSite.get("editor_type").toString();
-                    }
+                    editorType = "markdown";
                 }
                 skipFirstRubbishSave = true;
+            }
+        }
+        if (StringUtils.isEmpty(editorType)) {
+            if (Constants.webSite.get("editor_type") != null && StringUtils.isNotEmpty(Constants.webSite.get("editor_type").toString())) {
+                editorType = Constants.webSite.get("editor_type").toString();
+            } else {
+                editorType = "markdown";
             }
         }
         articleContent.put("editorType", editorType);

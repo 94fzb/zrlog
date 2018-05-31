@@ -7221,3 +7221,8 @@ a:hover {
 .has-error > div > input.form-control, .has-error > input.form-control  {
     border-color: #A94442;
 }
+
+.navbar-nav > div > div > .btn {
+    background-color: #ffffff;
+    height: 57px;
+}

@@ -206,7 +206,7 @@ public class Log extends Model<Log> implements Serializable {
     /**
      * @param logId
      */
-    public void incrClick(int logId) {
+    public void clickAdd(Object logId) {
         Log log = findById(logId);
         if (log != null) {
             log.set("logId", logId).set("click", log.getInt("click") + 1).update();

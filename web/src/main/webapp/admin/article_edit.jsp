@@ -162,12 +162,12 @@
         <div class="col-md-12 col-sm-12 col-xs-12 col-lg-9">
             <div class="form-group">
                 <div class="row">
-                    <div class="col-md-6 col-xs-12" id="title-parent" style="padding-bottom: 5px">
+                    <div class="col-md-6 col-xs-12" id="title-parent">
                         <input required name="title" id="title" maxlength="254" value="${log.title}"
                                class="form-control"
                                type="text" placeholder="${_res['inputArticleTitle']}"/>
                     </div>
-                    <div class="col-md-3 col-xs-12 full-screen-hide" style="padding-bottom: 5px">
+                    <div class="col-md-3 col-xs-12 full-screen-hide">
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <span class="input-group-text">/${post}</span>
