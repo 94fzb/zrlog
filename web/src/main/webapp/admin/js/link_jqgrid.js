@@ -73,7 +73,7 @@ jQuery(function ($) {
         editurl: "api/admin/link/update",
         height: 410,
 
-        autowidth: true
+        width: getJqGridWidth()
 
     });
 

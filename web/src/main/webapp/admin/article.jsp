@@ -17,7 +17,7 @@
 <div class="page-title">
     <div class="col-md-2 offset-md-10 col-xs-12 top_search">
         <form class="form-search">
-            <div class="input-group row">
+            <div class="input-group">
                 <input id="keywords" value="${keywords}" name="keywords" autocomplete="off" type="text"
                        placeholder="${_res.searchTip}" class="form-control">
                 <span class="input-group-btn">

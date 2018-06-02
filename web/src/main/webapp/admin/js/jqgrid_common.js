@@ -69,13 +69,16 @@ function enableTooltips(table) {
 
 function resizeJqGrid() {
     if (jqGrid) {
-        var minWidth = $("#grid-table").attr("min-width");
-        if (minWidth && $("#right_col").width() < minWidth) {
-            jqGrid.setGridWidth(minWidth);
-            $(".ui-jqgrid-bdiv").css("background-color", $("#right_col").css("background-color"));
-        } else {
-            jqGrid.setGridWidth($("#right_col").width());
-        }
+        jqGrid.setGridWidth(getJqGridWidth());
+    }
+}
+
+function getJqGridWidth(){
+    var minWidth = $("#grid-table").attr("min-width");
+    if (minWidth && $("#right_col").width() < minWidth) {
+        return minWidth;
+    } else {
+        return $("#right_col").width();
     }
 }
 

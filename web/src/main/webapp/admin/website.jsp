@@ -211,10 +211,10 @@
                     <span class="col-md-4">
                     类型<select name="editor_type" class="form-control select2_single">
                         <option
-                                <c:if test="${webs.editorType eq 'html'}">selected="selected"</c:if>
+                                <c:if test="${webs.editor_type eq 'html'}">selected="selected"</c:if>
                                 value="html">html</option>
                         <option
-                                <c:if test="${webs.editorType ne 'html'}">selected="selected"</c:if>
+                                <c:if test="${webs.editor_type ne 'html'}">selected="selected"</c:if>
                                 value="markdown">markdown</option>
                     </select>
                         </span>

@@ -63,7 +63,7 @@ jQuery(function ($) {
         },
         height: 410,
 
-        autowidth: true
+        width: getJqGridWidth()
 
     });
 

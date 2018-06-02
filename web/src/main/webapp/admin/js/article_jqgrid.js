@@ -46,7 +46,7 @@ jQuery(function ($) {
             }, 0);
         },
         height: 410,
-        autowidth: true
+        width: getJqGridWidth()
     });
 
     function editFormat(cellvalue, options, rowObject) {

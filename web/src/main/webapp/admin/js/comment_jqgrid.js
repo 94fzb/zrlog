@@ -68,8 +68,7 @@ $(function ($) {
             }, 0);
         },
         height: 410,
-        autowidth: true
-
+        width: getJqGridWidth(),
     });
 
     function viewLog(cellvalue, options, rowObject) {

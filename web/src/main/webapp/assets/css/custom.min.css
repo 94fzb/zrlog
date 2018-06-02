@@ -7218,11 +7218,15 @@ a:hover {
     padding: 6px 4px;
 }
 
-.has-error > div > input.form-control, .has-error > input.form-control  {
+.has-error > div > input.form-control, .has-error > input.form-control {
     border-color: #A94442;
 }
 
 .navbar-nav > div > div > .btn {
     background-color: #ffffff;
     height: 57px;
+}
+
+#jqgrid {
+    overflow-x: auto;
 }

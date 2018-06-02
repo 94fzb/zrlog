@@ -274,9 +274,11 @@ $(function () {
             h = $("#thumbnail-img").width() / w * h;
             $("#thumbnail-img").height(h);
             $("#thumbnail").val(url);
-            $("#camera-icon").hide();
         } else {
             defaultThumbnail();
+        }
+        if (url) {
+            $("#camera-icon").hide();
         }
     }
 
