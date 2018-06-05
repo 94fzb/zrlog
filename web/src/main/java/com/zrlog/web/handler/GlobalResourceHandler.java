@@ -49,7 +49,7 @@ public class GlobalResourceHandler extends Handler {
 
     public void handle(String target, HttpServletRequest request, HttpServletResponse response, boolean[] isHandled) {
         long start = System.currentTimeMillis();
-        String url = WebTools.getRealScheme(request) + "://" + request.getHeader("host") + request.getContextPath() + "/";
+        String url = WebTools.getHomeUrl(request);
         request.setAttribute("basePath", url);
         request.setAttribute("pageEndTag", PAGE_END_TAG);
         String ext = null;
@@ -60,7 +60,7 @@ public class GlobalResourceHandler extends Handler {
             }
         }
         try {
-            final ResponseRenderPrintWriter responseRenderPrintWriter = new ResponseRenderPrintWriter(response.getOutputStream(), !JFinal.me().getConstants().getDevMode(), url, PAGE_END_TAG, request, response);
+            final ResponseRenderPrintWriter responseRenderPrintWriter = new ResponseRenderPrintWriter(response.getOutputStream(), !JFinal.me().getConstants().getDevMode(), url, PAGE_END_TAG, request, response, System.getProperty("file.encoding"));
             response = new HttpServletResponseWrapper(response) {
                 @Override
                 public PrintWriter getWriter() {
@@ -112,7 +112,7 @@ public class GlobalResourceHandler extends Handler {
                 requestInfo.setIp(WebTools.getRealIp(request));
                 requestInfo.setUrl(url);
                 requestInfo.setUserAgent(request.getHeader("User-Agent"));
-                requestInfo.setAccessTime(new Date());
+                requestInfo.setRequestTime(new Date().getTime());
                 requestInfo.setRequestUri(target);
                 RequestStatisticsPlugin.record(requestInfo);
             }

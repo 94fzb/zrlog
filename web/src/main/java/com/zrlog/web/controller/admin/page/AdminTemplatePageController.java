@@ -12,6 +12,7 @@ import com.zrlog.service.TemplateService;
 import com.zrlog.util.I18NUtil;
 import com.zrlog.web.controller.BaseController;
 import com.zrlog.web.interceptor.TemplateHelper;
+import com.zrlog.web.util.WebTools;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.Cookie;
@@ -52,9 +53,7 @@ public class AdminTemplatePageController extends BaseController {
             Cookie cookie = new Cookie("template", template);
             cookie.setPath("/");
             getResponse().addCookie(cookie);
-            String path = getRequest().getContextPath();
-            String basePath = getRequest().getScheme() + "://" + getRequest().getHeader("host") + path + "/";
-            redirect(basePath);
+            redirect(WebTools.getHomeUrl(getRequest()));
         } else {
             setAttr("message", I18NUtil.getStringFromRes("templatePathNotNull"));
         }

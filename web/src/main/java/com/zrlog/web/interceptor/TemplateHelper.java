@@ -146,7 +146,7 @@ public class TemplateHelper {
     public static String setBaseUrl(HttpServletRequest request, boolean staticBlog, Map webSite) {
         String templateUrl;
         String scheme = WebTools.getRealScheme(request);
-        String baseUrl = scheme + "://" + request.getHeader("host") + request.getContextPath() + "/";
+        String baseUrl = WebTools.getHomeUrl(request);
         String templatePath = request.getAttribute("template").toString();
         if (staticBlog) {
             baseUrl = request.getContextPath() + "/";

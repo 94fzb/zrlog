@@ -1,0 +1,1 @@
+alter table `website` modify COLUMN `value` longtext DEFAULT NULL;

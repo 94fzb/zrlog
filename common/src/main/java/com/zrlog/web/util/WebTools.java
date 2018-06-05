@@ -34,6 +34,10 @@ public class WebTools {
         return ip;
     }
 
+    public static String getHomeUrl(HttpServletRequest request) {
+        return WebTools.getRealScheme(request) + "://" + request.getHeader("host") + request.getContextPath() + "/";
+    }
+
     public static String getRealScheme(HttpServletRequest request) {
         if (request != null) {
             String scheme = request.getHeader("X-Forwarded-Proto");

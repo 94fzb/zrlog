@@ -1,11 +1,18 @@
 package com.zrlog.web.plugin;
 
-import java.util.Date;
-
 public class RequestInfo {
     private String url;
     private String userAgent;
-    private Date accessTime;
+
+    public long getRequestTime() {
+        return requestTime;
+    }
+
+    public void setRequestTime(long requestTime) {
+        this.requestTime = requestTime;
+    }
+
+    private long requestTime;
     private String ip;
 
     public boolean isDeal() {
@@ -44,13 +51,6 @@ public class RequestInfo {
         this.userAgent = userAgent;
     }
 
-    public Date getAccessTime() {
-        return accessTime;
-    }
-
-    public void setAccessTime(Date accessTime) {
-        this.accessTime = accessTime;
-    }
 
     public String getIp() {
         return ip;
@@ -59,7 +59,6 @@ public class RequestInfo {
     public void setIp(String ip) {
         this.ip = ip;
     }
-
 
 
 }

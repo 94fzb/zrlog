@@ -34,11 +34,9 @@
 </head>
 <body class="nav-sm">
 <c:if test="${previewDb}">
-    <div class="container">
-        <div class="col-md-12 bg-info text-center">
-            <h3 style="color: red"><i class="fa fa-warning"></i> ${_res['defaultDbTips']}</h3>
-        </div>
-    </div>
+<div class="text-center">
+    <h3 style="color: red"><i class="fa fa-warning"></i> ${_res['defaultDbTips']}</h3>
+</div>
 </c:if>
 <div class="container body">
     <div class="main_container">

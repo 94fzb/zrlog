@@ -13,10 +13,18 @@
     <script src="${basePath}assets/js/jquery.min.js"></script>
     <script src="${basePath}assets/js/bootstrap.min.js"></script>
     <script src="${basePath}assets/js/validator.min.js"></script>
+    <style>
+        .container {
+            min-width: 60%;
+        }
+        .alert{
+            width: 100%;
+        }
+    </style>
 </head>
 
 <body style="background:#fff">
-<div class="container" style="max-width: 1080px">
+<div class="container">
     <div class="x_panel">
         <div class="x_title">
             <div class="widget-header widget-header-blue widget-header-flat">
@@ -26,7 +34,7 @@
         </div>
 
         <div class="x_content">
-            <div class="col-xs-12">
+            <div class="col-md-12">
                 <div class="row">
                     <div class="alert alert-danger" <c:if test="${empty errorMsg }">style="display: none;"</c:if>>
                         <b><i class="fa fa-info-circle"></i> ${errorMsg}</b>
@@ -34,7 +42,7 @@
                 </div>
             </div>
             <c:if test="${currentViewName ne 'forbidden'}">
-            <div class="col-xs-12">
+            <div class="col-md-12">
                 <div id="wizard" class="form_wizard wizard_horizontal">
                     <ul class="list-unstyled wizard_steps anchor">
                         <li>

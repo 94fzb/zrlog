@@ -33,6 +33,7 @@ class ResponseRenderPrintWriter extends PrintWriter {
     private String endFlag;
     private HttpServletRequest request;
     private HttpServletResponse response;
+    private String charset;
 
     public String getResponseBody() {
         return body;
@@ -42,7 +43,7 @@ class ResponseRenderPrintWriter extends PrintWriter {
         return str.trim().endsWith("</html>") || str.trim().endsWith(endFlag);
     }
 
-    ResponseRenderPrintWriter(OutputStream out, boolean compress, String baseUrl, String endFlag, HttpServletRequest request, HttpServletResponse response) {
+    ResponseRenderPrintWriter(OutputStream out, boolean compress, String baseUrl, String endFlag, HttpServletRequest request, HttpServletResponse response, String charset) {
         super(out);
         this.compress = compress;
         compressor.setRemoveIntertagSpaces(true);
@@ -51,6 +52,7 @@ class ResponseRenderPrintWriter extends PrintWriter {
         this.endFlag = endFlag;
         this.request = request;
         this.response = response;
+        this.charset = charset;
     }
 
     private void tryFlush() {
@@ -81,7 +83,7 @@ class ResponseRenderPrintWriter extends PrintWriter {
     public void flush() {
         synchronized (builder) {
             try {
-                body = builder.toString();
+                body = new String(builder.toString().getBytes("UTF-8"));
                 boolean includeEndTag = isIncludePageEndTag(body);
                 if (includeEndTag && response.getContentType().contains("text/html")) {
                     body = getCompressAndParseHtml(body);
@@ -105,6 +107,7 @@ class ResponseRenderPrintWriter extends PrintWriter {
             currentBody = currentBody.substring(0, currentBody.length() - endFlag.length());
         }
         HtmlCleaner htmlCleaner = new HtmlCleaner();
+        htmlCleaner.getProperties().setCharset(charset);
         htmlCleaner.getProperties().setUseCdataForScriptAndStyle(false);
         TagNode tagNode = htmlCleaner.clean(currentBody);
         TagNode[] tagNodes = tagNode.getAllElements(true);
@@ -181,7 +184,7 @@ class ResponseRenderPrintWriter extends PrintWriter {
     }
 
     private String tryReplace(String href) {
-        if (href.startsWith(baseUrl) || href.startsWith("admin/js") || href.startsWith("admin/markdwon") || href.startsWith("assets")) {
+        if (href.startsWith(baseUrl) || href.startsWith("admin/js") || href.startsWith("admin/markdwon") || href.startsWith("admin/summernote") || href.startsWith("assets")) {
             String uriPath = href;
             if (href.startsWith(baseUrl)) {
                 uriPath = href.substring(baseUrl.length());

@@ -8,7 +8,7 @@
                     <h3 class="green">${_res.installInputWebSiteInfo}</h3>
                 </div>
                 <hr>
-                <div class="form-group">
+                <div class="form-group row">
                     <label class="control-label col-xs-12 col-sm-3 no-padding-right">${_res.installAdmin}:</label>
 
                     <div class="col-xs-6 col-sm-3">
@@ -20,7 +20,7 @@
 
                 <div class="space-8"></div>
 
-                <div class="form-group">
+                <div class="form-group row">
                     <label class="control-label col-xs-12 col-sm-3 no-padding-right">${_res.installAdminPassword}:</label>
 
                     <div class="col-xs-6 col-sm-3">
@@ -31,7 +31,7 @@
                 </div>
 
                 <div class="space-8"></div>
-                <div class="form-group">
+                <div class="form-group row">
                     <label class="control-label col-xs-12 col-sm-3 no-padding-right">${_res.installAdminEmail}:</label>
 
                     <div class="col-xs-6 col-sm-3">
@@ -42,7 +42,7 @@
                 </div>
 
                 <div class="space-8"></div>
-                <div class="form-group">
+                <div class="form-group row">
                     <label class="control-label col-xs-12 col-sm-3 no-padding-right">${_res.installWebSiteTitle}:</label>
 
                     <div class="col-xs-8 col-sm-4">
@@ -55,7 +55,7 @@
                 </div>
 
                 <div class="space-8"></div>
-                <div class="form-group">
+                <div class="form-group row">
                     <label class="control-label col-xs-12 col-sm-3 no-padding-right">${_res.installWebSiteSecond}:</label>
 
                     <div class="col-xs-8 col-sm-4">

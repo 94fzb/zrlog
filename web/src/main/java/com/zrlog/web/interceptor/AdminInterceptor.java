@@ -79,7 +79,7 @@ class AdminInterceptor implements Interceptor {
                     controller.render("/admin/message" + ZrLogConfig.getTemplateExt());
                 } else {
                     if (!tryDoRender(ai, controller)) {
-                        controller.redirect(Constants.NOT_FOUND_PAGE);
+                        controller.redirect(WebTools.getHomeUrl(ai.getController().getRequest()) + Constants.NOT_FOUND_PAGE);
                     }
                 }
             } catch (Exception e) {
