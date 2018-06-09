@@ -21,6 +21,7 @@
     <link rel="stylesheet" type="text/css" href="${baseUrl}assets/css/video-js.css"/>
     <link rel="stylesheet" type="text/css" media="screen" href="${templateUrl}/css/style.css"/>
     <link rel="stylesheet" type="text/css" media="screen" href="${templateUrl}/css/editormd.css"/>
+    <link rel="stylesheet" type="text/css" media="screen" href="${baseUrl}/assets/js/katex/katex.min.css"/>
     <script src="${templateUrl}/js/lib/jquery-1.10.2.min.js"></script>
     <script src="${templateUrl}/js/lib/modernizr.min.js"></script>
     <script src="${templateUrl }/js/sheshui.js"></script>

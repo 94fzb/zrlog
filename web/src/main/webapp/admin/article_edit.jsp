@@ -14,6 +14,7 @@
     var article = ${article};
     var uploadUrl = 'api/admin/upload/';
     var editorMdPath = "admin/markdown/lib/";
+    var katexPath = "assets/js/katex/";
     var editorLang = "admin/markdown/languages/";
     var summernoteLang = "admin/summernote/lang/";
     $('.icheck').iCheck({
@@ -135,9 +136,7 @@
 <form class="form-horizontal form-label-left" id="article-form" style="max-width: 1795px">
     <input type="hidden" id="id" name="id" value="${log.logId}">
     <input type="hidden" name="editorType">
-    <textarea placeholder="${_res.editorPlaceholder}" id="content" name="content"
-              style="display: none;"></textarea>
-    <textarea id="markdown" name="markdown" style="display: none;"></textarea>
+    <textarea placeholder="${_res.editorPlaceholder}" style="display: none;"></textarea>
     <div class="row">
         <div class="col-md-12 col-sm-12 col-xs-12" style="padding-bottom: 10px;">
             <div class="text-right">

@@ -2,8 +2,6 @@ $(function () {
     window.contentChange = function (content, markdown) {
         article.content = content;
         article.markdown = markdown;
-        $("#content").val(content);
-        $("#markdown").val(markdown);
         if (content === '') {
             editorDivWrapper.addClass("has-error");
             editorDivWrapper.css("border-color", "#a94442");
@@ -93,7 +91,7 @@ $(function () {
 
     function validator(el) {
         //仅在2个输入框都不为空的情况，标记为又文本需要输入
-        if ($("#title").val() === '' && $("#content").val() === '' && $("input[name='typeId']:checked").val() === undefined) {
+        if ($("#title").val() === '' && article.content === '' && $("input[name='typeId']:checked").val() === undefined) {
             $("#title-parent").removeClass("has-error");
             editorDivWrapper.removeClass("has-error");
             editorDivWrapper.css("border-color", "#ccc");
@@ -104,7 +102,7 @@ $(function () {
         if ($("#title").val() === '') {
             $("#title-parent").addClass("has-error");
         }
-        if ($("#content").val() === '') {
+        if (article.content === '') {
             editorDivWrapper.addClass("has-error");
             editorDivWrapper.css("border-color", "#a94442");
         }
@@ -122,7 +120,7 @@ $(function () {
         if ($(this).val() !== '') {
             $("#title-parent").removeClass("has-error");
         } else {
-            if ($("#content").val() === '') {
+            if (article.content === '') {
                 editorDivWrapper.removeClass("has-error");
                 $("#title-parent").removeClass("has-error");
                 editorDivWrapper.css("border-color", "#ccc");
@@ -157,7 +155,7 @@ $(function () {
             return;
         }
         refreshKeywords();
-        var body = getFormRequestBody("#article-form");
+        var body = getArticleRequestBody();
         var tLastChangeRequestBody = JSON.stringify(body);
         var changed = tLastChangeRequestBody !== lastChangeRequestBody;
         if (validator($("#article-form")) && (!timer || changed)) {
@@ -183,7 +181,7 @@ $(function () {
                                 data.message = (timer ? lang.auto : "") + (rubbish ? lang.rubbish : "") + (currentLang === 'en' ? " " : "") + (isPrivateCheckBoxEl.is(":checked") || timer || rubbish ? lang.saveSuccess : lang.releaseSuccess) + " " + zeroPad(date.getHours(), 2) + ":" + zeroPad(date.getMinutes(), 2) + ":" + zeroPad(date.getSeconds(), 2);
                             }
                             preTips(data);
-                            lastChangeRequestBody = JSON.stringify(getFormRequestBody("#article-form"));
+                            lastChangeRequestBody = JSON.stringify(getArticleRequestBody());
                         },
                         error: function (xhr, err) {
                             preTips({"error": 1, "message": formatErrorMessage(xhr, err)});
@@ -196,12 +194,19 @@ $(function () {
             } else {
                 skipFirstRubbishSave = false;
                 saving = false;
-                lastChangeRequestBody = JSON.stringify(getFormRequestBody("#article-form"));
+                lastChangeRequestBody = JSON.stringify(getArticleRequestBody());
             }
         } else {
-            lastChangeRequestBody = JSON.stringify(getFormRequestBody("#article-form"));
+            lastChangeRequestBody = JSON.stringify(getArticleRequestBody());
         }
     };
+
+    function getArticleRequestBody() {
+        var body = getFormRequestBody("#article-form");
+        body['content'] = article.content;
+        body['markdown'] = article.markdown;
+        return body;
+    }
 
     function preTips(message) {
         if (saving) {
