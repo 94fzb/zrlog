@@ -82,6 +82,7 @@ public class ZrLogConfig extends JFinalConfig {
             } else {
                 systemProp.put("os.type", systemProp.getProperty("os.name").toLowerCase());
             }
+            systemProp.put("docker", ZrLogUtil.isDockerMode() ? "docker" : "");
         }
     }
 

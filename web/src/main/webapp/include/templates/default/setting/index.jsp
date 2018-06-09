@@ -12,19 +12,6 @@
         });
     });
 </script>
-<style>
-    input[type="file"] {
-        display: none;
-    }
-
-    .custom-file-upload {
-        border: 1px solid #ccc;
-        display: inline-block;
-        padding: 6px 12px;
-        cursor: pointer;
-    }
-</style>
-
 <form id="templateAjax" action="api/admin/template/config" class="form-horizontal">
     <input type="hidden" name="template" value="${template}">
     <div class="form-group row">
@@ -48,12 +35,10 @@
         <label class="col-sm-3 control-label no-padding-right">网站&nbsp;Logo </label>
         <div class="col-sm-7">
             <input id="logo" class="form-control col-sm-10" name="avatar" value="${_res.avatar}">
-        </div>
-        <div class="col-sm-2">
             <label for="fileUpload" class="custom-file-upload">
                 ${_res['upload']}
             </label>
-            <input type="file" id="fileUpload" class="fileUpload icon-upload-alt" name="imgFile" value="上传"/>
+            <input type="file" id="fileUpload" class="fileUpload icon-upload-alt" name="imgFile" value="${_res['upload']}"/>
         </div>
     </div>
     <div class="ln_solid"></div>

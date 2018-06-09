@@ -117,7 +117,7 @@ public class ArticleController extends BaseController {
     }
 
     protected String detail(Object id) {
-        Log log = Log.dao.findById(id);
+        Log log = Log.dao.findByIdOrAlias(id);
         if (log != null) {
             Integer logId = log.get("logId");
             log.put("lastLog", Log.dao.findLastLog(logId, I18NUtil.getStringFromRes("noLastLog")));

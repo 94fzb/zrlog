@@ -2,7 +2,6 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ include file="header.jsp" %>
 <section>
-    <%@ include file="update_browser.jsp" %>
     <c:choose>
         <c:when test="${not empty log}">
             <div style="background:rgba(255,255,255,1);">

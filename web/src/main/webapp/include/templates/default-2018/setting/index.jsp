@@ -12,23 +12,6 @@
         });
     });
 </script>
-<style>
-    input {
-        height: 34px;
-        border: 1px solid #ccc;
-    }
-
-    input[type="file"] {
-        display: none;
-    }
-
-    .custom-file-upload {
-        border: 1px solid #ccc;
-        display: inline-block;
-        padding: 6px 12px;
-        cursor: pointer;
-    }
-</style>
 <form role="form" id="templateAjax" method="post" action="api/admin/template/config" class="form-horizontal">
     <input type="hidden" name="template" value="${template}">
 
@@ -43,8 +26,7 @@
     </div>
 
     <div class="form-group row">
-        <label
-                class="col-sm-3 control-label no-padding-right">
+        <label class="col-sm-3 control-label no-padding-right">
             关于页 </label>
         <div class="col-sm-6">
             <input class="form-control" name="aboutPage" value="${_res.aboutPage}">
@@ -52,16 +34,13 @@
     </div>
 
     <div class="form-group row">
-        <label
-                class="col-sm-3 control-label no-padding-right">
-            头像 &nbsp;</label>
+        <label class="col-sm-3 control-label no-padding-right">头像 &nbsp;</label>
         <div class="col-md-9">
             <input class="col-md-6" id="avatar-field" name="avatar" value="${_res.avatar}">
             <label for="avatar" class="custom-file-upload">
                 ${_res['upload']}
             </label>
-            <input type="file" class="col-md-6 fileUpload icon-upload-alt" id="avatar"
-                   name="imgFile" value="上传"/>
+            <input type="file" class="col-md-6 fileUpload icon-upload-alt" id="avatar" name="imgFile" value="上传"/>
         </div>
     </div>
 

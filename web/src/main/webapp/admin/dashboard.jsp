@@ -1,5 +1,6 @@
 <%@ page session="false" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="f" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <div class="page-header">
     <h3>
@@ -38,7 +39,7 @@
                             <td>
                                 运行环境
                             </td>
-                            <td>${system['java.vm.name']} (${system['java.runtime.version']})</td>
+                            <td><i class="fa fa-${system['docker']}"></i>${system['java.vm.name']} (${system['java.runtime.version']})</td>
                         </tr>
                         <tr>
                             <td>

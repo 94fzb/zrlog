@@ -23,7 +23,7 @@ public class CommentService {
     }
 
     private boolean isAllowComment(int articleId) {
-        Log log = Log.dao.findById(articleId);
+        Log log = Log.dao.findByIdOrAlias(articleId);
         return (log != null && log.getBoolean("canComment")) && isAllowComment();
     }
 
@@ -54,7 +54,7 @@ public class CommentService {
             createCommentResponse.setError(1);
             createCommentResponse.setMessage("");
         }
-        Log log = Log.dao.findById(createCommentRequest.getLogId());
+        Log log = Log.dao.findByIdOrAlias(createCommentRequest.getLogId());
         if (log != null) {
             createCommentResponse.setAlias(log.getStr("alias"));
         }

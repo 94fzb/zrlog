@@ -1,13 +1,17 @@
 package com.zrlog.service;
 
-import com.hibegin.common.util.BeanUtil;
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.SecurityUtils;
+import com.jfinal.core.JFinal;
 import com.zrlog.common.Constants;
 import com.zrlog.common.type.TestConnectDbResult;
-import com.zrlog.common.vo.InitFirstArticleVO;
+import com.zrlog.util.I18NUtil;
+import com.zrlog.util.ParseUtil;
 import com.zrlog.util.ZrLogUtil;
 import org.apache.log4j.Logger;
+import org.commonmark.node.Node;
+import org.commonmark.parser.Parser;
+import org.commonmark.renderer.html.HtmlRenderer;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -56,6 +60,7 @@ public class InstallService {
         map.put(Constants.AUTO_UPGRADE_VERSION_KEY, Constants.DEFAULT_AUTO_UPGRADE_VERSION_TYPE.getCycle());
         map.put("title", webSite.get("title"));
         map.put("second_title", webSite.get("second_title"));
+        map.put("language", I18NUtil.getCurrentLocale());
         map.put(Constants.ZRLOG_SQL_VERSION_KEY, ZrLogUtil.getSqlVersion(basePath + "/update-sql"));
         return map;
     }
@@ -178,19 +183,27 @@ public class InstallService {
         return false;
     }
 
+    public static String renderMd(String md) {
+        Parser parser = Parser.builder().build();
+        Node document = parser.parse(md);
+        HtmlRenderer renderer = HtmlRenderer.builder().build();
+        return renderer.render(document);
+    }
 
     private void insertFirstArticle(Connection connect) throws SQLException {
         String insetLog = "INSERT INTO `log`(`logId`,`canComment`,`keywords`,`alias`,`typeId`,`userId`,`title`,`content`,`plain_content`,`markdown`,`digest`,`releaseTime`,`last_update_date`,`rubbish`,`private`) VALUES (1,?,?,?,1,1,?,?,?,?,?,?,?,?,?)";
         PreparedStatement ps = connect.prepareStatement(insetLog);
         ps.setBoolean(1, true);
-        InitFirstArticleVO initFirstArticleVO = BeanUtil.convert(InstallService.class.getResourceAsStream("/init-blog.json"), InitFirstArticleVO.class);
-        ps.setString(2, initFirstArticleVO.getKeywords());
-        ps.setString(3, initFirstArticleVO.getAlias());
-        ps.setString(4, initFirstArticleVO.getTitle());
-        ps.setString(5, initFirstArticleVO.getContent());
-        ps.setString(6, initFirstArticleVO.getPlainContent());
-        ps.setString(7, initFirstArticleVO.getMarkdown());
-        ps.setString(8, initFirstArticleVO.getDigest());
+        String markdown = IOUtil.getStringInputStream(InstallService.class.getResourceAsStream("/init-blog/" + I18NUtil.getCurrentLocale() + ".md"));
+        markdown = markdown.replace("${basePath}", JFinal.me().getContextPath());
+        String content = renderMd(markdown);
+        ps.setString(2, I18NUtil.getStringFromRes("defaultType"));
+        ps.setString(3, "hello-world");
+        ps.setString(4, I18NUtil.getStringFromRes("helloWorld"));
+        ps.setString(5, content);
+        ps.setString(6, new ArticleService().getPlainSearchTxt(content));
+        ps.setString(7, markdown);
+        ps.setString(8, ParseUtil.autoDigest(content, Constants.getAutoDigestLength()));
         ps.setObject(9, new java.util.Date());
         ps.setObject(10, new java.util.Date());
         ps.setBoolean(11, false);
@@ -200,21 +213,21 @@ public class InstallService {
     }
 
     private void insertType(Connection connect) throws SQLException {
-        String insertLogType = "INSERT INTO `type`(`typeId`, `typeName`, `remark`, `alias`) VALUES (1,'记录','','notes')";
+        String insertLogType = "INSERT INTO `type`(`typeId`, `typeName`, `remark`, `alias`) VALUES (1,'" + I18NUtil.getStringFromRes("defaultType") + "','','note')";
         PreparedStatement ps = connect.prepareStatement(insertLogType);
         ps.executeUpdate();
         ps.close();
     }
 
     private void insertTag(Connection connect) throws SQLException {
-        String insertTag = "INSERT INTO `tag`(`tagId`,`text`,`count`) VALUES (1,'记录',1)";
+        String insertTag = "INSERT INTO `tag`(`tagId`,`text`,`count`) VALUES (1,'" + I18NUtil.getStringFromRes("defaultType") + "',1)";
         PreparedStatement ps = connect.prepareStatement(insertTag);
         ps.executeUpdate();
         ps.close();
     }
 
     private void initPlugin(Connection connection) throws SQLException {
-        String insertPluginSql = "INSERT INTO `plugin` VALUES (1,'系统提供的插件',b'1','分类菜单',NULL,'types',3),(2,NULL,b'1','标签云',NULL,'tags',3),(3,NULL,b'1','友链',NULL,'links',2),(4,NULL,b'1','存档',NULL,'archives',3)";
+        String insertPluginSql = "INSERT INTO `plugin` VALUES (1,NULL,b'1','" + I18NUtil.getStringFromRes("category") + "',NULL,'types',3),(2,NULL,b'1','" + I18NUtil.getStringFromRes("tag") + "',NULL,'tags',3),(3,NULL,b'1','" + I18NUtil.getStringFromRes("link") + "',NULL,'links',2),(4,NULL,b'1','" + I18NUtil.getStringFromRes("archive") + "',NULL,'archives',3)";
         PreparedStatement ps = connection.prepareStatement(insertPluginSql);
         ps.executeUpdate();
         ps.close();
@@ -225,7 +238,7 @@ public class InstallService {
         PreparedStatement ps = connect.prepareStatement(insertLogNavSql);
         ps.setObject(1, 2);
         ps.setObject(2, "/admin/login");
-        ps.setObject(3, "管理");
+        ps.setObject(3, I18NUtil.getStringFromRes("manage"));
         ps.setObject(4, 2);
         ps.executeUpdate();
         ps.close();
@@ -234,7 +247,7 @@ public class InstallService {
         ps = connect.prepareStatement(insertLogNavSql);
         ps.setObject(1, 1);
         ps.setObject(2, "/");
-        ps.setObject(3, "主页");
+        ps.setObject(3, I18NUtil.getStringFromRes("home"));
         ps.setObject(4, 1);
         ps.executeUpdate();
         ps.close();

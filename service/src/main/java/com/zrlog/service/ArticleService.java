@@ -101,7 +101,7 @@ public class ArticleService {
         }
         // 自动摘要
         if (StringUtils.isEmpty(createArticleRequest.getDigest())) {
-            log.set("digest", ParseUtil.autoDigest(log.get("content").toString(), 100));
+            log.set("digest", ParseUtil.autoDigest(log.get("content").toString(), Constants.getAutoDigestLength()));
         } else {
             log.set("digest", createArticleRequest.getDigest());
         }

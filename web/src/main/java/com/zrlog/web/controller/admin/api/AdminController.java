@@ -1,5 +1,6 @@
 package com.zrlog.web.controller.admin.api;
 
+import com.hibegin.common.util.StringUtils;
 import com.zrlog.common.request.ChangePasswordRequest;
 import com.zrlog.common.request.LoginRequest;
 import com.zrlog.common.request.UpdateAdminRequest;
@@ -25,14 +26,35 @@ public class AdminController extends BaseController {
         UpdateAdminRequest updateAdminRequest = ZrLogUtil.convertRequestBody(getRequest(), UpdateAdminRequest.class);
         UpdateRecordResponse updateRecordResponse = new UpdateRecordResponse();
         if (updateAdminRequest != null) {
-            updateAdminRequest.setUserId(AdminTokenThreadLocal.getUserId());
-            getRequest().setAttribute("user", userService.update(updateAdminRequest));
+            if (StringUtils.isEmpty(updateAdminRequest.getUserName())) {
+                updateRecordResponse.setError(1);
+            } else {
+                if (ZrLogUtil.isPreviewMode() && !System.getenv("DEFAULT_USERNAME").equals(updateAdminRequest.getUserName())) {
+                    return errorUpdateRecordResponse();
+                } else {
+                    updateAdminRequest.setUserId(AdminTokenThreadLocal.getUserId());
+                    getRequest().setAttribute("user", userService.update(updateAdminRequest));
+                    updateRecordResponse.setMessage(I18NUtil.getStringFromRes("updatePersonInfoSuccess"));
+                }
+            }
+        } else {
+            updateRecordResponse.setError(1);
         }
-        updateRecordResponse.setMessage(I18NUtil.getStringFromRes("updatePersonInfoSuccess"));
         return updateRecordResponse;
     }
 
     public UpdateRecordResponse changePassword() {
-        return userService.updatePassword(ZrLogUtil.convertRequestBody(getRequest(), ChangePasswordRequest.class));
+        if (ZrLogUtil.isPreviewMode()) {
+            return errorUpdateRecordResponse();
+        } else {
+            return userService.updatePassword(ZrLogUtil.convertRequestBody(getRequest(), ChangePasswordRequest.class));
+        }
+    }
+
+    private UpdateRecordResponse errorUpdateRecordResponse() {
+        UpdateRecordResponse updateRecordResponse = new UpdateRecordResponse();
+        updateRecordResponse.setError(1);
+        updateRecordResponse.setMessage(I18NUtil.getStringFromRes("permissionError"));
+        return updateRecordResponse;
     }
 }

@@ -1,5 +1,13 @@
-﻿<jsp:useBean id="init" scope="request" type="com.zrlog.model.BaseDataInitVO"/>
+﻿<%@ page import="com.zrlog.util.ZrLogUtil" %>
+<jsp:useBean id="init" scope="request" type="com.zrlog.model.BaseDataInitVO"/>
 <%@ page session="false" pageEncoding="UTF-8" %>
+<%
+    //预览环境默认输入密码
+    if (ZrLogUtil.isPreviewMode()) {
+        request.setAttribute("userName", System.getenv("DEFAULT_USERNAME"));
+        request.setAttribute("password", System.getenv("DEFAULT_PASSWORD"));
+    }
+%>
 <!DOCTYPE html>
 <html>
 <base href="${basePath}"/>
@@ -31,13 +39,15 @@
                 <input type="hidden" id="redirectFrom" value="${param.redirectFrom}">
                 <div class="wrap-input100 validate-input m-b-26">
                     <span class="label-input100">${_res.userName}</span>
-                    <input class="input100" type="text" name="userName" id="userName" placeholder="${_res.userName}">
+                    <input class="input100" type="text" name="userName" value="${userName}" id="userName"
+                           placeholder="${_res.userName}">
                     <span class="focus-input100"></span>
                 </div>
 
                 <div class="wrap-input100 validate-input m-b-18">
                     <span class="label-input100">${_res.password}</span>
-                    <input class="input100" type="password" name="password" placeholder="${_res.password}">
+                    <input class="input100" type="password" value="${password}" name="password"
+                           placeholder="${_res.password}">
                     <span class="focus-input100"></span>
                 </div>
 
@@ -46,7 +56,7 @@
                         <?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
                         "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
                         <svg t="1517682510435" class="icon" style="" viewBox="0 0 1024 1024" version="1.1"
-                             xmlns="http://www.w3.org/2000/svg" p-id="1047" xmlns:xlink="http://www.w3.org/1999/xlink"
+                             xmlns="http://www.w3.org/2000/svg" p-id="1047"
                              width="16" height="16">
                             <defs>
                                 <style type="text/css"></style>

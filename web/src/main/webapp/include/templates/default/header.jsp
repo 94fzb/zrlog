@@ -14,36 +14,24 @@
     }
 %>
 <!DOCTYPE html>
-<html lang="zh" class="no-js">
+<html>
 <head>
     <%@ include file="../../core/core_mate.jsp" %>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
     <link rel="stylesheet" type="text/css" href="${baseUrl}assets/css/video-js.css"/>
     <link rel="stylesheet" type="text/css" media="screen" href="${templateUrl}/css/style.css"/>
     <link rel="stylesheet" type="text/css" media="screen" href="${templateUrl}/css/editormd.css"/>
-    <link rel="stylesheet" type="text/css" media="screen" href="${baseUrl}/assets/js/katex/katex.min.css"/>
-    <script src="${templateUrl}/js/lib/jquery-1.10.2.min.js"></script>
-    <script src="${templateUrl}/js/lib/modernizr.min.js"></script>
+    <link rel="stylesheet" type="text/css" media="screen" href="${baseUrl}assets/js/katex/katex.min.css"/>
+    <script src="${templateUrl}/js/jquery.min.js"></script>
     <script src="${templateUrl }/js/sheshui.js"></script>
     <script src="${baseUrl }assets/js/video.js"></script>
-    <!--[if lt IE 9]>
-    <script src="${templateUrl}/js/html5shiv.js"></script>
-    <script src="${templateUrl}/js/css3-mediaqueries.js"></script>
-    <link rel="stylesheet" type="text/css" media="screen" href="${templateUrl}/css/style-ie7.css"/>
-    <![endif]-->
     <style>
         header .avatar {
-            display: block;
-            float: left;
-            width: 64px;
-            height: 64px;
-            margin-top: -8px;
-            margin-right: 5px;
-            border-radius: 50%;
-            /*box-shadow: 0px 0px 10px 2px #EDEDEF;*/
             background: url('${_res.avatar}') scroll center center #FFFFFF;
             background-size: cover;
-            overflow: hidden;
+            margin-top: -5px;
+            width: 60px;
+            height: 60px;
         }
 
         .gn-menu-main li.sitename .gn-icon {
@@ -52,9 +40,8 @@
             margin-top: 10px;
             border-radius: 50%;
             background-size: cover;
-            background: #f0f0f0 url('${_res.avatar}') no-repeat center center;
+            background: url('${_res.avatar}') no-repeat center center;
             display: inline-block;
-            background-size: cover;
         }
 
         .markdown-body ul, .markdown-body ol {

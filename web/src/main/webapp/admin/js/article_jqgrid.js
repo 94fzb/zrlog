@@ -54,7 +54,7 @@ jQuery(function ($) {
     }
 
     function viewLog(cellvalue, options, rowObject) {
-        return '<a target="_blank" href="admin/article/preview?id=' + rowObject.id + '"><div id="jEditButton_2" class="ui-pg-div ui-inline-edit" onmouseout="jQuery(this).removeClass(\'ui-state-hover\')" onmouseover="jQuery(this).addClass(\'ui-state-hover\');" style="float: left; cursor: pointer; display: block;" title="" data-original-title="' + lang.view + '  ' + rowObject.title.replace(/<font[^>]*?>[\s\S]*?<\/font>/gi, "") + '"><i class="fa fa-search-plus ui-icon"></i></div></a>'
+        return '<a target="_blank" href="admin/article/preview?id=' + rowObject.id + '"><div id="jEditButton_2" class="ui-pg-div ui-inline-edit" onmouseout="jQuery(this).removeClass(\'ui-state-hover\')" onmouseover="jQuery(this).addClass(\'ui-state-hover\');" style="float: left; cursor: pointer; display: block;" title="" data-original-title="' + lang.view + '  ' + $("<div>"+rowObject.title + '"<div>"').text() +'><i class="fa fa-search-plus ui-icon"></i></div></a>'
     }
 
     function renderPrivate(cellvalue, options, rowObject) {
@@ -107,7 +107,7 @@ jQuery(function ($) {
 
     $("#searchArticleBtn").click(function () {
         var queryStr = '?keywords=' + $.trim($("#keywords").val());
-        jqGrid.jqGrid('setGridParam', {url: articleUrl + queryStr});
+        jqGrid.jqGrid('setGridParam', {url: articleUrl + queryStr, page: 1});
         window.history.replaceState({}, "", window.location.pathname + queryStr + window.location.hash);
         jqGrid.jqGrid('setGridParam', {datatype: 'json'}).trigger('reloadGrid');
         return false;

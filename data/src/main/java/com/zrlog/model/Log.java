@@ -31,13 +31,13 @@ public class Log extends Model<Log> implements Serializable {
     public Log() {
     }
 
-    public Log findById(Object id) {
-        if (id != null) {
+    public Log findByIdOrAlias(Object idOrAlias) {
+        if (idOrAlias != null) {
             String sql = "select l.*,last_update_date as lastUpdateDate,u.userName,(select count(commentId) from " + Comment.TABLE_NAME + " where logId=l.logId) commentSize ,t.alias as typeAlias,t.typeName as typeName  from " + TABLE_NAME + " l inner join user u,type t where t.typeId=l.typeId and u.userId=l.userId and rubbish=? and private=? and l.logId=?";
-            Log log = findFirst(sql, rubbish, _private, id);
+            Log log = findFirst(sql, rubbish, _private, idOrAlias);
             if (log == null) {
                 sql = "select l.*,last_update_date as lastUpdateDate,u.userName,(select count(commentId) from " + Comment.TABLE_NAME + " where logId=l.logId) commentSize ,t.alias as typeAlias,t.typeName as typeName  from " + TABLE_NAME + " l inner join user u,type t where t.typeId=l.typeId and u.userId=l.userId and rubbish=? and private=? and l.alias=?";
-                log = findFirst(sql, rubbish, _private, id);
+                log = findFirst(sql, rubbish, _private, idOrAlias);
             }
             if (log != null) {
                 return log;
@@ -204,12 +204,12 @@ public class Log extends Model<Log> implements Serializable {
     }
 
     /**
-     * @param logId
+     * @param idOrAlias
      */
-    public void clickAdd(Object logId) {
-        Log log = findById(logId);
+    public void clickAdd(Object idOrAlias) {
+        Log log = findByIdOrAlias(idOrAlias);
         if (log != null) {
-            log.set("logId", logId).set("click", log.getInt("click") + 1).update();
+            log.set("logId", log.getInt("logId")).set("click", log.getInt("click") + 1).update();
         }
     }
 

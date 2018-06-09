@@ -13,5 +13,4 @@
         <meta name="keywords" content="${requestScope.log.keywords}"/>
     </c:otherwise>
 </c:choose>
-<meta name="generator" content="ZrLog ${zrlog.version}"/>
 <link rel="shortcut icon" href="${rurl }favicon.ico"/>

@@ -98,4 +98,16 @@ public class Constants {
         }
         return sessionTimeout;
     }
+
+    public static int getAutoDigestLength() {
+        Object dbSettingSize = webSite.get("article_auto_digest_length");
+        if (dbSettingSize != null) {
+            try {
+                return Integer.valueOf(dbSettingSize.toString());
+            } catch (Exception e) {
+                //ignore
+            }
+        }
+        return 100;
+    }
 }

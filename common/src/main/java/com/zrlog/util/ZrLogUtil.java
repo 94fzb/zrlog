@@ -229,6 +229,16 @@ public class ZrLogUtil {
         return value != null && value.startsWith("bae");
     }
 
+    public static boolean isPreviewMode() {
+        String value = System.getenv("PREVIEW_MODE");
+        return "true".equalsIgnoreCase(value);
+    }
+
+    public static boolean isDockerMode() {
+        String value = System.getenv("DOCKER_MODE");
+        return "true".equalsIgnoreCase(value);
+    }
+
     public static boolean isInternalHostName(String name) {
         InetAddress address;
         try {

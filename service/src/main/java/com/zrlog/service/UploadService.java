@@ -27,6 +27,17 @@ public class UploadService {
                     , new HttpJsonArrayHandle<Map>(), PluginHelper.genHeaderMapByRequest(request)).getT();
             if (urls != null && !urls.isEmpty()) {
                 url = (String) urls.get(0).get("url");
+                if (!url.startsWith("https://") && !url.startsWith("http://")) {
+                    if (url.startsWith("/")) {
+                        url = contextPath + uri;
+                    } else {
+                        if ("".equals(contextPath)) {
+                            url = "/" + uri;
+                        } else {
+                            url = contextPath + uri;
+                        }
+                    }
+                }
             } else {
                 url = contextPath + uri;
             }

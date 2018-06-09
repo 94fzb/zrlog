@@ -10,6 +10,7 @@ import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.config.ZrLogConfig;
 
 import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class RequestStatisticsPlugin implements IPlugin {
 
@@ -21,6 +22,7 @@ public class RequestStatisticsPlugin implements IPlugin {
 
     private static List<RequestInfo> requestInfoList = Collections.synchronizedList(new ArrayList<>());
     private static Set<String> visitArticleSet = Collections.synchronizedSet(new HashSet<>());
+    private ReentrantLock lock = new ReentrantLock();
 
 
     @Override
@@ -84,8 +86,13 @@ public class RequestStatisticsPlugin implements IPlugin {
     }
 
     private void save() {
-        WebSite.dao.updateByKV(DB_KEY, new Gson().toJson(requestInfoList));
-        WebSite.dao.updateByKV(ARTICLE_DB_KEY, new Gson().toJson(visitArticleSet));
+        lock.tryLock();
+        try {
+            WebSite.dao.updateByKV(DB_KEY, new Gson().toJson(requestInfoList));
+            WebSite.dao.updateByKV(ARTICLE_DB_KEY, new Gson().toJson(visitArticleSet));
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override

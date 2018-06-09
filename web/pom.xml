@@ -15,6 +15,7 @@
     <properties>
         <tomcat7Version>7.0.85</tomcat7Version>
         <tomcat-scope>compile</tomcat-scope>
+        <contextPath>/</contextPath>
     </properties>
 
     <dependencies>
@@ -99,7 +100,7 @@
                 <version>2.2</version>
                 <configuration>
                     <port>8080</port>
-                    <path>/</path>
+                    <path>${contextPath}</path>
                 </configuration>
             </plugin>
             <plugin>
@@ -109,6 +110,7 @@
                     <resourceEncoding>UTF-8</resourceEncoding>
                     <warSourceDirectory>src/main/webapp</warSourceDirectory>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
+                    <recompressZippedFiles>true</recompressZippedFiles>
                     <packagingExcludes>
                         WEB-INF/classes/rebel.xml,
                         WEB-INF/classes/com/zrlog/web/Application.class,

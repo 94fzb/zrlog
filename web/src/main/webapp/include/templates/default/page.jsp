@@ -2,7 +2,6 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ include file="header.jsp" %>
 <section>
-    <%@ include file="update_browser.jsp" %>
     <c:choose>
         <c:when test="${empty requestScope.data}">
             <c:set var="pageLevel" value="1" scope="request"/>

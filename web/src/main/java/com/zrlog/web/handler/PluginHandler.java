@@ -11,6 +11,7 @@ import com.zrlog.model.User;
 import com.zrlog.service.AdminTokenService;
 import com.zrlog.service.AdminTokenThreadLocal;
 import com.zrlog.service.PluginHelper;
+import com.zrlog.util.BlogBuildInfoUtil;
 import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.log4j.Logger;
@@ -42,6 +43,8 @@ public class PluginHandler extends Handler {
 
     @Override
     public void handle(String target, HttpServletRequest request, HttpServletResponse response, boolean[] isHandled) {
+        //便于Wappalyzer读取
+        response.addHeader("X-ZrLog", BlogBuildInfoUtil.getVersion());
         boolean isPluginPath = false;
         for (String path : pluginHandlerPaths) {
             if (target.startsWith(path)) {
