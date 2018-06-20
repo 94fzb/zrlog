@@ -40,7 +40,7 @@ $(function () {
                 dialogMaskOpacity: 0,    // 设置透明遮罩层的透明度，全局通用，默认值为0.1
                 dialogMaskBgColor: "#000", // 设置透明遮罩层的背景颜色，全局通用，默认为#fff
                 imageUpload: true,
-                imageFormats: ["jpg", "jpeg", "gif", "png", "ico", "bmp", "webp"],
+                imageFormats: imageExts,
                 imageUploadURL: uploadUrl,
                 theme: dark ? "dark" : "default",
                 previewTheme: dark ? "dark" : "default",

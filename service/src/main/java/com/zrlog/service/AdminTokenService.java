@@ -11,6 +11,7 @@ import com.zrlog.model.User;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -80,6 +81,8 @@ public class AdminTokenService {
                         return null;
                     }
                 }
+            } catch (BadPaddingException e) {
+                //ignore 发生数据库 secretKey 无法解析 token 的情况下
             } catch (Exception e) {
                 LOGGER.info("error", e);
             }

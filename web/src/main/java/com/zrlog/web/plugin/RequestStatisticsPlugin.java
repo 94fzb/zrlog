@@ -86,7 +86,7 @@ public class RequestStatisticsPlugin implements IPlugin {
     }
 
     private void save() {
-        lock.tryLock();
+        lock.lock();
         try {
             WebSite.dao.updateByKV(DB_KEY, new Gson().toJson(requestInfoList));
             WebSite.dao.updateByKV(ARTICLE_DB_KEY, new Gson().toJson(visitArticleSet));

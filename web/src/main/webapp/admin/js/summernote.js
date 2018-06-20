@@ -23,7 +23,7 @@ $(function () {
                 var data = new FormData();
                 data.append("imgFile", image);
                 $.ajax({
-                    url: uploadUrl,
+                    url: uploadUrl + "?dir=image",
                     cache: false,
                     contentType: false,
                     processData: false,

@@ -107,7 +107,7 @@ public class GlobalResourceHandler extends Handler {
                 LOGGER.info(request.getServletPath() + " used time " + (System.currentTimeMillis() - start));
             }
             //仅保留非静态资源请求或者是以 .html结尾的
-            if (!target.contains(".") || target.endsWith(".html")) {
+            if (ZrLogConfig.isInstalled() && !target.contains(".") || target.endsWith(".html")) {
                 RequestInfo requestInfo = new RequestInfo();
                 requestInfo.setIp(WebTools.getRealIp(request));
                 requestInfo.setUrl(url);

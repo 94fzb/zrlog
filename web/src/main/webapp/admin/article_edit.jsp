@@ -17,6 +17,7 @@
     var katexPath = "assets/js/katex/";
     var editorLang = "admin/markdown/languages/";
     var summernoteLang = "admin/summernote/lang/";
+    var imageExts = ["jpg", "jpeg", "gif", "png", "ico", "bmp", "webp"];
     $('.icheck').iCheck({
         checkboxClass: 'icheckbox_flat-blue',
         radioClass: 'iradio_flat-blue'
@@ -26,6 +27,7 @@
     var editorEl = $("#editorDiv");
     var editorDivWrapper = $("#editorDivWrapper");
     var editorTheme = editorEl.attr("theme");
+    $("#thumbnail-upload").attr("accept", imageExts.join(","));
 </script>
 <script src="${basePath}assets/js/screenfull.min.js"></script>
 <script src="${basePath}assets/js/jquery.liteuploader.min.js"></script>
@@ -206,7 +208,7 @@
                                          test="${log!=null and not empty log.thumbnail}">background: url('${log.thumbnail}')</c:if>"
                                  class="thumbnail-img img-responsive WriteCover-wrapper WriteCover-previewWrapper">
                                 <i id="camera-icon" class="WriteCover-uploadIcon fa fa-camera fa-3"></i>
-                                <input type="file" accept=".jpeg, .jpg, .png" id="thumbnail-upload"
+                                <input type="file" id="thumbnail-upload"
                                        name="imgFile"
                                        value="${log.thumbnail}"
                                        class="WriteCover-uploadInput">
@@ -283,7 +285,8 @@
                             <div class="tagsinput" id="keywords"></div>
                             <div class="tagsinput" id="unCheckedTag" style="max-height: 240px;width: 100%">
                                 <c:forEach items="${init.tags}" var="tags">
-                                    <span class="tag2" val="${tags.text}"><i style="padding-right: 5px" class="fa fa-tag"></i>${tags.text}</span>
+                                    <span class="tag2" val="${tags.text}"><i style="padding-right: 5px"
+                                                                             class="fa fa-tag"></i>${tags.text}</span>
                                 </c:forEach>
                             </div>
                         </div>

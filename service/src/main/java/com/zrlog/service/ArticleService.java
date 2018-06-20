@@ -198,7 +198,7 @@ public class ArticleService {
                     path = path.substring(0, path.indexOf('.')) + "_thumbnail" + path.substring(path.indexOf('.'));
                     thumbnailFile = new File(PathKit.getWebRootPath() + path);
                 } else {
-                    bytes = IOUtil.getByteByInputStream(new FileInputStream(PathKit.getWebRootPath() + url));
+                    bytes = IOUtil.getByteByInputStream(new FileInputStream(PathKit.getWebRootPath() + url.replace(JFinal.me().getContextPath(), "")));
                     path = url.substring(0, url.indexOf('.')) + "_thumbnail" + url.substring(path.indexOf('.'));
                     thumbnailFile = new File(PathKit.getWebRootPath() + path);
                 }
