@@ -1,5 +1,4 @@
-<%@ page session="false" pageEncoding="UTF-8" %>
-<jsp:include page="header.jsp"/>
+<#include "header.ftl"/>
 <div id="step-container" class=" stepContainer row-fluid position-relative">
     <div class="row red" style="width: 100%">
         <div class="col-md-12 red">
@@ -82,4 +81,4 @@
         </div>
     </div>
 </div>
-<jsp:include page="footer.jsp"/>
+<#include "footer.ftl"/>

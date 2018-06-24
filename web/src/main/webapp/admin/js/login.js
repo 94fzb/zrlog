@@ -67,6 +67,8 @@ MD5 = function (e) {
 $(function () {
     $("#userName").focus();
 
+    $("#redirectFrom").val(getParameterByName("redirectFrom"));
+
     function login() {
         var url = $("#login_form").attr("action");
         var loginFromArr = $('#login_form').serializeArray();

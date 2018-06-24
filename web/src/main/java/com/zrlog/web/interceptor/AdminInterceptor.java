@@ -6,24 +6,22 @@ import com.jfinal.aop.Interceptor;
 import com.jfinal.aop.Invocation;
 import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
-import com.jfinal.kit.PathKit;
+import com.jfinal.render.FreeMarkerRender;
 import com.zrlog.common.Constants;
 import com.zrlog.common.response.ExceptionResponse;
 import com.zrlog.common.vo.AdminTokenVO;
-import com.zrlog.model.BaseDataInitVO;
 import com.zrlog.model.User;
 import com.zrlog.service.AdminTokenService;
 import com.zrlog.service.CacheService;
 import com.zrlog.util.I18NUtil;
 import com.zrlog.web.annotation.RefreshCache;
-import com.zrlog.web.config.ZrLogConfig;
+import com.zrlog.web.controller.admin.page.AdminPageController;
 import com.zrlog.web.handler.GlobalResourceHandler;
 import com.zrlog.web.util.WebTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -53,20 +51,10 @@ class AdminInterceptor implements Interceptor {
         Controller controller = ai.getController();
         Map.Entry<AdminTokenVO, User> entry = adminTokenService.getAdminTokenVOUserEntry(controller.getRequest());
         if (entry != null) {
-            BaseDataInitVO init = (BaseDataInitVO) ai.getController().getRequest().getAttribute("init");
-            Map<String, Object> webSite = init.getWebSite();
-            if (webSite.get("admin_dashboard_naver") == null) {
-                webSite.put("admin_dashboard_naver", "nav-md");
-            }
-            //默认开启文章封面
-            if (webSite.get("article_thumbnail_status") == null) {
-                webSite.put("article_thumbnail_status", 1);
-            }
-            ai.getController().getRequest().setAttribute("webs", webSite);
             try {
                 User user = entry.getValue();
                 if (StringUtils.isEmpty(user.getStr("header"))) {
-                    user.set("header", "assets/images/default-portrait.gif");
+                    user.set("header", Constants.DEFAULT_HEADER);
                 }
                 controller.setAttr("user", user);
                 TemplateHelper.fullTemplateInfo(controller, false);
@@ -76,7 +64,8 @@ class AdminInterceptor implements Interceptor {
                 ai.invoke();
                 // 存在消息提示
                 if (controller.getAttr("message") != null) {
-                    controller.render("/admin/message" + ZrLogConfig.getTemplateExt());
+                    AdminPageController.initIndex(controller.getRequest());
+                    controller.render(new FreeMarkerRender("/admin/index.ftl"));
                 } else {
                     if (!tryDoRender(ai, controller)) {
                         controller.redirect(WebTools.getHomeUrl(ai.getController().getRequest()) + Constants.NOT_FOUND_PAGE);
@@ -152,12 +141,18 @@ class AdminInterceptor implements Interceptor {
                 controller.renderJson((Object) ai.getReturnValue());
                 rendered = true;
             } else if (ai.getActionKey().startsWith("/admin") && returnValue instanceof String) {
-                String templatePath = returnValue.toString() + ZrLogConfig.getTemplateExt();
-                if (new File(PathKit.getWebRootPath() + templatePath).exists()) {
-                    controller.render(templatePath);
-                    rendered = true;
+                //返回值，约定：admin 开头的不写模板类型，其他要写全
+                if (!returnValue.toString().endsWith(".jsp") && returnValue.toString().startsWith("/admin")) {
+                    String templatePath = returnValue.toString() + ".ftl";
+                    if (AdminInterceptor.class.getResourceAsStream(Constants.FTL_VIEW_PATH + templatePath) != null) {
+                        controller.render(new FreeMarkerRender(templatePath));
+                        rendered = true;
+                    } else {
+                        rendered = false;
+                    }
                 } else {
-                    rendered = false;
+                    controller.render(returnValue.toString());
+                    rendered = true;
                 }
             }
         } else {

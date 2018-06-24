@@ -106,6 +106,9 @@ var lang = allLang[currentLang];
 var mainColor = "#1890ff";
 
 $(function () {
+    NProgress.configure({ parent: '#nav_menu' });
+
+
     $(".haveRead").click(function (e) {
         var commentId = $(this).attr("id");
         var commentEl = $(this);
@@ -117,9 +120,9 @@ $(function () {
             success: function () {
                 commentEl.parent().remove();
                 var count = parseInt($("#commentNum").text() - 1);
-                if(count <= 0){
+                if (count <= 0) {
                     $("#commentMessages").remove();
-                }else{
+                } else {
                     $("#commentNum").text(count);
                 }
 
@@ -211,6 +214,7 @@ function clear(path) {
 
 function loadPage(path) {
     if (window.location.pathname.indexOf("admin/template/download") > 0) {
+        NProgress.done();
         return;
     }
     clear(path);

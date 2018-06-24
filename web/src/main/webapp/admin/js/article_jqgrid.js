@@ -1,8 +1,10 @@
 jQuery(function ($) {
+    var keywrods = $.trim(getParameterByName("keywords"));
+    $("#keywords").val(keywrods);
     var articleUrl = 'api/admin/article';
     var deleteUrl = "api/admin/article/delete";
     jqGrid = jQuery(grid_selector).jqGrid({
-        url: articleUrl + "?keywords=" + $.trim($("#keywords").val()),
+        url: articleUrl + "?keywords=" + keywrods,
         datatype: "json",
         colNames: ['', 'ID', lang.title, lang.keywords, lang.author, lang.type,
             lang.viewCount, lang.rubbish, lang.private, lang.createTime, lang.lastUpdateDate, lang.edit, lang.view],
@@ -54,7 +56,7 @@ jQuery(function ($) {
     }
 
     function viewLog(cellvalue, options, rowObject) {
-        return '<a target="_blank" href="admin/article/preview?id=' + rowObject.id + '"><div id="jEditButton_2" class="ui-pg-div ui-inline-edit" onmouseout="jQuery(this).removeClass(\'ui-state-hover\')" onmouseover="jQuery(this).addClass(\'ui-state-hover\');" style="float: left; cursor: pointer; display: block;" title="" data-original-title="' + lang.view + '  ' + $("<div>"+rowObject.title + '"<div>"').text() +'><i class="fa fa-search-plus ui-icon"></i></div></a>'
+        return '<a target="_blank" href="admin/article/preview?id=' + rowObject.id + '"><div id="jEditButton_2" class="ui-pg-div ui-inline-edit" onmouseout="jQuery(this).removeClass(\'ui-state-hover\')" onmouseover="jQuery(this).addClass(\'ui-state-hover\');" style="float: left; cursor: pointer; display: block;" title="" data-original-title="' + lang.view + '  ' + $("<div>" + rowObject.title + '"<div>"').text() + '><i class="fa fa-search-plus ui-icon"></i></div></a>'
     }
 
     function renderPrivate(cellvalue, options, rowObject) {

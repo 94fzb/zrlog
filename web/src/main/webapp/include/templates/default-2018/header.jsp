@@ -105,7 +105,7 @@
             <header>
                 <a href="${pageContext.request.contextPath}/?avatar"><i class="avatar"></i></a>
                 <h1 class="page-title">
-                    <a href='${rurl}'>${webs.title}</a>
+                    <a href='${rurl}'>${website.title}</a>
                 </h1>
                 <nav class="mainnav">
                     <ul class="section_list">
@@ -139,7 +139,7 @@
         <aside>
             <div class="side-inner">
                 <i id="collapseDrawerPannel" class="material-icons">navigate_next</i>
-                <h2 class="s-title">${webs.title}</h2>
+                <h2 class="s-title">${website.title}</h2>
                 <div class="widget category-list">
                     <h3>博客分类 <span class="en">Categories</span></h3>
                     <div class="list">

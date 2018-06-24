@@ -1,4 +1,3 @@
-<%@ page session="false" pageEncoding="UTF-8" %>
 </div>
 </div>
 <div style="padding-top: 10px">

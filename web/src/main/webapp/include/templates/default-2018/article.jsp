@@ -21,6 +21,6 @@
         </div>
     </div>
     <p style="color:#D4D4D4">最后更新：${log.lastUpdateDate}</p>
-    <p style="color:#D4D4D4">—— 原创内容，转载请注明：[ 文章转载自：${webs.title} &nbsp; <a href="${baseUrl}"
+    <p style="color:#D4D4D4">—— 原创内容，转载请注明：[ 文章转载自：${website.title} &nbsp; <a href="${baseUrl}"
                                                                            style="color:#D4D4D4">${baseUrl}</a> ] ——</p>
 </article>

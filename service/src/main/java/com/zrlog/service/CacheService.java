@@ -71,6 +71,9 @@ public class CacheService {
         }
         if (baseController != null) {
             baseController.setAttr("init", cacheInit);
+            baseController.setAttr("website", cacheInit.getWebSite());
+            //默认开启文章封面
+            cacheInit.getWebSite().putIfAbsent("article_thumbnail_status", "1");
             Constants.webSite.clear();
             Constants.webSite.putAll(cacheInit.getWebSite());
         }

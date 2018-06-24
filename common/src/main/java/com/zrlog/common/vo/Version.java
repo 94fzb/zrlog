@@ -11,6 +11,16 @@ public class Version implements Serializable {
     private String releaseDate;
     private String version;
     private long fileSize;
+
+    public long getZipFileSize() {
+        return zipFileSize;
+    }
+
+    public void setZipFileSize(long zipFileSize) {
+        this.zipFileSize = zipFileSize;
+    }
+
+    private long zipFileSize;
     private String changeLog;
     private String type;
     private String downloadUrl;
@@ -99,7 +109,6 @@ public class Version implements Serializable {
     public void setMd5sum(String md5sum) {
         this.md5sum = md5sum;
     }
-
 
 
 }

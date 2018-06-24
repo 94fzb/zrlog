@@ -1,4 +1,3 @@
-<%@ page session="false" pageEncoding="UTF-8" %>
 <style>
     input {
         height: 36px;
@@ -16,6 +15,16 @@
         cursor: pointer;
     }
 </style>
+<script>
+    var page = "admin/template/configPage?template=${templateInfo.template}";
+    $.get(page, function (responseText, textStatus, req) {
+        if (textStatus === "error") {
+            return $("#" + id).html("");
+        } else {
+            $("#configDiv").html(req.responseText);
+        }
+    });
+</script>
 <div class="page-header">
     <h3>
         主题设置
@@ -23,8 +32,7 @@
     </h3>
 </div>
 <div class="row">
-    <div class="col-md-6 col-xs-12 col-sm-12">
-        <jsp:include page="${include}.jsp"/>
+    <div class="col-md-6 col-xs-12 col-sm-12" id="configDiv">
     </div>
 </div>
 ${pageEndTag}

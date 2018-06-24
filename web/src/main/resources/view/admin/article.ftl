@@ -1,12 +1,3 @@
-<%@ page session="false" pageEncoding="UTF-8" %>
-<%
-    try {
-        String str = new String(request.getParameter("keywords").getBytes("ISO-8859-1"), "UTF-8");
-        request.setAttribute("keywords", str);
-    } catch (Exception e) {
-
-    }
-%>
 <script src="${basePath}assets/js/jqGrid/jquery.jqGrid.min.js"></script>
 <script src="${basePath}assets/js/jqGrid/i18n/grid.locale-${lang}.js"></script>
 <script src="${basePath}admin/js/jqgrid_common.js"></script>
@@ -18,7 +9,7 @@
     <div class="col-md-2 offset-md-10 col-xs-12 top_search">
         <form class="form-search">
             <div class="input-group">
-                <input id="keywords" value="${keywords}" name="keywords" autocomplete="off" type="text"
+                <input id="keywords" name="keywords" autocomplete="off" type="text"
                        placeholder="${_res.searchTip}" class="form-control">
                 <span class="input-group-btn">
                       <button type="submit" id="searchArticleBtn" class="btn btn-default">${_res.search}</button>

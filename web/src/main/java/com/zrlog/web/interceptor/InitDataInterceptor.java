@@ -29,17 +29,17 @@ public class InitDataInterceptor implements Interceptor {
     }
 
     private void doIntercept(Invocation invocation) {
-        //未安装情况下无法设置缓存
-        if (!ZrLogConfig.isInstalled()) {
-            invocation.getController().render("/install/index" + ZrLogConfig.getTemplateExt());
-        } else {
-            if (invocation.getController() instanceof BaseController) {
-                HttpServletRequest request = invocation.getController().getRequest();
-                BaseController baseController = (BaseController) invocation.getController();
-                baseController.setAttr("requrl", ZrLogUtil.getFullUrl(request));
-                cacheService.refreshInitDataCache(GlobalResourceHandler.CACHE_HTML_PATH, baseController, false);
-                lastAccessTime = System.currentTimeMillis();
-            }
+        //未安装情况下,尝试跳转去安装
+        if (!ZrLogConfig.isInstalled() && !invocation.getActionKey().startsWith("/install")) {
+            invocation.getController().redirect("/install");
+            return;
+        }
+        if (invocation.getController() instanceof BaseController) {
+            HttpServletRequest request = invocation.getController().getRequest();
+            BaseController baseController = (BaseController) invocation.getController();
+            baseController.setAttr("requrl", ZrLogUtil.getFullUrl(request));
+            cacheService.refreshInitDataCache(GlobalResourceHandler.CACHE_HTML_PATH, baseController, false);
+            lastAccessTime = System.currentTimeMillis();
         }
         invocation.invoke();
     }

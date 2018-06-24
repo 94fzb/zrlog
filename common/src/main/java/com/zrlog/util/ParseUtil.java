@@ -83,10 +83,10 @@ public class ParseUtil {
 
     public static boolean isGarbageComment(String str) {
         // TODO　如何过滤垃圾信息
-        return !containsHanScript(str);
+        return false;
     }
 
-    private static boolean containsHanScript(String s) {
+    /*private static boolean containsHanScript(String s) {
         for (int i = 0; i < s.length(); ) {
             int codepoint = s.codePointAt(i);
             i += Character.charCount(codepoint);
@@ -95,7 +95,7 @@ public class ParseUtil {
             }
         }
         return false;
-    }
+    }*/
 
     /**
      * 输入一段纯文本，通过指定关键字提取相关的上下文

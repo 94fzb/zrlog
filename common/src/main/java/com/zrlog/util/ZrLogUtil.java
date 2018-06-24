@@ -249,4 +249,12 @@ public class ZrLogUtil {
             return false;
         }
     }
+
+    public static String getViewExt(String type) {
+        if (type != null && type.equals("freemarker")) {
+            return ".ftl";
+        } else {
+            return ".jsp";
+        }
+    }
 }

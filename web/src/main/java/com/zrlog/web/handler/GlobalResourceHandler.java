@@ -42,7 +42,8 @@ public class GlobalResourceHandler extends Handler {
 
     static {
         //由于程序的.jsp文件没有存放在WEB-INF目录，为了防止访问.jsp页面获得的没有数据的页面，或则是错误的页面。
-        FORBIDDEN_URI_EXT_SET.add(ZrLogConfig.getTemplateExt());
+        FORBIDDEN_URI_EXT_SET.add(".jsp");
+        FORBIDDEN_URI_EXT_SET.add(".ftl");
         //这主要用在主题目录下面的配置文件。
         FORBIDDEN_URI_EXT_SET.add(".properties");
     }
@@ -60,7 +61,7 @@ public class GlobalResourceHandler extends Handler {
             }
         }
         try {
-            final ResponseRenderPrintWriter responseRenderPrintWriter = new ResponseRenderPrintWriter(response.getOutputStream(), !JFinal.me().getConstants().getDevMode(), url, PAGE_END_TAG, request, response, System.getProperty("file.encoding"));
+            final ResponseRenderPrintWriter responseRenderPrintWriter = new ResponseRenderPrintWriter(response.getOutputStream(), true, url, PAGE_END_TAG, request, response, System.getProperty("file.encoding"));
             response = new HttpServletResponseWrapper(response) {
                 @Override
                 public PrintWriter getWriter() {

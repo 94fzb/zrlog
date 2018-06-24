@@ -13,6 +13,37 @@ public class TemplateVO {
     private List<String> previewImages;
     private String author;
     private boolean configAble;
+    private boolean preview;
+
+    public String getViewType() {
+        return viewType;
+    }
+
+    public void setViewType(String viewType) {
+        this.viewType = viewType;
+    }
+
+    private String viewType;
+
+    public boolean isPreview() {
+        return preview;
+    }
+
+    public void setPreview(boolean preview) {
+        this.preview = preview;
+    }
+
+    public boolean isUse() {
+        return use;
+    }
+
+    public void setUse(boolean use) {
+        this.use = use;
+    }
+
+    private boolean use;
+
+
 
     public String getTemplate() {
         return template;

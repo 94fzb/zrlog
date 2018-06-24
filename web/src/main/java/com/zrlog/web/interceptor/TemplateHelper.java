@@ -44,6 +44,7 @@ public class TemplateHelper {
         request.setAttribute("init", baseDataInitVO);
         Map webSite = baseDataInitVO.getWebSite();
         String baseUrl = setBaseUrl(request, staticBlog, webSite);
+        //过期
         request.setAttribute("webs", webSite);
         request.setAttribute("searchUrl", baseUrl + Constants.getArticleUri() + "search");
         String title = webSite.get("title") + " - " + webSite.get("second_title");
@@ -222,9 +223,9 @@ public class TemplateHelper {
         Log nextLog = data.get("nextLog");
         nextLog.put("url", baseUrl + Constants.getArticleUri() + nextLog.get("alias") + suffix);
         lastLog.put("url", baseUrl + Constants.getArticleUri() + lastLog.get("alias") + suffix);
-        String markdown = data.getStr("markdown").toLowerCase();
         //没有使用md的toc目录的文章才尝试使用系统提取的目录
-        if (!markdown.contains("[toc]") && !markdown.contains("[tocm]")) {
+        if (data.getStr("markdown") != null && !data.getStr("markdown").toLowerCase().contains("[toc]")
+                && !data.getStr("markdown").toLowerCase().contains("[tocm]")) {
             //最基础的实现方式，若需要更强大的实现方式建议使用JavaScript完成（页面输入toc对象）
             OutlineVO outlineVO = OutlineUtil.extractOutline(data.getStr("content"));
             data.put("tocHtml", OutlineUtil.buildTocHtml(outlineVO, ""));

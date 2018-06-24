@@ -27,21 +27,17 @@
                 <div class="col-md-4">
 			<span class="col-sm-12" id="cycle-select-parent">
 			<select name="autoUpgradeVersion" class="form-control select2_single">
-				<!--
-				<option <c:if test="${webs.autoUpgradeVersion == 60}">selected="selected"</c:if> value="60">${_res['admin.upgrade.cycle.oneMinute']}</option>
-				<option <c:if test="${webs.autoUpgradeVersion == 3600}">selected="selected"</c:if> value="3600">${_res['admin.upgrade.cycle.oneHour']}</option>
-				-->
 				<option
-                        <c:if test="${webs.autoUpgradeVersion == 86400}">selected="selected"</c:if>
+                        <c:if test="${website.autoUpgradeVersion == 86400}">selected="selected"</c:if>
                         value="86400">${_res['admin.upgrade.cycle.oneDay']}</option>
 				<option
-                        <c:if test="${webs.autoUpgradeVersion == 604800}">selected="selected"</c:if>
+                        <c:if test="${website.autoUpgradeVersion == 604800}">selected="selected"</c:if>
                         value="604800">${_res['admin.upgrade.cycle.oneWeek']}</option>
 				<option
-                        <c:if test="${webs.autoUpgradeVersion == 1296000}">selected="selected"</c:if>
+                        <c:if test="${website.autoUpgradeVersion == 1296000}">selected="selected"</c:if>
                         value="1296000">${_res['admin.upgrade.cycle.halfMonth']}</option>
 				<option
-                        <c:if test="${webs.autoUpgradeVersion == -1}">selected="selected"</c:if>
+                        <c:if test="${website.autoUpgradeVersion == -1}">selected="selected"</c:if>
                         value="-1">${_res['admin.upgrade.cycle.never']}</option>
 			</select>
 			</span>
@@ -57,7 +53,7 @@
                 <input type="checkbox" class="form-control js-switch" style="display: none;"
                        data-switchery="upgradePreview"
                        name="upgradePreview"
-                       <c:if test="${webs.upgradePreview == 1}">checked="checked"</c:if>>
+                       <c:if test="${website.upgradePreview == 1}">checked="checked"</c:if>>
             </label>
             </span>
                 </div>

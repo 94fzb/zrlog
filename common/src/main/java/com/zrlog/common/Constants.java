@@ -35,8 +35,10 @@ public class Constants {
     public static String TEMPLATE_CONFIG_SUFFIX = "_setting";
     public static final AutoUpgradeVersionType DEFAULT_AUTO_UPGRADE_VERSION_TYPE = AutoUpgradeVersionType.ONE_DAY;
     public static String DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ssXXX";
-    public static final Map<String, Object> webSite = Collections.synchronizedMap(new HashMap<String, Object>());
+    public static final Map<String, Object> webSite = Collections.synchronizedMap(new HashMap<>());
     public static boolean IN_JAR = new File("webapp").exists();
+    public static String FTL_VIEW_PATH = "/view";
+    public static String DEFAULT_HEADER = "assets/images/default-portrait.gif";
 
     public static String pluginServer;
 

@@ -7,9 +7,11 @@ import com.hibegin.common.util.http.handle.HttpFileHandle;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
 import com.zrlog.common.Constants;
+import com.zrlog.common.vo.TemplateVO;
 import com.zrlog.model.WebSite;
 import com.zrlog.service.TemplateService;
 import com.zrlog.util.I18NUtil;
+import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.controller.BaseController;
 import com.zrlog.web.interceptor.TemplateHelper;
 import com.zrlog.web.util.WebTools;
@@ -26,25 +28,25 @@ public class AdminTemplatePageController extends BaseController {
     private TemplateService templateService = new TemplateService();
 
     public String index() {
-        setAttr("templates", templateService.getAllTemplates(getRequest().getContextPath()));
-        setAttr("previewTemplate", TemplateHelper.getTemplatePathByCookie(getRequest().getCookies()));
+        setAttr("templates", templateService.getAllTemplates(getRequest().getContextPath(), TemplateHelper.getTemplatePathByCookie(getRequest().getCookies())));
         return "/admin/template";
     }
 
     public String config() {
         String templateName = getPara("template");
-        File file = new File(PathKit.getWebRootPath() + templateName + "/setting/index.jsp");
-        if (file.exists()) {
-            setAttr("include", templateName + "/setting/index");
-            setAttr("template", templateName);
-            setAttr("templateInfo", templateService.getTemplateVO(JFinal.me().getContextPath(), file.getParentFile().getParentFile()));
-            I18NUtil.addToRequest(PathKit.getWebRootPath() + templateName + "/language/", getRequest(), JFinal.me().getConstants().getDevMode(), true);
-            String jsonStr = new WebSite().getStringValueByName(templateName + Constants.TEMPLATE_CONFIG_SUFFIX);
-            fullTemplateSetting(jsonStr);
-            return "/admin/template_config";
-        } else {
-            return Constants.NOT_FOUND_PAGE;
-        }
+        setAttr("templateInfo", templateService.getTemplateVO(JFinal.me().getContextPath(), new File(PathKit.getWebRootPath() + templateName)));
+        return "/admin/template_config";
+    }
+
+    public String configPage() {
+        String templateName = getPara("template");
+        setAttr("template", templateName);
+        TemplateVO templateVO = templateService.getTemplateVO(JFinal.me().getContextPath(), new File(PathKit.getWebRootPath() + templateName));
+        setAttr("templateInfo", templateVO);
+        I18NUtil.addToRequest(PathKit.getWebRootPath() + templateName + "/language/", getRequest(), JFinal.me().getConstants().getDevMode(), true);
+        String jsonStr = new WebSite().getStringValueByName(templateName + Constants.TEMPLATE_CONFIG_SUFFIX);
+        fullTemplateSetting(jsonStr);
+        return templateName + "/setting/index" + ZrLogUtil.getViewExt(templateVO.getViewType());
     }
 
     public void preview() {
@@ -72,6 +74,7 @@ public class AdminTemplatePageController extends BaseController {
                 FileUtils.moveOrCopyFile(fileHandle.getT().toString(), target, true);
                 ZipUtil.unZip(target, path.toString() + "/");
                 setAttr("message", I18NUtil.getStringFromRes("templateDownloadSuccess"));
+                setAttr("backUrl", "admin/index#template");
             } else {
                 setAttr("message", I18NUtil.getStringFromRes("templateExists"));
             }

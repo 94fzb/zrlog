@@ -6,7 +6,11 @@ import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.jfinal.json.Json;
 import com.jfinal.kit.PathKit;
+import com.jfinal.render.FreeMarkerRender;
 import com.zrlog.common.response.ApiStandardResponse;
+import com.zrlog.common.vo.TemplateVO;
+import com.zrlog.service.TemplateService;
+import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.config.ZrLogConfig;
 
 import java.io.File;
@@ -50,11 +54,13 @@ class VisitorInterceptor implements Interceptor {
             return;
         }
 
-        String basePath = TemplateHelper.fullTemplateInfo(ai.getController(), true);
+        String templatePath = TemplateHelper.fullTemplateInfo(ai.getController(), true);
+        TemplateVO templateVO = new TemplateService().getTemplateVO(JFinal.me().getContextPath(), new File(PathKit.getWebRootPath() + templatePath));
+        String ext = ZrLogUtil.getViewExt(templateVO.getViewType());
         if (ai.getController().getAttr("log") != null) {
             ai.getController().setAttr("pageLevel", 1);
         } else if (ai.getController().getAttr("data") != null) {
-            if ("/".equals(ai.getActionKey()) && new File(PathKit.getWebRootPath() + basePath + "/" + templateName + ZrLogConfig.getTemplateExt()).exists()) {
+            if ("/".equals(ai.getActionKey()) && new File(PathKit.getWebRootPath() + templatePath + "/" + templateName + ext).exists()) {
                 ai.getController().setAttr("pageLevel", 2);
             } else {
                 templateName = "page";
@@ -64,7 +70,7 @@ class VisitorInterceptor implements Interceptor {
             ai.getController().setAttr("pageLevel", 2);
         }
         fullDevData(ai.getController());
-        ai.getController().render(basePath + "/" + templateName + ZrLogConfig.getTemplateExt());
+        ai.getController().render(templatePath + "/" + templateName + ext);
     }
 
     /**
@@ -107,11 +113,13 @@ class VisitorInterceptor implements Interceptor {
             if (ai.getReturnValue() != null) {
                 template = ai.getReturnValue();
             }
+        } else {
+            ai.getController().getRequest().setAttribute("errorMsg", ((Map) ai.getController().getRequest().getAttribute("_res")).get("installed"));
         }
         if (template == null) {
             template = "/install/forbidden";
         }
         ai.getController().setAttr("currentViewName", template.substring("/install/".length()));
-        ai.getController().render(template + ZrLogConfig.getTemplateExt());
+        ai.getController().render(new FreeMarkerRender(template + ".ftl"));
     }
 }

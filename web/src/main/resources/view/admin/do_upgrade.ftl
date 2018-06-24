@@ -1,4 +1,3 @@
-<%@ page session="false" pageEncoding="UTF-8" %>
 <script type="text/javascript" src="${basePath}admin/js/set_update.js"></script>
 <script src="${basePath}assets/js/switchery.min.js"></script>
 <script src="${basePath}assets/js/jquery.smartWizard.js"></script>
@@ -10,7 +9,7 @@
 </style>
 <div class="page-header">
     <h3>
-        ${_res['upgradeWizard']}
+    ${_res['upgradeWizard']}
     </h3>
 </div>
 <div class="row">
@@ -18,19 +17,19 @@
         <div id="wizard_verticle" class="form_wizard wizard_horizontal">
             <ul class="list-unstyled wizard_steps anchor">
                 <li>
-                    <a href="${currentPage}#step-11" class="selected" isdone="1" rel="1">
+                    <a href="#step-11" class="selected" isdone="1" rel="1">
                         <span class="step_no">1</span>
                         <span class="step_descr">变更日志</span>
                     </a>
                 </li>
                 <li>
-                    <a href="${currentPage}#step-22" class="disabled" isdone="0" rel="2">
+                    <a href="#step-22" class="disabled" isdone="0" rel="2">
                         <span class="step_no">2</span>
                         <span class="step_descr">下载更新</span>
                     </a>
                 </li>
                 <li>
-                    <a href="${currentPage}#step-33" class="disabled" isdone="0" rel="3">
+                    <a href="#step-33" class="disabled" isdone="0" rel="3">
                         <span class="step_no">3</span>
                         <span class="step_descr">执行更新</span>
                     </a>
@@ -39,7 +38,9 @@
             <div class="stepContainer" style="min-height: 400px;overflow-y:auto;">
                 <div id="step-11" class="content" style="display: block;">
                     <div id="changeLog">
-                        ${lastVersion.version.changeLog}
+                        <#if lastVersion?? && lastVersion.upgrade>
+                            ${lastVersion.version.changeLog}
+                        </#if>
                     </div>
                 </div>
                 <div id="step-22" class="content" style="min-height: 400px;overflow-y:auto;display: none;">

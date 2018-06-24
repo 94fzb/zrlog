@@ -1,15 +1,8 @@
-<%@ page session="false" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="f" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
-<%
-    request.setAttribute("previewDb", com.zrlog.web.config.ZrLogConfig.isPreviewDb());
-%>
 <!DOCTYPE html>
 <html lang="${lang}">
 <base href="${basePath}"/>
 <head>
-    <title>${webs.title} | ${_res['admin.management']}</title>
+    <title>${website.title} | ${_res['admin.management']}</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -33,18 +26,18 @@
     </style>
 </head>
 <body class="nav-sm">
-<c:if test="${previewDb}">
+<#if previewDb>
 <div class="text-center">
     <h3 style="color: red"><i class="fa fa-warning"></i> ${_res['defaultDbTips']}</h3>
 </div>
-</c:if>
+</#if>
 <div class="container body">
     <div class="main_container">
         <div class="col-md-3 left_col">
             <div id="left_col" class="left_col scroll-view">
                 <div class="navbar nav_title" style="border: 0;">
-                    <a href="${basePath}" target="_blank" title="${webs.title}" class="site_title"><i
-                            class="fa fa-home"></i> <span>${webs.title}</span></a>
+                    <a href="${basePath}" target="_blank" title="${website.title}" class="site_title"><i
+                            class="fa fa-home"></i> <span>${website.title}</span></a>
                 </div>
                 <div class="clearfix"></div>
                 <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
@@ -109,51 +102,43 @@
             <div class="nav_menu" id="nav_menu">
                 <nav class="nav navbar-nav navbar-right" style="height: 57px;">
                     <div>
-                        <c:if test="${fn:length(noReadComments) > 0}">
+                        <#if noReadComments??>
                         <div class="btn-group" id="commentMessages">
                             <button class="btn btn-default dropdown-toggle info-number" data-toggle="dropdown"
                                     aria-expanded="false">
                                 <i class="fa fa-envelope-o"></i>
-                                <span class="badge bg-green" id="commentNum">${fn:length(noReadComments)}</span>
+                                <span class="badge bg-green" id="commentNum">${noReadComments?size}</span>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-right list-unstyled msg_list">
-                                <c:forEach items="${noReadComments}" var="comment">
+                                <#list noReadComments as comment>
                                     <li style="min-width: 240px;">
                                         <a target="_blank" class="haveRead dropdown-item user-profile"
                                            id="${comment.id}">
                         <span class="image">
-                        <c:choose>
-                            <c:when test='${not empty comment.header}'>
-                                <img class="msg-photo" style="min-height: 38px;min-width: 38px" src="${comment.header}">
-                            </c:when>
-                            <c:otherwise>
-                                <img class="msg-photo" style="min-height: 38px;min-width: 38px"
-                                     src="${baseUrl}assets/images/default-portrait.gif">
-                            </c:otherwise>
-                        </c:choose>
+                            <img class="msg-photo" style="min-height: 38px;min-width: 38px" src="${comment.header}">
                         </span>
                                             <span>
                           <span>${comment.userName}</span>
                           <span class="time"></span>
                         </span>
                                             <span class="message">
-                                                    ${comment.userComment}
+                                                ${comment.userComment}
                                             </span>
                                         </a>
                                     </li>
-                                </c:forEach>
+                                </#list>
                                 <li>
                                     <div class="text-center">
                                         <a href="admin/index#comment">
-                                                ${_res['admin.viewAllComment']}
+                                            ${_res['admin.viewAllComment']}
                                             <i class="fa fa-angle-right"></i>
                                         </a>
                                     </div>
                                 </li>
                             </ul>
                         </div>
-                        </c:if>
-                        <c:if test="${lastVersion.upgrade}">
+                        </#if>
+                        <#if lastVersion.upgrade>
                         <div class="btn-group">
                             <button class="btn btn-default dropdown-toggle info-number" data-toggle="dropdown"
                                     aria-expanded="false">
@@ -164,12 +149,13 @@
                                 <li>
                                     <a class="dropdown-item" style="padding: 0 !important"
                                        href="admin/index?buildId=${lastVersion.version.buildId}#do_upgrade">
-                                        版本号：&nbsp;&nbsp;V${lastVersion.version.version}-${lastVersion.version.buildId}（${lastVersion.version.type}）
+                                        版本号：&nbsp;&nbsp;V${lastVersion.version.version}-${lastVersion.version.buildId}
+                                        （${lastVersion.version.type}）
                                         <br/>发布时间：${lastVersion.version.releaseDate}</a>
                                 </li>
                             </ul>
                         </div>
-                        </c:if>
+                        </#if>
                         <div class="btn-group">
                             <button class="btn btn-default dropdown-toggle user-profile" data-toggle="dropdown"
                                     aria-expanded="false">
@@ -178,25 +164,37 @@
                             <div class="dropdown-menu dropdown-menu-right">
                                 <a class="dropdown-item" href="admin/index#user">
                                     <i class="fa fa-user"></i>
-                                    ${_res['admin.user.info']}
+                                ${_res['admin.user.info']}
                                 </a>
                                 <a class="dropdown-item" href="admin/index#change_password">
                                     <i class="fa fa-key"></i>
-                                    ${_res['admin.changePwd']}
+                                ${_res['admin.changePwd']}
                                 </a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="admin/logout">
                                     <i class="fa fa-sign-out"></i>
-                                    ${_res['admin.user.logout']}
+                                ${_res['admin.user.logout']}
                                 </a>
-                                </li>
                             </div>
                         </div>
                 </nav>
             </div>
         </div>
         <div class="right_col" id="right_col" role="main" style="min-height: 1440px">
-            <div style="min-height: 600px"></div>
+            <div style="min-height: 600px">
+                <#if message??>
+                    <div class="alert alert-block alert-info" style="margin-top: 66px">
+                        <p>
+                            ${message}
+                        </p>
+                        <p>
+                            <a href="${backUrl!'javascript:history.go(-1);'}">
+                                <button class="btn btn-sm btn-primary">${_res.goBack}</button>
+                            </a>
+                        </p>
+                    </div>
+                </#if>
+            </div>
         </div>
         <footer>
             <strong>${_res.copyright} <a href="https://www.zrlog.com" target="_blank" rel="noopener"> ZrLog

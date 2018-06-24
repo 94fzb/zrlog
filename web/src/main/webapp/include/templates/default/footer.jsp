@@ -7,16 +7,16 @@
         <footer>
             <div class="footer-left mission"><p>${_res.footerSlogan}</p></div>
             <div class="footer-right">
-                <p><cite>${_res['copyrightCurrentYear']}&nbsp;&nbsp;${webs.title}</cite></p>
+                <p><cite>${_res['copyrightCurrentYear']}&nbsp;&nbsp;${website.title}</cite></p>
                 <p>Powered by <a href="http://zrlog.com" target="_blank">zrlog</a>, <span title="涉水轻舟">Themed by <a href="http://sheshui.me/about" target="_blank">Robin L.</a></span></p>
-                <p>${webs.icp}</p>
+                <p>${website.icp}</p>
             </div>
             <div class="clearfix"></div>
         </footer>
     </div>
 </div>
 </div>
-<div style="display:none">${webs.webCm}</div>
+<div style="display:none">${website.webCm}</div>
 </body>
 </html>
 

@@ -1,18 +1,8 @@
-﻿<%@ page import="com.zrlog.util.ZrLogUtil" %>
-<jsp:useBean id="init" scope="request" type="com.zrlog.model.BaseDataInitVO"/>
-<%@ page session="false" pageEncoding="UTF-8" %>
-<%
-    //预览环境默认输入密码
-    if (ZrLogUtil.isPreviewMode()) {
-        request.setAttribute("userName", System.getenv("DEFAULT_USERNAME"));
-        request.setAttribute("password", System.getenv("DEFAULT_PASSWORD"));
-    }
-%>
 <!DOCTYPE html>
 <html>
 <base href="${basePath}"/>
 <head>
-    <title>${init.webSite.title} - ${_res.login}</title>
+    <title>${website.title} - ${_res.login}</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -31,22 +21,21 @@
             <div class="login100-form-title"
                  style="background-image: url('${basePath}assets/images/login-bg.jpg');">
 					<span class="login100-form-title-1">
-                        ${_res.userNameAndPassword}
+                    ${_res.userNameAndPassword}
                     </span>
             </div>
-
             <form class="login100-form validate-form" id="login_form" action="${basePath}api/admin/login">
-                <input type="hidden" id="redirectFrom" value="${param.redirectFrom}">
+                <input type="hidden" id="redirectFrom">
                 <div class="wrap-input100 validate-input m-b-26">
                     <span class="label-input100">${_res.userName}</span>
-                    <input class="input100" type="text" name="userName" value="${userName}" id="userName"
+                    <input class="input100" type="text" name="userName" value="${userName!''}" id="userName"
                            placeholder="${_res.userName}">
                     <span class="focus-input100"></span>
                 </div>
 
                 <div class="wrap-input100 validate-input m-b-18">
                     <span class="label-input100">${_res.password}</span>
-                    <input class="input100" type="password" value="${password}" name="password"
+                    <input class="input100" type="password" value="${password!''}" name="password"
                            placeholder="${_res.password}">
                     <span class="focus-input100"></span>
                 </div>
@@ -73,7 +62,7 @@
         </div>
     </div>
     <div class="text-center container-login5">
-        <p><strong>${_res['copyrightCurrentYear']}</strong> ${init.webSite.title} All Rights Reserved. </p>
+        <p><strong>${_res['copyrightCurrentYear']}</strong> ${website.title} All Rights Reserved. </p>
     </div>
 </div>
 </body>

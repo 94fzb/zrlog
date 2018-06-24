@@ -1,11 +1,9 @@
-<%@ page session="false" pageEncoding="UTF-8" %>
-<%
-    if ("template".equals(request.getParameter("editType"))) {
-        request.setAttribute("tips", "主题编辑建议仅用于临时变更");
-    }
-%>
 <script>
-    var path = '${param['path']}';
+    var path = '${path!''}';
+    if (path === '') {
+        path = getParameterByName("path");
+    }
+    $("#basePath").val(path);
 </script>
 <link rel="stylesheet" href="${basePath}admin/markdown/lib/codemirror/codemirror.min.css"/>
 <link rel="stylesheet" href="${basePath}admin/markdown/lib/codemirror/addon/dialog/dialog.css"/>
@@ -45,14 +43,13 @@
 </style>
 <div class="page-header">
     <h3>
-        ${_res['fileEdit']}
+    ${_res['fileEdit']}
         <small id="editing"></small>
     </h3>
 </div>
-<h4 class="text-right">${tips}</h4>
 <div>
     <form id="saveFileForm">
-        <input type="hidden" id="basePath" value="${param.path}">
+        <input type="hidden" id="basePath">
         <input type="hidden" name="file" id="file">
         <textarea name="content" id="content" hidden></textarea>
 
@@ -69,9 +66,8 @@
         <div class="ln_solid"></div>
         <div class="col-md-offset-1">
             <button class="btn btn-info" type="button" id="saveFile">
-                ${_res['submit']}
+            ${_res['submit']}
             </button>
         </div>
     </form>
 </div>
-${pageEndTag}

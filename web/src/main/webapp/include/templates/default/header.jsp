@@ -58,7 +58,7 @@
                 <h1 class="site-name">
                     <i class="avatar"></i>
                     <a title="${_res.title}" href="${rurl}">${_res.title}</a>
-                    <span class="slogan">${webs.title }</span>
+                    <span class="slogan">${website.title }</span>
                 </h1>
                 <nav class="mainnav">
                     <ul class="section_list">

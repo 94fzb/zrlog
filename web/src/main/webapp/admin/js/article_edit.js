@@ -1,4 +1,15 @@
+var imageExts = ["jpg", "jpeg", "gif", "png", "ico", "bmp", "webp"];
+var editorEl = $("#editorDiv");
+var editorDivWrapper = $("#editorDivWrapper");
+var editorTheme = editorEl.attr("theme");
+
 $(function () {
+    $('.icheck').iCheck({
+        checkboxClass: 'icheckbox_flat-blue',
+        radioClass: 'iradio_flat-blue'
+    });
+    $("#thumbnail-upload").attr("accept", imageExts.join(","));
+
     window.contentChange = function (content, markdown) {
         article.content = content;
         article.markdown = markdown;
@@ -10,6 +21,11 @@ $(function () {
             editorDivWrapper.css("border-color", "#ccc");
         }
     };
+    $("#id").val(article.logId);
+    $("#title").val(article.title);
+    $("#alias").val(article.alias);
+    $("#keywordsVal").val(article.keywords);
+    $("#digest").val(article.digest);
 
     contentChange(article.content, article.markdown);
     editorTypeSelect(article['editorType']);

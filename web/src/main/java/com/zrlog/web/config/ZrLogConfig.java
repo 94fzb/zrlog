@@ -8,6 +8,7 @@ import com.jfinal.kit.PathKit;
 import com.jfinal.plugin.IPlugin;
 import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
 import com.jfinal.plugin.activerecord.IDataSourceProvider;
+import com.jfinal.render.FreeMarkerRender;
 import com.jfinal.render.ViewType;
 import com.jfinal.template.Engine;
 import com.zrlog.model.*;
@@ -50,10 +51,10 @@ public class ZrLogConfig extends JFinalConfig {
     private static final String DEFAULT_PREVIEW_DB_HOST = "demo.blog.zrlog.com";
     private static String jdbcUrl;
     //存放Zrlog的一些系统参数
-    private Properties systemProperties = new Properties();
+    public static Properties blogProperties = new Properties();
     private Properties dbProperties = new Properties();
     // 读取系统参数
-    private static final Properties systemProp = System.getProperties();
+    public static final Properties systemProp = System.getProperties();
     //存放为config的属性，是为了安装完成后还获得JFinal的插件列表对象
     private Plugins plugins;
     private boolean haveSqlUpdated = false;
@@ -72,9 +73,9 @@ public class ZrLogConfig extends JFinalConfig {
             FileUtils.deleteFile("/home/bae/backup");
         }
         try {
-            systemProperties.load(ZrLogConfig.class.getResourceAsStream("/zrlog.properties"));
+            blogProperties.load(ZrLogConfig.class.getResourceAsStream("/zrlog.properties"));
         } catch (IOException e) {
-            LOGGER.error("load systemProperties error", e);
+            LOGGER.error("load blogProperties error", e);
         }
         if (StringUtils.isNotEmpty(systemProp.getProperty("os.name"))) {
             if (systemProp.get("os.name").toString().startsWith("Mac")) {
@@ -195,7 +196,7 @@ public class ZrLogConfig extends JFinalConfig {
                 plugins.add(dataSourcePlugin);
                 // 添加表与实体的映射关系
                 plugins.add(getActiveRecordPlugin(dataSourcePlugin));
-                Object pluginJvmArgsObj = systemProperties.get("pluginJvmArgs");
+                Object pluginJvmArgsObj = blogProperties.get("pluginJvmArgs");
                 if (pluginJvmArgsObj == null) {
                     pluginJvmArgsObj = "";
                 }
@@ -236,6 +237,7 @@ public class ZrLogConfig extends JFinalConfig {
      */
     @Override
     public void afterJFinalStart() {
+        FreeMarkerRender.getConfiguration().setClassForTemplateLoading(ZrLogConfig.class, com.zrlog.common.Constants.FTL_VIEW_PATH);
         super.afterJFinalStart();
         if (isInstalled()) {
             initDatabaseVersion();
@@ -243,11 +245,11 @@ public class ZrLogConfig extends JFinalConfig {
         systemProp.setProperty("zrlog.runtime.path", PathKit.getWebRootPath());
         systemProp.setProperty("server.info", JFinal.me().getServletContext().getServerInfo());
         JFinal.me().getServletContext().setAttribute("system", systemProp);
-        systemProperties.put("version", BlogBuildInfoUtil.getVersion());
-        systemProperties.put("buildId", BlogBuildInfoUtil.getBuildId());
-        systemProperties.put("buildTime", new SimpleDateFormat("yyyy-MM-dd").format(BlogBuildInfoUtil.getTime()));
-        systemProperties.put("runMode", BlogBuildInfoUtil.getRunMode());
-        JFinal.me().getServletContext().setAttribute("zrlog", systemProperties);
+        blogProperties.put("version", BlogBuildInfoUtil.getVersion());
+        blogProperties.put("buildId", BlogBuildInfoUtil.getBuildId());
+        blogProperties.put("buildTime", new SimpleDateFormat("yyyy-MM-dd").format(BlogBuildInfoUtil.getTime()));
+        blogProperties.put("runMode", BlogBuildInfoUtil.getRunMode());
+        JFinal.me().getServletContext().setAttribute("zrlog", blogProperties);
         JFinal.me().getServletContext().setAttribute("config", this);
         if (haveSqlUpdated) {
             int updatedVersion = ZrLogUtil.getSqlVersion(getUpgradeSqlBasePath());
@@ -378,15 +380,6 @@ public class ZrLogConfig extends JFinalConfig {
             plugin.start();
         }
         initDatabaseVersion();
-    }
-
-    public static String getTemplateExt() {
-        if (JFinal.me().getConstants().getViewType() == ViewType.JSP) {
-            return ".jsp";
-        } else {
-            return ".html";
-        }
-
     }
 
     public static boolean isTest() {

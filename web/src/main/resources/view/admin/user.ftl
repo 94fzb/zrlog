@@ -1,4 +1,3 @@
-<%@ page session="false" pageEncoding="UTF-8" %>
 <script type="text/javascript" src="${basePath}admin/js/set_update.js"></script>
 <script src="${basePath}assets/js/jquery.liteuploader.min.js"></script>
 <script>
@@ -42,7 +41,7 @@
                 <label class="col-md-3 control-label no-padding-right"> ${_res.userName} </label>
 
                 <div class="col-md-6">
-                    <input type="text" name="userName" value="${user.userName }"
+                    <input type="text" name="userName" value="${user.userName!'' }"
                            class="form-control" required placeholder="">
                 </div>
             </div>
@@ -50,14 +49,14 @@
                 <label class="col-md-3 control-label no-padding-right"> ${_res['email']} </label>
 
                 <div class="col-md-6">
-                    <input type="email" name="email" value="${user.email }"
+                    <input type="email" name="email" value="${user.email!'' }"
                            class="form-control" placeholder="">
                 </div>
             </div>
             <div class="form-group row">
                 <label class="col-md-3 control-label no-padding-right">${_res['headPortrait']}</label>
                 <div class="col-md-9">
-                    <input id="logo" class="col-md-7" name="header" value="${user.header}"/>
+                    <input id="logo" class="col-md-7" name="header" value="${user.header!''}"/>
                     <label for="fileUpload" class="custom-file-upload">
                         ${_res['upload']}
                     </label>

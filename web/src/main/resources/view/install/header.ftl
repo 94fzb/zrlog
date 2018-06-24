@@ -1,5 +1,3 @@
-<%@ page session="false" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -17,7 +15,8 @@
         .container {
             min-width: 60%;
         }
-        .alert{
+
+        .alert {
             width: 100%;
         }
     </style>
@@ -36,38 +35,38 @@
         <div class="x_content">
             <div class="col-md-12">
                 <div class="row">
-                    <div class="alert alert-danger" <c:if test="${empty errorMsg }">style="display: none;"</c:if>>
-                        <b><i class="fa fa-info-circle"></i> ${errorMsg}</b>
-                    </div>
+                     <#if errorMsg ??>
+                         <div class="alert alert-danger">
+                             <b><i class="fa fa-info-circle"></i> ${errorMsg}</b>
+                         </div>
+                     </#if>
                 </div>
             </div>
-            <c:if test="${currentViewName ne 'forbidden'}">
+            <#if currentViewName != 'forbidden'>
             <div class="col-md-12">
                 <div id="wizard" class="form_wizard wizard_horizontal">
                     <ul class="list-unstyled wizard_steps anchor">
                         <li>
                             <a
-                                    <c:if test="${currentViewName eq 'index'}">class="selected"</c:if>
-                                    <c:if test="${currentViewName ne 'index'}">class="disable"</c:if>
-                                    isdone="1" rel="1">
+                                <#if currentViewName == 'index'>class="selected"</#if>
+                                    <#if currentViewName != 'index'>class="disable"</#if> isdone="1" rel="1">
                                 <span class="step_no">1</span>
                                 <span class="step_descr">${_res.installDatabaseInfo}</span>
                             </a>
                         </li>
                         <li>
                             <a
-                                    <c:if test="${currentViewName eq 'message'}">class="selected"</c:if>
-                                    <c:if test="${currentViewName ne 'message'}">class="disable"</c:if>
-                                    isdone="0" rel="2">
+                            <#if currentViewName == 'message'>class="selected"</#if>
+                            <#if currentViewName != 'message'>class="disable"</#if>
+                            isdone="0" rel="2">
                                 <span class="step_no">2</span>
                                 <span class="step_descr">${_res.installWebSiteInfo}</span>
                             </a>
                         </li>
                         <li>
                             <a
-                                    <c:if test="${currentViewName eq 'success'}">class="selected"</c:if>
-                                    <c:if test="${currentViewName ne 'success'}">class="disable"</c:if>
-                                    isdone="0" rel="3">
+                            <#if currentViewName == 'success'>class="selected"</#if>
+                            <#if currentViewName != 'success'>class="disable"</#if> isdone="0" rel="3">
                                 <span class="step_no">3</span>
                                 <span class="step_descr">${_res.installComplete}</span>
                             </a>
@@ -75,4 +74,4 @@
                     </ul>
                 </div>
             </div>
-            </c:if>
+            </#if>

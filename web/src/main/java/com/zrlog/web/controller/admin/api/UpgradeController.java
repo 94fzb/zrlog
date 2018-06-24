@@ -67,7 +67,7 @@ public class UpgradeController extends BaseController {
             File file = new File(PathKit.getWebRootPath() + "/WEB-INF/update-temp/" + "zrlog." + (Constants.IN_JAR ? "zip" : "war"));
             file.getParentFile().mkdir();
             Version version = lastVersion().getVersion();
-            handle = new DownloadProcessHandle(file, version.getFileSize(), Constants.IN_JAR ? version.getZipMd5sum() : version.getMd5sum());
+            handle = new DownloadProcessHandle(file, Constants.IN_JAR ? version.getZipFileSize() : version.getFileSize(), Constants.IN_JAR ? version.getZipMd5sum() : version.getMd5sum());
             HttpUtil.getInstance().sendGetRequest(Constants.IN_JAR ? version.getZipDownloadUrl() : version.getDownloadUrl(), handle, new HashMap<>());
             versionMap.put(AdminTokenThreadLocal.getUser().getSessionId(), version);
             downloadProcessHandleMap.put(AdminTokenThreadLocal.getUser().getSessionId(), handle);

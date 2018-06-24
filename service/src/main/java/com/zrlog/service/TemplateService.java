@@ -12,6 +12,7 @@ import com.zrlog.common.response.UploadTemplateResponse;
 import com.zrlog.common.vo.TemplateVO;
 import com.zrlog.model.WebSite;
 import com.zrlog.util.I18NUtil;
+import com.zrlog.util.ZrLogUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,7 +43,7 @@ public class TemplateService {
         return response;
     }
 
-    public List<TemplateVO> getAllTemplates(String contextPath) {
+    public List<TemplateVO> getAllTemplates(String contextPath, String previewTemplate) {
         File[] templatesFile = new File(PathKit.getWebRootPath() + Constants.TEMPLATE_BASE_PATH).listFiles();
         List<TemplateVO> templates = new ArrayList<>();
         if (templatesFile != null) {
@@ -61,6 +62,16 @@ public class TemplateService {
                 sortTemplates.add(templateVO);
             } else {
                 templateVO.setDeleteAble(true);
+            }
+
+            //同时存在以使用为主
+            if (templateVO.getTemplate().equals(Constants.webSite.get("template"))) {
+                templateVO.setUse(true);
+                continue;
+            }
+
+            if (templateVO.getTemplate().equals(previewTemplate)) {
+                templateVO.setPreview(true);
             }
         }
         for (TemplateVO templateVO : templates) {
@@ -84,6 +95,7 @@ public class TemplateService {
                 templateVO.setDigest(properties.getProperty("digest"));
                 templateVO.setVersion(properties.getProperty("version"));
                 templateVO.setUrl(properties.getProperty("url"));
+                templateVO.setViewType(properties.getProperty("viewType"));
                 if (properties.get("previewImages") != null) {
                     String[] images = properties.get("previewImages").toString().split(",");
                     for (int i = 0; i < images.length; i++) {
@@ -101,6 +113,7 @@ public class TemplateService {
             templateVO.setAuthor("");
             templateVO.setName(templatePath.substring(Constants.TEMPLATE_BASE_PATH.length()));
             templateVO.setUrl("");
+            templateVO.setViewType("jsp");
             templateVO.setVersion("");
         }
         if (templateVO.getPreviewImages() == null || templateVO.getPreviewImages().isEmpty()) {
@@ -109,7 +122,7 @@ public class TemplateService {
         if (StringUtils.isEmpty(templateVO.getDigest())) {
             templateVO.setDigest(I18NUtil.getStringFromRes("noIntroduction"));
         }
-        File settingFile = new File(PathKit.getWebRootPath() + templatePath + "/setting/index.jsp");
+        File settingFile = new File(PathKit.getWebRootPath() + templatePath + "/setting/index" + ZrLogUtil.getViewExt(templateVO.getViewType()));
         templateVO.setConfigAble(settingFile.exists());
         templateVO.setTemplate(templatePath);
         return templateVO;
