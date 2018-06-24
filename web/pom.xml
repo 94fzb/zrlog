@@ -73,18 +73,6 @@
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat</groupId>
-            <artifactId>tomcat-jasper</artifactId>
-            <version>${tomcat7Version}</version>
-            <scope>${tomcat-scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tomcat</groupId>
-            <artifactId>tomcat-jasper-el</artifactId>
-            <version>${tomcat7Version}</version>
-            <scope>${tomcat-scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tomcat</groupId>
             <artifactId>tomcat-jsp-api</artifactId>
             <version>${tomcat7Version}</version>
             <scope>${tomcat-scope}</scope>
@@ -126,6 +114,25 @@
                     </packagingExcludes>
                     <outputDirectory>${project.build.directory}/../../target</outputDirectory>
                 </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <recompressZippedFiles>true</recompressZippedFiles>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.zrlog.web.Application</mainClass>
+                        </manifest>
+                    </archive>
+                    <finalName>zrlog</finalName>
+                    <appendAssemblyId>false</appendAssemblyId>
+                    <outputDirectory>${project.build.directory}/../../target/</outputDirectory>
+                </configuration>
+
             </plugin>
         </plugins>
     </build>

@@ -67,13 +67,15 @@ public class I18NUtil {
             if (devMode) {
                 reloadSystemI18N();
             }
-            File[] propertiesFiles = new File(path).listFiles();
-            if (propertiesFiles != null) {
-                for (File propertiesFile : propertiesFiles) {
-                    try {
-                        loadI18N(new FileInputStream(propertiesFile), propertiesFile.getName());
-                    } catch (FileNotFoundException e) {
-                        //ignore
+            if (path != null) {
+                File[] propertiesFiles = new File(path).listFiles();
+                if (propertiesFiles != null) {
+                    for (File propertiesFile : propertiesFiles) {
+                        try {
+                            loadI18N(new FileInputStream(propertiesFile), propertiesFile.getName());
+                        } catch (FileNotFoundException e) {
+                            //ignore
+                        }
                     }
                 }
             }

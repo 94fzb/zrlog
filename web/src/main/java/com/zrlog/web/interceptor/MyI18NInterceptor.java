@@ -4,6 +4,7 @@ import com.jfinal.aop.Interceptor;
 import com.jfinal.aop.Invocation;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
+import com.zrlog.common.Constants;
 import com.zrlog.util.I18NUtil;
 
 /**
@@ -13,7 +14,11 @@ public class MyI18NInterceptor implements Interceptor {
 
     @Override
     public void intercept(Invocation inv) {
-        I18NUtil.addToRequest(PathKit.getRootClassPath(), inv.getController().getRequest(), JFinal.me().getConstants().getDevMode(), false);
+        if (Constants.IN_JAR) {
+            I18NUtil.addToRequest(null, inv.getController().getRequest(), JFinal.me().getConstants().getDevMode(), false);
+        } else {
+            I18NUtil.addToRequest(PathKit.getRootClassPath(), inv.getController().getRequest(), JFinal.me().getConstants().getDevMode(), false);
+        }
         inv.invoke();
     }
 }

@@ -18,16 +18,16 @@ import java.util.*;
 /**
  * 更新Zrlog，具体的流程看 run() 里面有详细流程。本质就是合成新war包，然后替换掉war包。
  */
-public class UpdateVersionThread extends Thread implements Serializable {
+public class WarUpdateVersionThread extends Thread implements Serializable, UpdateVersionHandler {
 
-    private static final Logger LOGGER = Logger.getLogger(UpdateVersionThread.class);
+    private static final Logger LOGGER = Logger.getLogger(WarUpdateVersionThread.class);
 
     private File file;
     private StringBuilder sb = new StringBuilder();
     private boolean finish;
     private File tempFilePath;
 
-    public UpdateVersionThread(File file) {
+    public WarUpdateVersionThread(File file) {
         this.file = file;
         tempFilePath = new File(System.getProperty("java.io.tmpdir") + File.separator + UUID.randomUUID().toString());
         tempFilePath.mkdirs();

@@ -4,6 +4,7 @@ package com.zrlog.common;
 import com.hibegin.common.util.StringUtils;
 import com.zrlog.common.type.AutoUpgradeVersionType;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,6 +36,7 @@ public class Constants {
     public static final AutoUpgradeVersionType DEFAULT_AUTO_UPGRADE_VERSION_TYPE = AutoUpgradeVersionType.ONE_DAY;
     public static String DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ssXXX";
     public static final Map<String, Object> webSite = Collections.synchronizedMap(new HashMap<String, Object>());
+    public static boolean IN_JAR = new File("webapp").exists();
 
     public static String pluginServer;
 

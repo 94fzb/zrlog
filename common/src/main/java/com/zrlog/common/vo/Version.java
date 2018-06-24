@@ -14,7 +14,27 @@ public class Version implements Serializable {
     private String changeLog;
     private String type;
     private String downloadUrl;
+
+    public String getZipDownloadUrl() {
+        return zipDownloadUrl;
+    }
+
+    public void setZipDownloadUrl(String zipDownloadUrl) {
+        this.zipDownloadUrl = zipDownloadUrl;
+    }
+
+    private String zipDownloadUrl;
     private String md5sum;
+
+    public String getZipMd5sum() {
+        return zipMd5sum;
+    }
+
+    public void setZipMd5sum(String zipMd5sum) {
+        this.zipMd5sum = zipMd5sum;
+    }
+
+    private String zipMd5sum;
 
     public String getBuildId() {
         return buildId;
@@ -79,4 +99,7 @@ public class Version implements Serializable {
     public void setMd5sum(String md5sum) {
         this.md5sum = md5sum;
     }
+
+
+
 }

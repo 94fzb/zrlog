@@ -58,7 +58,7 @@ public class PluginCoreProcess {
                             if (java.contains(" ")) {
                                 java = "java";
                             }
-                            pr = CmdUtil.getProcess(java, pluginJvmArgs, "-jar", pluginCoreFile, randomServerPort,
+                            pr = CmdUtil.getProcess(java, pluginJvmArgs, "-Duser.dir=" + pluginCoreFile.getParent(), "-jar", pluginCoreFile, randomServerPort,
                                     randomMasterPort, dbProperties, pluginCoreFile.getParent() + "/jars", randomListenPort, runtimePath, runTimeVersion);
                             PluginSocketThread pluginSocketThread = new PluginSocketThread("127.0.0.1", randomListenPort);
                             if (pr != null) {
