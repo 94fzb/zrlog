@@ -26,6 +26,8 @@ $(function () {
     $("#alias").val(article.alias);
     $("#keywordsVal").val(article.keywords);
     $("#digest").val(article.digest);
+    $("#thumbnail").val(article.thumbnail);
+    $("#thumbnail-img").css("background-image", article.thumbnail);
 
     contentChange(article.content, article.markdown);
     editorTypeSelect(article['editorType']);

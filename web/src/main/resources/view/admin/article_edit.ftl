@@ -166,12 +166,10 @@
                     <div class="col-md-3 col-xs-12 full-screen-hide">
                         <div class="text-right">
                             <div id="editorType" class="btn-group" data-toggle="buttons">
-                                <label class="btn btn-default" id="editorType_html" data-toggle-class="btn-primary"
-                                       data-toggle-passive-class="btn-default">
+                                <label class="btn btn-default" id="editorType_html" data-toggle-class="btn-primary" data-toggle-passive-class="btn-default">
                                     <input type="radio" value="html" data-parsley-multiple="editorType"> html
                                 </label>
-                                <label class="btn btn-default" id="editorType_markdown" data-toggle-class="btn-primary"
-                                       data-toggle-passive-class="btn-default">
+                                <label class="btn btn-default" id="editorType_markdown" data-toggle-class="btn-primary" data-toggle-passive-class="btn-default">
                                     <input type="radio" value="markdown" data-parsley-multiple="editorType"> markdown
                                 </label>
                             </div>
@@ -186,17 +184,12 @@
         <div class="col-md-12 col-lg-3 col-xs-12 full-screen-hide">
             <div class="row">
                 <div class="form-group col-xs-12">
-                    <#if website['article_thumbnail_status']?? && website['article_thumbnail_status'] == '0'>
+                    <#if website['article_thumbnail_status']?? && website['article_thumbnail_status'] == '1'>
                         <div class="x_panel">
-                            <div id="thumbnail-img" title="${_res['writeCover']}"
-                                 style="background-color:rgba(0,0,0,.075);<#if log?? && log.thumbnail??>background: url('${log.thumbnail}')</#if>"
-                                 class="thumbnail-img img-responsive WriteCover-wrapper WriteCover-previewWrapper">
+                            <div id="thumbnail-img" title="${_res['writeCover']}" style="background-color:rgba(0,0,0,.075);" class="thumbnail-img img-responsive WriteCover-wrapper WriteCover-previewWrapper">
                                 <i id="camera-icon" class="WriteCover-uploadIcon fa fa-camera fa-3"></i>
-                                <input type="file" id="thumbnail-upload"
-                                       name="imgFile"
-                                       value="${log.thumbnail}"
-                                       class="WriteCover-uploadInput">
-                                <input type="hidden" name="thumbnail" value="${log.thumbnail}" id="thumbnail">
+                                <input type="file" id="thumbnail-upload" name="imgFile" class="WriteCover-uploadInput">
+                                <input type="hidden" name="thumbnail" id="thumbnail">
                             </div>
                         </div>
                     </#if>
