@@ -74,6 +74,7 @@ ZrLog是使用Java开发的博客/CMS程序，具有简约，易用，组件化�
 * [SheShui.me](http://sheshui.me)
 * [Gentelella](https://github.com/puikinsh/gentelella)
 * [Jetbrains](https://www.jetbrains.com/)
+* [e-lionel](http://www.e-lionel.com)
 
 ### License
 
