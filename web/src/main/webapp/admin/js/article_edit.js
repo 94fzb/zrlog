@@ -2,6 +2,7 @@ var imageExts = ["jpg", "jpeg", "gif", "png", "ico", "bmp", "webp"];
 var editorEl = $("#editorDiv");
 var editorDivWrapper = $("#editorDivWrapper");
 var editorTheme = editorEl.attr("theme");
+var editForm = $("#article-form");
 
 $(function () {
     $('.icheck').iCheck({
@@ -13,13 +14,7 @@ $(function () {
     window.contentChange = function (content, markdown) {
         article.content = content;
         article.markdown = markdown;
-        if (content === '') {
-            editorDivWrapper.addClass("has-error");
-            editorDivWrapper.css("border-color", "#a94442");
-        } else {
-            editorDivWrapper.removeClass("has-error");
-            editorDivWrapper.css("border-color", "#ccc");
-        }
+        validator(editForm);
     };
     $("#id").val(article.logId);
     $("#title").val(article.title);
@@ -108,8 +103,8 @@ $(function () {
     var lastChangeRequestBody;
 
     function validator(el) {
-        //仅在2个输入框都不为空的情况，标记为又文本需要输入
-        if ($("#title").val() === '' && article.content === '' && $("input[name='typeId']:checked").val() === undefined) {
+        //仅在3个输入框都不为空的情况，标记为又文本需要输入
+        if (titleIsEmpty() && contentIsEmpty() && typeIsEmpty()) {
             $("#title-parent").removeClass("has-error");
             editorDivWrapper.removeClass("has-error");
             editorDivWrapper.css("border-color", "#ccc");
@@ -117,14 +112,19 @@ $(function () {
             $("#type-select-parent").css("border-color", "");
             return false;
         }
-        if ($("#title").val() === '') {
+        if (titleIsEmpty()) {
             $("#title-parent").addClass("has-error");
+        } else {
+            $("#title-parent").removeClass("has-error");
         }
-        if (article.content === '') {
+        if (contentIsEmpty()) {
             editorDivWrapper.addClass("has-error");
             editorDivWrapper.css("border-color", "#a94442");
+        } else {
+            editorDivWrapper.removeClass("has-error");
+            editorDivWrapper.css("border-color", "#ccc");
         }
-        if ($("input[name='typeId']:checked").val() === undefined) {
+        if (typeIsEmpty()) {
             $("#type-select-parent").addClass("has-error");
             $("#type-select-parent").css("border-color", "#a94442");
         } else {
@@ -134,18 +134,20 @@ $(function () {
         return el.find(".has-error").length === 0;
     }
 
+    function contentIsEmpty() {
+        return article.content === '' || article.content === undefined;
+    }
+
+    function typeIsEmpty() {
+        return $("input[name='typeId']:checked").val() === undefined;
+    }
+
+    function titleIsEmpty() {
+        return $("#title").val() === '';
+    }
+
     $("#title").on("change keyup paste click", function () {
-        if ($(this).val() !== '') {
-            $("#title-parent").removeClass("has-error");
-        } else {
-            if (article.content === '') {
-                editorDivWrapper.removeClass("has-error");
-                $("#title-parent").removeClass("has-error");
-                editorDivWrapper.css("border-color", "#ccc");
-            } else {
-                $("#title-parent").addClass("has-error");
-            }
-        }
+        validator(editForm);
     });
 
     var mobileHide = "d-none d-sm-block";
@@ -176,7 +178,7 @@ $(function () {
         var body = getArticleRequestBody();
         var tLastChangeRequestBody = JSON.stringify(body);
         var changed = tLastChangeRequestBody !== lastChangeRequestBody;
-        if (validator($("#article-form")) && (!timer || changed)) {
+        if (validator(editForm) && (!timer || changed)) {
             body['rubbish'] = rubbish;
             var url;
             if ($("#id").val() !== '') {
