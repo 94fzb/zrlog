@@ -52,7 +52,7 @@ public class RequestStatisticsPlugin implements IPlugin {
                         String key = requestInfo.getIp() + "_" + alias;
                         if (!visitArticleSet.contains(key)) {
                             Log.dao.clickAdd(alias);
-                            //若不是公网地址才记录
+                            //若是公网地址才记录
                             if (!ZrLogUtil.isInternalHostName(requestInfo.getIp())) {
                                 visitArticleSet.add(key);
                             }

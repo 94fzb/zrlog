@@ -30,6 +30,7 @@ public class CacheService {
     }
 
     private void initCache(Controller baseController) {
+        Tag.dao.refreshTag();
         BaseDataInitVO cacheInit = (BaseDataInitVO) JFinal.me().getServletContext().getAttribute(Constants.CACHE_KEY);
         if (cacheInit == null) {
             cacheInit = new BaseDataInitVO();

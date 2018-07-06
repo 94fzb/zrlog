@@ -149,7 +149,7 @@ public class Log extends Model<Log> implements Serializable {
     }
 
     public Map<String, Long> getArchives() {
-        List<Timestamp> lo = Db.query("select  releaseTime from " + TABLE_NAME + "  where rubbish=? and private=? order by logId desc", rubbish, _private);
+        List<Timestamp> lo = Db.query("select  releaseTime from " + TABLE_NAME + "  where rubbish=? and private=? order by releaseTime desc", rubbish, _private);
         Map<String, Long> archives = new LinkedHashMap<>();
         for (Timestamp objects : lo) {
             if (objects != null) {

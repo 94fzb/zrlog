@@ -57,4 +57,10 @@ public class AdminController extends BaseController {
         updateRecordResponse.setMessage(I18NUtil.getStringFromRes("permissionError"));
         return updateRecordResponse;
     }
+
+    @RefreshCache
+    //插件调用这个方法
+    public UpdateRecordResponse refreshCache() {
+        return new UpdateRecordResponse();
+    }
 }
