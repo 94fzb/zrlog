@@ -7,6 +7,18 @@ $(function () {
         }
     };
 
+    var tips = "<li id='tips' style='display: none'>" + _res['upload'] + "...</li>";
+
+    window.markdownImageUploadStart = function () {
+        $("#tips").show();
+    };
+
+    window.markdownImageUploadComplete = function (url) {
+        editor.insertValue("![](" + url + ")");
+        $("#tips").hide();
+    };
+
+
     window.markdownEditorCreate = function () {
         $.getScript(editorMdJs, function () {
             htmlEditorDestroy();
@@ -71,6 +83,7 @@ $(function () {
                         notify(e, "info");
                     });
                     $(".CodeMirror-gutters").height($(".CodeMirror-scroll").height() + 20);
+                    $(".editormd-menu").append(tips);
                 },
                 onfullscreen: function () {
                     editor.width("100%");
@@ -89,4 +102,47 @@ $(function () {
         })
     };
 
+});
+
+function uploadFile(file) {
+    var index = Math.random().toString(10).substr(2, 5) + '-' + Math.random().toString(36).substr(2);
+    var fileName = index + '.png';
+    var fileInfo = {
+        id: index,
+        name: fileName
+    };
+    markdownImageUploadStart(fileInfo);
+
+    var formData = new FormData();
+    formData.append('imgFile', file, fileName);
+    $.ajax({
+        method: 'post',
+        url: uploadUrl + "?dir=image",
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: function (data) {
+            var url = data.url;
+            markdownImageUploadComplete(url);
+        },
+        error: function (error) {
+            alert(error);
+        }
+    });
+}
+
+document.getElementById('editorDivWrapper').addEventListener('paste', function (e) {
+    if (editorType === "markdown") {
+        var clipboardData = e.clipboardData;
+        var items = clipboardData.items;
+        for (var i = 0; i < items.length; i++) {
+            if (items[i].kind === 'file' && items[i].type.match(/^image/)) {
+                // 取消默认的粘贴操作
+                e.preventDefault();
+                // 上传文件
+                uploadFile(items[i].getAsFile());
+                break;
+            }
+        }
+    }
 });

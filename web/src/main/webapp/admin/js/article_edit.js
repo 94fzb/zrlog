@@ -3,6 +3,7 @@ var editorEl = $("#editorDiv");
 var editorDivWrapper = $("#editorDivWrapper");
 var editorTheme = editorEl.attr("theme");
 var editForm = $("#article-form");
+var editorType;
 
 $(function () {
     $('.icheck').iCheck({
@@ -45,6 +46,7 @@ $(function () {
         $("#editorType .btn").removeClass("active").removeClass("btn-secondary");
         $("#editorType_" + type).addClass("active").addClass("btn-secondary");
         $("input[name='editorType']").val(type);
+        editorType = type;
     }
 
     $(".select2_single").select2({
