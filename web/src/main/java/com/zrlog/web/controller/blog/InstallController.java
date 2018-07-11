@@ -64,6 +64,7 @@ public class InstallController extends Controller {
      * 加载安装向导第一个页面数据
      */
     public String index() {
+        setAttr("isUTF", ZrLogConfig.systemProp.getProperty("file.encoding").toLowerCase().startsWith("utf"));
         return "/install/index";
     }
 }

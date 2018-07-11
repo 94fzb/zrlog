@@ -2,10 +2,14 @@
 <div id="step-container" class=" stepContainer row-fluid position-relative">
     <div class="row red" style="width: 100%">
         <div class="col-md-12 red">
+            <#if !isUTF>
+            <h3 class="red"><i class="fa fa-warning"></i> ${_res.useUTF}</h3>
+            </#if>
             <h3 class="red"><i class="fa fa-info"></i> ${_res.installPrompt}</h3>
             <ul>
                 <li><h4 class="red">${_res.installWarn1}</h4></li>
                 <li><h4 class="red">${_res.installWarn2}</h4></li>
+
             </ul>
         </div>
     </div>
@@ -72,7 +76,7 @@
                     <div class="col-xs-12 col-sm-10">
                         <div class="row-fluid wizard-actions">
                             <button data-last="Finish " class="btn btn-success btn-next">
-                                ${_res.installNextStep}&nbsp;<i class="fa fa-arrow-right"></i>
+                            ${_res.installNextStep}&nbsp;<i class="fa fa-arrow-right"></i>
                             </button>
                         </div>
                     </div>
