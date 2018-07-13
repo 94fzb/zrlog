@@ -3,10 +3,13 @@ package com.zrlog.util;
 import com.google.gson.Gson;
 import com.hibegin.common.util.BeanUtil;
 import com.hibegin.common.util.IOUtil;
+import com.hibegin.common.util.StringUtils;
 import com.hibegin.common.util.VersionComparator;
 import com.zrlog.common.Constants;
 import com.zrlog.common.response.PageableResponse;
 import com.zrlog.web.util.WebTools;
+import eu.bitwalker.useragentutils.BrowserType;
+import eu.bitwalker.useragentutils.UserAgent;
 import org.apache.log4j.Logger;
 
 import javax.servlet.ServletRequest;
@@ -26,8 +29,10 @@ import java.util.Date;
 public class ZrLogUtil {
 
     private static final Logger LOGGER = Logger.getLogger(ZrLogUtil.class);
+    private List<String> badUserAgents;
 
     private ZrLogUtil() {
+        badUserAgents = (List<String>) new Gson().fromJson(IOUtil.getStringInputStream(ZrLogUtil.class.getResourceAsStream("/config/bad-useragent.json")), List.class);
 
     }
 
@@ -256,5 +261,14 @@ public class ZrLogUtil {
         } else {
             return ".jsp";
         }
+    }
+
+    public static boolean isNormalBrowser(String userAgent) {
+        if (StringUtils.isEmpty(userAgent)) {
+            return false;
+        }
+        UserAgent ua = UserAgent.parseUserAgentString(userAgent);
+        BrowserType browserType = ua.getBrowser().getBrowserType();
+        return browserType == BrowserType.MOBILE_BROWSER || browserType == BrowserType.WEB_BROWSER;
     }
 }
