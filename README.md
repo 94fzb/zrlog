@@ -1,6 +1,8 @@
 ## ZrLog [![Build Status](https://travis-ci.org/94fzb/zrlog.svg?branch=master)](https://travis-ci.org/94fzb/zrlog) [![Apache License](http://img.shields.io/badge/license-apache2-orange.svg?style=flat)](http://www.apache.org/licenses/LICENSE-2.0) 
 
-ZrLog是使用Java开发的博客/CMS程序，具有简约，易用，组件化，内存占用低等特点。自带Markdown编辑器，让更多的精力放在写作上，而不是花费大量时间在学习程序的使用上。
+[中文](README.md) | [English](README.en-us.md)
+
+ZrLog是使用 Java 开发的博客/CMS程序，具有简约，易用，组件化，内存占用低等特点。自带 Markdown 编辑器，让更多的精力放在写作上，而不是花费大量时间在学习程序的使用上。
 
 ### 程序主页
 
@@ -45,7 +47,7 @@ ZrLog是使用Java开发的博客/CMS程序，具有简约，易用，组件化�
     * 2.访问 http://host:port/zrlog/install 
     * 3.填写数据库，管理员信息，完成安装
 
-### ChangeLog
+### 变更日志
 
 [查看完整的ChangeLog](https://www.zrlog.com/changelog?ref=md)
 
@@ -63,9 +65,9 @@ ZrLog是使用Java开发的博客/CMS程序，具有简约，易用，组件化�
 * 邮件 xchun90@163.com
 * 对程序有任何问题，欢迎反馈 [http://blog.zrlog.com/post/feedback](http://blog.zrlog.com/post/feedback)
 
-### FAQ
+### 常见问题
 
-如何你遇到了一些问题，可以先去这里找下 [FAQ](https://blog.zrlog.com/post/faq-collect)
+如何你遇到了一些问题，可以先去这里找下 [常见问题](https://blog.zrlog.com/post/faq-collect)
 
 ### 感谢
 
@@ -76,6 +78,6 @@ ZrLog是使用Java开发的博客/CMS程序，具有简约，易用，组件化�
 * [Jetbrains](https://www.jetbrains.com/)
 * [e-lionel](http://www.e-lionel.com)
 
-### License
+### 协议
 
 ZrLog is Open Source software released under the [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0.html).

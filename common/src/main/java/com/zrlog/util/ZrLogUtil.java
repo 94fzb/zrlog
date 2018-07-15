@@ -244,6 +244,10 @@ public class ZrLogUtil {
         return "true".equalsIgnoreCase(value);
     }
 
+    public static String getDbInfoByEnv() {
+        return System.getenv("DB_PROPERTIES");
+    }
+
     public static boolean isInternalHostName(String name) {
         InetAddress address;
         try {

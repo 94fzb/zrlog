@@ -1,6 +1,7 @@
 package com.zrlog.web.config;
 
 import com.hibegin.common.util.FileUtils;
+import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.StringUtils;
 import com.jfinal.config.*;
 import com.jfinal.core.JFinal;
@@ -25,10 +26,7 @@ import com.zrlog.web.interceptor.BlackListInterceptor;
 import com.zrlog.web.interceptor.InitDataInterceptor;
 import com.zrlog.web.interceptor.MyI18NInterceptor;
 import com.zrlog.web.interceptor.RouterInterceptor;
-import com.zrlog.web.plugin.CacheCleanerPlugin;
-import com.zrlog.web.plugin.RequestStatisticsPlugin;
-import com.zrlog.web.plugin.UpdateVersionPlugin;
-import com.zrlog.web.plugin.ViburDBCPPlugin;
+import com.zrlog.web.plugin.*;
 import com.zrlog.web.version.UpgradeVersionHandler;
 import org.apache.log4j.Logger;
 
@@ -64,6 +62,10 @@ public class ZrLogConfig extends JFinalConfig {
         return PathKit.getWebRootPath() + "/WEB-INF/update-sql";
     }
 
+    private String getDbProperties() {
+        return PathKit.getWebRootPath() + "/WEB-INF/db.properties";
+    }
+
     /**
      * 读取Zrlog的一些配置，主要是避免硬编码的问题
      */
@@ -91,26 +93,7 @@ public class ZrLogConfig extends JFinalConfig {
      * 通过检查WEB-INF目录下面是否有 install.lock 文件来判断是否已经安装过了，这里为静态工具方法，方便其他类调用。
      */
     public static boolean isInstalled() {
-        return new InstallService(PathKit.getWebRootPath() + "/WEB-INF").checkInstall();
-    }
-
-    /**
-     * 运行Zrlog的插件，当WEB-INF/plugins/这里目录下面不存在plugin-core.jar时，会通过网络请求下载最新的plugin核心服务，也可以通过
-     * 这种方式进行插件的及时更新。
-     * plugin-core也是一个java进程，通过调用系统命令的命令进行启动的。
-     *
-     * @param dbPropertiesPath
-     * @param pluginJvmArgs
-     */
-    private void runBlogPlugin(final String dbPropertiesPath, final String pluginJvmArgs) {
-        //这里使用独立的线程进行启动，主要是为了防止插件服务出问题后，影响整体，同时是避免启动过慢的问题。
-        new Thread(() -> {
-            //加载 zrlog 提供的插件
-            int port = PluginCoreProcess.getInstance().pluginServerStart(new File(PathKit.getWebRootPath() + "/WEB-INF/plugins/plugin-core.jar"),
-                    dbPropertiesPath, pluginJvmArgs, PathKit.getWebRootPath(), BlogBuildInfoUtil.getVersion());
-            com.zrlog.common.Constants.pluginServer = "http://localhost:" + port;
-        }).start();
-
+        return new InstallService(PathKit.getWebRootPath() + "/WEB-INF").checkInstall() || StringUtils.isNotEmpty(ZrLogUtil.getDbInfoByEnv());
     }
 
     /**
@@ -182,10 +165,12 @@ public class ZrLogConfig extends JFinalConfig {
     public void configPlugin(Plugins plugins) {
         // 如果没有安装的情况下不初始化数据
         if (isInstalled()) {
-            String dbPropertiesFile = PathKit.getWebRootPath() + "/WEB-INF/db.properties";
-            try (FileInputStream in = new FileInputStream(dbPropertiesFile)) {
+            if (StringUtils.isNotEmpty(ZrLogUtil.getDbInfoByEnv())) {
+                IOUtil.writeBytesToFile(ZrLogUtil.getDbInfoByEnv().getBytes(), new File(getDbProperties()));
+            }
+            try (FileInputStream in = new FileInputStream(getDbProperties())) {
                 dbProperties.load(in);
-                tryUpgradeDbPropertiesFile(dbPropertiesFile, dbProperties);
+                tryUpgradeDbPropertiesFile(getDbProperties(), dbProperties);
                 tryDoUpgrade(getUpgradeSqlBasePath(), dbProperties.getProperty("jdbcUrl"), dbProperties.getProperty("user"),
                         dbProperties.getProperty("password"), dbProperties.getProperty("driverClass"));
                 jdbcUrl = dbProperties.getProperty("jdbcUrl");
@@ -201,7 +186,8 @@ public class ZrLogConfig extends JFinalConfig {
                     pluginJvmArgsObj = "";
                 }
                 if (!isTest()) {
-                    runBlogPlugin(dbPropertiesFile, pluginJvmArgsObj.toString());
+                    //这里使用独立的线程进行启动，主要是为了防止插件服务出问题后，影响整体，同时是避免启动过慢的问题。
+                    new PluginCoreThread(getDbProperties(), pluginJvmArgsObj.toString()).start();
                     plugins.add(new UpdateVersionPlugin());
                     plugins.add(new CacheCleanerPlugin());
                 }
