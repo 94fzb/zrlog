@@ -14,8 +14,9 @@ public class AdminTokenThreadLocal {
     }
 
     public static void setAdminToken(AdminTokenVO user) {
-        if (userThreadLocal.get() == null)
+        if (userThreadLocal.get() == null) {
             userThreadLocal.set(user);
+        }
     }
 
     public static Integer getUserId() {

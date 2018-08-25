@@ -11,7 +11,7 @@ import com.zrlog.common.request.CreateArticleRequest;
 import com.zrlog.common.request.PageableRequest;
 import com.zrlog.common.request.UpdateArticleRequest;
 import com.zrlog.common.response.ArticleResponseEntry;
-import com.zrlog.common.response.CreateOrUpdateLogResponse;
+import com.zrlog.common.response.CreateOrUpdateArticleResponse;
 import com.zrlog.common.response.PageableResponse;
 import com.zrlog.common.response.UpdateRecordResponse;
 import com.zrlog.common.vo.AdminTokenVO;
@@ -43,20 +43,20 @@ public class ArticleService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ArticleService.class);
 
-    public CreateOrUpdateLogResponse create(Integer userId, CreateArticleRequest createArticleRequest) {
+    public CreateOrUpdateArticleResponse create(Integer userId, CreateArticleRequest createArticleRequest) {
         return save(userId, createArticleRequest);
     }
 
-    public CreateOrUpdateLogResponse update(Integer userId, UpdateArticleRequest updateArticleRequest) {
+    public CreateOrUpdateArticleResponse update(Integer userId, UpdateArticleRequest updateArticleRequest) {
         return save(userId, updateArticleRequest);
     }
 
-    private CreateOrUpdateLogResponse save(Integer userId, CreateArticleRequest createArticleRequest) {
+    private CreateOrUpdateArticleResponse save(Integer userId, CreateArticleRequest createArticleRequest) {
         Log log = getLog(userId, createArticleRequest);
         if (!createArticleRequest.isRubbish() && StringUtils.isNotEmpty(log.getStr("keywords"))) {
             Tag.dao.insertTag(log.getStr("keywords"));
         }
-        CreateOrUpdateLogResponse updateLogResponse = new CreateOrUpdateLogResponse();
+        CreateOrUpdateArticleResponse updateLogResponse = new CreateOrUpdateArticleResponse();
         updateLogResponse.setId(log.getInt("logId"));
         updateLogResponse.setAlias(log.getStr("alias"));
         updateLogResponse.setDigest(log.getStr("digest"));
@@ -92,7 +92,7 @@ public class ArticleService {
         log.set("last_update_date", new Date());
         log.set("canComment", createArticleRequest.isCanComment());
         log.set("recommended", createArticleRequest.isRecommended());
-        log.set("private", createArticleRequest.is_private());
+        log.set("privacy", createArticleRequest.isPrivacy());
         log.set("rubbish", createArticleRequest.isRubbish());
         if (StringUtils.isEmpty(createArticleRequest.getThumbnail())) {
             log.set("thumbnail", getFirstImgUrl(createArticleRequest.getContent(), userId));
@@ -105,7 +105,7 @@ public class ArticleService {
         } else {
             log.set("digest", createArticleRequest.getDigest());
         }
-        log.set("plain_content", getPlainSearchTxt((String) log.get("content")));
+        log.set("plain_content", getPlainSearchText(log.get("content")));
         log.set("editor_type", createArticleRequest.getEditorType());
         int articleId;
         String alias;
@@ -236,7 +236,7 @@ public class ArticleService {
         return IOUtil.getByteByInputStream(new FileInputStream(fileHandler.getT().getPath()));
     }
 
-    public String getPlainSearchTxt(String content) {
+    public String getPlainSearchText(String content) {
         return Jsoup.parse(content).body().text();
     }
 }

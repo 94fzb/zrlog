@@ -2,13 +2,12 @@ package com.zrlog.web.handler;
 
 import com.hibegin.common.util.FileUtils;
 import com.hibegin.common.util.IOUtil;
-import com.jfinal.core.JFinal;
 import com.jfinal.handler.Handler;
 import com.jfinal.kit.PathKit;
 import com.zrlog.common.Constants;
 import com.zrlog.service.AdminTokenThreadLocal;
 import com.zrlog.util.BlogBuildInfoUtil;
-import com.zrlog.util.I18NUtil;
+import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.config.ZrLogConfig;
 import com.zrlog.web.plugin.RequestInfo;
@@ -24,7 +23,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -37,7 +35,9 @@ public class GlobalResourceHandler extends Handler {
     private static final String PAGE_END_TAG = "<none id='SP_" + System.currentTimeMillis() + "'></none>";
     public static final String CACHE_HTML_PATH = PathKit.getWebRootPath() + "/_cache/";
 
-    //不希望部分技术人走后门，拦截一些不合法的请求
+    /**
+     * 不希望部分技术人走后门，拦截一些不合法的请求
+     */
     private static final Set<String> FORBIDDEN_URI_EXT_SET = new HashSet<>();
 
     static {
@@ -48,6 +48,7 @@ public class GlobalResourceHandler extends Handler {
         FORBIDDEN_URI_EXT_SET.add(".properties");
     }
 
+    @Override
     public void handle(String target, HttpServletRequest request, HttpServletResponse response, boolean[] isHandled) {
         long start = System.currentTimeMillis();
         String url = WebTools.getHomeUrl(request);
@@ -75,7 +76,7 @@ public class GlobalResourceHandler extends Handler {
                         target = target.substring(0, target.lastIndexOf("."));
                         if (Constants.isStaticHtmlStatus()) {
                             String path = new String(request.getServletPath().getBytes("ISO-8859-1"), "UTF-8");
-                            responseHtmlFile(target, request, response, isHandled, responseRenderPrintWriter, new File(CACHE_HTML_PATH + I18NUtil.getAcceptLanguage(request) + path));
+                            responseHtmlFile(target, request, response, isHandled, responseRenderPrintWriter, new File(CACHE_HTML_PATH + I18nUtil.getAcceptLanguage(request) + path));
                         } else {
                             this.next.handle(target, request, response, isHandled);
                         }
@@ -92,8 +93,8 @@ public class GlobalResourceHandler extends Handler {
                 }
             } else {
                 //首页静态化
-                if (target.equals("/") && Constants.isStaticHtmlStatus()) {
-                    responseHtmlFile(target, request, response, isHandled, responseRenderPrintWriter, new File(CACHE_HTML_PATH + I18NUtil.getAcceptLanguage(request) + "/index.html"));
+                if ("/".equals(target) && Constants.isStaticHtmlStatus()) {
+                    responseHtmlFile(target, request, response, isHandled, responseRenderPrintWriter, new File(CACHE_HTML_PATH + I18nUtil.getAcceptLanguage(request) + "/index.html"));
                 } else {
                     this.next.handle(target, request, response, isHandled);
                 }
@@ -102,7 +103,7 @@ public class GlobalResourceHandler extends Handler {
             LOGGER.error("", e);
         } finally {
             AdminTokenThreadLocal.remove();
-            I18NUtil.removeI18n();
+            I18nUtil.removeI18n();
             //开发环境下面打印整个请求的耗时，便于优化代码
             if (BlogBuildInfoUtil.isDev()) {
                 LOGGER.info(request.getServletPath() + " used time " + (System.currentTimeMillis() - start));
@@ -113,7 +114,7 @@ public class GlobalResourceHandler extends Handler {
                 requestInfo.setIp(WebTools.getRealIp(request));
                 requestInfo.setUrl(url);
                 requestInfo.setUserAgent(request.getHeader("User-Agent"));
-                requestInfo.setRequestTime(new Date().getTime());
+                requestInfo.setRequestTime(System.currentTimeMillis());
                 requestInfo.setRequestUri(target);
                 RequestStatisticsPlugin.record(requestInfo);
             }

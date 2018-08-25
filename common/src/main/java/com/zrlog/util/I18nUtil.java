@@ -15,10 +15,10 @@ import java.util.Properties;
 /**
  * 多语言的工具类
  */
-public class I18NUtil {
+public class I18nUtil {
 
     private static final String I18N_FILE_NAME = "_i18nFileName";
-    private static final Logger LOGGER = LoggerFactory.getLogger(I18NUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(I18nUtil.class);
     private static final Map<String, Map<String, Object>> I18N_RES_MAP = new HashMap<>();
     private static ThreadLocal<Map<String, Object>> threadLocal = new ThreadLocal<>();
 
@@ -27,8 +27,8 @@ public class I18NUtil {
     }
 
     private static void reloadSystemI18N() {
-        loadI18N(I18NUtil.class.getResourceAsStream("/i18n_en_US.properties"), "i18n_en_US.properties");
-        loadI18N(I18NUtil.class.getResourceAsStream("/i18n_zh_CN.properties"), "i18n_zh_CN.properties");
+        loadI18N(I18nUtil.class.getResourceAsStream("/i18n_en_US.properties"), "i18n_en_US.properties");
+        loadI18N(I18nUtil.class.getResourceAsStream("/i18n_zh_CN.properties"), "i18n_zh_CN.properties");
     }
 
     public static void removeI18n() {
@@ -86,7 +86,7 @@ public class I18NUtil {
             } else {
                 //try get locale info for HTTP header
                 if (request.getRequestURI().contains("/admin")) {
-                    Map<String, Object> webSite = Constants.webSite;
+                    Map<String, Object> webSite = Constants.WEB_SITE;
                     if (webSite.get("language") != null) {
                         String tmpLocale = (String) webSite.get("language");
                         locale = I18N_RES_MAP.get(Constants.I18N + "_" + tmpLocale) != null ? tmpLocale : null;
@@ -152,8 +152,8 @@ public class I18NUtil {
         if (threadLocal.get() != null) {
             locale = (String) threadLocal.get().get("_locale");
         } else {
-            if (Constants.webSite.get("language") != null) {
-                locale = (String) Constants.webSite.get("language");
+            if (Constants.WEB_SITE.get("language") != null) {
+                locale = (String) Constants.WEB_SITE.get("language");
             }
         }
         if (StringUtils.isEmpty(locale)) {

@@ -13,7 +13,7 @@ public class ArticleResponseEntry {
     private Date lastUpdateDate;
     private String typeName;
     private boolean rubbish;
-    private boolean _private;
+    private boolean privacy;
 
     public int getClick() {
         return click;
@@ -79,12 +79,12 @@ public class ArticleResponseEntry {
         this.rubbish = rubbish;
     }
 
-    public boolean is_private() {
-        return _private;
+    public boolean isPrivacy() {
+        return privacy;
     }
 
-    public void set_private(boolean _private) {
-        this._private = _private;
+    public void setPrivacy(boolean privacy) {
+        this.privacy = privacy;
     }
 
     public Date getLastUpdateDate() {

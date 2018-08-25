@@ -220,8 +220,8 @@
                             <div class="row">
                                 <div class="col-md-6" id="privateCheckbox">
                                     <label><span style="font-size: 16px">${_res['private']}</span>
-                                        <input type="checkbox" name="_private"
-                                               <#if log?? && log['private']>checked="checked"</#if>
+                                        <input type="checkbox" name="privacy"
+                                               <#if log?? && log['privacy']>checked="checked"</#if>
                                                class="js-switch"
                                                style="display: none;" data-switchery="true">
 

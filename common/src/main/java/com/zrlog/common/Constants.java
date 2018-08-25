@@ -26,16 +26,20 @@ public class Constants {
     public static final String AUTO_UPGRADE_VERSION_KEY = "autoUpgradeVersion";
     public static final int DEFAULT_ARTICLE_DIGEST_LENGTH = 200;
     public static final String ADMIN_TOKEN = "admin_token";
-    //字符长度必须要大于16个字符
+    /**
+     * 字符长度必须要大于16个字符
+     */
     public static final String AES_PUBLIC_KEY = "_BLOG_BLOG_BLOG_";
-    //1天
+    /**
+     * 1天
+     */
     private static final long DEFAULT_SESSION_TIMEOUT = 1000 * 60 * 60 * 24L;
     private static final String SESSION_TIMEOUT_KEY = "session_timeout";
     public static final String ATTACHED_FOLDER = "/attached/";
     public static String TEMPLATE_CONFIG_SUFFIX = "_setting";
     public static final AutoUpgradeVersionType DEFAULT_AUTO_UPGRADE_VERSION_TYPE = AutoUpgradeVersionType.ONE_DAY;
     public static String DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ssXXX";
-    public static final Map<String, Object> webSite = Collections.synchronizedMap(new HashMap<>());
+    public static final Map<String, Object> WEB_SITE = Collections.synchronizedMap(new HashMap<>());
     public static boolean IN_JAR = new File("webapp").exists();
     public static String FTL_VIEW_PATH = "/view";
     public static String DEFAULT_HEADER = "assets/images/default-portrait.gif";
@@ -43,11 +47,11 @@ public class Constants {
     public static String pluginServer;
 
     public static boolean isStaticHtmlStatus() {
-        return "1".equals(webSite.get("generator_html_status"));
+        return "1".equals(WEB_SITE.get("generator_html_status"));
     }
 
     public static int getMaxCacheHtmlSize() {
-        Object dbSettingSize = webSite.get("cache_html_size");
+        Object dbSettingSize = WEB_SITE.get("cache_html_size");
         if (dbSettingSize != null) {
             try {
                 return Integer.valueOf(dbSettingSize.toString());
@@ -59,7 +63,7 @@ public class Constants {
     }
 
     public static int getMaxCacheTimeout() {
-        Object dbSettingSize = webSite.get("cache_timeout_minutes");
+        Object dbSettingSize = WEB_SITE.get("cache_timeout_minutes");
         if (dbSettingSize != null) {
             try {
                 return Integer.valueOf(dbSettingSize.toString()) * 60 * 1000;
@@ -79,17 +83,17 @@ public class Constants {
     }
 
     public static String getArticleRoute() {
-        if (webSite.containsKey("article_route")) {
-            if (webSite.get("article_route") == null) {
+        if (WEB_SITE.containsKey("article_route")) {
+            if (WEB_SITE.get("article_route") == null) {
                 return "";
             }
-            return (String) webSite.get("article_route");
+            return (String) WEB_SITE.get("article_route");
         }
         return "post";
     }
 
     public static Long getSessionTimeout() {
-        String sessionTimeoutString = (String) Constants.webSite.get(Constants.SESSION_TIMEOUT_KEY);
+        String sessionTimeoutString = (String) Constants.WEB_SITE.get(Constants.SESSION_TIMEOUT_KEY);
         Long sessionTimeout;
         if (!StringUtils.isEmpty(sessionTimeoutString)) {
             //*60， Cookie过期时间单位为分钟
@@ -104,7 +108,7 @@ public class Constants {
     }
 
     public static int getAutoDigestLength() {
-        Object dbSettingSize = webSite.get("article_auto_digest_length");
+        Object dbSettingSize = WEB_SITE.get("article_auto_digest_length");
         if (dbSettingSize != null) {
             try {
                 return Integer.valueOf(dbSettingSize.toString());

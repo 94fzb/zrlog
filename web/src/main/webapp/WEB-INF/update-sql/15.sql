@@ -1,0 +1,1 @@
+alter table `log` CHANGE COLUMN `private` `privacy` bit(1) DEFAULT NULL;

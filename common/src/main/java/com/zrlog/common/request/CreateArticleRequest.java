@@ -9,7 +9,7 @@ public class CreateArticleRequest {
     private String alias;
     private String markdown;
     private boolean canComment;
-    private boolean _private;
+    private boolean privacy;
     private boolean recommended;
     private boolean rubbish;
     private String keywords;
@@ -96,12 +96,12 @@ public class CreateArticleRequest {
         this.recommended = recommended;
     }
 
-    public boolean is_private() {
-        return _private;
+    public boolean isPrivacy() {
+        return privacy;
     }
 
-    public void set_private(boolean _private) {
-        this._private = _private;
+    public void setPrivacy(boolean privacy) {
+        this.privacy = privacy;
     }
 
     public boolean isRubbish() {

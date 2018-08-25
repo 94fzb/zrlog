@@ -119,7 +119,7 @@ CREATE TABLE `log` (
   `userId` int(11) DEFAULT NULL,
   `hot` bit(1) DEFAULT NULL,
   `rubbish` bit(1) DEFAULT NULL,
-  `private` bit(1) DEFAULT NULL,
+  `privacy` bit(1) DEFAULT NULL,
   `editor_type` varchar(256) DEFAULT NULL,
   PRIMARY KEY (`logId`),
   KEY `typeId` (`typeId`),

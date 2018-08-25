@@ -7,7 +7,7 @@ import com.jfinal.kit.PathKit;
 import com.zrlog.common.Constants;
 import com.zrlog.model.Log;
 import com.zrlog.service.TemplateService;
-import com.zrlog.util.I18NUtil;
+import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.controller.BaseController;
 import com.zrlog.web.interceptor.TemplateHelper;
@@ -23,10 +23,10 @@ public class AdminArticlePageController extends BaseController {
         if (logId != null) {
             Log log = new Log().adminFindLogByLogId(logId);
             if (log != null) {
-                log.put("lastLog", Log.dao.findLastLog(logId, I18NUtil.getStringFromRes("noLastLog")));
-                log.put("nextLog", Log.dao.findNextLog(logId, I18NUtil.getStringFromRes("noNextLog")));
+                log.put("lastLog", Log.dao.findLastLog(logId, I18nUtil.getStringFromRes("noLastLog")));
+                log.put("nextLog", Log.dao.findNextLog(logId, I18nUtil.getStringFromRes("noNextLog")));
                 setAttr("log", log.getAttrs());
-                TemplateHelper.fillArticleInfo(log, TemplateHelper.setBaseUrl(getRequest(), false, Constants.webSite), "");
+                TemplateHelper.fillArticleInfo(log, TemplateHelper.setBaseUrl(getRequest(), false, Constants.WEB_SITE), "");
             }
             return getTemplatePath() + "/detail" + ZrLogUtil.getViewExt(new TemplateService().getTemplateVO(JFinal.me().getContextPath(),
                     new File(PathKit.getWebRootPath() + getTemplatePath())).getViewType());
@@ -54,8 +54,8 @@ public class AdminArticlePageController extends BaseController {
             }
         }
         if (StringUtils.isEmpty(editorType)) {
-            if (Constants.webSite.get("editor_type") != null && StringUtils.isNotEmpty(Constants.webSite.get("editor_type").toString())) {
-                editorType = Constants.webSite.get("editor_type").toString();
+            if (Constants.WEB_SITE.get("editor_type") != null && StringUtils.isNotEmpty(Constants.WEB_SITE.get("editor_type").toString())) {
+                editorType = Constants.WEB_SITE.get("editor_type").toString();
             } else {
                 editorType = "markdown";
             }

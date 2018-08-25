@@ -11,7 +11,7 @@ public class PagerUtil {
         Map<String, Object> pager = new HashMap<>();
         List<Map<String, Object>> pageList = new ArrayList<>();
         if (currentPage != 1) {
-            pageList.add(pageEntity(currentUri, currentPage, I18NUtil.getStringFromRes("prevPage"), currentPage - 1));
+            pageList.add(pageEntity(currentUri, currentPage, I18nUtil.getStringFromRes("prevPage"), currentPage - 1));
         }
         if (total > 10) {
             if (currentPage < 3 || total - 4 < currentPage) {
@@ -38,7 +38,7 @@ public class PagerUtil {
             }
         }
         if (currentPage != total) {
-            pageList.add(pageEntity(currentUri, currentPage, I18NUtil.getStringFromRes("nextPage"), currentPage + 1));
+            pageList.add(pageEntity(currentUri, currentPage, I18nUtil.getStringFromRes("nextPage"), currentPage + 1));
         }
         pager.put("pageList", pageList);
         pager.put("pageStartUrl", currentUri + 1);

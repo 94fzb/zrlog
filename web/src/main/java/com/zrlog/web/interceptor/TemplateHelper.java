@@ -8,7 +8,7 @@ import com.zrlog.common.Constants;
 import com.zrlog.common.vo.OutlineVO;
 import com.zrlog.model.*;
 import com.zrlog.service.CommentService;
-import com.zrlog.util.I18NUtil;
+import com.zrlog.util.I18nUtil;
 import com.zrlog.util.OutlineUtil;
 import com.zrlog.util.ParseUtil;
 import com.zrlog.util.ZrLogUtil;
@@ -121,8 +121,7 @@ public class TemplateHelper {
                     url = baseUrl + url;
                     logNav.put("url", url);
                 }
-                String ignoreScheme = request.getRequestURL().toString().replace("https://", "http://");
-                if (ignoreScheme.equals(url.replace("https://", "http://"))) {
+                if (ignoreScheme(request.getRequestURL().toString()).equals(ignoreScheme(url))) {
                     logNav.put("current", true);
                 } else {
                     logNav.put("current", false);
@@ -131,12 +130,21 @@ public class TemplateHelper {
         }
     }
 
+    private static String ignoreScheme(String url) {
+        if (url.startsWith("http://")) {
+            return url.substring("http:".length());
+        } else if (url.startsWith("https://")) {
+            return url.substring("https:".length());
+        }
+        return url;
+    }
+
     public static String fullTemplateInfo(Controller controller, boolean reload) {
         if (controller instanceof BaseController) {
             BaseController baseController = (BaseController) controller;
             String basePath = baseController.getTemplatePath();
             controller.getRequest().setAttribute("template", basePath);
-            I18NUtil.addToRequest(PathKit.getWebRootPath() + basePath + "/language/", controller.getRequest(), JFinal.me().getConstants().getDevMode(), reload);
+            I18nUtil.addToRequest(PathKit.getWebRootPath() + basePath + "/language/", controller.getRequest(), JFinal.me().getConstants().getDevMode(), reload);
             baseController.fullTemplateSetting();
             TemplateHelper.fullInfo(controller.getRequest(), Constants.isStaticHtmlStatus());
             return basePath;
@@ -146,7 +154,6 @@ public class TemplateHelper {
 
     public static String setBaseUrl(HttpServletRequest request, boolean staticBlog, Map webSite) {
         String templateUrl;
-        String scheme = WebTools.getRealScheme(request);
         String baseUrl = WebTools.getHomeUrl(request);
         String templatePath = request.getAttribute("template").toString();
         if (staticBlog) {
@@ -154,9 +161,9 @@ public class TemplateHelper {
             templateUrl = request.getContextPath() + templatePath;
         } else {
             if (isCdnResourceAble(webSite, templatePath)) {
-                templateUrl = scheme + "://" + webSite.get("staticResourceHost").toString() + request.getAttribute("template");
+                templateUrl = "//" + webSite.get("staticResourceHost").toString() + request.getAttribute("template");
             } else {
-                templateUrl = scheme + "://" + request.getHeader("host") + request.getContextPath() + request.getAttribute("template");
+                templateUrl = "//" + request.getHeader("host") + request.getContextPath() + request.getAttribute("template");
             }
         }
         request.setAttribute("url", templateUrl);
@@ -173,7 +180,8 @@ public class TemplateHelper {
             try (FileInputStream fileInputStream = new FileInputStream(file)) {
                 properties.load(fileInputStream);
                 if (properties.getProperty("staticResource") != null) {
-                    return webSite.get("staticResourceHost") != null && !"".equals(webSite.get("staticResourceHost"))/* && !JFinal.me().getConstants().getDevMode()*/;
+                    return webSite.get("staticResourceHost") != null && !"".equals(webSite.get("staticResourceHost"))
+                            /* && !JFinal.me().getConstants().getDevMode()*/;
                 }
             } catch (IOException e) {
                 LOGGER.error("load properties error", e);
@@ -193,7 +201,7 @@ public class TemplateHelper {
                     if (!thumbnailEnableArticle) {
                         log.put("thumbnail", null);
                     } else if (log.get("thumbnail") != null) {
-                        log.put("thumbnailAlt", ParseUtil.removeHtmlElement((String) log.get("title")));
+                        log.put("thumbnailAlt", ParseUtil.removeHtmlElement(log.get("title")));
                     }
                     log.put("url", baseUrl + Constants.getArticleUri() + log.get("alias") + suffix);
                     log.put("typeUrl", baseUrl + Constants.getArticleUri() + "sort/" + log.get("typeAlias") + suffix);
@@ -218,6 +226,7 @@ public class TemplateHelper {
     public static void fillArticleInfo(Log data, String baseUrl, String suffix) {
         data.put("alias", data.get("alias") + suffix);
         data.put("url", baseUrl + Constants.getArticleUri() + data.get("alias"));
+        data.put("noSchemeUrl", baseUrl.substring(2) + Constants.getArticleUri() + data.get("alias"));
         data.put("typeUrl", baseUrl + Constants.getArticleUri() + "sort/" + data.get("typeAlias") + suffix);
         Log lastLog = data.get("lastLog");
         Log nextLog = data.get("nextLog");

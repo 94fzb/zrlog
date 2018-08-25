@@ -6,7 +6,7 @@ import org.vibur.dbcp.ViburDBCPDataSource;
 
 import javax.sql.DataSource;
 
-public class ViburDBCPPlugin implements IPlugin, IDataSourceProvider {
+public class ViburDbcpPlugin implements IPlugin, IDataSourceProvider {
 
     private ViburDBCPDataSource ds;
 
@@ -14,7 +14,7 @@ public class ViburDBCPPlugin implements IPlugin, IDataSourceProvider {
     private String username;
     private String password;
 
-    public ViburDBCPPlugin(String jdbcUrl, String username, String password) {
+    public ViburDbcpPlugin(String jdbcUrl, String username, String password) {
         this.jdbcUrl = jdbcUrl;
         this.username = username;
         this.password = password;

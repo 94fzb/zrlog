@@ -9,7 +9,7 @@ import com.zrlog.model.Type;
 import com.zrlog.service.ArticleService;
 import com.zrlog.service.CacheService;
 import com.zrlog.service.CommentService;
-import com.zrlog.util.I18NUtil;
+import com.zrlog.util.I18nUtil;
 import com.zrlog.util.PagerUtil;
 import com.zrlog.util.ParseUtil;
 import com.zrlog.util.ZrLogUtil;
@@ -80,7 +80,7 @@ public class ArticleController extends BaseController {
         // 记录回话的Key
         setAttr("key", WebTools.htmlEncode(key));
 
-        setAttr("tipsType", I18NUtil.getStringFromRes("search"));
+        setAttr("tipsType", I18nUtil.getStringFromRes("search"));
         setAttr("tipsName", WebTools.htmlEncode(key));
 
         setPageInfo(Constants.getArticleUri() + "search/" + key + "-", data, getParaToInt(1, 1));
@@ -88,7 +88,7 @@ public class ArticleController extends BaseController {
     }
 
     public String record() {
-        setAttr("tipsType", I18NUtil.getStringFromRes("archive"));
+        setAttr("tipsType", I18nUtil.getStringFromRes("archive"));
         setAttr("tipsName", getPara(0));
 
         setPageInfo(Constants.getArticleUri() + "record/" + getPara(0) + "-", Log.dao.findByDate(getParaToInt(1, 1), getDefaultRows(), getPara(0)), getParaToInt(1, 1));
@@ -120,8 +120,8 @@ public class ArticleController extends BaseController {
         Log log = Log.dao.findByIdOrAlias(id);
         if (log != null) {
             Integer logId = log.get("logId");
-            log.put("lastLog", Log.dao.findLastLog(logId, I18NUtil.getStringFromRes("noLastLog")));
-            log.put("nextLog", Log.dao.findNextLog(logId, I18NUtil.getStringFromRes("noNextLog")));
+            log.put("lastLog", Log.dao.findLastLog(logId, I18nUtil.getStringFromRes("noLastLog")));
+            log.put("nextLog", Log.dao.findNextLog(logId, I18nUtil.getStringFromRes("noNextLog")));
             log.put("comments", Comment.dao.findAllByLogId(logId));
             setAttr("log", log);
         }
@@ -134,7 +134,7 @@ public class ArticleController extends BaseController {
 
         Type type = Type.dao.findByAlias(typeStr);
         setAttr("type", type);
-        setAttr("tipsType", I18NUtil.getStringFromRes("category"));
+        setAttr("tipsType", I18nUtil.getStringFromRes("category"));
         if (type != null) {
             setAttr("tipsName", type.getStr("typeName"));
         }
@@ -146,7 +146,7 @@ public class ArticleController extends BaseController {
             String tag = convertRequestParam(getPara(0));
             setPageInfo(Constants.getArticleUri() + "tag/" + getPara(0) + "-", Log.dao.findByTag(getParaToInt(1, 1), getDefaultRows(), tag), getParaToInt(1, 1));
 
-            setAttr("tipsType", I18NUtil.getStringFromRes("tag"));
+            setAttr("tipsType", I18nUtil.getStringFromRes("tag"));
             setAttr("tipsName", tag);
         }
         return "page";

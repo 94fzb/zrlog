@@ -1,6 +1,6 @@
 package com.zrlog.common.response;
 
-public class CreateOrUpdateLogResponse extends StandardResponse {
+public class CreateOrUpdateArticleResponse extends StandardResponse {
 
     private int id;
     private String alias;

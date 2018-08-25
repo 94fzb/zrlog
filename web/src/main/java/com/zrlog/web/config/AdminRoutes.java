@@ -13,6 +13,7 @@ import com.zrlog.web.controller.admin.page.AdminTemplatePageController;
  * 2. 浏览数据，变更数据。使用 /api/admin 的路由，以JSON的格式进行响应，及异步操作
  */
 class AdminRoutes extends Routes {
+    @Override
     public void config() {
         add("/admin", AdminPageController.class);
         add("/admin/template", AdminTemplatePageController.class);

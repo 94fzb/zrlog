@@ -5,7 +5,7 @@ import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
 import com.zrlog.common.type.TestConnectDbResult;
 import com.zrlog.service.InstallService;
-import com.zrlog.util.I18NUtil;
+import com.zrlog.util.I18nUtil;
 import com.zrlog.web.config.ZrLogConfig;
 
 import java.util.HashMap;
@@ -30,7 +30,7 @@ public class InstallController extends Controller {
         dbConn.put("driverClass", "com.mysql.cj.jdbc.Driver");
         TestConnectDbResult testConnectDbResult = new InstallService(PathKit.getWebRootPath() + "/WEB-INF", dbConn).testDbConn();
         if (testConnectDbResult.getError() != 0) {
-            setAttr("errorMsg", "[Error-" + testConnectDbResult.getError() + "] - " + I18NUtil.getStringFromRes("connectDbError_" + testConnectDbResult.getError()));
+            setAttr("errorMsg", "[Error-" + testConnectDbResult.getError() + "] - " + I18nUtil.getStringFromRes("connectDbError_" + testConnectDbResult.getError()));
             return index();
         } else {
             JFinal.me().getServletContext().setAttribute("dbConn", dbConn);
@@ -55,7 +55,7 @@ public class InstallController extends Controller {
             config.installFinish();
             return "/install/success";
         } else {
-            setAttr("errorMsg", "[Error-" + TestConnectDbResult.UNKNOWN.getError() + "] - " + I18NUtil.getStringFromRes("connectDbError_" + TestConnectDbResult.UNKNOWN.getError()));
+            setAttr("errorMsg", "[Error-" + TestConnectDbResult.UNKNOWN.getError() + "] - " + I18nUtil.getStringFromRes("connectDbError_" + TestConnectDbResult.UNKNOWN.getError()));
             return "/install/message";
         }
     }

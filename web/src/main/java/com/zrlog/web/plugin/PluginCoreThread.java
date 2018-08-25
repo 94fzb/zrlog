@@ -28,6 +28,6 @@ public class PluginCoreThread extends Thread {
         //加载 zrlog 提供的插件
         int port = PluginCoreProcess.getInstance().pluginServerStart(new File(PathKit.getWebRootPath() + "/WEB-INF/plugins/plugin-core.jar"),
                 dbPropertiesPath, pluginJvmArgs, PathKit.getWebRootPath(), BlogBuildInfoUtil.getVersion());
-        com.zrlog.common.Constants.pluginServer = "http://localhost:" + port;
+        com.zrlog.common.Constants.pluginServer = "http://127.0.0.1:" + port;
     }
 }

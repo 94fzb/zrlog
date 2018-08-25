@@ -8,7 +8,7 @@ import com.zrlog.common.response.LoginResponse;
 import com.zrlog.common.response.UpdateRecordResponse;
 import com.zrlog.service.AdminTokenThreadLocal;
 import com.zrlog.service.UserService;
-import com.zrlog.util.I18NUtil;
+import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.annotation.RefreshCache;
 import com.zrlog.web.controller.BaseController;
@@ -34,7 +34,7 @@ public class AdminController extends BaseController {
                 } else {
                     updateAdminRequest.setUserId(AdminTokenThreadLocal.getUserId());
                     getRequest().setAttribute("user", userService.update(updateAdminRequest));
-                    updateRecordResponse.setMessage(I18NUtil.getStringFromRes("updatePersonInfoSuccess"));
+                    updateRecordResponse.setMessage(I18nUtil.getStringFromRes("updatePersonInfoSuccess"));
                 }
             }
         } else {
@@ -54,12 +54,14 @@ public class AdminController extends BaseController {
     private UpdateRecordResponse errorUpdateRecordResponse() {
         UpdateRecordResponse updateRecordResponse = new UpdateRecordResponse();
         updateRecordResponse.setError(1);
-        updateRecordResponse.setMessage(I18NUtil.getStringFromRes("permissionError"));
+        updateRecordResponse.setMessage(I18nUtil.getStringFromRes("permissionError"));
         return updateRecordResponse;
     }
 
+    /**
+     * 插件调用这个方法
+     */
     @RefreshCache
-    //插件调用这个方法
     public UpdateRecordResponse refreshCache() {
         return new UpdateRecordResponse();
     }

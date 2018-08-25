@@ -88,7 +88,10 @@ $(function () {
     function tips(data) {
         if (data.error === 0) {
             $("#id").val(data.id);
-            $("#alias").val(data.alias);
+            var aliasEl = $("#alias");
+            if (aliasEl.val() === "") {
+                aliasEl.val(data.alias);
+            }
             $("#digest").val(data.digest);
             if (data.thumbnail !== null) {
                 fillThumbnail(data.thumbnail);
@@ -190,6 +193,7 @@ $(function () {
             }
             saving = true;
             if (!skipFirstRubbishSave) {
+                exitTips();
                 $.ajax({
                         url: url,
                         data: JSON.stringify(body),
@@ -201,6 +205,7 @@ $(function () {
                             var date = new Date();
                             if (!data.error) {
                                 data.message = (timer ? lang.auto : "") + (rubbish ? lang.rubbish : "") + (currentLang === 'en' ? " " : "") + (isPrivateCheckBoxEl.is(":checked") || timer || rubbish ? lang.saveSuccess : lang.releaseSuccess) + " " + zeroPad(date.getHours(), 2) + ":" + zeroPad(date.getMinutes(), 2) + ":" + zeroPad(date.getSeconds(), 2);
+                                exitNotTips();
                             }
                             preTips(data);
                             lastChangeRequestBody = JSON.stringify(getArticleRequestBody());
@@ -353,4 +358,17 @@ function gup(name, url) {
     var regex = new RegExp(regexS);
     var results = regex.exec(url);
     return results === null ? null : results[1];
+}
+
+
+function confirmExit() {
+    return "You have attempted to leave this page. Are you sure?";
+}
+
+function exitTips() {
+    window.onbeforeunload = confirmExit;
+}
+
+function exitNotTips() {
+    window.onbeforeunload = null;
 }

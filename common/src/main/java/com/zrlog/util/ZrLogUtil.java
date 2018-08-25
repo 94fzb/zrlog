@@ -7,7 +7,6 @@ import com.hibegin.common.util.StringUtils;
 import com.hibegin.common.util.VersionComparator;
 import com.zrlog.common.Constants;
 import com.zrlog.common.response.PageableResponse;
-import com.zrlog.web.util.WebTools;
 import eu.bitwalker.useragentutils.BrowserType;
 import eu.bitwalker.useragentutils.UserAgent;
 import org.apache.log4j.Logger;
@@ -89,7 +88,7 @@ public class ZrLogUtil {
     }
 
     public static String getFullUrl(HttpServletRequest request) {
-        return WebTools.getRealScheme(request) + "://" + request.getHeader("Host") + request.getRequestURI();
+        return "//" + request.getHeader("Host") + request.getRequestURI();
     }
 
     public static String getDatabaseServerVersion(String jdbcUrl, String userName, String password, String deriveClass) {
@@ -260,7 +259,7 @@ public class ZrLogUtil {
     }
 
     public static String getViewExt(String type) {
-        if (type != null && type.equals("freemarker")) {
+        if ("freemarker".equals(type)) {
             return ".ftl";
         } else {
             return ".jsp";

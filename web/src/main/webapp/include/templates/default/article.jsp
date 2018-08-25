@@ -19,7 +19,7 @@
         ${log.content }
     </div>
     <p style="color:#D4D4D4;padding-top: 20px;padding-bottom: 6px;">${_res.reprint}
-        <a title="${log.title }" href="${log.url}"><SPAN style="color: rgb(51, 102, 255);" span="">${log.url}</SPAN></a>
+        <a title="${log.title }" href="${log.url}"><SPAN style="color: rgb(51, 102, 255);" span="">${log.noSchemeUrl}</SPAN></a>
     </p>
     <div class="pager-nav">
         <a title="${log.nextLog.title}" href="${log.nextLog.url}"><p

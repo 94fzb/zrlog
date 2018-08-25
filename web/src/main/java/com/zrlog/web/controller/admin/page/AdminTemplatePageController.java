@@ -10,7 +10,7 @@ import com.zrlog.common.Constants;
 import com.zrlog.common.vo.TemplateVO;
 import com.zrlog.model.WebSite;
 import com.zrlog.service.TemplateService;
-import com.zrlog.util.I18NUtil;
+import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.controller.BaseController;
 import com.zrlog.web.interceptor.TemplateHelper;
@@ -43,7 +43,7 @@ public class AdminTemplatePageController extends BaseController {
         setAttr("template", templateName);
         TemplateVO templateVO = templateService.getTemplateVO(JFinal.me().getContextPath(), new File(PathKit.getWebRootPath() + templateName));
         setAttr("templateInfo", templateVO);
-        I18NUtil.addToRequest(PathKit.getWebRootPath() + templateName + "/language/", getRequest(), JFinal.me().getConstants().getDevMode(), true);
+        I18nUtil.addToRequest(PathKit.getWebRootPath() + templateName + "/language/", getRequest(), JFinal.me().getConstants().getDevMode(), true);
         String jsonStr = new WebSite().getStringValueByName(templateName + Constants.TEMPLATE_CONFIG_SUFFIX);
         fullTemplateSetting(jsonStr);
         return templateName + "/setting/index" + ZrLogUtil.getViewExt(templateVO.getViewType());
@@ -57,7 +57,7 @@ public class AdminTemplatePageController extends BaseController {
             getResponse().addCookie(cookie);
             redirect(WebTools.getHomeUrl(getRequest()));
         } else {
-            setAttr("message", I18NUtil.getStringFromRes("templatePathNotNull"));
+            setAttr("message", I18nUtil.getStringFromRes("templatePathNotNull"));
         }
     }
 
@@ -73,14 +73,14 @@ public class AdminTemplatePageController extends BaseController {
                 String target = fileHandle.getT().getParent() + "/" + fileName;
                 FileUtils.moveOrCopyFile(fileHandle.getT().toString(), target, true);
                 ZipUtil.unZip(target, path.toString() + "/");
-                setAttr("message", I18NUtil.getStringFromRes("templateDownloadSuccess"));
+                setAttr("message", I18nUtil.getStringFromRes("templateDownloadSuccess"));
                 setAttr("backUrl", "admin/index#template");
             } else {
-                setAttr("message", I18NUtil.getStringFromRes("templateExists"));
+                setAttr("message", I18nUtil.getStringFromRes("templateExists"));
             }
         } catch (Exception e) {
             LOGGER.error("download error ", e);
-            setAttr("message", I18NUtil.getStringFromRes("someError"));
+            setAttr("message", I18nUtil.getStringFromRes("someError"));
         }
     }
 }

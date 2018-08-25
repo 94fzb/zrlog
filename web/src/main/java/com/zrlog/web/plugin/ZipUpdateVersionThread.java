@@ -123,10 +123,12 @@ public class ZipUpdateVersionThread extends Thread implements Serializable, Upda
      *
      * @return
      */
+    @Override
     public String getMessage() {
         return sb.toString();
     }
 
+    @Override
     public boolean isFinish() {
         return finish;
     }

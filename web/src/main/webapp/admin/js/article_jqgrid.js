@@ -26,7 +26,7 @@ jQuery(function ($) {
             {name: 'typeName', index: 'typeName', width: 90},
             {name: 'click', index: 'click', width: 50, editable: false},
             {name: 'rubbish', index: 'rubbish', width: 50, editable: false, formatter: renderRubbish},
-            {name: '_private', index: '_private', width: 50, editable: false, formatter: renderPrivate},
+            {name: 'privacy', index: 'privacy', width: 50, editable: false, formatter: renderPrivate},
             {name: 'releaseTime', index: 'releaseTime', width: 90},
             {name: 'lastUpdateDate', index: 'lastUpdateDate', width: 90},
             {name: 'id', width: 50, index: 'id', sortable: false, formatter: editFormat},
@@ -60,7 +60,7 @@ jQuery(function ($) {
     }
 
     function renderPrivate(cellvalue, options, rowObject) {
-        if (rowObject['_private']) {
+        if (rowObject['privacy']) {
             return lang.yes;
         }
         return lang.no;

@@ -8,7 +8,7 @@ import com.zrlog.common.request.UpdateAdminRequest;
 import com.zrlog.common.response.LoginResponse;
 import com.zrlog.common.response.UpdateRecordResponse;
 import com.zrlog.model.User;
-import com.zrlog.util.I18NUtil;
+import com.zrlog.util.I18nUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,14 +28,14 @@ public class UserService {
             // compare oldPassword
             if (SecurityUtils.md5(oldPassword).equals(dbPassword)) {
                 User.dao.updatePassword(AdminTokenThreadLocal.getUserId(), SecurityUtils.md5(changePasswordRequest.getNewPassword()));
-                updateRecordResponse.setMessage(I18NUtil.getStringFromRes("changePasswordSuccess"));
+                updateRecordResponse.setMessage(I18nUtil.getStringFromRes("changePasswordSuccess"));
             } else {
                 updateRecordResponse.setError(1);
-                updateRecordResponse.setMessage(I18NUtil.getStringFromRes("oldPasswordError"));
+                updateRecordResponse.setMessage(I18nUtil.getStringFromRes("oldPasswordError"));
             }
         } else {
             updateRecordResponse.setError(1);
-            updateRecordResponse.setMessage(I18NUtil.getStringFromRes("argsError"));
+            updateRecordResponse.setMessage(I18nUtil.getStringFromRes("argsError"));
         }
         return updateRecordResponse;
     }
@@ -49,11 +49,11 @@ public class UserService {
                 adminTokenService.setAdminToken(User.dao.getIdByUserName(loginRequest.getUserName().toLowerCase()), sessionAtomicInteger.incrementAndGet(), request, response);
             } else {
                 loginResponse.setError(1);
-                loginResponse.setMessage(I18NUtil.getStringFromRes("userNameOrPasswordError"));
+                loginResponse.setMessage(I18nUtil.getStringFromRes("userNameOrPasswordError"));
             }
         } else {
             loginResponse.setError(1);
-            loginResponse.setMessage(I18NUtil.getStringFromRes("userNameAndPasswordRequired"));
+            loginResponse.setMessage(I18nUtil.getStringFromRes("userNameAndPasswordRequired"));
         }
         return loginResponse;
     }

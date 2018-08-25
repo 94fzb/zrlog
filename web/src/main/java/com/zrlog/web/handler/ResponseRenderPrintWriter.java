@@ -63,7 +63,8 @@ class ResponseRenderPrintWriter extends PrintWriter {
 
     @Override
     public void write(int c) {
-        builder.append((char) c); // It is actually a char, not an int.
+        // It is actually a char, not an int.
+        builder.append((char) c);
         tryFlush();
     }
 

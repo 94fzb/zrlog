@@ -70,7 +70,7 @@ public class Tag extends Model<Tag> {
     public void refreshTag() {
         Db.update("delete from " + TABLE_NAME + "");
         Map<String, Integer> countMap = new HashMap<>();
-        List<Log> logs = Log.dao.find("select keywords from " + Log.TABLE_NAME + " where rubbish=? and private=? ", false, false);
+        List<Log> logs = Log.dao.find("select keywords from " + Log.TABLE_NAME + " where rubbish=? and privacy=? ", false, false);
         for (Log log : logs) {
             if (StringUtils.isNotEmpty(log.getStr("keywords")) && log.getStr("keywords").trim().length() > 0) {
                 Set<String> tagSet = strToSet(log.getStr("keywords") + ",");

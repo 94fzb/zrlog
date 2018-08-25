@@ -152,7 +152,7 @@ public class PluginHandler extends Handler {
         CloseResponseHandle handle = new CloseResponseHandle();
         HttpUtil httpUtil = disableRedirect ? HttpUtil.getDisableRedirectInstance() : HttpUtil.getInstance();
         //GET请求不关心request.getInputStream() 的数据
-        if (method.equals(request.getMethod()) && method.equalsIgnoreCase("GET")) {
+        if (method.equals(request.getMethod()) && "GET".equalsIgnoreCase(method)) {
             httpResponse = httpUtil.sendGetRequest(pluginServerHttp + uri, request.getParameterMap(), handle, PluginHelper.genHeaderMapByRequest(request)).getT();
         } else {
             //如果是表单数据提交不关心请求头，反之将所有请求头都发到插件服务

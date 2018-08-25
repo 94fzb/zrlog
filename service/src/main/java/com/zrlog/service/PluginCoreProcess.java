@@ -14,7 +14,9 @@ public class PluginCoreProcess {
 
     private static final Logger LOGGER = Logger.getLogger(PluginCoreProcess.class);
 
-    //插件服务的下载地址
+    /**
+     * 插件服务的下载地址
+     */
     private static final String PLUGIN_CORE_DOWNLOAD_URL = Constants.ZRLOG_RESOURCE_DOWNLOAD_URL + "/plugin/core/plugin-core.jar";
 
     private Process pr;
@@ -69,7 +71,7 @@ public class PluginCoreProcess {
                                 //待插件启动
                                 Thread.sleep(2000);
                             } catch (InterruptedException e) {
-                                //e.printStackTrace();
+                                //ignore
                             }
                             pluginSocketThread.start();
                             while (!pluginSocketThread.isStop()) {

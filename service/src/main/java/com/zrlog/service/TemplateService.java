@@ -11,7 +11,7 @@ import com.zrlog.common.response.UpdateRecordResponse;
 import com.zrlog.common.response.UploadTemplateResponse;
 import com.zrlog.common.vo.TemplateVO;
 import com.zrlog.model.WebSite;
-import com.zrlog.util.I18NUtil;
+import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ZrLogUtil;
 
 import java.io.File;
@@ -25,7 +25,7 @@ public class TemplateService {
     public UpdateRecordResponse save(String template, Map<String, Object> settingMap) {
         new WebSite().updateByKV(template + Constants.TEMPLATE_CONFIG_SUFFIX, new Gson().toJson(settingMap));
         UpdateRecordResponse updateRecordResponse = new UpdateRecordResponse();
-        updateRecordResponse.setMessage(I18NUtil.getStringFromRes("templateUpdateSuccess"));
+        updateRecordResponse.setMessage(I18nUtil.getStringFromRes("templateUpdateSuccess"));
         return updateRecordResponse;
     }
 
@@ -36,7 +36,7 @@ public class TemplateService {
         //start extract template file
         FileUtils.moveOrCopyFile(file.toString(), finalFile, true);
         UploadTemplateResponse response = new UploadTemplateResponse();
-        response.setMessage(I18NUtil.getStringFromRes("templateUploadSuccess"));
+        response.setMessage(I18nUtil.getStringFromRes("templateUploadSuccess"));
         String extractFolder = finalPath + templateName.replace(".zip", "") + "/";
         FileUtils.deleteFile(extractFolder);
         ZipUtil.unZip(finalFile, extractFolder);
@@ -65,7 +65,7 @@ public class TemplateService {
             }
 
             //同时存在以使用为主
-            if (templateVO.getTemplate().equals(Constants.webSite.get("template"))) {
+            if (templateVO.getTemplate().equals(Constants.WEB_SITE.get("template"))) {
                 templateVO.setUse(true);
                 continue;
             }
@@ -120,7 +120,7 @@ public class TemplateService {
             templateVO.setPreviewImages(Collections.singletonList("assets/images/template-default-preview.jpg"));
         }
         if (StringUtils.isEmpty(templateVO.getDigest())) {
-            templateVO.setDigest(I18NUtil.getStringFromRes("noIntroduction"));
+            templateVO.setDigest(I18nUtil.getStringFromRes("noIntroduction"));
         }
         File settingFile = new File(PathKit.getWebRootPath() + templatePath + "/setting/index" + ZrLogUtil.getViewExt(templateVO.getViewType()));
         templateVO.setConfigAble(settingFile.exists());

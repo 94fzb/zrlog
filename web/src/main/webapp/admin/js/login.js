@@ -67,8 +67,6 @@ MD5 = function (e) {
 $(function () {
     $("#userName").focus();
 
-    $("#redirectFrom").val(getParameterByName("redirectFrom"));
-
     function login() {
         var url = $("#login_form").attr("action");
         var loginFromArr = $('#login_form').serializeArray();
@@ -96,7 +94,6 @@ $(function () {
                     var queryStr = "";
                     var reFrom = $("#redirectFrom").val();
                     if (reFrom.length !== 0) {
-                        redirectTo = reFrom.substr((baseUrl + "admin/").length);
                         if (reFrom.indexOf("?") > 0) {
                             queryStr = reFrom.substr(reFrom.indexOf("?"))
                         }
@@ -112,10 +109,14 @@ $(function () {
                         redirectTo = window.location.hash;
                     }
                     redirectTo = baseUrl + "admin/index" + queryStr + redirectTo;
-                    //console.info(redirectTo);
-                    window.location.replace(redirectTo);
-                    if ($("#right_col").length > 0) {
-                        reloadPage();
+                    console.info(window.location.protocol + ":" + redirectTo);
+                    if (window.location.protocol + redirectTo === window.location.href) {
+                        window.location.reload();
+                    } else {
+                        window.location.replace(redirectTo);
+                        if ($("#right_col").length > 0) {
+                            reloadPage();
+                        }
                     }
 
                 } else {

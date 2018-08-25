@@ -34,8 +34,6 @@ public class Application {
         } else {
             additionWebInfClasses = new File("target/classes");
         }
-        //resources.addPreResources(new DirResourceSet(resources, "/WEB-INF/classes",additionWebInfClasses.getAbsolutePath(), "/"));
-        //ctx.setResources(resources);
 
         tomcat.setBaseDir(additionWebInfClasses.toString());
         //idea的路径eclipse启动的路径有区别

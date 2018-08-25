@@ -27,7 +27,7 @@ public class BaseController extends Controller {
      * @return
      */
     public String getTemplatePath() {
-        String templatePath = Constants.webSite.get("template").toString();
+        String templatePath = Constants.WEB_SITE.get("template").toString();
         templatePath = templatePath == null ? Constants.DEFAULT_TEMPLATE_PATH : templatePath;
         String previewTheme = TemplateHelper.getTemplatePathByCookie(getRequest().getCookies());
         if (previewTheme != null) {
@@ -40,7 +40,7 @@ public class BaseController extends Controller {
     }
 
     public Integer getDefaultRows() {
-        return Integer.valueOf(Constants.webSite.get("rows").toString());
+        return Integer.valueOf(Constants.WEB_SITE.get("rows").toString());
     }
 
     public boolean isNotNullOrNotEmptyStr(Object... args) {
@@ -77,7 +77,7 @@ public class BaseController extends Controller {
     }
 
     public void fullTemplateSetting() {
-        Object jsonStr = Constants.webSite.get(getTemplatePath() + Constants.TEMPLATE_CONFIG_SUFFIX);
+        Object jsonStr = Constants.WEB_SITE.get(getTemplatePath() + Constants.TEMPLATE_CONFIG_SUFFIX);
         fullTemplateSetting(jsonStr);
     }
 

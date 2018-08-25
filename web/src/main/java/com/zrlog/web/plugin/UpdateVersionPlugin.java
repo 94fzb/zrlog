@@ -7,12 +7,13 @@ import com.zrlog.common.type.AutoUpgradeVersionType;
 import com.zrlog.common.vo.Version;
 import com.zrlog.model.WebSite;
 import com.zrlog.util.BlogBuildInfoUtil;
-import com.zrlog.util.I18NUtil;
+import com.zrlog.util.I18nUtil;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.Timer;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 基于JFinal插件的实现，使用定时器，定时检查是否有新的版本发布。
@@ -21,8 +22,17 @@ public class UpdateVersionPlugin implements IPlugin {
 
     private static final Logger LOGGER = Logger.getLogger(UpdateVersionPlugin.class);
 
-    private Timer timer;
+    private ScheduledExecutorService scheduledExecutorService;
+
     private UpdateVersionTimerTask updateVersionTimerTask;
+
+    private void initExecutorService() {
+        scheduledExecutorService = new ScheduledThreadPoolExecutor(1, r -> {
+            Thread thread = new Thread(r);
+            thread.setName("update-version-plugin-thread");
+            return thread;
+        });
+    }
 
     @Override
     public boolean start() {
@@ -30,14 +40,14 @@ public class UpdateVersionPlugin implements IPlugin {
         boolean checkPreview = previewAble();
         if (value != null && !"".equals(value)) {
             AutoUpgradeVersionType autoUpgradeVersionType = AutoUpgradeVersionType.cycle(Integer.parseInt(value));
-            if (timer != null) {
-                timer.cancel();
+            if (scheduledExecutorService != null) {
+                scheduledExecutorService.shutdown();
             }
             //开启了定时检查，定时器开始工作
             if (autoUpgradeVersionType != AutoUpgradeVersionType.NEVER) {
-                timer = new Timer();
+                initExecutorService();
                 updateVersionTimerTask = new UpdateVersionTimerTask(checkPreview);
-                timer.schedule(updateVersionTimerTask, new Date(), autoUpgradeVersionType.getCycle() * 1000);
+                scheduledExecutorService.schedule(updateVersionTimerTask, autoUpgradeVersionType.getCycle(), TimeUnit.SECONDS);
             }
             LOGGER.info("UpdateVersionPlugin start autoUpgradeVersionType " + autoUpgradeVersionType);
         }
@@ -46,8 +56,8 @@ public class UpdateVersionPlugin implements IPlugin {
 
     @Override
     public boolean stop() {
-        if (timer != null) {
-            timer.cancel();
+        if (scheduledExecutorService != null) {
+            scheduledExecutorService.shutdown();
         }
         return true;
     }
@@ -82,7 +92,7 @@ public class UpdateVersionPlugin implements IPlugin {
         try {
             return HttpUtil.getInstance().getSuccessTextByUrl("http://www.zrlog.com/changelog/" +
                     version + "-" + buildId + ".html?lang=" +
-                    I18NUtil.getCurrentLocale() + "&v=" + BlogBuildInfoUtil.getBuildId());
+                    I18nUtil.getCurrentLocale() + "&v=" + BlogBuildInfoUtil.getBuildId());
         } catch (IOException e) {
             LOGGER.error("", e);
         }

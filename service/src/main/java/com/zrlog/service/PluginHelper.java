@@ -3,9 +3,8 @@ package com.zrlog.service;
 import com.jfinal.core.JFinal;
 import com.zrlog.common.vo.AdminTokenVO;
 import com.zrlog.model.User;
-import com.zrlog.util.I18NUtil;
+import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ZrLogUtil;
-import com.zrlog.web.util.WebTools;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
@@ -22,7 +21,7 @@ public class PluginHelper {
             map.put("LoginUserId", adminTokenVO.getUserId() + "");
         }
         map.put("IsLogin", (adminTokenVO != null) + "");
-        map.put("Current-Locale", I18NUtil.getCurrentLocale());
+        map.put("Current-Locale", I18nUtil.getCurrentLocale());
         map.put("Blog-Version", ((Map) JFinal.me().getServletContext().getAttribute("zrlog")).get("version").toString());
         if (request != null) {
             String fullUrl = ZrLogUtil.getFullUrl(request);
@@ -30,7 +29,7 @@ public class PluginHelper {
                 fullUrl = fullUrl + "?" + request.getQueryString();
             }
             map.put("Cookie", request.getHeader("Cookie"));
-            map.put("AccessUrl", WebTools.getRealScheme(request) + "://" + request.getHeader("Host") + request.getContextPath());
+            map.put("AccessUrl", "http://127.0.0.1:" + request.getServerPort() + request.getContextPath());
             if (request.getHeader("Content-Type") != null) {
                 map.put("Content-Type", request.getHeader("Content-Type"));
             }

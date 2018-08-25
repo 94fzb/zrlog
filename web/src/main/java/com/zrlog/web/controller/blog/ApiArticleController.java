@@ -10,6 +10,7 @@ public class ApiArticleController extends ArticleController {
         return super.detail(getPara("id"));
     }
 
+    @Override
     public void addComment() {
         renderJson(super.saveComment());
     }

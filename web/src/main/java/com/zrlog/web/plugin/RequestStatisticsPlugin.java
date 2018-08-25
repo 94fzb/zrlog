@@ -10,12 +10,30 @@ import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.config.ZrLogConfig;
 
 import java.util.*;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class RequestStatisticsPlugin implements IPlugin {
 
-    private Timer clickTimer = new Timer();
-    private Timer saveTimer = new Timer();
+    private ScheduledExecutorService clickSchedule = new ScheduledThreadPoolExecutor(1, new ThreadFactory() {
+        @Override
+        public Thread newThread(Runnable r) {
+            Thread thread = new Thread(r);
+            thread.setName("request-statistics-click-thread");
+            return thread;
+        }
+    });
+    private ScheduledExecutorService saveSchedule = new ScheduledThreadPoolExecutor(1, new ThreadFactory() {
+        @Override
+        public Thread newThread(Runnable r) {
+            Thread thread = new Thread(r);
+            thread.setName("request-statistics-save-thread");
+            return thread;
+        }
+    });
     private static final String DB_KEY = "request_statistics";
     private static final String ARTICLE_DB_KEY = "article_request_statistics";
 
@@ -37,13 +55,13 @@ public class RequestStatisticsPlugin implements IPlugin {
             visitArticleSet = Collections.synchronizedSet(new HashSet<>(new Gson().fromJson(articleValue, new TypeToken<Collection<String>>() {
             }.getType())));
         }
-        saveTimer.schedule(new TimerTask() {
+        saveSchedule.schedule(new TimerTask() {
             @Override
             public void run() {
                 save();
             }
-        }, 0, 10000);
-        clickTimer.schedule(new TimerTask() {
+        }, 10, TimeUnit.SECONDS);
+        clickSchedule.schedule(new TimerTask() {
             @Override
             public void run() {
                 for (RequestInfo requestInfo : requestInfoList) {
@@ -62,7 +80,7 @@ public class RequestStatisticsPlugin implements IPlugin {
                 }
                 save();
             }
-        }, 0, 60000);
+        }, 60, TimeUnit.SECONDS);
         return true;
     }
 
@@ -97,8 +115,8 @@ public class RequestStatisticsPlugin implements IPlugin {
 
     @Override
     public boolean stop() {
-        clickTimer.cancel();
-        saveTimer.cancel();
+        clickSchedule.shutdown();
+        saveSchedule.shutdown();
         return true;
     }
 

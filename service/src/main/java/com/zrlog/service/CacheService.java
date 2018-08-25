@@ -61,7 +61,7 @@ public class CacheService {
             }
             cacheInit.setIndexHotLogs(indexHotLog);
             //存放公共数据到ServletContext
-            JFinal.me().getServletContext().setAttribute("webSite", website);
+            JFinal.me().getServletContext().setAttribute("WEB_SITE", website);
             JFinal.me().getServletContext().setAttribute(Constants.CACHE_KEY, cacheInit);
             List<File> staticFiles = new ArrayList<>();
             FileUtils.getAllFiles(PathKit.getWebRootPath(), staticFiles);
@@ -75,8 +75,8 @@ public class CacheService {
             baseController.setAttr("website", cacheInit.getWebSite());
             //默认开启文章封面
             cacheInit.getWebSite().putIfAbsent("article_thumbnail_status", "1");
-            Constants.webSite.clear();
-            Constants.webSite.putAll(cacheInit.getWebSite());
+            Constants.WEB_SITE.clear();
+            Constants.WEB_SITE.putAll(cacheInit.getWebSite());
         }
     }
 

@@ -25,7 +25,7 @@
                     </span>
             </div>
             <form class="login100-form validate-form" id="login_form" action="${basePath}api/admin/login">
-                <input type="hidden" id="redirectFrom">
+                <input type="hidden" id="redirectFrom" value="${redirectFrom!''}">
                 <div class="wrap-input100 validate-input m-b-26">
                     <span class="label-input100">${_res.userName}</span>
                     <input class="input100" type="text" name="userName" value="${userName!''}" id="userName"

@@ -1,6 +1,7 @@
 package com.zrlog.web.controller.admin.page;
 
 import com.hibegin.common.util.StringUtils;
+import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.zrlog.common.Constants;
 import com.zrlog.common.response.CheckVersionResponse;
@@ -67,15 +68,19 @@ public class AdminPageController extends BaseController {
     }
 
     public String login() {
-        if (ZrLogUtil.isPreviewMode()) {
-            getRequest().setAttribute("userName", System.getenv("DEFAULT_USERNAME"));
-            getRequest().setAttribute("password", System.getenv("DEFAULT_PASSWORD"));
-        }
+        previewField(this);
         if (AdminTokenThreadLocal.getUser() != null) {
             redirect(Constants.ADMIN_INDEX);
             return null;
         } else {
             return "/admin/login";
+        }
+    }
+
+    public static void previewField(Controller controller) {
+        if (ZrLogUtil.isPreviewMode()) {
+            controller.getRequest().setAttribute("userName", System.getenv("DEFAULT_USERNAME"));
+            controller.getRequest().setAttribute("password", System.getenv("DEFAULT_PASSWORD"));
         }
     }
 

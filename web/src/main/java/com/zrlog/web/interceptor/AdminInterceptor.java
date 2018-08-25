@@ -1,11 +1,13 @@
 package com.zrlog.web.interceptor;
 
 import com.hibegin.common.util.ExceptionUtils;
+import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.StringUtils;
 import com.jfinal.aop.Interceptor;
 import com.jfinal.aop.Invocation;
 import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
+import com.jfinal.kit.PathKit;
 import com.jfinal.render.FreeMarkerRender;
 import com.zrlog.common.Constants;
 import com.zrlog.common.response.ExceptionResponse;
@@ -13,18 +15,18 @@ import com.zrlog.common.vo.AdminTokenVO;
 import com.zrlog.model.User;
 import com.zrlog.service.AdminTokenService;
 import com.zrlog.service.CacheService;
-import com.zrlog.util.I18NUtil;
+import com.zrlog.util.I18nUtil;
 import com.zrlog.web.annotation.RefreshCache;
 import com.zrlog.web.controller.admin.page.AdminPageController;
 import com.zrlog.web.handler.GlobalResourceHandler;
-import com.zrlog.web.util.WebTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
+import java.io.FileInputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.Map;
 
 /**
@@ -68,7 +70,7 @@ class AdminInterceptor implements Interceptor {
                     controller.render(new FreeMarkerRender("/admin/index.ftl"));
                 } else {
                     if (!tryDoRender(ai, controller)) {
-                        controller.redirect(WebTools.getHomeUrl(ai.getController().getRequest()) + Constants.NOT_FOUND_PAGE);
+                        controller.renderHtml(IOUtil.getStringInputStream(new FileInputStream(PathKit.getWebRootPath() + Constants.NOT_FOUND_PAGE)));
                     }
                 }
             } catch (Exception e) {
@@ -99,25 +101,28 @@ class AdminInterceptor implements Interceptor {
         if (ai.getActionKey().startsWith("/api")) {
             ExceptionResponse exceptionResponse = new ExceptionResponse();
             exceptionResponse.setError(1);
-            exceptionResponse.setMessage(I18NUtil.getStringFromRes("admin.session.timeout"));
+            exceptionResponse.setMessage(I18nUtil.getStringFromRes("admin.session.timeout"));
             ai.getController().renderJson(exceptionResponse);
         } else {
-            //在重定向到登陆页面时，同时携带了当前的请求路径，方便登陆成功后的跳转
-            HttpServletRequest request = ai.getController().getRequest();
             try {
-                String url = request.getRequestURL().toString();
-                if ("https".equals(WebTools.getRealScheme(request))) {
-                    url = "https://" + request.getHeader("Host") + request.getRequestURI();
-                }
-                URL tUrl = new URL(url);
-                ai.getController().redirect(tUrl.getProtocol() + "://" + tUrl.getHost() +
-                        (tUrl.getPort() != -1 ? ":" + tUrl.getPort() : "") + request.getContextPath()
-                        + "/admin/login?redirectFrom="
-                        + url + URLEncoder.encode(request.getQueryString() != null ? "?" + request.getQueryString() : "", "UTF-8"));
-            } catch (IOException e) {
+                loginRender(ai.getController());
+            } catch (Exception e) {
                 LOGGER.error("", e);
             }
         }
+    }
+
+    /**
+     * 在重定向到登陆页面时，同时携带了当前的请求路径，方便登陆成功后的跳转
+     */
+    private void loginRender(Controller controller) throws MalformedURLException {
+        HttpServletRequest request = controller.getRequest();
+        String url = controller.getRequest().getRequestURL().toString();
+        URL tUrl = new URL(url);
+        AdminPageController.previewField(controller);
+        controller.getRequest().setAttribute("redirectFrom", tUrl.getPath() + (request.getQueryString() != null ? "?" + request.getQueryString() : ""));
+        controller.render(new FreeMarkerRender("/admin/login.ftl"));
+
     }
 
     /**

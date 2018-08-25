@@ -17,7 +17,7 @@ public class V6UpgradeVersionHandler implements UpgradeVersionHandler {
         while (rs.next()) {
             int id = rs.getInt("logid");
             PreparedStatement ups = connection.prepareStatement("update log set search_content = ? where logid = ?");
-            ups.setString(1, new ArticleService().getPlainSearchTxt(rs.getString("content")));
+            ups.setString(1, new ArticleService().getPlainSearchText(rs.getString("content")));
             ups.setInt(2, id);
             ups.execute();
             ups.close();

@@ -20,7 +20,7 @@ public class BlackListInterceptor implements Interceptor {
     public void intercept(Invocation invocation) {
         if (invocation.getController() instanceof BaseController) {
             BaseController baseController = (BaseController) invocation.getController();
-            String ipStr = (String) Constants.webSite.get("blackList");
+            String ipStr = (String) Constants.WEB_SITE.get("blackList");
             if (ipStr != null) {
                 Set<String> ipSet = new HashSet<>(Arrays.asList(ipStr.split(",")));
                 String requestIP = WebTools.getRealIp(baseController.getRequest());

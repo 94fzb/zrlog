@@ -3,7 +3,7 @@ package com.zrlog.web.controller.admin.api;
 import com.zrlog.common.request.CreateArticleRequest;
 import com.zrlog.common.request.UpdateArticleRequest;
 import com.zrlog.common.response.ArticleResponseEntry;
-import com.zrlog.common.response.CreateOrUpdateLogResponse;
+import com.zrlog.common.response.CreateOrUpdateArticleResponse;
 import com.zrlog.common.response.DeleteLogResponse;
 import com.zrlog.common.response.PageableResponse;
 import com.zrlog.service.AdminTokenThreadLocal;
@@ -28,12 +28,12 @@ public class ArticleController extends BaseController {
     }
 
     @RefreshCache
-    public CreateOrUpdateLogResponse create() {
+    public CreateOrUpdateArticleResponse create() {
         return articleService.create(AdminTokenThreadLocal.getUserId(), ZrLogUtil.convertRequestBody(getRequest(), CreateArticleRequest.class));
     }
 
     @RefreshCache
-    public CreateOrUpdateLogResponse update() {
+    public CreateOrUpdateArticleResponse update() {
         return articleService.update(AdminTokenThreadLocal.getUserId(), ZrLogUtil.convertRequestBody(getRequest(), UpdateArticleRequest.class));
     }
 

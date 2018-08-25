@@ -24,7 +24,7 @@ import com.zrlog.web.handler.GlobalResourceHandler;
 import com.zrlog.web.handler.PluginHandler;
 import com.zrlog.web.interceptor.BlackListInterceptor;
 import com.zrlog.web.interceptor.InitDataInterceptor;
-import com.zrlog.web.interceptor.MyI18NInterceptor;
+import com.zrlog.web.interceptor.MyI18nInterceptor;
 import com.zrlog.web.interceptor.RouterInterceptor;
 import com.zrlog.web.plugin.*;
 import com.zrlog.web.version.UpgradeVersionHandler;
@@ -48,12 +48,18 @@ public class ZrLogConfig extends JFinalConfig {
     private static final Logger LOGGER = Logger.getLogger(ZrLogConfig.class);
     private static final String DEFAULT_PREVIEW_DB_HOST = "demo.blog.zrlog.com";
     private static String jdbcUrl;
-    //存放Zrlog的一些系统参数
+    /**
+     * 存放Zrlog的一些系统参数
+     */
     public static Properties blogProperties = new Properties();
     private Properties dbProperties = new Properties();
-    // 读取系统参数
+    /**
+     * 读取系统参数
+     */
     public static final Properties systemProp = System.getProperties();
-    //存放为config的属性，是为了安装完成后还获得JFinal的插件列表对象
+    /**
+     * 存放为config的属性，是为了安装完成后还获得JFinal的插件列表对象
+     */
     private Plugins plugins;
     private boolean haveSqlUpdated = false;
     private static Routes currentRoutes;
@@ -122,6 +128,7 @@ public class ZrLogConfig extends JFinalConfig {
      *
      * @param con
      */
+    @Override
     public void configConstant(Constants con) {
         con.setDevMode(BlogBuildInfoUtil.isDev());
         con.setViewType(ViewType.JSP);
@@ -141,6 +148,7 @@ public class ZrLogConfig extends JFinalConfig {
      *
      * @param handlers
      */
+    @Override
     public void configHandler(Handlers handlers) {
         handlers.add(new PluginHandler());
         handlers.add(new GlobalResourceHandler());
@@ -152,9 +160,10 @@ public class ZrLogConfig extends JFinalConfig {
      *
      * @param interceptors
      */
+    @Override
     public void configInterceptor(Interceptors interceptors) {
         interceptors.add(new InitDataInterceptor());
-        interceptors.add(new MyI18NInterceptor());
+        interceptors.add(new MyI18nInterceptor());
         interceptors.add(new BlackListInterceptor());
         interceptors.add(new RouterInterceptor());
     }
@@ -162,6 +171,7 @@ public class ZrLogConfig extends JFinalConfig {
     /***
      * 加载JFinal的插件，比如JFinal提供的C3P0Plugin，Zrlog自动检查更新，加载Zrlog提供的插件。
      */
+    @Override
     public void configPlugin(Plugins plugins) {
         // 如果没有安装的情况下不初始化数据
         if (isInstalled()) {
@@ -176,7 +186,7 @@ public class ZrLogConfig extends JFinalConfig {
                 jdbcUrl = dbProperties.getProperty("jdbcUrl");
 
                 // 启动时候进行数据库连接
-                ViburDBCPPlugin dataSourcePlugin = new ViburDBCPPlugin(dbProperties.getProperty("jdbcUrl"),
+                ViburDbcpPlugin dataSourcePlugin = new ViburDbcpPlugin(dbProperties.getProperty("jdbcUrl"),
                         dbProperties.getProperty("user"), dbProperties.getProperty("password"));
                 plugins.add(dataSourcePlugin);
                 // 添加表与实体的映射关系
@@ -291,7 +301,7 @@ public class ZrLogConfig extends JFinalConfig {
                         }
                         //执行需要转换的数据
                         try {
-                            UpgradeVersionHandler upgradeVersionHandler = (UpgradeVersionHandler) Class.forName("com.zrlog.web.version.V" + entry.getKey() + "UpgradeVersionHandler").newInstance();
+                            UpgradeVersionHandler upgradeVersionHandler = (UpgradeVersionHandler) Class.forName("com.zrlog.web.version.V" + entry.getKey() + "UpgradeVersionHandler").getDeclaredConstructor().newInstance();
                             try {
                                 upgradeVersionHandler.doUpgrade(connection);
                             } catch (Exception e) {
@@ -330,6 +340,7 @@ public class ZrLogConfig extends JFinalConfig {
      *
      * @param routes （JFinal的Routes，类servlet的Mapper，但是JFinal是自己通过request URI path自己作的路由）
      */
+    @Override
     public void configRoute(Routes routes) {
         routes.add("/", ArticleController.class);
         routes.add("/install", InstallController.class);
