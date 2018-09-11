@@ -5,6 +5,7 @@ public class LoginRequest {
     private String key;
     private String password;
     private String userName;
+    private Boolean https;
 
     public String getKey() {
         return key;
@@ -28,5 +29,13 @@ public class LoginRequest {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public Boolean getHttps() {
+        return https;
+    }
+
+    public void setHttps(Boolean https) {
+        this.https = https;
     }
 }

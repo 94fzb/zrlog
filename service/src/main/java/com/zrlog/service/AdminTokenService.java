@@ -90,10 +90,11 @@ public class AdminTokenService {
         return null;
     }
 
-    public void setAdminToken(User user, int sessionId, HttpServletRequest request, HttpServletResponse response) {
+    public void setAdminToken(User user, int sessionId, String protocol, HttpServletRequest request, HttpServletResponse response) {
         AdminTokenVO adminTokenVO = new AdminTokenVO();
         adminTokenVO.setUserId(user.getInt("userId"));
         adminTokenVO.setSessionId(sessionId);
+        adminTokenVO.setProtocol(protocol);
         long loginTime = System.currentTimeMillis();
         adminTokenVO.setCreatedDate(loginTime);
         AdminTokenThreadLocal.setAdminToken(adminTokenVO);

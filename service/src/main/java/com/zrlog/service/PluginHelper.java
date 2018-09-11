@@ -28,6 +28,9 @@ public class PluginHelper {
             if (request.getQueryString() != null) {
                 fullUrl = fullUrl + "?" + request.getQueryString();
             }
+            if (adminTokenVO != null) {
+                fullUrl = adminTokenVO.getProtocol() + ":" + fullUrl;
+            }
             map.put("Cookie", request.getHeader("Cookie"));
             map.put("AccessUrl", "http://127.0.0.1:" + request.getServerPort() + request.getContextPath());
             if (request.getHeader("Content-Type") != null) {

@@ -25,7 +25,7 @@ public class Constants {
     public static final String ZRLOG_RESOURCE_DOWNLOAD_URL = "http://dl.zrlog.com";
     public static final String AUTO_UPGRADE_VERSION_KEY = "autoUpgradeVersion";
     public static final int DEFAULT_ARTICLE_DIGEST_LENGTH = 200;
-    public static final String ADMIN_TOKEN = "admin_token";
+    public static final String ADMIN_TOKEN = "admin-token";
     /**
      * 字符长度必须要大于16个字符
      */

@@ -5,6 +5,7 @@ public class AdminTokenVO {
     private long createdDate;
     private int userId;
     private int sessionId;
+    private String protocol;
 
     public long getCreatedDate() {
         return createdDate;
@@ -28,5 +29,13 @@ public class AdminTokenVO {
 
     public void setSessionId(int sessionId) {
         this.sessionId = sessionId;
+    }
+
+    public String getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
     }
 }

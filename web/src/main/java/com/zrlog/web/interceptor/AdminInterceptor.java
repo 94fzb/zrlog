@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.FileInputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
@@ -59,9 +58,10 @@ class AdminInterceptor implements Interceptor {
                     user.set("header", Constants.DEFAULT_HEADER);
                 }
                 controller.setAttr("user", user);
+                controller.setAttr("protocol", entry.getKey().getProtocol());
                 TemplateHelper.fullTemplateInfo(controller, false);
                 if (!"/admin/logout".equals(ai.getActionKey())) {
-                    adminTokenService.setAdminToken(entry.getValue(), entry.getKey().getSessionId(), controller.getRequest(), controller.getResponse());
+                    adminTokenService.setAdminToken(entry.getValue(), entry.getKey().getSessionId(), entry.getKey().getProtocol(), controller.getRequest(), controller.getResponse());
                 }
                 ai.invoke();
                 // 存在消息提示

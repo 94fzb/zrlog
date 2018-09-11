@@ -80,6 +80,7 @@ $(function () {
         for (var i = 0; i < loginFromArr.length; i++) {
             requestBody[loginFromArr[i]['name']] = loginFromArr[i]['value'];
         }
+        requestBody["https"] = window.location.protocol === "https:";
         requestBody["key"] = key;
         $.ajax({
             url: url,

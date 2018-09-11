@@ -46,7 +46,8 @@ public class UserService {
                 StringUtils.isNotEmpty(loginRequest.getPassword()) && StringUtils.isNotEmpty(loginRequest.getKey())) {
             String dbPassword = User.dao.getPasswordByUserName(loginRequest.getUserName().toLowerCase());
             if (dbPassword != null && SecurityUtils.md5(loginRequest.getKey() + ":" + dbPassword).equals(loginRequest.getPassword())) {
-                adminTokenService.setAdminToken(User.dao.getIdByUserName(loginRequest.getUserName().toLowerCase()), sessionAtomicInteger.incrementAndGet(), request, response);
+                adminTokenService.setAdminToken(User.dao.getIdByUserName(loginRequest.getUserName().toLowerCase()),
+                        sessionAtomicInteger.incrementAndGet(), loginRequest.getHttps() ? "https" : "http", request, response);
             } else {
                 loginResponse.setError(1);
                 loginResponse.setMessage(I18nUtil.getStringFromRes("userNameOrPasswordError"));

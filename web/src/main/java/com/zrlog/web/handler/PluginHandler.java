@@ -55,7 +55,7 @@ public class PluginHandler extends Handler {
             try {
                 Map.Entry<AdminTokenVO, User> entry = adminTokenService.getAdminTokenVOUserEntry(request);
                 if (entry != null) {
-                    adminTokenService.setAdminToken(entry.getValue(), entry.getKey().getSessionId(), request, response);
+                    adminTokenService.setAdminToken(entry.getValue(), entry.getKey().getSessionId(), entry.getKey().getProtocol(), request, response);
                 }
                 if (target.startsWith("/admin/plugins/")) {
                     try {
