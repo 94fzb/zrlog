@@ -2,6 +2,7 @@
 <link rel="stylesheet" href="${basePath}admin/summernote/summernote-bs4.css"/>
 <link rel="stylesheet" href="${basePath}assets/css/video-js.css"/>
 <link rel="stylesheet" href="${basePath}assets/css/icheck-blue.css"/>
+<link rel="stylesheet" href="${basePath}admin/css/article_edit.css"/>
 <script src="${basePath}assets/js/icheck.min.js"></script>
 <script>
     var skipFirstRubbishSave = ${skipFirstRubbishSave?c};
@@ -23,98 +24,6 @@
 <script src="${basePath}admin/js/mdeditor.js"></script>
 <script src="${basePath}admin/js/article_edit.js"></script>
 <script src="${basePath}assets/js/video.js"></script>
-<style>
-    .CodeMirror-scroll {
-        box-sizing: content-box;
-        height: 100%;
-        margin-bottom: -30px;
-        margin-right: -30px;
-        outline: 0 none;
-        overflow: hidden;
-        padding-bottom: 30px;
-        position: relative;
-    }
-
-    .switchery {
-        width: 38px;
-    }
-
-    .x_content {
-        clear: both;
-        float: left;
-        margin-top: 5px;
-        padding: 0;
-        position: relative;
-        width: 100%;
-    }
-
-    #preview-link {
-        color: #314659;
-    }
-
-    .save-btn-full-screen {
-        position: fixed;
-        z-index: 100000;
-        top: 2px;
-        right: 20px;
-    }
-
-    .saveToRubbish-btn-full-screen {
-        position: fixed;
-        z-index: 100000;
-        top: 2px;
-        right: 120px;
-    }
-
-    .editormd-html-preview, .editormd-preview-container {
-        padding: 5px;
-    }
-
-    #editorDiv {
-        width: 100%;
-        min-height: 1040px;
-        background-color: #ffffff;
-        border: 0;
-    }
-
-    #editorDivWrapper {
-        border: 1px solid #ccc;
-    }
-
-    .note-editor.note-frame {
-        border: #e6e9ed;
-        margin-bottom: 0;
-    }
-
-    .note-editor img {
-        max-width: 100%;
-    }
-
-    .editormd-preview-theme-dark .markdown-body h1, .editormd-preview-theme-dark .markdown-body h2,
-    .editormd-preview-theme-dark.markdown-body h3, .editormd-preview-theme-dark .markdown-body h4 {
-        color: #ccc;
-    }
-
-    .panel-default > .panel-heading button {
-        color: #666;
-    }
-
-    .full-screen-hide {
-
-    }
-
-    input[type=radio] {
-        display: none;
-    }
-
-    .note-popover .popover-content .dropdown-menu, .panel-heading.note-toolbar .dropdown-menu {
-        min-width: 120px;
-    }
-
-    .note-popover .popover-content, .card-header.note-toolbar {
-        background-color: #ffffff;
-    }
-</style>
 <div class="page-header">
     <h3>
     ${_res['admin.log.edit']}
@@ -166,10 +75,12 @@
                     <div class="col-md-3 col-xs-12 full-screen-hide">
                         <div class="text-right">
                             <div id="editorType" class="btn-group" data-toggle="buttons">
-                                <label class="btn btn-default" id="editorType_html" data-toggle-class="btn-primary" data-toggle-passive-class="btn-default">
+                                <label class="btn btn-default" id="editorType_html" data-toggle-class="btn-primary"
+                                       data-toggle-passive-class="btn-default">
                                     <input type="radio" value="html" data-parsley-multiple="editorType"> html
                                 </label>
-                                <label class="btn btn-default" id="editorType_markdown" data-toggle-class="btn-primary" data-toggle-passive-class="btn-default">
+                                <label class="btn btn-default" id="editorType_markdown" data-toggle-class="btn-primary"
+                                       data-toggle-passive-class="btn-default">
                                     <input type="radio" value="markdown" data-parsley-multiple="editorType"> markdown
                                 </label>
                             </div>
@@ -186,7 +97,9 @@
                 <div class="form-group col-xs-12">
                     <#if website['article_thumbnail_status']?? && website['article_thumbnail_status'] == '1'>
                         <div class="x_panel">
-                            <div id="thumbnail-img" title="${_res['writeCover']}" style="background-color:rgba(0,0,0,.075);" class="thumbnail-img img-responsive WriteCover-wrapper WriteCover-previewWrapper">
+                            <div id="thumbnail-img" title="${_res['writeCover']}"
+                                 style="background-color:rgba(0,0,0,.075);"
+                                 class="thumbnail-img img-responsive WriteCover-wrapper WriteCover-previewWrapper">
                                 <i id="camera-icon" class="WriteCover-uploadIcon fa fa-camera fa-3"></i>
                                 <input type="file" id="thumbnail-upload" name="imgFile" class="WriteCover-uploadInput">
                                 <input type="hidden" name="thumbnail" id="thumbnail">

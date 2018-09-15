@@ -15,31 +15,44 @@
 </style>
 <script>
     $(function () {
+        var tab = localStorage.getItem("currentTab");
+        if (tab == null) {
+            tab = "#basicTab";
+        }
+        $("#website-tab a[href='" + tab + "']").tab('show');
+
         $(".select2_single").select2({
             minimumResultsForSearch: -1,
             allowClear: true,
             dropdownParent: $("#type-select-parent")
         });
+        $(".nav-link").click(function () {
+            localStorage.setItem("currentTab", $(this).attr("href")+"");
+        });
 
     });
 </script>
-<div class="tabbable tabs-left">
+<div id="website-tab" class="tabbable tabs-left">
     <ul class="nav nav-tabs">
-        <li class="nav-item"><a class="nav-link active" href="#basic" data-toggle="tab">基本信息</a></li>
+        <li class="nav-item"><a class="nav-link" href="#basicTab" data-toggle="tab">基本信息</a></li>
         <li class="nav-item"><a class="nav-link" href="#blogTab" data-toggle="tab">博客设置</a></li>
-        <li class="nav-item"><a class="nav-link" href="#other" data-toggle="tab">其他设置</a></li>
-        <li class="nav-item"><a class="nav-link" href="#errorPageEdit" data-toggle="tab">错误页面编辑</a></li>
+        <li class="nav-item"><a class="nav-link" href="#templateTab"
+                                data-toggle="tab">${_res['admin.template.manage']}</a>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="#otherTab" data-toggle="tab">其他设置</a></li>
+        <li class="nav-item"><a class="nav-link" href="#errorPageEditTab" data-toggle="tab">错误页面编辑</a></li>
         <li class="nav-item"><a class="nav-link" href="#upgradeTab"
                                 data-toggle="tab">${_res['admin.upgrade.manage']}</a></li>
     </ul>
     <div class="tab-content row">
-        <div class="tab-pane in active col-md-6 col-xs-12 col-sm-12" id="basic">
+        <div class="tab-pane in col-md-6 col-xs-12 col-sm-12" id="basicTab">
             <h4 class="header">认真输入，有助于网站被收录</h4>
             <form role="form" class="form-horizontal" id="baseMsgAjax">
                 <div class="form-group row">
                     <label class="col-md-3 control-label no-padding-right"> 网站标题 </label>
                     <div class="col-md-9">
-                        <input type="text" name="title" value="${website.title!''}" class="form-control col-xs-12 col-sm-9"
+                        <input type="text" name="title" value="${website.title!''}"
+                               class="form-control col-xs-12 col-sm-9"
                                placeholder="请输入网站标题 ">
                     </div>
                 </div>
@@ -83,7 +96,7 @@
 
             </form>
         </div>
-        <div class="tab-pane col-md-6" id="other">
+        <div class="tab-pane col-md-6" id="otherTab">
             <h4 class="header">ICP，网站统计等信息</h4>
             <form role="form" class="form-horizontal" id="otherMsgAjax">
                 <div class="form-group row">
@@ -125,8 +138,11 @@
         </div>
         <#assign path="/error/">
         <#assign editType="错误页面">
-        <div class="tab-pane col-md-12" id="errorPageEdit">
+        <div class="tab-pane col-md-12" id="errorPageEditTab">
             <#include "file_editor.ftl"/>
+        </div>
+        <div class="tab-pane col-md-12" id="templateTab">
+            <#include "template.ftl"/>
         </div>
         <div class="tab-pane col-md-12" id="upgradeTab">
             <div class="row" style="margin-bottom: 15px">

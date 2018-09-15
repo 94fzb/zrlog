@@ -1,0 +1,90 @@
+.CodeMirror-scroll {
+    box-sizing: content-box;
+    height: 100%;
+    margin-bottom: -30px;
+    margin-right: -30px;
+    outline: 0 none;
+    overflow: hidden;
+    padding-bottom: 30px;
+    position: relative;
+}
+
+.switchery {
+    width: 38px;
+}
+
+.x_content {
+    clear: both;
+    float: left;
+    margin-top: 5px;
+    padding: 0;
+    position: relative;
+    width: 100%;
+}
+
+#preview-link {
+    color: #314659;
+}
+
+.save-btn-full-screen {
+    position: fixed;
+    z-index: 100000;
+    top: 2px;
+    right: 20px;
+}
+
+.saveToRubbish-btn-full-screen {
+    position: fixed;
+    z-index: 100000;
+    top: 2px;
+    right: 120px;
+}
+
+.editormd-html-preview, .editormd-preview-container {
+    padding: 5px;
+}
+
+#editorDiv {
+    width: 100%;
+    min-height: 1040px;
+    background-color: #ffffff;
+    border: 0;
+}
+
+#editorDivWrapper {
+    border: 1px solid #ccc;
+}
+
+.note-editor.note-frame {
+    border: #e6e9ed;
+    margin-bottom: 0;
+}
+
+.note-editor img {
+    max-width: 100%;
+}
+
+.editormd-preview-theme-dark .markdown-body h1, .editormd-preview-theme-dark .markdown-body h2,
+.editormd-preview-theme-dark.markdown-body h3, .editormd-preview-theme-dark .markdown-body h4 {
+    color: #ccc;
+}
+
+.panel-default > .panel-heading button {
+    color: #666;
+}
+
+.full-screen-hide {
+
+}
+
+input[type=radio] {
+    display: none;
+}
+
+.note-popover .popover-content .dropdown-menu, .panel-heading.note-toolbar .dropdown-menu {
+    min-width: 120px;
+}
+
+.note-popover .popover-content, .card-header.note-toolbar {
+    background-color: #ffffff;
+}

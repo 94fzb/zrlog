@@ -69,12 +69,12 @@ public class AdminTemplatePageController extends BaseController {
 
             if (!path.exists()) {
                 HttpFileHandle fileHandle = (HttpFileHandle) HttpUtil.getInstance().sendGetRequest(getPara("host") + "/template/download?id=" + getParaToInt("id"),
-                        new HttpFileHandle(PathKit.getWebRootPath() + Constants.TEMPLATE_BASE_PATH), new HashMap<String, String>());
+                        new HttpFileHandle(PathKit.getWebRootPath() + Constants.TEMPLATE_BASE_PATH), new HashMap<>());
                 String target = fileHandle.getT().getParent() + "/" + fileName;
                 FileUtils.moveOrCopyFile(fileHandle.getT().toString(), target, true);
                 ZipUtil.unZip(target, path.toString() + "/");
                 setAttr("message", I18nUtil.getStringFromRes("templateDownloadSuccess"));
-                setAttr("backUrl", "admin/index#template");
+                setAttr("backUrl", "admin/index#website");
             } else {
                 setAttr("message", I18nUtil.getStringFromRes("templateExists"));
             }

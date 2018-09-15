@@ -9,10 +9,12 @@ import com.zrlog.model.Comment;
 import com.zrlog.model.Log;
 import com.zrlog.service.AdminTokenService;
 import com.zrlog.service.AdminTokenThreadLocal;
+import com.zrlog.service.TemplateService;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.config.ZrLogConfig;
 import com.zrlog.web.controller.BaseController;
 import com.zrlog.web.controller.admin.api.UpgradeController;
+import com.zrlog.web.interceptor.TemplateHelper;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +23,8 @@ import java.util.List;
 public class AdminPageController extends BaseController {
 
     private AdminTokenService adminTokenService = new AdminTokenService();
+
+    private TemplateService templateService = new TemplateService();
 
     public String index() {
 
@@ -32,6 +36,8 @@ public class AdminPageController extends BaseController {
             } else {
                 if ("dashboard".equals(getPara(0))) {
                     fillStatistics();
+                } else if ("website".equals(getPara(0))) {
+                    setAttr("templates", templateService.getAllTemplates(getRequest().getContextPath(), TemplateHelper.getTemplatePathByCookie(getRequest().getCookies())));
                 }
                 return "/admin/" + getPara(0);
             }

@@ -7,6 +7,7 @@
 
     .custom-file-upload {
         cursor: pointer;
+        width: 120px;
     }
 
     .fix_button {
@@ -17,15 +18,10 @@
         padding-right: 6px;
     }
 </style>
-<div class="page-header">
-    <h3>
-    ${_res['admin.template.manage']}
-    </h3>
-</div>
 <div class="row">
-    <div class="col-md-12">
+    <div class="col-md-12  text-right">
         <label for="fileUpload"
-               class="custom-file-upload btn btn-primary offset-md-11 col-md-1 fix_button">
+               class="custom-file-upload btn btn-primary fix_button">
             <i class="fa fa-cloud-upload"></i><span style="padding-left: 5px">${_res['upload']}</span>
         </label>
         <input type="file" id="fileUpload" class="fileUpload" name="file" value=""/>
@@ -75,7 +71,7 @@
                                         class="fa fa-cog"></i></a>
                             </#if>
                             <#if template.deleteAble><a href="#" class="delete-btn"
-                                                                   template="${template.template}"><i
+                                                        template="${template.template}"><i
                                     class="fa fa-remove"></i></a></#if>
                             <a class="apply-btn" href="#" template="${template.template}"><i
                                     class="fa fa-check"></i></a>
@@ -98,4 +94,3 @@
         </a>
     </div>
 </div>
-${pageEndTag}

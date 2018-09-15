@@ -79,9 +79,6 @@
                                 </a>
                                 <ul class="nav child_menu">
                                     <li>
-                                        <a href="admin/index#template">${_res['admin.template.manage']}</a>
-                                    </li>
-                                    <li>
                                         <a href="admin/index#type">${_res['admin.type.manage']}</a>
                                     </li>
                                     <li>
