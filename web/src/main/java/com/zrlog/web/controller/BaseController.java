@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
@@ -61,7 +62,7 @@ public class BaseController extends Controller {
     public String convertRequestParam(String param) {
         if (param != null) {
             try {
-                return URLDecoder.decode(new String(param.getBytes("ISO-8859-1")), "UTF-8");
+                return URLDecoder.decode(new String(param.getBytes(StandardCharsets.ISO_8859_1)), "UTF-8");
             } catch (UnsupportedEncodingException e) {
                 LOGGER.error("request convert to UTF-8 error ", e);
             }

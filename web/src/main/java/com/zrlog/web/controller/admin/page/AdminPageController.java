@@ -62,7 +62,7 @@ public class AdminPageController extends BaseController {
         }
         request.setAttribute("lastVersion", response);
         request.setAttribute("zrlog", ZrLogConfig.blogProperties);
-        request.setAttribute("system", ZrLogConfig.systemProp);
+        request.setAttribute("system", ZrLogConfig.SYSTEM_PROP);
     }
 
 

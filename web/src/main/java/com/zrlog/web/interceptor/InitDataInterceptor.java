@@ -10,6 +10,8 @@ import com.zrlog.web.handler.GlobalResourceHandler;
 
 import javax.servlet.http.HttpServletRequest;
 
+import static com.zrlog.web.config.ZrLogConfig.INSTALL_ROUTER_PATH;
+
 /**
  * 缓存全局数据，并且存放在Servlet的Context里面，避免每次请求都需要重数据读取数据
  */
@@ -30,15 +32,15 @@ public class InitDataInterceptor implements Interceptor {
 
     private void doIntercept(Invocation invocation) {
         //未安装情况下,尝试跳转去安装
-        if (!ZrLogConfig.isInstalled() && !invocation.getActionKey().startsWith("/install")) {
-            invocation.getController().redirect("/install");
+        if (!ZrLogConfig.isInstalled() && !invocation.getActionKey().startsWith(INSTALL_ROUTER_PATH)) {
+            invocation.getController().redirect(INSTALL_ROUTER_PATH);
             return;
         }
         if (invocation.getController() instanceof BaseController) {
             HttpServletRequest request = invocation.getController().getRequest();
             BaseController baseController = (BaseController) invocation.getController();
             baseController.setAttr("requrl", ZrLogUtil.getFullUrl(request));
-            cacheService.refreshInitDataCache(GlobalResourceHandler.CACHE_HTML_PATH, baseController, false);
+            cacheService.refreshInitDataCache(GlobalResourceHandler.CACHE_HTML_PATH, baseController, true);
             lastAccessTime = System.currentTimeMillis();
         }
         invocation.invoke();

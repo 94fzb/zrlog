@@ -175,18 +175,7 @@ public class ZrLogUtil {
             File[] fs = file.listFiles();
             if (fs != null && fs.length > 0) {
                 fileList = Arrays.asList(fs);
-                Comparator<File> comparator = new Comparator<File>() {
-                    @Override
-                    public int compare(File o1, File o2) {
-                        Integer v1 = Integer.valueOf(o1.getName().replace(".sql", ""));
-                        Integer v2 = Integer.valueOf(o2.getName().replace(".sql", ""));
-                        if (v1 <= v2) {
-                            return -1;
-                        }
-                        return 0;
-                    }
-                };
-                Collections.sort(fileList, comparator);
+                fileList.sort(Comparator.comparingInt(e -> Integer.valueOf(e.getName().replace(".sql", ""))));
             }
         }
         return fileList;

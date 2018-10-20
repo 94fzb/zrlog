@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -34,6 +35,7 @@ public class GlobalResourceHandler extends Handler {
     private static final Logger LOGGER = LoggerFactory.getLogger(GlobalResourceHandler.class);
     private static final String PAGE_END_TAG = "<none id='SP_" + System.currentTimeMillis() + "'></none>";
     public static final String CACHE_HTML_PATH = PathKit.getWebRootPath() + "/_cache/";
+    private static ThreadLocal<Long> REQUEST_START_TIME = new ThreadLocal<>();
 
     /**
      * 不希望部分技术人走后门，拦截一些不合法的请求
@@ -51,6 +53,7 @@ public class GlobalResourceHandler extends Handler {
     @Override
     public void handle(String target, HttpServletRequest request, HttpServletResponse response, boolean[] isHandled) {
         long start = System.currentTimeMillis();
+        REQUEST_START_TIME.set(start);
         String url = WebTools.getHomeUrl(request);
         request.setAttribute("basePath", url);
         request.setAttribute("pageEndTag", PAGE_END_TAG);
@@ -75,7 +78,7 @@ public class GlobalResourceHandler extends Handler {
                     if (target.endsWith(".html") && target.startsWith("/" + Constants.getArticleUri())) {
                         target = target.substring(0, target.lastIndexOf("."));
                         if (Constants.isStaticHtmlStatus()) {
-                            String path = new String(request.getServletPath().getBytes("ISO-8859-1"), "UTF-8");
+                            String path = new String(request.getServletPath().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
                             responseHtmlFile(target, request, response, isHandled, responseRenderPrintWriter, new File(CACHE_HTML_PATH + I18nUtil.getAcceptLanguage(request) + path));
                         } else {
                             this.next.handle(target, request, response, isHandled);
@@ -119,6 +122,7 @@ public class GlobalResourceHandler extends Handler {
                 RequestStatisticsPlugin.record(requestInfo);
             }
         }
+        REQUEST_START_TIME.remove();
     }
 
     private void responseHtmlFile(String target, HttpServletRequest request, HttpServletResponse response, boolean[] isHandled, ResponseRenderPrintWriter responseRenderPrintWriter, File htmlFile) throws IOException {
@@ -136,18 +140,18 @@ public class GlobalResourceHandler extends Handler {
      * 将一个网页转化对应文件，用于静态化文章页
      */
     private void saveResponseBodyToHtml(File file, String copy) {
-        try {
-            if (copy != null) {
-                byte[] bytes = copy.getBytes("UTF-8");
-                FileUtils.tryResizeDiskSpace(CACHE_HTML_PATH + Constants.getArticleUri(), bytes.length, Constants.getMaxCacheHtmlSize());
-                if (!file.exists()) {
-                    file.getParentFile().mkdirs();
-                }
-                IOUtil.writeBytesToFile(bytes, file);
+        if (copy != null) {
+            byte[] bytes = copy.getBytes(StandardCharsets.UTF_8);
+            FileUtils.tryResizeDiskSpace(CACHE_HTML_PATH + Constants.getArticleUri(), bytes.length, Constants.getMaxCacheHtmlSize());
+            if (!file.exists()) {
+                file.getParentFile().mkdirs();
             }
-        } catch (IOException e) {
-            LOGGER.error("saveResponseBodyToHtml error", e);
+            IOUtil.writeBytesToFile(bytes, file);
         }
+    }
+
+    public static void printUserTime(String key) {
+        LOGGER.info("key = " + key + " usedTime " + (System.currentTimeMillis() - REQUEST_START_TIME.get()));
     }
 
 }

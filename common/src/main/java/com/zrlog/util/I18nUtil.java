@@ -39,11 +39,7 @@ public class I18nUtil {
         if (name.startsWith(Constants.I18N) && name.endsWith(".properties")) {
             try {
                 String key = name.replace(".properties", "");
-                Map<String, Object> map = I18N_RES_MAP.get(key);
-                if (map == null) {
-                    map = new HashMap<>();
-                    I18N_RES_MAP.put(key, map);
-                }
+                Map<String, Object> map = I18N_RES_MAP.computeIfAbsent(key, k -> new HashMap<>());
                 Properties properties = new Properties();
 
                 properties.load(inputStream);

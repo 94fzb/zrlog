@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -84,7 +85,7 @@ class ResponseRenderPrintWriter extends PrintWriter {
     public void flush() {
         synchronized (builder) {
             try {
-                body = new String(builder.toString().getBytes("UTF-8"));
+                body = new String(builder.toString().getBytes(StandardCharsets.UTF_8));
                 boolean includeEndTag = isIncludePageEndTag(body);
                 if (includeEndTag && response.getContentType().contains("text/html")) {
                     body = getCompressAndParseHtml(body);
@@ -156,7 +157,7 @@ class ResponseRenderPrintWriter extends PrintWriter {
                 }
                 CloseResponseHandle handle = PluginHandler.getContext(url, "GET", request, false);
                 byte[] bytes = IOUtil.getByteByInputStream(handle.getT().getEntity().getContent());
-                plugin.put(content, new String(bytes, "UTF-8"));
+                plugin.put(content, new String(bytes, StandardCharsets.UTF_8));
             } catch (Exception e) {
                 LOGGER.error("", e);
             }

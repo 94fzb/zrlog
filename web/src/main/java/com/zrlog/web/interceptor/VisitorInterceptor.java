@@ -12,6 +12,7 @@ import com.zrlog.common.vo.TemplateVO;
 import com.zrlog.service.TemplateService;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.config.ZrLogConfig;
+import com.zrlog.web.handler.GlobalResourceHandler;
 
 import java.io.File;
 import java.util.Enumeration;
@@ -53,8 +54,9 @@ class VisitorInterceptor implements Interceptor {
         if (templateName == null) {
             return;
         }
-
+        GlobalResourceHandler.printUserTime("Template");
         String templatePath = TemplateHelper.fullTemplateInfo(ai.getController(), true);
+        GlobalResourceHandler.printUserTime("Permission");
         TemplateVO templateVO = new TemplateService().getTemplateVO(JFinal.me().getContextPath(), new File(PathKit.getWebRootPath() + templatePath));
         String ext = ZrLogUtil.getViewExt(templateVO.getViewType());
         if (ai.getController().getAttr("log") != null) {

@@ -48,6 +48,7 @@ public class ZrLogConfig extends JFinalConfig {
     private static final Logger LOGGER = Logger.getLogger(ZrLogConfig.class);
     private static final String DEFAULT_PREVIEW_DB_HOST = "demo.blog.zrlog.com";
     private static String jdbcUrl;
+    public static final String INSTALL_ROUTER_PATH = "/install";
     /**
      * 存放Zrlog的一些系统参数
      */
@@ -56,7 +57,7 @@ public class ZrLogConfig extends JFinalConfig {
     /**
      * 读取系统参数
      */
-    public static final Properties systemProp = System.getProperties();
+    public static final Properties SYSTEM_PROP = System.getProperties();
     /**
      * 存放为config的属性，是为了安装完成后还获得JFinal的插件列表对象
      */
@@ -85,13 +86,13 @@ public class ZrLogConfig extends JFinalConfig {
         } catch (IOException e) {
             LOGGER.error("load blogProperties error", e);
         }
-        if (StringUtils.isNotEmpty(systemProp.getProperty("os.name"))) {
-            if (systemProp.get("os.name").toString().startsWith("Mac")) {
-                systemProp.put("os.type", "apple");
+        if (StringUtils.isNotEmpty(SYSTEM_PROP.getProperty("os.name"))) {
+            if (SYSTEM_PROP.get("os.name").toString().startsWith("Mac")) {
+                SYSTEM_PROP.put("os.type", "apple");
             } else {
-                systemProp.put("os.type", systemProp.getProperty("os.name").toLowerCase());
+                SYSTEM_PROP.put("os.type", SYSTEM_PROP.getProperty("os.name").toLowerCase());
             }
-            systemProp.put("docker", ZrLogUtil.isDockerMode() ? "docker" : "");
+            SYSTEM_PROP.put("docker", ZrLogUtil.isDockerMode() ? "docker" : "");
         }
     }
 
@@ -238,9 +239,9 @@ public class ZrLogConfig extends JFinalConfig {
         if (isInstalled()) {
             initDatabaseVersion();
         }
-        systemProp.setProperty("zrlog.runtime.path", PathKit.getWebRootPath());
-        systemProp.setProperty("server.info", JFinal.me().getServletContext().getServerInfo());
-        JFinal.me().getServletContext().setAttribute("system", systemProp);
+        SYSTEM_PROP.setProperty("zrlog.runtime.path", PathKit.getWebRootPath());
+        SYSTEM_PROP.setProperty("server.info", JFinal.me().getServletContext().getServerInfo());
+        JFinal.me().getServletContext().setAttribute("system", SYSTEM_PROP);
         blogProperties.put("version", BlogBuildInfoUtil.getVersion());
         blogProperties.put("buildId", BlogBuildInfoUtil.getBuildId());
         blogProperties.put("buildTime", new SimpleDateFormat("yyyy-MM-dd").format(BlogBuildInfoUtil.getTime()));
@@ -256,7 +257,7 @@ public class ZrLogConfig extends JFinalConfig {
     }
 
     private void initDatabaseVersion() {
-        systemProp.put("dbServer.version", ZrLogUtil.getDatabaseServerVersion(dbProperties.getProperty("jdbcUrl"), dbProperties.getProperty("user"),
+        SYSTEM_PROP.put("dbServer.version", ZrLogUtil.getDatabaseServerVersion(dbProperties.getProperty("jdbcUrl"), dbProperties.getProperty("user"),
                 dbProperties.getProperty("password"), dbProperties.getProperty("driverClass")));
 
     }
@@ -343,7 +344,7 @@ public class ZrLogConfig extends JFinalConfig {
     @Override
     public void configRoute(Routes routes) {
         routes.add("/", ArticleController.class);
-        routes.add("/install", InstallController.class);
+        routes.add(INSTALL_ROUTER_PATH, InstallController.class);
         // 后台管理者
         routes.add(new AdminRoutes());
         currentRoutes = routes;
@@ -359,7 +360,7 @@ public class ZrLogConfig extends JFinalConfig {
     }
 
     public static List<String> articleRouterList() {
-        return Arrays.asList("/" + com.zrlog.common.Constants.getArticleRoute());
+        return Collections.singletonList("/" + com.zrlog.common.Constants.getArticleRoute());
     }
 
     @Override
@@ -380,7 +381,7 @@ public class ZrLogConfig extends JFinalConfig {
     }
 
     public static boolean isTest() {
-        return "junit-test".equals(systemProp.getProperty("env"));
+        return "junit-test".equals(SYSTEM_PROP.getProperty("env"));
     }
 
     public static boolean isPreviewDb() {

@@ -42,6 +42,7 @@ public class Constants {
     public static final Map<String, Object> WEB_SITE = Collections.synchronizedMap(new HashMap<>());
     public static boolean IN_JAR = new File("webapp").exists();
     public static String FTL_VIEW_PATH = "/view";
+    public static final String ARTICLE_ROUTER_KEY = "article_route";
     public static String DEFAULT_HEADER = "assets/images/default-portrait.gif";
 
     public static String pluginServer;
@@ -83,8 +84,8 @@ public class Constants {
     }
 
     public static String getArticleRoute() {
-        if (WEB_SITE.containsKey("article_route")) {
-            if (WEB_SITE.get("article_route") == null) {
+        if (WEB_SITE.containsKey(ARTICLE_ROUTER_KEY)) {
+            if (WEB_SITE.get(ARTICLE_ROUTER_KEY) == null) {
                 return "";
             }
             return (String) WEB_SITE.get("article_route");

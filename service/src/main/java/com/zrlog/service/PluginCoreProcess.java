@@ -88,26 +88,23 @@ public class PluginCoreProcess {
                     }
 
                     private void printInputStreamWithThread(final InputStream in, final File serverFileName, final PluginSocketThread pluginSocketThread) {
-                        new Thread() {
-                            @Override
-                            public void run() {
-                                BufferedReader br = new BufferedReader(new InputStreamReader(in));
-                                String str;
-                                try {
-                                    str = br.readLine();
-                                    if (str != null && str.startsWith("Error: Invalid or corrupt jarfile")) {
-                                        System.out.println(str);
-                                        serverFileName.delete();
-                                        pluginSocketThread.setStop(true);
-                                    }
-                                    while ((str = br.readLine()) != null) {
-                                        System.out.println(str);
-                                    }
-                                } catch (IOException e) {
-                                    LOGGER.error("plugin output error", e);
+                        new Thread(() -> {
+                            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+                            String str;
+                            try {
+                                str = br.readLine();
+                                if (str != null && str.startsWith("Error: Invalid or corrupt jarfile")) {
+                                    System.out.println(str);
+                                    serverFileName.delete();
+                                    pluginSocketThread.setStop(true);
                                 }
+                                while ((str = br.readLine()) != null) {
+                                    System.out.println(str);
+                                }
+                            } catch (IOException e) {
+                                LOGGER.error("plugin output error", e);
                             }
-                        }.start();
+                        }).start();
                     }
                 }.start();
             }
@@ -136,12 +133,7 @@ public class PluginCoreProcess {
      */
     private void registerShutdownHook() {
         Runtime rt = Runtime.getRuntime();
-        rt.addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                stopPluginCore();
-            }
-        });
+        rt.addShutdownHook(new Thread(this::stopPluginCore));
     }
 
     public void stopPluginCore() {
