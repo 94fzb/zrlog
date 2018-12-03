@@ -1,6 +1,7 @@
 package com.zrlog.common;
 
 
+import com.hibegin.common.util.BooleanUtils;
 import com.hibegin.common.util.StringUtils;
 import com.zrlog.common.type.AutoUpgradeVersionType;
 
@@ -95,7 +96,7 @@ public class Constants {
 
     public static Long getSessionTimeout() {
         String sessionTimeoutString = (String) Constants.WEB_SITE.get(Constants.SESSION_TIMEOUT_KEY);
-        Long sessionTimeout;
+        long sessionTimeout;
         if (!StringUtils.isEmpty(sessionTimeoutString)) {
             //*60， Cookie过期时间单位为分钟
             sessionTimeout = Long.valueOf(sessionTimeoutString) * 60 * 1000;
@@ -118,5 +119,13 @@ public class Constants {
             }
         }
         return 100;
+    }
+
+    public static boolean getBooleanByFromWebSite(String key) {
+        Object dbSettingSize = WEB_SITE.get(key);
+        if (dbSettingSize != null) {
+            return dbSettingSize instanceof String && ("1".equals(dbSettingSize) || BooleanUtils.isTrue((String) dbSettingSize));
+        }
+        return false;
     }
 }

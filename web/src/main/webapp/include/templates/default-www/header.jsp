@@ -38,7 +38,7 @@
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container">
-        <a class="navbar-brand" href="#" href="${rurl}"><c:if test="${not empty _res.navBarBrand}">
+        <a <c:if test="${not empty _res.navBarBrand}">class='navbar-brand'</c:if> href="${rurl}"><c:if test="${not empty _res.navBarBrand}">
             <b>${_res.navBarBrand}</b>
         </c:if></a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"

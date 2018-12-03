@@ -44,7 +44,6 @@ public class TemplateVO {
     private boolean use;
 
 
-
     public String getTemplate() {
         return template;
     }

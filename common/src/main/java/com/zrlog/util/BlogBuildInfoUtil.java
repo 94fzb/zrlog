@@ -20,7 +20,7 @@ public class BlogBuildInfoUtil {
     private static final Logger LOGGER = Logger.getLogger(BlogBuildInfoUtil.class);
 
     /**
-     *目前以git的commitId的前7位标记构建的Id
+     * 目前以git的commitId的前7位标记构建的Id
      */
     private static String buildId;
     private static String version;

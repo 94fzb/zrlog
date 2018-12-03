@@ -39,9 +39,9 @@
             height: 50px;
             margin-top: 10px;
             border-radius: 50%;
-            background-size: cover;
             background: url('${_res.avatar}') no-repeat center center;
             display: inline-block;
+            background-size: cover;
         }
 
         .markdown-body ul, .markdown-body ol {

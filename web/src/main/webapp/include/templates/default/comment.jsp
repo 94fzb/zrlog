@@ -27,18 +27,19 @@
                                         class="txpCommentInputMessage" rows="15" cols="45" name="userComment"
                                         id="message"></textarea></p>
                                 <div class="input-group">
-                                    <p><label>${_res.name}</label><input type="text" id="name"
-                                                                         class="comment_name_input"
-                                                                         size="25" name="userName"
-                                                                         value=""></p>
-                                    <p><label>${_res.email}</label><input type="text" id="email"
-                                                                          class="comment_email_input"
-                                                                          size="80" name="userMail"
-                                                                          value=""></p>
-                                    <p><label>${_res.website}</label><input type="text" id="web"
-                                                                            class="comment_web_input"
-                                                                            size="255" name="webHome"
-                                                                            value=""></p>
+                                    <p><label for="name">${_res.name}</label>
+                                        <input type="text" id="name"
+                                               class="comment_name_input"
+                                               size="25" name="userName"
+                                               value=""></p>
+                                    <p><label for="email">${_res.email}</label><input type="text" id="email"
+                                                                                      class="comment_email_input"
+                                                                                      size="80" name="userMail"
+                                                                                      value=""></p>
+                                    <p><label for="web">${_res.website}</label><input type="text" id="web"
+                                                                                      class="comment_web_input"
+                                                                                      size="255" name="webHome"
+                                                                                      value=""></p>
                                 </div>
                                 <div class="button-set">
                                     <span class="submit"><input type="submit" id="txpCommentSubmit" class="button"

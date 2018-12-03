@@ -32,13 +32,13 @@
                                         class="txpCommentInputMessage" rows="15" cols="45" name="userComment"
                                         id="message"></textarea></p>
                                 <div class="input-group">
-                                    <p><label for="userName">姓名</label><input type="text" id="name"
+                                    <p><label for="name">姓名</label><input type="text" id="name"
                                                                               class="comment_name_input" size="25"
                                                                               name="userName" value=""></p>
-                                    <p><label for="userMail">邮箱</label><input type="text" id="email"
+                                    <p><label for="email">邮箱</label><input type="text" id="email"
                                                                               class="comment_email_input" size="25"
                                                                               name="userMail" value=""></p>
-                                    <p><label for="webHome">网站</label><input type="text" id="web"
+                                    <p><label for="web">网站</label><input type="text" id="web"
                                                                              class="comment_web_input" size="25"
                                                                              name="webHome" value=""></p>
                                 </div>

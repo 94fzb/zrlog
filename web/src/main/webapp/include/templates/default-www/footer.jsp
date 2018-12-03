@@ -14,7 +14,7 @@
                 <p class="copyright">Copyright &copy; 2018 ${webs.title}</p>
             </div>
             <div class="col-lg-12 footer-below">
-                <a href="${baseUrl}">${baseUrl}</a>
+                <a href="${baseUrl}">${host}</a>
             </div>
         </div>
     </div>

@@ -133,21 +133,6 @@ aside li a:hover{background-color:#FFFFFF; text-decoration:none}
 .comment .comment-write textarea{width:100%; /*box-shadow: 0 0 2px #DDDDDD inset;*/}
 .comment .comment-write textarea:focus{box-shadow: 0 0 5px #DDDDDD;}
 .comment .remember label{float:none; padding:0; margin:0; background-color:#FFFFFF;color:#333333;}
-.comments-wrapper {width:100%;}
-.comments-wrapper .input-group{}
-.comments-wrapper .input-group p{}
-.comments-wrapper .input-group label{float:left;position: relative;margin-right: -42px; text-align:center;color: #999;}
-.comments-wrapper .input-group input{width:100%; padding-left: 42px;}
-.comments-wrapper .input-group input[type=text]{ /*box-shadow: 0 0 2px #DDDDDD inset;*/}
-.comments-wrapper .input-group input[type=text]:focus{box-shadow: 0 0 5px #DDDDDD;}
-.comments-wrapper .button-set .button{width:100px; height:30px; margin-bottom:10px;overflow:hidden; border:0 none; background-color: #3399CC;color:#FFF;}
-.comments-wrapper .button-set .remember{display:block;width: 100%;margin-bottom:10px;}
-.comments-wrapper .button-set .button:hover{background-color: #ff7700;/*#3399FF;*/}
-.comments-wrapper .button-set  .preview .disabled,
-.comments-wrapper .button-set  .submit .disabled{ background-color: #CCCCCC;}
-.comments-wrapper .button-set .checkbox{width:auto;}
-.comments-wrapper .note{clear:both; }
-.comments-wrapper .required{color:#FF0000; }
 ul.comments_error{background-color: #FFFFFF; margin:5px 0; padding: 2px 5px; border: 1px solid #C2D97A;}
 ul.comments_error li{padding: 2px 0 2px 12px; margin-bottom: 0; border: 0 none; background: url(../images/dot.gif) no-repeat scroll 2px center transparent;}
 

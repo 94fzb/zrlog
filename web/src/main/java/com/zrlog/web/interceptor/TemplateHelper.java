@@ -58,12 +58,7 @@ public class TemplateHelper {
         } else if (request.getAttribute("log") != null) {
             data = request.getAttribute("log");
         }
-        boolean thumbnailEnableArticle = true;
-        Object tT = webSite.get("article_thumbnail_status");
-        if (tT instanceof Boolean) {
-            thumbnailEnableArticle = (Boolean) tT;
-        }
-        staticHtml(data, baseUrl, suffix, thumbnailEnableArticle);
+        staticHtml(data, baseUrl, suffix, Constants.getBooleanByFromWebSite("article_thumbnail_status"));
         if (request.getAttribute("pager") != null && !((List<Map<String, Object>>) ((Map) request.getAttribute("pager")).get("pageList")).isEmpty()) {
             List<Map<String, Object>> pageList = (List<Map<String, Object>>) ((Map) request.getAttribute("pager")).get("pageList");
             for (Map<String, Object> pageMap : pageList) {
@@ -113,7 +108,7 @@ public class TemplateHelper {
                     if (suffix.length() > 0 && url.length() == 1) {
                         url = "";
                     } else {
-                        url = url.substring(1, url.length());
+                        url = url.substring(1);
                     }
                     if (url.startsWith("/" + Constants.getArticleUri())) {
                         url += suffix;
@@ -170,6 +165,7 @@ public class TemplateHelper {
         request.setAttribute("templateUrl", templateUrl);
         request.setAttribute("rurl", baseUrl);
         request.setAttribute("baseUrl", baseUrl);
+        request.setAttribute("host", request.getHeader("host"));
         return baseUrl;
     }
 

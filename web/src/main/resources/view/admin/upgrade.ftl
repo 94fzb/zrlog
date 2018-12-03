@@ -1,5 +1,3 @@
-<%@ page session="false" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <script type="text/javascript" src="${basePath}admin/js/set_update.js"></script>
 <script src="${basePath}assets/js/select2/select2.min.js"></script>
 <script src="${basePath}assets/js/switchery.min.js"></script>

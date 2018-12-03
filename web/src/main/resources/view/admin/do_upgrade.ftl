@@ -39,7 +39,7 @@
                 <div id="step-11" class="content" style="display: block;">
                     <div id="changeLog">
                         <#if lastVersion?? && lastVersion.upgrade>
-                            ${lastVersion.version.changeLog}
+                            ${lastVersion.version.changeLog!''}
                         </#if>
                     </div>
                 </div>
