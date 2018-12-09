@@ -2,6 +2,7 @@ package com.zrlog.web.handler;
 
 import com.hibegin.common.util.FileUtils;
 import com.hibegin.common.util.IOUtil;
+import com.jfinal.core.JFinal;
 import com.jfinal.handler.Handler;
 import com.jfinal.kit.PathKit;
 import com.zrlog.common.Constants;
@@ -151,7 +152,9 @@ public class GlobalResourceHandler extends Handler {
     }
 
     public static void printUserTime(String key) {
-        LOGGER.info("key = " + key + " usedTime " + (System.currentTimeMillis() - REQUEST_START_TIME.get()));
+        if (JFinal.me().getConstants().getDevMode()) {
+            LOGGER.info("key = " + key + " usedTime " + (System.currentTimeMillis() - REQUEST_START_TIME.get()));
+        }
     }
 
 }

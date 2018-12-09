@@ -33,8 +33,7 @@ public class CacheCleanerPlugin implements IPlugin {
         scheduledThreadPoolExecutor.schedule(new TimerTask() {
             @Override
             public void run() {
-                if (InitDataInterceptor.getLastAccessTime() > 0 && System.currentTimeMillis() - InitDataInterceptor.getLastAccessTime() > Constants.getMaxCacheTimeout()) {
-                    InitDataInterceptor.setLastAccessTime(0L);
+                if (System.currentTimeMillis() - InitDataInterceptor.getLastAccessTime() > Constants.getInitDataMaxCacheTimeout()) {
                     cacheService.refreshInitDataCache(GlobalResourceHandler.CACHE_HTML_PATH, null, true);
                 }
             }

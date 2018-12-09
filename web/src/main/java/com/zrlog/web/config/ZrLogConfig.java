@@ -49,6 +49,7 @@ public class ZrLogConfig extends JFinalConfig {
     private static final String DEFAULT_PREVIEW_DB_HOST = "demo.blog.zrlog.com";
     private static String jdbcUrl;
     public static final String INSTALL_ROUTER_PATH = "/install";
+    public static String JDBC_URL_BASE_QUERY_PARAM = "characterEncoding=UTF-8&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=GMT";
     /**
      * 存放Zrlog的一些系统参数
      */
@@ -224,7 +225,7 @@ public class ZrLogConfig extends JFinalConfig {
     private void tryUpgradeDbPropertiesFile(String dbFile, Properties properties) throws IOException {
         if (!"com.mysql.cj.jdbc.Driver".equals(properties.get("driverClass"))) {
             properties.put("driverClass", "com.mysql.cj.jdbc.Driver");
-            properties.put("jdbcUrl", properties.get("jdbcUrl") + "&useSSL=false&serverTimezone=GMT");
+            properties.put("jdbcUrl", properties.get("jdbcUrl") + "&" + JDBC_URL_BASE_QUERY_PARAM);
             properties.store(new FileOutputStream(dbFile), "Support mysql8");
         }
     }

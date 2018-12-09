@@ -3,6 +3,7 @@ package com.zrlog.web.controller.blog;
 import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
+import com.zrlog.common.Constants;
 import com.zrlog.common.type.TestConnectDbResult;
 import com.zrlog.service.InstallService;
 import com.zrlog.util.I18nUtil;
@@ -24,7 +25,7 @@ public class InstallController extends Controller {
     public String testDbConn() {
         Map<String, String> dbConn = new HashMap<>();
         dbConn.put("jdbcUrl", "jdbc:mysql://" + getPara("dbhost") + ":" + getPara("port") + "/" + getPara("dbname")
-                + "?characterEncoding=UTF-8&useSSL=false&serverTimezone=GMT");
+                + "?" + ZrLogConfig.JDBC_URL_BASE_QUERY_PARAM);
         dbConn.put("user", getPara("dbuser"));
         dbConn.put("password", getPara("dbpwd"));
         dbConn.put("driverClass", "com.mysql.cj.jdbc.Driver");

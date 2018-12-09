@@ -53,9 +53,7 @@ public class ArticleService {
 
     private CreateOrUpdateArticleResponse save(Integer userId, CreateArticleRequest createArticleRequest) {
         Log log = getLog(userId, createArticleRequest);
-        if (!createArticleRequest.isRubbish() && StringUtils.isNotEmpty(log.getStr("keywords"))) {
-            Tag.dao.insertTag(log.getStr("keywords"));
-        }
+        Tag.dao.refreshTag();
         CreateOrUpdateArticleResponse updateLogResponse = new CreateOrUpdateArticleResponse();
         updateLogResponse.setId(log.getInt("logId"));
         updateLogResponse.setAlias(log.getStr("alias"));
@@ -72,8 +70,8 @@ public class ArticleService {
     public UpdateRecordResponse delete(Object logId) {
         if (logId != null) {
             Log log = Log.dao.adminFindLogByLogId(logId);
-            if (log != null && log.get("keywords") != null) {
-                Tag.dao.deleteTag(log.get("keywords").toString());
+            if (log != null && StringUtils.isNotEmpty(log.get("keywords"))) {
+                Tag.dao.refreshTag();
             }
             Log.dao.deleteById(logId);
         }

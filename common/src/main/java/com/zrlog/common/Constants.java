@@ -64,7 +64,7 @@ public class Constants {
         return 20 * 1024 * 1024;
     }
 
-    public static int getMaxCacheTimeout() {
+    public static int getInitDataMaxCacheTimeout() {
         Object dbSettingSize = WEB_SITE.get("cache_timeout_minutes");
         if (dbSettingSize != null) {
             try {
@@ -73,7 +73,7 @@ public class Constants {
                 //ignore
             }
         }
-        return 60 * 60 * 1000;
+        return 5 * 60 * 1000;
     }
 
     public static String getArticleUri() {

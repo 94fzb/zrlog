@@ -21,13 +21,8 @@ public class InitDataInterceptor implements Interceptor {
 
     private CacheService cacheService = new CacheService();
 
-
     public static long getLastAccessTime() {
         return lastAccessTime;
-    }
-
-    public static void setLastAccessTime(long l) {
-        InitDataInterceptor.lastAccessTime = l;
     }
 
     private void doIntercept(Invocation invocation) {
@@ -40,7 +35,7 @@ public class InitDataInterceptor implements Interceptor {
             HttpServletRequest request = invocation.getController().getRequest();
             BaseController baseController = (BaseController) invocation.getController();
             baseController.setAttr("requrl", ZrLogUtil.getFullUrl(request));
-            cacheService.refreshInitDataCache(GlobalResourceHandler.CACHE_HTML_PATH, baseController, true);
+            cacheService.refreshInitDataCache(GlobalResourceHandler.CACHE_HTML_PATH, baseController, false);
             lastAccessTime = System.currentTimeMillis();
         }
         invocation.invoke();

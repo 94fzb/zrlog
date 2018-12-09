@@ -90,11 +90,7 @@ public class Tag extends Model<Tag> {
         }
     }
 
-    public boolean insertTag(String now) {
-        return insertTag(strToSet(now));
-    }
-
-    private boolean insertTag(Set<String> now) {
+    private void insertTag(Set<String> now) {
         for (String add : now) {
             Tag t = dao.findFirst("select * from " + TABLE_NAME + " where text=?", add);
             if (t == null) {
@@ -103,14 +99,9 @@ public class Tag extends Model<Tag> {
                 t.set("count", t.getInt("count") + 1).update();
             }
         }
-        return true;
     }
 
-    public boolean deleteTag(String old) {
-        return deleteTag(strToSet(old));
-    }
-
-    private boolean deleteTag(Set<String> old) {
+    private void deleteTag(Set<String> old) {
         for (String del : old) {
             Tag t = dao.findFirst("select * from " + TABLE_NAME + " where text=?", del);
             if (t != null) {
@@ -121,7 +112,6 @@ public class Tag extends Model<Tag> {
                 }
             }
         }
-        return true;
     }
 
     public Map<String, Object> find(PageableRequest page) {
