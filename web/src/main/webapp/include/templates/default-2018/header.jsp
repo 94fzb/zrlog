@@ -13,16 +13,12 @@
     <jsp:include page="../../core/core_mate.jsp"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <link rel="stylesheet" type="text/css" href="${baseUrl}assets/css/video-js.css"/>
-    <link rel="stylesheet" type="text/css" media="screen" href="${templateUrl}/css/common_2018.css"/>
     <link rel="stylesheet" type="text/css" media="screen" href="${templateUrl}/css/style_2018.css"/>
-
-    <link rel="stylesheet" type="text/css" media="screen" href="${templateUrl}/css/pager.css"/>
     <link rel="stylesheet" type="text/css" media="screen" href="${templateUrl}/css/editormd.css"/>
 
     <script src="${templateUrl}/js/jquery-1.10.2.min.js"></script>
     <script src="${baseUrl }assets/js/video.js"></script>
     <script src="${templateUrl}/js/modernizr.custom.16617.js"></script>
-    <script src="${templateUrl}/js/classie.js"></script>
     <script src="${templateUrl}/js/jquery.lazyload.min.js"></script>
     <style>
         @font-face {
@@ -37,10 +33,6 @@
             url(${templateUrl}/fonts/MaterialIcons-Regular.ttf) format('truetype');
         }
 
-        .markdown-body ul, .markdown-body ol {
-            padding-left: 0;
-        }
-
         .side .s-header .avatar,
         .top .avatar {
             background: url('${_res.avatar}') scroll center center #FFFFFF;
@@ -48,48 +40,6 @@
             border-radius: 50%;
             overflow: hidden;
             margin-left: 10px;
-        }
-
-        .vjs-default-skin .vjs-control-bar {
-            font-size: 60%;
-            height: 39px;
-        }
-
-        .vjs-default-skin .vjs-control {
-            color: #ffffff;
-        }
-
-        .vjs-default-skin .vjs-slider-handle {
-            color: #ffffff;
-
-        }
-
-        .vjs-default-skin .vjs-duration-display {
-            color: #ffffff;
-            padding-top: 10px;
-        }
-
-        .vjs-default-skin .vjs-current-time-display {
-            color: #ffffff;
-            padding-top: 10px;
-
-        }
-
-        .vjs-time-divider {
-            float: left;
-            line-height: 3em;
-            margin-top: 9px;
-            padding-left: 8px;
-            padding-right: 8px;
-        }
-
-        .vjs-control-bar div span {
-            color: #ffffff;
-            padding-top: 12px;
-        }
-
-        .vjs-default-skin .vjs-seek-handle {
-            top: -5px;
         }
     </style>
 </head>
@@ -147,84 +97,6 @@
                         </ul>
                     </div>
                 </div>
-                <script type="text/javascript">
-                    $(document).ready(function () {
-                        var tags_a = $("#tags").find("a");
-                        tags_a.each(function () {
-                            var x = 6;
-                            var y = 0;
-                            var rand = parseInt(Math.random() * (x - y + 1) + y);
-                            $(this).addClass("size" + rand);
-                        });
-                    });
-                </script>
-                <style type="text/css">
-                    /*.taglist a {
-                        padding: 0;
-                        display: inline-block;
-                        white-space: nowrap;
-                    }*/
-
-                    a.size1 {
-                        font-size: 10px;
-                        padding: 2px;
-                        color: #804D40;
-                    }
-
-                    a.size1:hover {
-                        color: #E13728;
-                    }
-
-                    a.size2 {
-                        padding: 2px;
-                        font-size: 12px;
-                        color: #B9251A;
-                    }
-
-                    a.size2:hover {
-                        color: #E13728;
-                    }
-
-                    a.size3 {
-                        padding: 3px;
-                        font-size: 14px;
-                        color: #C4876A;
-                    }
-
-                    a.size3:hover {
-                        color: #E13728;
-                    }
-
-                    a.size4 {
-                        padding: 1px;
-                        font-size: 18px;
-                        color: #B46A47;
-                    }
-
-                    a.size4:hover {
-                        color: #E13728;
-                    }
-
-                    a.size5 {
-                        padding: 3px;
-                        font-size: 16px;
-                        color: #E13728;
-                    }
-
-                    a.size5:hover {
-                        color: #B46A47;
-                    }
-
-                    a.size6 {
-                        padding: 2px;
-                        font-size: 12px;
-                        color: #77625E
-                    }
-
-                    a.size6:hover {
-                        color: #E13728;
-                    }
-                </style>
                 <div class="widget category-list" style="padding-bottom: 10px">
                     <h3>标签 <span class="en">Tags</span></h3>
                     <div class="taglist" id="tags">

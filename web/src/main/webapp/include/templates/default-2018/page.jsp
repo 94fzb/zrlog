@@ -1,4 +1,4 @@
-<%@ page language="java" session="false" import="java.util.*" pageEncoding="UTF-8" %>
+<%@ page language="java" session="false" pageEncoding="UTF-8" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <jsp:include page="header.jsp"></jsp:include>
 <div class="main clearfloat">
@@ -40,9 +40,8 @@
                                 </div>
                                 <div class="meta">
                                     <p class="category"><a rel="tag" href="${log.typeUrl}">${log.typeName}</a></p>
-                                    <p class="published">/
-                                        <time datetime="${log.releaseTime}">
-                                            &nbsp;${log.releaseTime.year+1900}-${log.releaseTime.month+1}-${log.releaseTime.date}</time>
+                                    <p style="padding: 0 5px 0 5px">/</p>
+                                    <p class="published"><time datetime="${log.releaseTime}">${log.releaseTime.year+1900}-${log.releaseTime.month+1}-${log.releaseTime.date}</time>
                                     </p>
                                 </div>
                             </div>

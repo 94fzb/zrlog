@@ -186,10 +186,16 @@ class ResponseRenderPrintWriter extends PrintWriter {
     }
 
     private String tryReplace(String href) {
-        if (href.startsWith(baseUrl) || href.startsWith("admin/js") || href.startsWith("admin/markdwon") || href.startsWith("admin/summernote") || href.startsWith("assets")) {
+        String templateUrl = (String) request.getAttribute("templateUrl");
+        if (templateUrl == null) {
+            templateUrl = baseUrl;
+        }
+        if (href.startsWith(baseUrl) || href.startsWith(templateUrl) || href.startsWith("admin/js") || href.startsWith("admin/markdwon") || href.startsWith("admin/summernote") || href.startsWith("assets")) {
             String uriPath = href;
             if (href.startsWith(baseUrl)) {
                 uriPath = href.substring(baseUrl.length());
+            } else if (href.startsWith(templateUrl)) {
+                uriPath = href.substring(templateUrl.length());
             }
             if (uriPath.contains("?")) {
                 uriPath = uriPath.substring(0, uriPath.lastIndexOf("?"));
