@@ -9,6 +9,7 @@ import com.jfinal.kit.PathKit;
 import com.jfinal.plugin.IPlugin;
 import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
 import com.jfinal.plugin.activerecord.IDataSourceProvider;
+import com.jfinal.plugin.hikaricp.HikariCpPlugin;
 import com.jfinal.render.FreeMarkerRender;
 import com.jfinal.render.ViewType;
 import com.jfinal.template.Engine;
@@ -188,7 +189,7 @@ public class ZrLogConfig extends JFinalConfig {
                 jdbcUrl = dbProperties.getProperty("jdbcUrl");
 
                 // 启动时候进行数据库连接
-                ViburDbcpPlugin dataSourcePlugin = new ViburDbcpPlugin(dbProperties.getProperty("jdbcUrl"),
+                HikariCpPlugin dataSourcePlugin = new HikariCpPlugin(dbProperties.getProperty("jdbcUrl"),
                         dbProperties.getProperty("user"), dbProperties.getProperty("password"));
                 plugins.add(dataSourcePlugin);
                 // 添加表与实体的映射关系
