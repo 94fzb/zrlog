@@ -7,8 +7,13 @@
     <i class="fa fa-info"></i>
     <span style="padding-left: 5px">${_res['admin.index.welcomeTips']}</span>
     <a class="d-none d-sm-block" target="_blank" href="http://blog.zrlog.com/post/feedback" style="float: right"><i
-            class="fa fa-support"></i><span style="padding-left: 5px"> ${_res['suggestAndFeedback']}</span> </a>
+                class="fa fa-support"></i><span style="padding-left: 5px"> ${_res['suggestAndFeedback']}</span> </a>
 </div>
+<style>
+    .table td, .table th {
+        word-break: break-all;
+    }
+</style>
 <div class="row">
     <div class="col-md-7 col-xs-12 col-sm-12">
         <div class="widget-box">
@@ -35,7 +40,10 @@
                             <td>
                                 运行环境
                             </td>
-                            <td><i class="fa fa-${system['docker']!''}"></i>${system['java.vm.name']} (${system['java.runtime.version']})</td>
+                            <td>
+                                <i class="fa fa-${system['docker']!''}"></i>${system['java.vm.name']} (${system['java.runtime.version']}
+                                )
+                            </td>
                         </tr>
                         <tr>
                             <td>
@@ -54,8 +62,8 @@
                                 操作系统
                             </td>
                             <td><i class="fa fa-${system['os.type']}"></i> ${system['os.name']}
-                                - ${system['os.arch']}
-                                - ${system['os.version']}</td>
+                                    - ${system['os.arch']}
+                                    - ${system['os.version']}</td>
                         </tr>
                         <tr>
                             <td>

@@ -24,11 +24,6 @@
     <script src="${templateUrl}/js/modernizr.custom.16617.js"></script>
     <script src="${templateUrl}/js/classie.js"></script>
     <script src="${templateUrl}/js/jquery.lazyload.min.js"></script>
-    <!--[if lt IE 9]>
-    <link rel="stylesheet" type="text/css" media="screen" href="${templateUrl}/css/style-ie7.css"/>
-    <script src="${templateUrl}/js/html5shiv.js"></script>
-    <script src="${templateUrl}/js/css3-mediaqueries.js"></script>
-    <![endif]-->
     <style>
         @font-face {
             font-family: 'Material Icons';
@@ -52,6 +47,7 @@
             background-size: cover;
             border-radius: 50%;
             overflow: hidden;
+            margin-left: 10px;
         }
 
         .vjs-default-skin .vjs-control-bar {
@@ -261,4 +257,3 @@
             </c:if>
         </div>
     </div>
-<jsp:include page="update_browser.jsp"/>
