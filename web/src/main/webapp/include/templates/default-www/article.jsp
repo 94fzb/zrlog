@@ -3,9 +3,12 @@
 <article>
     <h2 class="post-title">${log.title}</h2>
     <div class="meta">
-        <p class="category"><a href="${log.typeUrl}" rel="tag">${log.typeName}</a>&nbsp;</p>
-        <p class="published">/&nbsp;<time datetime="${log.releaseTime}">
-            &nbsp;${log.releaseTime.year+1900}-${log.releaseTime.month+1}-${log.releaseTime.date}</time>
+        <p class="category" style="padding-right: 5px">
+            <a href="${log.typeUrl}" rel="tag">${log.typeName}</a>
+        </p>
+        /
+        <p class="published" style="padding-left: 5px">
+            ${log.releaseTime.year+1900}-${log.releaseTime.month+1}-${log.releaseTime.date}
         </p>
     </div>
     <div class="content">

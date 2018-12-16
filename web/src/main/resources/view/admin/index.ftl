@@ -160,16 +160,16 @@
                             </button>
                             <div class="dropdown-menu dropdown-menu-right">
                                 <a class="dropdown-item" href="admin/index#user">
-                                    <i class="fa fa-user"></i>
+                                    <i class="fa fa-user pr5"></i>
                                 ${_res['admin.user.info']}
                                 </a>
                                 <a class="dropdown-item" href="admin/index#change_password">
-                                    <i class="fa fa-key"></i>
+                                    <i class="fa fa-key pr5"></i>
                                 ${_res['admin.changePwd']}
                                 </a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="admin/logout">
-                                    <i class="fa fa-sign-out"></i>
+                                    <i class="fa fa-sign-out pr5"></i>
                                 ${_res['admin.user.logout']}
                                 </a>
                             </div>
@@ -194,8 +194,8 @@
             </div>
         </div>
         <footer>
-            <strong>${_res.copyright} <a href="https://www.zrlog.com" target="_blank" rel="noopener"> ZrLog
-                . </a></strong>
+            <strong>${_res.copyright}
+                <a href="https://www.zrlog.com" target="_blank" rel="noopener">ZrLog .</a></strong>
             All rights reserved.
             <div class="pull-right d-none d-sm-block">
                 <span><strong>Version</strong> ${zrlog.version}</span>

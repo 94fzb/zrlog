@@ -2,8 +2,7 @@
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <c:if test="${not empty requestScope.pager}">
-<div class="container">
-<nav aria-label="Page navigation">
+<nav>
   <ul class="pagination">
 	<c:if test="${!requestScope.pager.startPage}">
 		 <li class="page-item"><a title="${_res.pageStart}" class="page-link" href="${pager.pageStartUrl}">${_res.pageStart}</a></li>
@@ -16,5 +15,4 @@
 	</c:if>
   </ul>
 </nav>
-</div>
 </c:if>

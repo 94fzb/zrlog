@@ -21,6 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -71,15 +73,23 @@ public class TemplateHelper {
         List<Tag> tags = baseDataInitVO.getTags();
         if (!tags.isEmpty()) {
             for (Tag tag : tags) {
-                String tagUri = baseUrl + Constants.getArticleUri() + "tag/" + tag.get("text") + suffix;
-                tag.put("url", tagUri);
+                try {
+                    String tagUri = baseUrl + Constants.getArticleUri() + "tag/" + URLEncoder.encode(tag.get("text"), "UTF-8") + suffix;
+                    tag.put("url", tagUri);
+                } catch (UnsupportedEncodingException e) {
+                    LOGGER.error("", e);
+                }
             }
         }
         List<Type> types = baseDataInitVO.getTypes();
         if (!types.isEmpty()) {
             for (Type type : types) {
-                String tagUri = baseUrl + Constants.getArticleUri() + "sort/" + type.get("alias") + suffix;
-                type.put("url", tagUri);
+                try {
+                    String tagUri = baseUrl + Constants.getArticleUri() + "sort/" + URLEncoder.encode(type.get("alias"), "UTF-8") + suffix;
+                    type.put("url", tagUri);
+                } catch (UnsupportedEncodingException e) {
+                    LOGGER.error("", e);
+                }
             }
         }
         Map<String, Long> archiveMap = baseDataInitVO.getArchives();
@@ -157,6 +167,7 @@ public class TemplateHelper {
         } else {
             if (isCdnResourceAble(webSite, templatePath)) {
                 templateUrl = "//" + webSite.get("staticResourceHost").toString() + request.getAttribute("template");
+                request.setAttribute("staticResourceBaseUrl", "//" + webSite.get("staticResourceHost").toString() + request.getContextPath() + "/");
             } else {
                 templateUrl = "//" + request.getHeader("host") + request.getContextPath() + request.getAttribute("template");
             }

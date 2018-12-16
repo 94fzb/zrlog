@@ -49,6 +49,7 @@ class ResponseRenderPrintWriter extends PrintWriter {
         this.compress = compress;
         compressor.setRemoveIntertagSpaces(true);
         compressor.setRemoveComments(true);
+        compressor.setRemoveSurroundingSpaces("span,i,button");
         this.baseUrl = baseUrl;
         this.endFlag = endFlag;
         this.request = request;
@@ -186,16 +187,16 @@ class ResponseRenderPrintWriter extends PrintWriter {
     }
 
     private String tryReplace(String href) {
-        String templateUrl = (String) request.getAttribute("templateUrl");
-        if (templateUrl == null) {
-            templateUrl = baseUrl;
+        String staticResourceBaseUrl = (String) request.getAttribute("staticResourceBaseUrl");
+        if (staticResourceBaseUrl == null) {
+            staticResourceBaseUrl = baseUrl;
         }
-        if (href.startsWith(baseUrl) || href.startsWith(templateUrl) || href.startsWith("admin/js") || href.startsWith("admin/markdwon") || href.startsWith("admin/summernote") || href.startsWith("assets")) {
+        if (href.startsWith(baseUrl) || href.startsWith(staticResourceBaseUrl) || href.startsWith("admin/js") || href.startsWith("admin/markdwon") || href.startsWith("admin/summernote") || href.startsWith("assets")) {
             String uriPath = href;
             if (href.startsWith(baseUrl)) {
                 uriPath = href.substring(baseUrl.length());
-            } else if (href.startsWith(templateUrl)) {
-                uriPath = href.substring(templateUrl.length());
+            } else if (href.startsWith(staticResourceBaseUrl)) {
+                uriPath = href.substring(staticResourceBaseUrl.length());
             }
             if (uriPath.contains("?")) {
                 uriPath = uriPath.substring(0, uriPath.lastIndexOf("?"));

@@ -15,7 +15,7 @@ public class Link extends Model<Link> {
     public static final String TABLE_NAME = "link";
 
     public List<Link> find() {
-        return find("select linkName,linkId as id,sort,url from " + TABLE_NAME + " order by sort");
+        return find("select linkName,linkId as id,sort,url,alt from " + TABLE_NAME + " order by sort");
     }
 
     public Map<String, Object> find(PageableRequest page) {

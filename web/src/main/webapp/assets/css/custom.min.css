@@ -7230,3 +7230,15 @@ a:hover {
 #jqgrid {
     overflow-x: auto;
 }
+
+.pr5 {
+    padding-right: 5px
+}
+
+button > i {
+    padding-right: 5px
+}
+
+.fa-docker {
+    padding-right: 5px
+}

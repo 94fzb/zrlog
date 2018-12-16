@@ -19,8 +19,7 @@
         <div class="widget-box">
             <div class="widget-header">
                 <h5>
-                    <i class="fa fa-server"></i>
-                    ${_res.serverInfo}
+                    <i class="fa fa-server pr5"></i>${_res.serverInfo}
                 </h5>
             </div>
             <div class="widget-body">
@@ -61,7 +60,7 @@
                             <td>
                                 操作系统
                             </td>
-                            <td><i class="fa fa-${system['os.type']}"></i> ${system['os.name']}
+                            <td><i class="fa fa-${system['os.type']} pr5"></i> ${system['os.name']}
                                     - ${system['os.arch']}
                                     - ${system['os.version']}</td>
                         </tr>
@@ -99,7 +98,7 @@
         <div class="widget-box">
             <div class="widget-header">
                 <h5>
-                    <i class="fa fa-pie-chart"></i>
+                    <i class="fa fa-pie-chart pr5"></i>
                     ${_res['admin.index.outline']}
                 </h5>
             </div>

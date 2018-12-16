@@ -413,20 +413,6 @@
     background-color: #fff;
 }
 
-@media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
-    .editormd-container-mask,
-    .editormd-dialog-mask-con {
-        background-image: url(../images/loading@2x.gif);
-    }
-}
-
-@media only screen and (-webkit-min-device-pixel-ratio: 3), only screen and (min-device-pixel-ratio: 3) {
-    .editormd-container-mask,
-    .editormd-dialog-mask-con {
-        background-image: url(../images/loading@3x.gif);
-    }
-}
-
 .editormd-code-block-dialog textarea,
 .editormd-preformatted-text-dialog textarea {
     width: 100%;
@@ -766,7 +752,7 @@
 @font-face {
     font-family: 'FontAwesome';
     src: url("../fonts/fontawesome-webfont.eot?v=4.6.3");
-    src: url("../fonts/fontawesome-webfont.eot?#iefix&v=4.6.3") format("embedded-opentype"), url("../fonts/fontawesome-webfont.woff2?v=4.6.3") format("woff2"), url("../fonts/fontawesome-webfont.woff?v=4.6.3") format("woff"), url("../fonts/fontawesome-webfont.ttf?v=4.6.3") format("truetype"), url("../fonts/fontawesome-webfont.svg?v=4.6.3#fontawesomeregular") format("svg");
+    src: url("../fonts/fontawesome-webfont.eot?#iefix&v=4.6.3") format("embedded-opentype"), url("../fonts/fontawesome-webfont.woff2?v=4.6.3") format("woff2"), url("../fonts/fontawesome-webfont.woff?v=4.6.3") format("woff"), url("../fonts/fontawesome-webfont.ttf?v=4.6.3") format("truetype");
     font-weight: normal;
     font-style: normal;
 }

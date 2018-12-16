@@ -29,14 +29,14 @@
 .save-btn-full-screen {
     position: fixed;
     z-index: 100000;
-    top: 2px;
+    top: 0;
     right: 20px;
 }
 
 .saveToRubbish-btn-full-screen {
     position: fixed;
     z-index: 100000;
-    top: 2px;
+    top: 0;
     right: 120px;
 }
 

@@ -156,6 +156,10 @@ public class ArticleController extends BaseController {
         return "tags";
     }
 
+    public String link() {
+        return "link";
+    }
+
     public String all() {
         int page = ParseUtil.strToInt(getPara(1), 1);
         Map<String, Object> data = Log.dao.find(page, getDefaultRows());

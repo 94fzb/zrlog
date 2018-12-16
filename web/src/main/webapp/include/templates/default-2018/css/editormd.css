@@ -4332,3 +4332,7 @@ hr.editormd-page-break {
 .editormd-onlyread .editormd-preview {
     top: 0;
 }
+
+.editormd-preview-container p > code, .editormd-html-preview p > code{
+    margin-left: 0;
+}

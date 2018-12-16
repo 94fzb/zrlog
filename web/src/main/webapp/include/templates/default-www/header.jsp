@@ -4,7 +4,7 @@
 <html lang="zh" class="no-js">
 <head>
     <meta charset="utf-8"/>
-    <c:set var="webs" value="${init.webSite}" scope="request"></c:set>
+    <c:set var="webs" value="${init.webSite}" scope="request"/>
     <title><c:if test="${not empty requestScope.log.title}">${requestScope.log.title} - </c:if>${webs.title}
         - ${webs.second_title}</title>
     <link rel="shortcut icon" type="image/x-icon" href="${rurl}favicon.ico"/>
@@ -18,22 +18,12 @@
         </c:otherwise>
     </c:choose>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
-    <link rel="shortcut icon" href="${rurl }/favicon.ico"/>
     <link rel="stylesheet" type="text/css" media="screen" href="${url}/css/common.css"/>
-    <link rel="stylesheet" type="text/css" media="screen" href="${url}/css/editormd.css"/>
     <link rel="stylesheet" type="text/css" media="screen" href="${url}/css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" media="screen" href="${url}/css/style.css"/>
-
+    <link rel="stylesheet" type="text/css" media="screen" href="${url}/css/editormd.css"/>
     <script src="${url}/js/jquery-1.10.2.min.js"></script>
     <script src="${url}/js/bootstrap.min.js"></script>
-    <style>
-        .bg-light {
-            font-size: 18px;
-        }
-        .nav-item {
-            padding-right: 20px;
-        }
-    </style>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -67,6 +57,6 @@
         </div>
     </div>
 </nav>
-<div class="main clearfloat" style="padding-top: 20px">
+<div class="main clearfloat">
+    <div class="container">
     <section>
-        <jsp:include page="update_browser.jsp"/>

@@ -36,6 +36,10 @@ public class RequestStatisticsPlugin implements IPlugin {
     });
     private static final String DB_KEY = "request_statistics";
     private static final String ARTICLE_DB_KEY = "article_request_statistics";
+    /**
+     * 保留一周的
+     */
+    private static final long REMOVE_TIME = 3600 * 24 * 1000 * 7L;
 
 
     private static List<RequestInfo> requestInfoList = Collections.synchronizedList(new ArrayList<>());
@@ -64,6 +68,7 @@ public class RequestStatisticsPlugin implements IPlugin {
         clickSchedule.schedule(new TimerTask() {
             @Override
             public void run() {
+                List<RequestInfo> removeList = new ArrayList<>();
                 for (RequestInfo requestInfo : requestInfoList) {
                     String alias = getAlias(requestInfo.getRequestUri());
                     if (StringUtils.isNotEmpty(alias) && !requestInfo.isDeal()) {
@@ -77,7 +82,11 @@ public class RequestStatisticsPlugin implements IPlugin {
                         }
                         requestInfo.setDeal(true);
                     }
+                    if (System.currentTimeMillis() - requestInfo.getRequestTime() > REMOVE_TIME) {
+                        removeList.add(requestInfo);
+                    }
                 }
+                requestInfoList.removeAll(removeList);
                 save();
             }
         }, 60, TimeUnit.SECONDS);

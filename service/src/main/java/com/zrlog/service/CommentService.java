@@ -19,7 +19,7 @@ import java.util.Map;
 public class CommentService {
 
     public boolean isAllowComment() {
-        return !"1".equals(Constants.WEB_SITE.get("disable_comment_status"));
+        return !Constants.getBooleanByFromWebSite("disable_comment_status");
     }
 
     private boolean isAllowComment(int articleId) {

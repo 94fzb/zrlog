@@ -1,7 +1,7 @@
 <%@ page language="java" session="false" pageEncoding="UTF-8" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<jsp:include page="header.jsp"></jsp:include>
-<div class="main clearfloat">
+<jsp:include page="header.jsp"/>
+<div class="main">
     <section>
         <c:choose>
             <c:when test="${empty requestScope.data}">

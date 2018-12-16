@@ -10,12 +10,6 @@
                 <time datetime="${log.releaseTime}">${log.releaseTime.year+1900}-${log.releaseTime.month+1}-${log.releaseTime.date}</time>
             </p>
         </div>
-
-        <style>
-            .prettyprint .linenum li:before {
-                content: "";
-            }
-        </style>
         <div class="content markdown-body editormd-preview-container" style="padding:0">
             ${log.content }
         </div>

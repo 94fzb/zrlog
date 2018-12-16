@@ -22,7 +22,7 @@
     <div class="col-md-12  text-right">
         <label for="fileUpload"
                class="custom-file-upload btn btn-primary fix_button">
-            <i class="fa fa-cloud-upload"></i><span style="padding-left: 5px">${_res['upload']}</span>
+            <i class="fa fa-cloud-upload" style="padding-right: 5px"></i><span>${_res['upload']}</span>
         </label>
         <input type="file" id="fileUpload" class="fileUpload" name="file" value=""/>
     </div>
@@ -89,8 +89,7 @@
     <div class="col-md-12">
         <a href="admin/index#template_center">
             <button class="btn btn-dark col-md-1 fix_button"><i
-                    class="fa fa-cloud-download"></i><span
-                    style="padding-left: 5px">${_res['admin.theme.download']}</span></button>
+                    class="fa fa-cloud-download"></i><span>${_res['admin.theme.download']}</span></button>
         </a>
     </div>
 </div>

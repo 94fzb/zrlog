@@ -19,7 +19,7 @@
 }
 
 .gn-icon::before {
-    font-family: 'icomoon';
+    font-family: 'icomoon', serif;
     font-weight: normal;
     font-style: normal;
     font-variant: normal;
@@ -109,28 +109,6 @@ sup {
 
 sub {
     bottom: -.5em;
-}
-
-::-webkit-scrollbar-track-piece {
-    background-color: #f5f5f5;
-    border-left: 1px solid #D2D2D2;
-}
-
-::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-    background-color: #c2c2c2;
-    background-clip: padding-box;
-    border: 1px solid #C1C1C1;
-    min-height: 28px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    border: 1px solid #C1C1C1;
-    background-color: #B1B1B1;
 }
 
 /* Global Style by Sheshui.Me 20110726 */
@@ -359,7 +337,6 @@ footer h2 {
 
 footer li {
     padding: 0.2em 0 0.2em 10px;
-    background: url(../images/dot.gif) no-repeat scroll 2px 9px transparent;
 }
 
 .footer-left {
@@ -453,15 +430,6 @@ footer .mission p {
     text-align: center;
 }
 
-.hline {
-    clear: both;
-    margin: 0 auto 10px;
-    height: 20px;
-    font-size: 1px;
-    line-height: 1;
-    background: url(../images/hline.gif) no-repeat scroll center center transparent;
-}
-
 .published-time {
     color: #999999;
     font-size: 11px;
@@ -484,7 +452,7 @@ header .site-name,
 header .site-name a {
     color: #333333;
     font: normal 26px/1em Monospaced Number, Chinese Quote, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Helvetica Neue, Helvetica, Arial, sans-serif;;
-    text-shadow: 1px 1px 20x #D4D4D4;
+    text-shadow: 1px 1px 20px #D4D4D4;
     text-overflow: ellipsis;
     overflow: hidden;
     word-break: break-all;
@@ -501,7 +469,7 @@ header .site-name span {
 }
 
 header .site-name:hover span {
-    top: 0px;
+    top: 0;
 }
 
 header .site-name a:hover {
@@ -516,7 +484,7 @@ header .avatar {
     margin-top: -8px;
     margin-right: 5px;
     border-radius: 50%; /*box-shadow: 0px 0px 10px 2px #EDEDEF;*/
-    background: url('../images/avatar240_240.jpg') scroll center center #FFFFFF;
+    background: url('../images/avatar.gif') scroll center center #FFFFFF;
     background-size: cover;
     overflow: hidden;
 }
@@ -722,13 +690,6 @@ header nav.mainnav .link-studio:hover {
     padding: 5px;
     border: 1px solid #FF7700;
     margin: 10px 0;
-}
-
-.contact-block .zemError li {
-    padding: 0.2em 0 0.2em 10px;
-    background: url(../images/dot.gif) no-repeat scroll 2px 9px transparent;
-    border: 0 none;
-    margin: 0;
 }
 
 .meta {
@@ -1263,7 +1224,6 @@ section article li sup a, section .content sup a {
 }
 
 section p a:hover,
-section .content a:hoveraaa,
 section .content a:hover span {
     color: #FF7300;
 }
@@ -1294,18 +1254,12 @@ section .content h2 {
     font-size: 20px;
 }
 
-section .content h2, section .content h3, section .content h4, section .content h5, section .content h6, section .content h7 {
+section .content h2, section .content h3, section .content h4, section .content h5, section .content h6 {
     margin-top: 1.5em;
 }
 
 section .content h2:first-child, section .content h3:first-child, section .content h4:first-child {
     margin-top: 0;
-}
-
-section span#read-more {
-    height: 1;
-    line-height: 1;
-    font-size: 1;
 }
 
 section .entry {
@@ -1597,23 +1551,6 @@ article .timeline-box dd:after {
     border-right-color: #F8F8F8;
     border-width: 8px;
     top: 4px;
-}
-
-.blogs article .author {
-    position: absolute;
-    left: -75px;
-    top: 0px;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background-image: url(../images/jing60.jpg);
-    background-size: cover;
-    opacity: 0.9;
-    border: 1px solid rgba(255, 255, 255, 1)
-}
-
-.blogs article .robin {
-    background-image: url(../images/robin60.jpg);
 }
 
 .blogs article .author:hover {
@@ -1932,17 +1869,6 @@ ul.comments_error li {
     padding: 2px 0 2px 12px;
     margin-bottom: 0;
     border: 0 none;
-    background: url(../images/dot.gif) no-repeat scroll 2px center transparent;
-}
-
-/* Widget */
-.twitter {
-    overflow: hidden;
-    position: relative;
-    height: 56px;
-    margin-bottom: 15px;
-    background: url(../images/arrow_line.gif) no-repeat scroll 66px -16px #FFFFFF;
-    color: #888888;
 }
 
 .twitter .avatar {
@@ -2035,9 +1961,6 @@ ul.comments_error li {
     background-color: #FFF;
 }
 
-.grid-container .items-list {
-    background: url(../images/v_line.gif) repeat-y scroll 180px 0 transparent;
-}
 
 /* Photos */
 /*.albums .top header, .albums .main, .albums .main section, .albums .bottom footer{width: 720px;}*/
@@ -2191,80 +2114,6 @@ ul.comments_error li {
     padding-right: 10px;
 }
 
-/* 404 */
-.error-wrap {
-    position: relative;
-    height: 450px;
-    margin: 20px 0;
-    background: url(../images/error_01.jpg) no-repeat scroll 15px center #FFFFFF;
-}
-
-.error-wrap .pre,
-.error-wrap .next {
-    position: absolute;
-    top: 185px;
-    height: 190px;
-    width: 380px;
-    text-indent: -999em;
-}
-
-.error-wrap .next {
-    height: 180px;
-    top: 195px;
-}
-
-.error-wrap .pre:hover,
-.error-wrap .next:hover {
-    background: url(../images/error_02.jpg) no-repeat scroll 15px -150px transparent;
-}
-
-.error-wrap .pre {
-    left: 0;
-}
-
-.error-wrap .next {
-    right: 0;
-}
-
-.error-wrap .next:hover {
-    background-position: -605px -160px;
-}
-
-.error-wrap section {
-    width: 100%;
-}
-
-.error-wrap .error-info {
-    padding-top: 150px;
-    height: 260px;
-}
-
-.error-wrap .error-msg {
-    text-align: center;
-}
-
-.error-wrap .error-status {
-    height: 30px;
-    width: 100px;
-    margin: 0 auto;
-    text-indent: -999em;
-}
-
-.error-wrap .widget {
-    position: absolute;
-    top: 245px;
-    left: 400px;
-    z-index: 99;
-}
-
-.error-wrap .search input {
-    width: 180px;
-}
-
-/* Calendar */
-.calendar {
-}
-
 /* tips */
 .tips {
     position: absolute;
@@ -2280,7 +2129,6 @@ ul.comments_error li {
 }
 
 .tips .close {
-    background: url('../images/close.gif') no-repeat scroll top right transparent;
     float: right;
     width: 15px;
     height: 15px;
@@ -2321,43 +2169,6 @@ ul.comments_error li {
 .not-ie .notice, .not-ie .browsers {
     height: 30px;
     float: left;
-}
-
-.not-ie .notice {
-    padding-top: 6px;
-    height: 24px;
-}
-
-.not-ie .browsers a {
-    float: left;
-    margin-right: 10px;
-    height: 30px;
-    line-height: 100px;
-    overflow: hidden;
-    width: 30px;
-    background: url('../images/browser.png') no-repeat scroll 0 0 transparent;
-}
-
-.not-ie .browsers a.chrome {
-    background-position: 0 0;
-}
-
-.not-ie .browsers a.ff {
-    background-position: -33px 0;
-}
-
-.not-ie .browsers a.opera {
-    background-position: -64px 0;
-}
-
-.not-ie .browsers a.safari {
-    background-position: -94px 0;
-}
-
-/* Icon on About page*/
-.icon-g, .icon-t, .icon-fb, .icon-linkdein, .icon-amazon, .icon-tu {
-    padding: 1px 0 1px 18px;
-    background: url('../images/icon_sns.gif') no-repeat scroll 0 0 transparent;
 }
 
 .icon-g {
@@ -2450,30 +2261,6 @@ ul.comments_error li {
     top: 0;
     margin: 0 0 0 -25px;
     background-size: cover;
-}
-
-.timeline-view .item .pcgroup {
-    background-image: url(../images/pcgroup.jpg);
-}
-
-.timeline-view .item .rib {
-    background-image: url(../images/rib.jpg);
-}
-
-.timeline-view .item .gmc {
-    background-image: url(../images/gmc.jpg);
-}
-
-.timeline-view .item .tenpay {
-    background-image: url(../images/tenpay.jpg);
-}
-
-.timeline-view .item .bysoft {
-    background-image: url(../images/bysoft.jpg);
-}
-
-.timeline-view .item .xiamen {
-    background-image: url(../images/xiamen.jpg);
 }
 
 .timeline-view .item .summary {
@@ -2834,7 +2621,7 @@ ul.comments_error li {
         background-color: #f0f0f0;
         background-repeat: no-repeat;
         background-position: center center;
-        background-image: url('../images/avatar240_240.jpg');
+        background-image: url('../images/avatar.gif');
         display: inline-block;
     }
 }

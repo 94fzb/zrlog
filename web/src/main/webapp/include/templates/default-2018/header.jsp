@@ -1,5 +1,4 @@
-﻿﻿
-<%@ page language="java" session="false" import="java.util.*" pageEncoding="UTF-8" %>
+﻿<%@ page language="java" session="false" import="java.util.Map" pageEncoding="UTF-8" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
     Map<String, Object> res = (Map<String, Object>) request.getAttribute("_res");
@@ -15,24 +14,11 @@
     <link rel="stylesheet" type="text/css" href="${baseUrl}assets/css/video-js.css"/>
     <link rel="stylesheet" type="text/css" media="screen" href="${templateUrl}/css/style_2018.css"/>
     <link rel="stylesheet" type="text/css" media="screen" href="${templateUrl}/css/editormd.css"/>
-
     <script src="${templateUrl}/js/jquery-1.10.2.min.js"></script>
     <script src="${baseUrl }assets/js/video.js"></script>
     <script src="${templateUrl}/js/modernizr.custom.16617.js"></script>
     <script src="${templateUrl}/js/jquery.lazyload.min.js"></script>
     <style>
-        @font-face {
-            font-family: 'Material Icons';
-            font-style: normal;
-            font-weight: 400;
-            src: url(${templateUrl}/fonts/MaterialIcons-Regular.eot); /* For IE6-8 */
-            src: local('Material Icons'),
-            local('MaterialIcons-Regular'),
-            url(${templateUrl}/fonts/MaterialIcons-Regular.woff2) format('woff2'),
-            url(${templateUrl}/fonts/MaterialIcons-Regular.woff) format('woff'),
-            url(${templateUrl}/fonts/MaterialIcons-Regular.ttf) format('truetype');
-        }
-
         .side .s-header .avatar,
         .top .avatar {
             background: url('${_res.avatar}') scroll center center #FFFFFF;
@@ -43,13 +29,13 @@
         }
     </style>
 </head>
-<body class="default front">
+<body>
 <div class="page">
     <div id="overLayer"></div>
     <div class="top">
         <div class="inner">
             <header>
-                <a href="${pageContext.request.contextPath}/?avatar"><i class="avatar"></i></a>
+                <a href="${baseUrl}"><i class="avatar"></i></a>
                 <h1 class="page-title">
                     <a href='${rurl}'>${website.title}</a>
                 </h1>
@@ -91,13 +77,13 @@
                     <div class="list">
                         <ul>
                             <c:forEach var="type" items="${init.types}">
-                                <li class="parent"><a title="${type.typeName}" href="${rurl}post/sort/${type.alias}"><i
+                                <li><a title="${type.typeName}" href="${rurl}post/sort/${type.alias}"><i
                                         class="material-icons">label</i> ${type.typeName} (${type.typeamount})</a></li>
                             </c:forEach>
                         </ul>
                     </div>
                 </div>
-                <div class="widget category-list" style="padding-bottom: 10px">
+                <div class="widget category-list">
                     <h3>标签 <span class="en">Tags</span></h3>
                     <div class="taglist" id="tags">
                         <c:forEach items="${init.tags}" var="tag">
@@ -105,7 +91,7 @@
                         </c:forEach>
                     </div>
                 </div>
-                <div class="widget channel-index">
+                <div class="widget category-list">
                     <ul>
                         <li><a href="${rurl}post/all"><i class="material-icons">description</i><span>博客</span></a></li>
                         <c:choose>
@@ -118,14 +104,4 @@
                 </div>
             </div>
         </aside>
-    </div>
-    <div class="ribbon">
-        <div class="breadcrumb" style="font-size:14px">
-            <c:if test="${not empty log}">
-                <section>
-                    <a href="${baseUrl}" class="item">首页</a> &gt; <a href="${log.typeUrl}"
-                                                                     class="item">${log.typeName}</a> &gt; ${log.title}
-                </section>
-            </c:if>
-        </div>
     </div>

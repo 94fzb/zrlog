@@ -49,7 +49,7 @@ public class Constants {
     public static String pluginServer;
 
     public static boolean isStaticHtmlStatus() {
-        return "1".equals(WEB_SITE.get("generator_html_status"));
+        return getBooleanByFromWebSite("generator_html_status");
     }
 
     public static int getMaxCacheHtmlSize() {
