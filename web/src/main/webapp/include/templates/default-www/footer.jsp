@@ -12,7 +12,7 @@
                 <p>
                     ${_res.footerLink}
                 </p>
-                <p class="copyright">Copyright &copy; 2018 ${webs.title}</p>
+                <p class="copyright">${_res['copyrightCurrentYear']} ${webs.title}</p>
             </div>
             <div class="col-lg-12 footer-below">
                 <a href="${baseUrl}">${host}</a>

@@ -56,7 +56,7 @@ $(function () {
     });
 
     var keywordsEl = $("#keywords");
-    var isPrivateCheckBoxEl = $("input[name='_private']");
+    var isPrivateCheckBoxEl = $("input[name='privacy']");
     keywordsEl.tagsInput({
         height: '68px',
         width: 'auto'
