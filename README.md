@@ -61,9 +61,9 @@ ZrLog是使用 Java 开发的博客/CMS程序，具有简约，易用，组件�
 
 ### 获取帮助
 
-* QQ群 6399942
+* 微信号 hibegin
 * 邮件 xchun90@163.com
-* 对程序有任何问题，欢迎反馈 [http://blog.zrlog.com/post/feedback](http://blog.zrlog.com/post/feedback)
+* 对程序有任何问题，欢迎反馈 [https://blog.zrlog.com/post/feedback](https://blog.zrlog.com/post/feedback)
 
 ### 常见问题
 
