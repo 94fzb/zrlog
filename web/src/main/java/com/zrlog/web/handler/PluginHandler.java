@@ -10,8 +10,8 @@ import com.zrlog.common.vo.AdminTokenVO;
 import com.zrlog.model.User;
 import com.zrlog.service.AdminTokenService;
 import com.zrlog.service.AdminTokenThreadLocal;
-import com.zrlog.service.PluginHelper;
 import com.zrlog.util.BlogBuildInfoUtil;
+import com.zrlog.web.util.PluginHelper;
 import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.log4j.Logger;
@@ -52,8 +52,9 @@ public class PluginHandler extends Handler {
             }
         }
         if (isPluginPath) {
+            Map.Entry<AdminTokenVO, User> entry = null;
             try {
-                Map.Entry<AdminTokenVO, User> entry = adminTokenService.getAdminTokenVOUserEntry(request);
+                entry = adminTokenService.getAdminTokenVOUserEntry(request);
                 if (entry != null) {
                     adminTokenService.setAdminToken(entry.getValue(), entry.getKey().getSessionId(), entry.getKey().getProtocol(), request, response);
                 }
@@ -72,6 +73,9 @@ public class PluginHandler extends Handler {
                 }
             } finally {
                 isHandled[0] = true;
+                if (entry != null) {
+                    AdminTokenThreadLocal.remove();
+                }
             }
         } else {
             this.next.handle(target, request, response, isHandled);
@@ -153,13 +157,13 @@ public class PluginHandler extends Handler {
         HttpUtil httpUtil = disableRedirect ? HttpUtil.getDisableRedirectInstance() : HttpUtil.getInstance();
         //GET请求不关心request.getInputStream() 的数据
         if (method.equals(request.getMethod()) && "GET".equalsIgnoreCase(method)) {
-            httpResponse = httpUtil.sendGetRequest(pluginServerHttp + uri, request.getParameterMap(), handle, PluginHelper.genHeaderMapByRequest(request)).getT();
+            httpResponse = httpUtil.sendGetRequest(pluginServerHttp + uri, request.getParameterMap(), handle, PluginHelper.genHeaderMapByRequest(request, AdminTokenThreadLocal.getUser())).getT();
         } else {
             //如果是表单数据提交不关心请求头，反之将所有请求头都发到插件服务
             if ("application/x-www-form-urlencoded".equals(request.getContentType())) {
-                httpResponse = httpUtil.sendPostRequest(pluginServerHttp + uri, request.getParameterMap(), handle, PluginHelper.genHeaderMapByRequest(request)).getT();
+                httpResponse = httpUtil.sendPostRequest(pluginServerHttp + uri, request.getParameterMap(), handle, PluginHelper.genHeaderMapByRequest(request, AdminTokenThreadLocal.getUser())).getT();
             } else {
-                httpResponse = httpUtil.sendPostRequest(pluginServerHttp + uri + "?" + request.getQueryString(), IOUtil.getByteByInputStream(request.getInputStream()), handle, PluginHelper.genHeaderMapByRequest(request)).getT();
+                httpResponse = httpUtil.sendPostRequest(pluginServerHttp + uri + "?" + request.getQueryString(), IOUtil.getByteByInputStream(request.getInputStream()), handle, PluginHelper.genHeaderMapByRequest(request, AdminTokenThreadLocal.getUser())).getT();
             }
         }
         //添加插件服务的HTTP响应头到调用者响应头里面
