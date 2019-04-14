@@ -4,6 +4,7 @@ import com.hibegin.common.util.http.HttpUtil;
 import com.hibegin.common.util.http.handle.HttpJsonArrayHandle;
 import com.zrlog.common.Constants;
 import com.zrlog.common.response.UploadFileResponse;
+import com.zrlog.web.util.PluginHelper;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,7 +25,7 @@ public class UploadService {
         String url;
         try {
             List<Map> urls = HttpUtil.getInstance().sendGetRequest(Constants.pluginServer + "/service", map
-                    , new HttpJsonArrayHandle<Map>(), PluginHelper.genHeaderMapByRequest(request)).getT();
+                    , new HttpJsonArrayHandle<Map>(), PluginHelper.genHeaderMapByRequest(request, AdminTokenThreadLocal.getUser())).getT();
             if (urls != null && !urls.isEmpty()) {
                 url = (String) urls.get(0).get("url");
                 if (!url.startsWith("https://") && !url.startsWith("http://")) {
