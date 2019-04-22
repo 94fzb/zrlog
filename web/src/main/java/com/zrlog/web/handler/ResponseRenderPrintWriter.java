@@ -6,6 +6,9 @@ import com.zrlog.service.CacheService;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.SimpleHtmlSerializer;
 import org.htmlcleaner.TagNode;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -133,7 +136,8 @@ class ResponseRenderPrintWriter extends PrintWriter {
             currentBody = currentBody.replace(entry.getKey(), entry.getValue());
         }
         if (compress) {
-            //currentBody = compressor.compress(currentBody);
+            Document doc = Jsoup.parse(currentBody);
+            currentBody = doc.outerHtml();
         }
         currentBody = currentBody + "<!--" + (System.currentTimeMillis() - startTime) + "ms-->";
         return currentBody;

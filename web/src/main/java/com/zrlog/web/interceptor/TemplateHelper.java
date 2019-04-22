@@ -48,7 +48,6 @@ public class TemplateHelper {
         String baseUrl = setBaseUrl(request, staticBlog, webSite);
         //过期
         request.setAttribute("webs", webSite);
-        request.setAttribute("searchUrl", baseUrl + Constants.getArticleUri() + "search");
         String title = webSite.get("title") + " - " + webSite.get("second_title");
         if (request.getAttribute("log") != null) {
             title = ((Log) request.getAttribute("log")).get("title") + " - " + title;
@@ -60,7 +59,7 @@ public class TemplateHelper {
         } else if (request.getAttribute("log") != null) {
             data = request.getAttribute("log");
         }
-        staticHtml(data, baseUrl, suffix, Constants.getBooleanByFromWebSite("article_thumbnail_status"));
+        staticHtml(data, request, suffix, Constants.getBooleanByFromWebSite("article_thumbnail_status"));
         if (request.getAttribute("pager") != null && !((List<Map<String, Object>>) ((Map) request.getAttribute("pager")).get("pageList")).isEmpty()) {
             List<Map<String, Object>> pageList = (List<Map<String, Object>>) ((Map) request.getAttribute("pager")).get("pageList");
             for (Map<String, Object> pageMap : pageList) {
@@ -74,7 +73,7 @@ public class TemplateHelper {
         if (!tags.isEmpty()) {
             for (Tag tag : tags) {
                 try {
-                    String tagUri = baseUrl + Constants.getArticleUri() + "tag/" + URLEncoder.encode(tag.get("text"), "UTF-8") + suffix;
+                    String tagUri =baseUrl + Constants.getArticleUri() + "tag/" + URLEncoder.encode(tag.get("text"), "UTF-8") + suffix;
                     tag.put("url", tagUri);
                 } catch (UnsupportedEncodingException e) {
                     LOGGER.error("", e);
@@ -102,7 +101,7 @@ public class TemplateHelper {
             archive.setUrl(tagUri);
             archiveList.add(archive);
         }
-        fullNavBar(request, suffix, baseDataInitVO, baseUrl);
+        fullNavBar(request, suffix, baseDataInitVO,baseUrl);
         baseDataInitVO.setArchiveList(archiveList);
     }
 
@@ -169,7 +168,8 @@ public class TemplateHelper {
                 templateUrl = "//" + webSite.get("staticResourceHost").toString() + request.getAttribute("template");
                 request.setAttribute("staticResourceBaseUrl", "//" + webSite.get("staticResourceHost").toString() + request.getContextPath() + "/");
             } else {
-                templateUrl = "//" + request.getHeader("host") + request.getContextPath() + request.getAttribute("template");
+                templateUrl = request.getContextPath() + request.getAttribute("template");
+                baseUrl = WebTools.getHomeUrl(request);
             }
         }
         request.setAttribute("url", templateUrl);
@@ -177,6 +177,7 @@ public class TemplateHelper {
         request.setAttribute("rurl", baseUrl);
         request.setAttribute("baseUrl", baseUrl);
         request.setAttribute("host", request.getHeader("host"));
+        request.setAttribute("searchUrl", baseUrl + Constants.getArticleUri() + "search");
         return baseUrl;
     }
 
@@ -197,9 +198,9 @@ public class TemplateHelper {
         return false;
     }
 
-    private static void staticHtml(Object data, String baseUrl, String suffix, boolean thumbnailEnableArticle) {
+    private static void staticHtml(Object data, HttpServletRequest request, String suffix, boolean thumbnailEnableArticle) {
         if (data instanceof Log) {
-            fillArticleInfo((Log) data, baseUrl, suffix);
+            fillArticleInfo((Log) data, request, suffix);
         } else if (data instanceof Map) {
             Map map = (Map) data;
             List<Log> logList = (List<Log>) map.get("rows");
@@ -210,8 +211,8 @@ public class TemplateHelper {
                     } else if (log.get("thumbnail") != null) {
                         log.put("thumbnailAlt", ParseUtil.removeHtmlElement(log.get("title")));
                     }
-                    log.put("url", baseUrl + Constants.getArticleUri() + log.get("alias") + suffix);
-                    log.put("typeUrl", baseUrl + Constants.getArticleUri() + "sort/" + log.get("typeAlias") + suffix);
+                    log.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + log.get("alias") + suffix);
+                    log.put("typeUrl", WebTools.getHomeUrl(request) + Constants.getArticleUri() + "sort/" + log.get("typeAlias") + suffix);
                 }
             }
         }
@@ -230,15 +231,15 @@ public class TemplateHelper {
         return previewTemplate;
     }
 
-    public static void fillArticleInfo(Log data, String baseUrl, String suffix) {
+    public static void fillArticleInfo(Log data,  HttpServletRequest request, String suffix) {
         data.put("alias", data.get("alias") + suffix);
-        data.put("url", baseUrl + Constants.getArticleUri() + data.get("alias"));
-        data.put("noSchemeUrl", baseUrl.substring(2) + Constants.getArticleUri() + data.get("alias"));
-        data.put("typeUrl", baseUrl + Constants.getArticleUri() + "sort/" + data.get("typeAlias") + suffix);
+        data.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + data.get("alias"));
+        data.put("noSchemeUrl", WebTools.getHomeUrlWithHost(request) + Constants.getArticleUri() + data.get("alias"));
+        data.put("typeUrl", WebTools.getHomeUrl(request) + Constants.getArticleUri() + "sort/" + data.get("typeAlias") + suffix);
         Log lastLog = data.get("lastLog");
         Log nextLog = data.get("nextLog");
-        nextLog.put("url", baseUrl + Constants.getArticleUri() + nextLog.get("alias") + suffix);
-        lastLog.put("url", baseUrl + Constants.getArticleUri() + lastLog.get("alias") + suffix);
+        nextLog.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + nextLog.get("alias") + suffix);
+        lastLog.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + lastLog.get("alias") + suffix);
         //没有使用md的toc目录的文章才尝试使用系统提取的目录
         if (data.getStr("markdown") != null && !data.getStr("markdown").toLowerCase().contains("[toc]")
                 && !data.getStr("markdown").toLowerCase().contains("[tocm]")) {

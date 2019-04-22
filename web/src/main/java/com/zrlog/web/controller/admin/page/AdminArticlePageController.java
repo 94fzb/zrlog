@@ -26,7 +26,7 @@ public class AdminArticlePageController extends BaseController {
                 log.put("lastLog", Log.dao.findLastLog(logId, I18nUtil.getStringFromRes("noLastLog")));
                 log.put("nextLog", Log.dao.findNextLog(logId, I18nUtil.getStringFromRes("noNextLog")));
                 setAttr("log", log.getAttrs());
-                TemplateHelper.fillArticleInfo(log, TemplateHelper.setBaseUrl(getRequest(), false, Constants.WEB_SITE), "");
+                TemplateHelper.fillArticleInfo(log, getRequest(), "");
             }
             return getTemplatePath() + "/detail" + ZrLogUtil.getViewExt(new TemplateService().getTemplateVO(JFinal.me().getContextPath(),
                     new File(PathKit.getWebRootPath() + getTemplatePath())).getViewType());
