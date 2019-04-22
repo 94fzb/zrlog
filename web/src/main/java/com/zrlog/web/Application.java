@@ -25,6 +25,7 @@ public class Application {
         }
 
         tomcat.setPort(Integer.valueOf(webPort));
+        tomcat.getConnector();
 
         // Declare an alternative location for your "WEB-INF/classes" dir
         // Servlet 3.0 annotation will work

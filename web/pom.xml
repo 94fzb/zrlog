@@ -13,7 +13,7 @@
     <packaging>war</packaging>
 
     <properties>
-        <tomcat7Version>7.0.91</tomcat7Version>
+        <tomcat7Version>9.0.19</tomcat7Version>
         <tomcat-scope>compile</tomcat-scope>
         <contextPath>/</contextPath>
     </properties>
@@ -41,11 +41,6 @@
             <version>2.21</version>
         </dependency>
         <dependency>
-            <groupId>com.googlecode.htmlcompressor</groupId>
-            <artifactId>htmlcompressor</artifactId>
-            <version>1.5.2</version>
-        </dependency>
-        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>${servlet.version}</version>
@@ -67,19 +62,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
-            <artifactId>tomcat-embed-logging-juli</artifactId>
-            <version>${tomcat7Version}</version>
-            <scope>${tomcat-scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-jasper</artifactId>
-            <version>${tomcat7Version}</version>
-            <scope>${tomcat-scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tomcat</groupId>
-            <artifactId>tomcat-jsp-api</artifactId>
             <version>${tomcat7Version}</version>
             <scope>${tomcat-scope}</scope>
         </dependency>

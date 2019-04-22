@@ -76,9 +76,7 @@ public class RequestStatisticsPlugin implements IPlugin {
                         if (!visitArticleSet.contains(key) && ZrLogUtil.isNormalBrowser(requestInfo.getUserAgent())) {
                             Log.dao.clickAdd(alias);
                             //若是公网地址才记录
-                            if (!ZrLogUtil.isInternalHostName(requestInfo.getIp())) {
-                                visitArticleSet.add(key);
-                            }
+                            visitArticleSet.add(key);
                         }
                         requestInfo.setDeal(true);
                     }

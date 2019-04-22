@@ -170,7 +170,7 @@
                             <input class="form-control" placeholder="${_res['tagTips']}" type="hidden" name="keywords"
                                    id="keywordsVal" size="60" maxlength="60"/>
                             <div class="tagsinput" id="keywords"></div>
-                            <div class="tagsinput" id="unCheckedTag" style="max-height: 240px;width: 100%">
+                            <div class="tagsinput" id="unCheckedTag" style="max-height: 145px;width: 100%">
                                 <#list init.tags as tags>
                                     <span class="tag2" val="${tags.text}"><i style="padding-right: 5px"
                                                                              class="fa fa-tag"></i>${tags.text}</span>

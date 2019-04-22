@@ -1,6 +1,6 @@
 package com.zrlog.service;
 
-import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.hibegin.common.util.FileUtils;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.common.util.ZipUtil;
@@ -23,7 +23,7 @@ import java.util.*;
 public class TemplateService {
 
     public UpdateRecordResponse save(String template, Map<String, Object> settingMap) {
-        new WebSite().updateByKV(template + Constants.TEMPLATE_CONFIG_SUFFIX, new Gson().toJson(settingMap));
+        new WebSite().updateByKV(template + Constants.TEMPLATE_CONFIG_SUFFIX, new GsonBuilder().serializeNulls().create().toJson(settingMap));
         UpdateRecordResponse updateRecordResponse = new UpdateRecordResponse();
         updateRecordResponse.setMessage(I18nUtil.getStringFromRes("templateUpdateSuccess"));
         return updateRecordResponse;
