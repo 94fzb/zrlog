@@ -45,17 +45,38 @@ public class TemplateController extends BaseController {
         return new WebSiteSettingUpdateResponse();
     }
 
-    public LoadFileResponse loadFile() throws FileNotFoundException {
+    public LoadFileResponse loadFile() throws FileNotFoundException,IllegalAccessException {
         LoadFileResponse loadFileResponse = new LoadFileResponse();
-        loadFileResponse.setFileContent(IOUtil.getStringInputStream(new FileInputStream(PathKit.getWebRootPath() + getPara("file"))));
+        loadFileResponse.setFileContent(IOUtil.getStringInputStream(new FileInputStream(PathKit.getWebRootPath() + getAndCheckInputFile())));
         return loadFileResponse;
     }
 
     @RefreshCache
-    public StandardResponse saveFile() {
-        String file = PathKit.getWebRootPath() + getPara("file");
+    public StandardResponse saveFile() throws IllegalAccessException{
+        String filePath = getAndCheckInputFile();
+        String file = PathKit.getWebRootPath() + filePath;
         IOUtil.writeBytesToFile(getPara("content").getBytes(), new File(file));
         return new StandardResponse();
+    }
+
+    private String getAndCheckInputFile() throws IllegalAccessException {
+        String filePath = getPara("file");
+        return checkByWhiteList(filePath);
+    }
+
+    private String checkByWhiteList(String filePath) throws IllegalAccessException {
+        if (filePath.contains("../")) {
+            throw new IllegalAccessException("");
+        }
+        if(!filePath.startsWith("/error") && !filePath.startsWith("/include")){
+            throw new IllegalAccessException("");
+        }
+        return filePath;
+    }
+
+    private String getAndCheckInputFilePath() throws IllegalAccessException {
+        String filePath = getPara("path");
+        return checkByWhiteList(filePath);
     }
 
     public UploadTemplateResponse upload() throws IOException {
@@ -64,9 +85,9 @@ public class TemplateController extends BaseController {
         return templateService.upload(templateName, getFile(uploadFieldName).getFile());
     }
 
-    public ListFileResponse files() {
+    public ListFileResponse files() throws IllegalAccessException{
         ListFileResponse listFileResponse = new ListFileResponse();
-        listFileResponse.setFiles(templateService.getFiles(getPara("path")));
+        listFileResponse.setFiles(templateService.getFiles(getAndCheckInputFilePath()));
         return listFileResponse;
     }
 
