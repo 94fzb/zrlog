@@ -40,6 +40,10 @@ public class WebTools {
         return "//" + request.getHeader("host") + request.getContextPath() + "/";
     }
 
+    public static String getHomeUrlWithHostNotProtocol(HttpServletRequest request) {
+        return request.getHeader("host") + request.getContextPath() + "/";
+    }
+
     public static String getHomeUrl(HttpServletRequest request) {
         return request.getContextPath() + "/";
     }

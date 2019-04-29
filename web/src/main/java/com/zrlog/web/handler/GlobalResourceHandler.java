@@ -57,6 +57,7 @@ public class GlobalResourceHandler extends Handler {
         REQUEST_START_TIME.set(start);
         String url = WebTools.getHomeUrl(request);
         request.setAttribute("basePath", url);
+        request.setAttribute("baseWithHostPath", WebTools.getHomeUrlWithHostNotProtocol(request));
         request.setAttribute("pageEndTag", PAGE_END_TAG);
         String ext = null;
         if (target.contains("/")) {
