@@ -1,4 +1,6 @@
-package com.zrlog.model;
+package com.zrlog.web.cache.vo;
+
+import com.zrlog.model.*;
 
 import java.io.Serializable;
 import java.util.List;

@@ -8,7 +8,6 @@ import com.jfinal.plugin.activerecord.Model;
  */
 public class User extends Model<User> {
 
-    public static final User dao = new User();
     public static final String TABLE_NAME = "user";
 
     public String getPasswordByUserName(String userName) {
@@ -20,15 +19,11 @@ public class User extends Model<User> {
     }
 
     public User getIdByUserName(String userName) {
-        User user = findFirst("select * from " + TABLE_NAME + " where username=?", userName);
-        if (user != null) {
-            return user;
-        }
-        return null;
+        return findFirst("select * from " + TABLE_NAME + " where username=?", userName);
     }
 
     public String getPasswordByUserId(int userId) {
-        return (String) findFirst("select password from " + TABLE_NAME + " where userId=?", userId).get("password");
+        return findFirst("select password from " + TABLE_NAME + " where userId=?", userId).get("password");
     }
 
     public boolean updatePassword(int userId, String password) {

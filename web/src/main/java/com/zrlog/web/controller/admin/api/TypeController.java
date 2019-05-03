@@ -10,11 +10,11 @@ import java.util.Map;
 public class TypeController extends BaseController {
     @RefreshCache
     public UpdateRecordResponse delete() {
-        return new UpdateRecordResponse(Type.dao.deleteById(getPara("id")));
+        return new UpdateRecordResponse(new Type().deleteById(getPara("id")));
     }
 
     public Map index() {
-        return Type.dao.find(getPageable());
+        return new Type().find(getPageable());
     }
 
     @RefreshCache

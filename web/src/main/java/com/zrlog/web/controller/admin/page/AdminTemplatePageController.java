@@ -65,7 +65,7 @@ public class AdminTemplatePageController extends BaseController {
         try {
             String fileName = getRequest().getParameter("templateName");
             String templatePath = fileName.substring(0, fileName.indexOf('.'));
-            File path = new File(PathKit.getWebRootPath() + Constants.TEMPLATE_BASE_PATH + templatePath + "/");
+            File path = new File(PathKit.getWebRootPath() + Constants.TEMPLATE_BASE_PATH + templatePath + File.separator);
 
             if (!path.exists()) {
                 HttpFileHandle fileHandle = (HttpFileHandle) HttpUtil.getInstance().sendGetRequest(getPara("host") + "/template/download?id=" + getParaToInt("id"),

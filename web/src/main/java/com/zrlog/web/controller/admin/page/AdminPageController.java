@@ -7,8 +7,8 @@ import com.zrlog.common.Constants;
 import com.zrlog.common.response.CheckVersionResponse;
 import com.zrlog.model.Comment;
 import com.zrlog.model.Log;
-import com.zrlog.service.AdminTokenService;
-import com.zrlog.service.AdminTokenThreadLocal;
+import com.zrlog.web.token.AdminTokenService;
+import com.zrlog.web.token.AdminTokenThreadLocal;
 import com.zrlog.service.TemplateService;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.config.ZrLogConfig;
@@ -22,12 +22,13 @@ import java.util.List;
 
 public class AdminPageController extends BaseController {
 
+    private static final String LOGOUT_URI = "/admin/login";
+
     private AdminTokenService adminTokenService = new AdminTokenService();
 
     private TemplateService templateService = new TemplateService();
 
     public String index() {
-
         if (AdminTokenThreadLocal.getUser() != null) {
             initIndex(getRequest());
             if (getPara(0) == null || getRequest().getRequestURI().endsWith("admin/") || "login".equals(getPara(0))) {
@@ -42,7 +43,7 @@ public class AdminPageController extends BaseController {
                 return "/admin/" + getPara(0);
             }
         } else {
-            return "/admin/login";
+            return LOGOUT_URI;
         }
     }
 
@@ -51,7 +52,7 @@ public class AdminPageController extends BaseController {
 
         CheckVersionResponse response = new UpgradeController().lastVersion();
         JFinal.me().getServletContext().setAttribute("lastVersion", response);
-        List<Comment> commentList = Comment.dao.findHaveReadIsFalse();
+        List<Comment> commentList = new Comment().findHaveReadIsFalse();
         if (commentList != null && !commentList.isEmpty()) {
             request.setAttribute("noReadComments", commentList);
             for (Comment comment : commentList) {
@@ -67,10 +68,10 @@ public class AdminPageController extends BaseController {
 
 
     private void fillStatistics() {
-        getRequest().setAttribute("commCount", Comment.dao.count());
-        getRequest().setAttribute("toDayCommCount", Comment.dao.countToDayComment());
-        getRequest().setAttribute("clickCount", Log.dao.sumClick());
-        getRequest().setAttribute("articleCount", Log.dao.adminCount());
+        getRequest().setAttribute("commCount", new Comment().count());
+        getRequest().setAttribute("toDayCommCount", new Comment().countToDayComment());
+        getRequest().setAttribute("clickCount", new Log().sumClick());
+        getRequest().setAttribute("articleCount", new Log().adminCount());
     }
 
     public String login() {
@@ -78,9 +79,8 @@ public class AdminPageController extends BaseController {
         if (AdminTokenThreadLocal.getUser() != null) {
             redirect(Constants.ADMIN_INDEX);
             return null;
-        } else {
-            return "/admin/login";
         }
+        return LOGOUT_URI;
     }
 
     public static void previewField(Controller controller) {
@@ -106,6 +106,6 @@ public class AdminPageController extends BaseController {
                 getResponse().addCookie(cookie);
             }
         }
-        redirect("/admin/login");
+        redirect(LOGOUT_URI);
     }
 }

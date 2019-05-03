@@ -2,14 +2,13 @@ package com.zrlog.web.plugin;
 
 import com.jfinal.plugin.IPlugin;
 import com.zrlog.common.Constants;
-import com.zrlog.service.CacheService;
+import com.zrlog.web.cache.CacheService;
 import com.zrlog.web.handler.GlobalResourceHandler;
 import com.zrlog.web.interceptor.InitDataInterceptor;
 
 import java.util.TimerTask;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -17,13 +16,10 @@ import java.util.concurrent.TimeUnit;
  */
 public class CacheCleanerPlugin implements IPlugin {
 
-    private ScheduledExecutorService scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1, new ThreadFactory() {
-        @Override
-        public Thread newThread(Runnable r) {
-            Thread thread = new Thread(r);
-            thread.setName("cache-clean-plugin-thread");
-            return thread;
-        }
+    private ScheduledExecutorService scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1, r -> {
+        Thread thread = new Thread(r);
+        thread.setName("cache-clean-plugin-thread");
+        return thread;
     });
 
     private CacheService cacheService = new CacheService();

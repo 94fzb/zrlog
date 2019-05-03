@@ -13,13 +13,13 @@ public class BlogNavController extends BaseController {
     public UpdateRecordResponse delete() {
         String[] ids = getPara("id").split(",");
         for (String id : ids) {
-            LogNav.dao.deleteById(id);
+            new LogNav().deleteById(id);
         }
         return new UpdateRecordResponse();
     }
 
     public Map index() {
-        return LogNav.dao.find(getPageable());
+        return new LogNav().find(getPageable());
     }
 
     @RefreshCache

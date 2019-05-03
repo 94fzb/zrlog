@@ -11,7 +11,6 @@ import java.util.Map;
  * 存放程序的友情链接，对应数据库link表
  */
 public class Link extends Model<Link> {
-    public static final Link dao = new Link();
     public static final String TABLE_NAME = "link";
 
     public List<Link> find() {

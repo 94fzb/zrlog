@@ -1,4 +1,4 @@
-package com.zrlog.service;
+package com.zrlog.web.plugin;
 
 import com.hibegin.common.util.IOUtil;
 import org.apache.log4j.Logger;
@@ -9,15 +9,15 @@ import java.net.Socket;
 /**
  * 处理由于未知原因插件异常停止后，还可以通过命令重新加载，保证插件的高可用。
  */
-class PluginSocketThread extends Thread {
+class PluginGhostThread extends Thread {
 
-    private static final Logger LOGGER = Logger.getLogger(PluginSocketThread.class);
+    private static final Logger LOGGER = Logger.getLogger(PluginGhostThread.class);
     private int port;
     private String host;
 
     private boolean stop;
 
-    public PluginSocketThread(String host, int port) {
+    public PluginGhostThread(String host, int port) {
         this.host = host;
         this.port = port;
     }

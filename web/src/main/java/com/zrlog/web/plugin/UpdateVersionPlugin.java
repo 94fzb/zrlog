@@ -36,7 +36,7 @@ public class UpdateVersionPlugin implements IPlugin {
 
     @Override
     public boolean start() {
-        String value = WebSite.dao.getStringValueByName(Constants.AUTO_UPGRADE_VERSION_KEY);
+        String value = new WebSite().getStringValueByName(Constants.AUTO_UPGRADE_VERSION_KEY);
         boolean checkPreview = previewAble();
         if (value != null && !"".equals(value)) {
             AutoUpgradeVersionType autoUpgradeVersionType = AutoUpgradeVersionType.cycle(Integer.parseInt(value));
@@ -63,7 +63,7 @@ public class UpdateVersionPlugin implements IPlugin {
     }
 
     private boolean previewAble() {
-        return WebSite.dao.getBoolValueByName("upgradePreview");
+        return new WebSite().getBoolValueByName("upgradePreview");
     }
 
     /**

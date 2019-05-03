@@ -2,13 +2,12 @@ package com.zrlog.web.handler;
 
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.http.handle.CloseResponseHandle;
-import com.zrlog.service.CacheService;
+import com.zrlog.common.vo.AdminTokenVO;
+import com.zrlog.web.cache.CacheService;
+import com.zrlog.web.util.PluginHelper;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.SimpleHtmlSerializer;
 import org.htmlcleaner.TagNode;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,15 +27,14 @@ class ResponseRenderPrintWriter extends PrintWriter {
     private static final Logger LOGGER = LoggerFactory.getLogger(ResponseRenderPrintWriter.class);
 
     private final StringBuilder builder = new StringBuilder();
-    //private HtmlCompressor compressor = new HtmlCompressor();
     private String body;
-    private boolean compress;
     private long startTime = System.currentTimeMillis();
     private String baseUrl;
     private String endFlag;
     private HttpServletRequest request;
     private HttpServletResponse response;
     private String charset;
+    private AdminTokenVO adminTokenVO;
 
     public String getResponseBody() {
         return body;
@@ -46,17 +44,14 @@ class ResponseRenderPrintWriter extends PrintWriter {
         return str.trim().endsWith("</html>") || str.trim().endsWith(endFlag);
     }
 
-    ResponseRenderPrintWriter(OutputStream out, boolean compress, String baseUrl, String endFlag, HttpServletRequest request, HttpServletResponse response, String charset) {
+    ResponseRenderPrintWriter(OutputStream out, String baseUrl, String endFlag, HttpServletRequest request, HttpServletResponse response, AdminTokenVO adminTokenVO) {
         super(out);
-        this.compress = compress;
-        //compressor.setRemoveIntertagSpaces(true);
-        //compressor.setRemoveComments(true);
-        //compressor.setRemoveSurroundingSpaces("span,i,button");
         this.baseUrl = baseUrl;
         this.endFlag = endFlag;
         this.request = request;
         this.response = response;
-        this.charset = charset;
+        this.charset = System.getProperty("file.encoding");
+        this.adminTokenVO = adminTokenVO;
     }
 
     private void tryFlush() {
@@ -135,10 +130,6 @@ class ResponseRenderPrintWriter extends PrintWriter {
         for (Map.Entry<String, String> entry : plugin.entrySet()) {
             currentBody = currentBody.replace(entry.getKey(), entry.getValue());
         }
-        if (compress) {
-            Document doc = Jsoup.parse(currentBody);
-            currentBody = doc.outerHtml();
-        }
         currentBody = currentBody + "<!--" + (System.currentTimeMillis() - startTime) + "ms-->";
         return currentBody;
 
@@ -159,7 +150,7 @@ class ResponseRenderPrintWriter extends PrintWriter {
                 if (tag.hasAttribute("param")) {
                     url += "?" + tag.getAttributeByName("param");
                 }
-                CloseResponseHandle handle = PluginHandler.getContext(url, "GET", request, false);
+                CloseResponseHandle handle = PluginHelper.getContext(url, "GET", request, false, adminTokenVO);
                 byte[] bytes = IOUtil.getByteByInputStream(handle.getT().getEntity().getContent());
                 plugin.put(content, new String(bytes, StandardCharsets.UTF_8));
             } catch (Exception e) {

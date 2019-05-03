@@ -8,6 +8,7 @@ import com.zrlog.common.response.UploadFileResponse;
 import com.zrlog.service.UploadService;
 import com.zrlog.util.ThumbnailUtil;
 import com.zrlog.web.controller.BaseController;
+import com.zrlog.web.token.AdminTokenThreadLocal;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -26,7 +27,7 @@ public class UploadController extends BaseController {
         File imgFile = getFile(uploadFieldName).getFile();
         String finalFilePath = PathKit.getWebRootPath() + uri;
         FileUtils.moveOrCopyFile(imgFile.toString(), finalFilePath, true);
-        return new UploadService().getCloudUrl(getRequest().getContextPath(), uri, finalFilePath, getRequest());
+        return new UploadService().getCloudUrl(getRequest().getContextPath(), uri, finalFilePath, getRequest(), AdminTokenThreadLocal.getUser());
     }
 
     private String generatorUri(String uploadFieldName) {
@@ -56,7 +57,7 @@ public class UploadController extends BaseController {
         } else {
             IOUtil.writeBytesToFile(bytes, thumbnailFile);
         }
-        UploadFileResponse uploadFileResponse = new UploadService().getCloudUrl(getRequest().getContextPath(), uri, finalFilePath, getRequest());
+        UploadFileResponse uploadFileResponse = new UploadService().getCloudUrl(getRequest().getContextPath(), uri, finalFilePath, getRequest(), AdminTokenThreadLocal.getUser());
         uploadFileResponse.setUrl(uploadFileResponse.getUrl() + "?h=" + height + "&w=" + width);
         imgFile.delete();
         return uploadFileResponse;

@@ -13,12 +13,13 @@ import com.zrlog.common.Constants;
 import com.zrlog.common.response.ExceptionResponse;
 import com.zrlog.common.vo.AdminTokenVO;
 import com.zrlog.model.User;
-import com.zrlog.service.AdminTokenService;
-import com.zrlog.service.CacheService;
 import com.zrlog.util.I18nUtil;
 import com.zrlog.web.annotation.RefreshCache;
+import com.zrlog.web.cache.CacheService;
 import com.zrlog.web.controller.admin.page.AdminPageController;
 import com.zrlog.web.handler.GlobalResourceHandler;
+import com.zrlog.web.token.AdminTokenService;
+import com.zrlog.web.token.AdminTokenThreadLocal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +27,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.FileInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Map;
 
 /**
  * 负责全部后台请求的处理（/admin/plugins/*,/api/admin/plugins/* 除外）
@@ -50,18 +50,18 @@ class AdminInterceptor implements Interceptor {
      */
     private void adminPermission(Invocation ai) {
         Controller controller = ai.getController();
-        Map.Entry<AdminTokenVO, User> entry = adminTokenService.getAdminTokenVOUserEntry(controller.getRequest());
-        if (entry != null) {
+        AdminTokenVO adminTokenVO = adminTokenService.getAdminTokenVO(controller.getRequest());
+        if (adminTokenVO != null) {
             try {
-                User user = entry.getValue();
+                User user = new User().findById(adminTokenVO.getUserId());
                 if (StringUtils.isEmpty(user.getStr("header"))) {
                     user.set("header", Constants.DEFAULT_HEADER);
                 }
                 controller.setAttr("user", user);
-                controller.setAttr("protocol", entry.getKey().getProtocol());
+                controller.setAttr("protocol", adminTokenVO.getProtocol());
                 TemplateHelper.fullTemplateInfo(controller, false);
                 if (!"/admin/logout".equals(ai.getActionKey())) {
-                    adminTokenService.setAdminToken(entry.getValue(), entry.getKey().getSessionId(), entry.getKey().getProtocol(), controller.getRequest(), controller.getResponse());
+                    adminTokenService.setAdminToken(user, adminTokenVO.getSessionId(), adminTokenVO.getProtocol(), controller.getRequest(), controller.getResponse());
                 }
                 ai.invoke();
                 // 存在消息提示
@@ -76,6 +76,8 @@ class AdminInterceptor implements Interceptor {
             } catch (Exception e) {
                 LOGGER.error("", e);
                 exceptionHandler(ai, e);
+            } finally {
+                AdminTokenThreadLocal.remove();
             }
         } else if ("/admin/login".equals(ai.getActionKey()) || "/api/admin/login".equals(ai.getActionKey())) {
             ai.invoke();
@@ -137,7 +139,7 @@ class AdminInterceptor implements Interceptor {
         if (ai.getMethod().getAnnotation(RefreshCache.class) != null) {
             cacheService.refreshInitDataCache(GlobalResourceHandler.CACHE_HTML_PATH, controller, true);
             if (JFinal.me().getConstants().getDevMode()) {
-                LOGGER.info(controller.getRequest().getRequestURI() + " trigger refresh cache");
+                LOGGER.info("{} trigger refresh cache", controller.getRequest().getRequestURI());
             }
         }
         boolean rendered = false;

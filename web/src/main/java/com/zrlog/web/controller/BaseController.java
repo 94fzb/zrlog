@@ -61,6 +61,10 @@ public class BaseController extends Controller {
      */
     public String convertRequestParam(String param) {
         if (param != null) {
+            //如果可以正常读取到中文的情况，直接跳过转换
+            if(containsHanScript(param)){
+                return param;
+            }
             try {
                 return URLDecoder.decode(new String(param.getBytes(StandardCharsets.ISO_8859_1)), "UTF-8");
             } catch (UnsupportedEncodingException e) {
@@ -68,6 +72,12 @@ public class BaseController extends Controller {
             }
         }
         return "";
+    }
+
+    private static boolean containsHanScript(String s) {
+        return s.codePoints().anyMatch(
+                codepoint ->
+                        Character.UnicodeScript.of(codepoint) == Character.UnicodeScript.HAN);
     }
 
     public void fullTemplateSetting(Object jsonStr) {

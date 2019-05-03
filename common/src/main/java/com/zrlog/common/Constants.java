@@ -37,14 +37,14 @@ public class Constants {
     private static final long DEFAULT_SESSION_TIMEOUT = 1000 * 60 * 60 * 24L;
     private static final String SESSION_TIMEOUT_KEY = "session_timeout";
     public static final String ATTACHED_FOLDER = "/attached/";
-    public static String TEMPLATE_CONFIG_SUFFIX = "_setting";
+    public static final String TEMPLATE_CONFIG_SUFFIX = "_setting";
     public static final AutoUpgradeVersionType DEFAULT_AUTO_UPGRADE_VERSION_TYPE = AutoUpgradeVersionType.ONE_DAY;
-    public static String DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ssXXX";
+    public static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ssXXX";
     public static final Map<String, Object> WEB_SITE = Collections.synchronizedMap(new HashMap<>());
-    public static boolean IN_JAR = new File("webapp").exists();
-    public static String FTL_VIEW_PATH = "/view";
+    public static final boolean IN_JAR = new File("webapp").exists();
+    public static final String FTL_VIEW_PATH = "/view";
     public static final String ARTICLE_ROUTER_KEY = "article_route";
-    public static String DEFAULT_HEADER = "assets/images/default-portrait.gif";
+    public static final String DEFAULT_HEADER = "assets/images/default-portrait.gif";
 
     public static String pluginServer;
 

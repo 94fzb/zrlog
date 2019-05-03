@@ -15,7 +15,6 @@ public class Tag extends Model<Tag> {
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(Tag.class);
 
-    public static final Tag dao = new Tag();
     public static final String TABLE_NAME = "tag";
 
     public List<Tag> find() {
@@ -70,7 +69,7 @@ public class Tag extends Model<Tag> {
     public void refreshTag() {
         Db.update("delete from " + TABLE_NAME + "");
         Map<String, Integer> countMap = new HashMap<>();
-        List<Log> logs = Log.dao.find("select keywords from " + Log.TABLE_NAME + " where rubbish=? and privacy=? ", false, false);
+        List<Log> logs = new Log().find("select keywords from " + Log.TABLE_NAME + " where rubbish=? and privacy=? ", false, false);
         for (Log log : logs) {
             if (StringUtils.isNotEmpty(log.getStr("keywords")) && log.getStr("keywords").trim().length() > 0) {
                 Set<String> tagSet = strToSet(log.getStr("keywords") + ",");
@@ -92,7 +91,7 @@ public class Tag extends Model<Tag> {
 
     private void insertTag(Set<String> now) {
         for (String add : now) {
-            Tag t = dao.findFirst("select * from " + TABLE_NAME + " where text=?", add);
+            Tag t = findFirst("select * from " + TABLE_NAME + " where text=?", add);
             if (t == null) {
                 new Tag().set("text", add).set("count", 1).save();
             } else {
@@ -103,7 +102,7 @@ public class Tag extends Model<Tag> {
 
     private void deleteTag(Set<String> old) {
         for (String del : old) {
-            Tag t = dao.findFirst("select * from " + TABLE_NAME + " where text=?", del);
+            Tag t = findFirst("select * from " + TABLE_NAME + " where text=?", del);
             if (t != null) {
                 if (t.getInt("count") > 1) {
                     t.set("count", t.getInt("count") - 1).update();

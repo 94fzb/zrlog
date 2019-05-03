@@ -15,7 +15,7 @@ import com.jfinal.render.ViewType;
 import com.jfinal.template.Engine;
 import com.zrlog.model.*;
 import com.zrlog.service.InstallService;
-import com.zrlog.service.PluginCoreProcess;
+import com.zrlog.web.plugin.PluginCoreProcess;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.controller.blog.ApiArticleController;
@@ -200,7 +200,7 @@ public class ZrLogConfig extends JFinalConfig {
                 }
                 if (!isTest()) {
                     //这里使用独立的线程进行启动，主要是为了防止插件服务出问题后，影响整体，同时是避免启动过慢的问题。
-                    new PluginCoreThread(getDbProperties(), pluginJvmArgsObj.toString()).start();
+                    plugins.add(new PluginCorePlugin(getDbProperties(), pluginJvmArgsObj.toString()));
                     plugins.add(new UpdateVersionPlugin());
                     plugins.add(new CacheCleanerPlugin());
                 }
@@ -253,7 +253,7 @@ public class ZrLogConfig extends JFinalConfig {
         if (haveSqlUpdated) {
             int updatedVersion = ZrLogUtil.getSqlVersion(getUpgradeSqlBasePath());
             if (updatedVersion > 0) {
-                WebSite.dao.updateByKV(com.zrlog.common.Constants.ZRLOG_SQL_VERSION_KEY, updatedVersion + "");
+                new WebSite().updateByKV(com.zrlog.common.Constants.ZRLOG_SQL_VERSION_KEY, updatedVersion + "");
             }
         }
     }

@@ -1,9 +1,10 @@
-package com.zrlog.service;
+package com.zrlog.web.cache;
 
 import com.hibegin.common.util.FileUtils;
 import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
+import com.zrlog.web.cache.vo.BaseDataInitVO;
 import com.zrlog.common.Constants;
 import com.zrlog.model.*;
 
@@ -21,7 +22,7 @@ public class CacheService {
         if (cleanAble) {
             clearCache();
             FileUtils.deleteFile(cachePath);
-            Tag.dao.refreshTag();
+            new Tag().refreshTag();
         }
         initCache(baseController);
     }
@@ -34,30 +35,30 @@ public class CacheService {
         BaseDataInitVO cacheInit = (BaseDataInitVO) JFinal.me().getServletContext().getAttribute(Constants.CACHE_KEY);
         if (cacheInit == null) {
             cacheInit = new BaseDataInitVO();
-            Map<String, Object> website = WebSite.dao.getWebSite();
+            Map<String, Object> website = new WebSite().getWebSite();
             //兼容早期模板判断方式
             website.put("user_comment_pluginStatus", "on".equals(website.get("duoshuo_status")));
 
             BaseDataInitVO.Statistics statistics = new BaseDataInitVO.Statistics();
-            statistics.setTotalArticleSize(Log.dao.count());
+            statistics.setTotalArticleSize(new Log().count());
             cacheInit.setStatistics(statistics);
             cacheInit.setWebSite(website);
-            cacheInit.setLinks(Link.dao.find());
-            cacheInit.setTypes(Type.dao.find());
+            cacheInit.setLinks(new Link().find());
+            cacheInit.setTypes(new Type().find());
             statistics.setTotalTypeSize(cacheInit.getTypes().size());
-            cacheInit.setLogNavs(LogNav.dao.find());
-            cacheInit.setPlugins(Plugin.dao.find());
-            cacheInit.setArchives(Log.dao.getArchives());
-            cacheInit.setTags(Tag.dao.find());
+            cacheInit.setLogNavs(new LogNav().find());
+            cacheInit.setPlugins(new Plugin().find());
+            cacheInit.setArchives(new Log().getArchives());
+            cacheInit.setTags(new Tag().find());
             statistics.setTotalTagSize(cacheInit.getTags().size());
             List<Type> types = cacheInit.getTypes();
-            cacheInit.setHotLogs((List<Log>) Log.dao.find(1, 6).get("rows"));
+            cacheInit.setHotLogs((List<Log>) new Log().find(1, 6).get("rows"));
             Map<Map<String, Object>, List<Log>> indexHotLog = new LinkedHashMap<>();
             for (Type type : types) {
                 Map<String, Object> typeMap = new TreeMap<>();
                 typeMap.put("typeName", type.getStr("typeName"));
                 typeMap.put("alias", type.getStr("alias"));
-                indexHotLog.put(typeMap, (List<Log>) Log.dao.findByTypeAlias(1, 6, type.getStr("alias")).get("rows"));
+                indexHotLog.put(typeMap, (List<Log>) new Log().findByTypeAlias(1, 6, type.getStr("alias")).get("rows"));
             }
             cacheInit.setIndexHotLogs(indexHotLog);
             //存放公共数据到ServletContext

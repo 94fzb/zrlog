@@ -7,7 +7,7 @@ import com.zrlog.model.Comment;
 import com.zrlog.model.Log;
 import com.zrlog.model.Type;
 import com.zrlog.service.ArticleService;
-import com.zrlog.service.CacheService;
+import com.zrlog.web.cache.CacheService;
 import com.zrlog.service.CommentService;
 import com.zrlog.util.I18nUtil;
 import com.zrlog.util.PagerUtil;
@@ -91,7 +91,7 @@ public class ArticleController extends BaseController {
         setAttr("tipsType", I18nUtil.getStringFromRes("archive"));
         setAttr("tipsName", getPara(0));
 
-        setPageInfo(Constants.getArticleUri() + "record/" + getPara(0) + "-", Log.dao.findByDate(getParaToInt(1, 1), getDefaultRows(), getPara(0)), getParaToInt(1, 1));
+        setPageInfo(Constants.getArticleUri() + "record/" + getPara(0) + "-", new Log().findByDate(getParaToInt(1, 1), getDefaultRows(), getPara(0)), getParaToInt(1, 1));
         return "page";
     }
 
@@ -117,12 +117,12 @@ public class ArticleController extends BaseController {
     }
 
     protected String detail(Object id) {
-        Log log = Log.dao.findByIdOrAlias(id);
+        Log log = new Log().findByIdOrAlias(id);
         if (log != null) {
             Integer logId = log.get("logId");
-            log.put("lastLog", Log.dao.findLastLog(logId, I18nUtil.getStringFromRes("noLastLog")));
-            log.put("nextLog", Log.dao.findNextLog(logId, I18nUtil.getStringFromRes("noNextLog")));
-            log.put("comments", Comment.dao.findAllByLogId(logId));
+            log.put("lastLog", new Log().findLastLog(logId, I18nUtil.getStringFromRes("noLastLog")));
+            log.put("nextLog", new Log().findNextLog(logId, I18nUtil.getStringFromRes("noNextLog")));
+            log.put("comments", new Comment().findAllByLogId(logId));
             setAttr("log", log);
         }
         return "detail";
@@ -130,9 +130,9 @@ public class ArticleController extends BaseController {
 
     public String sort() {
         String typeStr = convertRequestParam(getPara(0));
-        setPageInfo(Constants.getArticleUri() + "sort/" + typeStr + "-", Log.dao.findByTypeAlias(getParaToInt(1, 1), getDefaultRows(), typeStr), getParaToInt(1, 1));
+        setPageInfo(Constants.getArticleUri() + "sort/" + typeStr + "-", new Log().findByTypeAlias(getParaToInt(1, 1), getDefaultRows(), typeStr), getParaToInt(1, 1));
 
-        Type type = Type.dao.findByAlias(typeStr);
+        Type type = new Type().findByAlias(typeStr);
         setAttr("type", type);
         setAttr("tipsType", I18nUtil.getStringFromRes("category"));
         if (type != null) {
@@ -144,7 +144,7 @@ public class ArticleController extends BaseController {
     public String tag() {
         if (getPara(0) != null) {
             String tag = convertRequestParam(getPara(0));
-            setPageInfo(Constants.getArticleUri() + "tag/" + getPara(0) + "-", Log.dao.findByTag(getParaToInt(1, 1), getDefaultRows(), tag), getParaToInt(1, 1));
+            setPageInfo(Constants.getArticleUri() + "tag/" + getPara(0) + "-", new Log().findByTag(getParaToInt(1, 1), getDefaultRows(), tag), getParaToInt(1, 1));
 
             setAttr("tipsType", I18nUtil.getStringFromRes("tag"));
             setAttr("tipsName", tag);
@@ -162,7 +162,7 @@ public class ArticleController extends BaseController {
 
     public String all() {
         int page = ParseUtil.strToInt(getPara(1), 1);
-        Map<String, Object> data = Log.dao.find(page, getDefaultRows());
+        Map<String, Object> data = new Log().find(page, getDefaultRows());
         setPageInfo(Constants.getArticleUri() + "all-", data, page);
         return "index";
     }

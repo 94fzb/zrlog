@@ -1,4 +1,4 @@
-package com.zrlog.service;
+package com.zrlog.web.token;
 
 import com.zrlog.common.vo.AdminTokenVO;
 
@@ -7,13 +7,16 @@ import com.zrlog.common.vo.AdminTokenVO;
  */
 public class AdminTokenThreadLocal {
 
+    private AdminTokenThreadLocal() {
+    }
+
     private static ThreadLocal<AdminTokenVO> userThreadLocal = new ThreadLocal<>();
 
     public static AdminTokenVO getUser() {
         return userThreadLocal.get();
     }
 
-    public static void setAdminToken(AdminTokenVO user) {
+    static void setAdminToken(AdminTokenVO user) {
         if (userThreadLocal.get() == null) {
             userThreadLocal.set(user);
         }

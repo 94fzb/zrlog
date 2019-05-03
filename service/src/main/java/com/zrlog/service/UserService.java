@@ -10,24 +10,16 @@ import com.zrlog.common.response.UpdateRecordResponse;
 import com.zrlog.model.User;
 import com.zrlog.util.I18nUtil;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.concurrent.atomic.AtomicInteger;
-
 public class UserService {
 
-    private AdminTokenService adminTokenService = new AdminTokenService();
-
-    private static AtomicInteger sessionAtomicInteger = new AtomicInteger();
-
-    public UpdateRecordResponse updatePassword(ChangePasswordRequest changePasswordRequest) {
+    public UpdateRecordResponse updatePassword(int currentUserId, ChangePasswordRequest changePasswordRequest) {
         UpdateRecordResponse updateRecordResponse = new UpdateRecordResponse();
         if (StringUtils.isNotEmpty(changePasswordRequest.getOldPassword()) && StringUtils.isNotEmpty(changePasswordRequest.getNewPassword())) {
-            String dbPassword = User.dao.getPasswordByUserId(AdminTokenThreadLocal.getUserId());
+            String dbPassword = new User().getPasswordByUserId(currentUserId);
             String oldPassword = changePasswordRequest.getOldPassword();
             // compare oldPassword
             if (SecurityUtils.md5(oldPassword).equals(dbPassword)) {
-                User.dao.updatePassword(AdminTokenThreadLocal.getUserId(), SecurityUtils.md5(changePasswordRequest.getNewPassword()));
+                new User().updatePassword(currentUserId, SecurityUtils.md5(changePasswordRequest.getNewPassword()));
                 updateRecordResponse.setMessage(I18nUtil.getStringFromRes("changePasswordSuccess"));
             } else {
                 updateRecordResponse.setError(1);
@@ -40,15 +32,12 @@ public class UserService {
         return updateRecordResponse;
     }
 
-    public LoginResponse login(LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
+    public LoginResponse login(LoginRequest loginRequest) {
         LoginResponse loginResponse = new LoginResponse();
         if (StringUtils.isNotEmpty(loginRequest.getUserName()) &&
                 StringUtils.isNotEmpty(loginRequest.getPassword()) && StringUtils.isNotEmpty(loginRequest.getKey())) {
-            String dbPassword = User.dao.getPasswordByUserName(loginRequest.getUserName().toLowerCase());
-            if (dbPassword != null && SecurityUtils.md5(loginRequest.getKey() + ":" + dbPassword).equals(loginRequest.getPassword())) {
-                adminTokenService.setAdminToken(User.dao.getIdByUserName(loginRequest.getUserName().toLowerCase()),
-                        sessionAtomicInteger.incrementAndGet(), loginRequest.getHttps() ? "https" : "http", request, response);
-            } else {
+            String dbPassword = new User().getPasswordByUserName(loginRequest.getUserName().toLowerCase());
+            if (dbPassword == null || !SecurityUtils.md5(loginRequest.getKey() + ":" + dbPassword).equals(loginRequest.getPassword())) {
                 loginResponse.setError(1);
                 loginResponse.setMessage(I18nUtil.getStringFromRes("userNameOrPasswordError"));
             }
@@ -61,7 +50,7 @@ public class UserService {
 
 
     public Object update(UpdateAdminRequest updateAdminRequest) {
-        User.dao.updateEmailUserNameHeaderByUserId(updateAdminRequest.getEmail(), updateAdminRequest.getUserName(), updateAdminRequest.getHeader(), updateAdminRequest.getUserId());
-        return User.dao.findById(updateAdminRequest.getUserId());
+        new User().updateEmailUserNameHeaderByUserId(updateAdminRequest.getEmail(), updateAdminRequest.getUserName(), updateAdminRequest.getHeader(), updateAdminRequest.getUserId());
+        return new User().findById(updateAdminRequest.getUserId());
     }
 }

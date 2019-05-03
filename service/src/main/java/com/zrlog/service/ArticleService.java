@@ -43,17 +43,17 @@ public class ArticleService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ArticleService.class);
 
-    public CreateOrUpdateArticleResponse create(Integer userId, CreateArticleRequest createArticleRequest) {
-        return save(userId, createArticleRequest);
+    public CreateOrUpdateArticleResponse create(AdminTokenVO adminTokenVO, CreateArticleRequest createArticleRequest) {
+        return save(adminTokenVO, createArticleRequest);
     }
 
-    public CreateOrUpdateArticleResponse update(Integer userId, UpdateArticleRequest updateArticleRequest) {
-        return save(userId, updateArticleRequest);
+    public CreateOrUpdateArticleResponse update(AdminTokenVO adminTokenVO, UpdateArticleRequest updateArticleRequest) {
+        return save(adminTokenVO, updateArticleRequest);
     }
 
-    private CreateOrUpdateArticleResponse save(Integer userId, CreateArticleRequest createArticleRequest) {
-        Log log = getLog(userId, createArticleRequest);
-        Tag.dao.refreshTag();
+    private CreateOrUpdateArticleResponse save(AdminTokenVO adminTokenVO, CreateArticleRequest createArticleRequest) {
+        Log log = getLog(adminTokenVO, createArticleRequest);
+        new Tag().refreshTag();
         CreateOrUpdateArticleResponse updateLogResponse = new CreateOrUpdateArticleResponse();
         updateLogResponse.setId(log.getInt("logId"));
         updateLogResponse.setAlias(log.getStr("alias"));
@@ -69,23 +69,23 @@ public class ArticleService {
 
     public UpdateRecordResponse delete(Object logId) {
         if (logId != null) {
-            Log log = Log.dao.adminFindLogByLogId(logId);
+            Log log = new Log().adminFindLogByLogId(logId);
             if (log != null && StringUtils.isNotEmpty(log.get("keywords"))) {
-                Tag.dao.refreshTag();
+                new Tag().refreshTag();
             }
-            Log.dao.deleteById(logId);
+            new Log().deleteById(logId);
         }
         return new UpdateRecordResponse();
     }
 
-    private Log getLog(Integer userId, CreateArticleRequest createArticleRequest) {
+    private Log getLog(AdminTokenVO adminTokenVO, CreateArticleRequest createArticleRequest) {
         Log log = new Log();
         log.set("content", createArticleRequest.getContent());
         log.set("title", createArticleRequest.getTitle());
         log.set("keywords", createArticleRequest.getKeywords());
         log.set("markdown", createArticleRequest.getMarkdown());
         log.set("content", createArticleRequest.getContent());
-        log.set("userId", userId);
+        log.set("userId", adminTokenVO.getUserId());
         log.set("typeId", createArticleRequest.getTypeId());
         log.set("last_update_date", new Date());
         log.set("canComment", createArticleRequest.isCanComment());
@@ -93,7 +93,7 @@ public class ArticleService {
         log.set("privacy", createArticleRequest.isPrivacy());
         log.set("rubbish", createArticleRequest.isRubbish());
         if (StringUtils.isEmpty(createArticleRequest.getThumbnail())) {
-            log.set("thumbnail", getFirstImgUrl(createArticleRequest.getContent(), userId));
+            log.set("thumbnail", getFirstImgUrl(createArticleRequest.getContent(), adminTokenVO));
         } else {
             log.set("thumbnail", createArticleRequest.getThumbnail());
         }
@@ -110,11 +110,11 @@ public class ArticleService {
         if (createArticleRequest instanceof UpdateArticleRequest) {
             articleId = ((UpdateArticleRequest) createArticleRequest).getId();
         } else {
-            articleId = Log.dao.findMaxId() + 1;
+            articleId = new Log().findMaxId() + 1;
             log.set("releaseTime", new Date());
         }
         if (createArticleRequest.getAlias() == null) {
-            alias = Integer.valueOf(articleId).toString();
+            alias = Integer.toString(articleId);
         } else {
             alias = createArticleRequest.getAlias();
         }
@@ -124,13 +124,13 @@ public class ArticleService {
     }
 
     public PageableResponse<ArticleResponseEntry> page(PageableRequest pageableRequest, String keywords) {
-        Map<String, Object> data = Log.dao.find(pageableRequest.getPage(), pageableRequest.getRows(), keywords, pageableRequest.getOrder(), pageableRequest.getSort());
+        Map<String, Object> data = new Log().find(pageableRequest.getPage(), pageableRequest.getRows(), keywords, pageableRequest.getOrder(), pageableRequest.getSort());
         wrapperSearchKeyword(data, keywords);
         return ZrLogUtil.convertPageable(data, ArticleResponseEntry.class);
     }
 
     public Map<String, Object> searchArticle(int page, int row, String keywords) {
-        Map<String, Object> data = Log.dao.findByTitleOrPlainContentLike(page, row, keywords);
+        Map<String, Object> data = new Log().findByTitleOrPlainContentLike(page, row, keywords);
         wrapperSearchKeyword(data, keywords);
         return data;
     }
@@ -169,7 +169,7 @@ public class ArticleService {
 
     }
 
-    public String getFirstImgUrl(String htmlContent, int userId) {
+    public String getFirstImgUrl(String htmlContent, AdminTokenVO adminTokenVO) {
         if (StringUtils.isEmpty(htmlContent)) {
             return "";
         }
@@ -177,9 +177,6 @@ public class ArticleService {
         if (!elements.isEmpty()) {
             String url = elements.first().attr("src");
             try {
-                AdminTokenVO adminTokenVO = new AdminTokenVO();
-                adminTokenVO.setUserId(userId);
-                AdminTokenThreadLocal.setAdminToken(adminTokenVO);
                 //检查默认目录是否存在
                 new File(JFinal.me().getConstants().getBaseUploadPath()).mkdirs();
                 String path = url;
@@ -219,7 +216,7 @@ public class ArticleService {
                         LOGGER.error("generation jpeg thumbnail error ", e);
                         return url;
                     }
-                    return new UploadService().getCloudUrl(JFinal.me().getContextPath(), path, thumbnailFile.getPath(), null).getUrl() + "?h=" + height + "&w=" + width;
+                    return new UploadService().getCloudUrl(JFinal.me().getContextPath(), path, thumbnailFile.getPath(), null, adminTokenVO).getUrl() + "?h=" + height + "&w=" + width;
                 }
             } catch (Exception e) {
                 LOGGER.error("", e);

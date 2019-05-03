@@ -1,9 +1,11 @@
-package com.zrlog.model;
+package com.zrlog.web.cache.vo;
+
+import java.io.Serializable;
 
 /**
  * 文章存档的值对象，不在数据库中有对应的表记录，通过SQL语言查询完成
  */
-public class Archive {
+public class Archive implements Serializable {
     private String url;
     private String text;
     private Long count;

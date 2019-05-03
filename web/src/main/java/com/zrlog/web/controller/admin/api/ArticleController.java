@@ -6,7 +6,7 @@ import com.zrlog.common.response.ArticleResponseEntry;
 import com.zrlog.common.response.CreateOrUpdateArticleResponse;
 import com.zrlog.common.response.DeleteLogResponse;
 import com.zrlog.common.response.PageableResponse;
-import com.zrlog.service.AdminTokenThreadLocal;
+import com.zrlog.web.token.AdminTokenThreadLocal;
 import com.zrlog.service.ArticleService;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.annotation.RefreshCache;
@@ -29,12 +29,12 @@ public class ArticleController extends BaseController {
 
     @RefreshCache
     public CreateOrUpdateArticleResponse create() {
-        return articleService.create(AdminTokenThreadLocal.getUserId(), ZrLogUtil.convertRequestBody(getRequest(), CreateArticleRequest.class));
+        return articleService.create(AdminTokenThreadLocal.getUser(), ZrLogUtil.convertRequestBody(getRequest(), CreateArticleRequest.class));
     }
 
     @RefreshCache
     public CreateOrUpdateArticleResponse update() {
-        return articleService.update(AdminTokenThreadLocal.getUserId(), ZrLogUtil.convertRequestBody(getRequest(), UpdateArticleRequest.class));
+        return articleService.update(AdminTokenThreadLocal.getUser(), ZrLogUtil.convertRequestBody(getRequest(), UpdateArticleRequest.class));
     }
 
     public PageableResponse<ArticleResponseEntry> index() {

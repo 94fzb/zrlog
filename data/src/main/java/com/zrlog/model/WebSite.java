@@ -11,7 +11,6 @@ import java.util.Map;
  * 存放全局的设置，比如网站标题，关键字，插件，主题的配置信息等，当字典表处理即可，对应数据库的website表
  */
 public class WebSite extends Model<WebSite> {
-    public static final WebSite dao = new WebSite();
     public static final String TABLE_NAME = "website";
 
     public Map<String, Object> getWebSite() {

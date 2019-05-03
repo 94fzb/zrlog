@@ -1,7 +1,7 @@
 package com.zrlog.web.plugin;
 
 import com.jfinal.kit.PathKit;
-import com.zrlog.service.PluginCoreProcess;
+import com.jfinal.plugin.IPlugin;
 import com.zrlog.util.BlogBuildInfoUtil;
 
 import java.io.File;
@@ -11,23 +11,28 @@ import java.io.File;
  * 这种方式进行插件的及时更新。
  * plugin-core也是一个java进程，通过调用系统命令的命令进行启动的。
  */
-public class PluginCoreThread extends Thread {
-
+public class PluginCorePlugin implements IPlugin {
 
     private String dbPropertiesPath;
     private String pluginJvmArgs;
 
-    public PluginCoreThread(String dbPropertiesPath, String pluginJvmArgs) {
+    public PluginCorePlugin(String dbPropertiesPath, String pluginJvmArgs) {
         this.dbPropertiesPath = dbPropertiesPath;
         this.pluginJvmArgs = pluginJvmArgs;
-        setName("plugin-core-thread");
     }
 
     @Override
-    public void run() {
+    public boolean start() {
         //加载 zrlog 提供的插件
         int port = PluginCoreProcess.getInstance().pluginServerStart(new File(PathKit.getWebRootPath() + "/WEB-INF/plugins/plugin-core.jar"),
                 dbPropertiesPath, pluginJvmArgs, PathKit.getWebRootPath(), BlogBuildInfoUtil.getVersion());
         com.zrlog.common.Constants.pluginServer = "http://127.0.0.1:" + port;
+        return true;
+    }
+
+    @Override
+    public boolean stop() {
+        PluginCoreProcess.getInstance().stopPluginCore();
+        return true;
     }
 }

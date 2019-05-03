@@ -6,13 +6,15 @@ import com.jfinal.core.JFinal;
 import com.jfinal.handler.Handler;
 import com.jfinal.kit.PathKit;
 import com.zrlog.common.Constants;
-import com.zrlog.service.AdminTokenThreadLocal;
+import com.zrlog.common.vo.AdminTokenVO;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.config.ZrLogConfig;
 import com.zrlog.web.plugin.RequestInfo;
 import com.zrlog.web.plugin.RequestStatisticsPlugin;
+import com.zrlog.web.token.AdminTokenService;
+import com.zrlog.web.token.AdminTokenThreadLocal;
 import com.zrlog.web.util.WebTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,9 +38,10 @@ public class GlobalResourceHandler extends Handler {
     private static final Logger LOGGER = LoggerFactory.getLogger(GlobalResourceHandler.class);
     private static final String PAGE_END_TAG = "<none id='SP_" + System.currentTimeMillis() + "'></none>";
     public static final String CACHE_HTML_PATH = PathKit.getWebRootPath() + "/_cache/";
-    private static ThreadLocal<Long> REQUEST_START_TIME = new ThreadLocal<>();
+    private static final ThreadLocal<Long> REQUEST_START_TIME = new ThreadLocal<>();
 
     /**
+     * `
      * 不希望部分技术人走后门，拦截一些不合法的请求
      */
     private static final Set<String> FORBIDDEN_URI_EXT_SET = new HashSet<>();
@@ -67,7 +70,8 @@ public class GlobalResourceHandler extends Handler {
             }
         }
         try {
-            final ResponseRenderPrintWriter responseRenderPrintWriter = new ResponseRenderPrintWriter(response.getOutputStream(), true, url, PAGE_END_TAG, request, response, System.getProperty("file.encoding"));
+            AdminTokenVO adminTokenVO = new AdminTokenService().getAdminTokenVO(request);
+            final ResponseRenderPrintWriter responseRenderPrintWriter = new ResponseRenderPrintWriter(response.getOutputStream(), url, PAGE_END_TAG, request, response, adminTokenVO);
             response = new HttpServletResponseWrapper(response) {
                 @Override
                 public PrintWriter getWriter() {
@@ -79,7 +83,7 @@ public class GlobalResourceHandler extends Handler {
                     // 处理静态化文件,仅仅缓存文章页(变化较小)
                     if (target.endsWith(".html") && target.startsWith("/" + Constants.getArticleUri())) {
                         target = target.substring(0, target.lastIndexOf("."));
-                        if (Constants.isStaticHtmlStatus()) {
+                        if (Constants.isStaticHtmlStatus() && adminTokenVO == null) {
                             String path = new String(request.getServletPath().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
                             responseHtmlFile(target, request, response, isHandled, responseRenderPrintWriter, new File(CACHE_HTML_PATH + I18nUtil.getAcceptLanguage(request) + path));
                         } else {
@@ -89,16 +93,12 @@ public class GlobalResourceHandler extends Handler {
                         this.next.handle(target, request, response, isHandled);
                     }
                 } else {
-                    try {
-                        //非法请求, 返回403
-                        response.sendError(403);
-                    } catch (IOException e) {
-                        LOGGER.error("", e);
-                    }
+                    //非法请求, 返回403
+                    response.sendError(403);
                 }
             } else {
                 //首页静态化
-                if ("/".equals(target) && Constants.isStaticHtmlStatus()) {
+                if ("/".equals(target) && Constants.isStaticHtmlStatus() && adminTokenVO == null) {
                     responseHtmlFile(target, request, response, isHandled, responseRenderPrintWriter, new File(CACHE_HTML_PATH + I18nUtil.getAcceptLanguage(request) + "/index.html"));
                 } else {
                     this.next.handle(target, request, response, isHandled);
@@ -107,11 +107,10 @@ public class GlobalResourceHandler extends Handler {
         } catch (Exception e) {
             LOGGER.error("", e);
         } finally {
-            AdminTokenThreadLocal.remove();
             I18nUtil.removeI18n();
             //开发环境下面打印整个请求的耗时，便于优化代码
             if (BlogBuildInfoUtil.isDev()) {
-                LOGGER.info(request.getServletPath() + " used time " + (System.currentTimeMillis() - start));
+                LOGGER.info("{} used time {}", request.getServletPath(), System.currentTimeMillis() - start);
             }
             //仅保留非静态资源请求或者是以 .html结尾的
             if (ZrLogConfig.isInstalled() && !target.contains(".") || target.endsWith(".html")) {

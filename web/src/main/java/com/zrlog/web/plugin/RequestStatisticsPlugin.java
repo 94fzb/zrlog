@@ -49,8 +49,8 @@ public class RequestStatisticsPlugin implements IPlugin {
 
     @Override
     public boolean start() {
-        String value = WebSite.dao.getStringValueByName(DB_KEY);
-        String articleValue = WebSite.dao.getStringValueByName(ARTICLE_DB_KEY);
+        String value = new WebSite().getStringValueByName(DB_KEY);
+        String articleValue = new WebSite().getStringValueByName(ARTICLE_DB_KEY);
         if (StringUtils.isNotEmpty(value)) {
             requestInfoList = Collections.synchronizedList(new Gson().fromJson(value, new TypeToken<Collection<RequestInfo>>() {
             }.getType()));
@@ -74,7 +74,7 @@ public class RequestStatisticsPlugin implements IPlugin {
                     if (StringUtils.isNotEmpty(alias) && !requestInfo.isDeal()) {
                         String key = requestInfo.getIp() + "_" + alias;
                         if (!visitArticleSet.contains(key) && ZrLogUtil.isNormalBrowser(requestInfo.getUserAgent())) {
-                            Log.dao.clickAdd(alias);
+                            new Log().clickAdd(alias);
                             //若是公网地址才记录
                             visitArticleSet.add(key);
                         }
@@ -113,8 +113,8 @@ public class RequestStatisticsPlugin implements IPlugin {
     private void save() {
         lock.lock();
         try {
-            WebSite.dao.updateByKV(DB_KEY, new Gson().toJson(requestInfoList));
-            WebSite.dao.updateByKV(ARTICLE_DB_KEY, new Gson().toJson(visitArticleSet));
+            new WebSite().updateByKV(DB_KEY, new Gson().toJson(requestInfoList));
+            new WebSite().updateByKV(ARTICLE_DB_KEY, new Gson().toJson(visitArticleSet));
         } finally {
             lock.unlock();
         }
@@ -122,8 +122,8 @@ public class RequestStatisticsPlugin implements IPlugin {
 
     @Override
     public boolean stop() {
-        clickSchedule.shutdown();
-        saveSchedule.shutdown();
+        clickSchedule.shutdownNow();
+        saveSchedule.shutdownNow();
         return true;
     }
 

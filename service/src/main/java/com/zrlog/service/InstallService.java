@@ -139,7 +139,6 @@ public class InstallService {
             Properties prop = new Properties();
             prop.putAll(dbConn);
             prop.store(out, "This is a database configuration file");
-            out.close();
             String s = IOUtil.getStringInputStream(InstallService.class.getResourceAsStream("/init-table-structure.sql"));
             String[] sql = s.split("\n");
             StringBuilder tempSqlStr = new StringBuilder();
@@ -167,8 +166,6 @@ public class InstallService {
             insertType(connect);
             insertTag(connect);
             insertFirstArticle(connect);
-
-            out.close();
             return true;
         } catch (Exception e) {
             LOGGER.error("install error ", e);
@@ -192,76 +189,76 @@ public class InstallService {
 
     private void insertFirstArticle(Connection connect) throws SQLException {
         String insetLog = "INSERT INTO `log`(`logId`,`canComment`,`keywords`,`alias`,`typeId`,`userId`,`title`,`content`,`plain_content`,`markdown`,`digest`,`releaseTime`,`last_update_date`,`rubbish`,`privacy`) VALUES (1,?,?,?,1,1,?,?,?,?,?,?,?,?,?)";
-        PreparedStatement ps = connect.prepareStatement(insetLog);
-        ps.setBoolean(1, true);
-        String markdown = IOUtil.getStringInputStream(InstallService.class.getResourceAsStream("/init-blog/" + I18nUtil.getCurrentLocale() + ".md"));
-        markdown = markdown.replace("${basePath}", JFinal.me().getContextPath());
-        String content = renderMd(markdown);
-        ps.setString(2, I18nUtil.getStringFromRes("defaultType"));
-        ps.setString(3, "hello-world");
-        ps.setString(4, I18nUtil.getStringFromRes("helloWorld"));
-        ps.setString(5, content);
-        ps.setString(6, new ArticleService().getPlainSearchText(content));
-        ps.setString(7, markdown);
-        ps.setString(8, ParseUtil.autoDigest(content, Constants.getAutoDigestLength()));
-        ps.setObject(9, new java.util.Date());
-        ps.setObject(10, new java.util.Date());
-        ps.setBoolean(11, false);
-        ps.setBoolean(12, false);
-        ps.executeUpdate();
-        ps.close();
+        try (PreparedStatement ps = connect.prepareStatement(insetLog)) {
+            ps.setBoolean(1, true);
+            String markdown = IOUtil.getStringInputStream(InstallService.class.getResourceAsStream("/init-blog/" + I18nUtil.getCurrentLocale() + ".md"));
+            markdown = markdown.replace("${basePath}", JFinal.me().getContextPath());
+            String content = renderMd(markdown);
+            ps.setString(2, I18nUtil.getStringFromRes("defaultType"));
+            ps.setString(3, "hello-world");
+            ps.setString(4, I18nUtil.getStringFromRes("helloWorld"));
+            ps.setString(5, content);
+            ps.setString(6, new ArticleService().getPlainSearchText(content));
+            ps.setString(7, markdown);
+            ps.setString(8, ParseUtil.autoDigest(content, Constants.getAutoDigestLength()));
+            ps.setObject(9, new java.util.Date());
+            ps.setObject(10, new java.util.Date());
+            ps.setBoolean(11, false);
+            ps.setBoolean(12, false);
+            ps.executeUpdate();
+        }
     }
 
     private void insertType(Connection connect) throws SQLException {
         String insertLogType = "INSERT INTO `type`(`typeId`, `typeName`, `remark`, `alias`) VALUES (1,'" + I18nUtil.getStringFromRes("defaultType") + "','','note')";
-        PreparedStatement ps = connect.prepareStatement(insertLogType);
-        ps.executeUpdate();
-        ps.close();
+        try(PreparedStatement ps = connect.prepareStatement(insertLogType)){
+            ps.executeUpdate();
+        }
     }
 
     private void insertTag(Connection connect) throws SQLException {
         String insertTag = "INSERT INTO `tag`(`tagId`,`text`,`count`) VALUES (1,'" + I18nUtil.getStringFromRes("defaultType") + "',1)";
-        PreparedStatement ps = connect.prepareStatement(insertTag);
-        ps.executeUpdate();
-        ps.close();
+        try(PreparedStatement ps = connect.prepareStatement(insertTag)){
+            ps.executeUpdate();
+        }
     }
 
     private void initPlugin(Connection connection) throws SQLException {
         String insertPluginSql = "INSERT INTO `plugin` VALUES (1,NULL,b'1','" + I18nUtil.getStringFromRes("category") + "',NULL,'types',3),(2,NULL,b'1','" + I18nUtil.getStringFromRes("tag") + "',NULL,'tags',3),(3,NULL,b'1','" + I18nUtil.getStringFromRes("link") + "',NULL,'links',2),(4,NULL,b'1','" + I18nUtil.getStringFromRes("archive") + "',NULL,'archives',3)";
-        PreparedStatement ps = connection.prepareStatement(insertPluginSql);
-        ps.executeUpdate();
-        ps.close();
+        try(PreparedStatement ps = connection.prepareStatement(insertPluginSql)){
+            ps.executeUpdate();
+        }
     }
 
     private void insertNav(Connection connect) throws SQLException {
         String insertLogNavSql = "INSERT INTO `lognav`( `navId`,`url`, `navName`, `sort`) VALUES (?,?,?,?)";
-        PreparedStatement ps = connect.prepareStatement(insertLogNavSql);
-        ps.setObject(1, 2);
-        ps.setObject(2, "/admin/login");
-        ps.setObject(3, I18nUtil.getStringFromRes("manage"));
-        ps.setObject(4, 2);
-        ps.executeUpdate();
-        ps.close();
+        try(PreparedStatement ps = connect.prepareStatement(insertLogNavSql)) {
+            ps.setObject(1, 2);
+            ps.setObject(2, "/admin/login");
+            ps.setObject(3, I18nUtil.getStringFromRes("manage"));
+            ps.setObject(4, 2);
+            ps.executeUpdate();
+        }
 
         insertLogNavSql = "INSERT INTO `lognav`( `navId`,`url`, `navName`, `sort`) VALUES (?,?,?,?)";
-        ps = connect.prepareStatement(insertLogNavSql);
-        ps.setObject(1, 1);
-        ps.setObject(2, "/");
-        ps.setObject(3, I18nUtil.getStringFromRes("home"));
-        ps.setObject(4, 1);
-        ps.executeUpdate();
-        ps.close();
+        try(PreparedStatement ps = connect.prepareStatement(insertLogNavSql)) {
+            ps.setObject(1, 1);
+            ps.setObject(2, "/");
+            ps.setObject(3, I18nUtil.getStringFromRes("home"));
+            ps.setObject(4, 1);
+            ps.executeUpdate();
+        }
     }
 
     private void initUser(Map<String, String> blogMsg, Connection connect) throws SQLException {
         String insertUserSql = "INSERT INTO `user`( `userId`,`userName`, `password`, `email`,`secretKey`) VALUES (1,?,?,?,?)";
-        PreparedStatement ps = connect.prepareStatement(insertUserSql);
-        ps.setString(1, blogMsg.get("username"));
-        ps.setString(2, SecurityUtils.md5(blogMsg.get("password")));
-        ps.setString(3, configMsg.get("email"));
-        ps.setString(4, UUID.randomUUID().toString());
-        ps.executeUpdate();
-        ps.close();
+        try(PreparedStatement ps = connect.prepareStatement(insertUserSql)) {
+            ps.setString(1, blogMsg.get("username"));
+            ps.setString(2, SecurityUtils.md5(blogMsg.get("password")));
+            ps.setString(3, configMsg.get("email"));
+            ps.setString(4, UUID.randomUUID().toString());
+            ps.executeUpdate();
+        }
     }
 
     private void initWebSite(Connection connect) throws SQLException {
@@ -272,14 +269,14 @@ public class InstallService {
             sb.append("(").append("?").append(",").append("?").append(",NULL),");
         }
         String insertWebSql = sb.toString().substring(0, sb.toString().length() - 1);
-        PreparedStatement ps = connect.prepareStatement(insertWebSql);
-        int i = 1;
-        for (Map.Entry<String, Object> e : defaultMap.entrySet()) {
-            ps.setString(i++, e.getKey());
-            ps.setObject(i++, e.getValue());
-        }
+        try(PreparedStatement ps = connect.prepareStatement(insertWebSql)) {
+            int i = 1;
+            for (Map.Entry<String, Object> e : defaultMap.entrySet()) {
+                ps.setString(i++, e.getKey());
+                ps.setObject(i++, e.getValue());
+            }
 
-        ps.executeUpdate();
-        ps.close();
+            ps.executeUpdate();
+        }
     }
 }

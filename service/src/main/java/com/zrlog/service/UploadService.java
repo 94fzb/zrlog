@@ -4,6 +4,7 @@ import com.hibegin.common.util.http.HttpUtil;
 import com.hibegin.common.util.http.handle.HttpJsonArrayHandle;
 import com.zrlog.common.Constants;
 import com.zrlog.common.response.UploadFileResponse;
+import com.zrlog.common.vo.AdminTokenVO;
 import com.zrlog.web.util.PluginHelper;
 import org.apache.log4j.Logger;
 
@@ -16,7 +17,7 @@ public class UploadService {
 
     private static final Logger LOGGER = Logger.getLogger(UploadService.class);
 
-    public UploadFileResponse getCloudUrl(String contextPath, String uri, String finalFilePath, HttpServletRequest request) {
+    public UploadFileResponse getCloudUrl(String contextPath, String uri, String finalFilePath, HttpServletRequest request, AdminTokenVO adminTokenVO) {
         UploadFileResponse uploadFileResponse = new UploadFileResponse();
         // try push to cloud
         Map<String, String[]> map = new HashMap<>();
@@ -25,7 +26,7 @@ public class UploadService {
         String url;
         try {
             List<Map> urls = HttpUtil.getInstance().sendGetRequest(Constants.pluginServer + "/service", map
-                    , new HttpJsonArrayHandle<Map>(), PluginHelper.genHeaderMapByRequest(request, AdminTokenThreadLocal.getUser())).getT();
+                    , new HttpJsonArrayHandle<Map>(), PluginHelper.genHeaderMapByRequest(request, adminTokenVO)).getT();
             if (urls != null && !urls.isEmpty()) {
                 url = (String) urls.get(0).get("url");
                 if (!url.startsWith("https://") && !url.startsWith("http://")) {

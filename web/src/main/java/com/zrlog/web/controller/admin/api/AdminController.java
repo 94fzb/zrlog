@@ -6,19 +6,33 @@ import com.zrlog.common.request.LoginRequest;
 import com.zrlog.common.request.UpdateAdminRequest;
 import com.zrlog.common.response.LoginResponse;
 import com.zrlog.common.response.UpdateRecordResponse;
-import com.zrlog.service.AdminTokenThreadLocal;
+import com.zrlog.model.User;
 import com.zrlog.service.UserService;
 import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.annotation.RefreshCache;
 import com.zrlog.web.controller.BaseController;
+import com.zrlog.web.token.AdminTokenService;
+import com.zrlog.web.token.AdminTokenThreadLocal;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class AdminController extends BaseController {
 
     private UserService userService = new UserService();
 
+    private AdminTokenService adminTokenService = new AdminTokenService();
+
+    private static AtomicInteger sessionAtomicInteger = new AtomicInteger();
+
     public LoginResponse login() {
-        return userService.login(ZrLogUtil.convertRequestBody(getRequest(), LoginRequest.class), getRequest(), getResponse());
+        LoginRequest loginRequest = ZrLogUtil.convertRequestBody(getRequest(), LoginRequest.class);
+        LoginResponse login = userService.login(loginRequest);
+        if (login.getError() == 0) {
+            adminTokenService.setAdminToken(new User().getIdByUserName(loginRequest.getUserName().toLowerCase()),
+                    sessionAtomicInteger.incrementAndGet(), loginRequest.getHttps() ? "https" : "http", getRequest(), getResponse());
+        }
+        return login;
     }
 
     @RefreshCache
@@ -47,7 +61,7 @@ public class AdminController extends BaseController {
         if (ZrLogUtil.isPreviewMode()) {
             return errorUpdateRecordResponse();
         } else {
-            return userService.updatePassword(ZrLogUtil.convertRequestBody(getRequest(), ChangePasswordRequest.class));
+            return userService.updatePassword(AdminTokenThreadLocal.getUserId(), ZrLogUtil.convertRequestBody(getRequest(), ChangePasswordRequest.class));
         }
     }
 

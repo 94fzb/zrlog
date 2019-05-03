@@ -9,7 +9,7 @@ import java.io.File;
 
 public class Application {
 
-    public static void main(String[] args) throws ServletException, LifecycleException {
+    public static void main(String[] args) throws LifecycleException {
         String webappDirLocation;
         if (Constants.IN_JAR) {
             webappDirLocation = "webapp";

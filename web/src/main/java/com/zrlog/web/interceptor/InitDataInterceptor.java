@@ -2,7 +2,7 @@ package com.zrlog.web.interceptor;
 
 import com.jfinal.aop.Interceptor;
 import com.jfinal.aop.Invocation;
-import com.zrlog.service.CacheService;
+import com.zrlog.web.cache.CacheService;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.config.ZrLogConfig;
 import com.zrlog.web.controller.BaseController;

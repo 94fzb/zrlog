@@ -1,5 +1,6 @@
 package com.zrlog.web.controller.admin.api;
 
+import com.zrlog.common.response.VersionResponse;
 import com.zrlog.common.response.WebSiteSettingUpdateResponse;
 import com.zrlog.model.WebSite;
 import com.zrlog.util.BlogBuildInfoUtil;
@@ -26,11 +27,11 @@ public class WebSiteController extends BaseController {
         return updateResponse;
     }
 
-    public Map<String, Object> version() {
-        Map<String, Object> map = new HashMap<>();
-        map.put("version", BlogBuildInfoUtil.getVersion());
-        map.put("buildId", BlogBuildInfoUtil.getBuildId());
-        map.put("changelog", UpdateVersionPlugin.getChangeLog(BlogBuildInfoUtil.getVersion(), BlogBuildInfoUtil.getBuildId()));
-        return map;
+    public VersionResponse version() {
+        VersionResponse versionResponse = new VersionResponse();
+        versionResponse.setBuildId(BlogBuildInfoUtil.getBuildId());
+        versionResponse.setVersion(BlogBuildInfoUtil.getVersion());
+        versionResponse.setChangelog(UpdateVersionPlugin.getChangeLog(BlogBuildInfoUtil.getVersion(), BlogBuildInfoUtil.getBuildId()));
+        return versionResponse;
     }
 }

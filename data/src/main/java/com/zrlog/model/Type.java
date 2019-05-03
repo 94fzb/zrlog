@@ -11,11 +11,10 @@ import java.util.Map;
  * 存放文章的分类信息，对应数据的type表
  */
 public class Type extends Model<Type> {
-    public static final Type dao = new Type();
     public static final String TABLE_NAME = "type";
 
     public List<Type> find() {
-        return dao.find("select t.typeId as id,t.alias,t.typeName,t.remark,(select count(logId) from " + Log.TABLE_NAME +
+        return find("select t.typeId as id,t.alias,t.typeName,t.remark,(select count(logId) from " + Log.TABLE_NAME +
                 " where rubbish=? and privacy=? and typeid=t.typeid) as typeamount from " + TABLE_NAME + " t", false, false);
     }
 
@@ -29,7 +28,7 @@ public class Type extends Model<Type> {
     }
 
     public Type findByAlias(String alias) {
-        return dao.findFirst("select * from " + TABLE_NAME + " where alias=?", alias);
+        return findFirst("select * from " + TABLE_NAME + " where alias=?", alias);
     }
 
 }

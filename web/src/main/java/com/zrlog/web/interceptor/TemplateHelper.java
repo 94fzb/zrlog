@@ -4,14 +4,16 @@ import com.hibegin.common.util.BeanUtil;
 import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
+import com.zrlog.web.cache.vo.Archive;
+import com.zrlog.web.cache.vo.BaseDataInitVO;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.OutlineVO;
-import com.zrlog.model.*;
+import com.zrlog.model.Log;
+import com.zrlog.model.LogNav;
+import com.zrlog.model.Tag;
+import com.zrlog.model.Type;
 import com.zrlog.service.CommentService;
-import com.zrlog.util.I18nUtil;
-import com.zrlog.util.OutlineUtil;
-import com.zrlog.util.ParseUtil;
-import com.zrlog.util.ZrLogUtil;
+import com.zrlog.util.*;
 import com.zrlog.web.controller.BaseController;
 import com.zrlog.web.util.WebTools;
 import org.apache.log4j.Logger;
@@ -60,77 +62,77 @@ public class TemplateHelper {
             data = request.getAttribute("log");
         }
         staticHtml(data, request, suffix, Constants.getBooleanByFromWebSite("article_thumbnail_status"));
-        if (request.getAttribute("pager") != null && !((List<Map<String, Object>>) ((Map) request.getAttribute("pager")).get("pageList")).isEmpty()) {
-            List<Map<String, Object>> pageList = (List<Map<String, Object>>) ((Map) request.getAttribute("pager")).get("pageList");
-            for (Map<String, Object> pageMap : pageList) {
-                pageMap.put("url", baseUrl + pageMap.get("url") + suffix);
+        PagerVO pager = (PagerVO) request.getAttribute("pager");
+        if (pager != null && !pager.getPageList().isEmpty()) {
+            List<PagerVO.PageEntry> pageList = pager.getPageList();
+            for (PagerVO.PageEntry pageMap : pageList) {
+                pageMap.setUrl(baseUrl + pageMap.getUrl() + suffix);
             }
-            Map<String, Object> pager = (Map<String, Object>) request.getAttribute("pager");
-            pager.put("pageStartUrl", baseUrl + pager.get("pageStartUrl") + suffix);
-            pager.put("pageEndUrl", baseUrl + pager.get("pageEndUrl") + suffix);
+
+            pager.setPageStartUrl(baseUrl + pager.getPageStartUrl() + suffix);
+            pager.setPageEndUrl(baseUrl + pager.getPageEndUrl() + suffix);
         }
-        List<Tag> tags = baseDataInitVO.getTags();
-        if (!tags.isEmpty()) {
-            for (Tag tag : tags) {
-                try {
-                    String tagUri =baseUrl + Constants.getArticleUri() + "tag/" + URLEncoder.encode(tag.get("text"), "UTF-8") + suffix;
-                    tag.put("url", tagUri);
-                } catch (UnsupportedEncodingException e) {
-                    LOGGER.error("", e);
-                }
-            }
-        }
-        List<Type> types = baseDataInitVO.getTypes();
-        if (!types.isEmpty()) {
-            for (Type type : types) {
-                try {
-                    String tagUri = baseUrl + Constants.getArticleUri() + "sort/" + URLEncoder.encode(type.get("alias"), "UTF-8") + suffix;
-                    type.put("url", tagUri);
-                } catch (UnsupportedEncodingException e) {
-                    LOGGER.error("", e);
-                }
-            }
-        }
-        Map<String, Long> archiveMap = baseDataInitVO.getArchives();
-        List<Archive> archiveList = new ArrayList<>();
+        fillTags(suffix, baseUrl, baseDataInitVO.getTags());
+        fillType(suffix, baseUrl, baseDataInitVO.getTypes());
+        fullNavBar(request, suffix, baseDataInitVO);
+        baseDataInitVO.setArchiveList(getConvertedArchives(suffix, baseUrl, baseDataInitVO.getArchives()));
+    }
+
+    private static List<Archive> getConvertedArchives(String suffix, String baseUrl, Map<String, Long> archiveMap) {
+        List<Archive> archives = new ArrayList<>();
         for (Map.Entry<String, Long> entry : archiveMap.entrySet()) {
             Archive archive = new Archive();
             archive.setCount(entry.getValue());
             archive.setText(entry.getKey());
             String tagUri = baseUrl + Constants.getArticleUri() + "record/" + entry.getKey() + suffix;
             archive.setUrl(tagUri);
-            archiveList.add(archive);
+            archives.add(archive);
         }
-        fullNavBar(request, suffix, baseDataInitVO,baseUrl);
-        baseDataInitVO.setArchiveList(archiveList);
+        return archives;
     }
 
-    private static void fullNavBar(HttpServletRequest request, String suffix, BaseDataInitVO baseDataInitVO, String baseUrl) {
-        List<LogNav> logNavList = baseDataInitVO.getLogNavs();
-        if (!logNavList.isEmpty()) {
-            for (LogNav logNav : logNavList) {
-                String url = logNav.get("url").toString();
-                if ("/".equals(url) && ("/all-1".equals(request.getRequestURI()) || (Constants.getArticleUri() + "all-1").equals(request.getRequestURI()))) {
-                    logNav.put("current", true);
-                    continue;
-                } else if (url.startsWith("/")) {
-                    if (suffix.length() > 0 && url.length() == 1) {
-                        url = "";
-                    } else {
-                        url = url.substring(1);
-                    }
-                    if (url.startsWith("/" + Constants.getArticleUri())) {
-                        url += suffix;
-                    }
-                    url = baseUrl + url;
-                    logNav.put("url", url);
-                }
-                if (ignoreScheme(request.getRequestURL().toString()).equals(ignoreScheme(url))) {
-                    logNav.put("current", true);
-                } else {
-                    logNav.put("current", false);
-                }
+    private static void fillTags(String suffix, String baseUrl, List<Tag> tags) {
+        for (Tag tag : tags) {
+            try {
+                String tagUri = baseUrl + Constants.getArticleUri() + "tag/" + URLEncoder.encode(tag.get("text"), "UTF-8") + suffix;
+                tag.put("url", tagUri);
+            } catch (UnsupportedEncodingException e) {
+                LOGGER.error("", e);
             }
+        }
+    }
+
+    private static void fillType(String suffix, String baseUrl, List<Type> types) {
+        for (Type type : types) {
+            try {
+                String tagUri = baseUrl + Constants.getArticleUri() + "sort/" + URLEncoder.encode(type.get("alias"), "UTF-8") + suffix;
+                type.put("url", tagUri);
+            } catch (UnsupportedEncodingException e) {
+                LOGGER.error("", e);
+            }
+        }
+    }
+
+    private static void fullNavBar(HttpServletRequest request, String suffix, BaseDataInitVO baseDataInitVO) {
+        List<LogNav> logNavList = baseDataInitVO.getLogNavs();
+        for (LogNav logNav : logNavList) {
+            String url = logNav.get("url").toString();
+            if ("/".equals(url) && ("/all-1".equals(request.getRequestURI()) || (Constants.getArticleUri() + "all-1").equals(request.getRequestURI()))) {
+                logNav.put("current", true);
+                continue;
+            } else if (url.startsWith("/")) {
+                if (suffix.length() > 0 && url.length() == 1) {
+                    url = "";
+                } else {
+                    url = url.substring(1);
+                }
+                if (url.startsWith("/" + Constants.getArticleUri())) {
+                    url += suffix;
+                }
+                url = WebTools.getHomeUrlWithHost(request) + url;
+                logNav.put("url", url);
+            }
+            logNav.put("current", ignoreScheme(request.getRequestURL().toString()).equals(ignoreScheme(url)));
         }
     }
 
@@ -143,7 +145,7 @@ public class TemplateHelper {
         return url;
     }
 
-    public static String fullTemplateInfo(Controller controller, boolean reload) {
+    static String fullTemplateInfo(Controller controller, boolean reload) {
         if (controller instanceof BaseController) {
             BaseController baseController = (BaseController) controller;
             String basePath = baseController.getTemplatePath();
@@ -156,7 +158,7 @@ public class TemplateHelper {
         return Constants.DEFAULT_TEMPLATE_PATH;
     }
 
-    public static String setBaseUrl(HttpServletRequest request, boolean staticBlog, Map webSite) {
+    private static String setBaseUrl(HttpServletRequest request, boolean staticBlog, Map webSite) {
         String templateUrl;
         String baseUrl = WebTools.getHomeUrl(request);
         String templatePath = request.getAttribute("template").toString();
@@ -188,8 +190,7 @@ public class TemplateHelper {
             try (FileInputStream fileInputStream = new FileInputStream(file)) {
                 properties.load(fileInputStream);
                 if (properties.getProperty("staticResource") != null) {
-                    return webSite.get("staticResourceHost") != null && !"".equals(webSite.get("staticResourceHost"))
-                            /* && !JFinal.me().getConstants().getDevMode()*/;
+                    return webSite.get("staticResourceHost") != null && !"".equals(webSite.get("staticResourceHost"));
                 }
             } catch (IOException e) {
                 LOGGER.error("load properties error", e);
@@ -206,10 +207,10 @@ public class TemplateHelper {
             List<Log> logList = (List<Log>) map.get("rows");
             if (logList != null) {
                 for (Log log : logList) {
-                    if (!thumbnailEnableArticle) {
-                        log.put("thumbnail", null);
-                    } else if (log.get("thumbnail") != null) {
+                    if (thumbnailEnableArticle) {
                         log.put("thumbnailAlt", ParseUtil.removeHtmlElement(log.get("title")));
+                    } else {
+                        log.put("thumbnail", null);
                     }
                     log.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + log.get("alias") + suffix);
                     log.put("typeUrl", WebTools.getHomeUrl(request) + Constants.getArticleUri() + "sort/" + log.get("typeAlias") + suffix);
@@ -231,7 +232,7 @@ public class TemplateHelper {
         return previewTemplate;
     }
 
-    public static void fillArticleInfo(Log data,  HttpServletRequest request, String suffix) {
+    public static void fillArticleInfo(Log data, HttpServletRequest request, String suffix) {
         data.put("alias", data.get("alias") + suffix);
         data.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + data.get("alias"));
         data.put("noSchemeUrl", WebTools.getHomeUrlWithHost(request) + Constants.getArticleUri() + data.get("alias"));

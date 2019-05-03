@@ -1,4 +1,4 @@
-package com.zrlog.service;
+package com.zrlog.web.token;
 
 import com.google.gson.Gson;
 import com.hibegin.common.util.ByteUtils;
@@ -19,8 +19,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
-import java.util.AbstractMap;
-import java.util.Map;
 
 public class AdminTokenService {
 
@@ -57,35 +55,36 @@ public class AdminTokenService {
         return cipher.doFinal(encrypted);
     }
 
-    public Map.Entry<AdminTokenVO, User> getAdminTokenVOUserEntry(HttpServletRequest request) {
+    public AdminTokenVO getAdminTokenVO(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            String decTokenString = null;
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals(Constants.ADMIN_TOKEN)) {
-                    decTokenString = cookie.getValue();
-                }
+        if (cookies == null) {
+            return null;
+        }
+        String decTokenString = null;
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals(Constants.ADMIN_TOKEN)) {
+                decTokenString = cookie.getValue();
             }
-            try {
-                if (StringUtils.isNotEmpty(decTokenString)) {
-                    int userId = Integer.parseInt(decTokenString.substring(0, decTokenString.indexOf(TOKEN_SPLIT_CHAR)));
-                    User user = User.dao.findById(userId);
-                    if (user != null) {
-                        byte[] adminTokenEncryptAfter = ByteUtils.hexString2Bytes(decTokenString.substring(decTokenString.indexOf(TOKEN_SPLIT_CHAR) + 1, decTokenString.length()));
-                        String base64Encode = new String(decrypt(user.getStr("secretKey"), Base64.decodeBase64(adminTokenEncryptAfter)));
-                        AdminTokenVO adminTokenVO = new Gson().fromJson(base64Encode, AdminTokenVO.class);
-                        if (adminTokenVO.getCreatedDate() + Constants.getSessionTimeout() > System.currentTimeMillis()) {
-                            return new AbstractMap.SimpleEntry<>(adminTokenVO, user);
-                        }
-                    } else {
-                        return null;
-                    }
-                }
-            } catch (BadPaddingException e) {
-                //ignore 发生数据库 secretKey 无法解析 token 的情况下
-            } catch (Exception e) {
-                LOGGER.info("error", e);
+        }
+        if (StringUtils.isEmpty(decTokenString)) {
+            return null;
+        }
+        try {
+            int userId = Integer.parseInt(decTokenString.substring(0, decTokenString.indexOf(TOKEN_SPLIT_CHAR)));
+            User user = new User().findById(userId);
+            if (user == null) {
+                return null;
             }
+            byte[] adminTokenEncryptAfter = ByteUtils.hexString2Bytes(decTokenString.substring(decTokenString.indexOf(TOKEN_SPLIT_CHAR) + 1));
+            String base64Encode = new String(decrypt(user.getStr("secretKey"), Base64.decodeBase64(adminTokenEncryptAfter)));
+            AdminTokenVO adminTokenVO = new Gson().fromJson(base64Encode, AdminTokenVO.class);
+            if (adminTokenVO.getCreatedDate() + Constants.getSessionTimeout() > System.currentTimeMillis()) {
+                return adminTokenVO;
+            }
+        } catch (BadPaddingException e) {
+            //ignore 发生数据库 secretKey 无法解析 token 的情况下
+        } catch (Exception e) {
+            LOGGER.info("error", e);
         }
         return null;
     }

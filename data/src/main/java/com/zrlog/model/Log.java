@@ -15,7 +15,7 @@ import java.util.*;
  * 存放文章数据，对应数据的log表。
  */
 public class Log extends Model<Log> implements Serializable {
-    public static final Log dao = new Log();
+
     public static final String TABLE_NAME = "log";
     /**
      *
@@ -40,9 +40,7 @@ public class Log extends Model<Log> implements Serializable {
                 sql = "select l.*,last_update_date as lastUpdateDate,u.userName,(select count(commentId) from " + Comment.TABLE_NAME + " where logId=l.logId) commentSize ,t.alias as typeAlias,t.typeName as typeName  from " + TABLE_NAME + " l inner join user u,type t where t.typeId=l.typeId and u.userId=l.userId and rubbish=? and privacy=? and l.alias=?";
                 log = findFirst(sql, rubbish, privacy, idOrAlias);
             }
-            if (log != null) {
-                return log;
-            }
+            return log;
         }
         return null;
     }

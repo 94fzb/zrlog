@@ -23,8 +23,8 @@ public class AdminArticlePageController extends BaseController {
         if (logId != null) {
             Log log = new Log().adminFindLogByLogId(logId);
             if (log != null) {
-                log.put("lastLog", Log.dao.findLastLog(logId, I18nUtil.getStringFromRes("noLastLog")));
-                log.put("nextLog", Log.dao.findNextLog(logId, I18nUtil.getStringFromRes("noNextLog")));
+                log.put("lastLog", new Log().findLastLog(logId, I18nUtil.getStringFromRes("noLastLog")));
+                log.put("nextLog", new Log().findNextLog(logId, I18nUtil.getStringFromRes("noNextLog")));
                 setAttr("log", log.getAttrs());
                 TemplateHelper.fillArticleInfo(log, getRequest(), "");
             }
@@ -41,7 +41,7 @@ public class AdminArticlePageController extends BaseController {
         Map<String, Object> articleContent = new HashMap<>();
         if (getPara("id") != null) {
             Integer logId = Integer.parseInt(getPara("id"));
-            Log log = Log.dao.adminFindLogByLogId(logId);
+            Log log = new Log().adminFindLogByLogId(logId);
             if (log != null) {
                 setAttr("log", log.getAttrs());
                 articleContent.putAll(log.getAttrs());

@@ -1,4 +1,4 @@
-package com.zrlog.service;
+package com.zrlog.web.plugin;
 
 import com.hibegin.common.util.CmdUtil;
 import com.hibegin.common.util.http.HttpUtil;
@@ -62,10 +62,10 @@ public class PluginCoreProcess {
                             }
                             pr = CmdUtil.getProcess(java, pluginJvmArgs, "-Duser.dir=" + pluginCoreFile.getParent(), "-jar", pluginCoreFile, randomServerPort,
                                     randomMasterPort, dbProperties, pluginCoreFile.getParent() + "/jars", randomListenPort, runtimePath, runTimeVersion);
-                            PluginSocketThread pluginSocketThread = new PluginSocketThread("127.0.0.1", randomListenPort);
+                            PluginGhostThread pluginGhostThread = new PluginGhostThread("127.0.0.1", randomListenPort);
                             if (pr != null) {
-                                printInputStreamWithThread(pr.getInputStream(), pluginCoreFile, pluginSocketThread);
-                                printInputStreamWithThread(pr.getErrorStream(), pluginCoreFile, pluginSocketThread);
+                                printInputStreamWithThread(pr.getInputStream(), pluginCoreFile, pluginGhostThread);
+                                printInputStreamWithThread(pr.getErrorStream(), pluginCoreFile, pluginGhostThread);
                             }
                             try {
                                 //待插件启动
@@ -73,8 +73,8 @@ public class PluginCoreProcess {
                             } catch (InterruptedException e) {
                                 //ignore
                             }
-                            pluginSocketThread.start();
-                            while (!pluginSocketThread.isStop()) {
+                            pluginGhostThread.start();
+                            while (!pluginGhostThread.isStop()) {
                                 try {
                                     Thread.sleep(1000);
                                 } catch (InterruptedException e) {
@@ -87,7 +87,7 @@ public class PluginCoreProcess {
                         }
                     }
 
-                    private void printInputStreamWithThread(final InputStream in, final File serverFileName, final PluginSocketThread pluginSocketThread) {
+                    private void printInputStreamWithThread(final InputStream in, final File serverFileName, final PluginGhostThread pluginGhostThread) {
                         new Thread(() -> {
                             BufferedReader br = new BufferedReader(new InputStreamReader(in));
                             String str;
@@ -96,7 +96,7 @@ public class PluginCoreProcess {
                                 if (str != null && str.startsWith("Error: Invalid or corrupt jarfile")) {
                                     System.out.println(str);
                                     serverFileName.delete();
-                                    pluginSocketThread.setStop(true);
+                                    pluginGhostThread.setStop(true);
                                 }
                                 while ((str = br.readLine()) != null) {
                                     System.out.println(str);
@@ -121,7 +121,7 @@ public class PluginCoreProcess {
             String filePath = serverFileName.getParentFile().toString();
             try {
                 LOGGER.info("plugin-core.jar not exists will download from " + PLUGIN_CORE_DOWNLOAD_URL);
-                HttpUtil.getInstance().sendGetRequest(PLUGIN_CORE_DOWNLOAD_URL + "?_=" + System.currentTimeMillis(), new HashMap<String, String[]>(), new HttpFileHandle(filePath), new HashMap<String, String>());
+                HttpUtil.getInstance().sendGetRequest(PLUGIN_CORE_DOWNLOAD_URL + "?_=" + System.currentTimeMillis(), new HashMap<>(), new HttpFileHandle(filePath), new HashMap<>());
             } catch (IOException e) {
                 LOGGER.warn("download plugin core error", e);
             }

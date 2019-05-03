@@ -11,13 +11,13 @@ public class LinkController extends BaseController {
 
     @RefreshCache
     public UpdateRecordResponse delete() {
-        return new UpdateRecordResponse(Link.dao.deleteById(getPara("id")));
+        return new UpdateRecordResponse(new Link().deleteById(getPara("id")));
     }
 
     @RefreshCache
     public UpdateRecordResponse update() {
         if (getPara("id") != null) {
-            Link.dao.set("linkId", getPara("id"))
+            new Link().set("linkId", getPara("id"))
                     .set("linkName", getPara("linkName"))
                     .set("sort", getParaToInt("sort", 100))
                     .set("url", getPara("url")).set("alt", getPara("alt")).update();
@@ -28,7 +28,7 @@ public class LinkController extends BaseController {
     }
 
     public Map index() {
-        return Link.dao.find(getPageable());
+        return new Link().find(getPageable());
     }
 
     @RefreshCache

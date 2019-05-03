@@ -3,7 +3,6 @@ package com.zrlog.web.controller.blog;
 import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
-import com.zrlog.common.Constants;
 import com.zrlog.common.type.TestConnectDbResult;
 import com.zrlog.service.InstallService;
 import com.zrlog.util.I18nUtil;

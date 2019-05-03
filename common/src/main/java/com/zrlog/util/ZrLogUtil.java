@@ -28,11 +28,8 @@ import java.util.*;
 public class ZrLogUtil {
 
     private static final Logger LOGGER = Logger.getLogger(ZrLogUtil.class);
-    private List<String> badUserAgents;
 
     private ZrLogUtil() {
-        badUserAgents = (List<String>) new Gson().fromJson(IOUtil.getStringInputStream(ZrLogUtil.class.getResourceAsStream("/config/bad-useragent.json")), List.class);
-
     }
 
     public static <T> T convertRequestBody(ServletRequest request, Class<T> clazz) {
@@ -97,14 +94,13 @@ public class ZrLogUtil {
             connect = getConnection(jdbcUrl, userName, password, deriveClass);
             if (connect != null) {
                 String queryVersionSQL = "select version()";
-                PreparedStatement ps = connect.prepareStatement(queryVersionSQL);
-                ResultSet resultSet = ps.executeQuery();
-                if (resultSet.next()) {
-                    String result = resultSet.getString(1);
-                    ps.close();
-                    return result;
+                try (PreparedStatement ps = connect.prepareStatement(queryVersionSQL)) {
+                    try (ResultSet resultSet = ps.executeQuery()) {
+                        if (resultSet.next()) {
+                            return resultSet.getString(1);
+                        }
+                    }
                 }
-                ps.close();
             }
         } catch (Exception e) {
             LOGGER.error("Not can same deriveClass " + deriveClass, e);
@@ -126,15 +122,14 @@ public class ZrLogUtil {
             connect = getConnection(jdbcUrl, userName, password, deriveClass);
             if (connect != null) {
                 String queryVersionSQL = "select value from website where name = ?";
-                PreparedStatement ps = connect.prepareStatement(queryVersionSQL);
-                ps.setString(1, Constants.ZRLOG_SQL_VERSION_KEY);
-                ResultSet resultSet = ps.executeQuery();
-                if (resultSet.next()) {
-                    String result = resultSet.getString(1);
-                    ps.close();
-                    return result;
+                try (PreparedStatement ps = connect.prepareStatement(queryVersionSQL)) {
+                    ps.setString(1, Constants.ZRLOG_SQL_VERSION_KEY);
+                    try (ResultSet resultSet = ps.executeQuery()) {
+                        if (resultSet.next()) {
+                            return resultSet.getString(1);
+                        }
+                    }
                 }
-                ps.close();
             }
         } catch (Exception e) {
             LOGGER.error("Not can same deriveClass " + deriveClass, e);

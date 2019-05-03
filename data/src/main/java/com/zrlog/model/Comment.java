@@ -14,7 +14,6 @@ import java.util.Map;
  * 对应数据里面的comment表，用于存放文章对应的评论信息。
  */
 public class Comment extends Model<Comment> {
-    public static final Comment dao = new Comment();
     public static final String TABLE_NAME = "comment";
     /**
      *

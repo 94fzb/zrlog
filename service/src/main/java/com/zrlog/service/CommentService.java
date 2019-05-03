@@ -23,7 +23,7 @@ public class CommentService {
     }
 
     private boolean isAllowComment(int articleId) {
-        Log log = Log.dao.findByIdOrAlias(articleId);
+        Log log = new Log().findByIdOrAlias(articleId);
         return (log != null && log.getBoolean("canComment")) && isAllowComment();
     }
 
@@ -54,7 +54,7 @@ public class CommentService {
             createCommentResponse.setError(1);
             createCommentResponse.setMessage("");
         }
-        Log log = Log.dao.findByIdOrAlias(createCommentRequest.getLogId());
+        Log log = new Log().findByIdOrAlias(createCommentRequest.getLogId());
         if (log != null) {
             createCommentResponse.setAlias(log.getStr("alias"));
         }
@@ -63,17 +63,17 @@ public class CommentService {
 
     public StandardResponse delete(String[] ids) {
         for (String id : ids) {
-            Comment.dao.deleteById(id);
+            new Comment().deleteById(id);
         }
         return new StandardResponse();
     }
 
     public UpdateRecordResponse read(ReadCommentRequest commentRequest) {
-        Comment.dao.doRead(commentRequest.getId());
+        new Comment().doRead(commentRequest.getId());
         return new UpdateRecordResponse();
     }
 
     public Map page(PageableRequest pageable) {
-        return Comment.dao.find(pageable);
+        return new Comment().find(pageable);
     }
 }

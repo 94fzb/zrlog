@@ -21,7 +21,7 @@ $(document).ready(function () {
     });
 
     $(".delete-btn").click(function () {
-        if (confirm("是否删除改主题？")) {
+        if (confirm("是否删除该主题？")) {
             var template = $(this).attr("template");
             $.post("api/admin/template/delete", {"template": template}, function (e) {
                 reloadPage();

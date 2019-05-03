@@ -1,15 +1,13 @@
 package com.zrlog.util;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class PagerUtil {
 
-    public static Map<String, Object> generatorPager(String currentUri, int currentPage, Integer total) {
-        Map<String, Object> pager = new HashMap<>();
-        List<Map<String, Object>> pageList = new ArrayList<>();
+    public static PagerVO generatorPager(String currentUri, int currentPage, Integer total) {
+        PagerVO pager = new PagerVO();
+        List<PagerVO.PageEntry> pageList = new ArrayList<>();
         if (currentPage != 1) {
             pageList.add(pageEntity(currentUri, currentPage, I18nUtil.getStringFromRes("prevPage"), currentPage - 1));
         }
@@ -40,23 +38,23 @@ public class PagerUtil {
         if (currentPage != total) {
             pageList.add(pageEntity(currentUri, currentPage, I18nUtil.getStringFromRes("nextPage"), currentPage + 1));
         }
-        pager.put("pageList", pageList);
-        pager.put("pageStartUrl", currentUri + 1);
-        pager.put("pageEndUrl", currentUri + total);
-        pager.put("startPage", currentPage == 1);
-        pager.put("endPage", currentPage == total);
+        pager.setPageList(pageList);
+        pager.setPageStartUrl(currentUri + 1);
+        pager.setPageEndUrl(currentUri + total);
+        pager.setStartPage(currentPage == 1);
+        pager.setEndPage(currentPage == total);
         return pager;
     }
 
-    private static Map<String, Object> pageEntity(String url, int currentPage, String desc, int page) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("url", url + page);
-        map.put("desc", desc);
-        map.put("current", currentPage == page);
+    private static PagerVO.PageEntry pageEntity(String url, int currentPage, String desc, int page) {
+        PagerVO.PageEntry map = new PagerVO.PageEntry();
+        map.setUrl(url + page);
+        map.setDesc(desc);
+        map.setCurrent(currentPage == page);
         return map;
     }
 
-    private static Map<String, Object> pageEntity(String url, int currentPage, int page) {
+    private static PagerVO.PageEntry pageEntity(String url, int currentPage, int page) {
         return pageEntity(url, currentPage, page + "", page);
     }
 
