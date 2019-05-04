@@ -1,11 +1,10 @@
 package com.zrlog.web.interceptor;
 
 import com.hibegin.common.util.BeanUtil;
+import com.hibegin.common.util.StringUtils;
 import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
-import com.zrlog.web.cache.vo.Archive;
-import com.zrlog.web.cache.vo.BaseDataInitVO;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.OutlineVO;
 import com.zrlog.model.Log;
@@ -14,6 +13,8 @@ import com.zrlog.model.Tag;
 import com.zrlog.model.Type;
 import com.zrlog.service.CommentService;
 import com.zrlog.util.*;
+import com.zrlog.web.cache.vo.Archive;
+import com.zrlog.web.cache.vo.BaseDataInitVO;
 import com.zrlog.web.controller.BaseController;
 import com.zrlog.web.util.WebTools;
 import org.apache.log4j.Logger;
@@ -207,9 +208,10 @@ public class TemplateHelper {
             List<Log> logList = (List<Log>) map.get("rows");
             if (logList != null) {
                 for (Log log : logList) {
-                    if (thumbnailEnableArticle) {
+                    if (thumbnailEnableArticle && StringUtils.isNotEmpty(log.get("thumbnail"))) {
                         log.put("thumbnailAlt", ParseUtil.removeHtmlElement(log.get("title")));
                     } else {
+                        log.put("thumbnailAlt", null);
                         log.put("thumbnail", null);
                     }
                     log.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + log.get("alias") + suffix);
