@@ -7,7 +7,8 @@ import com.hibegin.common.util.ZipUtil;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
 import com.zrlog.common.Constants;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,7 +21,7 @@ import java.util.*;
  */
 public class WarUpdateVersionThread extends Thread implements Serializable, UpdateVersionHandler {
 
-    private static final Logger LOGGER = Logger.getLogger(WarUpdateVersionThread.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WarUpdateVersionThread.class);
 
     private File file;
     private StringBuilder sb = new StringBuilder();
@@ -39,7 +40,7 @@ public class WarUpdateVersionThread extends Thread implements Serializable, Upda
     }
 
     private void updateProcessErrorMsg(Throwable e) {
-        LOGGER.error(e);
+        LOGGER.error("",e);
         sb.append("<pre style='color:red'>").append(ExceptionUtils.recordStackTraceMsg(e)).append("</pre>");
     }
 

@@ -9,7 +9,8 @@ import com.zrlog.common.Constants;
 import com.zrlog.common.response.PageableResponse;
 import eu.bitwalker.useragentutils.BrowserType;
 import eu.bitwalker.useragentutils.UserAgent;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
@@ -27,7 +28,7 @@ import java.util.*;
  */
 public class ZrLogUtil {
 
-    private static final Logger LOGGER = Logger.getLogger(ZrLogUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ZrLogUtil.class);
 
     private ZrLogUtil() {
     }
@@ -109,7 +110,7 @@ public class ZrLogUtil {
                 try {
                     connect.close();
                 } catch (SQLException e) {
-                    LOGGER.error(e);
+                    LOGGER.error("",e);
                 }
             }
         }
@@ -138,7 +139,7 @@ public class ZrLogUtil {
                 try {
                     connect.close();
                 } catch (SQLException e) {
-                    LOGGER.error(e);
+                    LOGGER.error("",e);
                 }
             }
         }
@@ -150,7 +151,7 @@ public class ZrLogUtil {
             Class.forName(driverClass);
             return DriverManager.getConnection(jdbcUrl, user, password);
         } catch (ClassNotFoundException | SQLException e) {
-            LOGGER.error(e);
+            LOGGER.error("",e);
         }
         return null;
     }
@@ -182,7 +183,7 @@ public class ZrLogUtil {
         try {
             version = Integer.valueOf(sqlVersion);
         } catch (Exception e) {
-            LOGGER.error(e);
+            LOGGER.error("",e);
         }
         for (File f : getSqlFileList(basePath)) {
             try {

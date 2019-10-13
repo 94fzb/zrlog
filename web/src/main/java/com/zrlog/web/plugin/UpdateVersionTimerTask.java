@@ -6,7 +6,8 @@ import com.zrlog.common.Constants;
 import com.zrlog.common.vo.Version;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.ZrLogUtil;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -20,7 +21,7 @@ import java.util.TimerTask;
  */
 class UpdateVersionTimerTask extends TimerTask {
 
-    private static final Logger LOGGER = Logger.getLogger(UpdateVersionTimerTask.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UpdateVersionTimerTask.class);
 
     private boolean checkPreview;
     private Version version;
@@ -34,7 +35,7 @@ class UpdateVersionTimerTask extends TimerTask {
         try {
             this.version = fetchLastVersion(checkPreview);
         } catch (Exception e) {
-            LOGGER.error(e);
+            LOGGER.error("",e);
         }
     }
 

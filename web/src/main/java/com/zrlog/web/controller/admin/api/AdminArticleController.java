@@ -12,7 +12,7 @@ import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.annotation.RefreshCache;
 import com.zrlog.web.controller.BaseController;
 
-public class ArticleController extends BaseController {
+public class AdminArticleController extends BaseController {
 
     private ArticleService articleService = new ArticleService();
 

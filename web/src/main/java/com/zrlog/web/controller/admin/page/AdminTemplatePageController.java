@@ -15,7 +15,8 @@ import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.controller.BaseController;
 import com.zrlog.web.interceptor.TemplateHelper;
 import com.zrlog.web.util.WebTools;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.Cookie;
 import java.io.File;
@@ -23,7 +24,7 @@ import java.util.HashMap;
 
 public class AdminTemplatePageController extends BaseController {
 
-    private static final Logger LOGGER = Logger.getLogger(AdminTemplatePageController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AdminTemplatePageController.class);
 
     private TemplateService templateService = new TemplateService();
 

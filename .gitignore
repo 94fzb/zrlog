@@ -37,3 +37,4 @@ web/sim.pid
 sim.pid
 .DS_Store
 .vscode
+tomcat.*

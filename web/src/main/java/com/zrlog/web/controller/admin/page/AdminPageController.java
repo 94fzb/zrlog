@@ -7,6 +7,7 @@ import com.zrlog.common.Constants;
 import com.zrlog.common.response.CheckVersionResponse;
 import com.zrlog.model.Comment;
 import com.zrlog.model.Log;
+import com.zrlog.web.interceptor.AdminInterceptor;
 import com.zrlog.web.token.AdminTokenService;
 import com.zrlog.web.token.AdminTokenThreadLocal;
 import com.zrlog.service.TemplateService;
@@ -30,7 +31,7 @@ public class AdminPageController extends BaseController {
 
     public String index() {
         if (AdminTokenThreadLocal.getUser() != null) {
-            initIndex(getRequest());
+            AdminInterceptor.initIndex(getRequest());
             if (getPara(0) == null || getRequest().getRequestURI().endsWith("admin/") || "login".equals(getPara(0))) {
                 redirect(Constants.ADMIN_INDEX);
                 return null;
@@ -47,25 +48,6 @@ public class AdminPageController extends BaseController {
         }
     }
 
-    public static void initIndex(HttpServletRequest request) {
-        request.setAttribute("previewDb", com.zrlog.web.config.ZrLogConfig.isPreviewDb());
-
-        CheckVersionResponse response = new UpgradeController().lastVersion();
-        JFinal.me().getServletContext().setAttribute("lastVersion", response);
-        List<Comment> commentList = new Comment().findHaveReadIsFalse();
-        if (commentList != null && !commentList.isEmpty()) {
-            request.setAttribute("noReadComments", commentList);
-            for (Comment comment : commentList) {
-                if (StringUtils.isEmpty(comment.get("header"))) {
-                    comment.set("header", Constants.DEFAULT_HEADER);
-                }
-            }
-        }
-        request.setAttribute("lastVersion", response);
-        request.setAttribute("zrlog", ZrLogConfig.blogProperties);
-        request.setAttribute("system", ZrLogConfig.SYSTEM_PROP);
-    }
-
 
     private void fillStatistics() {
         getRequest().setAttribute("commCount", new Comment().count());
@@ -75,19 +57,12 @@ public class AdminPageController extends BaseController {
     }
 
     public String login() {
-        previewField(this);
+        AdminInterceptor.previewField(getRequest());
         if (AdminTokenThreadLocal.getUser() != null) {
             redirect(Constants.ADMIN_INDEX);
             return null;
         }
         return LOGOUT_URI;
-    }
-
-    public static void previewField(Controller controller) {
-        if (ZrLogUtil.isPreviewMode()) {
-            controller.getRequest().setAttribute("userName", System.getenv("DEFAULT_USERNAME"));
-            controller.getRequest().setAttribute("password", System.getenv("DEFAULT_PASSWORD"));
-        }
     }
 
     public void logout() {

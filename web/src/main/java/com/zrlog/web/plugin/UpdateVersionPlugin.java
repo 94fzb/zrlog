@@ -8,7 +8,8 @@ import com.zrlog.common.vo.Version;
 import com.zrlog.model.WebSite;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.I18nUtil;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.concurrent.ScheduledExecutorService;
@@ -20,7 +21,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class UpdateVersionPlugin implements IPlugin {
 
-    private static final Logger LOGGER = Logger.getLogger(UpdateVersionPlugin.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UpdateVersionPlugin.class);
 
     private ScheduledExecutorService scheduledExecutorService;
 
@@ -81,7 +82,7 @@ public class UpdateVersionPlugin implements IPlugin {
             try {
                 return updateVersionTimerTask.fetchLastVersion(checkPreview);
             } catch (Exception e) {
-                LOGGER.error(e);
+                LOGGER.error("",e);
             }
         }
         return updateVersionTimerTask.getVersion();

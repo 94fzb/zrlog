@@ -1,7 +1,8 @@
 package com.zrlog.web.plugin;
 
 import com.hibegin.common.util.ExceptionUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.Serializable;
@@ -12,7 +13,7 @@ import java.util.UUID;
  */
 public class ZipUpdateVersionThread extends Thread implements Serializable, UpdateVersionHandler {
 
-    private static final Logger LOGGER = Logger.getLogger(ZipUpdateVersionThread.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ZipUpdateVersionThread.class);
 
     private File file;
     private StringBuilder sb = new StringBuilder();
@@ -31,7 +32,7 @@ public class ZipUpdateVersionThread extends Thread implements Serializable, Upda
     }
 
     private void updateProcessErrorMsg(Throwable e) {
-        LOGGER.error(e);
+        LOGGER.error("",e);
         sb.append("<pre style='color:red'>").append(ExceptionUtils.recordStackTraceMsg(e)).append("</pre>");
     }
 

@@ -7,15 +7,22 @@ import com.jfinal.aop.Interceptor;
 import com.jfinal.aop.Invocation;
 import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
+import com.jfinal.kit.JsonKit;
 import com.jfinal.kit.PathKit;
 import com.jfinal.render.FreeMarkerRender;
+import com.jfinal.render.JsonRender;
 import com.zrlog.common.Constants;
+import com.zrlog.common.response.CheckVersionResponse;
 import com.zrlog.common.response.ExceptionResponse;
 import com.zrlog.common.vo.AdminTokenVO;
+import com.zrlog.model.Comment;
 import com.zrlog.model.User;
 import com.zrlog.util.I18nUtil;
+import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.annotation.RefreshCache;
 import com.zrlog.web.cache.CacheService;
+import com.zrlog.web.config.ZrLogConfig;
+import com.zrlog.web.controller.admin.api.UpgradeController;
 import com.zrlog.web.controller.admin.page.AdminPageController;
 import com.zrlog.web.handler.GlobalResourceHandler;
 import com.zrlog.web.token.AdminTokenService;
@@ -27,11 +34,12 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.FileInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 /**
  * 负责全部后台请求的处理（/admin/plugins/*,/api/admin/plugins/* 除外）
  */
-class AdminInterceptor implements Interceptor {
+public class AdminInterceptor implements Interceptor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AdminInterceptor.class);
     private AdminTokenService adminTokenService = new AdminTokenService();
@@ -66,7 +74,7 @@ class AdminInterceptor implements Interceptor {
                 ai.invoke();
                 // 存在消息提示
                 if (controller.getAttr("message") != null) {
-                    AdminPageController.initIndex(controller.getRequest());
+                    initIndex(controller.getRequest());
                     controller.render(new FreeMarkerRender("/admin/index.ftl"));
                 } else {
                     if (!tryDoRender(ai, controller)) {
@@ -121,10 +129,36 @@ class AdminInterceptor implements Interceptor {
         HttpServletRequest request = controller.getRequest();
         String url = controller.getRequest().getRequestURL().toString();
         URL tUrl = new URL(url);
-        AdminPageController.previewField(controller);
+        previewField(controller.getRequest());
         controller.getRequest().setAttribute("redirectFrom", tUrl.getPath() + (request.getQueryString() != null ? "?" + request.getQueryString() : ""));
         controller.render(new FreeMarkerRender("/admin/login.ftl"));
 
+    }
+
+    public static void previewField(HttpServletRequest request) {
+        if (ZrLogUtil.isPreviewMode()) {
+            request.setAttribute("userName", System.getenv("DEFAULT_USERNAME"));
+            request.setAttribute("password", System.getenv("DEFAULT_PASSWORD"));
+        }
+    }
+
+    public static void initIndex(HttpServletRequest request) {
+        request.setAttribute("previewDb", com.zrlog.web.config.ZrLogConfig.isPreviewDb());
+
+        CheckVersionResponse response = new UpgradeController().lastVersion();
+        JFinal.me().getServletContext().setAttribute("lastVersion", response);
+        List<Comment> commentList = new Comment().findHaveReadIsFalse();
+        if (commentList != null && !commentList.isEmpty()) {
+            request.setAttribute("noReadComments", commentList);
+            for (Comment comment : commentList) {
+                if (StringUtils.isEmpty(comment.get("header"))) {
+                    comment.set("header", Constants.DEFAULT_HEADER);
+                }
+            }
+        }
+        request.setAttribute("lastVersion", response);
+        request.setAttribute("zrlog", ZrLogConfig.blogProperties);
+        request.setAttribute("system", ZrLogConfig.SYSTEM_PROP);
     }
 
     /**

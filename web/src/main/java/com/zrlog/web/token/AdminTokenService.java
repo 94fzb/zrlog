@@ -9,7 +9,8 @@ import com.zrlog.common.Constants;
 import com.zrlog.common.vo.AdminTokenVO;
 import com.zrlog.model.User;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -22,7 +23,7 @@ import java.io.UnsupportedEncodingException;
 
 public class AdminTokenService {
 
-    private static final Logger LOGGER = Logger.getLogger(AdminTokenService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AdminTokenService.class);
 
     private static final String TOKEN_SPLIT_CHAR = "#";
 

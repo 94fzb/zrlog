@@ -29,7 +29,8 @@ import com.zrlog.web.interceptor.MyI18nInterceptor;
 import com.zrlog.web.interceptor.RouterInterceptor;
 import com.zrlog.web.plugin.*;
 import com.zrlog.web.version.UpgradeVersionHandler;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -46,7 +47,7 @@ import java.util.*;
  */
 public class ZrLogConfig extends JFinalConfig {
 
-    private static final Logger LOGGER = Logger.getLogger(ZrLogConfig.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ZrLogConfig.class);
     private static final String DEFAULT_PREVIEW_DB_HOST = "demo.blog.zrlog.com";
     private static String jdbcUrl;
     public static final String INSTALL_ROUTER_PATH = "/install";
@@ -136,6 +137,7 @@ public class ZrLogConfig extends JFinalConfig {
         con.setDevMode(BlogBuildInfoUtil.isDev());
         con.setViewType(ViewType.JSP);
         con.setEncoding("utf-8");
+        con.setJsonDatePattern("yyyy-MM-dd");
         con.setI18nDefaultBaseName(com.zrlog.common.Constants.I18N);
         con.setI18nDefaultLocale("zh_CN");
         con.setError404View(com.zrlog.common.Constants.NOT_FOUND_PAGE);
@@ -298,7 +300,7 @@ public class ZrLogConfig extends JFinalConfig {
                                 try {
                                     statement.close();
                                 } catch (SQLException e) {
-                                    LOGGER.error(e);
+                                    LOGGER.error("",e);
                                 }
                             }
                         }

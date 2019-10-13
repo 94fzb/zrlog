@@ -6,7 +6,8 @@ import com.zrlog.common.Constants;
 import com.zrlog.common.response.UploadFileResponse;
 import com.zrlog.common.vo.AdminTokenVO;
 import com.zrlog.web.util.PluginHelper;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
@@ -15,7 +16,7 @@ import java.util.Map;
 
 public class UploadService {
 
-    private static final Logger LOGGER = Logger.getLogger(UploadService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UploadService.class);
 
     public UploadFileResponse getCloudUrl(String contextPath, String uri, String finalFilePath, HttpServletRequest request, AdminTokenVO adminTokenVO) {
         UploadFileResponse uploadFileResponse = new UploadFileResponse();
@@ -41,7 +42,7 @@ public class UploadService {
             }
         } catch (Exception e) {
             url = contextPath + uri;
-            LOGGER.error(e);
+            LOGGER.error("",e);
         }
         uploadFileResponse.setUrl(url);
         return uploadFileResponse;

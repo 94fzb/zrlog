@@ -4,7 +4,8 @@ import com.hibegin.common.util.CmdUtil;
 import com.hibegin.common.util.http.HttpUtil;
 import com.hibegin.common.util.http.handle.HttpFileHandle;
 import com.zrlog.common.Constants;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.HashMap;
@@ -12,7 +13,7 @@ import java.util.Random;
 
 public class PluginCoreProcess {
 
-    private static final Logger LOGGER = Logger.getLogger(PluginCoreProcess.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PluginCoreProcess.class);
 
     /**
      * 插件服务的下载地址

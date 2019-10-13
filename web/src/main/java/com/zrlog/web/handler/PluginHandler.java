@@ -6,7 +6,8 @@ import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.web.token.AdminTokenService;
 import com.zrlog.web.token.AdminTokenThreadLocal;
 import com.zrlog.web.util.PluginHelper;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,7 +26,7 @@ import java.util.List;
  */
 public class PluginHandler extends Handler {
 
-    private static final Logger LOGGER = Logger.getLogger(PluginHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PluginHandler.class);
 
     private AdminTokenService adminTokenService = new AdminTokenService();
 
@@ -49,13 +50,13 @@ public class PluginHandler extends Handler {
                     try {
                         adminPermission(target, request, response, entry);
                     } catch (IOException | InstantiationException e) {
-                        LOGGER.error(e);
+                        LOGGER.error("",e);
                     }
                 } else if (target.startsWith("/plugin/") || target.startsWith("/p/")) {
                     try {
                         visitorPermission(target, request, response, entry);
                     } catch (IOException | InstantiationException e) {
-                        LOGGER.error(e);
+                        LOGGER.error("",e);
                     }
                 }
             } finally {

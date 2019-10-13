@@ -17,7 +17,8 @@ import com.zrlog.web.cache.vo.Archive;
 import com.zrlog.web.cache.vo.BaseDataInitVO;
 import com.zrlog.web.controller.BaseController;
 import com.zrlog.web.util.WebTools;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -33,7 +34,7 @@ import java.util.Properties;
 
 public class TemplateHelper {
 
-    private static final Logger LOGGER = Logger.getLogger(TemplateHelper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TemplateHelper.class);
 
     private static void fullInfo(HttpServletRequest request, boolean staticHtml) {
         boolean staticBlog = ZrLogUtil.isStaticBlogPlugin(request);

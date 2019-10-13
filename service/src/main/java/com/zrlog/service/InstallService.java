@@ -8,10 +8,11 @@ import com.zrlog.common.type.TestConnectDbResult;
 import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ParseUtil;
 import com.zrlog.util.ZrLogUtil;
-import org.apache.log4j.Logger;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -27,7 +28,7 @@ import java.util.UUID;
  */
 public class InstallService {
 
-    private static final Logger LOGGER = Logger.getLogger(InstallService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(InstallService.class);
     private String basePath;
     private Map<String, String> dbConn;
     private Map<String, String> configMsg;

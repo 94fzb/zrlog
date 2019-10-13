@@ -34,7 +34,7 @@
                                     </div>
                                 </div>
                             </c:when>
-                            <c:when test="${plugin.pluginName eq 'links' and pageLevel>=plugin.level and not empty init.links}">
+                            <c:when test="${plugin.pluginName eq 'links' and pageLevel>=plugin.level}">
                                 <div class="widget">
                                     <h3>${_res.link}</h3>
                                     <ul>

@@ -1,7 +1,8 @@
 package com.zrlog.web.plugin;
 
 import com.hibegin.common.util.IOUtil;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -11,7 +12,7 @@ import java.net.Socket;
  */
 class PluginGhostThread extends Thread {
 
-    private static final Logger LOGGER = Logger.getLogger(PluginGhostThread.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PluginGhostThread.class);
     private int port;
     private String host;
 

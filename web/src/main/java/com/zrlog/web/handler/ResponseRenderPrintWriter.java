@@ -88,7 +88,9 @@ class ResponseRenderPrintWriter extends PrintWriter {
                 if (includeEndTag && response.getContentType().contains("text/html")) {
                     body = getCompressAndParseHtml(body);
                 }
-                out.write(body);
+                if(out != null) {
+                    out.write(body);
+                }
 
                 // Reset the local StringBuilder and issue real flush.
                 builder.setLength(0);

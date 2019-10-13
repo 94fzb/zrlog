@@ -10,6 +10,7 @@ import com.zrlog.model.*;
 
 import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 对缓存数据的操作
@@ -72,12 +73,33 @@ public class CacheService {
             }
         }
         if (baseController != null) {
-            baseController.setAttr("init", cacheInit);
-            baseController.setAttr("website", cacheInit.getWebSite());
+            final BaseDataInitVO cacheInitFile = cacheInit;
+            if(cacheInit.getTags() == null || cacheInit.getTags().isEmpty()){
+                cacheInit.getPlugins().stream().filter(e -> e.get("pluginName").equals("tags")).findFirst().ifPresent(e -> {
+                    cacheInitFile.getPlugins().remove(e);
+                });
+            }
+            if(cacheInit.getArchives() == null || cacheInit.getArchives().isEmpty()){
+                cacheInit.getPlugins().stream().filter(e -> e.get("pluginName").equals("archives")).findFirst().ifPresent(e -> {
+                    cacheInitFile.getPlugins().remove(e);
+                });
+            }
+            if(cacheInit.getTypes() == null || cacheInit.getTypes().isEmpty()){
+                cacheInit.getPlugins().stream().filter(e -> e.get("pluginName").equals("types")).findFirst().ifPresent(e -> {
+                    cacheInitFile.getPlugins().remove(e);
+                });
+            }
+            if(cacheInit.getLinks() == null || cacheInit.getLinks().isEmpty()){
+                cacheInit.getPlugins().stream().filter(e -> e.get("pluginName").equals("links")).findFirst().ifPresent(e -> {
+                    cacheInitFile.getPlugins().remove(e);
+                });
+            }
+            baseController.setAttr("init", cacheInitFile);
+            baseController.setAttr("website", cacheInitFile.getWebSite());
             //默认开启文章封面
-            cacheInit.getWebSite().putIfAbsent("article_thumbnail_status", "1");
+            cacheInitFile.getWebSite().putIfAbsent("article_thumbnail_status", "1");
             Constants.WEB_SITE.clear();
-            Constants.WEB_SITE.putAll(cacheInit.getWebSite());
+            Constants.WEB_SITE.putAll(cacheInitFile.getWebSite());
         }
     }
 

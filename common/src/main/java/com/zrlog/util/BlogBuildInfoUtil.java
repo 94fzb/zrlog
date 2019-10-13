@@ -2,7 +2,8 @@ package com.zrlog.util;
 
 
 import com.zrlog.common.Constants;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +18,7 @@ import java.util.Properties;
  */
 public class BlogBuildInfoUtil {
 
-    private static final Logger LOGGER = Logger.getLogger(BlogBuildInfoUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BlogBuildInfoUtil.class);
 
     /**
      * 目前以git的commitId的前7位标记构建的Id

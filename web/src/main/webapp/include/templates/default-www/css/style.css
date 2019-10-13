@@ -285,6 +285,17 @@ aside .search input.btn {
     border-radius: 0;
 }
 
+.search input.btn {
+    width: 80px;
+    height: 36px;
+    padding: 0;
+    border: 0 none;
+    vertical-align: middle;
+    outline: none;
+    background-color: #E4E4E4;
+    border-radius: 0;
+}
+
 aside .search input.btn:hover { /*box-shadow: 0 0 5px #DDDDDD;*/
     cursor: pointer;
 }

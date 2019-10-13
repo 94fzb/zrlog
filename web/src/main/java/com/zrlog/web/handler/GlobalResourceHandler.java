@@ -16,9 +16,12 @@ import com.zrlog.web.plugin.RequestStatisticsPlugin;
 import com.zrlog.web.token.AdminTokenService;
 import com.zrlog.web.token.AdminTokenThreadLocal;
 import com.zrlog.web.util.WebTools;
+import org.apache.catalina.connector.Response;
+import org.apache.catalina.connector.ResponseFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
@@ -72,12 +75,7 @@ public class GlobalResourceHandler extends Handler {
         try {
             AdminTokenVO adminTokenVO = new AdminTokenService().getAdminTokenVO(request);
             final ResponseRenderPrintWriter responseRenderPrintWriter = new ResponseRenderPrintWriter(response.getOutputStream(), url, PAGE_END_TAG, request, response, adminTokenVO);
-            response = new HttpServletResponseWrapper(response) {
-                @Override
-                public PrintWriter getWriter() {
-                    return responseRenderPrintWriter;
-                }
-            };
+            response = new MyHttpServletResponseWrapper(response,responseRenderPrintWriter);
             if (ext != null) {
                 if (!FORBIDDEN_URI_EXT_SET.contains(ext)) {
                     // 处理静态化文件,仅仅缓存文章页(变化较小)
@@ -102,6 +100,8 @@ public class GlobalResourceHandler extends Handler {
                     responseHtmlFile(target, request, response, isHandled, responseRenderPrintWriter, new File(CACHE_HTML_PATH + I18nUtil.getAcceptLanguage(request) + "/index.html"));
                 } else {
                     this.next.handle(target, request, response, isHandled);
+                    //JFinal， JsonRender 移除了 flush()，需要手动 flush，针对JFinal3.3 以后版本
+                    response.getWriter().flush();
                 }
             }
         } catch (Exception e) {
