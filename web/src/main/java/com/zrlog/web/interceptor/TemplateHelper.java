@@ -249,7 +249,9 @@ public class TemplateHelper {
                 && !data.getStr("markdown").toLowerCase().contains("[tocm]")) {
             //最基础的实现方式，若需要更强大的实现方式建议使用JavaScript完成（页面输入toc对象）
             OutlineVO outlineVO = OutlineUtil.extractOutline(data.getStr("content"));
-            data.put("tocHtml", OutlineUtil.buildTocHtml(outlineVO, ""));
+            if (outlineVO.size() > 0) {
+                data.put("tocHtml", OutlineUtil.buildTocHtml(outlineVO, ""));
+            }
             data.put("toc", outlineVO);
         }
         if (!new CommentService().isAllowComment()) {

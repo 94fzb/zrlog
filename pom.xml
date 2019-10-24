@@ -22,6 +22,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <servlet.version>3.1.0</servlet.version>
         <maven.test.skip>true</maven.test.skip>
+        <finalName>zrlog</finalName>
     </properties>
 
     <developers>

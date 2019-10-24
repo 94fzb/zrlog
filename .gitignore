@@ -38,3 +38,4 @@ sim.pid
 .DS_Store
 .vscode
 tomcat.*
+/web/src/main/webapp/include/templates/default-2019/

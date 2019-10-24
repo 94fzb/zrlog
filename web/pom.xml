@@ -15,7 +15,7 @@
     <properties>
         <tomcat7Version>9.0.27</tomcat7Version>
         <tomcat-scope>compile</tomcat-scope>
-        <contextPath>/</contextPath>
+        <contextPath>/${finalName}</contextPath>
     </properties>
 
     <dependencies>
@@ -69,7 +69,7 @@
     </dependencies>
 
     <build>
-        <finalName>zrlog-${project.version}</finalName>
+        <finalName>${finalName}-${project.version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.tomcat.maven</groupId>

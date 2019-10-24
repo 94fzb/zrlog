@@ -24,7 +24,7 @@ public class Application {
             webPort = "8080";
         }
 
-        tomcat.setPort(Integer.valueOf(webPort));
+        tomcat.setPort(Integer.parseInt(webPort));
         tomcat.getConnector();
 
         // Declare an alternative location for your "WEB-INF/classes" dir

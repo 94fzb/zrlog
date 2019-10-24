@@ -4,6 +4,7 @@ import com.hibegin.common.util.FileUtils;
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.StringUtils;
 import com.jfinal.config.*;
+import com.jfinal.core.Const;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
 import com.jfinal.plugin.IPlugin;
@@ -28,6 +29,7 @@ import com.zrlog.web.interceptor.InitDataInterceptor;
 import com.zrlog.web.interceptor.MyI18nInterceptor;
 import com.zrlog.web.interceptor.RouterInterceptor;
 import com.zrlog.web.plugin.*;
+import com.zrlog.web.render.BlogFrontendFreeMarkerRender;
 import com.zrlog.web.version.UpgradeVersionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -239,6 +241,12 @@ public class ZrLogConfig extends JFinalConfig {
     @Override
     public void afterJFinalStart() {
         FreeMarkerRender.getConfiguration().setClassForTemplateLoading(ZrLogConfig.class, com.zrlog.common.Constants.FTL_VIEW_PATH);
+        try {
+            BlogFrontendFreeMarkerRender.getConfiguration().setDirectoryForTemplateLoading(new File(PathKit.getWebRootPath()));
+            BlogFrontendFreeMarkerRender.init(JFinal.me().getServletContext(), Locale.getDefault(), Const.DEFAULT_FREEMARKER_TEMPLATE_UPDATE_DELAY);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         super.afterJFinalStart();
         if (isInstalled()) {
             initDatabaseVersion();

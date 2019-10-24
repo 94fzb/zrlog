@@ -1,5 +1,6 @@
 package com.zrlog.service;
 
+import com.hibegin.common.util.StringUtils;
 import com.zrlog.common.Constants;
 import com.zrlog.common.request.CreateCommentRequest;
 import com.zrlog.common.request.PageableRequest;
@@ -27,16 +28,29 @@ public class CommentService {
         return (log != null && log.getBoolean("canComment")) && isAllowComment();
     }
 
+    private static boolean isValidEmailAddress(String email) {
+        String ePattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$";
+        java.util.regex.Pattern p = java.util.regex.Pattern.compile(ePattern);
+        java.util.regex.Matcher m = p.matcher(email);
+        return m.matches();
+    }
+
     public CreateCommentResponse save(CreateCommentRequest createCommentRequest) {
         CreateCommentResponse createCommentResponse = new CreateCommentResponse();
         if (createCommentRequest.getLogId() != null && createCommentRequest.getComment() != null) {
-            if (isAllowComment(Integer.valueOf(createCommentRequest.getLogId()))) {
+            if (isAllowComment(Integer.parseInt(createCommentRequest.getLogId()))) {
                 String comment = Jsoup.clean(createCommentRequest.getComment(), Whitelist.basic());
+                String email = createCommentRequest.getMail();
+                if (StringUtils.isNotEmpty(email) || !isValidEmailAddress(email)) {
+                    throw new IllegalArgumentException(email + "not email address");
+                }
+                String nickname = Jsoup.clean(createCommentRequest.getUserName(), Whitelist.basic());
+                String userHome = Jsoup.clean(createCommentRequest.getUserHome(), Whitelist.basic());
                 if (comment.length() > 0 && !ParseUtil.isGarbageComment(comment)) {
-                    new Comment().set("userHome", createCommentRequest.getUserHome())
-                            .set("userMail", createCommentRequest.getComment())
+                    new Comment().set("userHome", userHome)
+                            .set("userMail", email)
                             .set("userIp", createCommentRequest.getIp())
-                            .set("userName", createCommentRequest.getUserName())
+                            .set("userName", nickname)
                             .set("logId", createCommentRequest.getLogId())
                             .set("userComment", comment)
                             .set("user_agent", createCommentRequest.getUserAgent())

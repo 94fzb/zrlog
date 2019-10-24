@@ -13,6 +13,7 @@ import com.zrlog.service.TemplateService;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.config.ZrLogConfig;
 import com.zrlog.web.handler.GlobalResourceHandler;
+import com.zrlog.web.render.BlogFrontendFreeMarkerRender;
 
 import java.io.File;
 import java.util.Enumeration;
@@ -72,7 +73,15 @@ class VisitorInterceptor implements Interceptor {
             ai.getController().setAttr("pageLevel", 2);
         }
         fullDevData(ai.getController());
-        ai.getController().render(templatePath + "/" + templateName + ext);
+        String viewPath = templatePath + "/" + templateName + ext;
+        if (ext.equals(".ftl")) {
+            BlogFrontendFreeMarkerRender render = new BlogFrontendFreeMarkerRender(viewPath);
+            render.setContext(ai.getController().getRequest(), ai.getController().getResponse());
+            ai.getController().render(render);
+        } else {
+            ai.getController().render(viewPath);
+        }
+
     }
 
     /**

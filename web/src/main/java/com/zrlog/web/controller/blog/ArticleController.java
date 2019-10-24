@@ -7,15 +7,17 @@ import com.zrlog.model.Comment;
 import com.zrlog.model.Log;
 import com.zrlog.model.Type;
 import com.zrlog.service.ArticleService;
-import com.zrlog.web.cache.CacheService;
 import com.zrlog.service.CommentService;
 import com.zrlog.util.I18nUtil;
 import com.zrlog.util.PagerUtil;
 import com.zrlog.util.ParseUtil;
 import com.zrlog.util.ZrLogUtil;
+import com.zrlog.web.cache.CacheService;
 import com.zrlog.web.controller.BaseController;
 import com.zrlog.web.handler.GlobalResourceHandler;
 import com.zrlog.web.util.WebTools;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
 
 import java.util.Map;
 
@@ -108,7 +110,7 @@ public class ArticleController extends BaseController {
     CreateCommentResponse saveComment() {
         CreateCommentRequest createCommentRequest = ZrLogUtil.convertRequestParam(getRequest().getParameterMap(), CreateCommentRequest.class);
         createCommentRequest.setIp(WebTools.getRealIp(getRequest()));
-        createCommentRequest.setUserAgent(getHeader("User-Agent"));
+        createCommentRequest.setUserAgent(Jsoup.clean(getHeader("User-Agent"), Whitelist.basic()));
         return commentService.save(createCommentRequest);
     }
 

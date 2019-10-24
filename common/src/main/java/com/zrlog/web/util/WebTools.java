@@ -1,6 +1,7 @@
 package com.zrlog.web.util;
 
 import com.zrlog.util.ZrLogUtil;
+import org.apache.http.conn.util.InetAddressUtils;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -16,11 +17,14 @@ public class WebTools {
      * @return
      */
     public static String getRealIp(HttpServletRequest request) {
+        String ip = null;
         //bae env
         if (ZrLogUtil.isBae() && request.getHeader("clientip") != null) {
-            return request.getHeader("clientip");
+            ip = request.getHeader("clientip");
         }
-        String ip = request.getHeader("X-forwarded-for");
+        if (ip == null || ip.length() == 0) {
+            ip = request.getHeader("X-forwarded-for");
+        }
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getHeader("X-Real-IP");
         }
@@ -33,7 +37,10 @@ public class WebTools {
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getRemoteAddr();
         }
-        return ip;
+        if (InetAddressUtils.isIPv4Address(ip) || InetAddressUtils.isIPv6Address(ip)) {
+            return ip;
+        }
+        throw new IllegalArgumentException(ip + " not ipAddress");
     }
 
     public static String getHomeUrlWithHost(HttpServletRequest request) {
