@@ -37,5 +37,6 @@ web/sim.pid
 sim.pid
 .DS_Store
 .vscode
+pom.xml.versionsBackup
 tomcat.*
 /web/src/main/webapp/include/templates/default-2019/
