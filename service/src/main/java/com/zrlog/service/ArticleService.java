@@ -96,7 +96,7 @@ public class ArticleService {
         log.set("privacy", createArticleRequest.isPrivacy());
         log.set("rubbish", createArticleRequest.isRubbish());
         if (StringUtils.isEmpty(createArticleRequest.getThumbnail())) {
-            log.set("thumbnail", Jsoup.clean(getFirstImgUrl(createArticleRequest.getContent(), adminTokenVO), Whitelist.basic()));
+            log.set("thumbnail", getFirstImgUrl(createArticleRequest.getContent(), adminTokenVO));
         } else {
             log.set("thumbnail", Jsoup.clean(createArticleRequest.getThumbnail(), Whitelist.basic()));
         }
