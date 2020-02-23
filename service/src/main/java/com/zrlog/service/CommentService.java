@@ -19,6 +19,13 @@ import java.util.Map;
 
 public class CommentService {
 
+    private static boolean isValidEmailAddress(String email) {
+        String ePattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$";
+        java.util.regex.Pattern p = java.util.regex.Pattern.compile(ePattern);
+        java.util.regex.Matcher m = p.matcher(email);
+        return m.matches();
+    }
+
     public boolean isAllowComment() {
         return !Constants.getBooleanByFromWebSite("disable_comment_status");
     }
@@ -26,13 +33,6 @@ public class CommentService {
     private boolean isAllowComment(int articleId) {
         Log log = new Log().findByIdOrAlias(articleId);
         return (log != null && log.getBoolean("canComment")) && isAllowComment();
-    }
-
-    private static boolean isValidEmailAddress(String email) {
-        String ePattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$";
-        java.util.regex.Pattern p = java.util.regex.Pattern.compile(ePattern);
-        java.util.regex.Matcher m = p.matcher(email);
-        return m.matches();
     }
 
     public CreateCommentResponse save(CreateCommentRequest createCommentRequest) {
@@ -44,8 +44,15 @@ public class CommentService {
                 if (StringUtils.isNotEmpty(email) || !isValidEmailAddress(email)) {
                     throw new IllegalArgumentException(email + "not email address");
                 }
-                String nickname = Jsoup.clean(createCommentRequest.getUserName(), Whitelist.basic());
-                String userHome = Jsoup.clean(createCommentRequest.getUserHome(), Whitelist.basic());
+                String nickname = createCommentRequest.getUserName();
+                if (StringUtils.isEmpty(nickname)) {
+                    throw new IllegalArgumentException("nickname not block");
+                }
+                nickname = Jsoup.clean(createCommentRequest.getUserName(), Whitelist.basic());
+                String userHome = createCommentRequest.getUserHome();
+                if (StringUtils.isNotEmpty(userHome)) {
+                    userHome = Jsoup.clean(createCommentRequest.getUserHome(), Whitelist.basic());
+                }
                 if (comment.length() > 0 && !ParseUtil.isGarbageComment(comment)) {
                     new Comment().set("userHome", userHome)
                             .set("userMail", email)
