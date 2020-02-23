@@ -41,7 +41,7 @@ public class CommentService {
             if (isAllowComment(Integer.parseInt(createCommentRequest.getLogId()))) {
                 String comment = Jsoup.clean(createCommentRequest.getComment(), Whitelist.basic());
                 String email = createCommentRequest.getMail();
-                if (StringUtils.isNotEmpty(email) || !isValidEmailAddress(email)) {
+                if (StringUtils.isNotEmpty(email) && !isValidEmailAddress(email)) {
                     throw new IllegalArgumentException(email + "not email address");
                 }
                 String nickname = createCommentRequest.getUserName();
