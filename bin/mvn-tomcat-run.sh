@@ -1,1 +1,5 @@
-./mvnw clean install -Dmaven.test.skip=true && cd web  && ../mvnw tomcat7:run -Dtomcat-scope=provided
+rm -rf web/src/main/lib
+rm -rf web/src/main/zrlog.*
+./mvnw clean package -Dmaven.war.skip
+mv web/src/main/zrlog*.jar web/src/main/zrlog.jar
+cd web/src/main/ && sh bin/run.sh

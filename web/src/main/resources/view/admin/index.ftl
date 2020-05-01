@@ -219,7 +219,7 @@
         </div>
     </div>
 </div>
-<script src="${basePath}assets/js/bootstrap.min.js"></script>
+<script src="${basePath}assets/js/bootstrap.bundle.min.js"></script>
 <script src="${basePath}assets/js/validator.min.js"></script>
 <script src="${basePath}assets/js/nprogress.js"></script>
 <script src="${basePath}assets/js/custom.min.js"></script>

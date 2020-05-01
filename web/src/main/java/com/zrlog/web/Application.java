@@ -4,7 +4,6 @@ import com.zrlog.common.Constants;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
 
-import javax.servlet.ServletException;
 import java.io.File;
 
 public class Application {
@@ -41,7 +40,11 @@ public class Application {
         if (!Constants.IN_JAR && !new File("").getAbsolutePath().endsWith(File.separator + "web")) {
             webappDirLocation = "web/" + webappDirLocation;
         }
-        tomcat.addWebapp("", new File(webappDirLocation).getAbsolutePath());
+        String contextPath = System.getenv("contextPath");
+        if (contextPath == null || contextPath.trim().length() == 0) {
+            contextPath = "";
+        }
+        tomcat.addWebapp(contextPath, new File(webappDirLocation).getAbsolutePath());
         tomcat.start();
         tomcat.getServer().await();
     }

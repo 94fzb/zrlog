@@ -768,8 +768,8 @@ a:hover, a:focus {
     border-radius: 0 25px 25px 0;
     border-style: solid solid solid none;
     border-width: 1px 1px 1px 0;
-    color: #93a2b2;
     margin-bottom: 0 !important;
+    background-color: #69c0ff
 }
 
 .toggle {

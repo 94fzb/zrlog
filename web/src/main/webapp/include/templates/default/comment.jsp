@@ -1,4 +1,4 @@
-﻿<%@ page session="false" pageEncoding="UTF-8" %>
+<%@ page session="false" pageEncoding="UTF-8" %>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <c:choose>
@@ -25,13 +25,13 @@
                                 <h2 id="comment">${_res.comment}</h2>
                                 <p class="comment-write"><label class="hidden" for="message">Message</label><textarea
                                         class="txpCommentInputMessage" rows="15" cols="45" name="userComment"
-                                        id="message"></textarea></p>
+                                        id="message" required></textarea></p>
                                 <div class="input-group">
                                     <p><label for="name">${_res.name}</label>
                                         <input type="text" id="name"
                                                class="comment_name_input"
                                                size="25" name="userName"
-                                               value=""></p>
+                                               value="" required></p>
                                     <p><label for="email">${_res.email}</label><input type="text" id="email"
                                                                                       class="comment_email_input"
                                                                                       size="80" name="userMail"

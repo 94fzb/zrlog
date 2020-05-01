@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.zrlog</groupId>
     <artifactId>zrlog</artifactId>
-    <version>2.1.10-SNAPSHOT</version>
+    <version>2.1.10</version>
     <modules>
         <module>web</module>
         <module>service</module>
@@ -18,7 +18,7 @@
 
     <properties>
         <java.version>1.8</java.version>
-        <jfinal.version>4.5</jfinal.version>
+        <jfinal.version>4.8</jfinal.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <servlet.version>3.1.0</servlet.version>
         <maven.test.skip>true</maven.test.skip>
@@ -29,7 +29,7 @@
         <developer>
             <name>xiaochun</name>
             <email>xchun90@163.com</email>
-            <url>http://blog.94fzb.com</url>
+            <url>http://xiaochun.zrlog.com</url>
             <roles>
                 <role>owner</role>
             </roles>
