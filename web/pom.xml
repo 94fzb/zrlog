@@ -120,6 +120,7 @@
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>false</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
+                            <includeScope>compile</includeScope>
                         </configuration>
                     </execution>
                 </executions>
