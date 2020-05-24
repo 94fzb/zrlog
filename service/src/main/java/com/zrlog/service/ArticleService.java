@@ -98,7 +98,7 @@ public class ArticleService {
         if (StringUtils.isEmpty(createArticleRequest.getThumbnail())) {
             log.set("thumbnail", getFirstImgUrl(createArticleRequest.getContent(), adminTokenVO));
         } else {
-            log.set("thumbnail", Jsoup.clean(createArticleRequest.getThumbnail(), Whitelist.basic()));
+            log.set("thumbnail", createArticleRequest.getThumbnail());
         }
         // 自动摘要
         if (StringUtils.isEmpty(createArticleRequest.getDigest())) {

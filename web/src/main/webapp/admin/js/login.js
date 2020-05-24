@@ -91,7 +91,6 @@ $(function () {
             success: function (e) {
                 if (!e.error) {
                     var redirectTo = "";
-                    var baseUrl = $("base").attr("href");
                     var queryStr = "";
                     var reFrom = $("#redirectFrom").val();
                     if (reFrom.length !== 0) {
@@ -109,9 +108,10 @@ $(function () {
                     } else {
                         redirectTo = window.location.hash;
                     }
-                    redirectTo = baseUrl + "admin/index" + queryStr + redirectTo;
-                    console.info(window.location.protocol + ":" + redirectTo);
-                    if (window.location.protocol + redirectTo === window.location.href) {
+                    var basePath = $("base").attr("href");
+                    redirectTo = window.location.protocol + "//" + window.location.host +   basePath + "admin/index" + queryStr + redirectTo;
+                    console.info(redirectTo);
+                    if (redirectTo === window.location.href) {
                         window.location.reload();
                     } else {
                         window.location.replace(redirectTo);

@@ -13,6 +13,8 @@ import com.zrlog.web.controller.BaseController;
 import com.zrlog.web.interceptor.TemplateHelper;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,6 +60,14 @@ public class AdminArticlePageController extends BaseController {
                 editorType = Constants.WEB_SITE.get("editor_type").toString();
             } else {
                 editorType = "markdown";
+            }
+        }
+        //兼容错误加载的图片
+        if (articleContent.get("thumbnail") != null) {
+            try {
+                articleContent.put("thumbnail", URLDecoder.decode((String) articleContent.get("thumbnail"), "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                //e.printStackTrace();
             }
         }
         articleContent.put("editorType", editorType);
