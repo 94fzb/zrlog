@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+rm -rf web/src/main/lib
+rm -rf web/src/main/zrlog.*
 version=$(printf 'VER\t${project.version}' | ./mvnw help:evaluate | grep '^VER' | cut -f2)
 ./mvnw clean package
 mv web/src/main/zrlog-"${version}".jar target/zrlog.jar
