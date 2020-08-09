@@ -23,7 +23,7 @@ class UpdateVersionTimerTask extends TimerTask {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UpdateVersionTimerTask.class);
 
-    private boolean checkPreview;
+    private final boolean checkPreview;
     private Version version;
 
     UpdateVersionTimerTask(boolean checkPreview) {
@@ -35,7 +35,7 @@ class UpdateVersionTimerTask extends TimerTask {
         try {
             this.version = fetchLastVersion(checkPreview);
         } catch (Exception e) {
-            LOGGER.error("",e);
+            LOGGER.error("", e);
         }
     }
 

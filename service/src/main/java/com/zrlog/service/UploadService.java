@@ -42,7 +42,7 @@ public class UploadService {
             }
         } catch (Exception e) {
             url = contextPath + uri;
-            LOGGER.error("",e);
+            LOGGER.error("", e);
         }
         uploadFileResponse.setUrl(url);
         return uploadFileResponse;

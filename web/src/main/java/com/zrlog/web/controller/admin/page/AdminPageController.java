@@ -1,33 +1,24 @@
 package com.zrlog.web.controller.admin.page;
 
-import com.hibegin.common.util.StringUtils;
-import com.jfinal.core.Controller;
-import com.jfinal.core.JFinal;
 import com.zrlog.common.Constants;
-import com.zrlog.common.response.CheckVersionResponse;
 import com.zrlog.model.Comment;
 import com.zrlog.model.Log;
+import com.zrlog.service.TemplateService;
+import com.zrlog.web.controller.BaseController;
 import com.zrlog.web.interceptor.AdminInterceptor;
+import com.zrlog.web.interceptor.TemplateHelper;
 import com.zrlog.web.token.AdminTokenService;
 import com.zrlog.web.token.AdminTokenThreadLocal;
-import com.zrlog.service.TemplateService;
-import com.zrlog.util.ZrLogUtil;
-import com.zrlog.web.config.ZrLogConfig;
-import com.zrlog.web.controller.BaseController;
-import com.zrlog.web.controller.admin.api.UpgradeController;
-import com.zrlog.web.interceptor.TemplateHelper;
 
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 public class AdminPageController extends BaseController {
 
     private static final String LOGOUT_URI = "/admin/login";
 
-    private AdminTokenService adminTokenService = new AdminTokenService();
+    private final AdminTokenService adminTokenService = new AdminTokenService();
 
-    private TemplateService templateService = new TemplateService();
+    private final TemplateService templateService = new TemplateService();
 
     public String index() {
         if (AdminTokenThreadLocal.getUser() != null) {

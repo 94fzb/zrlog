@@ -110,7 +110,7 @@ public class ZrLogUtil {
                 try {
                     connect.close();
                 } catch (SQLException e) {
-                    LOGGER.error("",e);
+                    LOGGER.error("", e);
                 }
             }
         }
@@ -139,7 +139,7 @@ public class ZrLogUtil {
                 try {
                     connect.close();
                 } catch (SQLException e) {
-                    LOGGER.error("",e);
+                    LOGGER.error("", e);
                 }
             }
         }
@@ -151,7 +151,7 @@ public class ZrLogUtil {
             Class.forName(driverClass);
             return DriverManager.getConnection(jdbcUrl, user, password);
         } catch (ClassNotFoundException | SQLException e) {
-            LOGGER.error("",e);
+            LOGGER.error("", e);
         }
         return null;
     }
@@ -183,7 +183,7 @@ public class ZrLogUtil {
         try {
             version = Integer.valueOf(sqlVersion);
         } catch (Exception e) {
-            LOGGER.error("",e);
+            LOGGER.error("", e);
         }
         for (File f : getSqlFileList(basePath)) {
             try {

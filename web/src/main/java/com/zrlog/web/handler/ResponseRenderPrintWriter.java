@@ -28,13 +28,13 @@ class ResponseRenderPrintWriter extends PrintWriter {
 
     private final StringBuilder builder = new StringBuilder();
     private String body;
-    private long startTime = System.currentTimeMillis();
-    private String baseUrl;
-    private String endFlag;
-    private HttpServletRequest request;
-    private HttpServletResponse response;
-    private String charset;
-    private AdminTokenVO adminTokenVO;
+    private final long startTime = System.currentTimeMillis();
+    private final String baseUrl;
+    private final String endFlag;
+    private final HttpServletRequest request;
+    private final HttpServletResponse response;
+    private final String charset;
+    private final AdminTokenVO adminTokenVO;
 
     public String getResponseBody() {
         return body;
@@ -88,7 +88,7 @@ class ResponseRenderPrintWriter extends PrintWriter {
                 if (includeEndTag && response.getContentType().contains("text/html")) {
                     body = getCompressAndParseHtml(body);
                 }
-                if(out != null) {
+                if (out != null) {
                     out.write(body);
                 }
 

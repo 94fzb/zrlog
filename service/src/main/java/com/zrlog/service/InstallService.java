@@ -212,28 +212,28 @@ public class InstallService {
 
     private void insertType(Connection connect) throws SQLException {
         String insertLogType = "INSERT INTO `type`(`typeId`, `typeName`, `remark`, `alias`) VALUES (1,'" + I18nUtil.getStringFromRes("defaultType") + "','','note')";
-        try(PreparedStatement ps = connect.prepareStatement(insertLogType)){
+        try (PreparedStatement ps = connect.prepareStatement(insertLogType)) {
             ps.executeUpdate();
         }
     }
 
     private void insertTag(Connection connect) throws SQLException {
         String insertTag = "INSERT INTO `tag`(`tagId`,`text`,`count`) VALUES (1,'" + I18nUtil.getStringFromRes("defaultType") + "',1)";
-        try(PreparedStatement ps = connect.prepareStatement(insertTag)){
+        try (PreparedStatement ps = connect.prepareStatement(insertTag)) {
             ps.executeUpdate();
         }
     }
 
     private void initPlugin(Connection connection) throws SQLException {
         String insertPluginSql = "INSERT INTO `plugin` VALUES (1,NULL,b'1','" + I18nUtil.getStringFromRes("category") + "',NULL,'types',3),(2,NULL,b'1','" + I18nUtil.getStringFromRes("tag") + "',NULL,'tags',3),(3,NULL,b'1','" + I18nUtil.getStringFromRes("link") + "',NULL,'links',2),(4,NULL,b'1','" + I18nUtil.getStringFromRes("archive") + "',NULL,'archives',3)";
-        try(PreparedStatement ps = connection.prepareStatement(insertPluginSql)){
+        try (PreparedStatement ps = connection.prepareStatement(insertPluginSql)) {
             ps.executeUpdate();
         }
     }
 
     private void insertNav(Connection connect) throws SQLException {
         String insertLogNavSql = "INSERT INTO `lognav`( `navId`,`url`, `navName`, `sort`) VALUES (?,?,?,?)";
-        try(PreparedStatement ps = connect.prepareStatement(insertLogNavSql)) {
+        try (PreparedStatement ps = connect.prepareStatement(insertLogNavSql)) {
             ps.setObject(1, 2);
             ps.setObject(2, "/admin/login");
             ps.setObject(3, I18nUtil.getStringFromRes("manage"));
@@ -242,7 +242,7 @@ public class InstallService {
         }
 
         insertLogNavSql = "INSERT INTO `lognav`( `navId`,`url`, `navName`, `sort`) VALUES (?,?,?,?)";
-        try(PreparedStatement ps = connect.prepareStatement(insertLogNavSql)) {
+        try (PreparedStatement ps = connect.prepareStatement(insertLogNavSql)) {
             ps.setObject(1, 1);
             ps.setObject(2, "/");
             ps.setObject(3, I18nUtil.getStringFromRes("home"));
@@ -253,7 +253,7 @@ public class InstallService {
 
     private void initUser(Map<String, String> blogMsg, Connection connect) throws SQLException {
         String insertUserSql = "INSERT INTO `user`( `userId`,`userName`, `password`, `email`,`secretKey`) VALUES (1,?,?,?,?)";
-        try(PreparedStatement ps = connect.prepareStatement(insertUserSql)) {
+        try (PreparedStatement ps = connect.prepareStatement(insertUserSql)) {
             ps.setString(1, blogMsg.get("username"));
             ps.setString(2, SecurityUtils.md5(blogMsg.get("password")));
             ps.setString(3, configMsg.get("email"));
@@ -270,7 +270,7 @@ public class InstallService {
             sb.append("(").append("?").append(",").append("?").append(",NULL),");
         }
         String insertWebSql = sb.toString().substring(0, sb.toString().length() - 1);
-        try(PreparedStatement ps = connect.prepareStatement(insertWebSql)) {
+        try (PreparedStatement ps = connect.prepareStatement(insertWebSql)) {
             int i = 1;
             for (Map.Entry<String, Object> e : defaultMap.entrySet()) {
                 ps.setString(i++, e.getKey());

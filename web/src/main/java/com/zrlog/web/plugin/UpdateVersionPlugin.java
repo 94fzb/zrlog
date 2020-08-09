@@ -82,7 +82,7 @@ public class UpdateVersionPlugin implements IPlugin {
             try {
                 return updateVersionTimerTask.fetchLastVersion(checkPreview);
             } catch (Exception e) {
-                LOGGER.error("",e);
+                LOGGER.error("", e);
             }
         }
         return updateVersionTimerTask.getVersion();

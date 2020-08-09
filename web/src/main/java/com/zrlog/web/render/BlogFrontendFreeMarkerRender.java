@@ -37,14 +37,13 @@ public class BlogFrontendFreeMarkerRender extends Render {
         // - Create a configuration instance
         // config = new Configuration();
         // - Templates are stoted in the WEB-INF/templates directory of the Web app.
-        config.setServletContextForTemplateLoading(servletContext, "/");	// "WEB-INF/templates"
+        config.setServletContextForTemplateLoading(servletContext, "/");    // "WEB-INF/templates"
         // - Set update dealy to 0 for now, to ease debugging and testing.
         //   Higher value should be used in production environment.
 
         if (getDevMode()) {
             config.setTemplateUpdateDelay(0);
-        }
-        else {
+        } else {
             config.setTemplateUpdateDelay(template_update_delay);
         }
 
@@ -56,13 +55,13 @@ public class BlogFrontendFreeMarkerRender extends Render {
         // - Use beans wrapper (recommmended for most applications)
         config.setObjectWrapper(ObjectWrapper.BEANS_WRAPPER);
         // - Set the default charset of the template files
-        config.setDefaultEncoding(getEncoding());		// config.setDefaultEncoding("ISO-8859-1");
+        config.setDefaultEncoding(getEncoding());        // config.setDefaultEncoding("ISO-8859-1");
         // - Set the charset of the output. This is actually just a hint, that
         //   templates may require for URL encoding and for generating META element
         //   that uses http-equiv="Content-type".
-        config.setOutputEncoding(getEncoding());			// config.setOutputEncoding("UTF-8");
+        config.setOutputEncoding(getEncoding());            // config.setOutputEncoding("UTF-8");
         // - Set the default locale
-        config.setLocale(locale /* Locale.CHINA */ );		// config.setLocale(Locale.US);
+        config.setLocale(locale /* Locale.CHINA */);        // config.setLocale(Locale.US);
         config.setLocalizedLookup(false);
 
         // 去掉int型输出时的逗号, 例如: 123,456
@@ -86,7 +85,7 @@ public class BlogFrontendFreeMarkerRender extends Render {
         response.setContentType(getContentType());
 
         Map data = new HashMap();
-        for (Enumeration<String> attrs = request.getAttributeNames(); attrs.hasMoreElements();) {
+        for (Enumeration<String> attrs = request.getAttributeNames(); attrs.hasMoreElements(); ) {
             String attrName = attrs.nextElement();
             data.put(attrName, request.getAttribute(attrName));
         }
@@ -95,7 +94,7 @@ public class BlogFrontendFreeMarkerRender extends Render {
         try {
             Template template = config.getTemplate(view);
             writer = response.getWriter();
-            template.process(data, writer);		// Merge the data-model and the template
+            template.process(data, writer);        // Merge the data-model and the template
         } catch (Exception e) {
             throw new RenderException(e);
         }

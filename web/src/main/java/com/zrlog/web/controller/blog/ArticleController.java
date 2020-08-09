@@ -23,9 +23,9 @@ import java.util.Map;
 
 public class ArticleController extends BaseController {
 
-    private ArticleService articleService = new ArticleService();
+    private final ArticleService articleService = new ArticleService();
 
-    private CommentService commentService = new CommentService();
+    private final CommentService commentService = new CommentService();
 
     /**
      * add page info for template more easy

@@ -4,13 +4,12 @@ import com.hibegin.common.util.FileUtils;
 import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
-import com.zrlog.web.cache.vo.BaseDataInitVO;
 import com.zrlog.common.Constants;
 import com.zrlog.model.*;
+import com.zrlog.web.cache.vo.BaseDataInitVO;
 
 import java.io.File;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 对缓存数据的操作
@@ -74,22 +73,22 @@ public class CacheService {
         }
         if (baseController != null) {
             final BaseDataInitVO cacheInitFile = cacheInit;
-            if(cacheInit.getTags() == null || cacheInit.getTags().isEmpty()){
+            if (cacheInit.getTags() == null || cacheInit.getTags().isEmpty()) {
                 cacheInit.getPlugins().stream().filter(e -> e.get("pluginName").equals("tags")).findFirst().ifPresent(e -> {
                     cacheInitFile.getPlugins().remove(e);
                 });
             }
-            if(cacheInit.getArchives() == null || cacheInit.getArchives().isEmpty()){
+            if (cacheInit.getArchives() == null || cacheInit.getArchives().isEmpty()) {
                 cacheInit.getPlugins().stream().filter(e -> e.get("pluginName").equals("archives")).findFirst().ifPresent(e -> {
                     cacheInitFile.getPlugins().remove(e);
                 });
             }
-            if(cacheInit.getTypes() == null || cacheInit.getTypes().isEmpty()){
+            if (cacheInit.getTypes() == null || cacheInit.getTypes().isEmpty()) {
                 cacheInit.getPlugins().stream().filter(e -> e.get("pluginName").equals("types")).findFirst().ifPresent(e -> {
                     cacheInitFile.getPlugins().remove(e);
                 });
             }
-            if(cacheInit.getLinks() == null || cacheInit.getLinks().isEmpty()){
+            if (cacheInit.getLinks() == null || cacheInit.getLinks().isEmpty()) {
                 cacheInit.getPlugins().stream().filter(e -> e.get("pluginName").equals("links")).findFirst().ifPresent(e -> {
                     cacheInitFile.getPlugins().remove(e);
                 });

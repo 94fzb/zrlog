@@ -16,7 +16,6 @@ import com.jfinal.render.ViewType;
 import com.jfinal.template.Engine;
 import com.zrlog.model.*;
 import com.zrlog.service.InstallService;
-import com.zrlog.web.plugin.PluginCoreProcess;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.controller.blog.ApiArticleController;
@@ -308,7 +307,7 @@ public class ZrLogConfig extends JFinalConfig {
                                 try {
                                     statement.close();
                                 } catch (SQLException e) {
-                                    LOGGER.error("",e);
+                                    LOGGER.error("", e);
                                 }
                             }
                         }

@@ -40,7 +40,7 @@ public class WarUpdateVersionThread extends Thread implements Serializable, Upda
     }
 
     private void updateProcessErrorMsg(Throwable e) {
-        LOGGER.error("",e);
+        LOGGER.error("", e);
         sb.append("<pre style='color:red'>").append(ExceptionUtils.recordStackTraceMsg(e)).append("</pre>");
     }
 

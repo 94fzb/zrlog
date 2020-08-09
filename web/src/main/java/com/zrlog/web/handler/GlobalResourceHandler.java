@@ -82,7 +82,7 @@ public class GlobalResourceHandler extends Handler {
                 if (!FORBIDDEN_URI_EXT_SET.contains(ext)) {
                     if (catGeneratorHtml(target)) {
                         target = target.substring(0, target.lastIndexOf("."));
-                        if (Constants.isStaticHtmlStatus() && adminTokenVO == null) {
+                        if (Constants.isStaticHtmlStatus()) {
                             String path = new String(request.getServletPath().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
                             if ("/".equals(path)) {
                                 path = INDEX_PAGE_HTML;

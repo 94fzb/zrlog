@@ -15,15 +15,11 @@ import com.zrlog.common.response.UpgradeProcessResponse;
 import com.zrlog.common.type.AutoUpgradeVersionType;
 import com.zrlog.common.vo.Version;
 import com.zrlog.model.WebSite;
-import com.zrlog.web.token.AdminTokenThreadLocal;
-import com.zrlog.web.plugin.PluginCoreProcess;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.annotation.RefreshCache;
 import com.zrlog.web.controller.BaseController;
-import com.zrlog.web.plugin.UpdateVersionHandler;
-import com.zrlog.web.plugin.UpdateVersionPlugin;
-import com.zrlog.web.plugin.WarUpdateVersionThread;
-import com.zrlog.web.plugin.ZipUpdateVersionThread;
+import com.zrlog.web.plugin.*;
+import com.zrlog.web.token.AdminTokenThreadLocal;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,9 +29,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class UpgradeController extends BaseController {
 
-    private static Map<Integer, DownloadProcessHandle> downloadProcessHandleMap = new ConcurrentHashMap<>();
-    private static Map<Integer, Version> versionMap = new ConcurrentHashMap<>();
-    private static Map<Integer, UpdateVersionHandler> updateVersionThreadMap = new ConcurrentHashMap<>();
+    private static final Map<Integer, DownloadProcessHandle> downloadProcessHandleMap = new ConcurrentHashMap<>();
+    private static final Map<Integer, Version> versionMap = new ConcurrentHashMap<>();
+    private static final Map<Integer, UpdateVersionHandler> updateVersionThreadMap = new ConcurrentHashMap<>();
 
     @RefreshCache
     public UpdateRecordResponse setting() {

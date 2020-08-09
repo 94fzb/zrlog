@@ -73,11 +73,11 @@ public class PluginHelper {
                 headerMap.put(header.getName(), header.getValue());
             }
             if (BlogBuildInfoUtil.isDev()) {
-                LOGGER.info("{} --------------------------------- response",uri);
+                LOGGER.info("{} --------------------------------- response", uri);
             }
             for (Map.Entry<String, String> t : headerMap.entrySet()) {
                 if (BlogBuildInfoUtil.isDev()) {
-                    LOGGER.info("{} value-> {}" ,t.getKey(), t.getValue());
+                    LOGGER.info("{} value-> {}", t.getKey(), t.getValue());
                 }
             }
         }

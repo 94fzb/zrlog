@@ -45,14 +45,14 @@ public class TemplateController extends BaseController {
         return new WebSiteSettingUpdateResponse();
     }
 
-    public LoadFileResponse loadFile() throws FileNotFoundException,IllegalAccessException {
+    public LoadFileResponse loadFile() throws FileNotFoundException, IllegalAccessException {
         LoadFileResponse loadFileResponse = new LoadFileResponse();
         loadFileResponse.setFileContent(IOUtil.getStringInputStream(new FileInputStream(PathKit.getWebRootPath() + getAndCheckInputFile())));
         return loadFileResponse;
     }
 
     @RefreshCache
-    public StandardResponse saveFile() throws IllegalAccessException{
+    public StandardResponse saveFile() throws IllegalAccessException {
         String filePath = getAndCheckInputFile();
         String file = PathKit.getWebRootPath() + filePath;
         IOUtil.writeBytesToFile(getPara("content").getBytes(), new File(file));
@@ -68,7 +68,7 @@ public class TemplateController extends BaseController {
         if (filePath.contains("../")) {
             throw new IllegalAccessException("");
         }
-        if(!filePath.startsWith("/error") && !filePath.startsWith("/include")){
+        if (!filePath.startsWith("/error") && !filePath.startsWith("/include")) {
             throw new IllegalAccessException("");
         }
         return filePath;
@@ -85,7 +85,7 @@ public class TemplateController extends BaseController {
         return templateService.upload(templateName, getFile(uploadFieldName).getFile());
     }
 
-    public ListFileResponse files() throws IllegalAccessException{
+    public ListFileResponse files() throws IllegalAccessException {
         ListFileResponse listFileResponse = new ListFileResponse();
         listFileResponse.setFiles(templateService.getFiles(getAndCheckInputFilePath()));
         return listFileResponse;

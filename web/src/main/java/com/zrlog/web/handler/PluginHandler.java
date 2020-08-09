@@ -28,9 +28,9 @@ public class PluginHandler extends Handler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PluginHandler.class);
 
-    private AdminTokenService adminTokenService = new AdminTokenService();
+    private final AdminTokenService adminTokenService = new AdminTokenService();
 
-    private List<String> pluginHandlerPaths = Arrays.asList("/admin/plugins/", "/plugin/", "/p/");
+    private final List<String> pluginHandlerPaths = Arrays.asList("/admin/plugins/", "/plugin/", "/p/");
 
     @Override
     public void handle(String target, HttpServletRequest request, HttpServletResponse response, boolean[] isHandled) {
@@ -40,6 +40,7 @@ public class PluginHandler extends Handler {
         for (String path : pluginHandlerPaths) {
             if (target.startsWith(path)) {
                 isPluginPath = true;
+                break;
             }
         }
         if (isPluginPath) {
@@ -50,13 +51,13 @@ public class PluginHandler extends Handler {
                     try {
                         adminPermission(target, request, response, entry);
                     } catch (IOException | InstantiationException e) {
-                        LOGGER.error("",e);
+                        LOGGER.error("", e);
                     }
                 } else if (target.startsWith("/plugin/") || target.startsWith("/p/")) {
                     try {
                         visitorPermission(target, request, response, entry);
                     } catch (IOException | InstantiationException e) {
-                        LOGGER.error("",e);
+                        LOGGER.error("", e);
                     }
                 }
             } finally {

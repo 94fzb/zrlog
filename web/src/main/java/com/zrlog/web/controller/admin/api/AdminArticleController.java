@@ -6,15 +6,15 @@ import com.zrlog.common.response.ArticleResponseEntry;
 import com.zrlog.common.response.CreateOrUpdateArticleResponse;
 import com.zrlog.common.response.DeleteLogResponse;
 import com.zrlog.common.response.PageableResponse;
-import com.zrlog.web.token.AdminTokenThreadLocal;
 import com.zrlog.service.ArticleService;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.annotation.RefreshCache;
 import com.zrlog.web.controller.BaseController;
+import com.zrlog.web.token.AdminTokenThreadLocal;
 
 public class AdminArticleController extends BaseController {
 
-    private ArticleService articleService = new ArticleService();
+    private final ArticleService articleService = new ArticleService();
 
     @RefreshCache
     public DeleteLogResponse delete() {

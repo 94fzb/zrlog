@@ -9,7 +9,6 @@ import com.zrlog.web.annotation.RefreshCache;
 import com.zrlog.web.controller.BaseController;
 import com.zrlog.web.plugin.UpdateVersionPlugin;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
