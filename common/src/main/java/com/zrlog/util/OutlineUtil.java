@@ -22,7 +22,7 @@ public class OutlineUtil {
         for (Element element : elements) {
             Outline outline = new Outline();
             outline.setText(element.text().trim());
-            outline.setLevel(-Integer.valueOf(element.tagName().replace("h", "")));
+            outline.setLevel(-Integer.parseInt(element.tagName().replace("h", "")));
             outlines.add(outline);
         }
         int currentLevel = 0;

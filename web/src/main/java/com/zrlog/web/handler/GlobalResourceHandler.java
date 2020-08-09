@@ -14,21 +14,15 @@ import com.zrlog.web.config.ZrLogConfig;
 import com.zrlog.web.plugin.RequestInfo;
 import com.zrlog.web.plugin.RequestStatisticsPlugin;
 import com.zrlog.web.token.AdminTokenService;
-import com.zrlog.web.token.AdminTokenThreadLocal;
 import com.zrlog.web.util.WebTools;
-import org.apache.catalina.connector.Response;
-import org.apache.catalina.connector.ResponseFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
@@ -42,6 +36,7 @@ public class GlobalResourceHandler extends Handler {
     private static final String PAGE_END_TAG = "<none id='SP_" + System.currentTimeMillis() + "'></none>";
     public static final String CACHE_HTML_PATH = PathKit.getWebRootPath() + "/_cache/";
     private static final ThreadLocal<Long> REQUEST_START_TIME = new ThreadLocal<>();
+    private static final String INDEX_PAGE_HTML = "/index.html";
 
     /**
      * `
@@ -55,6 +50,13 @@ public class GlobalResourceHandler extends Handler {
         FORBIDDEN_URI_EXT_SET.add(".ftl");
         //这主要用在主题目录下面的配置文件。
         FORBIDDEN_URI_EXT_SET.add(".properties");
+    }
+
+    /**
+     * 处理静态化文件,仅仅缓存文章页(变化较小)
+     */
+    private static boolean catGeneratorHtml(String targetUri) {
+        return "/".equals(targetUri) || (targetUri.startsWith("/" + Constants.getArticleUri()) && targetUri.endsWith(".html"));
     }
 
     @Override
@@ -75,14 +77,16 @@ public class GlobalResourceHandler extends Handler {
         try {
             AdminTokenVO adminTokenVO = new AdminTokenService().getAdminTokenVO(request);
             final ResponseRenderPrintWriter responseRenderPrintWriter = new ResponseRenderPrintWriter(response.getOutputStream(), url, PAGE_END_TAG, request, response, adminTokenVO);
-            response = new MyHttpServletResponseWrapper(response,responseRenderPrintWriter);
+            response = new MyHttpServletResponseWrapper(response, responseRenderPrintWriter);
             if (ext != null) {
                 if (!FORBIDDEN_URI_EXT_SET.contains(ext)) {
-                    // 处理静态化文件,仅仅缓存文章页(变化较小)
-                    if (target.endsWith(".html") && target.startsWith("/" + Constants.getArticleUri())) {
+                    if (catGeneratorHtml(target)) {
                         target = target.substring(0, target.lastIndexOf("."));
                         if (Constants.isStaticHtmlStatus() && adminTokenVO == null) {
                             String path = new String(request.getServletPath().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+                            if ("/".equals(path)) {
+                                path = INDEX_PAGE_HTML;
+                            }
                             responseHtmlFile(target, request, response, isHandled, responseRenderPrintWriter, new File(CACHE_HTML_PATH + I18nUtil.getAcceptLanguage(request) + path));
                         } else {
                             this.next.handle(target, request, response, isHandled);
@@ -96,8 +100,8 @@ public class GlobalResourceHandler extends Handler {
                 }
             } else {
                 //首页静态化
-                if ("/".equals(target) && Constants.isStaticHtmlStatus() && adminTokenVO == null) {
-                    responseHtmlFile(target, request, response, isHandled, responseRenderPrintWriter, new File(CACHE_HTML_PATH + I18nUtil.getAcceptLanguage(request) + "/index.html"));
+                if ("/".equals(target) && Constants.isStaticHtmlStatus()) {
+                    responseHtmlFile(target, request, response, isHandled, responseRenderPrintWriter, new File(CACHE_HTML_PATH + I18nUtil.getAcceptLanguage(request) + INDEX_PAGE_HTML));
                 } else {
                     this.next.handle(target, request, response, isHandled);
                     //JFinal， JsonRender 移除了 flush()，需要手动 flush，针对JFinal3.3 以后版本

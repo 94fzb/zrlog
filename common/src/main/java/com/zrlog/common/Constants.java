@@ -56,7 +56,7 @@ public class Constants {
         Object dbSettingSize = WEB_SITE.get("cache_html_size");
         if (dbSettingSize != null) {
             try {
-                return Integer.valueOf(dbSettingSize.toString());
+                return Integer.parseInt(dbSettingSize.toString());
             } catch (Exception e) {
                 //ignore
             }
@@ -68,7 +68,7 @@ public class Constants {
         Object dbSettingSize = WEB_SITE.get("cache_timeout_minutes");
         if (dbSettingSize != null) {
             try {
-                return Integer.valueOf(dbSettingSize.toString()) * 60 * 1000;
+                return Integer.parseInt(dbSettingSize.toString()) * 60 * 1000;
             } catch (Exception e) {
                 //ignore
             }
@@ -99,7 +99,7 @@ public class Constants {
         long sessionTimeout;
         if (!StringUtils.isEmpty(sessionTimeoutString)) {
             //*60， Cookie过期时间单位为分钟
-            sessionTimeout = Long.valueOf(sessionTimeoutString) * 60 * 1000;
+            sessionTimeout = Long.parseLong(sessionTimeoutString) * 60 * 1000;
             if (sessionTimeout <= 0) {
                 sessionTimeout = Constants.DEFAULT_SESSION_TIMEOUT;
             }
@@ -113,7 +113,7 @@ public class Constants {
         Object dbSettingSize = WEB_SITE.get("article_auto_digest_length");
         if (dbSettingSize != null) {
             try {
-                return Integer.valueOf(dbSettingSize.toString());
+                return Integer.parseInt(dbSettingSize.toString());
             } catch (Exception e) {
                 //ignore
             }

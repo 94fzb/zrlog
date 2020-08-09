@@ -10,7 +10,7 @@ public enum AutoUpgradeVersionType {
 
     NEVER(-1), ONE_MINUTE(60), ONE_HOUR(3600), ONE_DAY(86400), ONE_WEEK(604800), HALF_MONTH(1296000);
 
-    private int cycle;
+    private final int cycle;
 
     AutoUpgradeVersionType(int cycle) {
         this.cycle = cycle;
