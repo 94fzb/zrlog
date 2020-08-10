@@ -77,7 +77,7 @@
                     <div class="list">
                         <ul>
                             <c:forEach var="type" items="${init.types}">
-                                <li><a title="${type.typeName}" href="${rurl}post/sort/${type.alias}"><i
+                                <li><a title="${type.typeName}" href="${type.url}"><i
                                         class="material-icons">label</i> ${type.typeName} (${type.typeamount})</a></li>
                             </c:forEach>
                         </ul>

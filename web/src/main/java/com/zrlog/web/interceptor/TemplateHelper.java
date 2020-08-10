@@ -115,26 +115,30 @@ public class TemplateHelper {
         }
     }
 
+    private static boolean isHomePage(HttpServletRequest request) {
+        String uri = request.getRequestURI().replace(".html", "");
+        return "/".equals(uri) || "/all-1".equals(uri) || "/all".equals(uri) || ("/" + Constants.getArticleUri() + "all").equals(uri) ||
+                ("/" + Constants.getArticleUri() + "all-1").equals(uri);
+    }
+
     private static void fullNavBar(HttpServletRequest request, String suffix, BaseDataInitVO baseDataInitVO) {
         List<LogNav> logNavList = baseDataInitVO.getLogNavs();
         for (LogNav logNav : logNavList) {
             String url = logNav.get("url").toString();
-            if ("/".equals(url) && ("/all-1".equals(request.getRequestURI()) || (Constants.getArticleUri() + "all-1").equals(request.getRequestURI()))) {
-                logNav.put("current", true);
-                continue;
+            boolean current;
+            if ("/".equals(url) && isHomePage(request)) {
+                current = true;
             } else if (url.startsWith("/")) {
-                if (suffix.length() > 0 && url.length() == 1) {
-                    url = "";
-                } else {
-                    url = url.substring(1);
-                }
+                //文章页
                 if (url.startsWith("/" + Constants.getArticleUri())) {
-                    url += suffix;
+                    url = WebTools.getHomeUrlWithHost(request) + url.substring(1) + suffix;
+                    logNav.put("url", url);
                 }
-                url = WebTools.getHomeUrlWithHost(request) + url;
-                logNav.put("url", url);
+                current = ignoreScheme(request.getRequestURL().toString()).equals(ignoreScheme(url));
+            } else {
+                current = ignoreScheme(request.getRequestURL().toString()).equals(ignoreScheme(url));
             }
-            logNav.put("current", ignoreScheme(request.getRequestURL().toString()).equals(ignoreScheme(url)));
+            logNav.put("current", current);
         }
     }
 
