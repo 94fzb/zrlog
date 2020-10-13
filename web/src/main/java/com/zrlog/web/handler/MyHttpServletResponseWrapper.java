@@ -2,7 +2,6 @@ package com.zrlog.web.handler;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
-import java.io.PrintWriter;
 
 public class MyHttpServletResponseWrapper extends HttpServletResponseWrapper {
 
@@ -14,7 +13,8 @@ public class MyHttpServletResponseWrapper extends HttpServletResponseWrapper {
     }
 
     @Override
-    public PrintWriter getWriter() {
+    public ResponseRenderPrintWriter getWriter() {
         return responseRenderPrintWriter;
     }
+
 }

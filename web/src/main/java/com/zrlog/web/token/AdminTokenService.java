@@ -8,6 +8,8 @@ import com.jfinal.core.JFinal;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.AdminTokenVO;
 import com.zrlog.model.User;
+import com.zrlog.web.WebConstants;
+import com.zrlog.web.config.ZrLogConfig;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +21,7 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 public class AdminTokenService {
 
@@ -27,22 +29,18 @@ public class AdminTokenService {
 
     private static final String TOKEN_SPLIT_CHAR = "#";
 
-    private static IvParameterSpec iv;
+    private static final IvParameterSpec iv;
     private static SecretKeySpec secretKeySpec;
 
     static {
-        try {
-            iv = new IvParameterSpec(Constants.AES_PUBLIC_KEY.getBytes("UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            LOGGER.error("", e);
-        }
+        iv = new IvParameterSpec(WebConstants.AES_PUBLIC_KEY.getBytes(StandardCharsets.UTF_8));
     }
 
     private static byte[] encrypt(String secretKey, byte[] value) throws Exception {
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
         //必须要16位
         String newSecretKey = SecurityUtils.md5(secretKey).substring(8, 24);
-        secretKeySpec = new SecretKeySpec(newSecretKey.getBytes("UTF-8"), "AES");
+        secretKeySpec = new SecretKeySpec(newSecretKey.getBytes(StandardCharsets.UTF_8), "AES");
         cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, iv);
         return cipher.doFinal(value);
     }
@@ -51,19 +49,22 @@ public class AdminTokenService {
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
         //必须要16位
         String newSecretKey = SecurityUtils.md5(secretKey).substring(8, 24);
-        secretKeySpec = new SecretKeySpec(newSecretKey.getBytes("UTF-8"), "AES");
+        secretKeySpec = new SecretKeySpec(newSecretKey.getBytes(StandardCharsets.UTF_8), "AES");
         cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, iv);
         return cipher.doFinal(encrypted);
     }
 
     public AdminTokenVO getAdminTokenVO(HttpServletRequest request) {
+        if (!ZrLogConfig.isInstalled()) {
+            return null;
+        }
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {
             return null;
         }
         String decTokenString = null;
         for (Cookie cookie : cookies) {
-            if (cookie.getName().equals(Constants.ADMIN_TOKEN)) {
+            if (cookie.getName().equals(WebConstants.ADMIN_TOKEN)) {
                 decTokenString = cookie.getValue();
             }
         }
@@ -103,7 +104,7 @@ public class AdminTokenService {
             byte[] base64Bytes = Base64.encodeBase64(encrypt(user.get("secretKey").toString(), encryptBeforeString.getBytes()));
             String encryptAfterString = ByteUtils.bytesToHexString(base64Bytes);
             String finalTokenString = adminTokenVO.getUserId() + TOKEN_SPLIT_CHAR + encryptAfterString;
-            Cookie cookie = new Cookie(Constants.ADMIN_TOKEN, finalTokenString);
+            Cookie cookie = new Cookie(WebConstants.ADMIN_TOKEN, finalTokenString);
             cookie.setMaxAge((int) (Constants.getSessionTimeout() / 1000));
             setCookieDomain(request, cookie);
             cookie.setPath("/");

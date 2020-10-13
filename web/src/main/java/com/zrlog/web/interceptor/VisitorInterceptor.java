@@ -6,10 +6,10 @@ import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.jfinal.json.Json;
 import com.jfinal.kit.PathKit;
-import com.jfinal.render.FreeMarkerRender;
-import com.zrlog.common.response.ApiStandardResponse;
+import com.zrlog.common.rest.response.ApiStandardResponse;
+import com.zrlog.common.rest.response.StandardResponse;
 import com.zrlog.common.vo.TemplateVO;
-import com.zrlog.service.TemplateService;
+import com.zrlog.business.service.TemplateService;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.config.ZrLogConfig;
 import com.zrlog.web.handler.GlobalResourceHandler;
@@ -32,7 +32,20 @@ class VisitorInterceptor implements Interceptor {
     public void intercept(Invocation ai) {
         String actionKey = ai.getActionKey();
         if (actionKey.startsWith("/install")) {
-            installPermission(ai);
+            ai.invoke();
+        } else if (actionKey.startsWith("/api/public")) {
+            ai.invoke();
+            ai.getController().renderJson(RenderUtils.tryWrapperToStandardResponse(ai.getReturnValue()));
+        } else if (actionKey.startsWith("/api/install")) {
+            if (ZrLogConfig.isInstalled()) {
+                StandardResponse standardResponse = new StandardResponse();
+                standardResponse.setError(1);
+                standardResponse.setMessage((String) ((Map) ai.getController().getAttr("_res")).get("installed"));
+                ai.getController().renderJson(standardResponse);
+            } else {
+                ai.invoke();
+                ai.getController().renderJson(RenderUtils.tryWrapperToStandardResponse(ai.getReturnValue()));
+            }
         } else {
             if (ZrLogConfig.isInstalled()) {
                 if (actionKey.startsWith("/api")) {
@@ -107,30 +120,12 @@ class VisitorInterceptor implements Interceptor {
         ai.invoke();
         ApiStandardResponse apiStandardResponse = new ApiStandardResponse();
         if (ai.getController().getAttr("log") != null) {
-            apiStandardResponse.setData((Object) ai.getController().getAttr("log"));
+            apiStandardResponse.setData(ai.getController().getAttr("log"));
         } else if (ai.getController().getAttr("data") != null) {
-            apiStandardResponse.setData((Object) ai.getController().getAttr("data"));
+            apiStandardResponse.setData(ai.getController().getAttr("data"));
         } else {
-            apiStandardResponse.setError(1);
-            apiStandardResponse.setMessage("not found");
+            apiStandardResponse.setData(ai.getReturnValue());
         }
         ai.getController().renderJson(apiStandardResponse);
-    }
-
-    private void installPermission(Invocation ai) {
-        String template = null;
-        if (!ZrLogConfig.isInstalled()) {
-            ai.invoke();
-            if (ai.getReturnValue() != null) {
-                template = ai.getReturnValue();
-            }
-        } else {
-            ai.getController().getRequest().setAttribute("errorMsg", ((Map) ai.getController().getRequest().getAttribute("_res")).get("installed"));
-        }
-        if (template == null) {
-            template = "/install/forbidden";
-        }
-        ai.getController().setAttr("currentViewName", template.substring("/install/".length()));
-        ai.getController().render(new FreeMarkerRender(template + ".ftl"));
     }
 }

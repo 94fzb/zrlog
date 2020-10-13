@@ -6,7 +6,6 @@ import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.common.util.VersionComparator;
 import com.zrlog.common.Constants;
-import com.zrlog.common.response.PageableResponse;
 import eu.bitwalker.useragentutils.BrowserType;
 import eu.bitwalker.useragentutils.UserAgent;
 import org.slf4j.Logger;
@@ -43,29 +42,7 @@ public class ZrLogUtil {
         }
     }
 
-    /**
-     * 将输入的分页过后的对象，转化PageableResponse的对象
-     *
-     * @param object
-     * @param toClazz
-     * @param <T>
-     * @return
-     */
-    public static <T> PageableResponse<T> convertPageable(Object object, Class<T> toClazz) {
-        String jsonStr = new Gson().toJson(object);
-        PageableResponse pageableResponse = new Gson().fromJson(jsonStr, PageableResponse.class);
-        List<T> dataList = new ArrayList<>();
-        List oldDataList = pageableResponse.getRows();
-        for (Object obj : oldDataList) {
-            dataList.add(BeanUtil.convert(obj, toClazz));
-        }
-        PageableResponse<T> response = new PageableResponse<>();
-        response.setPage(pageableResponse.getPage());
-        response.setTotal(pageableResponse.getTotal());
-        response.setRecords(pageableResponse.getRecords());
-        response.setRows(dataList);
-        return response;
-    }
+
 
     public static <T> T convertRequestParam(Map<String, String[]> requestParam, Class<T> clazz) {
         Map<String, Object> tempMap = new HashMap<>();

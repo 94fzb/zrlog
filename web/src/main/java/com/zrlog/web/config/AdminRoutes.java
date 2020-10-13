@@ -2,7 +2,6 @@ package com.zrlog.web.config;
 
 import com.jfinal.config.Routes;
 import com.zrlog.web.controller.admin.api.*;
-import com.zrlog.web.controller.admin.page.AdminArticlePageController;
 import com.zrlog.web.controller.admin.page.AdminPageController;
 import com.zrlog.web.controller.admin.page.AdminTemplatePageController;
 
@@ -17,7 +16,6 @@ class AdminRoutes extends Routes {
     public void config() {
         add("/admin", AdminPageController.class);
         add("/admin/template", AdminTemplatePageController.class);
-        add("/admin/article", AdminArticlePageController.class);
         add("/api/admin", AdminController.class);
         add("/api/admin/link", LinkController.class);
         add("/api/admin/comment", CommentController.class);
@@ -28,5 +26,6 @@ class AdminRoutes extends Routes {
         add("/api/admin/template", TemplateController.class);
         add("/api/admin/upload", UploadController.class);
         add("/api/admin/upgrade", UpgradeController.class);
+        add("/api/admin/user", AdminUserController.class);
     }
 }

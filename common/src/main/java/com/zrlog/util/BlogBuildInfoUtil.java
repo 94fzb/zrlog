@@ -13,7 +13,7 @@ import java.util.Date;
 import java.util.Properties;
 
 /**
- * 读取Zrlog构建信息，及build.properties。
+ * 读取ZrLog构建信息，及build.properties。
  * 注 build.properties 为使用CI工具自动加入的，git代码仓库并没有该文件。
  */
 public class BlogBuildInfoUtil {

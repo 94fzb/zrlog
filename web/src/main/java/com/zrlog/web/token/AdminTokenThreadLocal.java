@@ -10,7 +10,7 @@ public class AdminTokenThreadLocal {
     private AdminTokenThreadLocal() {
     }
 
-    private static ThreadLocal<AdminTokenVO> userThreadLocal = new ThreadLocal<>();
+    private static final ThreadLocal<AdminTokenVO> userThreadLocal = new ThreadLocal<>();
 
     public static AdminTokenVO getUser() {
         return userThreadLocal.get();

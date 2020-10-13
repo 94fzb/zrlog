@@ -1,6 +1,6 @@
 package com.zrlog.web.annotation;
 
-import com.zrlog.web.cache.vo.BaseDataInitVO;
+import com.zrlog.business.cache.vo.BaseDataInitVO;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

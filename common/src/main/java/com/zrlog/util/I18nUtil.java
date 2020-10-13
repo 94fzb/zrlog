@@ -1,6 +1,5 @@
 package com.zrlog.util;
 
-import com.google.gson.Gson;
 import com.hibegin.common.util.StringUtils;
 import com.zrlog.common.Constants;
 import org.slf4j.Logger;
@@ -20,7 +19,7 @@ public class I18nUtil {
     private static final String I18N_FILE_NAME = "_i18nFileName";
     private static final Logger LOGGER = LoggerFactory.getLogger(I18nUtil.class);
     private static final Map<String, Map<String, Object>> I18N_RES_MAP = new HashMap<>();
-    private static ThreadLocal<Map<String, Object>> threadLocal = new ThreadLocal<>();
+    public static final ThreadLocal<Map<String, Object>> threadLocal = new ThreadLocal<>();
 
     static {
         reloadSystemI18N();
@@ -82,10 +81,9 @@ public class I18nUtil {
             } else {
                 //try get locale info for HTTP header
                 if (request.getRequestURI().contains("/admin")) {
-                    Map<String, Object> webSite = Constants.WEB_SITE;
-                    if (webSite.get("language") != null) {
-                        String tmpLocale = (String) webSite.get("language");
-                        locale = I18N_RES_MAP.get(Constants.I18N + "_" + tmpLocale) != null ? tmpLocale : null;
+                    String lang = (String) Constants.WEB_SITE.get("language");
+                    if (lang != null && lang.trim().length() > 0) {
+                        locale = I18N_RES_MAP.get(Constants.I18N + "_" + lang) != null ? lang : null;
                     }
                 } else {
                     if (request.getHeader("Accept-Language") != null) {
@@ -115,7 +113,6 @@ public class I18nUtil {
             }
             i18nMap.put("_locale", locale);
             request.setAttribute("_res", i18nMap);
-            request.setAttribute("res", new Gson().toJson(i18nMap));
             threadLocal.set(i18nMap);
         }
     }

@@ -2,10 +2,9 @@ package com.zrlog.web.handler;
 
 import com.jfinal.handler.Handler;
 import com.zrlog.common.vo.AdminTokenVO;
-import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.web.token.AdminTokenService;
 import com.zrlog.web.token.AdminTokenThreadLocal;
-import com.zrlog.web.util.PluginHelper;
+import com.zrlog.business.util.PluginHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,45 +28,35 @@ public class PluginHandler extends Handler {
     private static final Logger LOGGER = LoggerFactory.getLogger(PluginHandler.class);
 
     private final AdminTokenService adminTokenService = new AdminTokenService();
-
     private final List<String> pluginHandlerPaths = Arrays.asList("/admin/plugins/", "/plugin/", "/p/");
 
     @Override
     public void handle(String target, HttpServletRequest request, HttpServletResponse response, boolean[] isHandled) {
-        //便于Wappalyzer读取
-        response.addHeader("X-ZrLog", BlogBuildInfoUtil.getVersion());
-        boolean isPluginPath = false;
-        for (String path : pluginHandlerPaths) {
-            if (target.startsWith(path)) {
-                isPluginPath = true;
-                break;
-            }
-        }
-        if (isPluginPath) {
-            AdminTokenVO entry = null;
-            try {
-                entry = adminTokenService.getAdminTokenVO(request);
-                if (target.startsWith("/admin/plugins/")) {
-                    try {
-                        adminPermission(target, request, response, entry);
-                    } catch (IOException | InstantiationException e) {
-                        LOGGER.error("", e);
-                    }
-                } else if (target.startsWith("/plugin/") || target.startsWith("/p/")) {
-                    try {
-                        visitorPermission(target, request, response, entry);
-                    } catch (IOException | InstantiationException e) {
-                        LOGGER.error("", e);
-                    }
-                }
-            } finally {
-                isHandled[0] = true;
-                if (entry != null) {
-                    AdminTokenThreadLocal.remove();
-                }
-            }
-        } else {
+        if (pluginHandlerPaths.stream().noneMatch(target::startsWith)) {
             this.next.handle(target, request, response, isHandled);
+            return;
+        }
+        AdminTokenVO entry = null;
+        try {
+            entry = adminTokenService.getAdminTokenVO(request);
+            if (target.startsWith("/admin/plugins/")) {
+                try {
+                    adminPermission(target, request, response, entry);
+                } catch (IOException | InstantiationException e) {
+                    LOGGER.error("", e);
+                }
+            } else if (target.startsWith("/plugin/") || target.startsWith("/p/")) {
+                try {
+                    visitorPermission(target, request, response, entry);
+                } catch (IOException | InstantiationException e) {
+                    LOGGER.error("", e);
+                }
+            }
+        } finally {
+            if (entry != null) {
+                AdminTokenThreadLocal.remove();
+            }
+            isHandled[0] = true;
         }
     }
 

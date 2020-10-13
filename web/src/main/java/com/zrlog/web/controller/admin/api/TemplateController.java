@@ -4,9 +4,10 @@ import com.hibegin.common.util.FileUtils;
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.StringUtils;
 import com.jfinal.kit.PathKit;
-import com.zrlog.common.response.*;
+import com.zrlog.common.rest.response.StandardResponse;
 import com.zrlog.model.WebSite;
-import com.zrlog.service.TemplateService;
+import com.zrlog.business.rest.response.*;
+import com.zrlog.business.service.TemplateService;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.annotation.RefreshCache;
 import com.zrlog.web.controller.BaseController;
@@ -21,7 +22,7 @@ import java.util.Map;
 
 public class TemplateController extends BaseController {
 
-    private TemplateService templateService = new TemplateService();
+    private final TemplateService templateService = new TemplateService();
 
     @RefreshCache
     public WebSiteSettingUpdateResponse apply() {

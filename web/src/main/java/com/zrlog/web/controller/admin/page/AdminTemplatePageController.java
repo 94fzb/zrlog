@@ -9,7 +9,7 @@ import com.jfinal.kit.PathKit;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.TemplateVO;
 import com.zrlog.model.WebSite;
-import com.zrlog.service.TemplateService;
+import com.zrlog.business.service.TemplateService;
 import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.controller.BaseController;
@@ -26,7 +26,7 @@ public class AdminTemplatePageController extends BaseController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AdminTemplatePageController.class);
 
-    private TemplateService templateService = new TemplateService();
+    private final TemplateService templateService = new TemplateService();
 
     public String index() {
         setAttr("templates", templateService.getAllTemplates(getRequest().getContextPath(), TemplateHelper.getTemplatePathByCookie(getRequest().getCookies())));

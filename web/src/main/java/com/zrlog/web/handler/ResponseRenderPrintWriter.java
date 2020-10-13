@@ -3,8 +3,8 @@ package com.zrlog.web.handler;
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.http.handle.CloseResponseHandle;
 import com.zrlog.common.vo.AdminTokenVO;
-import com.zrlog.web.cache.CacheService;
-import com.zrlog.web.util.PluginHelper;
+import com.zrlog.business.cache.CacheService;
+import com.zrlog.business.util.PluginHelper;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.SimpleHtmlSerializer;
 import org.htmlcleaner.TagNode;
@@ -30,24 +30,26 @@ class ResponseRenderPrintWriter extends PrintWriter {
     private String body;
     private final long startTime = System.currentTimeMillis();
     private final String baseUrl;
-    private final String endFlag;
     private final HttpServletRequest request;
     private final HttpServletResponse response;
     private final String charset;
     private final AdminTokenVO adminTokenVO;
+
+    public HttpServletResponse getResponse() {
+        return response;
+    }
 
     public String getResponseBody() {
         return body;
     }
 
     public boolean isIncludePageEndTag(String str) {
-        return str.trim().endsWith("</html>") || str.trim().endsWith(endFlag);
+        return str.trim().endsWith("</html>");
     }
 
-    ResponseRenderPrintWriter(OutputStream out, String baseUrl, String endFlag, HttpServletRequest request, HttpServletResponse response, AdminTokenVO adminTokenVO) {
+    ResponseRenderPrintWriter(OutputStream out, String baseUrl, HttpServletRequest request, HttpServletResponse response, AdminTokenVO adminTokenVO) {
         super(out);
         this.baseUrl = baseUrl;
-        this.endFlag = endFlag;
         this.request = request;
         this.response = response;
         this.charset = System.getProperty("file.encoding");
@@ -103,11 +105,6 @@ class ResponseRenderPrintWriter extends PrintWriter {
 
     private String getCompressAndParseHtml(String inputBody) throws IOException {
         String currentBody = inputBody;
-
-        //不显示none标签
-        if (currentBody.endsWith(endFlag)) {
-            currentBody = currentBody.substring(0, currentBody.length() - endFlag.length());
-        }
         HtmlCleaner htmlCleaner = new HtmlCleaner();
         htmlCleaner.getProperties().setCharset(charset);
         htmlCleaner.getProperties().setUseCdataForScriptAndStyle(false);

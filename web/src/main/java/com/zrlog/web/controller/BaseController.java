@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.jfinal.core.Controller;
 import com.jfinal.kit.PathKit;
 import com.zrlog.common.Constants;
-import com.zrlog.common.request.PageableRequest;
+import com.zrlog.common.rest.request.PageRequest;
 import com.zrlog.web.interceptor.TemplateHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,16 +93,16 @@ public class BaseController extends Controller {
     }
 
     /**
-     * 封装Jqgrid的分页参数
+     * 分页参数
      *
      * @return
      */
-    public PageableRequest getPageable() {
-        PageableRequest pageableRequest = new PageableRequest();
-        pageableRequest.setRows(getParaToInt("rows", 10));
-        pageableRequest.setSort(getPara("sidx"));
-        pageableRequest.setOrder(getPara("sord"));
-        pageableRequest.setPage(getParaToInt("page", 1));
-        return pageableRequest;
+    public PageRequest getPageRequest() {
+        PageRequest pageRequest = new PageRequest();
+        pageRequest.setSize(getParaToInt("size", 10));
+        pageRequest.setSort(getPara("sidx"));
+        pageRequest.setOrder(getPara("sord"));
+        pageRequest.setPage(getParaToInt("page", 1));
+        return pageRequest;
     }
 }

@@ -1,7 +1,9 @@
 package com.zrlog.web.controller.admin.api;
 
-import com.zrlog.common.response.VersionResponse;
-import com.zrlog.common.response.WebSiteSettingUpdateResponse;
+import com.zrlog.business.rest.response.VersionResponse;
+import com.zrlog.business.rest.response.WebSiteSettingUpdateResponse;
+import com.zrlog.business.rest.response.WebSiteSettingsResponse;
+import com.zrlog.business.service.WebSiteService;
 import com.zrlog.model.WebSite;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.ZrLogUtil;
@@ -13,6 +15,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 public class WebSiteController extends BaseController {
+
+    private final WebSiteService webSiteService = new WebSiteService();
 
     @RefreshCache
     public WebSiteSettingUpdateResponse update() {
@@ -32,5 +36,9 @@ public class WebSiteController extends BaseController {
         versionResponse.setVersion(BlogBuildInfoUtil.getVersion());
         versionResponse.setChangelog(UpdateVersionPlugin.getChangeLog(BlogBuildInfoUtil.getVersion(), BlogBuildInfoUtil.getBuildId()));
         return versionResponse;
+    }
+
+    public WebSiteSettingsResponse settings() {
+        return webSiteService.loadSettings();
     }
 }

@@ -41,3 +41,8 @@ pom.xml.versionsBackup
 /web/src/main/webapp/include/templates/default-2019/
 web/src/main/zrlog
 web/src/main/lib
+web/src/main/webapp/install
+web/src/main/webapp/admin
+
+**/node_modules/**
+/admin-frontend/node_modules/**

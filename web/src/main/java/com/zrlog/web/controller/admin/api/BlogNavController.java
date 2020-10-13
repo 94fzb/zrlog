@@ -1,11 +1,10 @@
 package com.zrlog.web.controller.admin.api;
 
-import com.zrlog.common.response.UpdateRecordResponse;
+import com.zrlog.business.rest.response.UpdateRecordResponse;
+import com.zrlog.data.dto.PageData;
 import com.zrlog.model.LogNav;
 import com.zrlog.web.annotation.RefreshCache;
 import com.zrlog.web.controller.BaseController;
-
-import java.util.Map;
 
 public class BlogNavController extends BaseController {
 
@@ -18,8 +17,8 @@ public class BlogNavController extends BaseController {
         return new UpdateRecordResponse();
     }
 
-    public Map index() {
-        return new LogNav().find(getPageable());
+    public PageData<LogNav> index() {
+        return new LogNav().find(getPageRequest());
     }
 
     @RefreshCache

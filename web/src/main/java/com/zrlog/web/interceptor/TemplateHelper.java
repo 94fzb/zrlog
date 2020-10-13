@@ -5,16 +5,21 @@ import com.hibegin.common.util.StringUtils;
 import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
+import com.zrlog.business.cache.vo.Archive;
+import com.zrlog.business.cache.vo.BaseDataInitVO;
+import com.zrlog.business.service.CommentService;
+import com.zrlog.business.util.PagerVO;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.OutlineVO;
+import com.zrlog.data.dto.PageData;
 import com.zrlog.model.Log;
 import com.zrlog.model.LogNav;
 import com.zrlog.model.Tag;
 import com.zrlog.model.Type;
-import com.zrlog.service.CommentService;
-import com.zrlog.util.*;
-import com.zrlog.web.cache.vo.Archive;
-import com.zrlog.web.cache.vo.BaseDataInitVO;
+import com.zrlog.util.I18nUtil;
+import com.zrlog.util.OutlineUtil;
+import com.zrlog.util.ParseUtil;
+import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.controller.BaseController;
 import com.zrlog.web.util.WebTools;
 import org.slf4j.Logger;
@@ -164,7 +169,7 @@ public class TemplateHelper {
         return Constants.DEFAULT_TEMPLATE_PATH;
     }
 
-    private static String setBaseUrl(HttpServletRequest request, boolean staticBlog, Map webSite) {
+    public static String setBaseUrl(HttpServletRequest request, boolean staticBlog, Map webSite) {
         String templateUrl;
         String baseUrl = WebTools.getHomeUrl(request);
         String templatePath = request.getAttribute("template").toString();
@@ -208,9 +213,9 @@ public class TemplateHelper {
     private static void staticHtml(Object data, HttpServletRequest request, String suffix, boolean thumbnailEnableArticle) {
         if (data instanceof Log) {
             fillArticleInfo((Log) data, request, suffix);
-        } else if (data instanceof Map) {
-            Map map = (Map) data;
-            List<Log> logList = (List<Log>) map.get("rows");
+        } else if (data instanceof PageData) {
+            PageData<Log> map = (PageData) data;
+            List<Log> logList = map.getRows();
             if (logList != null) {
                 for (Log log : logList) {
                     if (thumbnailEnableArticle && StringUtils.isNotEmpty(log.get("thumbnail"))) {

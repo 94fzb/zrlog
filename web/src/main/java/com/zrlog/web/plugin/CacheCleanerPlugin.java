@@ -1,9 +1,9 @@
 package com.zrlog.web.plugin;
 
 import com.jfinal.plugin.IPlugin;
+import com.zrlog.business.cache.CacheService;
 import com.zrlog.common.Constants;
-import com.zrlog.web.cache.CacheService;
-import com.zrlog.web.handler.GlobalResourceHandler;
+import com.zrlog.web.handler.BlogArticleHandler;
 import com.zrlog.web.interceptor.InitDataInterceptor;
 
 import java.util.TimerTask;
@@ -16,13 +16,13 @@ import java.util.concurrent.TimeUnit;
  */
 public class CacheCleanerPlugin implements IPlugin {
 
-    private ScheduledExecutorService scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1, r -> {
+    private final ScheduledExecutorService scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1, r -> {
         Thread thread = new Thread(r);
         thread.setName("cache-clean-plugin-thread");
         return thread;
     });
 
-    private CacheService cacheService = new CacheService();
+    private final CacheService cacheService = new CacheService();
 
     @Override
     public boolean start() {
@@ -30,7 +30,7 @@ public class CacheCleanerPlugin implements IPlugin {
             @Override
             public void run() {
                 if (System.currentTimeMillis() - InitDataInterceptor.getLastAccessTime() > Constants.getInitDataMaxCacheTimeout()) {
-                    cacheService.refreshInitDataCache(GlobalResourceHandler.CACHE_HTML_PATH, null, true);
+                    cacheService.refreshInitDataCache(BlogArticleHandler.CACHE_HTML_PATH, null, true);
                 }
             }
         }, 6000, TimeUnit.SECONDS);

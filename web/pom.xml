@@ -53,6 +53,16 @@
             <artifactId>freemarker</artifactId>
             <version>2.3.23</version>
         </dependency>
+        <dependency>
+            <groupId>com.zrlog</groupId>
+            <artifactId>install-frontend</artifactId>
+            <version>2.1.15-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.zrlog</groupId>
+            <artifactId>admin-frontend</artifactId>
+            <version>2.1.15-SNAPSHOT</version>
+        </dependency>
 
 
         <!--tomcat embed mode-->
@@ -90,8 +100,12 @@
                         WEB-INF/update-temp/**,
                         WEB-INF/lib/tomcat*,
                         WEB-INF/lib/ecj*,
-                        post/**
-                        _cache/**
+                        post/**,
+                        _cache/**,
+                        **/css/*.map,
+                        **/js/*.map,
+                        admin/service-worker.js,
+                        install/service-worker.js,
                     </packagingExcludes>
                     <warName>${finalName}-${project.version}</warName>
                     <outputDirectory>${project.build.directory}/../../target</outputDirectory>

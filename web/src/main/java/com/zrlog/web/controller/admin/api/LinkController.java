@@ -1,11 +1,10 @@
 package com.zrlog.web.controller.admin.api;
 
-import com.zrlog.common.response.UpdateRecordResponse;
+import com.zrlog.business.rest.response.UpdateRecordResponse;
+import com.zrlog.data.dto.PageData;
 import com.zrlog.model.Link;
 import com.zrlog.web.annotation.RefreshCache;
 import com.zrlog.web.controller.BaseController;
-
-import java.util.Map;
 
 public class LinkController extends BaseController {
 
@@ -27,8 +26,8 @@ public class LinkController extends BaseController {
         }
     }
 
-    public Map index() {
-        return new Link().find(getPageable());
+    public PageData<Link> index() {
+        return new Link().find(getPageRequest());
     }
 
     @RefreshCache

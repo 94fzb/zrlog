@@ -4,9 +4,9 @@ import com.hibegin.common.util.FileUtils;
 import com.hibegin.common.util.IOUtil;
 import com.jfinal.kit.PathKit;
 import com.zrlog.common.Constants;
-import com.zrlog.common.response.UploadFileResponse;
-import com.zrlog.service.UploadService;
-import com.zrlog.util.ThumbnailUtil;
+import com.zrlog.business.rest.response.UploadFileResponse;
+import com.zrlog.business.service.UploadService;
+import com.zrlog.business.util.ThumbnailUtil;
 import com.zrlog.web.controller.BaseController;
 import com.zrlog.web.token.AdminTokenThreadLocal;
 

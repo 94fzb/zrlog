@@ -1,11 +1,10 @@
 package com.zrlog.web.controller.admin.api;
 
-import com.zrlog.common.response.UpdateRecordResponse;
+import com.zrlog.business.rest.response.UpdateRecordResponse;
+import com.zrlog.data.dto.PageData;
 import com.zrlog.model.Type;
 import com.zrlog.web.annotation.RefreshCache;
 import com.zrlog.web.controller.BaseController;
-
-import java.util.Map;
 
 public class TypeController extends BaseController {
     @RefreshCache
@@ -13,8 +12,8 @@ public class TypeController extends BaseController {
         return new UpdateRecordResponse(new Type().deleteById(getPara("id")));
     }
 
-    public Map index() {
-        return new Type().find(getPageable());
+    public PageData<Type> index() {
+        return new Type().find(getPageRequest());
     }
 
     @RefreshCache

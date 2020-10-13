@@ -11,16 +11,13 @@ import com.jfinal.plugin.IPlugin;
 import com.jfinal.plugin.activerecord.ActiveRecordPlugin;
 import com.jfinal.plugin.activerecord.IDataSourceProvider;
 import com.jfinal.plugin.hikaricp.HikariCpPlugin;
-import com.jfinal.render.FreeMarkerRender;
 import com.jfinal.render.ViewType;
 import com.jfinal.template.Engine;
+import com.zrlog.business.service.InstallService;
 import com.zrlog.model.*;
-import com.zrlog.service.InstallService;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.ZrLogUtil;
-import com.zrlog.web.controller.blog.ApiArticleController;
-import com.zrlog.web.controller.blog.ArticleController;
-import com.zrlog.web.controller.blog.InstallController;
+import com.zrlog.web.handler.BlogArticleHandler;
 import com.zrlog.web.handler.GlobalResourceHandler;
 import com.zrlog.web.handler.PluginHandler;
 import com.zrlog.web.interceptor.BlackListInterceptor;
@@ -53,28 +50,27 @@ public class ZrLogConfig extends JFinalConfig {
     private static String jdbcUrl;
     public static final String INSTALL_ROUTER_PATH = "/install";
     public static String JDBC_URL_BASE_QUERY_PARAM = "characterEncoding=UTF-8&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=GMT";
-    /**
-     * 存放Zrlog的一些系统参数
-     */
-    public static Properties blogProperties = new Properties();
-    private Properties dbProperties = new Properties();
+
     /**
      * 读取系统参数
      */
-    public static final Properties SYSTEM_PROP = System.getProperties();
+
     /**
      * 存放为config的属性，是为了安装完成后还获得JFinal的插件列表对象
      */
     private Plugins plugins;
     private boolean haveSqlUpdated = false;
-    private static Routes currentRoutes;
 
     private String getUpgradeSqlBasePath() {
         return PathKit.getWebRootPath() + "/WEB-INF/update-sql";
     }
 
-    private String getDbProperties() {
+    private static String getDbPropertiesFilePath() {
         return PathKit.getWebRootPath() + "/WEB-INF/db.properties";
+    }
+
+    public static ZrLogConfig getZrLogConfig() {
+        return (ZrLogConfig) JFinal.me().getServletContext().getAttribute("config");
     }
 
     /**
@@ -85,19 +81,43 @@ public class ZrLogConfig extends JFinalConfig {
         if (ZrLogUtil.isBae()) {
             FileUtils.deleteFile("/home/bae/backup");
         }
+    }
+
+    public static Properties getBlogProp() {
+        Properties blogProperties = new Properties();
         try {
             blogProperties.load(ZrLogConfig.class.getResourceAsStream("/zrlog.properties"));
         } catch (IOException e) {
             LOGGER.error("load blogProperties error", e);
         }
-        if (StringUtils.isNotEmpty(SYSTEM_PROP.getProperty("os.name"))) {
-            if (SYSTEM_PROP.get("os.name").toString().startsWith("Mac")) {
-                SYSTEM_PROP.put("os.type", "apple");
+        blogProperties.put("version", BlogBuildInfoUtil.getVersion());
+        blogProperties.put("buildId", BlogBuildInfoUtil.getBuildId());
+        blogProperties.put("buildTime", new SimpleDateFormat("yyyy-MM-dd").format(BlogBuildInfoUtil.getTime()));
+        blogProperties.put("runMode", BlogBuildInfoUtil.getRunMode());
+        return blogProperties;
+    }
+
+    public static Properties getSystemProp() {
+        Properties systemProp = System.getProperties();
+        systemProp.setProperty("zrlog.runtime.path", PathKit.getWebRootPath());
+        systemProp.setProperty("server.info", JFinal.me().getServletContext().getServerInfo());
+        if (StringUtils.isNotEmpty(systemProp.getProperty("os.name"))) {
+            if (systemProp.get("os.name").toString().startsWith("Mac")) {
+                systemProp.put("os.type", "apple");
             } else {
-                SYSTEM_PROP.put("os.type", SYSTEM_PROP.getProperty("os.name").toLowerCase());
+                systemProp.put("os.type", systemProp.getProperty("os.name").toLowerCase());
             }
-            SYSTEM_PROP.put("docker", ZrLogUtil.isDockerMode() ? "docker" : "");
+            systemProp.put("docker", ZrLogUtil.isDockerMode() ? "docker" : "");
         }
+        if (isInstalled()) {
+            Properties dbProperties = Objects.requireNonNull(getDbProp());
+            systemProp.put("dbServer.version", ZrLogUtil.getDatabaseServerVersion(dbProperties.getProperty("jdbcUrl"),
+                    dbProperties.getProperty("user"),
+                    dbProperties.getProperty("password"),
+                    dbProperties.getProperty("driverClass")));
+
+        }
+        return systemProp;
     }
 
     /**
@@ -156,8 +176,9 @@ public class ZrLogConfig extends JFinalConfig {
      */
     @Override
     public void configHandler(Handlers handlers) {
-        handlers.add(new PluginHandler());
         handlers.add(new GlobalResourceHandler());
+        handlers.add(new BlogArticleHandler());
+        handlers.add(new PluginHandler());
     }
 
     /**
@@ -174,6 +195,20 @@ public class ZrLogConfig extends JFinalConfig {
         interceptors.add(new RouterInterceptor());
     }
 
+
+    private static Properties getDbProp() {
+        if (isInstalled()) {
+            Properties dbProperties = new Properties();
+            try (FileInputStream in = new FileInputStream(getDbPropertiesFilePath())) {
+                dbProperties.load(in);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            return dbProperties;
+        }
+        return null;
+    }
+
     /***
      * 加载JFinal的插件，比如JFinal提供的C3P0Plugin，Zrlog自动检查更新，加载Zrlog提供的插件。
      */
@@ -182,11 +217,11 @@ public class ZrLogConfig extends JFinalConfig {
         // 如果没有安装的情况下不初始化数据
         if (isInstalled()) {
             if (StringUtils.isNotEmpty(ZrLogUtil.getDbInfoByEnv())) {
-                IOUtil.writeBytesToFile(ZrLogUtil.getDbInfoByEnv().getBytes(), new File(getDbProperties()));
+                IOUtil.writeBytesToFile(ZrLogUtil.getDbInfoByEnv().getBytes(), new File(getDbPropertiesFilePath()));
             }
-            try (FileInputStream in = new FileInputStream(getDbProperties())) {
-                dbProperties.load(in);
-                tryUpgradeDbPropertiesFile(getDbProperties(), dbProperties);
+            try {
+                Properties dbProperties = getDbProp();
+                tryUpgradeDbPropertiesFile(getDbPropertiesFilePath(), Objects.requireNonNull(dbProperties));
                 tryDoUpgrade(getUpgradeSqlBasePath(), dbProperties.getProperty("jdbcUrl"), dbProperties.getProperty("user"),
                         dbProperties.getProperty("password"), dbProperties.getProperty("driverClass"));
                 jdbcUrl = dbProperties.getProperty("jdbcUrl");
@@ -197,13 +232,13 @@ public class ZrLogConfig extends JFinalConfig {
                 plugins.add(dataSourcePlugin);
                 // 添加表与实体的映射关系
                 plugins.add(getActiveRecordPlugin(dataSourcePlugin));
-                Object pluginJvmArgsObj = blogProperties.get("pluginJvmArgs");
+                Object pluginJvmArgsObj = getBlogProp().get("pluginJvmArgs");
                 if (pluginJvmArgsObj == null) {
                     pluginJvmArgsObj = "";
                 }
                 if (!isTest()) {
                     //这里使用独立的线程进行启动，主要是为了防止插件服务出问题后，影响整体，同时是避免启动过慢的问题。
-                    plugins.add(new PluginCorePlugin(getDbProperties(), pluginJvmArgsObj.toString()));
+                    plugins.add(new PluginCorePlugin(getDbPropertiesFilePath(), pluginJvmArgsObj.toString()));
                     plugins.add(new UpdateVersionPlugin());
                     plugins.add(new CacheCleanerPlugin());
                 }
@@ -238,26 +273,15 @@ public class ZrLogConfig extends JFinalConfig {
      * 设置系统参数到Servlet的Context用于后台管理的主页面的展示，读取Zrlog的版本信息等。
      */
     @Override
-    public void afterJFinalStart() {
-        FreeMarkerRender.getConfiguration().setClassForTemplateLoading(ZrLogConfig.class, com.zrlog.common.Constants.FTL_VIEW_PATH);
+    public void onStart() {
         try {
             BlogFrontendFreeMarkerRender.getConfiguration().setDirectoryForTemplateLoading(new File(PathKit.getWebRootPath()));
             BlogFrontendFreeMarkerRender.init(JFinal.me().getServletContext(), Locale.getDefault(), Const.DEFAULT_FREEMARKER_TEMPLATE_UPDATE_DELAY);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        super.afterJFinalStart();
-        if (isInstalled()) {
-            initDatabaseVersion();
-        }
-        SYSTEM_PROP.setProperty("zrlog.runtime.path", PathKit.getWebRootPath());
-        SYSTEM_PROP.setProperty("server.info", JFinal.me().getServletContext().getServerInfo());
-        JFinal.me().getServletContext().setAttribute("system", SYSTEM_PROP);
-        blogProperties.put("version", BlogBuildInfoUtil.getVersion());
-        blogProperties.put("buildId", BlogBuildInfoUtil.getBuildId());
-        blogProperties.put("buildTime", new SimpleDateFormat("yyyy-MM-dd").format(BlogBuildInfoUtil.getTime()));
-        blogProperties.put("runMode", BlogBuildInfoUtil.getRunMode());
-        JFinal.me().getServletContext().setAttribute("zrlog", blogProperties);
+        super.onStart();
+
         JFinal.me().getServletContext().setAttribute("config", this);
         if (haveSqlUpdated) {
             int updatedVersion = ZrLogUtil.getSqlVersion(getUpgradeSqlBasePath());
@@ -268,8 +292,6 @@ public class ZrLogConfig extends JFinalConfig {
     }
 
     private void initDatabaseVersion() {
-        SYSTEM_PROP.put("dbServer.version", ZrLogUtil.getDatabaseServerVersion(dbProperties.getProperty("jdbcUrl"), dbProperties.getProperty("user"),
-                dbProperties.getProperty("password"), dbProperties.getProperty("driverClass")));
 
     }
 
@@ -338,7 +360,7 @@ public class ZrLogConfig extends JFinalConfig {
      * 重写了JFinal的stop方法，目的是为了，系统正常停止后（如使用sh catalina.sh stop，进行自动更新时）,正常关闭插件，防治内存泄漏。
      */
     @Override
-    public void beforeJFinalStop() {
+    public void onStop() {
         PluginCoreProcess.getInstance().stopPluginCore();
         for (IPlugin plugin : plugins.getPluginList()) {
             plugin.stop();
@@ -354,20 +376,9 @@ public class ZrLogConfig extends JFinalConfig {
      */
     @Override
     public void configRoute(Routes routes) {
-        routes.add("/", ArticleController.class);
-        routes.add(INSTALL_ROUTER_PATH, InstallController.class);
         // 后台管理者
         routes.add(new AdminRoutes());
-        currentRoutes = routes;
-        initRoute();
-    }
-
-    private static void initRoute() {
-        // 添加浏览者能访问Control 路由
-        currentRoutes.add("/api/v1/" + com.zrlog.common.Constants.getArticleRoute(), ApiArticleController.class);
-        if (!"".equals(com.zrlog.common.Constants.getArticleRoute())) {
-            currentRoutes.add("/" + com.zrlog.common.Constants.getArticleRoute(), ArticleController.class);
-        }
+        routes.add(new BlogRoutes());
     }
 
     public static List<String> articleRouterList() {
@@ -392,7 +403,7 @@ public class ZrLogConfig extends JFinalConfig {
     }
 
     public static boolean isTest() {
-        return "junit-test".equals(SYSTEM_PROP.getProperty("env"));
+        return "junit-test".equals(getSystemProp().getProperty("env"));
     }
 
     public static boolean isPreviewDb() {

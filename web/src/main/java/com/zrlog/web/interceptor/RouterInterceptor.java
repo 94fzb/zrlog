@@ -13,8 +13,8 @@ public class RouterInterceptor implements Interceptor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RouterInterceptor.class);
 
-    private VisitorInterceptor visitorInterceptor = new VisitorInterceptor();
-    private AdminInterceptor adminInterceptor = new AdminInterceptor();
+    private final VisitorInterceptor visitorInterceptor = new VisitorInterceptor();
+    private final AdminInterceptor adminInterceptor = new AdminInterceptor();
 
     @Override
     public void intercept(Invocation invocation) {

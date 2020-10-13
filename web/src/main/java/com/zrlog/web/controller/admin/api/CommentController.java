@@ -1,18 +1,18 @@
 package com.zrlog.web.controller.admin.api;
 
-import com.zrlog.common.request.ReadCommentRequest;
-import com.zrlog.common.response.StandardResponse;
-import com.zrlog.common.response.UpdateRecordResponse;
-import com.zrlog.service.CommentService;
+import com.zrlog.business.rest.request.ReadCommentRequest;
+import com.zrlog.business.rest.response.UpdateRecordResponse;
+import com.zrlog.business.service.CommentService;
+import com.zrlog.common.rest.response.StandardResponse;
+import com.zrlog.data.dto.PageData;
+import com.zrlog.model.Comment;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.annotation.RefreshCache;
 import com.zrlog.web.controller.BaseController;
 
-import java.util.Map;
-
 public class CommentController extends BaseController {
 
-    private CommentService commentService = new CommentService();
+    private final CommentService commentService = new CommentService();
 
     @RefreshCache
     public StandardResponse delete() {
@@ -23,8 +23,8 @@ public class CommentController extends BaseController {
         return commentService.read(ZrLogUtil.convertRequestBody(getRequest(), ReadCommentRequest.class));
     }
 
-    public Map index() {
-        return commentService.page(getPageable());
+    public PageData<Comment> index() {
+        return commentService.page(getPageRequest());
     }
 
     @RefreshCache

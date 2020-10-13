@@ -1,12 +1,15 @@
 package com.zrlog.web.controller.admin.api;
 
-import com.zrlog.common.request.CreateArticleRequest;
-import com.zrlog.common.request.UpdateArticleRequest;
-import com.zrlog.common.response.ArticleResponseEntry;
-import com.zrlog.common.response.CreateOrUpdateArticleResponse;
-import com.zrlog.common.response.DeleteLogResponse;
-import com.zrlog.common.response.PageableResponse;
-import com.zrlog.service.ArticleService;
+import com.zrlog.business.cache.CacheService;
+import com.zrlog.business.rest.request.CreateArticleRequest;
+import com.zrlog.business.rest.request.UpdateArticleRequest;
+import com.zrlog.business.rest.response.ArticleGlobalResponse;
+import com.zrlog.business.rest.response.ArticleResponseEntry;
+import com.zrlog.business.rest.response.CreateOrUpdateArticleResponse;
+import com.zrlog.business.rest.response.DeleteLogResponse;
+import com.zrlog.business.service.ArticleService;
+import com.zrlog.data.dto.PageData;
+import com.zrlog.model.Log;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.annotation.RefreshCache;
 import com.zrlog.web.controller.BaseController;
@@ -37,7 +40,21 @@ public class AdminArticleController extends BaseController {
         return articleService.update(AdminTokenThreadLocal.getUser(), ZrLogUtil.convertRequestBody(getRequest(), UpdateArticleRequest.class));
     }
 
-    public PageableResponse<ArticleResponseEntry> index() {
-        return articleService.page(getPageable(), convertRequestParam(getPara("keywords")));
+    public PageData<ArticleResponseEntry> index() {
+        return articleService.page(getPageRequest(), convertRequestParam(getPara("key")));
     }
+
+
+    public ArticleGlobalResponse global() {
+        return new CacheService().global();
+    }
+
+    public Log detail() {
+        if (getPara("id") != null) {
+            Integer logId = Integer.parseInt(getPara("id"));
+            return new Log().adminFindByIdOrAlias(logId);
+        }
+        return null;
+    }
+
 }
