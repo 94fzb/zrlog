@@ -4,6 +4,7 @@ import {
     CommentOutlined,
     ContainerOutlined,
     DashboardOutlined,
+    DownOutlined,
     FormOutlined,
     HomeOutlined,
     KeyOutlined,
@@ -105,7 +106,7 @@ export class IndexLayout extends BaseResourceComponent {
                         onCollapse={this.onCollapse}
                         width={70}
                     >
-                        <a href="/" target="_blank" rel="noopener noreferrer">
+                        <a href="/" target="_blank" title={this.state.res['websiteTitle']} rel="noopener noreferrer">
                             <Title id='logo'>
                                 <HomeOutlined/>
                             </Title>
@@ -170,14 +171,15 @@ export class IndexLayout extends BaseResourceComponent {
                     </Sider>
                     <Layout>
                         <Header>
-                            <Row gutter={6}>
-                                <Col xs={6} md={2} offset={22}>
+                            <Row>
+                                <Col span={24}>
                                     <Dropdown overlay={this.adminSettings(this.state.res)}
                                               overlayStyle={{float: "right"}}>
-                                        <Button size='large' type='text' style={{height: "50px"}}>
+                                        <Button size='large' type='text' style={{height: "64px", float: "right"}}>
                                             <Image preview={false} className="userAvatarImg"
                                                    src={this.state.basicInfo.header}/>
                                             <Text style={{paddingLeft: "10px"}}>{this.state.basicInfo.userName}</Text>
+                                            <DownOutlined/>
                                         </Button>
                                     </Dropdown>
                                 </Col>
@@ -201,12 +203,12 @@ export class IndexLayout extends BaseResourceComponent {
                         </Content>
                         <Footer>
                             <Row>
-                                <Col span={12}>
+                                <Col xs={24} md={12}>
                                     <Text>
                                         {this.state.res.copyrightTips}. All Rights Reserved.
                                     </Text>
                                 </Col>
-                                <Col span={12}>
+                                <Col xs={0} md={12}>
                                     <Text style={{float: 'right'}}>
                                         Version {this.state.res.currentVersion}
                                     </Text>

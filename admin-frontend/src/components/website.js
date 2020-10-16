@@ -118,7 +118,7 @@ export class Website extends BaseResourceComponent {
                 <Tabs defaultActiveKey={activeKey} onChange={e => this.handleTabClick(e)}>
                     <TabPane tab="基本信息" key="basic">
                         <Row>
-                            <Col span={12}>
+                            <Col md={12} xs={24}>
                                 <Title level={4}>认真输入，有助于网站被收录</Title>
                                 <Divider/>
                                 <Form ref={this.basicForm} {...layout}
@@ -144,7 +144,7 @@ export class Website extends BaseResourceComponent {
                     </TabPane>
                     <TabPane tab="博客设置" key="blog">
                         <Row>
-                            <Col span={12}>
+                            <Col md={12} xs={24}>
                                 <Form {...layout} ref={this.blogForm}
                                       onValuesChange={(k, v) => this.setBlogFormValue(k, v)}>
                                     <Form.Item name='session_timeout' label='会话过期时间（分钟）'>
@@ -182,7 +182,7 @@ export class Website extends BaseResourceComponent {
                     </TabPane>
                     <TabPane tab="其他设置" key="other">
                         <Row>
-                            <Col span={12}>
+                            <Col md={12} xs={24}>
                                 <Title level={4}>ICP，网站统计等信息</Title>
                                 <Divider/>
                                 <Form ref={this.otherForm} {...layout}
@@ -201,7 +201,7 @@ export class Website extends BaseResourceComponent {
                     </TabPane>
                     <TabPane tab={this.state.res['admin.upgrade.manage']} key="upgrade">
                         <Row>
-                            <Col span={12}>
+                            <Col md={12} xs={24}>
                                 <Form ref={this.upgradeForm} {...layout}
                                       onValuesChange={(k, v) => this.setUpgradeFormValue(k, v)}>
                                     <Form.Item name='autoUpgradeVersion'

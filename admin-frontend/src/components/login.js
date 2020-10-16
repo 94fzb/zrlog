@@ -1,15 +1,17 @@
 import React from 'react'
+import {LoginOutlined} from '@ant-design/icons';
 import {Button, Form, Input, Layout} from 'antd';
 import Card from "antd/es/card";
 import axios from "axios";
 import {message} from "antd/es";
 import Spin from "antd/es/spin";
 import {BaseResourceComponent} from "./base-resource-component";
+import Title from "antd/es/typography/Title";
 
 const md5 = require('md5');
 
 const layout = {
-    labelCol: {span: 10},
+    labelCol: {span: 8},
     wrapperCol: {span: 8},
 };
 const tailLayout = {
@@ -55,7 +57,19 @@ export class Login extends BaseResourceComponent {
             <Spin spinning={this.state.resLoading}>
                 <Layout>
                     <Content>
-                        <Card className='login-container' style={{textAlign: "center"}} title={this.getSecondTitle()}>
+                        <Card className='login-container'
+                              cover={
+                                  <div className='dimback'>
+                                      <div
+                                          className='dim'
+                                          style={{
+                                              backgroundImage: "url('/admin/vendors/images/login-bg.jpg')",
+                                              height: "120px"
+                                          }}>
+                                      </div>
+                                      <Title level={3} style={{color:"#fff"}}>{this.getSecondTitle()}</Title>
+                                  </div>}
+                              style={{textAlign: "center"}}>
                             <Form
                                 ref={this.loginFrom}
                                 {...layout}
@@ -80,7 +94,7 @@ export class Login extends BaseResourceComponent {
 
                                 <Form.Item {...tailLayout}>
                                     <Button type="primary" enterButton htmlType='submit'>
-                                        {this.state.res.login}
+                                        <LoginOutlined/> {this.state.res.login}
                                     </Button>
                                 </Form.Item>
                             </Form>

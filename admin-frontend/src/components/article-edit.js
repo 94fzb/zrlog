@@ -17,10 +17,14 @@ import TextArea from "antd/es/input/TextArea";
 import * as axios from "axios";
 import {ArticleEditTag} from "./article-edit-tag";
 import {message} from "antd/es";
+import Image from "antd/es/image";
 
 export class ArticleEdit extends BaseResourceComponent {
 
     articleFrom = React.createRef();
+
+    // eslint-disable-next-line no-undef
+    jquery = $;
 
     getSecondTitle() {
         return this.state.res['admin.log.edit'];
@@ -49,43 +53,76 @@ export class ArticleEdit extends BaseResourceComponent {
             this.setState({
                 typeOptions: options
             })
-            this.setState({
-                globalLoading: false
-            });
+
             const query = new URLSearchParams(this.props.location.search);
             const id = query.get("id");
             if (id !== null && id !== '') {
                 axios.get("/api/admin/article/detail?id=" + id).then(({data}) => {
-                    this.editMdConfig.markdown = data.data.markdown
-                    this.setValue(data.data)
+                    this.setValue(data.data);
+                    this.setState({
+                        globalLoading: false
+                    });
                 })
+            } else {
+                this.setState({
+                    globalLoading: false
+                });
             }
         });
     };
 
-    editMdConfig = {
-        codeFold: true,
-        appendMarkdown: "",
-        markdown: '',
-        path: "/vendors/markdown/lib/",
-        searchReplace: true,
-        htmlDecode: "pre",
-        emoji: true,
-        taskList: true,
-        tocm: false,         // Using [TOCM]
-        tex: true,                   // 开启科学公式TeX语言支持，默认关闭
-        flowChart: true,             // 开启流程图支持，默认关闭
-        sequenceDiagram: true,       // 开启时序/序列图支持，默认关闭,
-        dialogMaskOpacity: 0,    // 设置透明遮罩层的透明度，全局通用，默认值为0.1
-        dialogMaskBgColor: "#000", // 设置透明遮罩层的背景颜色，全局通用，默认为#fff
-        imageUpload: true,
-        imageFormats: [],
-        imageUploadURL: "/api/admin/upload",
-        width: "100%",
-        height: "1240px",
-        /*theme: dark ? "dark" : "default",
-        previewTheme: dark ? "dark" : "default",
-        editorTheme: dark ? "pastel-on-dark" : "default",*/
+    getEditorConfig() {
+        return {
+            codeFold: true,
+            appendMarkdown: "",
+            markdown: '',
+            path: "/vendors/markdown/lib/",
+            searchReplace: true,
+            htmlDecode: "pre",
+            emoji: true,
+            taskList: true,
+            tocm: false,         // Using [TOCM]
+            tex: true,                   // 开启科学公式TeX语言支持，默认关闭
+            flowChart: true,             // 开启流程图支持，默认关闭
+            sequenceDiagram: true,       // 开启时序/序列图支持，默认关闭,
+            dialogMaskOpacity: 0,    // 设置透明遮罩层的透明度，全局通用，默认值为0.1
+            dialogMaskBgColor: "#000", // 设置透明遮罩层的背景颜色，全局通用，默认为#fff
+            imageUpload: true,
+            imageFormats: [],
+            imageUploadURL: "/api/admin/upload",
+            width: "100%",
+            height: "1240px",
+            onload: function (e, editor) {
+                // eslint-disable-next-line no-undef
+                const jquery = $;
+                e.setValue(jquery("#markdown").text());
+                jquery("#fileDialog").on("click", function () {
+                    editor.executePlugin("fileDialog", "../plugins/file-dialog/file-dialog");
+                });
+                jquery("#videoDialog").on("click", function () {
+                    editor.executePlugin("videoDialog", "../plugins/video-dialog/video-dialog");
+                });
+                jquery("#copPreviewHtmlToClipboard").on("click", function () {
+                    function copyToClipboard(html) {
+                        const temp = jquery("<input>");
+                        jquery("body").append(temp);
+                        temp.val(html).select();
+                        document.execCommand("copy");
+                        temp.remove();
+                    }
+
+                    copyToClipboard('<div class="markdown-body" style="padding:0">' + editor.getPreviewedHTML() + "</div>");
+                    //const e = {"message": lang.copPreviewHtmlToClipboardSuccess, "error": 0};
+                    //notify(e, "info");
+                });
+            },
+            onChange: function (e) {
+                console.info(e);
+            }
+            /*        theme: true ? "dark" : "default",
+                    previewTheme: true ? "dark" : "default",
+                    editorTheme: true ? "pastel-on-dark" : "default",*/
+        }
     }
 
     setValue(changedValues) {
@@ -95,87 +132,141 @@ export class ArticleEdit extends BaseResourceComponent {
     }
 
     onFinish(allValues) {
-        axios.post("/api/admin/article/create", JSON.stringify(allValues)).then(({data}) => {
+        allValues.content = this.jquery("#content").text();
+        allValues.markdown = this.jquery("#markdown").text();
+        allValues.keywords = this.jquery("#keywords").val();
+        let uri;
+        if (allValues.logId !== undefined) {
+            uri = '/api/admin/article/update'
+        } else {
+            uri = '/api/admin/article/create'
+        }
+        axios.post(uri, JSON.stringify(allValues)).then(({data}) => {
             if (data.error) {
                 message.error(data.message);
             } else {
-
+                message.info(this.state.res['releaseSuccess']);
             }
         })
     }
 
     getArticleRoute() {
-        if(this.state === undefined || this.state.res === undefined || this.state.res['articleRoute'] === undefined) {
+        if (this.state === undefined || this.state.res === undefined || this.state.res['articleRoute'] === undefined) {
             return "";
         }
         return this.state.res['articleRoute'];
     }
 
+    preview() {
+        this.onFinish();
+    }
+
 
     render() {
+
+        function gup(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+            const regexS = "[\\?&]" + name + "=([^&#]*)";
+            const regex = new RegExp(regexS);
+            const results = regex.exec(url);
+            return results === null ? null : results[1];
+        }
+
+
+        function getThumbnailHeight(url, originW) {
+            const w = gup("w", url);
+            let h = gup("h", url);
+            if (h) {
+                // eslint-disable-next-line no-undef
+                h = originW / w * h;
+                return h;
+            } else {
+                return 128;
+            }
+        }
+
         return (
-            <Spin spinning={this.state.resLoading}>
+            <Spin spinning={this.state.resLoading && this.state.globalLoading}>
                 <Title className='page-header' level={3}>{this.getSecondTitle()}</Title>
                 <Divider/>
                 <Form
                     ref={this.articleFrom}
                     onFinish={(values) => this.onFinish(values)}
                     onValuesChange={(k, v) => this.setValue(k, v)}>
+                    <Form.Item name='logId'>
+                        <Input hidden={true}/>
+                    </Form.Item>
                     <Row style={{paddingBottom: "15px"}}>
-                        <Col offset={18} span={6}>
-                            <Space size={5} style={{float: "right"}}>
-                                <Button type="ghost">{this.state.res.preview}</Button>
-                                <Button type='primary' enterButton
-                                        htmlType='submit'>{this.state.res.saveAsDraft}</Button>
-                            </Space>
+                        <Col span={24}>
+                            <div style={{float: "right"}}>
+                                <Space size={5}>
+                                    {/*<Button type="ghost">{this.state.res.preview}</Button>*/}
+                                    <Button type='primary' enterButton
+                                            htmlType='submit'>{this.state.res.release}</Button>
+                                </Space>
+                            </div>
                         </Col>
                     </Row>
-                    <Row>
-                        <Col span={10}>
+                    <Row gutter={8}>
+                        <Col md={8} xs={24}>
                             <Form.Item
                                 name="title"
                                 rules={[{required: true, message: this.state.res.inputArticleTitle}]}>
                                 <Input placeholder={this.state.res.inputArticleTitle}/>
                             </Form.Item>
                         </Col>
-                        <Col span={5}>
+                        <Col md={5} xs={24}>
                             <Form.Item name="alias">
                                 <Input addonBefore={this.getArticleRoute() + "/"}
                                        placeholder={this.state.res.inputArticleAlias}/>
                             </Form.Item>
                         </Col>
-                        <Col span={2}>
+                        <Col md={5} xs={0}>
 
                         </Col>
                     </Row>
-                    <Row>
-                        <Col span={18} style={{zIndex: 10}}>
-                            <Form.Item name='content'>
-                                <Editor config={this.editMdConfig}>{this.state.markdown}</Editor>
+                    <Row gutter={8}>
+                        <Col md={18} xs={24} style={{zIndex: 10}}>
+                            <Form.Item name='markdown'>
+                                <div id='markdown' dangerouslySetInnerHTML={{__html: this.state.markdown}}
+                                     style={{display: "none"}}/>
+                                <div id='content' style={{display: "none"}}/>
+                                <Editor config={this.getEditorConfig()}/>
                             </Form.Item>
                         </Col>
-                        <Col span={6}>
-                            <Row style={{paddingLeft: "12px"}}>
+                        <Col md={6} xs={24}>
+                            <Row gutter={[8, 8]}>
                                 <Col span={24}>
-                                    <Card size="small" className='x-card'>
+                                    <Card size="small">
                                         <Dragger>
-                                            <CameraOutlined style={{fontSize: "28px"}}/>
+                                            {this.state.thumbnail === undefined && (
+                                                <CameraOutlined style={{fontSize: "28px"}}/>
+                                            )}
+                                            {this.state.thumbnail !== undefined && (
+                                                <Image
+                                                    height={getThumbnailHeight(this.state.thumbnail, this.props.width)}
+                                                    src={this.state.thumbnail}/>
+                                            )}
                                         </Dragger>
                                     </Card>
                                 </Col>
                                 <Col span={24}>
-                                    <Card size="small" className='x-card' title={this.state.res['admin.setting']}>
-                                        <Form.Item valuePropName="checked" name='canComment' label={this.state.res['commentAble']}>
+                                    <Card size="small" title={this.state.res['admin.setting']}>
+                                        <Form.Item valuePropName="checked" name='canComment'
+                                                   label={this.state.res['commentAble']}>
                                             <Switch size="small"/>
                                         </Form.Item>
-                                        <Form.Item valuePropName="checked" name='privacy' label={this.state.res['private']}>
+                                        <Form.Item valuePropName="checked" name='privacy'
+                                                   label={this.state.res['private']}>
                                             <Switch size="small"/>
                                         </Form.Item>
                                     </Card>
                                 </Col>
                                 <Col span={24}>
-                                    <Card size="small" className='x-card' title={this.state.res['admin.type.manage']}>
-                                        <Form.Item name='typeId' rules={[{required: true}]}>
+                                    <Card size="small"
+                                          title={this.state.res['admin.type.manage']}>
+                                        <Form.Item label='' name='typeId' rules={[{required: true}]}>
                                             <Radio.Group style={{width: "100%"}}>
                                                 {this.state.typeOptions}
                                             </Radio.Group>
@@ -183,13 +274,14 @@ export class ArticleEdit extends BaseResourceComponent {
                                     </Card>
                                 </Col>
                                 <Col span={24}>
-                                    <Card size="small" className='x-card' title={this.state.res.tag}>
-                                        <ArticleEditTag allTags={this.state.tags.map(x => x.text)} tags={[]}/>
+                                    <Card size="small" title={this.state.res.tag}>
+                                        <ArticleEditTag keywords={this.state.keywords}
+                                                        allTags={this.state.tags.map(x => x.text)} tags={[]}/>
                                     </Card>
                                 </Col>
 
                                 <Col span={24}>
-                                    <Card size="small" className='x-card' title={this.state.res.digest}>
+                                    <Card size="small" title={this.state.res.digest}>
                                         <Form.Item name='digest'>
                                             <TextArea rows={3}/>
                                         </Form.Item>

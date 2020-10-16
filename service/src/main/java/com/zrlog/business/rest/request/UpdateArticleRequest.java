@@ -2,13 +2,13 @@ package com.zrlog.business.rest.request;
 
 public class UpdateArticleRequest extends CreateArticleRequest {
 
-    private int id;
+    private Integer logId;
 
-    public int getId() {
-        return id;
+    public Integer getLogId() {
+        return logId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setLogId(Integer logId) {
+        this.logId = logId;
     }
 }

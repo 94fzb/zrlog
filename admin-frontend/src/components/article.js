@@ -8,7 +8,6 @@ import Spin from "antd/es/spin";
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
 import Popconfirm from "antd/es/popconfirm";
-import {Link} from "react-router-dom";
 
 export class Article extends BaseTableComponent {
 
@@ -139,10 +138,8 @@ export class Article extends BaseTableComponent {
                 <Title className='page-header' level={3}>{this.getSecondTitle()}</Title>
                 <Divider/>
                 <Row style={{paddingBottom: "10px"}}>
-                    <Col span={18}>
-                    </Col>
-                    <Col span={6}>
-                        <Search placeholder={this.state.res.searchTip} onSearch={this.onErrSearch} enterButton/>
+                    <Col span={24}>
+                        <Search placeholder={this.state.res.searchTip} onSearch={this.onErrSearch} enterButton style={{maxWidth: "240px", float: "right"}}/>
                     </Col>
                 </Row>
 

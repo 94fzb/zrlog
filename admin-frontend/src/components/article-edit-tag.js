@@ -3,13 +3,14 @@ import React from "react";
 import {Input, Tag} from 'antd';
 import {TweenOneGroup} from 'rc-tween-one';
 import {PlusOutlined, TagOutlined} from '@ant-design/icons';
-import Divider from "antd/lib/divider";
 import {BaseResourceComponent} from "./base-resource-component";
+import Title from "antd/es/typography/Title";
+
 
 export class ArticleEditTag extends BaseResourceComponent {
 
     state = {
-        tags: this.props.tags,
+        keywords: this.props.keywords,
         allTags: this.props.allTags
     }
 
@@ -17,15 +18,18 @@ export class ArticleEditTag extends BaseResourceComponent {
         return {
             inputVisible: false,
             inputValue: '',
-            tags: [],
+            keywords: '',
             allTags: []
         }
     }
 
     handleClose = removedTag => {
-        const tags = this.tags.filter(tag => tag !== removedTag);
-        console.log(tags);
-        this.setState({tags});
+        const tags = this.state.keywords.split(",").filter(tag => tag !== removedTag);
+        console.info(tags.join(","));
+        //this.props.tags = tags;
+        this.setState({
+            keywords: tags.join(",")
+        })
     };
 
     showInput = () => {
@@ -38,13 +42,13 @@ export class ArticleEditTag extends BaseResourceComponent {
 
     handleInputConfirm = () => {
         const {inputValue} = this.state;
-        let {tags} = this.state;
-        if (inputValue && tags.indexOf(inputValue) === -1) {
-            tags = [...tags, inputValue];
+        let {keywords} = this.state;
+        if (inputValue && keywords.indexOf(inputValue) === -1) {
+            keywords = keywords += "," + inputValue;
         }
-        console.log(tags);
+        console.log(keywords);
         this.setState({
-            tags,
+            keywords: keywords,
             inputVisible: false,
             inputValue: '',
         });
@@ -57,6 +61,7 @@ export class ArticleEditTag extends BaseResourceComponent {
     forMap = tag => {
         const tagElem = (
             <Tag
+                color="#108ee9"
                 closable
                 onClose={e => {
                     e.preventDefault();
@@ -74,28 +79,50 @@ export class ArticleEditTag extends BaseResourceComponent {
     };
 
     allTagsOnClick(e) {
-
+        e.currentTarget.remove();
+        let tags = this.state.keywords.split(",");
+        tags.push(e.currentTarget.textContent);
+        this.setState({
+            keywords: tags.join(',')
+        })
     }
 
     tagForMap = tag => {
         const tagElem = (
-            <Tag icon={<TagOutlined/>} onAuxClick={this.allTagsOnClick()} closable={false} color="#108ee9">
+            <Tag icon={<TagOutlined/>} onClick={(e) => this.allTagsOnClick(e)} closable={false} color="#108ee9">
                 {tag}
             </Tag>
         );
         return (
-            <span key={tag} style={{display: 'inline-block'}}>
+            <span key={"all-" + tag} style={{display: 'inline-block'}}>
         {tagElem}
       </span>
         );
     };
 
     render() {
-        const {inputVisible, allTags, tags, inputValue} = this.state;
-        const tagChild = this.props.tags.map(this.forMap);
+        const {inputVisible, inputValue} = this.state;
+        let tagChild;
+        if (this.props.keywords !== undefined && this.props.keywords !== '') {
+            if (this.state.keywords !== undefined) {
+                console.info(this.state.keywords);
+                //this.state.tags = this.props.keywords + "," + this.state.tags;
+            } else {
+                this.state.keywords = this.props.keywords;
+            }
+            let newTags = Array.from(new Set(this.state.keywords.split(",").filter(x => x !== '')));
+            if (newTags.length > 0) {
+                this.state.keywords = newTags.join(",");
+                tagChild = newTags.map(this.forMap);
+            } else {
+                this.state.keywords = '';
+                tagChild = [].map(this.forMap);
+            }
+        }
         const allTagChild = this.props.allTags.map(this.tagForMap);
         return (
             <>
+                <Input id='keywords' value={this.state.keywords} hidden={true}/>
                 <div style={{marginBottom: 16}}>
                     <TweenOneGroup
                         enter={{
@@ -131,7 +158,7 @@ export class ArticleEditTag extends BaseResourceComponent {
                         <Tag onClick={this.showInput} className="site-tag-plus">
                             <PlusOutlined/> New Tag
                         </Tag>
-                        <Divider/>
+                        <Title level={5} style={{paddingTop: "15px"}}>All Tags</Title>
                         <div style={{maxHeight: "120px", overflowY: "scroll"}}>
                             {allTagChild}
                         </div>

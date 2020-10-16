@@ -98,10 +98,11 @@ export class Index extends BaseResourceComponent {
                 <Title className='page-header' level={3}>{this.getSecondTitle()}</Title>
                 <Divider/>
                 <Alert message={this.state.res['admin.index.welcomeTips']} type="info" showIcon/>
-                <Row style={{paddingTop: "20px"}}>
+                <Row gutter={8} style={{paddingTop: "20px"}}>
                     <Col xs={24} md={14}>
                         <Card size={"small"} title={this.state.res['serverInfo']}>
                             <Table
+                                style={{wordBreak: "break-all"}}
                                 size='middle'
                                 columns={this.getFixedColumns()}
                                 dataSource={this.state.system}

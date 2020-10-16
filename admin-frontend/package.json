@@ -43,6 +43,6 @@
     ]
   },
   "devDependencies": {
-    "rc-tween-one": "^2.7.3"
+    "rc-tween-one": "2.2.10-beta.0"
   }
 }

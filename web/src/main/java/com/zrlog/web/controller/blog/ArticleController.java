@@ -121,13 +121,13 @@ public class ArticleController extends BaseController {
         return detail(convertRequestParam(getPara()));
     }
 
-    protected String detail(Object id) {
+    protected String detail(Object idOrAlias) {
         AdminTokenVO adminTokenVO = adminTokenService.getAdminTokenVO(getRequest());
         Log log;
         if (adminTokenVO == null) {
-            log = new Log().findByIdOrAlias(id);
+            log = new Log().findByIdOrAlias(idOrAlias);
         } else {
-            log = new Log().adminFindByIdOrAlias(id);
+            log = new Log().adminFindByIdOrAlias(idOrAlias);
         }
         if (log == null) {
             return "404";

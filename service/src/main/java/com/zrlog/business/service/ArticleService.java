@@ -32,10 +32,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * 与文章相关的业务代码
@@ -111,7 +108,7 @@ public class ArticleService {
         int articleId;
         String alias;
         if (createArticleRequest instanceof UpdateArticleRequest) {
-            articleId = ((UpdateArticleRequest) createArticleRequest).getId();
+            articleId = Objects.requireNonNull(((UpdateArticleRequest) createArticleRequest).getLogId());
         } else {
             articleId = new Log().findMaxId() + 1;
             log.set("releaseTime", new Date());

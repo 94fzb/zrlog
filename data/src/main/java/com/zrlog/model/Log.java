@@ -31,16 +31,18 @@ public class Log extends Model<Log> implements Serializable {
     }
 
     public Log findByIdOrAlias(Object idOrAlias) {
-        if (idOrAlias != null) {
+        if (idOrAlias == null) {
+            return null;
+        }
+        if (idOrAlias instanceof Integer) {
             String sql = "select l.*,last_update_date as lastUpdateDate,u.userName,(select count(commentId) from " + Comment.TABLE_NAME + " where logId=l.logId) commentSize ,t.alias as typeAlias,t.typeName as typeName  from " + TABLE_NAME + " l inner join user u,type t where t.typeId=l.typeId and u.userId=l.userId and rubbish=? and privacy=? and l.logId=?";
             Log log = findFirst(sql, rubbish, privacy, idOrAlias);
-            if (log == null) {
-                sql = "select l.*,last_update_date as lastUpdateDate,u.userName,(select count(commentId) from " + Comment.TABLE_NAME + " where logId=l.logId) commentSize ,t.alias as typeAlias,t.typeName as typeName  from " + TABLE_NAME + " l inner join user u,type t where t.typeId=l.typeId and u.userId=l.userId and rubbish=? and privacy=? and l.alias=?";
-                log = findFirst(sql, rubbish, privacy, idOrAlias);
+            if (log != null) {
+                return log;
             }
-            return log;
         }
-        return null;
+        String sql = "select l.*,last_update_date as lastUpdateDate,u.userName,(select count(commentId) from " + Comment.TABLE_NAME + " where logId=l.logId) commentSize ,t.alias as typeAlias,t.typeName as typeName  from " + TABLE_NAME + " l inner join user u,type t where t.typeId=l.typeId and u.userId=l.userId and rubbish=? and privacy=? and l.alias=?";
+        return findFirst(sql, rubbish, privacy, idOrAlias);
     }
 
     /**
@@ -50,16 +52,18 @@ public class Log extends Model<Log> implements Serializable {
      * @return
      */
     public Log adminFindByIdOrAlias(Object idOrAlias) {
-        if (idOrAlias != null) {
+        if (idOrAlias == null) {
+            return null;
+        }
+        if (idOrAlias instanceof Integer) {
             String sql = "select l.*,last_update_date as lastUpdateDate,u.userName,(select count(commentId) from " + Comment.TABLE_NAME + " where logId=l.logId) commentSize ,t.alias as typeAlias,t.typeName as typeName  from " + TABLE_NAME + " l inner join user u,type t where t.typeId=l.typeId and u.userId=l.userId and l.logId=?";
             Log log = findFirst(sql, idOrAlias);
-            if (log == null) {
-                sql = "select l.*,last_update_date as lastUpdateDate,u.userName,(select count(commentId) from " + Comment.TABLE_NAME + " where logId=l.logId) commentSize ,t.alias as typeAlias,t.typeName as typeName  from " + TABLE_NAME + " l inner join user u,type t where t.typeId=l.typeId and u.userId=l.userId and l.alias=?";
-                log = findFirst(sql, idOrAlias);
+            if (log != null) {
+                return log;
             }
-            return log;
         }
-        return null;
+        String sql = "select l.*,last_update_date as lastUpdateDate,u.userName,(select count(commentId) from " + Comment.TABLE_NAME + " where logId=l.logId) commentSize ,t.alias as typeAlias,t.typeName as typeName  from " + TABLE_NAME + " l inner join user u,type t where t.typeId=l.typeId and u.userId=l.userId and l.alias=?";
+        return findFirst(sql, idOrAlias);
     }
 
     public Log findLastLog(int id, String notFoundDesc) {

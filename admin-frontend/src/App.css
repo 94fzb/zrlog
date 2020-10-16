@@ -1,4 +1,4 @@
-@import '~antd/dist/antd.css';
+@import '~antd/dist/antd.min.css';
 
 body {
     color: #314659;
@@ -27,7 +27,6 @@ body {
 
 .ant-layout {
     min-height: 100vh;
-    background-color: #f7f7f7;
 }
 
 .ant-layout-content {
@@ -36,18 +35,16 @@ body {
 }
 
 .ant-layout-footer {
-    background-color: #ffffff;
     height: 52px;
     padding: 20px;
 }
 
 .ant-layout-header {
-    background: #ffffff;
+    padding: 0;
 }
 
 .ant-menu {
     background-color: #001529;
-    color: #ffffff;
 }
 
 li.ant-menu-item > a {
@@ -120,10 +117,6 @@ h3.page-header {
     font-size: 1.75rem;
 }
 
-.x-card {
-    margin-bottom: 10px;
-}
-
 h1, h2, h3, h4 {
     color: #0d1a26;
 }
@@ -135,9 +128,31 @@ h1, h2, h3, h4 {
 }
 
 .ant-menu-vertical .ant-menu-item:not(:last-child), .ant-menu-vertical-left .ant-menu-item:not(:last-child), .ant-menu-vertical-right .ant-menu-item:not(:last-child), .ant-menu-inline .ant-menu-item:not(:last-child) {
-     margin-bottom: 0;
+    margin-bottom: 0;
 }
 
-.ant-menu-vertical .ant-menu-item, .ant-menu-vertical-left .ant-menu-item, .ant-menu-vertical-right .ant-menu-item, .ant-menu-inline .ant-menu-item, .ant-menu-vertical .ant-menu-submenu-title, .ant-menu-vertical-left .ant-menu-submenu-title, .ant-menu-vertical-right .ant-menu-submenu-title, .ant-menu-inline .ant-menu-submenu-title{
+.ant-menu-vertical .ant-menu-item, .ant-menu-vertical-left .ant-menu-item, .ant-menu-vertical-right .ant-menu-item, .ant-menu-inline .ant-menu-item, .ant-menu-vertical .ant-menu-submenu-title, .ant-menu-vertical-left .ant-menu-submenu-title, .ant-menu-vertical-right .ant-menu-submenu-title, .ant-menu-inline .ant-menu-submenu-title {
     margin-top: 0;
+}
+
+
+.dim {
+    opacity: 0.6;
+    filter: alpha(opacity=60);
+    width: 100%;
+    font-size: 30px;
+    height: 150px;
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    background-size: cover;
+    background: no-repeat center;
+}
+
+.dimback {
+    background: rgba(54, 84, 99, 0.7);
+    text-align: center;
 }
