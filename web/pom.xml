@@ -108,7 +108,7 @@
                         install/service-worker.js,
                     </packagingExcludes>
                     <warName>${finalName}-${project.version}</warName>
-                    <outputDirectory>${parent.build.directory}</outputDirectory>
+                    <outputDirectory>${project.build.directory}/../../target</outputDirectory>
                 </configuration>
             </plugin>
             <plugin>
