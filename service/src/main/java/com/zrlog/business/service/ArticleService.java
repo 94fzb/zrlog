@@ -82,6 +82,8 @@ public class ArticleService {
         log.set("title", Jsoup.clean(createArticleRequest.getTitle(), Whitelist.basic()));
         if (StringUtils.isNotEmpty(createArticleRequest.getKeywords())) {
             log.set("keywords", Jsoup.clean(createArticleRequest.getKeywords(), Whitelist.basic()));
+        } else {
+            log.set("keywords", null);
         }
         log.set("markdown", createArticleRequest.getMarkdown());
         log.set("content", createArticleRequest.getContent());

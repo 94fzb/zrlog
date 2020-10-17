@@ -58,10 +58,8 @@ export class ArticleEdit extends BaseResourceComponent {
             const id = query.get("id");
             if (id !== null && id !== '') {
                 axios.get("/api/admin/article/detail?id=" + id).then(({data}) => {
+                    data.data.globalLoading = false;
                     this.setValue(data.data);
-                    this.setState({
-                        globalLoading: false
-                    });
                 })
             } else {
                 this.setState({
@@ -76,7 +74,7 @@ export class ArticleEdit extends BaseResourceComponent {
             codeFold: true,
             appendMarkdown: "",
             markdown: '',
-            path: "/vendors/markdown/lib/",
+            path: "/admin/vendors/markdown/lib/",
             searchReplace: true,
             htmlDecode: "pre",
             emoji: true,
@@ -126,8 +124,11 @@ export class ArticleEdit extends BaseResourceComponent {
     }
 
     setValue(changedValues) {
+        const {file} = changedValues.thumbnail;
+        if (file !== undefined) {
+            changedValues.thumbnail = this.state.thumbnail;
+        }
         this.setState(changedValues);
-        console.info(changedValues);
         this.articleFrom.current.setFieldsValue(changedValues);
     }
 
@@ -161,30 +162,41 @@ export class ArticleEdit extends BaseResourceComponent {
         this.onFinish();
     }
 
+    gup(name, url) {
+        if (!url) url = window.location.href;
+        name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+        const regexS = "[\\?&]" + name + "=([^&#]*)";
+        const regex = new RegExp(regexS);
+        const results = regex.exec(url);
+        return results === null ? null : results[1];
+    }
+
+
+    getThumbnailHeight(url) {
+        let originW = this.jquery("#thumbnail").width();
+        const w = this.gup("w", url);
+        let h = this.gup("h", url);
+        if (h) {
+            return originW / w * h;
+        } else {
+            return 128;
+        }
+    }
+
+    onUploadChange(info) {
+        const {status} = info.file;
+        if (status === 'done') {
+            message.success(`${info.file.response.url} file uploaded successfully.`);
+            this.setValue({
+                thumbnail: info.file.response.url
+            });
+        } else if (status === 'error') {
+            message.error(`${info.file.name} file upload failed.`);
+        }
+    };
+
 
     render() {
-
-        function gup(name, url) {
-            if (!url) url = window.location.href;
-            name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
-            const regexS = "[\\?&]" + name + "=([^&#]*)";
-            const regex = new RegExp(regexS);
-            const results = regex.exec(url);
-            return results === null ? null : results[1];
-        }
-
-
-        function getThumbnailHeight(url, originW) {
-            const w = gup("w", url);
-            let h = gup("h", url);
-            if (h) {
-                // eslint-disable-next-line no-undef
-                h = originW / w * h;
-                return h;
-            } else {
-                return 128;
-            }
-        }
 
         return (
             <Spin spinning={this.state.resLoading && this.state.globalLoading}>
@@ -239,16 +251,25 @@ export class ArticleEdit extends BaseResourceComponent {
                             <Row gutter={[8, 8]}>
                                 <Col span={24}>
                                     <Card size="small">
-                                        <Dragger>
-                                            {this.state.thumbnail === undefined && (
-                                                <CameraOutlined style={{fontSize: "28px"}}/>
-                                            )}
-                                            {this.state.thumbnail !== undefined && (
-                                                <Image
-                                                    height={getThumbnailHeight(this.state.thumbnail, this.props.width)}
-                                                    src={this.state.thumbnail}/>
-                                            )}
-                                        </Dragger>
+                                        <Form.Item name='thumbnail'>
+                                            <Dragger
+                                                action={"/api/admin/upload/thumbnail?dir=thumbnail"}
+                                                name='imgFile'
+                                                onChange={(e) => this.onUploadChange(e)}>
+                                                <div id="thumbnail">
+                                                    {(this.state.thumbnail === undefined ||
+                                                        this.state.thumbnail === null ||
+                                                        this.state.thumbnail === '') && (
+                                                        <CameraOutlined style={{fontSize: "28px"}}/>
+                                                    )}
+                                                    {this.state.thumbnail !== '' && (
+                                                        <Image
+                                                            height={this.getThumbnailHeight(this.state.thumbnail)}
+                                                            src={this.state.thumbnail}/>
+                                                    )}
+                                                </div>
+                                            </Dragger>
+                                        </Form.Item>
                                     </Card>
                                 </Col>
                                 <Col span={24}>

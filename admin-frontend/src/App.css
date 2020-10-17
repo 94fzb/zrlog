@@ -156,3 +156,7 @@ h1, h2, h3, h4 {
     background: rgba(54, 84, 99, 0.7);
     text-align: center;
 }
+
+.ant-upload-list {
+    display: none;
+}

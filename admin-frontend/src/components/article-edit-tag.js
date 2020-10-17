@@ -9,17 +9,12 @@ import Title from "antd/es/typography/Title";
 
 export class ArticleEditTag extends BaseResourceComponent {
 
-    state = {
-        keywords: this.props.keywords,
-        allTags: this.props.allTags
-    }
-
     initState() {
         return {
             inputVisible: false,
             inputValue: '',
-            keywords: '',
-            allTags: []
+            keywords: this.props.keywords,
+            allTags: this.props.allTags
         }
     }
 
@@ -104,14 +99,11 @@ export class ArticleEditTag extends BaseResourceComponent {
         const {inputVisible, inputValue} = this.state;
         let tagChild;
         if (this.props.keywords !== undefined && this.props.keywords !== '') {
-            if (this.state.keywords !== undefined) {
-                console.info(this.state.keywords);
-                //this.state.tags = this.props.keywords + "," + this.state.tags;
-            } else {
+            if (this.state.keywords === undefined) {
                 this.state.keywords = this.props.keywords;
             }
-            let newTags = Array.from(new Set(this.state.keywords.split(",").filter(x => x !== '')));
-            if (newTags.length > 0) {
+            if (this.state.keywords !== undefined && this.state.keywords != null) {
+                let newTags = Array.from(new Set(this.state.keywords.split(",").filter(x => x !== '')));
                 this.state.keywords = newTags.join(",");
                 tagChild = newTags.map(this.forMap);
             } else {
