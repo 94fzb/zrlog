@@ -1,6 +1,7 @@
 import React from "react";
 import axios from "axios";
 import {BaseResourceComponent} from "./base-resource-component";
+import {message} from "antd";
 
 export class BaseTableComponent extends BaseResourceComponent {
 
@@ -38,5 +39,19 @@ export class BaseTableComponent extends BaseResourceComponent {
 
     getDataApiUri() {
         return null;
+    }
+
+
+    getDeleteApiUri() {
+        return null;
+    }
+
+    handleDelete(key) {
+        axios.post(this.getDeleteApiUri() + "?id=" + key).then(({data}) => {
+            if (!data.error) {
+                message.info("删除成功");
+                this.fetchData(this.state.pagination);
+            }
+        });
     }
 }

@@ -124,10 +124,11 @@ export class ArticleEdit extends BaseResourceComponent {
     }
 
     setValue(changedValues) {
-        const {file} = changedValues.thumbnail;
-        if (file !== undefined) {
-            changedValues.thumbnail = this.state.thumbnail;
-        }
+        /*      console.info(changedValues);
+              const {file} = changedValues.thumbnail;
+              if (file !== undefined) {
+                  changedValues.thumbnail = this.state.thumbnail;
+              }*/
         this.setState(changedValues);
         this.articleFrom.current.setFieldsValue(changedValues);
     }
@@ -136,6 +137,7 @@ export class ArticleEdit extends BaseResourceComponent {
         allValues.content = this.jquery("#content").text();
         allValues.markdown = this.jquery("#markdown").text();
         allValues.keywords = this.jquery("#keywords").val();
+        allValues.thumbnail = this.state.thumbnail;
         let uri;
         if (allValues.logId !== undefined) {
             uri = '/api/admin/article/update'
@@ -148,6 +150,9 @@ export class ArticleEdit extends BaseResourceComponent {
             } else {
                 message.info(this.state.res['releaseSuccess']);
             }
+            this.setValue({
+                "logId": data.id
+            })
         })
     }
 
@@ -206,7 +211,7 @@ export class ArticleEdit extends BaseResourceComponent {
                     ref={this.articleFrom}
                     onFinish={(values) => this.onFinish(values)}
                     onValuesChange={(k, v) => this.setValue(k, v)}>
-                    <Form.Item name='logId'>
+                    <Form.Item name='logId' style={{display: "none"}}>
                         <Input hidden={true}/>
                     </Form.Item>
                     <Row style={{paddingBottom: "15px"}}>
@@ -251,25 +256,23 @@ export class ArticleEdit extends BaseResourceComponent {
                             <Row gutter={[8, 8]}>
                                 <Col span={24}>
                                     <Card size="small">
-                                        <Form.Item name='thumbnail'>
-                                            <Dragger
-                                                action={"/api/admin/upload/thumbnail?dir=thumbnail"}
-                                                name='imgFile'
-                                                onChange={(e) => this.onUploadChange(e)}>
-                                                <div id="thumbnail">
-                                                    {(this.state.thumbnail === undefined ||
-                                                        this.state.thumbnail === null ||
-                                                        this.state.thumbnail === '') && (
-                                                        <CameraOutlined style={{fontSize: "28px"}}/>
-                                                    )}
-                                                    {this.state.thumbnail !== '' && (
-                                                        <Image
-                                                            height={this.getThumbnailHeight(this.state.thumbnail)}
-                                                            src={this.state.thumbnail}/>
-                                                    )}
-                                                </div>
-                                            </Dragger>
-                                        </Form.Item>
+                                        <Dragger
+                                            action={"/api/admin/upload/thumbnail?dir=thumbnail"}
+                                            name='imgFile'
+                                            onChange={(e) => this.onUploadChange(e)}>
+                                            <div id="thumbnail">
+                                                {(this.state.thumbnail === undefined ||
+                                                    this.state.thumbnail === null ||
+                                                    this.state.thumbnail === '') && (
+                                                    <CameraOutlined style={{fontSize: "28px"}}/>
+                                                )}
+                                                {this.state.thumbnail !== '' && (
+                                                    <Image
+                                                        height={this.getThumbnailHeight(this.state.thumbnail)}
+                                                        src={this.state.thumbnail}/>
+                                                )}
+                                            </div>
+                                        </Dragger>
                                     </Card>
                                 </Col>
                                 <Col span={24}>

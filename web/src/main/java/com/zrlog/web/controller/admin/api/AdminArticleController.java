@@ -50,11 +50,11 @@ public class AdminArticleController extends BaseController {
     }
 
     public Log detail() {
-        if (getPara("id") != null) {
-            Integer logId = Integer.parseInt(getPara("id"));
-            return new Log().adminFindByIdOrAlias(logId);
+        if (getPara("id") == null) {
+            return null;
         }
-        return null;
+        Integer logId = Integer.parseInt(getPara("id"));
+        return new Log().adminFindByIdOrAlias(logId);
     }
 
 }

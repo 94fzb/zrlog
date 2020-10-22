@@ -39,9 +39,8 @@ export class User extends BaseResourceComponent {
         const {status} = info.file;
         if (status === 'done') {
             message.success(`${info.file.response.url} file uploaded successfully.`);
-            this.setValue({
-                header: info.file.response.url
-            });
+            this.state.basic.header = info.file.response.url;
+            this.setValue(this.state.basic);
         } else if (status === 'error') {
             message.error(`${info.file.name} file upload failed.`);
         }
@@ -110,7 +109,6 @@ export class User extends BaseResourceComponent {
                         <Col span={24}>
                             <Form.Item
                                 label={this.state.res.headPortrait}
-                                name="header"
                                 rules={[{required: true}]}
                             >
                                 <Dragger style={{width: "156px"}} multiple={false}

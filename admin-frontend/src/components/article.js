@@ -27,7 +27,7 @@ export class Article extends BaseTableComponent {
                         this.state.rows.length >= 1 ? (
                             <div style={{color: "red"}}>
                                 <Popconfirm title="Sure to delete?"
-                                            onConfirm={() => this.handleDelete(record.key)}>
+                                            onConfirm={() => this.handleDelete(record.id)}>
                                     <DeleteOutlined/>
                                 </Popconfirm>
                             </div>
@@ -125,8 +125,8 @@ export class Article extends BaseTableComponent {
         return this.state.res['blogManage'];
     }
 
-    handleDelete(key) {
-        return undefined;
+    getDeleteApiUri() {
+        return "/api/admin/article/delete";
     }
 
     render() {
@@ -139,7 +139,8 @@ export class Article extends BaseTableComponent {
                 <Divider/>
                 <Row style={{paddingBottom: "10px"}}>
                     <Col span={24}>
-                        <Search placeholder={this.state.res.searchTip} onSearch={this.onErrSearch} enterButton style={{maxWidth: "240px", float: "right"}}/>
+                        <Search placeholder={this.state.res.searchTip} onSearch={this.onErrSearch} enterButton
+                                style={{maxWidth: "240px", float: "right"}}/>
                     </Col>
                 </Row>
 

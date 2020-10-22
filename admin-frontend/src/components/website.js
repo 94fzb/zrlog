@@ -14,6 +14,7 @@ import TextArea from "antd/es/input/TextArea";
 import {Spin} from "antd/es";
 import Switch from "antd/es/switch";
 import Select from "antd/es/select";
+import InputNumber from "antd/lib/input-number";
 
 const {Option} = Select;
 
@@ -124,7 +125,7 @@ export class Website extends BaseResourceComponent {
                                 <Form ref={this.basicForm} {...layout}
                                       onValuesChange={(k, v) => this.setBasicFormValue(k, v)}
                                 >
-                                    <Form.Item name='title' label='网站标题'>
+                                    <Form.Item name='title' label='网站标题' rules={[{required: true}]}>
                                         <Input placeholder='请输入网站标题'/>
                                     </Form.Item>
                                     <Form.Item name='second_title' label='网站副标题'>
@@ -147,8 +148,8 @@ export class Website extends BaseResourceComponent {
                             <Col md={12} xs={24}>
                                 <Form {...layout} ref={this.blogForm}
                                       onValuesChange={(k, v) => this.setBlogFormValue(k, v)}>
-                                    <Form.Item name='session_timeout' label='会话过期时间（分钟）'>
-                                        <Input type={"number"} placeholder=''/>
+                                    <Form.Item name='session_timeout' label='会话过期时间（分钟）' rules={[{required: true}]}>
+                                        <InputNumber type={"number"} min={5} placeholder=''/>
                                     </Form.Item>
                                     <Form.Item valuePropName="checked" name='generator_html_status' label='静态化文章页'>
                                         <Switch/>

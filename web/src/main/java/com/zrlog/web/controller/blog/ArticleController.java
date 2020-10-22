@@ -40,12 +40,15 @@ public class ArticleController extends BaseController {
      * @param data
      * @param pageRequest
      */
-    private void setPageInfo(String currentUri, PageData<Log> data, PageRequest pageRequest) {
+    private void setPageDataInfo(String currentUri, PageData<Log> data, PageRequest pageRequest) {
         setAttr("yurl", currentUri);
-        setAttr("data", data);
         long totalPage = BigDecimal.valueOf(Math.ceil(data.getTotalElements() * 1.0 / pageRequest.getSize())).longValue();
-        if (totalPage > 1) {
-            setAttr("pager", PagerUtil.generatorPager(currentUri, pageRequest.getPage(), totalPage));
+        if (totalPage > 0) {
+            setAttr("data", data);
+            //大于1页
+            if (totalPage > 1) {
+                setAttr("pager", PagerUtil.generatorPager(currentUri, pageRequest.getPage(), totalPage));
+            }
         }
     }
 
@@ -88,7 +91,7 @@ public class ArticleController extends BaseController {
         setAttr("tipsType", I18nUtil.getStringFromRes("search"));
         setAttr("tipsName", WebTools.htmlEncode(key));
 
-        setPageInfo(Constants.getArticleUri() + "search/" + key + "-", data, new PageRequest(getParaToInt(1, 1), getDefaultRows()));
+        setPageDataInfo(Constants.getArticleUri() + "search/" + key + "-", data, new PageRequest(getParaToInt(1, 1), getDefaultRows()));
         return "page";
     }
 
@@ -96,7 +99,7 @@ public class ArticleController extends BaseController {
         setAttr("tipsType", I18nUtil.getStringFromRes("archive"));
         setAttr("tipsName", getPara(0));
 
-        setPageInfo(Constants.getArticleUri() + "record/" + getPara(0) + "-", new Log().findByDate(getParaToInt(1, 1), getDefaultRows(), getPara(0)), new PageRequest(getParaToInt(1, 1), getDefaultRows()));
+        setPageDataInfo(Constants.getArticleUri() + "record/" + getPara(0) + "-", new Log().findByDate(getParaToInt(1, 1), getDefaultRows(), getPara(0)), new PageRequest(getParaToInt(1, 1), getDefaultRows()));
         return "page";
     }
 
@@ -129,21 +132,20 @@ public class ArticleController extends BaseController {
         } else {
             log = new Log().adminFindByIdOrAlias(idOrAlias);
         }
-        if (log == null) {
-            return "404";
+        if (log != null) {
+            Integer logId = log.get("logId");
+            log.put("lastLog", new Log().findLastLog(logId, I18nUtil.getStringFromRes("noLastLog")));
+            log.put("nextLog", new Log().findNextLog(logId, I18nUtil.getStringFromRes("noNextLog")));
+            log.put("comments", new Comment().findAllByLogId(logId));
+            setAttr("log", log);
+            return "detail";
         }
-        Integer logId = log.get("logId");
-        log.put("lastLog", new Log().findLastLog(logId, I18nUtil.getStringFromRes("noLastLog")));
-        log.put("nextLog", new Log().findNextLog(logId, I18nUtil.getStringFromRes("noNextLog")));
-        log.put("comments", new Comment().findAllByLogId(logId));
-        setAttr("log", log);
-        return "detail";
-
+        return "index";
     }
 
     public String sort() {
         String typeStr = convertRequestParam(getPara(0));
-        setPageInfo(Constants.getArticleUri() + "sort/" + typeStr + "-", new Log().findByTypeAlias(getParaToInt(1, 1), getDefaultRows(), typeStr), new PageRequest(getParaToInt(1, 1), getDefaultRows()));
+        setPageDataInfo(Constants.getArticleUri() + "sort/" + typeStr + "-", new Log().findByTypeAlias(getParaToInt(1, 1), getDefaultRows(), typeStr), new PageRequest(getParaToInt(1, 1), getDefaultRows()));
 
         Type type = new Type().findByAlias(typeStr);
         setAttr("type", type);
@@ -157,7 +159,7 @@ public class ArticleController extends BaseController {
     public String tag() {
         if (getPara(0) != null) {
             String tag = convertRequestParam(getPara(0));
-            setPageInfo(Constants.getArticleUri() + "tag/" + getPara(0) + "-", new Log().findByTag(getParaToInt(1, 1), getDefaultRows(), tag), new PageRequest(getParaToInt(1, 1), getDefaultRows()));
+            setPageDataInfo(Constants.getArticleUri() + "tag/" + getPara(0) + "-", new Log().findByTag(getParaToInt(1, 1), getDefaultRows(), tag), new PageRequest(getParaToInt(1, 1), getDefaultRows()));
 
             setAttr("tipsType", I18nUtil.getStringFromRes("tag"));
             setAttr("tipsName", tag);
@@ -175,8 +177,8 @@ public class ArticleController extends BaseController {
 
     public String all() {
         PageRequest pageRequest = new PageRequest(ParseUtil.strToInt(getPara(1), 1), getDefaultRows());
-        PageData<Log> data = new Log().find(pageRequest);
-        setPageInfo(Constants.getArticleUri() + "all-", data, pageRequest);
+        PageData<Log> data = new Log().adminFind(pageRequest);
+        setPageDataInfo(Constants.getArticleUri() + "all-", data, pageRequest);
         return "index";
     }
 }

@@ -183,6 +183,10 @@ public class ParseUtil {
         return newContent;
     }
 
+    public static boolean isNumeric(String str) {
+        return str.matches("-?\\d+(.\\d+)?");
+    }
+
     public static void main(String[] args) {
         System.out.println("check = " + isGarbageComment("what is the best insurance company for auto"));
     }

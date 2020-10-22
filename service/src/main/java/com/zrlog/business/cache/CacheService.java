@@ -54,7 +54,7 @@ public class CacheService {
             cacheInit.setTags(new Tag().findAll());
             statistics.setTotalTagSize(cacheInit.getTags().size());
             List<Type> types = cacheInit.getTypes();
-            cacheInit.setHotLogs(new Log().find(new PageRequest(1, 6)).getRows());
+            cacheInit.setHotLogs(new Log().adminFind(new PageRequest(1, 6)).getRows());
             Map<Map<String, Object>, List<Log>> indexHotLog = new LinkedHashMap<>();
             for (Type type : types) {
                 Map<String, Object> typeMap = new TreeMap<>();

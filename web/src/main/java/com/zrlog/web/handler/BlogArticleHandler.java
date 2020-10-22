@@ -52,7 +52,7 @@ public class BlogArticleHandler extends Handler {
                 if (target.equals("/")) {
                     responseHtmlFile(target, request, response, isHandled, INDEX_PAGE_HTML);
                 } else {
-                    String fileName = new String(request.getServletPath().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+                    String fileName = request.getServletPath();
                     responseHtmlFile(target.substring(0, target.indexOf(".")), request, response, isHandled, fileName);
                 }
             } else {

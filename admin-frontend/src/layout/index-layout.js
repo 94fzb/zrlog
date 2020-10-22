@@ -185,7 +185,7 @@ export class IndexLayout extends BaseResourceComponent {
                                 </Col>
                             </Row>
                         </Header>
-                        <Content style={{margin: '8px'}}>
+                        <Content style={{margin: '4px'}}>
                             <Switch>
                                 <Route path="/admin/index" component={Index}/>
                                 <Route path="/admin/article-edit" component={ArticleEdit}/>

@@ -126,7 +126,7 @@ public class ArticleService {
     }
 
     public PageData<ArticleResponseEntry> page(PageRequest pageRequest, String keywords) {
-        PageData<Log> data = new Log().find(pageRequest.getPage(), pageRequest.getSize(), keywords, pageRequest.getOrder(), pageRequest.getSort());
+        PageData<Log> data = new Log().adminFind(pageRequest, keywords);
         wrapperSearchKeyword(data, keywords);
         return convertPageable(data, ArticleResponseEntry.class);
     }

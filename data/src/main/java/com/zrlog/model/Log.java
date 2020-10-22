@@ -34,7 +34,7 @@ public class Log extends Model<Log> implements Serializable {
         if (idOrAlias == null) {
             return null;
         }
-        if (idOrAlias instanceof Integer) {
+        if (idOrAlias instanceof Integer || ParseUtil.isNumeric((String) idOrAlias)) {
             String sql = "select l.*,last_update_date as lastUpdateDate,u.userName,(select count(commentId) from " + Comment.TABLE_NAME + " where logId=l.logId) commentSize ,t.alias as typeAlias,t.typeName as typeName  from " + TABLE_NAME + " l inner join user u,type t where t.typeId=l.typeId and u.userId=l.userId and rubbish=? and privacy=? and l.logId=?";
             Log log = findFirst(sql, rubbish, privacy, idOrAlias);
             if (log != null) {
@@ -44,6 +44,7 @@ public class Log extends Model<Log> implements Serializable {
         String sql = "select l.*,last_update_date as lastUpdateDate,u.userName,(select count(commentId) from " + Comment.TABLE_NAME + " where logId=l.logId) commentSize ,t.alias as typeAlias,t.typeName as typeName  from " + TABLE_NAME + " l inner join user u,type t where t.typeId=l.typeId and u.userId=l.userId and rubbish=? and privacy=? and l.alias=?";
         return findFirst(sql, rubbish, privacy, idOrAlias);
     }
+
 
     /**
      * 这个用于Admin 进行查询不检查
@@ -55,7 +56,7 @@ public class Log extends Model<Log> implements Serializable {
         if (idOrAlias == null) {
             return null;
         }
-        if (idOrAlias instanceof Integer) {
+        if (idOrAlias instanceof Integer || ParseUtil.isNumeric((String) idOrAlias)) {
             String sql = "select l.*,last_update_date as lastUpdateDate,u.userName,(select count(commentId) from " + Comment.TABLE_NAME + " where logId=l.logId) commentSize ,t.alias as typeAlias,t.typeName as typeName  from " + TABLE_NAME + " l inner join user u,type t where t.typeId=l.typeId and u.userId=l.userId and l.logId=?";
             Log log = findFirst(sql, idOrAlias);
             if (log != null) {
@@ -92,7 +93,7 @@ public class Log extends Model<Log> implements Serializable {
         return 0;
     }
 
-    public PageData<Log> find(PageRequest pageRequest) {
+    public PageData<Log> adminFind(PageRequest pageRequest) {
         PageData<Log> data = new PageData<>();
         String sql = "select l.*,t.typeName,t.alias as typeAlias,u.userName,(select count(commentId) from " + Comment.TABLE_NAME + " where logId=l.logId) commentSize from " + TABLE_NAME + " l inner join user u inner join type t where rubbish=? and privacy=? and u.userId=l.userId and t.typeid=l.typeid  order by l.logId desc limit  ?,?";
 
@@ -105,14 +106,11 @@ public class Log extends Model<Log> implements Serializable {
     /**
      * 管理员查询文章
      *
-     * @param page
-     * @param pageSize
+     * @param pageRequest
      * @param keywords
-     * @param order
-     * @param field
      * @return
      */
-    public PageData<Log> find(int page, int pageSize, String keywords, String order, String field) {
+    public PageData<Log> adminFind(PageRequest pageRequest, String keywords) {
         PageData<Log> data = new PageData<>();
         String searchKeywords = "";
         List<Object> searchParam = new ArrayList<>();
@@ -125,8 +123,9 @@ public class Log extends Model<Log> implements Serializable {
             params.addAll(searchParam);
         }
         String pageSort = "l.logId desc";
-        String sortField = field;
-        if (order != null && !"".equals(order) && field != null && !"".equals(field)) {
+        String sortField = pageRequest.getSort();
+        String order = pageRequest.getOrder();
+        if (order != null && !"".equals(order) && sortField != null && !"".equals(sortField)) {
             if ("id".equals(sortField)) {
                 sortField = "logId";
             } else if ("typeName".equals(sortField)) {
@@ -140,8 +139,8 @@ public class Log extends Model<Log> implements Serializable {
             }
             pageSort = "l." + sortField + " " + order;
         }
-        params.add(ParseUtil.getFirstRecord(page, pageSize));
-        params.add(pageSize);
+        params.add(ParseUtil.getFirstRecord(pageRequest.getPage(), pageRequest.getSize()));
+        params.add(pageRequest.getSize());
         String sql = "select l.*,l.privacy privacy,t.typeName,l.logId as id,l.last_update_date as lastUpdateDate,t.alias as typeAlias,u.userName,(select count(commentId) from " + Comment.TABLE_NAME + " where logId=l.logId ) commentSize from " + TABLE_NAME + " l inner join user u inner join type t where u.userId=l.userId" + searchKeywords + " and t.typeid=l.typeid order by " + pageSort + " limit ?,?";
         data.setRows(findEntry(sql, params.toArray()));
         ModelUtil.fillPageData(this, "from " + TABLE_NAME + " l inner join user u where u.userId=l.userId " + searchKeywords, data, searchParam.toArray());
