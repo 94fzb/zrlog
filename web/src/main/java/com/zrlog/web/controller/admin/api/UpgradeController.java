@@ -6,17 +6,11 @@ import com.jfinal.config.Plugins;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
 import com.jfinal.plugin.IPlugin;
-import com.zrlog.common.Constants;
-import com.zrlog.business.rest.request.UpgradeSettingRequest;
 import com.zrlog.business.rest.response.CheckVersionResponse;
 import com.zrlog.business.rest.response.DownloadUpdatePackageResponse;
-import com.zrlog.business.rest.response.UpdateRecordResponse;
 import com.zrlog.business.rest.response.UpgradeProcessResponse;
-import com.zrlog.common.type.AutoUpgradeVersionType;
+import com.zrlog.common.Constants;
 import com.zrlog.common.vo.Version;
-import com.zrlog.model.WebSite;
-import com.zrlog.util.ZrLogUtil;
-import com.zrlog.web.annotation.RefreshCache;
 import com.zrlog.web.controller.BaseController;
 import com.zrlog.web.plugin.*;
 import com.zrlog.web.token.AdminTokenThreadLocal;
@@ -32,30 +26,6 @@ public class UpgradeController extends BaseController {
     private static final Map<Integer, DownloadProcessHandle> downloadProcessHandleMap = new ConcurrentHashMap<>();
     private static final Map<Integer, Version> versionMap = new ConcurrentHashMap<>();
     private static final Map<Integer, UpdateVersionHandler> updateVersionThreadMap = new ConcurrentHashMap<>();
-
-    @RefreshCache
-    public UpdateRecordResponse setting() {
-        UpdateRecordResponse recordResponse = new UpdateRecordResponse();
-        UpgradeSettingRequest upgradeSettingRequest = ZrLogUtil.convertRequestBody(getRequest(), UpgradeSettingRequest.class);
-        new WebSite().updateByKV("autoUpgradeVersion", upgradeSettingRequest.getAutoUpgradeVersion());
-        new WebSite().updateByKV("upgradePreview", upgradeSettingRequest.isUpgradePreview());
-        recordResponse.setError(0);
-        Plugins plugins = (Plugins) JFinal.me().getServletContext().getAttribute("plugins");
-        if (AutoUpgradeVersionType.cycle(upgradeSettingRequest.getAutoUpgradeVersion()) == AutoUpgradeVersionType.NEVER) {
-            for (IPlugin plugin : plugins.getPluginList()) {
-                if (plugin instanceof UpdateVersionPlugin) {
-                    plugin.stop();
-                }
-            }
-        } else {
-            for (IPlugin plugin : plugins.getPluginList()) {
-                if (plugin instanceof UpdateVersionPlugin) {
-                    plugin.start();
-                }
-            }
-        }
-        return recordResponse;
-    }
 
     public DownloadUpdatePackageResponse download() throws IOException {
         DownloadProcessHandle handle = downloadProcessHandleMap.get(AdminTokenThreadLocal.getUser().getSessionId());

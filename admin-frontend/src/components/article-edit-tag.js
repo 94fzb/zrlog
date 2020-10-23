@@ -56,6 +56,7 @@ export class ArticleEditTag extends BaseResourceComponent {
     forMap = tag => {
         const tagElem = (
             <Tag
+                icon={<TagOutlined/>}
                 color="#108ee9"
                 closable
                 onClose={e => {

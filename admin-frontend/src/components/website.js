@@ -2,7 +2,7 @@ import React from "react";
 import axios from "axios";
 
 import {BaseResourceComponent} from "./base-resource-component";
-import {Tabs} from "antd";
+import {message, Tabs} from "antd";
 import Title from "antd/lib/typography/Title";
 import Form from "antd/es/form";
 import Input from "antd/es/input";
@@ -111,6 +111,14 @@ export class Website extends BaseResourceComponent {
         }
     }
 
+    websiteFormFinish(changedValues, formName) {
+        axios.post("/api/admin/website/" + formName, JSON.stringify(changedValues)).then(({data}) => {
+            if (!data.error) {
+                message.info(data.message);
+            }
+        });
+    }
+
     render() {
         return (
             <Spin spinning={this.state.resLoading && this.state.settingsLoading}>
@@ -124,6 +132,7 @@ export class Website extends BaseResourceComponent {
                                 <Divider/>
                                 <Form ref={this.basicForm} {...layout}
                                       onValuesChange={(k, v) => this.setBasicFormValue(k, v)}
+                                      onFinish={k => this.websiteFormFinish(k, "basic")}
                                 >
                                     <Form.Item name='title' label='网站标题' rules={[{required: true}]}>
                                         <Input placeholder='请输入网站标题'/>
@@ -138,7 +147,8 @@ export class Website extends BaseResourceComponent {
                                         <TextArea rows={5}/>
                                     </Form.Item>
                                     <Divider/>
-                                    <Button type='primary'>{this.state.res.submit}</Button>
+                                    <Button type='primary' enterButton
+                                            htmlType='submit'>{this.state.res.submit}</Button>
                                 </Form>
                             </Col>
                         </Row>
@@ -146,8 +156,12 @@ export class Website extends BaseResourceComponent {
                     <TabPane tab="博客设置" key="blog">
                         <Row>
                             <Col md={12} xs={24}>
+                                <Title level={4}>博客设置</Title>
+                                <Divider/>
                                 <Form {...layout} ref={this.blogForm}
-                                      onValuesChange={(k, v) => this.setBlogFormValue(k, v)}>
+                                      onValuesChange={(k, v) => this.setBlogFormValue(k, v)}
+                                      onFinish={k => this.websiteFormFinish(k, "blog")}
+                                >
                                     <Form.Item name='session_timeout' label='会话过期时间（分钟）' rules={[{required: true}]}>
                                         <InputNumber type={"number"} min={5} placeholder=''/>
                                     </Form.Item>
@@ -173,7 +187,8 @@ export class Website extends BaseResourceComponent {
                                         </Select>
                                     </Form.Item>
                                     <Divider/>
-                                    <Button type='primary'>{this.state.res.submit}</Button>
+                                    <Button type='primary' enterButton
+                                            htmlType='submit'>{this.state.res.submit}</Button>
                                 </Form>
                             </Col>
                         </Row>
@@ -187,7 +202,9 @@ export class Website extends BaseResourceComponent {
                                 <Title level={4}>ICP，网站统计等信息</Title>
                                 <Divider/>
                                 <Form ref={this.otherForm} {...layout}
-                                      onValuesChange={(k, v) => this.setBlogFormValue(k, v)}>
+                                      onValuesChange={(k, v) => this.setBlogFormValue(k, v)}
+                                      onFinish={k => this.websiteFormFinish(k, "other")}
+                                >
                                     <Form.Item name='icp' label='ICP备案信息'>
                                         <TextArea/>
                                     </Form.Item>
@@ -195,7 +212,8 @@ export class Website extends BaseResourceComponent {
                                         <TextArea rows={7}/>
                                     </Form.Item>
                                     <Divider/>
-                                    <Button type='primary'>{this.state.res.submit}</Button>
+                                    <Button type='primary' enterButton
+                                            htmlType='submit'>{this.state.res.submit}</Button>
                                 </Form>
                             </Col>
                         </Row>
@@ -203,8 +221,15 @@ export class Website extends BaseResourceComponent {
                     <TabPane tab={this.state.res['admin.upgrade.manage']} key="upgrade">
                         <Row>
                             <Col md={12} xs={24}>
+                                <Button type='dashed' style={{float: "right"}}>{this.state.res.checkUpgrade}</Button>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col md={12} xs={24}>
                                 <Form ref={this.upgradeForm} {...layout}
-                                      onValuesChange={(k, v) => this.setUpgradeFormValue(k, v)}>
+                                      onValuesChange={(k, v) => this.setUpgradeFormValue(k, v)}
+                                      onFinish={k => this.websiteFormFinish(k, "upgrade")}
+                                >
                                     <Form.Item name='autoUpgradeVersion'
                                                label={this.state.res['admin.upgrade.autoCheckCycle']}>
                                         <Select style={{width: 200}}>
@@ -222,11 +247,13 @@ export class Website extends BaseResourceComponent {
                                             </Select.Option>
                                         </Select>
                                     </Form.Item>
-                                    <Form.Item valuePropName="checked" name='upgradePreview' label={this.state.res['admin.upgrade.canPreview']}>
+                                    <Form.Item valuePropName="checked" name='upgradePreview'
+                                               label={this.state.res['admin.upgrade.canPreview']}>
                                         <Switch/>
                                     </Form.Item>
                                     <Divider/>
-                                    <Button type='primary'>{this.state.res.submit}</Button>
+                                    <Button type='primary' enterButton
+                                            htmlType='submit'>{this.state.res.submit}</Button>
                                 </Form>
                             </Col>
                         </Row>

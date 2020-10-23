@@ -48,6 +48,13 @@ export class Login extends BaseResourceComponent {
         })
     };
 
+    fetchResSuccess(res) {
+        const {defaultLoginInfo} = res;
+        if (defaultLoginInfo !== undefined) {
+            this.setValue(defaultLoginInfo);
+        }
+    }
+
     getSecondTitle() {
         return this.state.res.userNameAndPassword;
     }
@@ -67,7 +74,7 @@ export class Login extends BaseResourceComponent {
                                               height: "120px"
                                           }}>
                                       </div>
-                                      <Title level={3} style={{color:"#fff"}}>{this.getSecondTitle()}</Title>
+                                      <Title level={3} style={{color: "#fff"}}>{this.getSecondTitle()}</Title>
                                   </div>}
                               style={{textAlign: "center"}}>
                             <Form

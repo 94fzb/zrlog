@@ -5,14 +5,15 @@ import com.jfinal.aop.Interceptor;
 import com.jfinal.aop.Invocation;
 import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
-import com.zrlog.common.Constants;
+import com.zrlog.business.cache.CacheService;
+import com.zrlog.business.exception.AdminAuthException;
 import com.zrlog.business.rest.response.ExceptionResponse;
+import com.zrlog.common.Constants;
+import com.zrlog.common.exception.AbstractBusinessException;
 import com.zrlog.common.vo.AdminTokenVO;
 import com.zrlog.model.User;
-import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.annotation.RefreshCache;
-import com.zrlog.business.cache.CacheService;
 import com.zrlog.web.handler.BlogArticleHandler;
 import com.zrlog.web.token.AdminTokenService;
 import com.zrlog.web.token.AdminTokenThreadLocal;
@@ -42,52 +43,56 @@ public class AdminInterceptor implements Interceptor {
      * @param ai
      */
     private void adminPermission(Invocation ai) {
+        Controller controller = ai.getController();
         try {
-            Controller controller = ai.getController();
-            if ("/admin/login".equals(ai.getActionKey()) ||
-                    "/admin/logout".equals(ai.getActionKey()) ||
-                    "/api/admin/login".equals(ai.getActionKey())) {
-                ai.invoke();
-                tryDoRender(ai);
-            } else {
+            if ("/admin/login".equals(ai.getActionKey())) {
                 AdminTokenVO adminTokenVO = adminTokenService.getAdminTokenVO(controller.getRequest());
                 if (adminTokenVO != null) {
-                    try {
-                        User user = new User().findById(adminTokenVO.getUserId());
-                        adminTokenService.setAdminToken(user, adminTokenVO.getSessionId(), adminTokenVO.getProtocol(), controller.getRequest(), controller.getResponse());
-                        ai.invoke();
-                        tryDoRender(ai);
-                    } catch (Exception e) {
-                        LOGGER.error("", e);
-                        exceptionHandler(ai, e);
-                    }
+                    controller.redirect("/admin/index");
                 } else {
-                    blockUnLoginRequestHandler(ai);
+                    tryDoRender(ai);
                 }
+                return;
+            }
+            if ("/admin/logout".equals(ai.getActionKey()) ||
+                    "/api/admin/login".equals(ai.getActionKey())) {
+                tryDoRender(ai);
+                return;
+            }
+            AdminTokenVO adminTokenVO = adminTokenService.getAdminTokenVO(controller.getRequest());
+            if (adminTokenVO == null) {
+                blockUnLoginRequestHandler(ai);
+                return;
+            }
+
+            User user = new User().findById(adminTokenVO.getUserId());
+            adminTokenService.setAdminToken(user, adminTokenVO.getSessionId(), adminTokenVO.getProtocol(), controller.getRequest(), controller.getResponse());
+            tryDoRender(ai);
+        } catch (AbstractBusinessException e) {
+            ExceptionResponse response = new ExceptionResponse();
+            response.setStack(ExceptionUtils.recordStackTraceMsg(e));
+            response.setError(e.getError());
+            response.setMessage(e.getMessage());
+            controller.renderJson(response);
+        } catch (Exception e) {
+            LOGGER.error("", e);
+            if (ai.getActionKey().startsWith("/api")) {
+                ExceptionResponse response = new ExceptionResponse();
+                response.setStack(ExceptionUtils.recordStackTraceMsg(e));
+                response.setError(9999);
+                response.setMessage(e.getMessage());
+                controller.renderJson(response);
+            } else {
+                ai.getController().redirect(Constants.ERROR_PAGE);
             }
         } finally {
             AdminTokenThreadLocal.remove();
         }
     }
 
-    private void exceptionHandler(Invocation ai, Exception e) {
-        if (ai.getActionKey().startsWith("/api")) {
-            ExceptionResponse exceptionResponse = new ExceptionResponse();
-            exceptionResponse.setError(9001);
-            exceptionResponse.setMessage(e.getMessage());
-            exceptionResponse.setStack(ExceptionUtils.recordStackTraceMsg(e));
-            ai.getController().renderJson(exceptionResponse);
-        } else {
-            ai.getController().redirect(Constants.ERROR_PAGE);
-        }
-    }
-
     private void blockUnLoginRequestHandler(Invocation ai) {
         if (ai.getActionKey().startsWith("/api")) {
-            ExceptionResponse exceptionResponse = new ExceptionResponse();
-            exceptionResponse.setError(1);
-            exceptionResponse.setMessage(I18nUtil.getStringFromRes("admin.session.timeout"));
-            ai.getController().renderJson(exceptionResponse);
+            throw new AdminAuthException();
         } else {
             try {
                 String url = ai.getController().getRequest().getContextPath()
@@ -100,13 +105,6 @@ public class AdminInterceptor implements Interceptor {
         }
     }
 
-    public static void previewField(HttpServletRequest request) {
-        if (ZrLogUtil.isPreviewMode()) {
-            request.setAttribute("userName", System.getenv("DEFAULT_USERNAME"));
-            request.setAttribute("password", System.getenv("DEFAULT_PASSWORD"));
-        }
-    }
-
 
     /**
      * 尝试通过Controller的放回值来进行数据的渲染
@@ -115,6 +113,7 @@ public class AdminInterceptor implements Interceptor {
      * @return true 表示已经渲染数据了，false 表示并未按照约定编写，及没有进行渲染
      */
     private void tryDoRender(Invocation ai) {
+        ai.invoke();
         Controller controller = ai.getController();
         Object returnValue = ai.getReturnValue();
         if (ai.getMethod().getAnnotation(RefreshCache.class) != null) {

@@ -6,7 +6,6 @@ import com.jfinal.render.HtmlRender;
 import com.zrlog.common.Constants;
 import com.zrlog.web.WebConstants;
 import com.zrlog.web.controller.BaseController;
-import com.zrlog.web.interceptor.AdminInterceptor;
 import com.zrlog.web.token.AdminTokenService;
 
 import javax.servlet.http.Cookie;
@@ -26,7 +25,6 @@ public class AdminPageController extends BaseController {
     }
 
     public void login() throws FileNotFoundException {
-        AdminInterceptor.previewField(getRequest());
         render(new HtmlRender(IOUtil.getStringInputStream(new FileInputStream(PathKit.getWebRootPath() + "/admin/index.html"))));
     }
 

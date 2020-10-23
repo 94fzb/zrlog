@@ -20,6 +20,10 @@ export class BaseResourceComponent extends React.Component {
 
     }
 
+    fetchResSuccess(res) {
+
+    }
+
     componentDidMount() {
         this.fetchRes();
     }
@@ -31,6 +35,7 @@ export class BaseResourceComponent extends React.Component {
                 res: data.data,
                 resLoading: false
             });
+            this.fetchResSuccess(data.data);
             document.title = [this.getSecondTitle(), data.data['admin.management'], this.state.res.websiteTitle].filter(Boolean).join(" | ");
         })
     }

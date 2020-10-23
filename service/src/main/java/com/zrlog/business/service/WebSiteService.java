@@ -30,7 +30,7 @@ public class WebSiteService {
         blog.setLanguage((String) Constants.WEB_SITE.get("language"));
         blog.setGenerator_html_status(Constants.getBooleanByFromWebSite("generator_html_status"));
         blog.setDisable_comment_status(Constants.getBooleanByFromWebSite("disable_comment_status"));
-        blog.setSession_timeout(Constants.getSessionTimeout());
+        blog.setSession_timeout(Constants.getSessionTimeout() / 60 / 1000);
         blog.setArticle_thumbnail_status(Constants.getBooleanByFromWebSite("article_thumbnail_status"));
         webSiteSettingsResponse.setBlog(blog);
         return webSiteSettingsResponse;

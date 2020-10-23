@@ -128,5 +128,6 @@ public class AdminTokenService {
         if (!JFinal.me().getConstants().getDevMode()) {
             cookie.setDomain(getDomain(request));
         }
+        cookie.setHttpOnly(true);
     }
 }
