@@ -15,7 +15,10 @@ export class Index extends BaseResourceComponent {
 
     initState() {
         return {
-            statisticsInfo: {}
+            statisticsInfo: {},
+            system: [
+                {}
+            ]
         };
     }
 
@@ -94,7 +97,8 @@ export class Index extends BaseResourceComponent {
         const {statisticsInfo} = this.state;
 
         return (
-            <Spin spinning={this.state.serverInfoLoading && this.state.resLoading && this.state.statisticsInfoLoading}>
+            <Spin delay={this.getSpinDelayTime()}
+                  spinning={this.state.serverInfoLoading && this.state.resLoading && this.state.statisticsInfoLoading}>
                 <Title className='page-header' level={3}>{this.getSecondTitle()}</Title>
                 <Divider/>
                 <Alert message={this.state.res['admin.index.welcomeTips']} type="info" showIcon/>

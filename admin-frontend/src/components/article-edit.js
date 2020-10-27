@@ -204,7 +204,7 @@ export class ArticleEdit extends BaseResourceComponent {
     render() {
 
         return (
-            <Spin spinning={this.state.resLoading && this.state.globalLoading}>
+            <Spin delay={this.getSpinDelayTime()} spinning={this.state.resLoading && this.state.globalLoading}>
                 <Title className='page-header' level={3}>{this.getSecondTitle()}</Title>
                 <Divider/>
                 <Form

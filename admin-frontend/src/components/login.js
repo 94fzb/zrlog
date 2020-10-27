@@ -61,9 +61,9 @@ export class Login extends BaseResourceComponent {
 
     render() {
         return (
-            <Spin spinning={this.state.resLoading}>
+            <Spin delay={this.getSpinDelayTime()} spinning={this.state.resLoading}>
                 <Layout>
-                    <Content>
+                    <Content style={{minWidth: "100%"}}>
                         <Card className='login-container'
                               cover={
                                   <div className='dimback'>

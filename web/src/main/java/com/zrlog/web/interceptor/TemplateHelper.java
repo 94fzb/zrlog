@@ -62,13 +62,8 @@ public class TemplateHelper {
             title = ((Log) request.getAttribute("log")).get("title") + " - " + title;
         }
         request.setAttribute("title", title);
-        Object data = null;
-        if (request.getAttribute("data") != null) {
-            data = request.getAttribute("data");
-        } else if (request.getAttribute("log") != null) {
-            data = request.getAttribute("log");
-        }
-        staticHtml(data, request, suffix, Constants.getBooleanByFromWebSite("article_thumbnail_status"));
+
+        staticHtml(request, suffix, Constants.getBooleanByFromWebSite("article_thumbnail_status"));
         PagerVO pager = (PagerVO) request.getAttribute("pager");
         if (pager != null && !pager.getPageList().isEmpty()) {
             List<PagerVO.PageEntry> pageList = pager.getPageList();
@@ -210,11 +205,9 @@ public class TemplateHelper {
         return false;
     }
 
-    private static void staticHtml(Object data, HttpServletRequest request, String suffix, boolean thumbnailEnableArticle) {
-        if (data instanceof Log) {
-            fillArticleInfo((Log) data, request, suffix);
-        } else if (data instanceof PageData) {
-            PageData<Log> map = (PageData) data;
+    private static void staticHtml(HttpServletRequest request, String suffix, boolean thumbnailEnableArticle) {
+        if (request.getAttribute("data") != null) {
+            PageData<Log> map = (PageData) request.getAttribute("data");
             List<Log> logList = map.getRows();
             if (logList != null) {
                 for (Log log : logList) {
@@ -228,6 +221,8 @@ public class TemplateHelper {
                     log.put("typeUrl", WebTools.getHomeUrl(request) + Constants.getArticleUri() + "sort/" + log.get("typeAlias") + suffix);
                 }
             }
+        } else if (request.getAttribute("log") != null) {
+            fillArticleInfo((Log) request.getAttribute("log"), request, suffix);
         }
     }
 

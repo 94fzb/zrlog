@@ -121,7 +121,7 @@ export class Website extends BaseResourceComponent {
 
     render() {
         return (
-            <Spin spinning={this.state.resLoading && this.state.settingsLoading}>
+            <Spin delay={this.getSpinDelayTime()} spinning={this.state.resLoading && this.state.settingsLoading}>
                 <Title className='page-header' level={3}>{this.getSecondTitle()}</Title>
                 <Divider/>
                 <Tabs defaultActiveKey={activeKey} onChange={e => this.handleTabClick(e)}>

@@ -28,6 +28,10 @@ export class BaseResourceComponent extends React.Component {
         this.fetchRes();
     }
 
+    getSpinDelayTime() {
+        return 200;
+    }
+
     fetchRes() {
         axios.get('/api/public/resource').then(({data}) => {
             data.data.copyrightTips = data.data.copyright + ' ZrLog';

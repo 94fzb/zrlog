@@ -134,7 +134,7 @@ export class Article extends BaseTableComponent {
         const {rows, pagination, tableLoading} = this.state;
 
         return (
-            <Spin spinning={tableLoading}>
+            <Spin delay={this.getSpinDelayTime()} spinning={tableLoading}>
                 <Title className='page-header' level={3}>{this.getSecondTitle()}</Title>
                 <Divider/>
                 <Row style={{paddingBottom: "10px"}}>

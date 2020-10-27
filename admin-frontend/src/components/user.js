@@ -77,7 +77,7 @@ export class User extends BaseResourceComponent {
     render() {
 
         return (
-            <Spin spinning={this.state.resLoading && this.state.userLoading}>
+            <Spin delay={this.getSpinDelayTime()} spinning={this.state.resLoading && this.state.userLoading}>
                 <Title className='page-header' level={3}>{this.getSecondTitle()}</Title>
                 <Divider/>
                 <Form onFinish={(values) => this.onFinish(values)}
