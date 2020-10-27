@@ -38,8 +38,12 @@ export class ArticleEditTag extends BaseResourceComponent {
     handleInputConfirm = () => {
         const {inputValue} = this.state;
         let {keywords} = this.state;
-        if (inputValue && keywords.indexOf(inputValue) === -1) {
-            keywords = keywords += "," + inputValue;
+        if (inputValue) {
+            if (keywords) {
+                keywords = keywords += "," + inputValue;
+            } else {
+                keywords = inputValue;
+            }
         }
         console.log(keywords);
         this.setState({

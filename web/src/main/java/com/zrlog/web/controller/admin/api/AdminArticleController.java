@@ -8,12 +8,14 @@ import com.zrlog.business.rest.response.ArticleResponseEntry;
 import com.zrlog.business.rest.response.CreateOrUpdateArticleResponse;
 import com.zrlog.business.rest.response.DeleteLogResponse;
 import com.zrlog.business.service.ArticleService;
+import com.zrlog.common.Constants;
 import com.zrlog.data.dto.PageData;
 import com.zrlog.model.Log;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.annotation.RefreshCache;
 import com.zrlog.web.controller.BaseController;
 import com.zrlog.web.token.AdminTokenThreadLocal;
+import com.zrlog.web.util.WebTools;
 
 public class AdminArticleController extends BaseController {
 
@@ -41,7 +43,9 @@ public class AdminArticleController extends BaseController {
     }
 
     public PageData<ArticleResponseEntry> index() {
-        return articleService.page(getPageRequest(), convertRequestParam(getPara("key")));
+        PageData<ArticleResponseEntry> key = articleService.page(getPageRequest(), convertRequestParam(getPara("key")));
+        key.getRows().forEach(x -> x.setUrl(WebTools.getHomeUrl(getRequest()) + Constants.getArticleUri() + x.getId()));
+        return key;
     }
 
 

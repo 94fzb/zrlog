@@ -99,11 +99,11 @@ export class Article extends BaseTableComponent {
                 {
                     title: '浏览',
                     key: 'view',
-                    dataIndex: 'id',
-                    render: (text) =>
+                    dataIndex: 'url',
+                    render: (url) =>
                         this.state.rows.length >= 1 ? (
                             <div style={{color: "red"}}>
-                                <a target={"_blank"} href={"/" + this.state.res['articleRoute'] + "/" + text}>
+                                <a rel="noopener noreferrer" target={"_blank"} href={url}>
                                     <EyeOutlined/>
                                 </a>
                             </div>

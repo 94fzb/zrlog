@@ -128,23 +128,21 @@ public class ArticleService {
     public PageData<ArticleResponseEntry> page(PageRequest pageRequest, String keywords) {
         PageData<Log> data = new Log().adminFind(pageRequest, keywords);
         wrapperSearchKeyword(data, keywords);
-        return convertPageable(data, ArticleResponseEntry.class);
+        return convertPageable(data);
     }
 
     /**
      * 将输入的分页过后的对象，转化PageableResponse的对象
      *
      * @param object
-     * @param toClazz
-     * @param <T>
      * @return
      */
-    private static <T> PageData<T> convertPageable(PageData<Log> object, Class<T> toClazz) {
-        List<T> dataList = new ArrayList<>();
+    private PageData<ArticleResponseEntry> convertPageable(PageData<Log> object) {
+        List<ArticleResponseEntry> dataList = new ArrayList<>();
         for (Log obj : object.getRows()) {
-            dataList.add(BeanUtil.convert(obj.getAttrs(), toClazz));
+            dataList.add(BeanUtil.convert(obj.getAttrs(), ArticleResponseEntry.class));
         }
-        PageData<T> pageData = new PageData<>();
+        PageData<ArticleResponseEntry> pageData = new PageData<>();
         pageData.setTotalElements(object.getTotalElements());
         pageData.setRows(dataList);
         return pageData;

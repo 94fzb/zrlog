@@ -14,6 +14,7 @@ public class ArticleResponseEntry {
     private String typeName;
     private boolean rubbish;
     private boolean privacy;
+    private String url;
 
     public int getClick() {
         return click;
@@ -93,5 +94,13 @@ public class ArticleResponseEntry {
 
     public void setLastUpdateDate(Date lastUpdateDate) {
         this.lastUpdateDate = lastUpdateDate;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }
