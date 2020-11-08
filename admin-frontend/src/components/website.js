@@ -175,13 +175,13 @@ export class Website extends BaseResourceComponent {
                                         <Switch/>
                                     </Form.Item>
                                     <Form.Item name='language' label='语言'>
-                                        <Select>
+                                        <Select style={{maxWidth:"100px"}}>
                                             <Option value='zh_CN'>{this.state.res['languageChinese']}</Option>
                                             <Option value='en_US'>{this.state.res['languageEnglish']}</Option>
                                         </Select>
                                     </Form.Item>
                                     <Form.Item name='article_route' label='文章路由'>
-                                        <Select>
+                                        <Select style={{maxWidth:"100px"}}>
                                             <Option value=''>默认</Option>
                                             <Option value='post'>post</Option>
                                         </Select>
@@ -232,7 +232,7 @@ export class Website extends BaseResourceComponent {
                                 >
                                     <Form.Item name='autoUpgradeVersion'
                                                label={this.state.res['admin.upgrade.autoCheckCycle']}>
-                                        <Select style={{width: 200}}>
+                                        <Select  style={{maxWidth:"100px"}} >
                                             <Select.Option key='86400' value={86400}>
                                                 {this.state.res['admin.upgrade.cycle.oneDay']}
                                             </Select.Option>

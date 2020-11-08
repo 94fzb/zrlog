@@ -11,14 +11,48 @@ import Spin from "antd/lib/spin";
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
 
-export class Index extends BaseResourceComponent {
+var system = [
+    {
+        "name": "运行环境",
+        "value": ""
+    },
+    {
+        "name": "JavaEE 容器信息",
+        "value":""
+    }
+    ,
+    {
+        "name": "运行路径",
+        "value": ""
+    },
+    {
+        "name": "操作系统",
+        "value": ""
+    },
+    {
+        "name": "系统时区 - 地域/语言",
+        "value": ""
+    },
+    {
+        "name": "数据库版本",
+        "value": ""
+    },
+    {
+        "name": "系统编码",
+        "value": ""
+    },
+    {
+        "name": "程序版本",
+        "value": ""
+    }
+];
 
+export class Index extends BaseResourceComponent {
+    
     initState() {
         return {
             statisticsInfo: {},
-            system: [
-                {}
-            ]
+            system: system
         };
     }
 
@@ -27,47 +61,19 @@ export class Index extends BaseResourceComponent {
         axios.get("/api/admin/statisticsInfo").then(({data}) => {
             this.setState({
                 statisticsInfo: data.data,
-                statisticsInfoLoading: false,
             })
         });
         axios.get("/api/admin/serverInfo").then(({data}) => {
+            system[0].value = data.data['java.vm.name'] + " - " + data.data['java.runtime.version'];
+            system[1].value  = data.data['server.info'];
+            system[2].value  = data.data['zrlog.runtime.path'];
+            system[3].value  = data.data['os.name'] + " - " + data.data['os.arch'] + " - " + data.data['os.version'];
+            system[4].value  = data.data['user.timezone'] + " - " + data.data['user.country'] + "/" + data.data['user.language'];
+            system[5].value  = data.data['dbServer.version'];
+            system[6].value  = data.data['file.encoding'];
+            system[7].value  = data.data['zrlog.version'] + " - " + data.data['zrlog.buildId'] + " (" + data.data['zrlog.buildTime'] + ")";
             this.setState({
-                serverInfoLoading: false,
-                system: [
-                    {
-                        "name": "运行环境",
-                        "value": data.data['java.vm.name'] + " - " + data.data['java.runtime.version']
-                    },
-                    {
-                        "name": "JavaEE 容器信息",
-                        "value": data.data['server.info']
-                    }
-                    ,
-                    {
-                        "name": "运行路径",
-                        "value": data.data['zrlog.runtime.path']
-                    },
-                    {
-                        "name": "操作系统",
-                        "value": data.data['os.name'] + " - " + data.data['os.arch'] + " - " + data.data['os.version']
-                    },
-                    {
-                        "name": "系统时区 - 地域/语言",
-                        "value": data.data['user.timezone'] + " - " + data.data['user.country'] + "/" + data.data['user.language'],
-                    },
-                    {
-                        "name": "数据库版本",
-                        "value": data.data['dbServer.version']
-                    },
-                    {
-                        "name": "系统编码",
-                        "value": data.data['file.encoding']
-                    },
-                    {
-                        "name": "程序版本",
-                        "value": data.data['zrlog.version'] + " - " + data.data['zrlog.buildId'] + " (" + data.data['zrlog.buildTime'] + ")"
-                    }
-                ]
+                system: system
             })
         })
 
@@ -98,7 +104,7 @@ export class Index extends BaseResourceComponent {
 
         return (
             <Spin delay={this.getSpinDelayTime()}
-                  spinning={this.state.serverInfoLoading && this.state.resLoading && this.state.statisticsInfoLoading}>
+                  spinning={this.state.resLoading}>
                 <Title className='page-header' level={3}>{this.getSecondTitle()}</Title>
                 <Divider/>
                 <Alert message={this.state.res['admin.index.welcomeTips']} type="info" showIcon/>
@@ -107,7 +113,7 @@ export class Index extends BaseResourceComponent {
                         <Card size={"small"} title={this.state.res['serverInfo']}>
                             <Table
                                 style={{wordBreak: "break-all"}}
-                                size='middle'
+                                size='small'
                                 columns={this.getFixedColumns()}
                                 dataSource={this.state.system}
                                 pagination={false}
