@@ -37,9 +37,10 @@ export class BaseResourceComponent extends React.Component {
         this.setState({
             res: data.data,
             resLoading: false
+        },() => {
+            this.fetchResSuccess(data.data);
+            document.title = [this.getSecondTitle(), data.data['admin.management'], this.state.res.websiteTitle].filter(Boolean).join(" | ");
         });
-        this.fetchResSuccess(data.data);
-        document.title = [this.getSecondTitle(), data.data['admin.management'], this.state.res.websiteTitle].filter(Boolean).join(" | ");
     }
 
     fetchRes() {

@@ -162,8 +162,8 @@ export class Website extends BaseResourceComponent {
                                       onValuesChange={(k, v) => this.setBlogFormValue(k, v)}
                                       onFinish={k => this.websiteFormFinish(k, "blog")}
                                 >
-                                    <Form.Item name='session_timeout' label='会话过期时间（分钟）' rules={[{required: true}]}>
-                                        <InputNumber type={"number"} min={5} placeholder=''/>
+                                    <Form.Item name='session_timeout' label='会话过期时间' rules={[{required: true}]}>
+                                        <Input suffix="分钟" style={{maxWidth:"120px"}} max={99999} type={"number"} min={5} placeholder=''/>
                                     </Form.Item>
                                     <Form.Item valuePropName="checked" name='generator_html_status' label='静态化文章页'>
                                         <Switch/>
