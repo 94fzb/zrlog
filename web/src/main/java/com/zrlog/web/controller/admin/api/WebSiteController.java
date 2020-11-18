@@ -88,9 +88,4 @@ public class WebSiteController extends BaseController {
         recordResponse.setError(0);
         return recordResponse;
     }
-
-    @RefreshCache
-    public WebSiteSettingUpdateResponse template() {
-        return update(Object.class);
-    }
 }

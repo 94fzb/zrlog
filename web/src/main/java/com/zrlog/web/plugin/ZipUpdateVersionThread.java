@@ -83,7 +83,7 @@ public class ZipUpdateVersionThread extends Thread implements Serializable, Upda
         File[] templates = templatePath.listFiles();
         if (templates != null && templates.length > 0) {
             for (File template : templates) {
-                if (template.isDirectory() && template.toString().substring(PathKit.getWebRootPath().length()).startsWith(Constants.DEFAULT_TEMPLATE_PATH)) {
+                if (template.isDirectory() && template.toString().substring(PathKit.getWebRootPath().length()).startsWith(Constants._PATH)) {
                     //skip default template folder
                     continue;
                 }

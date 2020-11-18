@@ -217,21 +217,28 @@ export class Website extends BaseResourceComponent {
                                 return (
                                     <Col md={6} xs={24}>
                                         <Badge.Ribbon
-                                            text={template.use ? this.state.res['admin.theme.inUse'] : template.inPreview ? this.state.res['admin.theme.inPreview'] : ""}
-                                            style={{display: template.use || template.inPreview ? "block" : "none"}}>
+                                            text={template.use ? this.state.res['admin.theme.inUse'] : template.preview ? this.state.res['admin.theme.inPreview'] : ""}
+                                            style={{display: template.use || template.preview ? "block" : "none"}}>
                                             <Card
                                                 style={{width: 300}}
                                                 cover={
                                                     <img
+                                                        height={343}
                                                         alt={template.name}
                                                         src={template.previewImage}
                                                     />
                                                 }
                                                 actions={[
                                                     <SettingOutlined key="setting"/>,
-                                                    <EyeOutlined key="edit"/>,
-                                                    <DeleteOutlined key="delete"/>,
-                                                    <CheckOutlined/>,
+                                                    <Link target='_blank'
+                                                          to={"/admin/template/preview?template=" + template.template}>
+                                                        <EyeOutlined key="preview"/>
+                                                    </Link>,
+                                                    <DeleteOutlined disabled={!template.deleteAble} key="delete"/>,
+                                                    <Link target='_blank'
+                                                          to={"/admin/template/apply?template=" + template.template}>
+                                                        <CheckOutlined/>,
+                                                    </Link>
                                                 ]}
                                             >
                                                 <Meta
