@@ -16,6 +16,7 @@ import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.annotation.RefreshCache;
 import com.zrlog.web.controller.BaseController;
+import com.zrlog.web.interceptor.TemplateHelper;
 import com.zrlog.web.plugin.UpdateVersionPlugin;
 
 import java.util.Map;
@@ -34,7 +35,7 @@ public class WebSiteController extends BaseController {
     }
 
     public WebSiteSettingsResponse settings() {
-        return webSiteService.loadSettings();
+        return webSiteService.loadSettings(getRequest(), TemplateHelper.getTemplatePathByCookie(getRequest().getCookies()));
     }
 
     @RefreshCache
@@ -90,6 +91,6 @@ public class WebSiteController extends BaseController {
 
     @RefreshCache
     public WebSiteSettingUpdateResponse template() {
-        return update(TemplateWebSiteRequest.class);
+        return update(Object.class);
     }
 }

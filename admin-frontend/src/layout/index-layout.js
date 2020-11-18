@@ -33,6 +33,7 @@ import Image from "antd/es/image";
 import {User} from "../components/user";
 import {UserUpdatePassword} from "../components/user-update-password";
 import * as axios from "axios";
+import {TemplateCenter} from "../components/template-center";
 
 
 const {Header, Content, Footer, Sider} = Layout;
@@ -197,6 +198,7 @@ export class IndexLayout extends BaseResourceComponent {
                                 <Route path="/admin/nav" component={Nav}/>
                                 <Route path="/admin/article" component={Article}/>
                                 <Route path="/admin/user" component={User}/>
+                                <Route path="/admin/template-center" component={TemplateCenter}/>
                                 <Route path="/admin/user-update-password" component={UserUpdatePassword}/>
                                 <Route component={NotFoundPage}/>
                             </Switch>

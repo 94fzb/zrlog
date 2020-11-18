@@ -11,6 +11,7 @@ public class TemplateVO {
     private String digest;
     private boolean deleteAble;
     private List<String> previewImages;
+    private String previewImage;
     private String author;
     private boolean configAble;
     private boolean preview;
@@ -114,5 +115,13 @@ public class TemplateVO {
 
     public void setConfigAble(boolean configAble) {
         this.configAble = configAble;
+    }
+
+    public String getPreviewImage() {
+        return previewImage;
+    }
+
+    public void setPreviewImage(String previewImage) {
+        this.previewImage = previewImage;
     }
 }

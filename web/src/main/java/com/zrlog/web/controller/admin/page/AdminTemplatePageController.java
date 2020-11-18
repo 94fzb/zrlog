@@ -28,11 +28,6 @@ public class AdminTemplatePageController extends BaseController {
 
     private final TemplateService templateService = new TemplateService();
 
-    public String index() {
-        setAttr("templates", templateService.getAllTemplates(getRequest().getContextPath(), TemplateHelper.getTemplatePathByCookie(getRequest().getCookies())));
-        return "/admin/template";
-    }
-
     public String config() {
         String templateName = getPara("template");
         setAttr("templateInfo", templateService.getTemplateVO(JFinal.me().getContextPath(), new File(PathKit.getWebRootPath() + templateName)));
@@ -55,6 +50,7 @@ public class AdminTemplatePageController extends BaseController {
         if (template != null) {
             Cookie cookie = new Cookie("template", template);
             cookie.setPath("/");
+            cookie.setHttpOnly(true);
             getResponse().addCookie(cookie);
             redirect(WebTools.getHomeUrl(getRequest()));
         } else {

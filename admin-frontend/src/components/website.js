@@ -2,7 +2,7 @@ import React from "react";
 import axios from "axios";
 
 import {BaseResourceComponent} from "./base-resource-component";
-import {message, Tabs} from "antd";
+import {Card, Badge, message, Tabs} from "antd";
 import Title from "antd/lib/typography/Title";
 import Form from "antd/es/form";
 import Input from "antd/es/input";
@@ -15,6 +15,17 @@ import {Spin} from "antd/es";
 import Switch from "antd/es/switch";
 import Select from "antd/es/select";
 import InputNumber from "antd/lib/input-number";
+import {
+    CheckOutlined,
+    DeleteColumnOutlined,
+    DeleteOutlined,
+    EditOutlined,
+    EllipsisOutlined, EyeOutlined,
+    SettingOutlined
+} from "@ant-design/icons";
+import Meta from "antd/es/card/Meta";
+import Avatar from "antd/es/avatar/avatar";
+import {Link} from "react-router-dom";
 
 const {Option} = Select;
 
@@ -36,6 +47,7 @@ export class Website extends BaseResourceComponent {
 
     initState() {
         return {
+            templates: [],
             settingsLoading: true
         }
     }
@@ -71,6 +83,9 @@ export class Website extends BaseResourceComponent {
             }
             this.setState({
                 settingsLoading: false
+            })
+            this.setState({
+                templates: data.data.templates
             })
         })
     }
@@ -163,7 +178,8 @@ export class Website extends BaseResourceComponent {
                                       onFinish={k => this.websiteFormFinish(k, "blog")}
                                 >
                                     <Form.Item name='session_timeout' label='会话过期时间' rules={[{required: true}]}>
-                                        <Input suffix="分钟" style={{maxWidth:"120px"}} max={99999} type={"number"} min={5} placeholder=''/>
+                                        <Input suffix="分钟" style={{maxWidth: "120px"}} max={99999} type={"number"}
+                                               min={5} placeholder=''/>
                                     </Form.Item>
                                     <Form.Item valuePropName="checked" name='generator_html_status' label='静态化文章页'>
                                         <Switch/>
@@ -175,13 +191,13 @@ export class Website extends BaseResourceComponent {
                                         <Switch/>
                                     </Form.Item>
                                     <Form.Item name='language' label='语言'>
-                                        <Select style={{maxWidth:"100px"}}>
+                                        <Select style={{maxWidth: "100px"}}>
                                             <Option value='zh_CN'>{this.state.res['languageChinese']}</Option>
                                             <Option value='en_US'>{this.state.res['languageEnglish']}</Option>
                                         </Select>
                                     </Form.Item>
                                     <Form.Item name='article_route' label='文章路由'>
-                                        <Select style={{maxWidth:"100px"}}>
+                                        <Select style={{maxWidth: "100px"}}>
                                             <Option value=''>默认</Option>
                                             <Option value='post'>post</Option>
                                         </Select>
@@ -194,7 +210,44 @@ export class Website extends BaseResourceComponent {
                         </Row>
                     </TabPane>
                     <TabPane tab="主题设置" key="template">
-
+                        <Title level={4}>主题设置</Title>
+                        <Divider/>
+                        <Row gutter={[8, 8]}>
+                            {this.state.templates.map((template) => {
+                                return (
+                                    <Col md={6} xs={24}>
+                                        <Badge.Ribbon
+                                            text={template.use ? this.state.res['admin.theme.inUse'] : template.inPreview ? this.state.res['admin.theme.inPreview'] : ""}
+                                            style={{display: template.use || template.inPreview ? "block" : "none"}}>
+                                            <Card
+                                                style={{width: 300}}
+                                                cover={
+                                                    <img
+                                                        alt={template.name}
+                                                        src={template.previewImage}
+                                                    />
+                                                }
+                                                actions={[
+                                                    <SettingOutlined key="setting"/>,
+                                                    <EyeOutlined key="edit"/>,
+                                                    <DeleteOutlined key="delete"/>,
+                                                    <CheckOutlined/>,
+                                                ]}
+                                            >
+                                                <Meta
+                                                    title={template.name}
+                                                    description={template.digest}
+                                                />
+                                            </Card>
+                                        </Badge.Ribbon>
+                                    </Col>
+                                )
+                            })}
+                        </Row>
+                        <Divider/>
+                        <Link to='/admin/template-center'>
+                            <Button type={"primary"}>{this.state.res['admin.theme.download']}</Button>
+                        </Link>
                     </TabPane>
                     <TabPane tab="其他设置" key="other">
                         <Row>
@@ -232,7 +285,7 @@ export class Website extends BaseResourceComponent {
                                 >
                                     <Form.Item name='autoUpgradeVersion'
                                                label={this.state.res['admin.upgrade.autoCheckCycle']}>
-                                        <Select  style={{maxWidth:"100px"}} >
+                                        <Select style={{maxWidth: "100px"}}>
                                             <Select.Option key='86400' value={86400}>
                                                 {this.state.res['admin.upgrade.cycle.oneDay']}
                                             </Select.Option>

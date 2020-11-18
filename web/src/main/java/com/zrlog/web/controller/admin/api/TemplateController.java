@@ -4,21 +4,26 @@ import com.hibegin.common.util.FileUtils;
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.StringUtils;
 import com.jfinal.kit.PathKit;
+import com.zrlog.common.Constants;
 import com.zrlog.common.rest.response.StandardResponse;
+import com.zrlog.common.vo.TemplateVO;
 import com.zrlog.model.WebSite;
 import com.zrlog.business.rest.response.*;
 import com.zrlog.business.service.TemplateService;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.annotation.RefreshCache;
 import com.zrlog.web.controller.BaseController;
+import com.zrlog.web.exception.BadTemplatePathException;
+import com.zrlog.web.interceptor.TemplateHelper;
 
 import javax.servlet.http.Cookie;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class TemplateController extends BaseController {
 
@@ -33,12 +38,13 @@ public class TemplateController extends BaseController {
         Cookie cookie = new Cookie("template", "");
         cookie.setPath("/");
         cookie.setMaxAge(0);
+        cookie.setHttpOnly(true);
         getResponse().addCookie(cookie);
         return webSiteSettingUpdateResponse;
     }
 
     public WebSiteSettingUpdateResponse delete() {
-        String template = getPara("template");
+        String template = checkByWhiteList(getPara("template"));
         File file = new File(PathKit.getWebRootPath() + template);
         if (file.exists()) {
             FileUtils.deleteFile(file.toString());
@@ -46,72 +52,24 @@ public class TemplateController extends BaseController {
         return new WebSiteSettingUpdateResponse();
     }
 
-    public LoadFileResponse loadFile() throws FileNotFoundException, IllegalAccessException {
-        LoadFileResponse loadFileResponse = new LoadFileResponse();
-        loadFileResponse.setFileContent(IOUtil.getStringInputStream(new FileInputStream(PathKit.getWebRootPath() + getAndCheckInputFile())));
-        return loadFileResponse;
-    }
-
-    @RefreshCache
-    public StandardResponse saveFile() throws IllegalAccessException {
-        String filePath = getAndCheckInputFile();
-        String file = PathKit.getWebRootPath() + filePath;
-        IOUtil.writeBytesToFile(getPara("content").getBytes(), new File(file));
-        return new StandardResponse();
-    }
-
-    private String getAndCheckInputFile() throws IllegalAccessException {
-        String filePath = getPara("file");
-        return checkByWhiteList(filePath);
-    }
-
-    private String checkByWhiteList(String filePath) throws IllegalAccessException {
-        if (filePath.contains("../")) {
-            throw new IllegalAccessException("");
+    private String checkByWhiteList(String filePath) {
+        if (Objects.isNull(filePath)) {
+            throw new BadTemplatePathException("");
         }
-        if (!filePath.startsWith("/error") && !filePath.startsWith("/include")) {
-            throw new IllegalAccessException("");
+        filePath = filePath.replace("\\", "/");
+        if (filePath.contains("../")) {
+            throw new BadTemplatePathException(filePath);
+        }
+        if (!filePath.startsWith("/error") && !filePath.startsWith(Constants.TEMPLATE_BASE_PATH)) {
+            throw new BadTemplatePathException(filePath);
         }
         return filePath;
-    }
-
-    private String getAndCheckInputFilePath() throws IllegalAccessException {
-        String filePath = getPara("path");
-        return checkByWhiteList(filePath);
     }
 
     public UploadTemplateResponse upload() throws IOException {
         String uploadFieldName = "file";
         String templateName = getFile(uploadFieldName).getOriginalFileName();
         return templateService.upload(templateName, getFile(uploadFieldName).getFile());
-    }
-
-    public ListFileResponse files() throws IllegalAccessException {
-        ListFileResponse listFileResponse = new ListFileResponse();
-        listFileResponse.setFiles(templateService.getFiles(getAndCheckInputFilePath()));
-        return listFileResponse;
-    }
-
-    /**
-     * @return
-     * @deprecated 主题设置建议直接使用config方法
-     */
-    @Deprecated
-    @RefreshCache
-    public UpdateRecordResponse setting() {
-        Map<String, String[]> param = getRequest().getParameterMap();
-        String template = getPara("template");
-        Map<String, Object> settingMap = new HashMap<>();
-        for (Map.Entry<String, String[]> entry : param.entrySet()) {
-            if (!"template".equals(entry.getKey())) {
-                if (entry.getValue().length > 1) {
-                    settingMap.put(entry.getKey(), entry.getValue());
-                } else {
-                    settingMap.put(entry.getKey(), entry.getValue()[0]);
-                }
-            }
-        }
-        return templateService.save(template, settingMap);
     }
 
     @RefreshCache

@@ -1,14 +1,17 @@
 package com.zrlog.business.rest.response;
 
 import com.zrlog.business.rest.base.*;
+import com.zrlog.common.vo.TemplateVO;
+
+import java.util.List;
 
 public class WebSiteSettingsResponse {
 
     private BasicWebSiteRequest basic;
     private BlogWebSiteRequest blog;
     private OtherWebSiteRequest other;
-    private TemplateWebSiteRequest template;
     private UpgradeWebSiteRequest upgrade;
+    private List<TemplateVO> templates;
 
     public BasicWebSiteRequest getBasic() {
         return basic;
@@ -34,19 +37,19 @@ public class WebSiteSettingsResponse {
         this.other = other;
     }
 
-    public TemplateWebSiteRequest getTemplate() {
-        return template;
-    }
-
-    public void setTemplate(TemplateWebSiteRequest template) {
-        this.template = template;
-    }
-
     public UpgradeWebSiteRequest getUpgrade() {
         return upgrade;
     }
 
     public void setUpgrade(UpgradeWebSiteRequest upgrade) {
         this.upgrade = upgrade;
+    }
+
+    public List<TemplateVO> getTemplates() {
+        return templates;
+    }
+
+    public void setTemplates(List<TemplateVO> templates) {
+        this.templates = templates;
     }
 }

@@ -104,6 +104,9 @@ public class TemplateService {
                             images[i] = contextPath + templatePath + "/" + image;
                         }
                     }
+                    if (images.length > 0) {
+                        templateVO.setPreviewImage(images[0]);
+                    }
                     templateVO.setPreviewImages(Arrays.asList(images));
                 }
             } catch (IOException e) {

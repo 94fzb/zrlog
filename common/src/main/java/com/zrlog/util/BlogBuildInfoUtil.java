@@ -60,7 +60,7 @@ public class BlogBuildInfoUtil {
             buildId = "0000000";
         }
         if (version == null) {
-            version = "1.0.0-SNAPSHOT";
+            version = "2.1.15-SNAPSHOT";
         }
     }
 
