@@ -1,11 +1,11 @@
-package com.zrlog.web.controller.blog;
+package com.zrlog.web.controller.blog.api;
 
 import com.jfinal.core.Controller;
 import com.jfinal.kit.PathKit;
-import com.zrlog.common.rest.response.StandardResponse;
-import com.zrlog.business.type.TestConnectDbResult;
+import com.zrlog.business.exception.InstallException;
 import com.zrlog.business.service.InstallService;
-import com.zrlog.util.I18nUtil;
+import com.zrlog.business.type.TestConnectDbResult;
+import com.zrlog.common.rest.response.StandardResponse;
 import com.zrlog.web.config.ZrLogConfig;
 
 import java.util.HashMap;
@@ -23,12 +23,10 @@ public class ApiInstallController extends Controller {
      */
     public StandardResponse testDbConn() {
         TestConnectDbResult testConnectDbResult = new InstallService(PathKit.getWebRootPath() + "/WEB-INF", getDbConn()).testDbConn();
-        StandardResponse standardResponse = new StandardResponse();
         if (testConnectDbResult.getError() != 0) {
-            standardResponse.setMessage("[Error-" + testConnectDbResult.getError() + "] - " + I18nUtil.getStringFromRes("connectDbError_" + testConnectDbResult.getError()));
-            standardResponse.setError(1);
+            throw new InstallException(testConnectDbResult);
         }
-        return standardResponse;
+        return new StandardResponse();
     }
 
     private Map<String, String> getDbConn() {
@@ -51,14 +49,11 @@ public class ApiInstallController extends Controller {
         configMsg.put("username", getPara("username"));
         configMsg.put("password", getPara("password"));
         configMsg.put("email", getPara("email"));
-        StandardResponse standardResponse = new StandardResponse();
-        if (new InstallService(PathKit.getWebRootPath() + "/WEB-INF", getDbConn(), configMsg).install()) {
-            //通知启动插件，配置库连接等操作
-            ZrLogConfig.getZrLogConfig().installFinish();
-        } else {
-            standardResponse.setMessage("[Error-" + TestConnectDbResult.UNKNOWN.getError() + "] - " + I18nUtil.getStringFromRes("connectDbError_" + TestConnectDbResult.UNKNOWN.getError()));
-            standardResponse.setError(1);
+        if (!new InstallService(PathKit.getWebRootPath() + "/WEB-INF", getDbConn(), configMsg).install()) {
+            throw new InstallException(TestConnectDbResult.UNKNOWN);
         }
-        return standardResponse;
+        //通知启动插件，配置库连接等操作
+        ZrLogConfig.getZrLogConfig().installFinish();
+        return new StandardResponse();
     }
 }

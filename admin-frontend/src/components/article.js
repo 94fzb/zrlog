@@ -144,7 +144,7 @@ export class Article extends BaseTableComponent {
                     </Col>
                 </Row>
 
-                <Table style={{minWidth: "1200px"}} onChange={this.onShowSizeChange} columns={this.state.columns}
+                <Table bordered style={{minWidth: "1200px"}} onChange={this.onShowSizeChange} columns={this.state.columns}
                        pagination={pagination} dataSource={rows}/>
             </Spin>
         )

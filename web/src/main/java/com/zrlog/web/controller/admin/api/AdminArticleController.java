@@ -1,6 +1,7 @@
 package com.zrlog.web.controller.admin.api;
 
 import com.zrlog.business.cache.CacheService;
+import com.zrlog.business.exception.NotFindResourceException;
 import com.zrlog.business.rest.request.CreateArticleRequest;
 import com.zrlog.business.rest.request.UpdateArticleRequest;
 import com.zrlog.business.rest.response.ArticleGlobalResponse;
@@ -55,10 +56,14 @@ public class AdminArticleController extends BaseController {
 
     public Log detail() {
         if (getPara("id") == null) {
-            return null;
+            throw new NotFindResourceException();
         }
         Integer logId = Integer.parseInt(getPara("id"));
-        return new Log().adminFindByIdOrAlias(logId);
+        Log log = new Log().adminFindByIdOrAlias(logId);
+        if (log == null) {
+            throw new NotFindResourceException();
+        }
+        return log;
     }
 
 }

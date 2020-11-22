@@ -1,13 +1,12 @@
 package com.zrlog.business.rest.response;
 
-import com.zrlog.common.rest.response.StandardResponse;
-
-public class UpgradeProcessResponse extends StandardResponse {
+public class UpgradeProcessResponse {
 
     private boolean finish;
     private String buildId;
     private String version;
     private boolean needRestart;
+    private String message;
 
     public boolean isNeedRestart() {
         return needRestart;
@@ -39,5 +38,13 @@ public class UpgradeProcessResponse extends StandardResponse {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

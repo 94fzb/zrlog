@@ -1,4 +1,4 @@
-package com.zrlog.web.controller.blog;
+package com.zrlog.web.controller.blog.page;
 
 import com.hibegin.common.util.IOUtil;
 import com.jfinal.core.Controller;

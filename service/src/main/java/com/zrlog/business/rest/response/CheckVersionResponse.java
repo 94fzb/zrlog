@@ -1,21 +1,20 @@
 package com.zrlog.business.rest.response;
 
 
-import com.zrlog.common.rest.response.StandardResponse;
 import com.zrlog.common.vo.Version;
 
 import java.io.Serializable;
 
-public class CheckVersionResponse extends StandardResponse implements Serializable {
+public class CheckVersionResponse implements Serializable {
 
-    private boolean upgrade;
+    private Boolean upgrade;
     private Version version;
 
-    public boolean isUpgrade() {
+    public Boolean getUpgrade() {
         return upgrade;
     }
 
-    public void setUpgrade(boolean upgrade) {
+    public void setUpgrade(Boolean upgrade) {
         this.upgrade = upgrade;
     }
 

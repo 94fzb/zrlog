@@ -1,8 +1,6 @@
 package com.zrlog.business.rest.response;
 
-import com.zrlog.common.rest.response.StandardResponse;
-
-public class UploadFileResponse extends StandardResponse {
+public class UploadFileResponse {
     private String url;
 
     public String getUrl() {

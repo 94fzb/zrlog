@@ -1,4 +1,4 @@
-package com.zrlog.web.controller.blog;
+package com.zrlog.web.controller.blog.api;
 
 import com.jfinal.core.Controller;
 import com.zrlog.common.Constants;

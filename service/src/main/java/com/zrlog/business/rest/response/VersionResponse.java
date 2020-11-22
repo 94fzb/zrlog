@@ -1,8 +1,6 @@
 package com.zrlog.business.rest.response;
 
-import com.zrlog.common.rest.response.StandardResponse;
-
-public class VersionResponse extends StandardResponse {
+public class VersionResponse {
 
     private String version;
     private String buildId;

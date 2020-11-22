@@ -138,7 +138,7 @@
                                 var json = uploadIframe.contentWindow.document.body.innerHTML.replace(/<[^>]+>/g, "");
                                 json = (typeof JSON.parse !== "undefined") ? JSON.parse(json) : eval("(" + json + ")");
                                 if (json.error === 0) {
-                                    dialog.find("[data-url]").val(json.url);
+                                    dialog.find("[data-url]").val(json.data.url);
                                 }
                                 else {
                                     alert(json.message);

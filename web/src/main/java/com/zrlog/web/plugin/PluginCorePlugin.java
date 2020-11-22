@@ -13,8 +13,8 @@ import java.io.File;
  */
 public class PluginCorePlugin implements IPlugin {
 
-    private String dbPropertiesPath;
-    private String pluginJvmArgs;
+    private final String dbPropertiesPath;
+    private final String pluginJvmArgs;
 
     public PluginCorePlugin(String dbPropertiesPath, String pluginJvmArgs) {
         this.dbPropertiesPath = dbPropertiesPath;

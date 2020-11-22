@@ -52,15 +52,15 @@ public class ArticleService {
     private CreateOrUpdateArticleResponse save(AdminTokenVO adminTokenVO, CreateArticleRequest createArticleRequest) {
         Log log = getLog(adminTokenVO, createArticleRequest);
         new Tag().refreshTag();
+        if (createArticleRequest instanceof UpdateArticleRequest) {
+            log.update();
+        } else {
+            log.save();
+        }
         CreateOrUpdateArticleResponse updateLogResponse = new CreateOrUpdateArticleResponse();
         updateLogResponse.setId(log.getInt("logId"));
         updateLogResponse.setAlias(log.getStr("alias"));
         updateLogResponse.setDigest(log.getStr("digest"));
-        if (createArticleRequest instanceof UpdateArticleRequest) {
-            updateLogResponse.setError(log.update() ? 0 : 1);
-        } else {
-            updateLogResponse.setError(log.save() ? 0 : 1);
-        }
         updateLogResponse.setThumbnail(log.getStr("thumbnail"));
         return updateLogResponse;
     }
@@ -115,7 +115,7 @@ public class ArticleService {
             articleId = new Log().findMaxId() + 1;
             log.set("releaseTime", new Date());
         }
-        if (createArticleRequest.getAlias() == null) {
+        if (StringUtils.isEmpty(createArticleRequest.getAlias())) {
             alias = Integer.toString(articleId);
         } else {
             alias = createArticleRequest.getAlias();

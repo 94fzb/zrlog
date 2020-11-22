@@ -52,10 +52,6 @@ public class ZrLogConfig extends JFinalConfig {
     public static String JDBC_URL_BASE_QUERY_PARAM = "characterEncoding=UTF-8&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=GMT";
 
     /**
-     * 读取系统参数
-     */
-
-    /**
      * 存放为config的属性，是为了安装完成后还获得JFinal的插件列表对象
      */
     private Plugins plugins;

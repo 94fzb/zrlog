@@ -63,17 +63,8 @@ public class CommentService {
                             .set("user_agent", createCommentRequest.getUserAgent())
                             .set("reply_id", createCommentRequest.getReplyId())
                             .set("commTime", new Date()).set("hide", 1).save();
-                } else {
-                    createCommentResponse.setError(1);
-                    createCommentResponse.setMessage("");
                 }
-            } else {
-                createCommentResponse.setError(1);
-                createCommentResponse.setMessage("");
             }
-        } else {
-            createCommentResponse.setError(1);
-            createCommentResponse.setMessage("");
         }
         Log log = new Log().findByIdOrAlias(createCommentRequest.getLogId());
         if (log != null) {

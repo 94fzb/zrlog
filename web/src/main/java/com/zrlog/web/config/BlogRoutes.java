@@ -1,7 +1,11 @@
 package com.zrlog.web.config;
 
 import com.jfinal.config.Routes;
-import com.zrlog.web.controller.blog.*;
+import com.zrlog.web.controller.blog.api.ApiArticleController;
+import com.zrlog.web.controller.blog.api.ApiInstallController;
+import com.zrlog.web.controller.blog.api.BlogApiPublicController;
+import com.zrlog.web.controller.blog.page.ArticleController;
+import com.zrlog.web.controller.blog.page.InstallController;
 
 import static com.zrlog.web.config.ZrLogConfig.INSTALL_ROUTER_PATH;
 

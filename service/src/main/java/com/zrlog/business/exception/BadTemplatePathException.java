@@ -1,4 +1,4 @@
-package com.zrlog.web.exception;
+package com.zrlog.business.exception;
 
 import com.zrlog.common.exception.AbstractBusinessException;
 
@@ -6,8 +6,8 @@ public class BadTemplatePathException extends AbstractBusinessException {
 
     private final String templatePath;
 
-    public BadTemplatePathException(String templatePaht) {
-        this.templatePath = templatePaht;
+    public BadTemplatePathException(String templatePath) {
+        this.templatePath = templatePath;
     }
 
     @Override

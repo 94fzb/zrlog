@@ -2,8 +2,8 @@ package com.zrlog.web.controller.admin.api;
 
 import com.hibegin.common.util.BeanUtil;
 import com.hibegin.common.util.StringUtils;
-import com.zrlog.business.rest.request.UpdatePasswordRequest;
 import com.zrlog.business.rest.request.UpdateAdminRequest;
+import com.zrlog.business.rest.request.UpdatePasswordRequest;
 import com.zrlog.business.rest.response.UpdateRecordResponse;
 import com.zrlog.business.rest.response.UserBasicInfoResponse;
 import com.zrlog.business.service.UserService;
@@ -32,13 +32,8 @@ public class AdminUserController extends BaseController {
             if (StringUtils.isEmpty(updateAdminRequest.getUserName())) {
                 updateRecordResponse.setError(1);
             } else {
-                if (ZrLogUtil.isPreviewMode() && !System.getenv("DEFAULT_USERNAME").equals(updateAdminRequest.getUserName())) {
-                    return errorUpdateRecordResponse();
-                } else {
-                    updateAdminRequest.setUserId(AdminTokenThreadLocal.getUserId());
-                    userService.update(updateAdminRequest);
-                    updateRecordResponse.setMessage(I18nUtil.getStringFromRes("updatePersonInfoSuccess"));
-                }
+                userService.update(AdminTokenThreadLocal.getUserId(), updateAdminRequest);
+                updateRecordResponse.setMessage(I18nUtil.getStringFromRes("updatePersonInfoSuccess"));
             }
         } else {
             updateRecordResponse.setError(1);
@@ -47,17 +42,6 @@ public class AdminUserController extends BaseController {
     }
 
     public UpdateRecordResponse updatePassword() {
-        if (ZrLogUtil.isPreviewMode()) {
-            return errorUpdateRecordResponse();
-        } else {
-            return userService.updatePassword(AdminTokenThreadLocal.getUserId(), ZrLogUtil.convertRequestBody(getRequest(), UpdatePasswordRequest.class));
-        }
-    }
-
-    private UpdateRecordResponse errorUpdateRecordResponse() {
-        UpdateRecordResponse updateRecordResponse = new UpdateRecordResponse();
-        updateRecordResponse.setError(1);
-        updateRecordResponse.setMessage(I18nUtil.getStringFromRes("permissionError"));
-        return updateRecordResponse;
+        return userService.updatePassword(AdminTokenThreadLocal.getUserId(), ZrLogUtil.convertRequestBody(getRequest(), UpdatePasswordRequest.class));
     }
 }

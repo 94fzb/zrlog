@@ -2,11 +2,12 @@ package com.zrlog.web.controller.admin.api;
 
 import com.zrlog.business.rest.request.LoginRequest;
 import com.zrlog.business.rest.response.LoginResponse;
+import com.zrlog.business.rest.response.StatisticsInfoResponse;
 import com.zrlog.business.rest.response.UpdateRecordResponse;
+import com.zrlog.business.service.UserService;
 import com.zrlog.model.Comment;
 import com.zrlog.model.Log;
 import com.zrlog.model.User;
-import com.zrlog.business.service.UserService;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.annotation.RefreshCache;
 import com.zrlog.web.config.ZrLogConfig;
@@ -27,12 +28,10 @@ public class AdminController extends BaseController {
 
     public LoginResponse login() {
         LoginRequest loginRequest = ZrLogUtil.convertRequestBody(getRequest(), LoginRequest.class);
-        LoginResponse login = userService.login(loginRequest);
-        if (login.getError() == 0) {
-            adminTokenService.setAdminToken(new User().getUserByUserName(loginRequest.getUserName().toLowerCase()),
-                    sessionAtomicInteger.incrementAndGet(), loginRequest.getHttps() ? "https" : "http", getRequest(), getResponse());
-        }
-        return login;
+        userService.login(loginRequest);
+        adminTokenService.setAdminToken(new User().getUserByUserName(loginRequest.getUserName().toLowerCase()),
+                sessionAtomicInteger.incrementAndGet(), loginRequest.getHttps() ? "https" : "http", getRequest(), getResponse());
+        return new LoginResponse();
     }
 
     /**
@@ -50,12 +49,12 @@ public class AdminController extends BaseController {
         return info;
     }
 
-    public Map<String, Object> statisticsInfo() {
-        Map<String, Object> info = new HashMap<>();
-        info.put("commCount", new Comment().count());
-        info.put("toDayCommCount", new Comment().countToDayComment());
-        info.put("clickCount", new Log().sumClick());
-        info.put("articleCount", new Log().adminCount());
+    public StatisticsInfoResponse statisticsInfo() {
+        StatisticsInfoResponse info = new StatisticsInfoResponse();
+        info.setCommCount(new Comment().count());
+        info.setToDayCommCount(new Comment().countToDayComment());
+        info.setClickCount(new Log().sumClick().longValue());
+        info.setArticleCount(new Log().adminCount());
         return info;
     }
 }

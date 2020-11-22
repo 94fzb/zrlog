@@ -39,7 +39,7 @@ export class User extends BaseResourceComponent {
         const {status} = info.file;
         if (status === 'done') {
             message.success(`${info.file.response.url} file uploaded successfully.`);
-            this.state.basic.header = info.file.response.url;
+            this.state.basic.header = info.file.response.data.url;
             this.setValue(this.state.basic);
         } else if (status === 'error') {
             message.error(`${info.file.name} file upload failed.`);

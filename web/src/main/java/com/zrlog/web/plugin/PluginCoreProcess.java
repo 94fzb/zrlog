@@ -22,7 +22,7 @@ public class PluginCoreProcess {
 
     private Process pr;
     private boolean canStart = true;
-    private static PluginCoreProcess instance = new PluginCoreProcess();
+    private static final PluginCoreProcess instance = new PluginCoreProcess();
 
     private PluginCoreProcess() {
     }

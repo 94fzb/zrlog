@@ -1,8 +1,6 @@
 package com.zrlog.business.rest.response;
 
-import com.zrlog.common.rest.response.StandardResponse;
-
-public class CreateOrUpdateArticleResponse extends StandardResponse {
+public class CreateOrUpdateArticleResponse {
 
     private int id;
     private String alias;

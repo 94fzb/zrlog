@@ -269,7 +269,7 @@ public class InstallService {
         for (int i = 0; i < defaultMap.size(); i++) {
             sb.append("(").append("?").append(",").append("?").append(",NULL),");
         }
-        String insertWebSql = sb.toString().substring(0, sb.toString().length() - 1);
+        String insertWebSql = sb.substring(0, sb.toString().length() - 1);
         try (PreparedStatement ps = connect.prepareStatement(insertWebSql)) {
             int i = 1;
             for (Map.Entry<String, Object> e : defaultMap.entrySet()) {

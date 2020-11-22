@@ -1,4 +1,4 @@
-package com.zrlog.web.controller.blog;
+package com.zrlog.web.controller.blog.page;
 
 import com.zrlog.business.cache.CacheService;
 import com.zrlog.business.rest.request.CreateCommentRequest;
@@ -113,7 +113,7 @@ public class ArticleController extends BaseController {
         redirect("/" + Constants.getArticleUri() + response.getAlias() + ext);
     }
 
-    CreateCommentResponse saveComment() {
+    public CreateCommentResponse saveComment() {
         CreateCommentRequest createCommentRequest = ZrLogUtil.convertRequestParam(getRequest().getParameterMap(), CreateCommentRequest.class);
         createCommentRequest.setIp(WebTools.getRealIp(getRequest()));
         createCommentRequest.setUserAgent(Jsoup.clean(getHeader("User-Agent"), Whitelist.basic()));

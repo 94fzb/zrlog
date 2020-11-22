@@ -1,16 +1,14 @@
 package com.zrlog.business.rest.response;
 
-import com.zrlog.common.rest.response.StandardResponse;
+public class DownloadUpdatePackageResponse {
 
-public class DownloadUpdatePackageResponse extends StandardResponse {
+    private Integer process;
 
-    private int process;
-
-    public int getProcess() {
+    public Integer getProcess() {
         return process;
     }
 
-    public void setProcess(int process) {
+    public void setProcess(Integer process) {
         this.process = process;
     }
 }

@@ -18,7 +18,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class RequestStatisticsPlugin implements IPlugin {
 
-    private ScheduledExecutorService clickSchedule = new ScheduledThreadPoolExecutor(1, new ThreadFactory() {
+    private final ScheduledExecutorService clickSchedule = new ScheduledThreadPoolExecutor(1, new ThreadFactory() {
         @Override
         public Thread newThread(Runnable r) {
             Thread thread = new Thread(r);
@@ -26,7 +26,7 @@ public class RequestStatisticsPlugin implements IPlugin {
             return thread;
         }
     });
-    private ScheduledExecutorService saveSchedule = new ScheduledThreadPoolExecutor(1, new ThreadFactory() {
+    private final ScheduledExecutorService saveSchedule = new ScheduledThreadPoolExecutor(1, new ThreadFactory() {
         @Override
         public Thread newThread(Runnable r) {
             Thread thread = new Thread(r);
@@ -44,7 +44,7 @@ public class RequestStatisticsPlugin implements IPlugin {
 
     private static List<RequestInfo> requestInfoList = Collections.synchronizedList(new ArrayList<>());
     private static Set<String> visitArticleSet = Collections.synchronizedSet(new HashSet<>());
-    private ReentrantLock lock = new ReentrantLock();
+    private final ReentrantLock lock = new ReentrantLock();
 
 
     @Override

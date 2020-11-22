@@ -13,8 +13,8 @@ import java.net.Socket;
 class PluginGhostThread extends Thread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PluginGhostThread.class);
-    private int port;
-    private String host;
+    private final int port;
+    private final String host;
 
     private boolean stop;
 

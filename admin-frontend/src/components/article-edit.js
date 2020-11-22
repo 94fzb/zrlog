@@ -69,6 +69,7 @@ export class ArticleEdit extends BaseResourceComponent {
         });
     };
 
+
     getEditorConfig() {
         return {
             codeFold: true,
@@ -95,10 +96,10 @@ export class ArticleEdit extends BaseResourceComponent {
                 const jquery = $;
                 e.setValue(jquery("#markdown").text());
                 jquery("#fileDialog").on("click", function () {
-                    editor.executePlugin("fileDialog", "../plugins/file-dialog/file-dialog");
+                    editor.executePlugin("fileDialog", "file-dialog/file-dialog");
                 });
                 jquery("#videoDialog").on("click", function () {
-                    editor.executePlugin("videoDialog", "../plugins/video-dialog/video-dialog");
+                    editor.executePlugin("videoDialog", "video-dialog/video-dialog");
                 });
                 jquery("#copPreviewHtmlToClipboard").on("click", function () {
                     function copyToClipboard(html) {
@@ -151,7 +152,9 @@ export class ArticleEdit extends BaseResourceComponent {
                 message.info(this.state.res['releaseSuccess']);
             }
             this.setValue({
-                "logId": data.id
+                "logId": data.data.id,
+                "digest": data.data.digest,
+                "alias": data.data.alias
             })
         })
     }
@@ -193,7 +196,7 @@ export class ArticleEdit extends BaseResourceComponent {
         if (status === 'done') {
             message.success(`${info.file.response.url} file uploaded successfully.`);
             this.setValue({
-                thumbnail: info.file.response.url
+                thumbnail: info.file.response.data.url
             });
         } else if (status === 'error') {
             message.error(`${info.file.name} file upload failed.`);
@@ -307,7 +310,7 @@ export class ArticleEdit extends BaseResourceComponent {
                                 <Col span={24}>
                                     <Card size="small" title={this.state.res.digest}>
                                         <Form.Item name='digest'>
-                                            <TextArea rows={3}/>
+                                            <TextArea placeholder={this.state.res.digestTips} rows={3}/>
                                         </Form.Item>
                                     </Card>
                                 </Col>
