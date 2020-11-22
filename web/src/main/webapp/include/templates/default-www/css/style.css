@@ -52,7 +52,6 @@ section article li sup a, section .content sup a {
     text-decoration: none;
 }
 
-section p a:hover,
 section .content table {
     border-left: 1px solid #CCCCCC;
     border-top: 1px solid #CCCCCC;

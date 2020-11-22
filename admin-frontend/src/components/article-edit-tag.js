@@ -80,7 +80,12 @@ export class ArticleEditTag extends BaseResourceComponent {
 
     allTagsOnClick(e) {
         e.currentTarget.remove();
-        let tags = this.state.keywords.split(",");
+        let tags;
+        if (this.state.keywords) {
+            tags = this.state.keywords.split(",");
+        } else {
+            tags = [];
+        }
         tags.push(e.currentTarget.textContent);
         this.setState({
             keywords: tags.join(',')
@@ -103,18 +108,16 @@ export class ArticleEditTag extends BaseResourceComponent {
     render() {
         const {inputVisible, inputValue} = this.state;
         let tagChild;
-        if (this.props.keywords !== undefined && this.props.keywords !== '') {
-            if (this.state.keywords === undefined) {
-                this.state.keywords = this.props.keywords;
-            }
-            if (this.state.keywords !== undefined && this.state.keywords != null) {
-                let newTags = Array.from(new Set(this.state.keywords.split(",").filter(x => x !== '')));
-                this.state.keywords = newTags.join(",");
-                tagChild = newTags.map(this.forMap);
-            } else {
-                this.state.keywords = '';
-                tagChild = [].map(this.forMap);
-            }
+        if (this.state.keywords === '') {
+            this.state.keywords = this.props.keywords;
+        }
+        if (this.state.keywords !== undefined && this.state.keywords != null) {
+            let newTags = Array.from(new Set(this.state.keywords.split(",").filter(x => x !== '')));
+            this.state.keywords = newTags.join(",");
+            tagChild = newTags.map(this.forMap);
+        } else {
+            this.state.keywords = '';
+            tagChild = [].map(this.forMap);
         }
         const allTagChild = this.props.allTags.map(this.tagForMap);
         return (
@@ -134,8 +137,9 @@ export class ArticleEditTag extends BaseResourceComponent {
                         leave={{opacity: 0, width: 0, scale: 0, duration: 200}}
                         appear={false}
                     >
-                        {tagChild}
+
                     </TweenOneGroup>
+                    {tagChild}
 
                 </div>
                 {inputVisible && (

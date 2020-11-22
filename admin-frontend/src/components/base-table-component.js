@@ -22,6 +22,8 @@ export class BaseTableComponent extends BaseResourceComponent {
                 tableLoading: false,
                 pagination: {
                     total: data.data.totalElements,
+                    key: query.key,
+                    current: query.page
                 },
                 rows: data.data.rows
             };

@@ -8,15 +8,12 @@ import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.config.ZrLogConfig;
 import com.zrlog.web.util.WebTools;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
 public class BlogApiPublicController extends Controller {
 
-    public Map<String, Object> resource() throws UnsupportedEncodingException {
+    public Map<String, Object> resource() {
         Map<String, Object> stringObjectMap = I18nUtil.threadLocal.get();
         stringObjectMap.put("currentVersion", BlogBuildInfoUtil.getVersion());
         stringObjectMap.put("websiteTitle", Constants.WEB_SITE.get("title"));
