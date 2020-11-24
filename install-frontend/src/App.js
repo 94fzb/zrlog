@@ -84,6 +84,7 @@ class App extends React.Component {
                 loading: false,
                 installDone: installed
             });
+            document.title = this.state.res.installWizard;
         })
     }
 
