@@ -38,7 +38,9 @@ export class ArticleEdit extends BaseResourceComponent {
             types: [],
             tags: [],
             globalLoading: true,
-            article: {}
+            article: {
+                keywords: ""
+            }
         }
     }
 
@@ -139,7 +141,7 @@ export class ArticleEdit extends BaseResourceComponent {
         allValues.content = this.jquery("#content").text();
         allValues.markdown = this.jquery("#markdown").text();
         allValues.keywords = this.jquery("#keywords").val();
-        allValues.thumbnail = this.state.thumbnail;
+        allValues.thumbnail = this.state.article.thumbnail;
         let uri;
         if (allValues.logId !== undefined) {
             uri = '/api/admin/article/update'
@@ -173,14 +175,13 @@ export class ArticleEdit extends BaseResourceComponent {
     }
 
     preview = async () => {
-        this.setState({
+        /*this.setState({
             article: {
                 rubbish: true
             }
-        },() => {
-            this.setValue(this.state.article);
+        }, () => {
             this.articleFrom.current.submit();
-        })
+        })*/
     }
 
     gup(name, url) {
@@ -207,7 +208,7 @@ export class ArticleEdit extends BaseResourceComponent {
     onUploadChange(info) {
         const {status} = info.file;
         if (status === 'done') {
-            message.success(`${info.file.response.url} file uploaded successfully.`);
+            message.success(`${info.file.response.data.url} file uploaded successfully.`);
             this.setValue({
                 thumbnail: info.file.response.data.url
             });
@@ -282,15 +283,15 @@ export class ArticleEdit extends BaseResourceComponent {
                                             name='imgFile'
                                             onChange={(e) => this.onUploadChange(e)}>
                                             <div id="thumbnail">
-                                                {(this.state.thumbnail === undefined ||
-                                                    this.state.thumbnail === null ||
-                                                    this.state.thumbnail === '') && (
+                                                {(this.state.article.thumbnail === undefined ||
+                                                    this.state.article.thumbnail === null ||
+                                                    this.state.article.thumbnail === '') && (
                                                     <CameraOutlined style={{fontSize: "28px"}}/>
                                                 )}
-                                                {this.state.thumbnail !== '' && (
+                                                {this.state.article.thumbnail !== '' && (
                                                     <Image
-                                                        height={this.getThumbnailHeight(this.state.thumbnail)}
-                                                        src={this.state.thumbnail}/>
+                                                        height={this.getThumbnailHeight(this.state.article.thumbnail)}
+                                                        src={this.state.article.thumbnail}/>
                                                 )}
                                             </div>
                                         </Dragger>
@@ -320,7 +321,7 @@ export class ArticleEdit extends BaseResourceComponent {
                                 </Col>
                                 <Col span={24}>
                                     <Card size="small" title={this.state.res.tag}>
-                                        <ArticleEditTag keywords={this.state.keywords}
+                                        <ArticleEditTag keywords={this.state.article.keywords}
                                                         allTags={this.state.tags.map(x => x.text)} tags={[]}/>
                                     </Card>
                                 </Col>

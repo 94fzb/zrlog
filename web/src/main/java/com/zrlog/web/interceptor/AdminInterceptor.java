@@ -12,15 +12,12 @@ import com.zrlog.common.Constants;
 import com.zrlog.common.exception.AbstractBusinessException;
 import com.zrlog.common.vo.AdminTokenVO;
 import com.zrlog.model.User;
-import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.annotation.RefreshCache;
 import com.zrlog.web.handler.BlogArticleHandler;
 import com.zrlog.web.token.AdminTokenService;
 import com.zrlog.web.token.AdminTokenThreadLocal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * 负责全部后台请求的处理（/admin/plugins/*,/api/admin/plugins/* 除外）

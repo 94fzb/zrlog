@@ -1,8 +1,5 @@
 package com.zrlog.web;
 
-import com.hibegin.common.util.StringUtils;
-import com.zrlog.common.Constants;
-
 public class WebConstants {
 
     private WebConstants() {

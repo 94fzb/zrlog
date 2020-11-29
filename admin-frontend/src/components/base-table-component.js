@@ -49,12 +49,14 @@ export class BaseTableComponent extends BaseResourceComponent {
         return null;
     }
 
-    handleDelete(key) {
+    handleDelete = (key) => {
         axios.post(this.getDeleteApiUri() + "?id=" + key).then(({data}) => {
-            if (!data.error) {
-                message.info("删除成功");
-                this.fetchData(this.state.pagination);
+            if (data.error) {
+                message.error(this.state.res['deleteError']);
+                return;
             }
+            message.info("删除成功");
+            this.fetchData(this.state.pagination);
         });
     }
 }

@@ -43,7 +43,6 @@ public class ZrLogUtil {
     }
 
 
-
     public static <T> T convertRequestParam(Map<String, String[]> requestParam, Class<T> clazz) {
         Map<String, Object> tempMap = new HashMap<>();
         for (Map.Entry<String, String[]> entry : requestParam.entrySet()) {

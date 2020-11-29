@@ -62,12 +62,7 @@ export class Comment extends BaseTableComponent {
                     title: '评论时间',
                     key: 'commTime',
                     dataIndex: 'commTime'
-                },
-                {
-                    title: '浏览',
-                    key: 'view',
-                    dataIndex: 'view'
-                },
+                }
             ]
         }
     }
@@ -94,6 +89,7 @@ export class Comment extends BaseTableComponent {
                 <Title className='page-header' level={3}>{this.getSecondTitle()}</Title>
                 <Divider/>
                 <Table bordered loading={tableLoading} onChange={this.onShowSizeChange}
+                       scroll={{x: '100vw'}}
                        columns={this.state.columns} pagination={pagination} dataSource={rows}/>
             </Spin>
         )

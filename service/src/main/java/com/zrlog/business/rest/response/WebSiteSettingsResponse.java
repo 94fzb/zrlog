@@ -1,6 +1,9 @@
 package com.zrlog.business.rest.response;
 
-import com.zrlog.business.rest.base.*;
+import com.zrlog.business.rest.base.BasicWebSiteRequest;
+import com.zrlog.business.rest.base.BlogWebSiteRequest;
+import com.zrlog.business.rest.base.OtherWebSiteRequest;
+import com.zrlog.business.rest.base.UpgradeWebSiteRequest;
 import com.zrlog.common.vo.TemplateVO;
 
 import java.util.List;

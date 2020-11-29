@@ -9,7 +9,7 @@ function Iframe(props) {
 export class TemplateCenter extends BaseResourceComponent {
 
     getSecondTitle() {
-        return null;
+        return this.state.res['templateCenter'];
     }
 
     render() {

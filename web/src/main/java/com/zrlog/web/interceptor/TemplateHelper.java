@@ -53,7 +53,7 @@ public class TemplateHelper {
 
         BaseDataInitVO baseDataInitVO = BeanUtil.cloneObject(request.getAttribute("init"));
         request.setAttribute("init", baseDataInitVO);
-        Map webSite = baseDataInitVO.getWebSite();
+        Map<String, Object> webSite = baseDataInitVO.getWebSite();
         String baseUrl = setBaseUrl(request, staticBlog, webSite);
         //过期
         request.setAttribute("webs", webSite);
