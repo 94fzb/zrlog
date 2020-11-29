@@ -42,7 +42,7 @@ class UpdateVersionTimerTask extends TimerTask {
     Version fetchLastVersion(boolean ckPreview) throws IOException, ParseException {
         String versionUrl;
         if (ckPreview) {
-            versionUrl = Constants.ZRLOG_RESOURCE_DOWNLOAD_URL + "/preview/last.version.json";
+            versionUrl = Constants.ZRLOG_RESOURCE_DOWNLOAD_URL + "/snapshot/last.version.json";
         } else {
             versionUrl = Constants.ZRLOG_RESOURCE_DOWNLOAD_URL + "/release/last.version.json";
         }
