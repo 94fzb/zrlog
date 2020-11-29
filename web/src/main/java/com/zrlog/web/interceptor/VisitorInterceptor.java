@@ -6,10 +6,11 @@ import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.jfinal.json.Json;
 import com.jfinal.kit.PathKit;
+import com.zrlog.business.service.TemplateService;
+import com.zrlog.common.exception.AbstractBusinessException;
 import com.zrlog.common.rest.response.ApiStandardResponse;
 import com.zrlog.common.rest.response.StandardResponse;
 import com.zrlog.common.vo.TemplateVO;
-import com.zrlog.business.service.TemplateService;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.config.ZrLogConfig;
 import com.zrlog.web.handler.GlobalResourceHandler;
@@ -43,8 +44,15 @@ class VisitorInterceptor implements Interceptor {
                 standardResponse.setMessage((String) ((Map) ai.getController().getAttr("_res")).get("installed"));
                 ai.getController().renderJson(standardResponse);
             } else {
-                ai.invoke();
-                ai.getController().renderJson(RenderUtils.tryWrapperToStandardResponse(ai.getReturnValue()));
+                try {
+                    ai.invoke();
+                    ai.getController().renderJson(RenderUtils.tryWrapperToStandardResponse(ai.getReturnValue()));
+                } catch (AbstractBusinessException e) {
+                    StandardResponse standardResponse = new StandardResponse();
+                    standardResponse.setError(e.getError());
+                    standardResponse.setMessage(e.getMessage());
+                    ai.getController().renderJson(e);
+                }
             }
         } else {
             if (ZrLogConfig.isInstalled()) {
