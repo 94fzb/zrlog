@@ -2,7 +2,7 @@ import React from "react";
 import axios from "axios";
 
 import {BaseResourceComponent} from "./base-resource-component";
-import {Card, Badge, message, Tabs} from "antd";
+import {Card, Badge, message, Tabs, Modal} from "antd";
 import Title from "antd/lib/typography/Title";
 import Form from "antd/es/form";
 import Input from "antd/es/input";
@@ -14,17 +14,13 @@ import TextArea from "antd/es/input/TextArea";
 import {Spin} from "antd/es";
 import Switch from "antd/es/switch";
 import Select from "antd/es/select";
-import InputNumber from "antd/lib/input-number";
 import {
     CheckOutlined,
-    DeleteColumnOutlined,
     DeleteOutlined,
-    EditOutlined,
-    EllipsisOutlined, EyeOutlined,
+    EyeOutlined,
     SettingOutlined
 } from "@ant-design/icons";
 import Meta from "antd/es/card/Meta";
-import Avatar from "antd/es/avatar/avatar";
 import {Link} from "react-router-dom";
 
 const {Option} = Select;
@@ -134,7 +130,28 @@ export class Website extends BaseResourceComponent {
         });
     }
 
+    checkNewVersion = () => {
+        axios.get("/api/admin/upgrade/checkNewVersion").then(async ({data}) => {
+            if (data.data.upgrade) {
+                const title = "V" + data.data.version.version + "-" + data.data.version.buildId + " (" + data.data.version.type + ")";
+                Modal.confirm({
+                    title: title,
+                    content: data.data.version.changeLog,
+                    okText: '确认',
+                    cancelText: '取消',
+                    onOk: function () {
+                        window.location.href = "/admin/upgrade"
+                    }
+                });
+            } else {
+                message.info(this.state.res['notFoundNewVersion'])
+            }
+        });
+    }
+
+
     render() {
+
         return (
             <Spin delay={this.getSpinDelayTime()} spinning={this.state.resLoading && this.state.settingsLoading}>
                 <Title className='page-header' level={3}>{this.getSecondTitle()}</Title>
@@ -281,7 +298,8 @@ export class Website extends BaseResourceComponent {
                     <TabPane tab={this.state.res['admin.upgrade.manage']} key="upgrade">
                         <Row>
                             <Col md={12} xs={24}>
-                                <Button type='dashed' style={{float: "right"}}>{this.state.res.checkUpgrade}</Button>
+                                <Button type='dashed' onClick={this.checkNewVersion}
+                                        style={{float: "right"}}>{this.state.res.checkUpgrade}</Button>
                             </Col>
                         </Row>
                         <Row>

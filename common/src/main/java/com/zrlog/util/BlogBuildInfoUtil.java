@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.Properties;
 
@@ -26,7 +28,7 @@ public class BlogBuildInfoUtil {
     private static String buildId;
     private static String version;
     private static Date time;
-    private static String runMode = "DEV";
+    private static String runMode = "RELEASE";
 
     static {
         Properties properties = new Properties();
@@ -60,7 +62,7 @@ public class BlogBuildInfoUtil {
             buildId = "0000000";
         }
         if (version == null) {
-            version = "2.1.15-SNAPSHOT";
+            version = "1.0.0-SNAPSHOT";
         }
     }
 
@@ -75,7 +77,8 @@ public class BlogBuildInfoUtil {
     public static Date getTime() {
         //仅存在开发环境为空
         if (time == null) {
-            return new Date();
+            return Date.from(LocalDateTime.of(2015, 3, 29, 0, 0, 0)
+                    .atZone(ZoneOffset.systemDefault()).toInstant());
         }
         return time;
     }

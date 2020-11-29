@@ -1,5 +1,6 @@
 package com.zrlog.web.controller.admin.api;
 
+import com.hibegin.common.util.StringUtils;
 import com.hibegin.common.util.http.HttpUtil;
 import com.hibegin.common.util.http.handle.DownloadProcessHandle;
 import com.jfinal.config.Plugins;
@@ -56,6 +57,11 @@ public class UpgradeController extends BaseController {
                 if (version != null) {
                     checkVersionResponse.setUpgrade(true);
                     checkVersionResponse.setVersion(version);
+                    if (StringUtils.isEmpty(version.getChangeLog())) {
+                        version.setChangeLog("- 很懒");
+                    }
+                } else {
+                    checkVersionResponse.setUpgrade(false);
                 }
             }
         }

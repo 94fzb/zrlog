@@ -34,6 +34,7 @@ import {User} from "../components/user";
 import {UserUpdatePassword} from "../components/user-update-password";
 import * as axios from "axios";
 import {TemplateCenter} from "../components/template-center";
+import {Upgrade} from "../components/upgrade";
 
 
 const {Header, Content, Footer, Sider} = Layout;
@@ -200,6 +201,7 @@ export class IndexLayout extends BaseResourceComponent {
                                 <Route path="/admin/user" component={User}/>
                                 <Route path="/admin/template-center" component={TemplateCenter}/>
                                 <Route path="/admin/user-update-password" component={UserUpdatePassword}/>
+                                <Route path="/admin/upgrade" component={Upgrade}/>
                                 <Route component={NotFoundPage}/>
                             </Switch>
                         </Content>

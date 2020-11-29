@@ -2090,6 +2090,11 @@ ansi-styles@^4.1.0:
     "@types/color-name" "^1.1.1"
     color-convert "^2.0.1"
 
+antd-prompt@0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/antd-prompt/-/antd-prompt-0.3.1.tgz#6e601b3575578e6be9121da9180c3418a83b981e"
+  integrity sha512-c1Ceg5mM365AfPbCGj6MstKiX//L5pEZf5F2DaIdbZColpBo6FrxXSBRQCqmG/+2mKGAare8GsDbdYOIY4u/LA==
+
 antd@4.6.6:
   version "4.6.6"
   resolved "https://registry.yarnpkg.com/antd/-/antd-4.6.6.tgz#79b3e22ba6ddefaa2948d00d86d2c6130b3562fb"
