@@ -90,10 +90,11 @@ export class Comment extends BaseTableComponent {
 
 
         return (
-            <Spin delay={this.getSpinDelayTime()} spinning={tableLoading}>
+            <Spin delay={this.getSpinDelayTime()} spinning={this.state.resLoading}>
                 <Title className='page-header' level={3}>{this.getSecondTitle()}</Title>
                 <Divider/>
-                <Table bordered onChange={this.onShowSizeChange} columns={this.state.columns} pagination={pagination} dataSource={rows}/>
+                <Table bordered loading={tableLoading} onChange={this.onShowSizeChange}
+                       columns={this.state.columns} pagination={pagination} dataSource={rows}/>
             </Spin>
         )
     }

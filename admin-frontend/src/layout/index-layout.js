@@ -177,10 +177,14 @@ export class IndexLayout extends BaseResourceComponent {
                                 <Col span={24}>
                                     <Dropdown overlay={this.adminSettings(this.state.res)}
                                               overlayStyle={{float: "right"}}>
-                                        <Button size='large' type='text' style={{height: "64px", float: "right"}}>
+                                        <Button size='large' type='text'
+                                                style={{color: "#ffffff", height: "64px", float: "right"}}>
                                             <Image preview={false} className="userAvatarImg"
                                                    src={this.state.basicInfo.header}/>
-                                            <Text style={{paddingLeft: "10px"}}>{this.state.basicInfo.userName}</Text>
+                                            <Text style={{
+                                                color: "#ffffff",
+                                                paddingLeft: "10px",
+                                            }}>{this.state.basicInfo.userName}</Text>
                                             <DownOutlined/>
                                         </Button>
                                     </Dropdown>

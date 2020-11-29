@@ -1,7 +1,7 @@
 import React from "react";
 
 import {BaseResourceComponent} from "./base-resource-component";
-import {Button, Form, Input, message, Typography, Card, Spin, Steps, Progress, Modal} from 'antd';
+import {Button, message, Card, Spin, Steps, Progress, Modal, Row, Col} from 'antd';
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
 import axios from "axios";
@@ -47,7 +47,7 @@ export class Upgrade extends BaseResourceComponent {
     checkRestartSuccess = () => {
         if (this.state.restartSuccess) {
             clearInterval(checkRestartTimer);
-            Modal.confirm({
+            Modal.info({
                 title: "更新成功，跳转到管理首页？",
                 content: '',
                 okText: '确认',
@@ -120,46 +120,46 @@ export class Upgrade extends BaseResourceComponent {
             <Spin spinning={this.state.resLoading}>
                 <Title className='page-header' level={3}>{this.getSecondTitle()}</Title>
                 <Divider/>
-                <Card>
-                    <div>
-                        <Steps current={current}>
-                            {this.state.steps.map(item => (
-                                <Step key={item.title} title={item.title}/>
-                            ))}
-                        </Steps>
-                        <div className="steps-content" style={{marginTop: '20px'}}>
-                            {current === 0 && (
-                                <div dangerouslySetInnerHTML={{__html: this.state.changeLog}}>
-                                </div>
-                            )}
-                            {current === 1 && (
-                                <div>
-                                    <Progress strokeLinecap="square" percent={this.state.downloadProcess}/>
-                                </div>
-                            )}
-                            {current === 2 && (
-                                <div>
-                                    <Title level={4}>正在执行更新...</Title>
-                                    <div dangerouslySetInnerHTML={{__html: this.state.upgradeMessage}}>
+                <Row>
+                    <Col md={18} xs={24}>
+                        <Card>
+                            <Steps current={current}>
+                                {this.state.steps.map(item => (
+                                    <Step key={item.title} title={item.title}/>
+                                ))}
+                            </Steps>
+                            <div className="steps-content" style={{marginTop: '20px'}}>
+                                {current === 0 && (
+                                    <div dangerouslySetInnerHTML={{__html: this.state.changeLog}}/>
+                                )}
+                                {current === 1 && (
+                                    <div>
+                                        <Progress strokeLinecap="square" percent={this.state.downloadProcess}/>
                                     </div>
-                                </div>
-                            )}
-                        </div>
-                        <div className="steps-action" style={{paddingTop: '20px'}}>
-                            {current < this.state.steps.length - 1 && (
-                                <Button type="primary" disabled={this.state.disable} onClick={() => this.next()}>
-                                    {this.state.res.installNextStep}
-                                </Button>
-                            )}
-                            {current === this.state.steps.length - 1 && (
-                                <Button type="primary"
-                                        onClick={() => message.success(this.state.res.installSuccess)}>
-                                    {this.state.res.installDone}
-                                </Button>
-                            )}
-                        </div>
-                    </div>
-                </Card>
+                                )}
+                                {current === 2 && (
+                                    <div>
+                                        <Title level={4}>正在执行更新...</Title>
+                                        <div dangerouslySetInnerHTML={{__html: this.state.upgradeMessage}}/>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="steps-action" style={{paddingTop: '20px'}}>
+                                {current < this.state.steps.length - 1 && (
+                                    <Button type="primary" disabled={this.state.disabled} onClick={() => this.next()}>
+                                        {this.state.res.installNextStep}
+                                    </Button>
+                                )}
+                                {current === this.state.steps.length - 1 && (
+                                    <Button type="primary"
+                                            onClick={() => message.success(this.state.res.installSuccess)}>
+                                        {this.state.res.installDone}
+                                    </Button>
+                                )}
+                            </div>
+                        </Card>
+                    </Col>
+                </Row>
             </Spin>
         )
     }

@@ -6,6 +6,7 @@ import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.jfinal.json.Json;
 import com.jfinal.kit.PathKit;
+import com.zrlog.business.exception.InstalledException;
 import com.zrlog.business.service.TemplateService;
 import com.zrlog.common.exception.AbstractBusinessException;
 import com.zrlog.common.rest.response.ApiStandardResponse;
@@ -38,21 +39,17 @@ class VisitorInterceptor implements Interceptor {
             ai.invoke();
             ai.getController().renderJson(RenderUtils.tryWrapperToStandardResponse(ai.getReturnValue()));
         } else if (actionKey.startsWith("/api/install")) {
-            if (ZrLogConfig.isInstalled()) {
-                StandardResponse standardResponse = new StandardResponse();
-                standardResponse.setError(1);
-                standardResponse.setMessage((String) ((Map) ai.getController().getAttr("_res")).get("installed"));
-                ai.getController().renderJson(standardResponse);
-            } else {
-                try {
-                    ai.invoke();
-                    ai.getController().renderJson(RenderUtils.tryWrapperToStandardResponse(ai.getReturnValue()));
-                } catch (AbstractBusinessException e) {
-                    StandardResponse standardResponse = new StandardResponse();
-                    standardResponse.setError(e.getError());
-                    standardResponse.setMessage(e.getMessage());
-                    ai.getController().renderJson(e);
+            try {
+                if (ZrLogConfig.isInstalled()) {
+                    throw new InstalledException();
                 }
+                ai.invoke();
+                ai.getController().renderJson(RenderUtils.tryWrapperToStandardResponse(ai.getReturnValue()));
+            } catch (AbstractBusinessException e) {
+                StandardResponse standardResponse = new StandardResponse();
+                standardResponse.setError(e.getError());
+                standardResponse.setMessage(e.getMessage());
+                ai.getController().renderJson(e);
             }
         } else {
             if (ZrLogConfig.isInstalled()) {

@@ -19,6 +19,9 @@ import {ArticleEditTag} from "./article-edit-tag";
 import {message} from "antd/es";
 import Image from "antd/es/image";
 
+import {SaveOutlined, SendOutlined} from '@ant-design/icons';
+
+
 export class ArticleEdit extends BaseResourceComponent {
 
     articleFrom = React.createRef();
@@ -124,17 +127,15 @@ export class ArticleEdit extends BaseResourceComponent {
         }
     }
 
-    setValue(changedValues) {
-        /*      console.info(changedValues);
-              const {file} = changedValues.thumbnail;
-              if (file !== undefined) {
-                  changedValues.thumbnail = this.state.thumbnail;
-              }*/
-        this.setState(changedValues);
+    setValue = (changedValues) => {
         this.articleFrom.current.setFieldsValue(changedValues);
+        this.setState({
+            article: changedValues
+        });
     }
 
-    onFinish(allValues) {
+    onFinish = async (allValues) => {
+        console.info(allValues);
         allValues.content = this.jquery("#content").text();
         allValues.markdown = this.jquery("#markdown").text();
         allValues.keywords = this.jquery("#keywords").val();
@@ -145,17 +146,22 @@ export class ArticleEdit extends BaseResourceComponent {
         } else {
             uri = '/api/admin/article/create'
         }
-        axios.post(uri, JSON.stringify(allValues)).then(({data}) => {
+        await axios.post(uri, JSON.stringify(allValues)).then(({data}) => {
             if (data.error) {
                 message.error(data.message);
+                return
+            }
+            allValues.logId = data.data.id;
+            allValues.digest = data.data.digest
+            allValues.alias = data.data.alias;
+            if (allValues.rubbish) {
+                message.info(this.state.res['saveAsDraft']);
+                window.open("/post/" + allValues.logId, '_blank');
+                allValues.rubbish = false;
             } else {
                 message.info(this.state.res['releaseSuccess']);
             }
-            this.setValue({
-                "logId": data.data.id,
-                "digest": data.data.digest,
-                "alias": data.data.alias
-            })
+            this.setValue(allValues);
         })
     }
 
@@ -166,8 +172,15 @@ export class ArticleEdit extends BaseResourceComponent {
         return this.state.res['articleRoute'];
     }
 
-    preview() {
-        this.onFinish();
+    preview = async () => {
+        this.setState({
+            article: {
+                rubbish: true
+            }
+        },() => {
+            this.setValue(this.state.article);
+            this.articleFrom.current.submit();
+        })
     }
 
     gup(name, url) {
@@ -221,9 +234,14 @@ export class ArticleEdit extends BaseResourceComponent {
                         <Col span={24}>
                             <div style={{float: "right"}}>
                                 <Space size={5}>
-                                    {/*<Button type="ghost">{this.state.res.preview}</Button>*/}
+                                    <Button type="ghost" onClick={this.preview}>
+                                        <SaveOutlined/>
+                                        {this.state.res.preview}
+                                    </Button>
                                     <Button type='primary' enterButton
-                                            htmlType='submit'>{this.state.res.release}</Button>
+                                            htmlType='submit'>
+                                        <SendOutlined/>
+                                        {this.state.res.release}</Button>
                                 </Space>
                             </div>
                         </Col>
@@ -249,7 +267,7 @@ export class ArticleEdit extends BaseResourceComponent {
                     <Row gutter={8}>
                         <Col md={18} xs={24} style={{zIndex: 10}}>
                             <Form.Item name='markdown'>
-                                <div id='markdown' dangerouslySetInnerHTML={{__html: this.state.markdown}}
+                                <div id='markdown' dangerouslySetInnerHTML={{__html: this.state.article.markdown}}
                                      style={{display: "none"}}/>
                                 <div id='content' style={{display: "none"}}/>
                                 <Editor config={this.getEditorConfig()}/>

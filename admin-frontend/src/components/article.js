@@ -1,7 +1,7 @@
 import React from "react";
-import {DeleteOutlined, EditOutlined, EyeOutlined} from '@ant-design/icons';
+import {DeleteOutlined, EditOutlined} from '@ant-design/icons';
 
-import {Col, Row, Table} from "antd";
+import {Col, Row, Space, Table} from "antd";
 import Search from "antd/lib/input/Search";
 import {BaseTableComponent} from "./base-table-component";
 import Spin from "antd/es/spin";
@@ -22,22 +22,30 @@ export class Article extends BaseTableComponent {
                 {
                     title: '',
                     dataIndex: 'id',
-                    key: 'delete',
+                    key: 'action',
                     render: (text, record) =>
                         this.state.rows.length >= 1 ? (
-                            <div style={{color: "red"}}>
+                            <Space size={16}>
                                 <Popconfirm title="Sure to delete?"
                                             onConfirm={() => this.handleDelete(record.id)}>
-                                    <DeleteOutlined/>
+                                    <DeleteOutlined style={{color: "red"}}/>
                                 </Popconfirm>
-                            </div>
+                                <a href={"/admin/article-edit?id=" + text}>
+                                    <EditOutlined/>
+                                </a>
+                            </Space>
                         ) : null,
                 },
                 {
                     title: '标题',
                     dataIndex: 'title',
                     key: 'title',
-                    render: e => <div dangerouslySetInnerHTML={{__html: e}}/>,
+                    render: (text, record) =>
+                        this.state.rows.length >= 1 ? (
+                                <a style={{display:"inline"}} rel="noopener noreferrer" target={"_blank"} href={record.url}>
+                                    <div style={{display:"inline"}} dangerouslySetInnerHTML={{__html: text}}/>
+                                </a>
+                        ) : null,
                     width: "400px"
                 },
                 {
@@ -81,34 +89,7 @@ export class Article extends BaseTableComponent {
                     title: '最后更新时间',
                     key: 'lastUpdateDate',
                     dataIndex: 'lastUpdateDate'
-                },
-                {
-                    title: '编辑',
-                    key: 'edit',
-                    dataIndex: 'id',
-                    render: (text) =>
-                        this.state.rows.length >= 1 ? (
-                            <div style={{color: "red"}}>
-                                <a href={"/admin/article-edit?id=" + text}>
-                                    <EditOutlined/>
-                                </a>
-                            </div>
-                        ) : null,
-
-                },
-                {
-                    title: '浏览',
-                    key: 'view',
-                    dataIndex: 'url',
-                    render: (url) =>
-                        this.state.rows.length >= 1 ? (
-                            <div style={{color: "red"}}>
-                                <a rel="noopener noreferrer" target={"_blank"} href={url}>
-                                    <EyeOutlined/>
-                                </a>
-                            </div>
-                        ) : null,
-                },
+                }
             ]
         }
     }
@@ -134,7 +115,7 @@ export class Article extends BaseTableComponent {
         const {rows, pagination, tableLoading} = this.state;
 
         return (
-            <Spin delay={this.getSpinDelayTime()} spinning={tableLoading}>
+            <Spin delay={this.getSpinDelayTime()} spinning={this.state.resLoading}>
                 <Title className='page-header' level={3}>{this.getSecondTitle()}</Title>
                 <Divider/>
                 <Row style={{paddingBottom: "10px"}}>
@@ -144,8 +125,10 @@ export class Article extends BaseTableComponent {
                     </Col>
                 </Row>
 
-                <Table bordered style={{minWidth: "1200px"}} onChange={this.onShowSizeChange} columns={this.state.columns}
-                       pagination={pagination} dataSource={rows}/>
+                <Table loading={tableLoading} bordered
+                       onChange={this.onShowSizeChange} columns={this.state.columns}
+                       pagination={pagination} dataSource={rows}
+                       scroll={{x: '100vw'}}/>
             </Spin>
         )
     }

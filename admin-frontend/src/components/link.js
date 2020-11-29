@@ -34,6 +34,11 @@ export class BLink extends BaseTableComponent {
                     title: '链接',
                     dataIndex: 'url',
                     key: 'url',
+                    render: url => (
+                        <a style={{display: "inline"}} rel="noopener noreferrer" target={"_blank"} href={url}>
+                            <div style={{display: "inline"}} dangerouslySetInnerHTML={{__html: url}}/>
+                        </a>
+                    )
                 },
                 {
                     title: '链接',
@@ -71,10 +76,11 @@ export class BLink extends BaseTableComponent {
 
 
         return (
-            <Spin delay={this.getSpinDelayTime()} spinning={tableLoading}>
+            <Spin delay={this.getSpinDelayTime()} spinning={this.state.resLoading}>
                 <Title className='page-header' level={3}>{this.getSecondTitle()}</Title>
                 <Divider/>
-                <Table bordered onChange={this.onShowSizeChange} columns={this.state.columns} pagination={pagination}
+                <Table loading={tableLoading} bordered onChange={this.onShowSizeChange} columns={this.state.columns}
+                       pagination={pagination}
                        dataSource={rows}/>
             </Spin>
         )

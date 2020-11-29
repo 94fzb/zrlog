@@ -134,10 +134,10 @@ export class Website extends BaseResourceComponent {
         axios.get("/api/admin/upgrade/checkNewVersion").then(async ({data}) => {
             if (data.data.upgrade) {
                 const title = "V" + data.data.version.version + "-" + data.data.version.buildId + " (" + data.data.version.type + ")";
-                Modal.confirm({
+                Modal.info({
                     title: title,
                     content: data.data.version.changeLog,
-                    okText: '确认',
+                    okText: '去更新',
                     cancelText: '取消',
                     onOk: function () {
                         window.location.href = "/admin/upgrade"

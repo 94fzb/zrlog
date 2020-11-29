@@ -102,7 +102,7 @@ CREATE TABLE `user` (
 DROP TABLE IF EXISTS `log`;
 CREATE TABLE `log` (
   `logId` int(11) NOT NULL AUTO_INCREMENT,
-  `alias` varchar(255) DEFAULT NULL,
+  `alias` varchar(64) DEFAULT NULL,
   `canComment` bit(1) DEFAULT b'1',
   `click` int(11) DEFAULT '0',
   `content` longtext,
@@ -124,6 +124,7 @@ CREATE TABLE `log` (
   PRIMARY KEY (`logId`),
   KEY `typeId` (`typeId`),
   KEY `userId` (`userId`),
+  UNIQUE KEY `alias` (`alias`),
   CONSTRAINT `log_ibfk_2` FOREIGN KEY (`userId`) REFERENCES `user` (`userId`),
   CONSTRAINT `log_ibfk_1` FOREIGN KEY (`typeId`) REFERENCES `type` (`typeId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;

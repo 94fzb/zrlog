@@ -69,10 +69,10 @@ export class Type extends BaseTableComponent {
 
 
         return (
-            <Spin delay={this.getSpinDelayTime()} spinning={tableLoading}>
+            <Spin delay={this.getSpinDelayTime()} spinning={this.state.resLoading}>
                 <Title className='page-header' level={3}>{this.getSecondTitle()}</Title>
                 <Divider/>
-                <Table bordered onChange={this.onShowSizeChange} columns={this.state.columns} pagination={pagination}
+                <Table loading={tableLoading} bordered onChange={this.onShowSizeChange} columns={this.state.columns} pagination={pagination}
                        dataSource={rows}/>
             </Spin>
         )

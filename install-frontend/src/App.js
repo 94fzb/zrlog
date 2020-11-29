@@ -166,19 +166,19 @@ class App extends React.Component {
                                                     </ul>
                                                 </div>
                                                 <Title level={4}>{this.state.res.installInputDbInfo}</Title>
-                                                <FormItem name='dbHost' label={this.state.res.installDbHost}>
-                                                    <Input placeholder='127.0.0.1' required={true}/>
+                                                <FormItem name='dbHost' label={this.state.res.installDbHost} rules={[{required: true}]}>
+                                                    <Input placeholder='127.0.0.1'/>
                                                 </FormItem>
-                                                <FormItem name='dbName' label={this.state.res.installDbName}>
-                                                    <Input placeholder='ZrLog' required={true}/>
+                                                <FormItem name='dbName' label={this.state.res.installDbName} rules={[{required: true}]}>
+                                                    <Input placeholder='ZrLog'/>
                                                 </FormItem>
-                                                <FormItem name='dbUserName' label={this.state.res.installDbUserName}>
-                                                    <Input placeholder='root' required={true}/>
+                                                <FormItem name='dbUserName' label={this.state.res.installDbUserName} rules={[{required: true}]}>
+                                                    <Input placeholder='root'/>
                                                 </FormItem>
                                                 <FormItem name='dbPassword' label={this.state.res.installDbPassword}>
                                                     <Input type='password'/>
                                                 </FormItem>
-                                                <FormItem name='dbPort' label={this.state.res.installDbPort}>
+                                                <FormItem name='dbPort' label={this.state.res.installDbPort} rules={[{required: true}]}>
                                                     <Input type='number' placeholder='3306'/>
                                                 </FormItem>
                                             </Form>
@@ -187,16 +187,16 @@ class App extends React.Component {
                                             <Form ref={this.formWeblogInfoRef} {...formItemLayout}
                                                   onValuesChange={(k, v) => this.setWeblogValue(k, v)}>
                                                 <Title level={3}>{this.state.res.installInputWebSiteInfo}</Title>
-                                                <FormItem name='username' label={this.state.res.installAdmin}>
+                                                <FormItem name='username' label={this.state.res.installAdmin} rules={[{required: true}]}>
                                                     <Input placeholder='admin'/>
                                                 </FormItem>
-                                                <FormItem name='password' label={this.state.res.installAdminPassword}>
+                                                <FormItem name='password' label={this.state.res.installAdminPassword} rules={[{required: true}]}>
                                                     <Input type='password'/>
                                                 </FormItem>
                                                 <FormItem name='email' label={this.state.res.installAdminEmail}>
                                                     <Input type='email'/>
                                                 </FormItem>
-                                                <FormItem name='title' label={this.state.res.installWebSiteTitle}>
+                                                <FormItem name='title' label={this.state.res.installWebSiteTitle} rules={[{required: true}]}>
                                                     <Input placeholder={this.state.res.installWebSiteTitleTip}/>
                                                 </FormItem>
                                                 <FormItem name='second_title'
