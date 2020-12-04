@@ -9,7 +9,7 @@ import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
 import Popconfirm from "antd/es/popconfirm";
 
-export class Article extends BaseTableComponent {
+class Article extends BaseTableComponent {
 
     initState() {
         return {
@@ -133,3 +133,4 @@ export class Article extends BaseTableComponent {
         )
     }
 }
+export default Article;

@@ -13,7 +13,7 @@ let timer;
 let upgradeTimer;
 let checkRestartTimer;
 
-export class Upgrade extends BaseResourceComponent {
+class Upgrade extends BaseResourceComponent {
 
 
     initState() {
@@ -164,3 +164,5 @@ export class Upgrade extends BaseResourceComponent {
         )
     }
 }
+
+export default Upgrade;

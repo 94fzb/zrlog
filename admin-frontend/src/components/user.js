@@ -17,7 +17,7 @@ const layout = {
     wrapperCol: {span: 8},
 };
 
-export class User extends BaseResourceComponent {
+class User extends BaseResourceComponent {
 
     userForm = React.createRef();
 
@@ -130,3 +130,5 @@ export class User extends BaseResourceComponent {
         )
     }
 }
+
+export default User;

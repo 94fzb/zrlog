@@ -7,7 +7,7 @@ function Iframe(props) {
     return (<div dangerouslySetInnerHTML={{__html: props.iframe ? props.iframe : ""}}/>);
 }
 
-export class Plugin extends BaseResourceComponent {
+class Plugin extends BaseResourceComponent {
 
     getSecondTitle() {
         return this.state.res['admin.plugin.manage'];
@@ -19,3 +19,5 @@ export class Plugin extends BaseResourceComponent {
         )
     }
 }
+
+export default Plugin;

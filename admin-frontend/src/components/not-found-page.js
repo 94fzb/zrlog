@@ -5,7 +5,7 @@ import Result from "antd/es/result";
 import Button from "antd/es/button";
 import {Link} from "react-router-dom";
 
-export class NotFoundPage extends BaseResourceComponent {
+class NotFoundPage extends BaseResourceComponent {
 
     getSecondTitle() {
         return this.state.res.notFound;
@@ -22,3 +22,5 @@ export class NotFoundPage extends BaseResourceComponent {
         )
     }
 }
+
+export default NotFoundPage;

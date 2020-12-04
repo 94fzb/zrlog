@@ -1,23 +1,43 @@
 import React from 'react';
 import './App.css';
 import {Route, Switch} from "react-router-dom";
-import {Login} from "./components/login";
-import {IndexLayout} from "./layout/index-layout";
 import {Router} from "react-router";
 import {createBrowserHistory} from 'history';
 import {ConfigProvider} from "antd";
 import zh_CN from 'antd/es/locale/zh_CN';
+import Loadable from "react-loadable";
 
 const history = createBrowserHistory();
+
+export const MyLoadingComponent = ({isLoading, error}) => {
+    if (isLoading) {
+        return <div/>;
+    } else if (error) {
+        console.info(error);
+        return <div>Sorry, there was a problem loading the page.</div>;
+    } else {
+        return null;
+    }
+};
+
+const AsyncIndexLayout = Loadable({
+    loader: () => import('./layout/index-layout'),
+    loading: MyLoadingComponent
+});
+
+const AsyncLoginLayout = Loadable({
+    loader: () => import('./components/login'),
+    loading: MyLoadingComponent
+});
 
 function App() {
     return (
         <ConfigProvider locale={zh_CN}>
             <Router history={history}>
                 <Switch>
-                    <Route path="/admin/login" component={Login}/>
-                    <Route exact path="/admin/*" component={IndexLayout}/>
-                    <Route component={Login}/>
+                    <Route path="/admin/login" component={AsyncLoginLayout}/>
+                    <Route exact path="/admin/*" component={AsyncIndexLayout}/>
+                    <Route component={AsyncLoginLayout}/>
                 </Switch>
             </Router>
         </ConfigProvider>

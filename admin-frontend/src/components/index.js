@@ -47,7 +47,7 @@ var system = [
     }
 ];
 
-export class Index extends BaseResourceComponent {
+class Index extends BaseResourceComponent {
     
     initState() {
         return {
@@ -158,3 +158,5 @@ export class Index extends BaseResourceComponent {
         )
     }
 }
+
+export default Index;

@@ -14,28 +14,16 @@ import {
     UserOutlined
 } from '@ant-design/icons';
 import {Col, Layout, Menu, Row, Spin, Typography} from 'antd';
-import {Link, Route, Switch} from 'react-router-dom'
-import {Index} from "../components";
-import {BaseResourceComponent} from "../components/base-resource-component";
-import {ArticleEdit} from "../components/article-edit";
-import {Article} from "../components/article";
-import {Comment} from "../components/comment";
-import {Plugin} from "../components/plugin";
-import {Website} from "../components/website";
-import {Nav} from "../components/nav";
-import {BLink} from "../components/link";
-import {Type} from "../components/type";
-import {NotFoundPage} from "../components/not-found-page";
+import {Link} from 'react-router-dom'
+
 import Button from "antd/es/button";
 import Dropdown from "antd/es/dropdown";
 import Divider from "antd/es/divider";
 import Image from "antd/es/image";
-import {User} from "../components/user";
-import {UserUpdatePassword} from "../components/user-update-password";
 import * as axios from "axios";
-import {TemplateCenter} from "../components/template-center";
-import {Upgrade} from "../components/upgrade";
 
+import {BaseResourceComponent} from "../components/base-resource-component";
+import AdminLoginedRouter from "../routers/admin-logined-router";
 
 const {Header, Content, Footer, Sider} = Layout;
 const {SubMenu} = Menu;
@@ -50,7 +38,7 @@ function getDefaultOpenKeys() {
 
 const defaultOpenKeys = getDefaultOpenKeys();
 
-export class IndexLayout extends BaseResourceComponent {
+class IndexLayout extends BaseResourceComponent {
 
     initState() {
         return {
@@ -192,22 +180,7 @@ export class IndexLayout extends BaseResourceComponent {
                             </Row>
                         </Header>
                         <Content style={{margin: '4px'}}>
-                            <Switch>
-                                <Route path="/admin/index" component={Index}/>
-                                <Route path="/admin/article-edit" component={ArticleEdit}/>
-                                <Route path="/admin/comment" component={Comment}/>
-                                <Route path="/admin/plugin" component={Plugin}/>
-                                <Route path="/admin/website" component={Website}/>
-                                <Route path="/admin/article-type" component={Type}/>
-                                <Route path="/admin/link" component={BLink}/>
-                                <Route path="/admin/nav" component={Nav}/>
-                                <Route path="/admin/article" component={Article}/>
-                                <Route path="/admin/user" component={User}/>
-                                <Route path="/admin/template-center" component={TemplateCenter}/>
-                                <Route path="/admin/user-update-password" component={UserUpdatePassword}/>
-                                <Route path="/admin/upgrade" component={Upgrade}/>
-                                <Route component={NotFoundPage}/>
-                            </Switch>
+                            <AdminLoginedRouter/>
                         </Content>
                         <Footer>
                             <Row>
@@ -229,3 +202,5 @@ export class IndexLayout extends BaseResourceComponent {
         )
     }
 }
+
+export default IndexLayout;

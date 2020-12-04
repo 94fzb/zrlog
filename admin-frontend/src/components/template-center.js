@@ -6,7 +6,7 @@ function Iframe(props) {
     return (<div dangerouslySetInnerHTML={{__html: props.iframe ? props.iframe : ""}}/>);
 }
 
-export class TemplateCenter extends BaseResourceComponent {
+class TemplateCenter extends BaseResourceComponent {
 
     getSecondTitle() {
         return this.state.res['templateCenter'];
@@ -22,3 +22,5 @@ export class TemplateCenter extends BaseResourceComponent {
         )
     }
 }
+
+export default TemplateCenter;

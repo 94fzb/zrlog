@@ -20,7 +20,7 @@ const tailLayout = {
 
 const {Content, Footer} = Layout;
 
-export class Login extends BaseResourceComponent {
+class Login extends BaseResourceComponent {
 
     loginFrom = React.createRef();
 
@@ -115,3 +115,4 @@ export class Login extends BaseResourceComponent {
         )
     }
 }
+export default Login;

@@ -7,7 +7,7 @@ import Divider from "antd/es/divider";
 import Popconfirm from "antd/es/popconfirm";
 import {DeleteOutlined} from "@ant-design/icons";
 
-export class Type extends BaseTableComponent {
+class Type extends BaseTableComponent {
 
     initState() {
         return {
@@ -72,9 +72,13 @@ export class Type extends BaseTableComponent {
             <Spin delay={this.getSpinDelayTime()} spinning={this.state.resLoading}>
                 <Title className='page-header' level={3}>{this.getSecondTitle()}</Title>
                 <Divider/>
-                <Table loading={tableLoading} bordered onChange={this.onShowSizeChange} columns={this.state.columns} pagination={pagination}
-                       dataSource={rows}/>
+                <Table loading={tableLoading} bordered onChange={this.onShowSizeChange} columns={this.state.columns}
+                       pagination={pagination}
+                       dataSource={rows}
+                       scroll={{x: '100vw'}}/>
             </Spin>
         )
     }
 }
+
+export default Type;

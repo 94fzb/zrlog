@@ -15,7 +15,7 @@ const layout = {
 };
 
 
-export class UserUpdatePassword extends BaseResourceComponent {
+class UserUpdatePassword extends BaseResourceComponent {
 
     pwdFrom = React.createRef();
 
@@ -54,3 +54,5 @@ export class UserUpdatePassword extends BaseResourceComponent {
         )
     }
 }
+
+export default UserUpdatePassword;

@@ -8,7 +8,7 @@ import Popconfirm from "antd/es/popconfirm";
 import {DeleteOutlined} from "@ant-design/icons";
 
 
-export class Comment extends BaseTableComponent {
+class Comment extends BaseTableComponent {
 
     initState() {
         return {
@@ -95,3 +95,5 @@ export class Comment extends BaseTableComponent {
         )
     }
 }
+
+export default Comment;

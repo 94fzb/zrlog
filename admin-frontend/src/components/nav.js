@@ -7,7 +7,7 @@ import Divider from "antd/es/divider";
 import Popconfirm from "antd/es/popconfirm";
 import {DeleteOutlined} from "@ant-design/icons";
 
-export class Nav extends BaseTableComponent {
+class Nav extends BaseTableComponent {
 
     initState() {
         return {
@@ -77,8 +77,11 @@ export class Nav extends BaseTableComponent {
                 <Title className='page-header' level={3}>{this.getSecondTitle()}</Title>
                 <Divider/>
                 <Table loading={tableLoading} bordered onChange={this.onShowSizeChange} columns={this.state.columns} pagination={pagination}
-                       dataSource={rows}/>
+                       dataSource={rows}
+                       scroll={{x: '100vw'}}/>
             </Spin>
         )
     }
 }
+
+export default Nav;

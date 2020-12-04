@@ -34,7 +34,7 @@ const layout = {
     wrapperCol: {span: 16},
 };
 
-export class Website extends BaseResourceComponent {
+class Website extends BaseResourceComponent {
 
     basicForm = React.createRef();
     otherForm = React.createRef();
@@ -341,3 +341,4 @@ export class Website extends BaseResourceComponent {
         )
     }
 }
+export default Website;
