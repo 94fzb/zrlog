@@ -123,7 +123,7 @@ class Website extends BaseResourceComponent {
     }
 
     websiteFormFinish(changedValues, formName) {
-        axios.post("/api/admin/website/" + formName, JSON.stringify(changedValues)).then(({data}) => {
+        axios.post("/api/admin/website/" + formName, changedValues).then(({data}) => {
             if (!data.error) {
                 message.info(data.message);
             }
@@ -179,7 +179,7 @@ class Website extends BaseResourceComponent {
                                         <TextArea rows={5}/>
                                     </Form.Item>
                                     <Divider/>
-                                    <Button type='primary' enterButton
+                                    <Button type='primary' enterbutton='true'
                                             htmlType='submit'>{this.state.res.submit}</Button>
                                 </Form>
                             </Col>
@@ -220,7 +220,7 @@ class Website extends BaseResourceComponent {
                                         </Select>
                                     </Form.Item>
                                     <Divider/>
-                                    <Button type='primary' enterButton
+                                    <Button type='primary' enterbutton='true'
                                             htmlType='submit'>{this.state.res.submit}</Button>
                                 </Form>
                             </Col>
@@ -229,18 +229,18 @@ class Website extends BaseResourceComponent {
                     <TabPane tab="主题设置" key="template">
                         <Title level={4}>主题设置</Title>
                         <Divider/>
-                        <Row gutter={[8, 8]}>
+                        <Row gutter={[16, 16]}>
                             {this.state.templates.map((template) => {
                                 return (
-                                    <Col md={6} xs={24}>
+                                    <Col md={8} xxl={4} xs={24}>
                                         <Badge.Ribbon
                                             text={template.use ? this.state.res['admin.theme.inUse'] : template.preview ? this.state.res['admin.theme.inPreview'] : ""}
                                             style={{display: template.use || template.preview ? "block" : "none"}}>
                                             <Card
-                                                style={{width: 300}}
+                                                style={{width: 380}}
                                                 cover={
                                                     <img
-                                                        height={343}
+                                                        height={434}
                                                         alt={template.name}
                                                         src={template.previewImage}
                                                     />
@@ -254,7 +254,7 @@ class Website extends BaseResourceComponent {
                                                     <DeleteOutlined disabled={!template.deleteAble} key="delete"/>,
                                                     <Link target='_blank'
                                                           to={"/admin/template/apply?template=" + template.template}>
-                                                        <CheckOutlined/>,
+                                                        <CheckOutlined/>
                                                     </Link>
                                                 ]}
                                             >
@@ -289,7 +289,7 @@ class Website extends BaseResourceComponent {
                                         <TextArea rows={7}/>
                                     </Form.Item>
                                     <Divider/>
-                                    <Button type='primary' enterButton
+                                    <Button type='primary' enterbutton='true'
                                             htmlType='submit'>{this.state.res.submit}</Button>
                                 </Form>
                             </Col>
@@ -330,7 +330,7 @@ class Website extends BaseResourceComponent {
                                         <Switch/>
                                     </Form.Item>
                                     <Divider/>
-                                    <Button type='primary' enterButton
+                                    <Button type='primary' enterbutton='true'
                                             htmlType='submit'>{this.state.res.submit}</Button>
                                 </Form>
                             </Col>
@@ -341,4 +341,5 @@ class Website extends BaseResourceComponent {
         )
     }
 }
+
 export default Website;

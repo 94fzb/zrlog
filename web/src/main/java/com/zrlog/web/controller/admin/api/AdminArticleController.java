@@ -1,13 +1,11 @@
 package com.zrlog.web.controller.admin.api;
 
+import com.hibegin.common.util.BeanUtil;
 import com.zrlog.business.cache.CacheService;
 import com.zrlog.business.exception.NotFindResourceException;
 import com.zrlog.business.rest.request.CreateArticleRequest;
 import com.zrlog.business.rest.request.UpdateArticleRequest;
-import com.zrlog.business.rest.response.ArticleGlobalResponse;
-import com.zrlog.business.rest.response.ArticleResponseEntry;
-import com.zrlog.business.rest.response.CreateOrUpdateArticleResponse;
-import com.zrlog.business.rest.response.DeleteLogResponse;
+import com.zrlog.business.rest.response.*;
 import com.zrlog.business.service.ArticleService;
 import com.zrlog.common.Constants;
 import com.zrlog.data.dto.PageData;
@@ -54,7 +52,7 @@ public class AdminArticleController extends BaseController {
         return new CacheService().global();
     }
 
-    public Log detail() {
+    public LoadEditArticleResponse detail() {
         if (getPara("id") == null) {
             throw new NotFindResourceException();
         }
@@ -63,7 +61,7 @@ public class AdminArticleController extends BaseController {
         if (log == null) {
             throw new NotFindResourceException();
         }
-        return log;
+        return BeanUtil.convert(log.getAttrs(), LoadEditArticleResponse.class);
     }
 
 }

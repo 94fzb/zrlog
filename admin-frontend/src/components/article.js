@@ -8,6 +8,7 @@ import Spin from "antd/es/spin";
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
 import Popconfirm from "antd/es/popconfirm";
+import {Link} from "react-router-dom";
 
 class Article extends BaseTableComponent {
 
@@ -26,13 +27,13 @@ class Article extends BaseTableComponent {
                     render: (text, record) =>
                         this.state.rows.length >= 1 ? (
                             <Space size={16}>
-                                <Popconfirm title="Sure to delete?"
+                                <Popconfirm title={this.state.res['deleteTips']}
                                             onConfirm={() => this.handleDelete(record.id)}>
                                     <DeleteOutlined style={{color: "red"}}/>
                                 </Popconfirm>
-                                <a href={"/admin/article-edit?id=" + text}>
+                                <Link to={"/admin/article-edit?id=" + text}>
                                     <EditOutlined/>
-                                </a>
+                                </Link>
                             </Space>
                         ) : null,
                 },
@@ -42,9 +43,10 @@ class Article extends BaseTableComponent {
                     key: 'title',
                     render: (text, record) =>
                         this.state.rows.length >= 1 ? (
-                                <a style={{display:"inline"}} rel="noopener noreferrer" target={"_blank"} href={record.url}>
-                                    <div style={{display:"inline"}} dangerouslySetInnerHTML={{__html: text}}/>
-                                </a>
+                            <a style={{display: "inline"}} rel="noopener noreferrer" target={"_blank"}
+                               href={record.url}>
+                                <div style={{display: "inline"}} dangerouslySetInnerHTML={{__html: text}}/>
+                            </a>
                         ) : null,
                     width: "400px"
                 },
@@ -120,7 +122,7 @@ class Article extends BaseTableComponent {
                 <Divider/>
                 <Row style={{paddingBottom: "10px"}}>
                     <Col span={24}>
-                        <Search placeholder={this.state.res.searchTip} onSearch={this.onErrSearch} enterButton
+                        <Search placeholder={this.state.res.searchTip} onSearch={this.onErrSearch} enterbutton='true'
                                 style={{maxWidth: "240px", float: "right"}}/>
                     </Col>
                 </Row>
@@ -133,4 +135,5 @@ class Article extends BaseTableComponent {
         )
     }
 }
+
 export default Article;

@@ -28,7 +28,6 @@ class User extends BaseResourceComponent {
 
     setValue(changedValues) {
         this.userForm.current.setFieldsValue(changedValues);
-        console.info(changedValues);
         this.setState({
             basic: changedValues,
             userLoading: false
@@ -38,7 +37,6 @@ class User extends BaseResourceComponent {
     onUploadChange(info) {
         const {status} = info.file;
         if (status === 'done') {
-            message.success(`${info.file.response.data.url} file uploaded successfully.`);
             this.state.basic.header = info.file.response.data.url;
             this.setValue(this.state.basic);
         } else if (status === 'error') {
@@ -47,9 +45,11 @@ class User extends BaseResourceComponent {
     };
 
     onFinish() {
-        axios.post("/api/admin/user/update", JSON.stringify(this.state.basic)).then(({data}) => {
+        axios.post("/api/admin/user/update", this.state.basic).then(({data}) => {
             if (data.error) {
                 message.error(data.message);
+            } else {
+                message.info(data.message);
             }
             this.fetchData();
         })
@@ -114,14 +114,14 @@ class User extends BaseResourceComponent {
                                 <Dragger style={{width: "156px"}} multiple={false}
                                          onChange={(e) => this.onUploadChange(e)}
                                          name="imgFile"
-                                         action="/api/admin/upload?dir=images">
+                                         action="/api/admin/upload?dir=image">
                                     <Image preview={false} width={128} height={128} src={this.state.basic.header}/>
                                 </Dragger>
                             </Form.Item>
                         </Col>
                     </Row>
                     <Form.Item>
-                        <Button type="primary" enterButton htmlType='submit'>
+                        <Button type="primary" enterbutton='true' htmlType='submit'>
                             {this.state.res.submit}
                         </Button>
                     </Form.Item>

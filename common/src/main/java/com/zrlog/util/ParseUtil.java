@@ -1,5 +1,6 @@
 package com.zrlog.util;
 
+import com.hibegin.common.util.StringUtils;
 import com.zrlog.common.Constants;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -25,6 +26,9 @@ public class ParseUtil {
     }
 
     public static String autoDigest(String str, int size) {
+        if (StringUtils.isEmpty(str)) {
+            return str;
+        }
         StringBuilder sb = new StringBuilder();
         Document document = Jsoup.parseBodyFragment(str);
         List<Node> allTextNode = new ArrayList<>();

@@ -32,26 +32,26 @@ export class BaseResourceComponent extends React.Component {
         return 200;
     }
 
-    handleRes(data){
+    handleRes(data) {
         data.data.copyrightTips = data.data.copyright + ' ZrLog';
         this.setState({
             res: data.data,
             resLoading: false
-        },() => {
+        }, () => {
             this.fetchResSuccess(data.data);
             document.title = [this.getSecondTitle(), data.data['admin.management'], this.state.res.websiteTitle].filter(Boolean).join(" | ");
         });
     }
 
     fetchRes() {
-        const resourceKey = "commonRes";
+        const resourceKey = "commonRes.v2";
         const resourceData = window.sessionStorage.getItem(resourceKey);
-        if(resourceData === null) {
+        if (resourceData === null) {
             axios.get('/api/public/resource').then(({data}) => {
                 this.handleRes(data);
                 window.sessionStorage.setItem(resourceKey, JSON.stringify(data));
             })
-        }else{
+        } else {
             this.handleRes(JSON.parse(resourceData));
         }
     }

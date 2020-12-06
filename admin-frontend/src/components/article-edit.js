@@ -1,7 +1,7 @@
 import React from "react";
-import {CameraOutlined} from '@ant-design/icons';
+import {CameraOutlined, EyeOutlined} from '@ant-design/icons';
 import {BaseResourceComponent} from "./base-resource-component";
-import {Button, Input, Radio} from "antd";
+import {Button, Input, Modal, Radio} from "antd";
 import Form from "antd/es/form";
 import Spin from "antd/es/spin";
 import Row from "antd/es/grid/row";
@@ -13,23 +13,20 @@ import Card from "antd/es/card";
 import Dragger from "antd/es/upload/Dragger";
 import Switch from "antd/es/switch";
 import TextArea from "antd/es/input/TextArea";
-import * as axios from "axios";
 import {ArticleEditTag} from "./article-edit-tag";
 import {message} from "antd/es";
 import Image from "antd/es/image";
 
 import {SaveOutlined, SendOutlined} from '@ant-design/icons';
-import {MyEditorMdWrapper} from "./editor/my-editormd";
 import jquery from 'jquery';
+import MyEditorMdWrapper from "./editor/my-editormd-wrapper";
 
+const md5 = require('md5');
+const axios = require('axios');
 
 class ArticleEdit extends BaseResourceComponent {
 
     articleFrom = React.createRef();
-
-    getSecondTitle() {
-        return this.state.res['admin.log.edit'];
-    }
 
     initState() {
         return {
@@ -39,6 +36,20 @@ class ArticleEdit extends BaseResourceComponent {
             article: {
                 keywords: ""
             },
+            mdEditorScriptLoaded: false
+        }
+    }
+
+    rubbish = async (preview) => {
+        await this.onFinish(this.state.article, false, preview);
+    }
+
+    keydownHandler = async (e) => {
+        let charCode = String.fromCharCode(e.code).toLowerCase();
+        //console.info(e);
+        if (charCode === 'Keys' && e.ctrlKey) {
+            await this.preview(false);
+            e.preventDefault();
         }
     }
 
@@ -63,17 +74,29 @@ class ArticleEdit extends BaseResourceComponent {
                     this.initValue(pageState);
                 })
             } else {
-                console.info(pageState);
                 pageState.globalLoading = false;
                 this.setState(pageState);
             }
         });
+        document.addEventListener('keydown', this.keydownHandler);
     };
 
+    componentWillUnmount() {
+        document.removeEventListener('keydown', this.keydownHandler);
+    }
+
+    getSecondTitle() {
+        return this.state.res['admin.log.edit'] + (this.state.article.rubbish ? '-当前为草稿' : '');
+    }
+
+
     setValue = (changedValues) => {
-        this.articleFrom.current.setFieldsValue(changedValues);
+        let currentArticle = {...this.state.article, ...changedValues};
+        if (this.articleFrom.current) {
+            this.articleFrom.current.setFieldsValue(currentArticle);
+        }
         this.setState({
-            article: changedValues
+            article: currentArticle
         });
     }
 
@@ -82,35 +105,67 @@ class ArticleEdit extends BaseResourceComponent {
         this.setState(pageState);
     }
 
-    onFinish = async (allValues) => {
-        console.info(allValues);
-        allValues.content = jquery("#content").text();
-        allValues.markdown = jquery("#markdown").text();
+    onFinish = async (allValues, release, preview, autoSave) => {
+        if (allValues.title === undefined || allValues.title === '') {
+            return;
+        }
+        if (allValues.typeId === undefined || allValues.typeId === '') {
+            return;
+        }
+        allValues.rubbish = !release;
         allValues.keywords = jquery("#keywords").val();
-        allValues.thumbnail = this.state.article.thumbnail;
         let uri;
         if (allValues.logId !== undefined) {
             uri = '/api/admin/article/update'
         } else {
             uri = '/api/admin/article/create'
         }
-        await axios.post(uri, JSON.stringify(allValues)).then(({data}) => {
+        const currentVersion = md5(JSON.stringify(allValues));
+        //自动保存模式下，没有变化
+        if (autoSave && currentVersion === this.state.savedVersion) {
+            return;
+        }
+        if (!release) {
+            this.setState({
+                rubbishSaving: true
+            })
+        }
+        await axios.post(uri, allValues).then(({data}) => {
             if (data.error) {
                 message.error(data.message);
-                return
+                return;
             }
-            allValues.logId = data.data.id;
-            allValues.digest = data.data.digest
-            allValues.alias = data.data.alias;
-            if (allValues.rubbish) {
-                message.info(this.state.res['saveAsDraft']);
-                window.open("/post/" + allValues.logId, '_blank');
-                allValues.rubbish = false;
-            } else {
+            if (release) {
                 message.info(this.state.res['releaseSuccess']);
+            } else {
+                if (!autoSave) {
+                    message.info(this.state.res['saveAsDraft']);
+                }
+                if (preview) {
+                    window.open("/post/" + allValues.logId, '_blank');
+                }
             }
-            this.setValue(allValues);
-        })
+            this.setState({
+                savedVersion: currentVersion
+            });
+            this.setValue({
+                logId: data.data.id,
+                digest: data.data.digest,
+                alias: data.data.alias
+            });
+        }).catch((e) => {
+            Modal.error({
+                title: "保存失败",
+                content: e.toString(),
+                okText: '确认'
+            });
+        }).finally(() => {
+            if (!release) {
+                this.setState({
+                    rubbishSaving: false
+                })
+            }
+        });
     }
 
     getArticleRoute() {
@@ -120,172 +175,185 @@ class ArticleEdit extends BaseResourceComponent {
         return this.state.res['articleRoute'];
     }
 
-    preview = async () => {
-        /*this.setState({
-            article: {
-                rubbish: true
-            }
-        }, () => {
-            this.articleFrom.current.submit();
-        })*/
-    }
-
     gup(name, url) {
-        if (!url) url = window.location.href;
-        name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
-        const regexS = "[\\?&]" + name + "=([^&#]*)";
-        const regex = new RegExp(regexS);
-        const results = regex.exec(url);
-        return results === null ? null : results[1];
+        // eslint-disable-next-line
+        const results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(url);
+        if (!results) {
+            return undefined;
+        }
+        return results[1] || undefined;
     }
 
-    getThumbnailHeight(url) {
-        let originW = jquery("#thumbnail").width();
-        const w = this.gup("w", url);
+    setThumbnailHeight(url) {
         let h = this.gup("h", url);
         if (h) {
-            return originW / w * h;
-        } else {
-            return 128;
+            let originW = jquery("#thumbnail").width();
+            const w = this.gup("w", url);
+            jquery("#thumbnail").width(originW / w * h);
         }
     }
 
-    onUploadChange(info) {
+    onUploadChange = async (info) => {
         const {status} = info.file;
         if (status === 'done') {
-            message.success(`${info.file.response.data.url} file uploaded successfully.`);
-            this.setValue({
-                thumbnail: info.file.response.data.url
-            });
+            //message.success(`${info.file.name} file uploaded successfully.`);
+            let infos = {thumbnail: info.file.response.data.url}
+            this.setValue(infos);
+            this.setThumbnailHeight(info.file.response.data.url);
+            await this.autoSaveToRubbish(infos, 0)
         } else if (status === 'error') {
             message.error(`${info.file.name} file upload failed.`);
         }
     };
 
+    save = async () => {
+        //如果正在保存，尝试1s后再检查下
+        if (this.state.rubbishSaving) {
+            setTimeout(this.save, 1000);
+            return;
+        }
+        await this.onFinish(this.state.article, false, false, true);
+    };
+
+    autoSaveToRubbish = (changedValues, delayMs) => {
+        this.setValue(changedValues);
+        setTimeout(this.save, delayMs);
+    }
 
     render() {
-
         return (
-            <div>
-                <Spin delay={this.getSpinDelayTime()} spinning={this.state.resLoading && this.state.globalLoading}>
-                    <Title className='page-header' level={3}>{this.getSecondTitle()}</Title>
-                    <Divider/>
-                    <Form
-                        ref={this.articleFrom}
-                        onFinish={(values) => this.onFinish(values)}
-                        onValuesChange={(k, v) => this.setValue(k, v)}>
-                        <Form.Item name='logId' style={{display: "none"}}>
-                            <Input hidden={true}/>
-                        </Form.Item>
-                        <Row style={{paddingBottom: "15px"}}>
-                            <Col span={24}>
-                                <div style={{float: "right"}}>
-                                    <Space size={5}>
-                                        <Button type="ghost" onClick={this.preview}>
-                                            <SaveOutlined/>
-                                            {this.state.res.preview}
-                                        </Button>
-                                        <Button type='primary' enterButton
-                                                htmlType='submit'>
-                                            <SendOutlined/>
-                                            {this.state.res.release}</Button>
-                                    </Space>
-                                </div>
-                            </Col>
-                        </Row>
-                        <Row gutter={8}>
-                            <Col md={8} xs={24}>
-                                <Form.Item
-                                    name="title"
-                                    rules={[{required: true, message: this.state.res.inputArticleTitle}]}>
-                                    <Input placeholder={this.state.res.inputArticleTitle}/>
-                                </Form.Item>
-                            </Col>
-                            <Col md={5} xs={24}>
-                                <Form.Item name="alias">
-                                    <Input addonBefore={this.getArticleRoute() + "/"}
-                                           placeholder={this.state.res.inputArticleAlias}/>
-                                </Form.Item>
-                            </Col>
-                            <Col md={5} xs={0}>
+            <Spin delay={this.getSpinDelayTime()}
+                  spinning={this.state.resLoading && this.state.globalLoading}>
+                <Title className='page-header' level={3}>{this.getSecondTitle()}</Title>
+                <Divider/>
+                <Form
+                    onValuesChange={(v) => this.autoSaveToRubbish(v, 0)}
+                    ref={this.articleFrom}
+                    onFinish={(values) => this.onFinish(values, true, false)}>
+                    <Form.Item name='logId' style={{display: "none"}}>
+                        <Input hidden={true}/>
+                    </Form.Item>
+                    <Form.Item name='thumbnail' style={{display: "none"}}>
+                        <Input hidden={true}/>
+                    </Form.Item>
+                    <Form.Item name='rubbish' style={{display: "none"}}>
+                        <Input hidden={true}/>
+                    </Form.Item>
+                    <Form.Item name='markdown' style={{display: "none"}}>
+                        <Input hidden={true}/>
+                    </Form.Item>
+                    <Form.Item name='content' style={{display: "none"}}>
+                        <Input hidden={true}/>
+                    </Form.Item>
+                    <Row style={{paddingBottom: "15px"}}>
+                        <Col span={24}>
+                            <div style={{float: "right"}}>
+                                <Space size={5}>
+                                    <Button type="ghost" loading={this.state.rubbishSaving}
+                                            onClick={() => this.rubbish(false)}>
+                                        <SaveOutlined/>
+                                        {this.state.res.saveAsDraft}
+                                    </Button>
+                                    <Button type="ghost" onClick={() => this.rubbish(true)}>
+                                        <EyeOutlined/>
+                                        {this.state.res.preview}
+                                    </Button>
+                                    <Button type='primary' enterbutton='true'
+                                            htmlType='submit'>
+                                        <SendOutlined/>
+                                        {this.state.res.release}</Button>
+                                </Space>
+                            </div>
+                        </Col>
+                    </Row>
+                    <Row gutter={8}>
+                        <Col md={8} xs={24}>
+                            <Form.Item
+                                name="title"
+                                rules={[{required: true, message: this.state.res.inputArticleTitle}]}>
+                                <Input placeholder={this.state.res.inputArticleTitle}/>
+                            </Form.Item>
+                        </Col>
+                        <Col md={5} xs={24}>
+                            <Form.Item name="alias">
+                                <Input addonBefore={this.getArticleRoute() + "/"}
+                                       placeholder={this.state.res.inputArticleAlias}/>
+                            </Form.Item>
+                        </Col>
+                        <Col md={5} xs={0}>
 
-                            </Col>
-                        </Row>
-                        <Row gutter={8}>
-                            <Col md={18} xs={24} style={{zIndex: 10}}>
-                                <Form.Item name='markdown'>
-                                    <div id='markdown' dangerouslySetInnerHTML={{__html: this.state.article.markdown}}
-                                         style={{display: "none"}}/>
-                                    <div id='content' style={{display: "none"}}/>
-                                    {!this.state.globalLoading &&
-                                    <MyEditorMdWrapper editorPlaceholder={this.state.res['editorPlaceholder']} markdown={this.state.article.markdown}/>}
-                                </Form.Item>
-                            </Col>
-                            <Col md={6} xs={24}>
-                                <Row gutter={[8, 8]}>
-                                    <Col span={24}>
-                                        <Card size="small">
-                                            <Dragger
-                                                action={"/api/admin/upload/thumbnail?dir=thumbnail"}
-                                                name='imgFile'
-                                                onChange={(e) => this.onUploadChange(e)}>
-                                                <div id="thumbnail">
-                                                    {(this.state.article.thumbnail === undefined ||
-                                                        this.state.article.thumbnail === null ||
-                                                        this.state.article.thumbnail === '') && (
-                                                        <CameraOutlined style={{fontSize: "28px"}}/>
-                                                    )}
-                                                    {this.state.article.thumbnail !== '' && (
-                                                        <Image
-                                                            height={this.getThumbnailHeight(this.state.article.thumbnail)}
-                                                            src={this.state.article.thumbnail}/>
-                                                    )}
+                        </Col>
+                    </Row>
+                    <Row gutter={8}>
+                        <Col md={18} xs={24} style={{zIndex: 10}}>
+                            {!this.state.globalLoading &&
+                            <MyEditorMdWrapper superThis={this}/>
+                            }
+                        </Col>
+                        <Col md={6} xs={24}>
+                            <Row gutter={[8, 8]}>
+                                <Col span={24}>
+                                    <Card size="small">
+                                        <Dragger
+                                            action={"/api/admin/upload/thumbnail?dir=thumbnail"}
+                                            name='imgFile'
+                                            onChange={(e) => this.onUploadChange(e)}>
+                                            {(this.state.article.thumbnail === undefined ||
+                                                this.state.article.thumbnail === null ||
+                                                this.state.article.thumbnail === '') && (
+                                                <div style={{height: '108px'}}>
+                                                    <CameraOutlined style={{fontSize: "28px", paddingTop: '50px'}}/>
                                                 </div>
-                                            </Dragger>
-                                        </Card>
-                                    </Col>
-                                    <Col span={24}>
-                                        <Card size="small" title={this.state.res['admin.setting']}>
-                                            <Form.Item valuePropName="checked" name='canComment'
-                                                       label={this.state.res['commentAble']}>
-                                                <Switch size="small"/>
-                                            </Form.Item>
-                                            <Form.Item valuePropName="checked" name='privacy'
-                                                       label={this.state.res['private']}>
-                                                <Switch size="small"/>
-                                            </Form.Item>
-                                        </Card>
-                                    </Col>
-                                    <Col span={24}>
-                                        <Card size="small"
-                                              title={this.state.res['admin.type.manage']}>
-                                            <Form.Item label='' name='typeId' rules={[{required: true}]}>
-                                                <Radio.Group style={{width: "100%"}}>
-                                                    {this.state.typeOptions}
-                                                </Radio.Group>
-                                            </Form.Item>
-                                        </Card>
-                                    </Col>
-                                    <Col span={24}>
-                                        <Card size="small" title={this.state.res.tag}>
-                                            <ArticleEditTag keywords={this.state.article.keywords}
-                                                            allTags={this.state.tags.map(x => x.text)} tags={[]}/>
-                                        </Card>
-                                    </Col>
+                                            )}
+                                            {this.state.article.thumbnail !== '' && (
+                                                <Image id='thumbnail'
+                                                       src={this.state.article.thumbnail}/>
+                                            )}
+                                        </Dragger>
+                                    </Card>
+                                </Col>
+                                <Col span={24}>
+                                    <Card size="small" title={this.state.res['admin.setting']}>
+                                        <Form.Item valuePropName="checked" name='canComment'
+                                                   label={this.state.res['commentAble']}>
+                                            <Switch size="small"/>
+                                        </Form.Item>
+                                        <Form.Item valuePropName="checked" name='privacy'
+                                                   label={this.state.res['private']}>
+                                            <Switch size="small"/>
+                                        </Form.Item>
+                                    </Card>
+                                </Col>
+                                <Col span={24}>
+                                    <Card size="small"
+                                          title={this.state.res['admin.type.manage']}>
+                                        <Form.Item label='' name='typeId' rules={[{required: true}]}>
+                                            <Radio.Group style={{width: "100%"}}>
+                                                {this.state.typeOptions}
+                                            </Radio.Group>
+                                        </Form.Item>
+                                    </Card>
+                                </Col>
+                                <Col span={24}>
+                                    <Card size="small" title={this.state.res.tag}>
+                                        <ArticleEditTag superThis={this}
+                                                        keywords={this.state.article.keywords}
+                                                        allTags={this.state.tags.map(x => x.text)} tags={[]}/>
+                                    </Card>
+                                </Col>
 
-                                    <Col span={24}>
-                                        <Card size="small" title={this.state.res.digest}>
-                                            <Form.Item name='digest'>
-                                                <TextArea placeholder={this.state.res.digestTips} rows={3}/>
-                                            </Form.Item>
-                                        </Card>
-                                    </Col>
-                                </Row>
-                            </Col>
-                        </Row>
-                    </Form>
-                </Spin>
-            </div>
+                                <Col span={24}>
+                                    <Card size="small" title={this.state.res.digest}>
+                                        <Form.Item name='digest'>
+                                            <TextArea placeholder={this.state.res.digestTips} rows={3}/>
+                                        </Form.Item>
+                                    </Card>
+                                </Col>
+                            </Row>
+                        </Col>
+                    </Row>
+                </Form>
+            </Spin>
         )
     }
 }

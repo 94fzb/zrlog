@@ -1,5 +1,6 @@
 import React from 'react'
 import {
+    ApiOutlined,
     AppstoreOutlined,
     CommentOutlined,
     ContainerOutlined,
@@ -24,11 +25,11 @@ import * as axios from "axios";
 
 import {BaseResourceComponent} from "../components/base-resource-component";
 import AdminLoginedRouter from "../routers/admin-logined-router";
+import './index-layout.css'
 
 const {Header, Content, Footer, Sider} = Layout;
 const {SubMenu} = Menu;
 const {Title, Text} = Typography;
-import './index-layout.css'
 
 function getDefaultOpenKeys() {
     if (window.location.pathname === '/admin/link' || window.location.pathname === '/admin/nav' || window.location.pathname === '/admin/blog/type') {
@@ -130,7 +131,7 @@ class IndexLayout extends BaseResourceComponent {
                             </Menu.Item>
                             <Menu.Item key="/admin/plugin">
                                 <Link to='/admin/plugin'>
-                                    <QuestionCircleOutlined/>
+                                    <ApiOutlined />
                                     <span>{this.state.res['admin.plugin.manage']}</span>
                                 </Link>
                             </Menu.Item>
@@ -180,7 +181,7 @@ class IndexLayout extends BaseResourceComponent {
                                 </Col>
                             </Row>
                         </Header>
-                        <Content style={{margin: '4px'}}>
+                        <Content>
                             <AdminLoginedRouter/>
                         </Content>
                         <Footer>

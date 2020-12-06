@@ -6,6 +6,7 @@ import {createBrowserHistory} from 'history';
 import {ConfigProvider} from "antd";
 import zh_CN from 'antd/es/locale/zh_CN';
 import Loadable from "react-loadable";
+import UnknownErrorPage from "./components/unknown-error-page";
 
 const history = createBrowserHistory();
 
@@ -14,7 +15,7 @@ export const MyLoadingComponent = ({isLoading, error}) => {
         return <div/>;
     } else if (error) {
         console.info(error);
-        return <div>Sorry, there was a problem loading the page.</div>;
+        return <UnknownErrorPage message={error.toString()}/>;
     } else {
         return null;
     }

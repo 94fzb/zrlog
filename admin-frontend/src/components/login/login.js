@@ -34,7 +34,7 @@ class Login extends BaseResourceComponent {
             "password": md5(allValues.password),
             "https": window.location.protocol === "https:"
         };
-        axios.post("/api/admin/login", JSON.stringify(loginForm)).then(({data}) => {
+        axios.post("/api/admin/login", loginForm).then(({data}) => {
             if (data.error) {
                 message.error(data.message);
             } else {
@@ -100,7 +100,7 @@ class Login extends BaseResourceComponent {
                                 </Form.Item>
 
                                 <Form.Item {...tailLayout}>
-                                    <Button type="primary" enterButton htmlType='submit'>
+                                    <Button type="primary" enterbutton='true' htmlType='submit'>
                                         <LoginOutlined/> {this.state.res.login}
                                     </Button>
                                 </Form.Item>

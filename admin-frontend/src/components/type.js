@@ -24,7 +24,7 @@ class Type extends BaseTableComponent {
                     render: (text, record) =>
                         this.state.rows.length >= 1 ? (
                             <div style={{color: "red"}}>
-                                <Popconfirm title="Sure to delete?"
+                                <Popconfirm title={this.state.res['deleteTips']}
                                             onConfirm={() => this.handleDelete(record.id)}>
                                     <DeleteOutlined/>
                                 </Popconfirm>
