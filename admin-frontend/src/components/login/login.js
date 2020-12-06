@@ -5,7 +5,7 @@ import Card from "antd/es/card";
 import axios from "axios";
 import {message} from "antd/es";
 import Spin from "antd/es/spin";
-import {BaseResourceComponent} from "./base-resource-component";
+import {BaseResourceComponent} from "../base-resource-component";
 import Title from "antd/es/typography/Title";
 
 const md5 = require('md5');

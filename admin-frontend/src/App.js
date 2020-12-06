@@ -26,7 +26,7 @@ const AsyncIndexLayout = Loadable({
 });
 
 const AsyncLoginLayout = Loadable({
-    loader: () => import('./components/login'),
+    loader: () => import('./components/login/login'),
     loading: MyLoadingComponent
 });
 
