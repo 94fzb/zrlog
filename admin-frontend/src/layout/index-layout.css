@@ -99,7 +99,7 @@ h1, h2, h3, h4 {
     color: #0d1a26;
 }
 
-.userAvatarImg > img {
+.userAvatarImg {
     width: 40px;
     height: 40px;
     border-radius: 50%;

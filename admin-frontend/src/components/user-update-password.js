@@ -24,7 +24,7 @@ class UserUpdatePassword extends BaseResourceComponent {
     }
 
     onFinish(allValues) {
-        axios.post("/api/admin/user/updatePassword", JSON.stringify(allValues)).then(({data}) => {
+        axios.post("/api/admin/user/updatePassword", allValues).then(({data}) => {
             if (data.error) {
                 message.error(data.message);
             } else {
@@ -48,7 +48,7 @@ class UserUpdatePassword extends BaseResourceComponent {
                         <Input.Password/>
                     </Form.Item>
                     <Divider/>
-                    <Button type='primary' enterButton htmlType='submit'>{this.state.res.submit}</Button>
+                    <Button type='primary' enterbutton='true' htmlType='submit'>{this.state.res.submit}</Button>
                 </Form>
             </Spin>
         )

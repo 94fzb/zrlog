@@ -5,7 +5,7 @@ public class CreateArticleRequest {
     private String content;
     private String thumbnail;
     private String title;
-    private String typeId;
+    private Long typeId;
     private String alias;
     private String markdown;
     private boolean canComment;
@@ -40,11 +40,11 @@ public class CreateArticleRequest {
         this.title = title;
     }
 
-    public String getTypeId() {
+    public Long getTypeId() {
         return typeId;
     }
 
-    public void setTypeId(String typeId) {
+    public void setTypeId(Long typeId) {
         this.typeId = typeId;
     }
 

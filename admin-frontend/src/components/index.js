@@ -11,14 +11,14 @@ import Spin from "antd/lib/spin";
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
 
-var system = [
+const system = [
     {
         "name": "运行环境",
         "value": ""
     },
     {
         "name": "JavaEE 容器信息",
-        "value":""
+        "value": ""
     }
     ,
     {
@@ -48,7 +48,7 @@ var system = [
 ];
 
 class Index extends BaseResourceComponent {
-    
+
     initState() {
         return {
             statisticsInfo: {},
@@ -65,13 +65,13 @@ class Index extends BaseResourceComponent {
         });
         axios.get("/api/admin/serverInfo").then(({data}) => {
             system[0].value = data.data['java.vm.name'] + " - " + data.data['java.runtime.version'];
-            system[1].value  = data.data['server.info'];
-            system[2].value  = data.data['zrlog.runtime.path'];
-            system[3].value  = data.data['os.name'] + " - " + data.data['os.arch'] + " - " + data.data['os.version'];
-            system[4].value  = data.data['user.timezone'] + " - " + data.data['user.country'] + "/" + data.data['user.language'];
-            system[5].value  = data.data['dbServer.version'];
-            system[6].value  = data.data['file.encoding'];
-            system[7].value  = data.data['zrlog.version'] + " - " + data.data['zrlog.buildId'] + " (" + data.data['zrlog.buildTime'] + ")";
+            system[1].value = data.data['server.info'];
+            system[2].value = data.data['zrlog.runtime.path'];
+            system[3].value = data.data['os.name'] + " - " + data.data['os.arch'] + " - " + data.data['os.version'];
+            system[4].value = data.data['user.timezone'] + " - " + data.data['user.country'] + "/" + data.data['user.language'];
+            system[5].value = data.data['dbServer.version'];
+            system[6].value = data.data['file.encoding'];
+            system[7].value = data.data['zrlog.version'] + " - " + data.data['zrlog.buildId'] + " (" + data.data['zrlog.buildTime'] + ")";
             this.setState({
                 system: system
             })
@@ -84,11 +84,13 @@ class Index extends BaseResourceComponent {
             {
                 title: this.state.res.key,
                 dataIndex: 'name',
+                key: 'name',
                 fixed: true,
                 width: 180,
             },
             {
                 title: this.state.res.value,
+                key: 'value',
                 dataIndex: 'value',
             },
         ];

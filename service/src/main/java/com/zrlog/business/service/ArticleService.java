@@ -101,7 +101,7 @@ public class ArticleService {
         }
         // 自动摘要
         if (StringUtils.isEmpty(createArticleRequest.getDigest())) {
-            log.set("digest", ParseUtil.autoDigest(log.get("content").toString(), Constants.getAutoDigestLength()));
+            log.set("digest", ParseUtil.autoDigest(log.get("content"), Constants.getAutoDigestLength()));
         } else {
             log.set("digest", createArticleRequest.getDigest());
         }
@@ -243,6 +243,9 @@ public class ArticleService {
     }
 
     public String getPlainSearchText(String content) {
+        if (StringUtils.isEmpty(content)) {
+        return "";
+        }
         return Jsoup.parse(content).body().text();
     }
 }

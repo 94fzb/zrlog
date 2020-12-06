@@ -6,11 +6,11 @@
   "_location": "/vendors",
   "license": "MIT",
   "dependencies": {
-    "@ant-design/icons": "^4.2.2",
+    "@ant-design/icons": "4.3.0",
     "@testing-library/jest-dom": "4.2.4",
     "@testing-library/react": "9.3.2",
     "@testing-library/user-event": "7.1.2",
-    "antd": "4.6.6",
+    "antd": "4.9.4",
     "axios": "0.20.0",
     "font-awesome": "4.7.0",
     "history": "4.10.1",
@@ -25,11 +25,11 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "npm run build:react && npm run build:bundle",
+    "build": "yarn run build:react && yarn run build:bundle",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "build:react": "GENERATE_SOURCEMAP=false react-scripts build",
-    "build:bundle": "webpack --config webpack.config.js"
+    "build:react": "GENERATE_SOURCEMAP=false react-scripts --max_old_space_size=4096 build",
+    "build:bundle": "webpack --max_old_space_size=4096 --config webpack.config.js"
   },
   "eslintConfig": {
     "extends": "react-app"
