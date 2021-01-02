@@ -1,10 +1,35 @@
 import React from "react";
-import axios from "axios";
+import {Modal} from "antd";
+
+const axios = require('axios')
 
 export class BaseResourceComponent extends React.Component {
 
     constructor(props) {
         super(props);
+        axios.interceptors.response.use((response) => {
+            if (response.data.error === 9001) {
+                Modal.warn({
+                    title: response.data.message,
+                    okText: '确认'
+                });
+                return Promise.reject(response.data);
+            }
+            return response;
+        }, (error) => {
+            if (error && error.response) {
+                if (error.response.status === 502) {
+                    Modal.error({
+                        title: "服务未启动",
+                        content: <div style={{paddingTop: 20}}
+                                      dangerouslySetInnerHTML={{__html: error.response.data}}/>,
+                        okText: '确认'
+                    });
+                    return Promise.reject(error.response)
+                }
+            }
+            return Promise.reject(error);
+        });
         const basicMap = {
             resLoading: true,
             res: {},
@@ -39,15 +64,19 @@ export class BaseResourceComponent extends React.Component {
             resLoading: false
         }, () => {
             this.fetchResSuccess(data.data);
-            document.title = [this.getSecondTitle(), data.data['admin.management'], this.state.res.websiteTitle].filter(Boolean).join(" | ");
+            this.reloadTitle(data.data);
         });
+    }
+
+    reloadTitle(res) {
+        document.title = [this.getSecondTitle(), res['admin.management'], this.state.res.websiteTitle].filter(Boolean).join(" | ");
     }
 
     fetchRes() {
         const resourceKey = "commonRes.v2";
         const resourceData = window.sessionStorage.getItem(resourceKey);
         if (resourceData === null) {
-            axios.get('/api/public/resource').then(({data}) => {
+            this.getAxios().get('/api/public/resource').then(({data}) => {
                 this.handleRes(data);
                 window.sessionStorage.setItem(resourceKey, JSON.stringify(data));
             })
@@ -69,6 +98,10 @@ export class BaseResourceComponent extends React.Component {
             }
             return a;
         }, []).join('&');
+    }
+
+    getAxios() {
+        return axios;
     }
 
 }

@@ -55,7 +55,7 @@ class ArticleEdit extends BaseResourceComponent {
 
     componentDidMount() {
         super.componentDidMount();
-        axios.get("/api/admin/article/global").then(({data}) => {
+        this.getAxios().get("/api/admin/article/global").then(({data}) => {
             const options = [];
             data.data.types.forEach(x => {
                 options.push(<Radio style={{display: "block"}} key={x.id} value={x.id}>{x.typeName}</Radio>);
@@ -245,25 +245,27 @@ class ArticleEdit extends BaseResourceComponent {
                     <Form.Item name='content' style={{display: "none"}}>
                         <Input hidden={true}/>
                     </Form.Item>
-                    <Row style={{paddingBottom: "15px"}}>
-                        <Col span={24}>
-                            <div style={{float: "right"}}>
-                                <Space size={5}>
-                                    <Button type="ghost" loading={this.state.rubbishSaving}
-                                            onClick={() => this.rubbish(false)}>
-                                        <SaveOutlined/>
-                                        {this.state.res.saveAsDraft}
-                                    </Button>
-                                    <Button type="ghost" onClick={() => this.rubbish(true)}>
-                                        <EyeOutlined/>
-                                        {this.state.res.preview}
-                                    </Button>
-                                    <Button type='primary' enterbutton='true'
-                                            htmlType='submit'>
-                                        <SendOutlined/>
-                                        {this.state.res.release}</Button>
-                                </Space>
-                            </div>
+                    <Row gutter={[8, 8]} style={{paddingBottom: "5px"}}>
+                        <Col md={14} xxl={18} sm={6} span={0}/>
+                        <Col xxl={2} md={4} sm={6}>
+                            <Button type="ghost" block={true} loading={this.state.rubbishSaving}
+                                    onClick={() => this.rubbish(false)}>
+                                <SaveOutlined/>
+                                {this.state.res.saveAsDraft}
+                            </Button>
+                        </Col>
+                        <Col xxl={2} md={3} sm={6}>
+                            <Button type="ghost" block={true} onClick={() => this.rubbish(true)}>
+                                <EyeOutlined/>
+                                {this.state.res.preview}
+                            </Button>
+
+                        </Col>
+                        <Col xxl={2} md={3} sm={6}>
+                            <Button type='primary' block={true} enterbutton='true'
+                                    htmlType='submit'>
+                                <SendOutlined/>
+                                {this.state.res.release}</Button>
                         </Col>
                     </Row>
                     <Row gutter={[8, 8]}>

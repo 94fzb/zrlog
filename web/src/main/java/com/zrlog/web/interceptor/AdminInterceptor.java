@@ -12,6 +12,7 @@ import com.zrlog.common.Constants;
 import com.zrlog.common.exception.AbstractBusinessException;
 import com.zrlog.common.vo.AdminTokenVO;
 import com.zrlog.model.User;
+import com.zrlog.util.RequestUtil;
 import com.zrlog.web.annotation.RefreshCache;
 import com.zrlog.web.handler.BlogArticleHandler;
 import com.zrlog.web.token.AdminTokenService;
@@ -94,7 +95,7 @@ public class AdminInterceptor implements Interceptor {
             try {
                 String url = ai.getController().getRequest().getContextPath()
                         + "/admin/login?redirectFrom="
-                        + ai.getController().getRequest().getRequestURL() + (ai.getController().getRequest().getQueryString() != null ? "?" + ai.getController().getRequest().getQueryString() : "");
+                        + RequestUtil.getRequestURLWithQueryString(ai.getController().getRequest());
                 ai.getController().redirect(url);
             } catch (Exception e) {
                 LOGGER.error("", e);

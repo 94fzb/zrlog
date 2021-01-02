@@ -3,6 +3,7 @@ package com.zrlog.web.handler;
 import com.jfinal.handler.Handler;
 import com.zrlog.business.util.PluginHelper;
 import com.zrlog.common.vo.AdminTokenVO;
+import com.zrlog.util.RequestUtil;
 import com.zrlog.web.token.AdminTokenService;
 import com.zrlog.web.token.AdminTokenThreadLocal;
 import org.slf4j.Logger;
@@ -76,7 +77,7 @@ public class PluginHandler extends Handler {
         } else {
             response.sendRedirect(request.getContextPath()
                     + "/admin/login?redirectFrom="
-                    + request.getRequestURL() + (request.getQueryString() != null ? "?" + request.getQueryString() : ""));
+                    + RequestUtil.getRequestURLWithQueryString(request));
         }
     }
 

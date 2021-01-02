@@ -24,6 +24,12 @@ class Login extends BaseResourceComponent {
 
     loginFrom = React.createRef();
 
+    initState() {
+        return {
+            logging: false
+        }
+    }
+
     setValue(changedValues) {
         this.loginFrom.current.setFieldsValue(changedValues);
     }
@@ -34,6 +40,9 @@ class Login extends BaseResourceComponent {
             "password": md5(allValues.password),
             "https": window.location.protocol === "https:"
         };
+        this.setState({
+            logging: true
+        })
         axios.post("/api/admin/login", loginForm).then(({data}) => {
             if (data.error) {
                 message.error(data.message);
@@ -45,6 +54,10 @@ class Login extends BaseResourceComponent {
                     window.location.href = window.location.protocol + "//" + window.location.host + "/admin/index";
                 }
             }
+        }).finally(() => {
+            this.setState({
+                logging: false
+            })
         })
     };
 
@@ -100,7 +113,8 @@ class Login extends BaseResourceComponent {
                                 </Form.Item>
 
                                 <Form.Item {...tailLayout}>
-                                    <Button type="primary" enterbutton='true' htmlType='submit'>
+                                    <Button loading={this.state.logging} type="primary" enterbutton='true'
+                                            htmlType='submit'>
                                         <LoginOutlined/> {this.state.res.login}
                                     </Button>
                                 </Form.Item>
@@ -115,4 +129,5 @@ class Login extends BaseResourceComponent {
         )
     }
 }
+
 export default Login;

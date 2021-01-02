@@ -5,7 +5,6 @@ import {BaseResourceComponent} from "./base-resource-component";
 import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
 import Alert from "antd/es/alert";
-import * as axios from "axios";
 import {CommentOutlined, ContainerOutlined} from "@ant-design/icons";
 import Spin from "antd/lib/spin";
 import Title from "antd/es/typography/Title";
@@ -58,12 +57,12 @@ class Index extends BaseResourceComponent {
 
     componentDidMount() {
         super.componentDidMount();
-        axios.get("/api/admin/statisticsInfo").then(({data}) => {
+        this.getAxios().get("/api/admin/statisticsInfo").then(({data}) => {
             this.setState({
                 statisticsInfo: data.data,
             })
         });
-        axios.get("/api/admin/serverInfo").then(({data}) => {
+        this.getAxios().get("/api/admin/serverInfo").then(({data}) => {
             system[0].value = data.data['java.vm.name'] + " - " + data.data['java.runtime.version'];
             system[1].value = data.data['server.info'];
             system[2].value = data.data['zrlog.runtime.path'];

@@ -1,6 +1,5 @@
 // eslint-disable-next-line no-unused-vars
 import React from "react";
-import axios from "axios";
 import {BaseResourceComponent} from "./base-resource-component";
 import {message} from "antd";
 
@@ -18,7 +17,7 @@ export class BaseTableComponent extends BaseResourceComponent {
             size: pagination.pageSize,
             key: pagination.key
         }
-        axios.get(this.getDataApiUri() + this.mapToQueryString(query)).then(({data}) => {
+        this.getAxios().get(this.getDataApiUri() + this.mapToQueryString(query)).then(({data}) => {
             const tableData = {
                 tableLoading: false,
                 pagination: {
@@ -49,8 +48,8 @@ export class BaseTableComponent extends BaseResourceComponent {
         return null;
     }
 
-    handleDelete = (key) => {
-        axios.post(this.getDeleteApiUri() + "?id=" + key).then(({data}) => {
+    handleDelete = async (key) => {
+        await this.getAxios().post(this.getDeleteApiUri() + "?id=" + key).then(({data}) => {
             if (data.error) {
                 message.error(this.state.res['deleteError']);
                 return;

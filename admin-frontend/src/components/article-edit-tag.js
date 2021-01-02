@@ -157,9 +157,9 @@ export class ArticleEditTag extends BaseResourceComponent {
                 {!inputVisible && (
                     <>
                         <Tag onClick={this.showInput} className="site-tag-plus">
-                            <PlusOutlined/> New Tag
+                            <PlusOutlined/> {this.state.res['tagTips']}
                         </Tag>
-                        <Title level={5} style={{paddingTop: "15px"}}>All Tags</Title>
+                        <Title level={5} style={{paddingTop: "15px"}}>{this.state.res['allTag']}</Title>
                         <div style={{maxHeight: "120px", overflowY: "scroll"}}>
                             {allTagChild}
                         </div>
