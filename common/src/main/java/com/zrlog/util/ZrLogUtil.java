@@ -147,7 +147,7 @@ public class ZrLogUtil {
             File[] fs = file.listFiles();
             if (fs != null && fs.length > 0) {
                 fileList = Arrays.asList(fs);
-                fileList.sort(Comparator.comparingInt(e -> Integer.valueOf(e.getName().replace(".sql", ""))));
+                fileList.sort(Comparator.comparingInt(e -> Integer.parseInt(e.getName().replace(".sql", ""))));
             }
         }
         return fileList;
@@ -155,15 +155,15 @@ public class ZrLogUtil {
 
     public static List<Map.Entry<Integer, List<String>>> getExecSqlList(String sqlVersion, String basePath) {
         List<Map.Entry<Integer, List<String>>> sqlList = new ArrayList<>();
-        Integer version = 0;
+        int version = 0;
         try {
-            version = Integer.valueOf(sqlVersion);
+            version = Integer.parseInt(sqlVersion);
         } catch (Exception e) {
             LOGGER.error("", e);
         }
         for (File f : getSqlFileList(basePath)) {
             try {
-                Integer fileVersion = Integer.valueOf(f.getName().replace(".sql", ""));
+                int fileVersion = Integer.parseInt(f.getName().replace(".sql", ""));
                 if (fileVersion > version) {
                     LOGGER.info("need update sql " + f);
                     Map.Entry<Integer, List<String>> entry = new AbstractMap.SimpleEntry<>(fileVersion, Arrays.asList(IOUtil.getStringInputStream(new FileInputStream(f)).split("\n")));

@@ -1,5 +1,6 @@
 package com.zrlog.common.vo;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class TemplateVO {
@@ -15,6 +16,9 @@ public class TemplateVO {
     private String author;
     private boolean configAble;
     private boolean preview;
+    private TemplateConfigMap config;
+    private String viewType;
+    private boolean use;
 
     public String getViewType() {
         return viewType;
@@ -23,8 +27,6 @@ public class TemplateVO {
     public void setViewType(String viewType) {
         this.viewType = viewType;
     }
-
-    private String viewType;
 
     public boolean isPreview() {
         return preview;
@@ -41,9 +43,6 @@ public class TemplateVO {
     public void setUse(boolean use) {
         this.use = use;
     }
-
-    private boolean use;
-
 
     public String getTemplate() {
         return template;
@@ -123,5 +122,66 @@ public class TemplateVO {
 
     public void setPreviewImage(String previewImage) {
         this.previewImage = previewImage;
+    }
+
+    public TemplateConfigMap getConfig() {
+        return config;
+    }
+
+    public void setConfig(TemplateConfigMap config) {
+        this.config = config;
+    }
+
+    public static class TemplateConfigMap extends LinkedHashMap<String, TemplateConfigVO> {
+
+    }
+
+    public static class TemplateConfigVO {
+
+        private String label;
+        private String htmlElementType;
+        private String placeholder;
+        private String type;
+        private Object value;
+
+        public String getLabel() {
+            return label;
+        }
+
+        public void setLabel(String label) {
+            this.label = label;
+        }
+
+        public String getHtmlElementType() {
+            return htmlElementType;
+        }
+
+        public void setHtmlElementType(String htmlElementType) {
+            this.htmlElementType = htmlElementType;
+        }
+
+        public String getPlaceholder() {
+            return placeholder;
+        }
+
+        public void setPlaceholder(String placeholder) {
+            this.placeholder = placeholder;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
+        public void setValue(Object value) {
+            this.value = value;
+        }
     }
 }

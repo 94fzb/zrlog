@@ -942,12 +942,6 @@ section article li sup a, section .content sup a {
     text-decoration: none;
 }
 
-section p a:hover,
-section .content a:hover,
-section .content a:hover span {
-    color: #E91E63;
-}
-
 section .content th,
 section .content td {
     padding: 5px 8px;
