@@ -1,0 +1,20 @@
+{
+  "aboutPage": {
+    "label": "关于页",
+    "htmlElementType": "input",
+    "placeholder": "/about",
+    "type": "text"
+  },
+  "footerSlogan": {
+    "label": "底部 Slogan",
+    "htmlElementType": "input",
+    "placeholder": "放上一句自己喜欢的话语，让更多的人了解你",
+    "type": "text"
+  },
+  "avatar": {
+    "label": "头像",
+    "htmlElementType": "input",
+    "placeholder": "",
+    "type": "file"
+  }
+}

@@ -1,12 +1,13 @@
 package com.zrlog.common.rest.request;
 
-import com.zrlog.util.ParseUtil;
-
 public class PageRequest {
 
     private int size;
+
     private int page;
+
     private String sort;
+
     private String order;
 
     public PageRequest(int page, int size) {
@@ -50,6 +51,6 @@ public class PageRequest {
     }
 
     public int getOffset() {
-        return ParseUtil.getFirstRecord(page, size);
+        return (page - 1) * size;
     }
 }

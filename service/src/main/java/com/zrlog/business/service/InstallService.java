@@ -199,7 +199,7 @@ public class InstallService {
             ps.setString(3, "hello-world");
             ps.setString(4, I18nUtil.getStringFromRes("helloWorld"));
             ps.setString(5, content);
-            ps.setString(6, new ArticleService().getPlainSearchText(content));
+            ps.setString(6, VisitorArticleService.getPlainSearchText(content));
             ps.setString(7, markdown);
             ps.setString(8, ParseUtil.autoDigest(content, Constants.getAutoDigestLength()));
             ps.setObject(9, new java.util.Date());
@@ -235,7 +235,7 @@ public class InstallService {
         String insertLogNavSql = "INSERT INTO `lognav`( `navId`,`url`, `navName`, `sort`) VALUES (?,?,?,?)";
         try (PreparedStatement ps = connect.prepareStatement(insertLogNavSql)) {
             ps.setObject(1, 2);
-            ps.setObject(2, "/admin/login");
+            ps.setObject(2, Constants.ADMIN_LOGIN_URI_PATH);
             ps.setObject(3, I18nUtil.getStringFromRes("manage"));
             ps.setObject(4, 2);
             ps.executeUpdate();
