@@ -15,9 +15,9 @@ public class MyI18nInterceptor implements Interceptor {
     @Override
     public void intercept(Invocation inv) {
         if (Constants.IN_JAR) {
-            I18nUtil.addToRequest(null, inv.getController().getRequest(), JFinal.me().getConstants().getDevMode(), false);
+            I18nUtil.addToRequest(null, inv.getController().getRequest(), JFinal.me().getConstants().getDevMode());
         } else {
-            I18nUtil.addToRequest(PathKit.getRootClassPath(), inv.getController().getRequest(), JFinal.me().getConstants().getDevMode(), false);
+            I18nUtil.addToRequest(PathKit.getRootClassPath(), inv.getController().getRequest(), JFinal.me().getConstants().getDevMode());
         }
         inv.invoke();
     }

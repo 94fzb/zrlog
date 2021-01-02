@@ -43,17 +43,17 @@ public class AdminInterceptor implements Interceptor {
     private void adminPermission(Invocation ai) {
         Controller controller = ai.getController();
         try {
-            if ("/admin/login".equals(ai.getActionKey())) {
+            if (Constants.ADMIN_LOGIN_URI_BASE_PATH.equals(ai.getActionKey())) {
                 AdminTokenVO adminTokenVO = adminTokenService.getAdminTokenVO(controller.getRequest());
                 if (adminTokenVO != null) {
-                    controller.redirect("/admin/index");
+                    controller.redirect(Constants.ADMIN_URI_BASE_PATH + "/index");
                 } else {
                     tryDoRender(ai);
                 }
                 return;
             }
-            if ("/admin/logout".equals(ai.getActionKey()) ||
-                    "/api/admin/login".equals(ai.getActionKey())) {
+            if ((Constants.ADMIN_URI_BASE_PATH + "/logout").equals(ai.getActionKey()) ||
+                    ("/api" + Constants.ADMIN_LOGIN_URI_BASE_PATH).equals(ai.getActionKey())) {
                 tryDoRender(ai);
                 return;
             }
@@ -94,7 +94,7 @@ public class AdminInterceptor implements Interceptor {
         } else {
             try {
                 String url = ai.getController().getRequest().getContextPath()
-                        + "/admin/login?redirectFrom="
+                        + Constants.ADMIN_LOGIN_URI_BASE_PATH + "?redirectFrom="
                         + RequestUtil.getRequestURLWithQueryString(ai.getController().getRequest());
                 ai.getController().redirect(url);
             } catch (Exception e) {

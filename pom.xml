@@ -20,7 +20,7 @@
 
     <properties>
         <java.version>1.8</java.version>
-        <jfinal.version>4.8</jfinal.version>
+        <jfinal.version>4.9.06</jfinal.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <servlet.version>3.1.0</servlet.version>
         <maven.test.skip>true</maven.test.skip>

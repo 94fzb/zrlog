@@ -47,7 +47,7 @@ public class AdminTemplatePageController extends BaseController {
         String target = fileHandle.getT().getParent() + "/" + fileName;
         FileUtils.moveOrCopyFile(fileHandle.getT().toString(), target, true);
         ZipUtil.unZip(target, path.toString() + "/");
-        redirect("/admin/website#template");
+        redirect(Constants.ADMIN_URI_BASE_PATH + "/website#template");
     }
 
     @RefreshCache

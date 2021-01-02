@@ -2,6 +2,7 @@ package com.zrlog.web.handler;
 
 import com.jfinal.handler.Handler;
 import com.zrlog.business.util.PluginHelper;
+import com.zrlog.common.Constants;
 import com.zrlog.common.vo.AdminTokenVO;
 import com.zrlog.util.RequestUtil;
 import com.zrlog.web.token.AdminTokenService;
@@ -29,7 +30,7 @@ public class PluginHandler extends Handler {
     private static final Logger LOGGER = LoggerFactory.getLogger(PluginHandler.class);
 
     private final AdminTokenService adminTokenService = new AdminTokenService();
-    private final List<String> pluginHandlerPaths = Arrays.asList("/admin/plugins/", "/plugin/", "/p/");
+    private final List<String> pluginHandlerPaths = Arrays.asList(Constants.ADMIN_URI_BASE_PATH + "/plugins/", "/plugin/", "/p/");
 
     @Override
     public void handle(String target, HttpServletRequest request, HttpServletResponse response, boolean[] isHandled) {
@@ -40,7 +41,7 @@ public class PluginHandler extends Handler {
         AdminTokenVO entry = null;
         try {
             entry = adminTokenService.getAdminTokenVO(request);
-            if (target.startsWith("/admin/plugins/")) {
+            if (target.startsWith(Constants.ADMIN_URI_BASE_PATH + "/plugins/")) {
                 try {
                     adminPermission(target, request, response, entry);
                 } catch (IOException | InstantiationException e) {
@@ -73,10 +74,10 @@ public class PluginHandler extends Handler {
      */
     private void adminPermission(String target, HttpServletRequest request, HttpServletResponse response, AdminTokenVO entry) throws IOException, InstantiationException {
         if (entry != null) {
-            PluginHelper.accessPlugin(target.replace("/admin/plugins", ""), request, response, entry);
+            PluginHelper.accessPlugin(target.replace(Constants.ADMIN_URI_BASE_PATH + "/plugins", ""), request, response, entry);
         } else {
             response.sendRedirect(request.getContextPath()
-                    + "/admin/login?redirectFrom="
+                    + Constants.ADMIN_LOGIN_URI_BASE_PATH + "?redirectFrom="
                     + RequestUtil.getRequestURLWithQueryString(request));
         }
     }

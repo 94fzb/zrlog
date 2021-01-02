@@ -235,7 +235,7 @@ public class InstallService {
         String insertLogNavSql = "INSERT INTO `lognav`( `navId`,`url`, `navName`, `sort`) VALUES (?,?,?,?)";
         try (PreparedStatement ps = connect.prepareStatement(insertLogNavSql)) {
             ps.setObject(1, 2);
-            ps.setObject(2, "/admin/login");
+            ps.setObject(2, Constants.ADMIN_LOGIN_URI_BASE_PATH );
             ps.setObject(3, I18nUtil.getStringFromRes("manage"));
             ps.setObject(4, 2);
             ps.executeUpdate();

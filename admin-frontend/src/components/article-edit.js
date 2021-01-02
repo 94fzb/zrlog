@@ -7,7 +7,6 @@ import Spin from "antd/es/spin";
 import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
 import Divider from "antd/es/divider";
-import Space from "antd/es/space";
 import Title from "antd/es/typography/Title";
 import Card from "antd/es/card";
 import Dragger from "antd/es/upload/Dragger";
@@ -151,12 +150,19 @@ class ArticleEdit extends BaseResourceComponent {
             this.setValue({
                 logId: data.data.id,
                 digest: data.data.digest,
-                alias: data.data.alias
+                alias: data.data.alias,
+                rubbish: allValues.rubbish
             });
         }).catch((e) => {
+            let msg;
+            if (e.error) {
+                msg = e.message;
+            } else {
+                msg = e.toString();
+            }
             Modal.error({
                 title: "保存失败",
-                content: e.toString(),
+                content: msg,
                 okText: '确认'
             });
         }).finally(() => {
@@ -216,6 +222,10 @@ class ArticleEdit extends BaseResourceComponent {
     };
 
     autoSaveToRubbish = (changedValues, delayMs) => {
+        //还在加载不管
+        if (this.state.globalLoading) {
+            return;
+        }
         this.setValue(changedValues);
         setTimeout(this.save, delayMs);
     }

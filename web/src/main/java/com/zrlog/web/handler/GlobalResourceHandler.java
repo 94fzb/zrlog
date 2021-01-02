@@ -2,6 +2,7 @@ package com.zrlog.web.handler;
 
 import com.jfinal.core.JFinal;
 import com.jfinal.handler.Handler;
+import com.zrlog.common.Constants;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.I18nUtil;
 import com.zrlog.web.util.WebTools;
@@ -36,7 +37,7 @@ public class GlobalResourceHandler extends Handler {
         FORBIDDEN_URI_EXT_SET.add(".properties");
         //静态文件
         FORBIDDEN_URI_SET.add("/install/index.html");
-        FORBIDDEN_URI_SET.add("/admin/index.html");
+        FORBIDDEN_URI_SET.add(Constants.ADMIN_URI_BASE_PATH + "/index.html");
     }
 
     @Override

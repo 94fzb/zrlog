@@ -74,7 +74,7 @@ class VisitorInterceptor implements Interceptor {
             return;
         }
         GlobalResourceHandler.printUserTime("Template before");
-        String templatePath = TemplateHelper.fullTemplateInfo(ai.getController(), true);
+        String templatePath = TemplateHelper.fullTemplateInfo(ai.getController());
         GlobalResourceHandler.printUserTime("Template after");
         TemplateVO templateVO = new TemplateService().getTemplateVO(JFinal.me().getContextPath(), new File(PathKit.getWebRootPath() + templatePath));
         String ext = ZrLogUtil.getViewExt(templateVO.getViewType());

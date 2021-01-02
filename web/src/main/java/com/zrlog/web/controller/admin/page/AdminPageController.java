@@ -17,8 +17,8 @@ public class AdminPageController extends BaseController {
     private final AdminTokenService adminTokenService = new AdminTokenService();
 
     public void index() throws FileNotFoundException {
-        if (getRequest().getRequestURI().endsWith("/admin") || getRequest().getRequestURI().endsWith("/admin/")) {
-            redirect("/admin/index");
+        if (getRequest().getRequestURI().endsWith(Constants.ADMIN_URI_BASE_PATH) || getRequest().getRequestURI().endsWith(Constants.ADMIN_URI_BASE_PATH + "/")) {
+            redirect(Constants.ADMIN_URI_BASE_PATH + "/index");
             return;
         }
         render(new HtmlRender(IOUtil.getStringInputStream(new FileInputStream(PathKit.getWebRootPath() + "/admin/index.html"))));
@@ -39,6 +39,6 @@ public class AdminPageController extends BaseController {
                 getResponse().addCookie(cookie);
             }
         }
-        redirect("/admin/login");
+        redirect(Constants.ADMIN_LOGIN_URI_BASE_PATH);
     }
 }

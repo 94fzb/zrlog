@@ -151,12 +151,12 @@ public class TemplateHelper {
         return url;
     }
 
-    static String fullTemplateInfo(Controller controller, boolean reload) {
+    static String fullTemplateInfo(Controller controller) {
         if (controller instanceof BaseController) {
             BaseController baseController = (BaseController) controller;
             String basePath = baseController.getTemplatePath();
             controller.getRequest().setAttribute("template", basePath);
-            I18nUtil.addToRequest(PathKit.getWebRootPath() + basePath + "/language/", controller.getRequest(), JFinal.me().getConstants().getDevMode(), reload);
+            I18nUtil.addToRequest(PathKit.getWebRootPath() + basePath + "/language/", controller.getRequest(), JFinal.me().getConstants().getDevMode());
             baseController.fullTemplateSetting();
             TemplateHelper.fullInfo(controller.getRequest(), Constants.isStaticHtmlStatus());
             return basePath;

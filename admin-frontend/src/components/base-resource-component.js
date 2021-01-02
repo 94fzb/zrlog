@@ -2,6 +2,7 @@ import React from "react";
 import {Modal} from "antd";
 
 const axios = require('axios')
+const resourceKey = "commonRes.v3";
 
 export class BaseResourceComponent extends React.Component {
 
@@ -10,7 +11,8 @@ export class BaseResourceComponent extends React.Component {
         axios.interceptors.response.use((response) => {
             if (response.data.error === 9001) {
                 Modal.warn({
-                    title: response.data.message,
+                    title: '会话过期',
+                    content: response.data.message,
                     okText: '确认'
                 });
                 return Promise.reject(response.data);
@@ -73,13 +75,9 @@ export class BaseResourceComponent extends React.Component {
     }
 
     fetchRes() {
-        const resourceKey = "commonRes.v2";
         const resourceData = window.sessionStorage.getItem(resourceKey);
         if (resourceData === null) {
-            this.getAxios().get('/api/public/resource').then(({data}) => {
-                this.handleRes(data);
-                window.sessionStorage.setItem(resourceKey, JSON.stringify(data));
-            })
+            this.reloadServerRes();
         } else {
             this.handleRes(JSON.parse(resourceData));
         }
@@ -87,6 +85,13 @@ export class BaseResourceComponent extends React.Component {
 
     getSecondTitle() {
         return null;
+    }
+
+    reloadServerRes() {
+        this.getAxios().get('/api/public/resource').then(({data}) => {
+            this.handleRes(data);
+            window.sessionStorage.setItem(resourceKey, JSON.stringify(data));
+        })
     }
 
     mapToQueryString(map) {
