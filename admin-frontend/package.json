@@ -25,11 +25,9 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "yarn run build:react && yarn run build:bundle",
+    "build": "GENERATE_SOURCEMAP=false react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "build:react": "GENERATE_SOURCEMAP=false react-scripts --max_old_space_size=4096 build",
-    "build:bundle": "webpack --max_old_space_size=4096 --config webpack.config.js"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -48,7 +46,6 @@
   },
   "devDependencies": {
     "rc-tween-one": "2.2.10-beta.0",
-    "react-loadable": "5.5.0",
-    "uglifyjs-webpack-plugin": "^2.2.0"
+    "react-loadable": "5.5.0"
   }
 }

@@ -126,6 +126,7 @@ class Website extends BaseResourceComponent {
         axios.post("/api/admin/website/" + formName, changedValues).then(({data}) => {
             if (!data.error) {
                 message.info(data.message);
+                this.reloadServerRes();
             }
         });
     }
@@ -207,7 +208,7 @@ class Website extends BaseResourceComponent {
                                     <Form.Item valuePropName="checked" name='article_thumbnail_status' label='文章封面'>
                                         <Switch/>
                                     </Form.Item>
-                                    <Form.Item name='language' label='语言'>
+                                    <Form.Item name='language' label={this.state.res['language']}>
                                         <Select style={{maxWidth: "100px"}}>
                                             <Option value='zh_CN'>{this.state.res['languageChinese']}</Option>
                                             <Option value='en_US'>{this.state.res['languageEnglish']}</Option>
@@ -226,8 +227,8 @@ class Website extends BaseResourceComponent {
                             </Col>
                         </Row>
                     </TabPane>
-                    <TabPane tab="主题设置" key="template">
-                        <Title level={4}>主题设置</Title>
+                    <TabPane tab={this.state.res['admin.template.manage']} key="template">
+                        <Title level={4}>{this.state.res['admin.template.manage']}</Title>
                         <Divider/>
                         <Row gutter={[16, 16]}>
                             {this.state.templates.map((template) => {
@@ -235,12 +236,14 @@ class Website extends BaseResourceComponent {
                                     <Col md={8} xxl={4} xs={24}>
                                         <Badge.Ribbon
                                             text={template.use ? this.state.res['admin.theme.inUse'] : template.preview ? this.state.res['admin.theme.inPreview'] : ""}
-                                            style={{display: template.use || template.preview ? "block" : "none"}}>
+                                            style={{
+                                                fontSize: 16,
+                                                display: template.use || template.preview ? "" : "none"
+                                            }}>
                                             <Card
-                                                style={{width: 380}}
                                                 cover={
                                                     <img
-                                                        height={434}
+                                                        style={{width: "100%"}}
                                                         alt={template.name}
                                                         src={template.previewImage}
                                                     />

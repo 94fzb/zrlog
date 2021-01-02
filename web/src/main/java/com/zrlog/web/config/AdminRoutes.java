@@ -1,6 +1,7 @@
 package com.zrlog.web.config;
 
 import com.jfinal.config.Routes;
+import com.zrlog.common.Constants;
 import com.zrlog.web.controller.admin.api.*;
 import com.zrlog.web.controller.admin.page.AdminPageController;
 import com.zrlog.web.controller.admin.page.AdminTemplatePageController;
@@ -14,18 +15,18 @@ import com.zrlog.web.controller.admin.page.AdminTemplatePageController;
 class AdminRoutes extends Routes {
     @Override
     public void config() {
-        add("/admin", AdminPageController.class);
-        add("/admin/template", AdminTemplatePageController.class);
-        add("/api/admin", AdminController.class);
-        add("/api/admin/link", LinkController.class);
-        add("/api/admin/comment", CommentController.class);
-        add("/api/admin/type", TypeController.class);
-        add("/api/admin/nav", BlogNavController.class);
-        add("/api/admin/article", AdminArticleController.class);
-        add("/api/admin/website", WebSiteController.class);
-        add("/api/admin/template", TemplateController.class);
-        add("/api/admin/upload", UploadController.class);
-        add("/api/admin/upgrade", UpgradeController.class);
-        add("/api/admin/user", AdminUserController.class);
+        add(Constants.ADMIN_URI_BASE_PATH, AdminPageController.class);
+        add(Constants.ADMIN_URI_BASE_PATH + "/template", AdminTemplatePageController.class);
+        add("/api" + Constants.ADMIN_URI_BASE_PATH, AdminController.class);
+        add("/api" + Constants.ADMIN_URI_BASE_PATH + "/link", LinkController.class);
+        add("/api" + Constants.ADMIN_URI_BASE_PATH + "/comment", CommentController.class);
+        add("/api" + Constants.ADMIN_URI_BASE_PATH + "/type", TypeController.class);
+        add("/api" + Constants.ADMIN_URI_BASE_PATH + "/nav", BlogNavController.class);
+        add("/api" + Constants.ADMIN_URI_BASE_PATH + "/article", AdminArticleController.class);
+        add("/api" + Constants.ADMIN_URI_BASE_PATH + "/website", WebSiteController.class);
+        add("/api" + Constants.ADMIN_URI_BASE_PATH + "/template", TemplateController.class);
+        add("/api" + Constants.ADMIN_URI_BASE_PATH + "/upload", UploadController.class);
+        add("/api" + Constants.ADMIN_URI_BASE_PATH + "/upgrade", UpgradeController.class);
+        add("/api" + Constants.ADMIN_URI_BASE_PATH + "/user", AdminUserController.class);
     }
 }

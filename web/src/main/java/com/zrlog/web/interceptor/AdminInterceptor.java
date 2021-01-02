@@ -37,23 +37,21 @@ public class AdminInterceptor implements Interceptor {
     /**
      * 为了规范代码，这里做了一点类是Spring的ResponseEntity的东西，及通过方法的返回值来判断是应该返回页面还会对应JSON数据
      * 具体方式看 AdminRouters，这里用到了 ThreadLocal
-     *
-     * @param ai
      */
     private void adminPermission(Invocation ai) {
         Controller controller = ai.getController();
         try {
-            if ("/admin/login".equals(ai.getActionKey())) {
+            if (Constants.ADMIN_LOGIN_URI_BASE_PATH.equals(ai.getActionKey())) {
                 AdminTokenVO adminTokenVO = adminTokenService.getAdminTokenVO(controller.getRequest());
                 if (adminTokenVO != null) {
-                    controller.redirect("/admin/index");
+                    controller.redirect(Constants.ADMIN_URI_BASE_PATH + "/index");
                 } else {
                     tryDoRender(ai);
                 }
                 return;
             }
-            if ("/admin/logout".equals(ai.getActionKey()) ||
-                    "/api/admin/login".equals(ai.getActionKey())) {
+            if ((Constants.ADMIN_URI_BASE_PATH + "/logout").equals(ai.getActionKey()) ||
+                    ("/api" + Constants.ADMIN_LOGIN_URI_BASE_PATH).equals(ai.getActionKey())) {
                 tryDoRender(ai);
                 return;
             }
@@ -94,8 +92,8 @@ public class AdminInterceptor implements Interceptor {
         } else {
             try {
                 String url = ai.getController().getRequest().getContextPath()
-                        + "/admin/login?redirectFrom="
-                        + RequestUtil.getRequestURLWithQueryString(ai.getController().getRequest());
+                        + Constants.ADMIN_LOGIN_URI_BASE_PATH + "?redirectFrom="
+                        + RequestUtil.getRequestUriWithQueryString(ai.getController().getRequest());
                 ai.getController().redirect(url);
             } catch (Exception e) {
                 LOGGER.error("", e);
@@ -106,9 +104,6 @@ public class AdminInterceptor implements Interceptor {
 
     /**
      * 尝试通过Controller的放回值来进行数据的渲染
-     *
-     * @param ai
-     * @return true 表示已经渲染数据了，false 表示并未按照约定编写，及没有进行渲染
      */
     private void tryDoRender(Invocation ai) {
         ai.invoke();
