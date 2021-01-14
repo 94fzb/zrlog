@@ -84,7 +84,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>3.2.3</version>
+                <version>3.3.1</version>
                 <configuration>
                     <resourceEncoding>${project.build.sourceEncoding}</resourceEncoding>
                     <warSourceDirectory>src/main/webapp</warSourceDirectory>

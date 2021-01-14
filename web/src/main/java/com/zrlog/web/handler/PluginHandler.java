@@ -77,7 +77,7 @@ public class PluginHandler extends Handler {
             PluginHelper.accessPlugin(target.replace(Constants.ADMIN_URI_BASE_PATH + "/plugins", ""), request, response, entry);
         } else {
             response.sendRedirect(request.getContextPath()
-                    + Constants.ADMIN_LOGIN_URI_BASE_PATH + "?redirectFrom="
+                    + Constants.ADMIN_LOGIN_URI_PATH + "?redirectFrom="
                     + RequestUtil.getRequestUriWithQueryString(request));
         }
     }

@@ -26,7 +26,7 @@ public class Constants {
     public static final String AUTO_UPGRADE_VERSION_KEY = "autoUpgradeVersion";
     public static final int DEFAULT_ARTICLE_DIGEST_LENGTH = 200;
     public static final String ADMIN_URI_BASE_PATH = "/admin";
-    public static final String ADMIN_LOGIN_URI_BASE_PATH = ADMIN_URI_BASE_PATH + "/login";
+    public static final String ADMIN_LOGIN_URI_PATH = ADMIN_URI_BASE_PATH + "/login";
 
     public static final String ATTACHED_FOLDER = "/attached/";
     public static final String TEMPLATE_CONFIG_SUFFIX = "_setting";

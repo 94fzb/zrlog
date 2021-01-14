@@ -39,6 +39,6 @@ public class AdminPageController extends BaseController {
                 getResponse().addCookie(cookie);
             }
         }
-        redirect(Constants.ADMIN_LOGIN_URI_BASE_PATH);
+        redirect(Constants.ADMIN_LOGIN_URI_PATH);
     }
 }

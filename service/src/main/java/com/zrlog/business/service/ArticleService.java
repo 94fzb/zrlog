@@ -244,7 +244,7 @@ public class ArticleService {
 
     public String getPlainSearchText(String content) {
         if (StringUtils.isEmpty(content)) {
-        return "";
+            return "";
         }
         return Jsoup.parse(content).body().text();
     }
