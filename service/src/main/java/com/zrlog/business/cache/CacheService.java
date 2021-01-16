@@ -70,7 +70,15 @@ public class CacheService {
             FileUtils.getAllFiles(PathKit.getWebRootPath(), staticFiles);
             for (File file : staticFiles) {
                 String uri = file.toString().substring(PathKit.getWebRootPath().length());
-                cacheFileMap.put(uri, file.lastModified() + "");
+                if (!uri.startsWith("/assets") &&
+                        !uri.startsWith("/include") &&
+                        !Objects.equals("/favicon.ico", uri)) {
+                    continue;
+                }
+                if (uri.endsWith(".jsp")) {
+                    continue;
+                }
+                cacheFileMap.put(uri.substring(1), file.lastModified() + "");
             }
         }
         if (baseController != null) {

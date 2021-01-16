@@ -184,17 +184,17 @@ class ResponseRenderPrintWriter extends PrintWriter {
         if (staticResourceBaseUrl == null) {
             staticResourceBaseUrl = baseUrl;
         }
-        if (href.startsWith(baseUrl) || href.startsWith(staticResourceBaseUrl) || href.startsWith("admin/js") || href.startsWith("admin/markdwon") || href.startsWith("admin/summernote") || href.startsWith("assets")) {
+        if (href.startsWith(baseUrl) || href.startsWith(staticResourceBaseUrl) || href.startsWith("admin/js") || href.startsWith("assets")) {
             String uriPath = href;
-            if (href.startsWith(baseUrl)) {
-                uriPath = href.substring(baseUrl.length());
-            } else if (href.startsWith(staticResourceBaseUrl)) {
+            //优先判断静态资源的情况
+            if (href.startsWith(staticResourceBaseUrl)) {
                 uriPath = href.substring(staticResourceBaseUrl.length());
+            } else if (href.startsWith(baseUrl)) {
+                uriPath = href.substring(baseUrl.length());
             }
             if (uriPath.contains("?")) {
                 uriPath = uriPath.substring(0, uriPath.lastIndexOf("?"));
             }
-            uriPath = "/" + uriPath;
             String flag = CacheService.getFileFlag(uriPath);
             if (flag != null) {
                 if (href.contains("?")) {
