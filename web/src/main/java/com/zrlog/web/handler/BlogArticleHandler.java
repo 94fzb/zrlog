@@ -82,7 +82,7 @@ public class BlogArticleHandler extends Handler {
 
     private void responseHtmlFile(String target, HttpServletRequest request, HttpServletResponse response, boolean[] isHandled, String fileName) throws IOException {
         try {
-            File htmlFile = new File(CACHE_HTML_PATH + I18nUtil.getAcceptLanguage(request) + fileName);
+            File htmlFile = new File(CACHE_HTML_PATH + I18nUtil.getAcceptLocal(request) + fileName);
             response.setContentType("text/html;charset=UTF-8");
             if (htmlFile.exists() && !ZrLogUtil.isStaticBlogPlugin(request)) {
                 isHandled[0] = true;
