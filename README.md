@@ -10,9 +10,9 @@ ZrLog是使用 Java 开发的博客/CMS程序，具有简约，易用，组件�
 
 ### 一图胜千言
 
-![](http://dl.zrlog.com/assets/screenprint/post-detail.png)
+![](https://www.zrlog.com/assets/screenprint/post-detail.png)
 
-![](http://dl.zrlog.com/assets/screenprint/article-edit.png)
+![](https://www.zrlog.com/assets/screenprint/article-edit.png)
 
 ### 特性
 

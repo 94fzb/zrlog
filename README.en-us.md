@@ -10,9 +10,9 @@ ZrLog is a blog/CMS program developed in Java. It is simple, easy to use, compon
 
 ### Pictures
 
-![](http://dl.zrlog.com/assets/screenprint/post-detail.png)
+![](https://www.zrlog.com/assets/screenprint/post-detail.png)
 
-![](http://dl.zrlog.com/assets/screenprint/article-edit.png)
+![](https://www.zrlog.com/assets/screenprint/article-edit.png)
 
 ### Features
 
