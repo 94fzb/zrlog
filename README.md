@@ -49,7 +49,7 @@ ZrLog是使用 Java 开发的博客/CMS程序，具有简约，易用，组件�
 
 ### 变更日志
 
-[查看完整的ChangeLog](https://www.zrlog.com/changelog?ref=md)
+[查看完整的ChangeLog](https://www.zrlog.com/changelog/index.html?ref=md)
 
 ### 示例网站
  

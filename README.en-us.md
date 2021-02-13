@@ -48,7 +48,7 @@ ZrLog is a blog/CMS program developed in Java. It is simple, easy to use, compon
 
 ### ChangeLog
 
-[View the full ChangeLog](https://www.zrlog.com/changelog?ref=md)
+[View the full ChangeLog](https://www.zrlog.com/changelog/index.html?ref=md)
 
 ### Sample Website
 
