@@ -11,7 +11,7 @@
     "@testing-library/react": "9.3.2",
     "@testing-library/user-event": "7.1.2",
     "antd": "4.9.4",
-    "axios": "0.20.0",
+    "axios": "0.21.1",
     "font-awesome": "4.7.0",
     "history": "4.10.1",
     "jquery": "3.5.1",
