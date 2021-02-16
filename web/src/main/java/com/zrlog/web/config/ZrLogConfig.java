@@ -28,7 +28,6 @@ import com.zrlog.blog.web.interceptor.MyI18nInterceptor;
 import com.zrlog.web.inteceptor.RouterInterceptor;
 import com.zrlog.blog.web.plugin.CacheCleanerPlugin;
 import com.zrlog.blog.web.plugin.RequestStatisticsPlugin;
-import com.zrlog.blog.web.render.BlogFrontendFreeMarkerRender;
 import com.zrlog.blog.web.version.UpgradeVersionHandler;
 import com.zrlog.business.service.InstallAction;
 import com.zrlog.business.util.InstallUtils;
@@ -219,12 +218,6 @@ public class ZrLogConfig extends JFinalConfig implements InstallAction {
      */
     @Override
     public void onStart() {
-        try {
-            BlogFrontendFreeMarkerRender.getConfiguration().setDirectoryForTemplateLoading(new File(PathKit.getWebRootPath()));
-            BlogFrontendFreeMarkerRender.init(JFinal.me().getServletContext(), Locale.getDefault(), Const.DEFAULT_FREEMARKER_TEMPLATE_UPDATE_DELAY);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         super.onStart();
 
         JFinal.me().getServletContext().setAttribute("config", this);

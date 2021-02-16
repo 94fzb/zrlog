@@ -7,7 +7,6 @@ import com.jfinal.core.JFinal;
 import com.jfinal.json.Json;
 import com.jfinal.kit.PathKit;
 import com.zrlog.blog.web.handler.GlobalResourceHandler;
-import com.zrlog.blog.web.render.BlogFrontendFreeMarkerRender;
 import com.zrlog.business.exception.InstalledException;
 import com.zrlog.business.service.TemplateHelper;
 import com.zrlog.business.service.TemplateService;
@@ -94,10 +93,8 @@ public class VisitorInterceptor implements Interceptor {
         }
         fullDevData(ai.getController());
         String viewPath = templatePath + "/" + templateName + ext;
-        if (ext.equals(".ftl")) {
-            BlogFrontendFreeMarkerRender render = new BlogFrontendFreeMarkerRender(viewPath);
-            render.setContext(ai.getController().getRequest(), ai.getController().getResponse());
-            ai.getController().render(render);
+        if (".ftl".equals(ext)) {
+            throw new RuntimeException("Not implement");
         } else {
             ai.getController().render(viewPath);
         }

@@ -19,19 +19,13 @@
         <dependency>
             <groupId>com.zrlog</groupId>
             <artifactId>service</artifactId>
-            <version>${project.version}</version>
+            <version>2.1.15-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>${servlet.version}</version>
             <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.jfinal</groupId>
-            <artifactId>cos</artifactId>
-            <version>2020.4</version>
         </dependency>
         <dependency>
             <groupId>jstl</groupId>
@@ -43,19 +37,13 @@
             <artifactId>htmlcleaner</artifactId>
             <version>2.21</version>
         </dependency>
-        <dependency>
-            <groupId>org.freemarker</groupId>
-            <artifactId>freemarker</artifactId>
-            <version>2.3.23</version>
-        </dependency>
     </dependencies>
 
     <build>
-       <plugins>
+        <plugins>
             <plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
-                <version>1.10.0</version>
                 <executions>
                     <execution>
                         <id>install node and yarn</id>
@@ -87,54 +75,53 @@
                     <nodeVersion>v14.4.0</nodeVersion>
                     <yarnVersion>v1.22.4</yarnVersion>
                     <workingDirectory>src/main/frontend/src</workingDirectory>
-                    <outputdir>${parent.basedir}/web/src/main/webapp/install</outputdir>
                     <nodeDownloadRoot>https://npm.taobao.org/mirrors/node/</nodeDownloadRoot>
                     <yarnDownloadRoot>https://npm.taobao.org/mirrors/yarn/</yarnDownloadRoot>
                     <npmRegistryURL>https://registry.npm.taobao.org</npmRegistryURL>
                 </configuration>
             </plugin>
-           <plugin>
-               <artifactId>maven-clean-plugin</artifactId>
-               <version>3.1.0</version>
-               <executions>
-                   <execution>
-                       <id>clean</id>
-                       <phase>initialize</phase>
-                       <goals>
-                           <goal>clean</goal>
-                       </goals>
-                       <configuration>
-                           <filesets>
-                               <fileset>
-                                   <directory>../web/src/main/webapp/install</directory>
-                               </fileset>
-                           </filesets>
-                       </configuration>
-                   </execution>
-               </executions>
-           </plugin>
-           <plugin>
-               <artifactId>maven-resources-plugin</artifactId>
-               <version>3.2.0</version>
-               <executions>
-                   <execution>
-                       <id>copy-resources</id>
-                       <phase>package</phase>
-                       <goals>
-                           <goal>copy-resources</goal>
-                       </goals>
-                       <configuration>
-                           <outputDirectory>../web/src/main/webapp/install</outputDirectory>
-                           <resources>
-                               <resource>
-                                   <directory>src/main/frontend/build</directory>
-                                   <filtering>true</filtering>
-                               </resource>
-                           </resources>
-                       </configuration>
-                   </execution>
-               </executions>
-           </plugin>
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>clean</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                        <configuration>
+                            <filesets>
+                                <fileset>
+                                    <directory>../web/src/main/webapp/install</directory>
+                                </fileset>
+                            </filesets>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>../web/src/main/webapp/install</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/frontend/build</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>
