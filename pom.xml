@@ -9,8 +9,9 @@
         <module>service</module>
         <module>common</module>
         <module>data</module>
-        <module>install-frontend</module>
-        <module>admin-frontend</module>
+        <module>blog-web</module>
+        <module>admin-web</module>
+        <module>admin-token</module>
     </modules>
     <packaging>pom</packaging>
     <name>zrlog</name>

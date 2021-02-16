@@ -1,1 +1,0 @@
-./mvnw clean package -f 'admin-frontend/pom.xml' -X

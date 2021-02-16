@@ -18,6 +18,7 @@ import java.util.*;
  */
 public class CacheService {
 
+    public static final String CACHE_HTML_PATH = PathKit.getWebRootPath() + "/_cache/";
     private static final Map<String, String> cacheFileMap = new HashMap<>();
 
     public void refreshInitDataCache(String cachePath, Controller baseController, boolean cleanAble) {

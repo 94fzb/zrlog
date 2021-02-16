@@ -23,45 +23,19 @@
     <dependencies>
         <dependency>
             <groupId>com.zrlog</groupId>
-            <artifactId>service</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.jfinal</groupId>
-            <artifactId>cos</artifactId>
-            <version>2020.4</version>
+            <artifactId>blog-web</artifactId>
+            <version>2.1.15-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>jstl</groupId>
-            <artifactId>jstl</artifactId>
-            <version>1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>net.sourceforge.htmlcleaner</groupId>
-            <artifactId>htmlcleaner</artifactId>
-            <version>2.21</version>
+            <groupId>com.zrlog</groupId>
+            <artifactId>admin-web</artifactId>
+            <version>2.1.15-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>${servlet.version}</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.freemarker</groupId>
-            <artifactId>freemarker</artifactId>
-            <version>2.3.23</version>
-        </dependency>
-        <dependency>
-            <groupId>com.zrlog</groupId>
-            <artifactId>install-frontend</artifactId>
-            <version>2.1.15-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.zrlog</groupId>
-            <artifactId>admin-frontend</artifactId>
-            <version>2.1.15-SNAPSHOT</version>
         </dependency>
 
 
