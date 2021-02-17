@@ -1,1 +1,0 @@
-./mvnw clean package -f 'install-frontend/pom.xml'

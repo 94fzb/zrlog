@@ -105,4 +105,18 @@ public class BlogBuildInfoUtil {
         LOGGER.info("buildId = " + getBuildId());
         LOGGER.info("time = " + getTime());
     }
+
+    public static Properties getBlogProp() {
+        Properties blogProperties = new Properties();
+        try {
+            blogProperties.load(BlogBuildInfoUtil.class.getResourceAsStream("/zrlog.properties"));
+        } catch (IOException e) {
+            LOGGER.error("load blogProperties error", e);
+        }
+        blogProperties.put("version", BlogBuildInfoUtil.getVersion());
+        blogProperties.put("buildId", BlogBuildInfoUtil.getBuildId());
+        blogProperties.put("buildTime", new SimpleDateFormat("yyyy-MM-dd").format(BlogBuildInfoUtil.getTime()));
+        blogProperties.put("runMode", BlogBuildInfoUtil.getRunMode());
+        return blogProperties;
+    }
 }
