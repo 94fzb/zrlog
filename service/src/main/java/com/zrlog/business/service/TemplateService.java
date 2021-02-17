@@ -4,8 +4,10 @@ import com.google.gson.GsonBuilder;
 import com.hibegin.common.util.FileUtils;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.common.util.ZipUtil;
+import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
+import com.zrlog.blog.web.controller.BaseController;
 import com.zrlog.business.rest.response.UpdateRecordResponse;
 import com.zrlog.business.rest.response.UploadTemplateResponse;
 import com.zrlog.common.Constants;
@@ -14,6 +16,7 @@ import com.zrlog.model.WebSite;
 import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ZrLogUtil;
 
+import javax.servlet.http.Cookie;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -165,5 +168,18 @@ public class TemplateService {
         }
         //使用字典序
         return new ArrayList<>(new TreeSet<>(strFile));
+    }
+
+    public String getTemplatePathByCookie(Cookie[] cookies) {
+        String previewTemplate = null;
+        if (cookies != null && cookies.length > 0) {
+            for (Cookie cookie : cookies) {
+                if ("template".equals(cookie.getName()) && cookie.getValue().startsWith(Constants.TEMPLATE_BASE_PATH)) {
+                    previewTemplate = cookie.getValue();
+                    break;
+                }
+            }
+        }
+        return previewTemplate;
     }
 }

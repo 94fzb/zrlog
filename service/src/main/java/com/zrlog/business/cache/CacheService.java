@@ -1,6 +1,7 @@
 package com.zrlog.business.cache;
 
 import com.hibegin.common.util.FileUtils;
+import com.hibegin.common.util.IOUtil;
 import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
@@ -11,6 +12,7 @@ import com.zrlog.common.rest.request.PageRequest;
 import com.zrlog.model.*;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -18,19 +20,37 @@ import java.util.*;
  */
 public class CacheService {
 
+    private static final String CACHE_HTML_PATH = PathKit.getWebRootPath() + "/_cache/";
     private static final Map<String, String> cacheFileMap = new HashMap<>();
 
-    public void refreshInitDataCache(String cachePath, Controller baseController, boolean cleanAble) {
+    public File loadHtmlFile(String cacheKey) {
+        return new File(CACHE_HTML_PATH + cacheKey);
+    }
+
+
+    /**
+     * 将一个网页转化对应文件，用于静态化文章页
+     */
+    public void saveResponseBodyToHtml(File file, String copy) {
+        if (copy == null) {
+            return;
+        }
+        byte[] bytes = copy.getBytes(StandardCharsets.UTF_8);
+        FileUtils.tryResizeDiskSpace(CACHE_HTML_PATH + Constants.getArticleUri(), bytes.length, Constants.getMaxCacheHtmlSize());
+        if (!file.exists()) {
+            file.getParentFile().mkdirs();
+        }
+        IOUtil.writeBytesToFile(bytes, file);
+    }
+
+
+    public void refreshInitDataCache(Controller baseController, boolean cleanAble) {
         if (cleanAble) {
-            clearCache();
-            FileUtils.deleteFile(cachePath);
+            JFinal.me().getServletContext().removeAttribute(Constants.CACHE_KEY);
+            FileUtils.deleteFile(CACHE_HTML_PATH);
             new Tag().refreshTag();
         }
         initCache(baseController);
-    }
-
-    private void clearCache() {
-        JFinal.me().getServletContext().removeAttribute(Constants.CACHE_KEY);
     }
 
     private void initCache(Controller baseController) {

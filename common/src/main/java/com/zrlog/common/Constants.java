@@ -8,6 +8,7 @@ import com.zrlog.common.type.AutoUpgradeVersionType;
 import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -124,5 +125,9 @@ public class Constants {
             sessionTimeout = DEFAULT_SESSION_TIMEOUT;
         }
         return sessionTimeout;
+    }
+
+    public static List<String> articleRouterList() {
+        return Collections.singletonList("/" + getArticleRoute());
     }
 }

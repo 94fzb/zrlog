@@ -9,8 +9,9 @@
         <module>service</module>
         <module>common</module>
         <module>data</module>
-        <module>install-frontend</module>
-        <module>admin-frontend</module>
+        <module>blog-web</module>
+        <module>admin-web</module>
+        <module>admin-token</module>
     </modules>
     <packaging>pom</packaging>
     <name>zrlog</name>
@@ -109,5 +110,14 @@
                 <version>2.7</version>
             </plugin>
         </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>com.github.eirslett</groupId>
+                    <artifactId>frontend-maven-plugin</artifactId>
+                    <version>1.11.0</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 </project>
