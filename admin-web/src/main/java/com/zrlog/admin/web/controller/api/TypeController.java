@@ -1,10 +1,15 @@
 package com.zrlog.admin.web.controller.api;
 
+import com.hibegin.common.util.BeanUtil;
+import com.zrlog.admin.web.annotation.RefreshCache;
+import com.zrlog.blog.web.controller.BaseController;
+import com.zrlog.business.rest.base.CreateTypeRequest;
+import com.zrlog.business.rest.base.UpdateTypeRequest;
 import com.zrlog.business.rest.response.UpdateRecordResponse;
 import com.zrlog.data.dto.PageData;
 import com.zrlog.model.Type;
-import com.zrlog.admin.web.annotation.RefreshCache;
-import com.zrlog.blog.web.controller.BaseController;
+
+import java.io.IOException;
 
 public class TypeController extends BaseController {
     @RefreshCache
@@ -17,17 +22,19 @@ public class TypeController extends BaseController {
     }
 
     @RefreshCache
-    public UpdateRecordResponse add() {
-        return new UpdateRecordResponse(new Type().set("typeName", getPara("typeName"))
-                .set("alias", getPara("alias"))
-                .set("remark", getPara("remark")).save());
+    public UpdateRecordResponse add() throws IOException {
+        CreateTypeRequest typeRequest = BeanUtil.convert(getRequest().getInputStream(), CreateTypeRequest.class);
+        return new UpdateRecordResponse(new Type().set("typeName", typeRequest.getTypeName())
+                .set("alias", typeRequest.getAlias())
+                .set("remark", typeRequest.getRemark()).save());
     }
 
     @RefreshCache
-    public UpdateRecordResponse update() {
-        return new UpdateRecordResponse(new Type().set("typeId", getPara("id"))
-                .set("typeName", getPara("typeName"))
-                .set("alias", getPara("alias"))
-                .set("remark", getPara("remark")).update());
+    public UpdateRecordResponse update() throws IOException {
+        UpdateTypeRequest typeRequest = BeanUtil.convert(getRequest().getInputStream(), UpdateTypeRequest.class);
+        return new UpdateRecordResponse(new Type().set("typeId", typeRequest.getId())
+                .set("typeName", typeRequest.getTypeName())
+                .set("alias", typeRequest.getAlias())
+                .set("remark", typeRequest.getRemark()).update());
     }
 }

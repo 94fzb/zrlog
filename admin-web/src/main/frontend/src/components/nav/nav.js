@@ -1,12 +1,15 @@
 import React from "react";
-import {Spin, Table} from "antd";
-import {BaseTableComponent} from "./base-table-component";
+import {Space, Table} from "antd";
+import {BaseTableComponent} from "../base-table-component";
+import Spin from "antd/lib/spin";
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
 import Popconfirm from "antd/es/popconfirm";
 import {DeleteOutlined} from "@ant-design/icons";
+import {AddNav} from "./add_nav";
+import {EditNav} from "./edit_nav";
 
-class BLink extends BaseTableComponent {
+class Nav extends BaseTableComponent {
 
     initState() {
         return {
@@ -19,15 +22,16 @@ class BLink extends BaseTableComponent {
                 {
                     title: '',
                     dataIndex: 'id',
-                    key: 'delete',
+                    key: 'op',
                     render: (text, record) =>
                         this.state.rows.length >= 1 ? (
-                            <div style={{color: "red"}}>
+                            <Space size={16}>
                                 <Popconfirm title={this.state.res['deleteTips']}
                                             onConfirm={() => this.handleDelete(record.id)}>
-                                    <DeleteOutlined/>
+                                    <DeleteOutlined style={{color: "red"}}/>
                                 </Popconfirm>
-                            </div>
+                                <EditNav col={record}/>
+                            </Space>
                         ) : null,
                 },
                 {
@@ -41,37 +45,33 @@ class BLink extends BaseTableComponent {
                     )
                 },
                 {
-                    title: '链接',
-                    dataIndex: 'linkName',
-                    key: 'linkName',
+                    title: '导航名称',
+                    dataIndex: 'navName',
+                    key: 'navName',
                 },
                 {
-                    title: '网站名称',
-                    key: 'linkName',
-                    dataIndex: 'linkName'
-                },
-                {
-                    title: '描述',
-                    key: 'alt',
-                    dataIndex: 'alt'
+                    title: '排序',
+                    key: 'sort',
+                    dataIndex: 'sort'
                 }
             ]
         }
     }
 
     getDataApiUri() {
-        return "/api/admin/link"
+        return "/api/admin/nav"
     }
 
     getDeleteApiUri() {
-        return "/api/admin/link/delete";
+        return "/api/admin/nav/delete";
     }
 
     getSecondTitle() {
-        return this.state.res['admin.link.manage'];
+        return this.state.res['admin.nav.manage'];
     }
 
     render() {
+
         const {rows, pagination, tableLoading} = this.state;
 
 
@@ -79,6 +79,7 @@ class BLink extends BaseTableComponent {
             <Spin delay={this.getSpinDelayTime()} spinning={this.state.resLoading}>
                 <Title className='page-header' level={3}>{this.getSecondTitle()}</Title>
                 <Divider/>
+                <AddNav/>
                 <Table loading={tableLoading} bordered onChange={this.onShowSizeChange} columns={this.state.columns}
                        pagination={pagination}
                        dataSource={rows}
@@ -88,4 +89,4 @@ class BLink extends BaseTableComponent {
     }
 }
 
-export default BLink;
+export default Nav;

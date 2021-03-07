@@ -1,0 +1,40 @@
+body {
+    color: #314659;
+}
+
+.App {
+    text-align: center;
+}
+
+.login-container {
+    width: 100%;
+    margin-top: 20vh;
+    margin-right: auto;
+    margin-left: auto;
+    max-width: 660px;
+}
+
+.ant-layout {
+    min-height: 100vh;
+}
+
+.dim {
+    opacity: 0.6;
+    filter: alpha(opacity=60);
+    width: 100%;
+    font-size: 30px;
+    height: 150px;
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    background-size: cover;
+    background: no-repeat center;
+}
+
+.dimback {
+    background: rgba(54, 84, 99, 0.7);
+    text-align: center;
+}

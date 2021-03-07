@@ -278,10 +278,10 @@ class ArticleEdit extends BaseResourceComponent {
                                 {this.state.res.release}</Button>
                         </Col>
                     </Row>
-                    <Row gutter={[8, 8]}>
+                    <Row gutter={8}>
                         <Col md={8} xs={24}>
                             <Form.Item
-                                style={{marginBottom: 0}}
+                                style={{marginBottom: 8}}
                                 name="title"
                                 rules={[{required: true, message: this.state.res.inputArticleTitle}]}>
                                 <Input placeholder={this.state.res.inputArticleTitle}/>
@@ -289,7 +289,7 @@ class ArticleEdit extends BaseResourceComponent {
                         </Col>
                         <Col md={5} xs={24}>
                             <Form.Item
-                                style={{marginBottom: 0}}
+                                style={{marginBottom: 8}}
                                 name="alias">
                                 <Input addonBefore={this.getArticleRoute() + "/"}
                                        placeholder={this.state.res.inputArticleAlias}/>

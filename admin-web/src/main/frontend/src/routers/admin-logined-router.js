@@ -30,18 +30,18 @@ const AsyncWebSite = Loadable({
 });
 
 const AsyncType = Loadable({
-    loader: () => import("../components/type"),
+    loader: () => import("../components/type/type"),
     loading: MyLoadingComponent
 });
 
 
 const AsyncLink = Loadable({
-    loader: () => import("../components/link"),
+    loader: () => import("../components/link/link"),
     loading: MyLoadingComponent
 });
 
 const AsyncNav = Loadable({
-    loader: () => import("../components/nav"),
+    loader: () => import("../components/nav/nav"),
     loading: MyLoadingComponent
 });
 

@@ -34,7 +34,7 @@ function getDefaultOpenKeys() {
     if (window.location.pathname === '/admin/link' || window.location.pathname === '/admin/nav' || window.location.pathname === '/admin/blog/type') {
         return "more";
     }
-    return;
+    return "";
 }
 
 const defaultOpenKeys = getDefaultOpenKeys();
@@ -130,7 +130,7 @@ class IndexLayout extends BaseResourceComponent {
                             </Menu.Item>
                             <Menu.Item key="/admin/plugin">
                                 <Link to='/admin/plugin'>
-                                    <ApiOutlined />
+                                    <ApiOutlined/>
                                     <span>{this.state.res['admin.plugin.manage']}</span>
                                 </Link>
                             </Menu.Item>

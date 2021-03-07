@@ -1,11 +1,13 @@
 import React from "react";
-import {Table} from "antd";
-import {BaseTableComponent} from "./base-table-component";
+import {Space, Table} from "antd";
 import Spin from "antd/es/spin";
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
 import Popconfirm from "antd/es/popconfirm";
 import {DeleteOutlined} from "@ant-design/icons";
+import {BaseTableComponent} from "../base-table-component";
+import {AddType} from "./add_type";
+import {EditType} from "./edit_type";
 
 class Type extends BaseTableComponent {
 
@@ -23,12 +25,13 @@ class Type extends BaseTableComponent {
                     key: 'delete',
                     render: (text, record) =>
                         this.state.rows.length >= 1 ? (
-                            <div style={{color: "red"}}>
+                            <Space size={16}>
                                 <Popconfirm title={this.state.res['deleteTips']}
                                             onConfirm={() => this.handleDelete(record.id)}>
-                                    <DeleteOutlined/>
+                                    <DeleteOutlined style={{color: "red"}}/>
                                 </Popconfirm>
-                            </div>
+                                <EditType col={record}/>
+                            </Space>
                         ) : null,
                 },
                 {
@@ -69,14 +72,17 @@ class Type extends BaseTableComponent {
 
 
         return (
-            <Spin delay={this.getSpinDelayTime()} spinning={this.state.resLoading}>
-                <Title className='page-header' level={3}>{this.getSecondTitle()}</Title>
-                <Divider/>
-                <Table loading={tableLoading} bordered onChange={this.onShowSizeChange} columns={this.state.columns}
-                       pagination={pagination}
-                       dataSource={rows}
-                       scroll={{x: '100vw'}}/>
-            </Spin>
+            <>
+                <Spin delay={this.getSpinDelayTime()} spinning={this.state.resLoading}>
+                    <Title className='page-header' level={3}>{this.getSecondTitle()}</Title>
+                    <Divider/>
+                    <AddType/>
+                    <Table loading={tableLoading} bordered onChange={this.onShowSizeChange} columns={this.state.columns}
+                           pagination={pagination}
+                           dataSource={rows}
+                           scroll={{x: '100vw'}}/>
+                </Spin>
+            </>
         )
     }
 }

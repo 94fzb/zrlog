@@ -1,10 +1,15 @@
 package com.zrlog.admin.web.controller.api;
 
+import com.hibegin.common.util.BeanUtil;
+import com.zrlog.admin.web.annotation.RefreshCache;
+import com.zrlog.blog.web.controller.BaseController;
+import com.zrlog.business.rest.base.CreateLinkRequest;
+import com.zrlog.business.rest.base.UpdateLinkRequest;
 import com.zrlog.business.rest.response.UpdateRecordResponse;
 import com.zrlog.data.dto.PageData;
 import com.zrlog.model.Link;
-import com.zrlog.admin.web.annotation.RefreshCache;
-import com.zrlog.blog.web.controller.BaseController;
+
+import java.io.IOException;
 
 public class LinkController extends BaseController {
 
@@ -14,16 +19,14 @@ public class LinkController extends BaseController {
     }
 
     @RefreshCache
-    public UpdateRecordResponse update() {
-        if (getPara("id") != null) {
-            new Link().set("linkId", getPara("id"))
-                    .set("linkName", getPara("linkName"))
-                    .set("sort", getParaToInt("sort", 100))
-                    .set("url", getPara("url")).set("alt", getPara("alt")).update();
-            return new UpdateRecordResponse();
-        } else {
-            return add();
-        }
+    public UpdateRecordResponse update() throws IOException {
+        UpdateLinkRequest typeRequest = BeanUtil.convert(getRequest().getInputStream(), UpdateLinkRequest.class);
+        new Link().set("linkId", typeRequest.getId())
+                .set("linkName", typeRequest.getLinkName())
+                .set("sort", typeRequest.getSort())
+                .set("url", typeRequest.getUrl())
+                .set("alt", typeRequest.getAlt()).update();
+        return new UpdateRecordResponse();
     }
 
     public PageData<Link> index() {
@@ -31,10 +34,12 @@ public class LinkController extends BaseController {
     }
 
     @RefreshCache
-    public UpdateRecordResponse add() {
-        new Link().set("linkName", getPara("linkName"))
-                .set("sort", getParaToInt("sort", 100))
-                .set("url", getPara("url")).set("alt", getPara("alt")).save();
+    public UpdateRecordResponse add() throws IOException {
+        CreateLinkRequest typeRequest = BeanUtil.convert(getRequest().getInputStream(), CreateLinkRequest.class);
+        new Link().set("linkName", typeRequest.getLinkName())
+                .set("sort", typeRequest.getSort())
+                .set("url", typeRequest.getUrl())
+                .set("alt", typeRequest.getAlt()).save();
         return new UpdateRecordResponse();
     }
 
