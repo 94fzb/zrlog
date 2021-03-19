@@ -6,6 +6,7 @@ import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
 import com.zrlog.blog.web.controller.BaseController;
+import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.business.cache.vo.Archive;
 import com.zrlog.business.cache.vo.BaseDataInitVO;
 import com.zrlog.business.util.PagerVO;
@@ -20,7 +21,6 @@ import com.zrlog.util.I18nUtil;
 import com.zrlog.util.OutlineUtil;
 import com.zrlog.util.ParseUtil;
 import com.zrlog.util.ZrLogUtil;
-import com.zrlog.blog.web.util.WebTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,7 +115,7 @@ public class TemplateHelper {
 
     private static boolean isHomePage(HttpServletRequest request) {
         String uri = request.getRequestURI().replace(".html", "");
-        return "/".equals(uri) || "/all-1".equals(uri) || "/all".equals(uri) || ("/" + Constants.getArticleUri() + "all").equals(uri) ||
+        return "".equals(uri) || "/".equals(uri) || "/all-1".equals(uri) || "/all".equals(uri) || ("/" + Constants.getArticleUri() + "all").equals(uri) ||
                 ("/" + Constants.getArticleUri() + "all-1").equals(uri);
     }
 
@@ -127,11 +127,14 @@ public class TemplateHelper {
             if ("/".equals(url) && isHomePage(request)) {
                 current = true;
             } else if (url.startsWith("/")) {
-                //文章页
-                if (url.startsWith("/" + Constants.getArticleUri())) {
-                    url = WebTools.getHomeUrlWithHost(request) + url.substring(1) + suffix;
-                    logNav.put("url", url);
+                if ("/".equals(url)) {
+                    url = WebTools.getHomeUrlWithHost(request);
                 }
+                //文章页
+                else if (url.startsWith("/" + Constants.getArticleUri())) {
+                    url = WebTools.getHomeUrlWithHost(request) + url.substring(1) + suffix;
+                }
+                logNav.put("url", url);
                 current = ignoreScheme(request.getRequestURL().toString()).equals(ignoreScheme(url));
             } else {
                 current = ignoreScheme(request.getRequestURL().toString()).equals(ignoreScheme(url));
