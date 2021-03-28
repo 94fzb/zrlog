@@ -15,10 +15,10 @@ public class ZipUpdateVersionThread extends Thread implements Serializable, Upda
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ZipUpdateVersionThread.class);
 
-    private File file;
-    private StringBuilder sb = new StringBuilder();
+    private final File file;
+    private final StringBuilder sb = new StringBuilder();
     private boolean finish;
-    private File tempFilePath;
+    private final File tempFilePath;
 
     public ZipUpdateVersionThread(File file) {
         this.file = file;

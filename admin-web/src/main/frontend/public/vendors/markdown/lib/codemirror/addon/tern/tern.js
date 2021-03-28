@@ -528,7 +528,7 @@
         }
         for (var file in perFile) {
             var known = ts.docs[file], chs = perFile[file];
-            ;
+
             if (!known) continue;
             chs.sort(function (a, b) {
                 return cmpPos(b.start, a.start);

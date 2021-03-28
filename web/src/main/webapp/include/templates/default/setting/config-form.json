@@ -1,0 +1,20 @@
+{
+  "title": {
+    "label": "标题",
+    "htmlElementType": "input",
+    "placeholder": "不建议大于10个字符",
+    "type": "text"
+  },
+  "footerSlogan": {
+    "label": "底部 Slogan",
+    "htmlElementType": "input",
+    "placeholder": "放上一句自己喜欢的话语，让更多的人了解你",
+    "type": "text"
+  },
+  "avatar": {
+    "label": "网站 Logo",
+    "htmlElementType": "input",
+    "placeholder": "",
+    "type": "file"
+  }
+}

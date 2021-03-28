@@ -1,5 +1,5 @@
 import React from "react";
-import {BaseResourceComponent} from "./base-resource-component";
+import {BaseResourceComponent} from "../base-resource-component";
 
 
 function Iframe(props) {

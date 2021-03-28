@@ -1,9 +1,13 @@
 package com.zrlog.admin.web.controller.api;
 
+import com.google.gson.Gson;
 import com.hibegin.common.util.FileUtils;
+import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.StringUtils;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
+import com.zrlog.admin.web.annotation.RefreshCache;
+import com.zrlog.blog.web.controller.BaseController;
 import com.zrlog.business.exception.BadTemplatePathException;
 import com.zrlog.business.rest.response.UpdateRecordResponse;
 import com.zrlog.business.rest.response.UploadTemplateResponse;
@@ -14,11 +18,11 @@ import com.zrlog.common.vo.TemplateVO;
 import com.zrlog.model.WebSite;
 import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ZrLogUtil;
-import com.zrlog.admin.web.annotation.RefreshCache;
-import com.zrlog.blog.web.controller.BaseController;
 
 import javax.servlet.http.Cookie;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
@@ -82,12 +86,6 @@ public class TemplateController extends BaseController {
     }
 
     public TemplateVO configParams() {
-        String templateName = getPara("template");
-        TemplateVO templateVO = templateService.getTemplateVO(JFinal.me().getContextPath(), new File(PathKit.getWebRootPath() + templateName));
-        setAttr("templateInfo", templateVO);
-        I18nUtil.addToRequest(PathKit.getWebRootPath() + templateName + "/language/", getRequest(), JFinal.me().getConstants().getDevMode());
-        String jsonStr = new WebSite().getStringValueByName(templateName + Constants.TEMPLATE_CONFIG_SUFFIX);
-        fullTemplateSetting(jsonStr);
-        return templateVO;
+        return templateService.loadTemplateConfig(get("template"));
     }
 }

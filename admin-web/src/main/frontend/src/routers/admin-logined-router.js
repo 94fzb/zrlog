@@ -57,9 +57,14 @@ const AsyncUpgrade = Loadable({
 });
 
 const AsyncTemplateCenter = Loadable({
-    loader: () => import("../components/template-center"),
+    loader: () => import("../components/template/template-center"),
     loading: MyLoadingComponent
 });
+
+const AsyncTemplateConfig = Loadable({
+    loader: () => import("../components/template/template-config"),
+    loading: MyLoadingComponent
+})
 
 const AsyncUserUpdatePassword = Loadable({
     loader: () => import("../components/user-update-password"),
@@ -96,6 +101,7 @@ class AdminLoginedRouter extends React.Component {
                     <Route path="/admin/template-center" component={AsyncTemplateCenter}/>
                     <Route path="/admin/user-update-password" component={AsyncUserUpdatePassword}/>
                     <Route path="/admin/upgrade" component={AsyncUpgrade}/>
+                    <Route path="/admin/template-config" component={AsyncTemplateConfig}/>
                     <Route component={AsyncNotFoundPage}/>
                 </Switch>
             </Switch>

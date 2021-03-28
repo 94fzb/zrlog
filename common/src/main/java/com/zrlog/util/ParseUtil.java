@@ -122,7 +122,7 @@ public class ParseUtil {
                     for (int i = 0; i < strings.length - 1; i++) {
                         count += strings[i].length();
                         String str = wrapperFontRed(content.substring(count, count + keyword.length()));
-                        sb.append(content.substring(count - strings[i].length(), count));
+                        sb.append(content, count - strings[i].length(), count);
                         sb.append(str);
                         count += keyword.length();
                     }
@@ -130,7 +130,7 @@ public class ParseUtil {
                     sb.append(content.substring(count).replace(keyword.toLowerCase(), wrapperFontRed(keyword)));
                     newContent = sb.toString();
                 } else if (strings.length > 0) {
-                    sb.append(content.substring(0, strings[0].length()));
+                    sb.append(content, 0, strings[0].length());
                     sb.append(lowerContent.substring(strings[0].length()).replace(keyword.toLowerCase(), wrapperFontRed(content.substring(strings[0].length()))));
                     newContent = sb.toString();
                 } else {

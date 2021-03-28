@@ -1,13 +1,13 @@
 package com.zrlog.business.service;
 
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.hibegin.common.util.FileUtils;
+import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.common.util.ZipUtil;
-import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
-import com.zrlog.blog.web.controller.BaseController;
 import com.zrlog.business.rest.response.UpdateRecordResponse;
 import com.zrlog.business.rest.response.UploadTemplateResponse;
 import com.zrlog.common.Constants;
@@ -17,13 +17,34 @@ import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ZrLogUtil;
 
 import javax.servlet.http.Cookie;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.*;
 
 public class TemplateService {
+
+    /**
+     * 根据文件后缀 查找符合要求文件列表
+     *
+     * @param path
+     * @param prefix
+     */
+    private static void fillFileInfo(String path, List<String> fileList, String... prefix) {
+        File[] files = new File(path).listFiles();
+
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory() && new File(file.getAbsolutePath()).listFiles() != null) {
+                    fillFileInfo(file.getAbsolutePath(), fileList, prefix);
+                } else {
+                    for (String pre : prefix) {
+                        if (file.getAbsoluteFile().toString().endsWith(pre)) {
+                            fileList.add(file.getAbsoluteFile().toString());
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     public UpdateRecordResponse save(String template, Map<String, Object> settingMap) {
         new WebSite().updateByKV(template + Constants.TEMPLATE_CONFIG_SUFFIX, new GsonBuilder().serializeNulls().create().toJson(settingMap));
@@ -134,30 +155,6 @@ public class TemplateService {
         return templateVO;
     }
 
-    /**
-     * 根据文件后缀 查找符合要求文件列表
-     *
-     * @param path
-     * @param prefix
-     */
-    private static void fillFileInfo(String path, List<String> fileList, String... prefix) {
-        File[] files = new File(path).listFiles();
-
-        if (files != null) {
-            for (File file : files) {
-                if (file.isDirectory() && new File(file.getAbsolutePath()).listFiles() != null) {
-                    fillFileInfo(file.getAbsolutePath(), fileList, prefix);
-                } else {
-                    for (String pre : prefix) {
-                        if (file.getAbsoluteFile().toString().endsWith(pre)) {
-                            fileList.add(file.getAbsoluteFile().toString());
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     public List<String> getFiles(String path) {
         List<String> fileList = new ArrayList<>();
         fillFileInfo(PathKit.getWebRootPath() + path, fileList, ".jsp", ".js", ".css", ".html");
@@ -181,5 +178,34 @@ public class TemplateService {
             }
         }
         return previewTemplate;
+    }
+
+    public TemplateVO loadTemplateConfig(String templateName) {
+        TemplateVO templateVO = getTemplateVO(JFinal.me().getContextPath(), new File(PathKit.getWebRootPath() + templateName));
+        File configFile = new File(PathKit.getWebRootPath() + templateName + "/setting/config-form.json");
+        if (!configFile.exists()) {
+            return templateVO;
+        }
+        try {
+            String jsonStr = IOUtil.getStringInputStream(new FileInputStream(configFile));
+            TemplateVO.TemplateConfigMap config = new Gson().fromJson(jsonStr, TemplateVO.TemplateConfigMap.class);
+            if (StringUtils.isNotEmpty(jsonStr)) {
+                String dbJsonStr = new WebSite().getStringValueByName(templateName + Constants.TEMPLATE_CONFIG_SUFFIX);
+                if (StringUtils.isNotEmpty(dbJsonStr)) {
+                    Map<String, Object> dbConfig = new Gson().fromJson(dbJsonStr, Map.class);
+                    config.forEach((key, value) -> value.setValue(dbConfig.get(key)));
+                }
+            }
+            templateVO.setConfig(config);
+            //添加一个隐藏的表单域
+            TemplateVO.TemplateConfigVO templateConfigVO = new TemplateVO.TemplateConfigVO();
+            templateConfigVO.setHtmlElementType("input");
+            templateConfigVO.setType("hidden");
+            templateConfigVO.setValue(templateName);
+            config.put("template", templateConfigVO);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        return templateVO;
     }
 }

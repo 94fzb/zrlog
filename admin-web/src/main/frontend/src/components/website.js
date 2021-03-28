@@ -249,7 +249,9 @@ class Website extends BaseResourceComponent {
                                                     />
                                                 }
                                                 actions={[
-                                                    <SettingOutlined key="setting"/>,
+                                                    <Link to={'/admin/template-config?template=' + template.template}>
+                                                        <SettingOutlined key="setting"/>
+                                                    </Link>,
                                                     <Link target='_blank'
                                                           to={"/admin/template/preview?template=" + template.template}>
                                                         <EyeOutlined key="preview"/>

@@ -69,10 +69,6 @@ public class ZrLogConfig extends JFinalConfig implements InstallAction {
         }
     }
 
-    public static ZrLogConfig getZrLogConfig() {
-        return (ZrLogConfig) JFinal.me().getServletContext().getAttribute("config");
-    }
-
     public static boolean isTest() {
         return "junit-test".equals(InstallUtils.getSystemProp().getProperty("env"));
     }
