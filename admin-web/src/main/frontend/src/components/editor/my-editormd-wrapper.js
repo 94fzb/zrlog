@@ -70,6 +70,41 @@ class MyEditorMd extends BaseResourceComponent {
                 superMd.setState({
                     editorLoading: false
                 });
+
+                function uploadFile(file) {
+                    const index = Math.random().toString(10).substr(2, 5) + '-' + Math.random().toString(36).substr(2);
+                    const fileName = index + '.png';
+                    const formData = new FormData();
+                    formData.append('imgFile', file, fileName);
+                    $.ajax({
+                        method: 'post',
+                        url: "/api/admin/upload?dir=image",
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: function (data) {
+                            const url = data.data.url;
+                            editor.insertValue("![](" + url + ")");
+                        },
+                        error: function (error) {
+                            alert(error);
+                        }
+                    });
+                }
+
+                $("#" + editorMdId)[0].addEventListener('paste', function (e) {
+                    const clipboardData = e.clipboardData;
+                    const items = clipboardData.items;
+                    for (let i = 0; i < items.length; i++) {
+                        if (items[i].kind === 'file' && items[i].type.match(/^image/)) {
+                            // 取消默认的粘贴操作
+                            e.preventDefault();
+                            // 上传文件
+                            uploadFile(items[i].getAsFile());
+                            break;
+                        }
+                    }
+                });
             },
             onchange: function () {
                 const changed = {

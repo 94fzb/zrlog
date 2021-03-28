@@ -22,6 +22,12 @@ class TemplateConfig extends BaseResourceComponent {
 
     configFrom = React.createRef();
 
+    initState() {
+        return {
+            "resLoading": true
+        }
+    }
+
     setValue(changedValues) {
         let allValues = {...this.state.dataMap, ...changedValues};
         this.configFrom.current.setFieldsValue(allValues);

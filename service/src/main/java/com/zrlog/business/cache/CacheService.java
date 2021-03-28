@@ -22,6 +22,7 @@ public class CacheService {
 
     private static final String CACHE_HTML_PATH = PathKit.getWebRootPath() + "/_cache/";
     private static final Map<String, String> cacheFileMap = new HashMap<>();
+    private static BaseDataInitVO cacheInit;
 
     public File loadHtmlFile(String cacheKey) {
         return new File(CACHE_HTML_PATH + cacheKey);
@@ -46,7 +47,7 @@ public class CacheService {
 
     public void refreshInitDataCache(Controller baseController, boolean cleanAble) {
         if (cleanAble) {
-            JFinal.me().getServletContext().removeAttribute(Constants.CACHE_KEY);
+            cacheInit = null;
             FileUtils.deleteFile(CACHE_HTML_PATH);
             new Tag().refreshTag();
         }
@@ -54,7 +55,6 @@ public class CacheService {
     }
 
     private void initCache(Controller baseController) {
-        BaseDataInitVO cacheInit = (BaseDataInitVO) JFinal.me().getServletContext().getAttribute(Constants.CACHE_KEY);
         if (cacheInit == null) {
             cacheInit = new BaseDataInitVO();
             Map<String, Object> website = new WebSite().getWebSite();
@@ -85,7 +85,6 @@ public class CacheService {
             cacheInit.setIndexHotLogs(indexHotLog);
             //存放公共数据到ServletContext
             JFinal.me().getServletContext().setAttribute("WEB_SITE", website);
-            JFinal.me().getServletContext().setAttribute(Constants.CACHE_KEY, cacheInit);
             List<File> staticFiles = new ArrayList<>();
             FileUtils.getAllFiles(PathKit.getWebRootPath(), staticFiles);
             for (File file : staticFiles) {
@@ -101,35 +100,36 @@ public class CacheService {
                 cacheFileMap.put(uri.substring(1), file.lastModified() + "");
             }
         }
-        if (baseController != null) {
-            final BaseDataInitVO cacheInitFile = cacheInit;
-            if (cacheInit.getTags() == null || cacheInit.getTags().isEmpty()) {
-                cacheInit.getPlugins().stream().filter(e -> e.get("pluginName").equals("tags")).findFirst().ifPresent(e -> {
-                    cacheInitFile.getPlugins().remove(e);
-                });
-            }
-            if (cacheInit.getArchives() == null || cacheInit.getArchives().isEmpty()) {
-                cacheInit.getPlugins().stream().filter(e -> e.get("pluginName").equals("archives")).findFirst().ifPresent(e -> {
-                    cacheInitFile.getPlugins().remove(e);
-                });
-            }
-            if (cacheInit.getTypes() == null || cacheInit.getTypes().isEmpty()) {
-                cacheInit.getPlugins().stream().filter(e -> e.get("pluginName").equals("types")).findFirst().ifPresent(e -> {
-                    cacheInitFile.getPlugins().remove(e);
-                });
-            }
-            if (cacheInit.getLinks() == null || cacheInit.getLinks().isEmpty()) {
-                cacheInit.getPlugins().stream().filter(e -> e.get("pluginName").equals("links")).findFirst().ifPresent(e -> {
-                    cacheInitFile.getPlugins().remove(e);
-                });
-            }
-            baseController.setAttr("init", cacheInitFile);
-            baseController.setAttr("website", cacheInitFile.getWebSite());
-            //默认开启文章封面
-            cacheInitFile.getWebSite().putIfAbsent("article_thumbnail_status", "1");
-            Constants.WEB_SITE.clear();
-            Constants.WEB_SITE.putAll(cacheInitFile.getWebSite());
+        if (baseController == null) {
+            return;
         }
+        final BaseDataInitVO cacheInitFile = cacheInit;
+        if (cacheInit.getTags() == null || cacheInit.getTags().isEmpty()) {
+            cacheInit.getPlugins().stream().filter(e -> e.get("pluginName").equals("tags")).findFirst().ifPresent(e -> {
+                cacheInitFile.getPlugins().remove(e);
+            });
+        }
+        if (cacheInit.getArchives() == null || cacheInit.getArchives().isEmpty()) {
+            cacheInit.getPlugins().stream().filter(e -> e.get("pluginName").equals("archives")).findFirst().ifPresent(e -> {
+                cacheInitFile.getPlugins().remove(e);
+            });
+        }
+        if (cacheInit.getTypes() == null || cacheInit.getTypes().isEmpty()) {
+            cacheInit.getPlugins().stream().filter(e -> e.get("pluginName").equals("types")).findFirst().ifPresent(e -> {
+                cacheInitFile.getPlugins().remove(e);
+            });
+        }
+        if (cacheInit.getLinks() == null || cacheInit.getLinks().isEmpty()) {
+            cacheInit.getPlugins().stream().filter(e -> e.get("pluginName").equals("links")).findFirst().ifPresent(e -> {
+                cacheInitFile.getPlugins().remove(e);
+            });
+        }
+        baseController.setAttr("init", cacheInitFile);
+        baseController.setAttr("website", cacheInitFile.getWebSite());
+        //默认开启文章封面
+        cacheInitFile.getWebSite().putIfAbsent("article_thumbnail_status", "1");
+        Constants.WEB_SITE.clear();
+        Constants.WEB_SITE.putAll(cacheInitFile.getWebSite());
     }
 
     public static String getFileFlag(String uri) {
