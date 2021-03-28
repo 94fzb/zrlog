@@ -2,7 +2,7 @@
   "aboutPage": {
     "label": "关于页",
     "htmlElementType": "input",
-    "placeholder": "不建议大于10个字符",
+    "placeholder": "/about",
     "type": "text"
   },
   "footerSlogan": {
