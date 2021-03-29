@@ -7,13 +7,9 @@ import com.zrlog.business.rest.base.UpgradeWebSiteRequest;
 import com.zrlog.business.rest.response.WebSiteSettingsResponse;
 import com.zrlog.common.Constants;
 
-import javax.servlet.http.HttpServletRequest;
-
 public class WebSiteService {
 
-    private final TemplateService templateService = new TemplateService();
-
-    public WebSiteSettingsResponse loadSettings(HttpServletRequest request, String templatePath) {
+    public WebSiteSettingsResponse loadSettings() {
         WebSiteSettingsResponse webSiteSettingsResponse = new WebSiteSettingsResponse();
         BasicWebSiteRequest basic = new BasicWebSiteRequest();
         basic.setTitle((String) Constants.WEB_SITE.get("title"));
@@ -37,7 +33,6 @@ public class WebSiteService {
         blog.setSession_timeout(Constants.getSessionTimeout() / 60 / 1000);
         blog.setArticle_thumbnail_status(Constants.getBooleanByFromWebSite("article_thumbnail_status"));
         webSiteSettingsResponse.setBlog(blog);
-        webSiteSettingsResponse.setTemplates(templateService.getAllTemplates(request.getContextPath(), templatePath));
         return webSiteSettingsResponse;
     }
 }

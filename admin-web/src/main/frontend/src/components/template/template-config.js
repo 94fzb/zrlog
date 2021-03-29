@@ -24,7 +24,7 @@ class TemplateConfig extends BaseResourceComponent {
 
     initState() {
         return {
-            "resLoading": true
+            "loading": true
         }
     }
 
@@ -86,7 +86,7 @@ class TemplateConfig extends BaseResourceComponent {
             this.setState({
                 formInputs: formInputs,
                 dataMap: dataMap,
-                resLoading: false
+                loading: false
             })
             //console.info(dataMap);
             this.setValue(dataMap);
@@ -110,7 +110,7 @@ class TemplateConfig extends BaseResourceComponent {
 
     render() {
         return (
-            <Spin delay={this.getSpinDelayTime()} spinning={this.state.resLoading}>
+            <Spin delay={this.getSpinDelayTime()} spinning={this.state.loading}>
                 <Title className='page-header' level={3}>{this.getSecondTitle()}</Title>
                 <Divider/>
                 <Form ref={this.configFrom}

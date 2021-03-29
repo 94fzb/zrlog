@@ -14,7 +14,6 @@ import com.zrlog.business.rest.base.UpgradeWebSiteRequest;
 import com.zrlog.business.rest.response.VersionResponse;
 import com.zrlog.business.rest.response.WebSiteSettingUpdateResponse;
 import com.zrlog.business.rest.response.WebSiteSettingsResponse;
-import com.zrlog.business.service.TemplateService;
 import com.zrlog.business.service.WebSiteService;
 import com.zrlog.common.type.AutoUpgradeVersionType;
 import com.zrlog.model.WebSite;
@@ -37,7 +36,7 @@ public class WebSiteController extends BaseController {
     }
 
     public WebSiteSettingsResponse settings() {
-        return webSiteService.loadSettings(getRequest(), new TemplateService().getTemplatePathByCookie(getRequest().getCookies()));
+        return webSiteService.loadSettings();
     }
 
     @RefreshCache

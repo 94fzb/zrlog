@@ -1,10 +1,7 @@
 package com.zrlog.admin.web.controller.api;
 
-import com.google.gson.Gson;
 import com.hibegin.common.util.FileUtils;
-import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.StringUtils;
-import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
 import com.zrlog.admin.web.annotation.RefreshCache;
 import com.zrlog.blog.web.controller.BaseController;
@@ -16,14 +13,12 @@ import com.zrlog.business.service.TemplateService;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.TemplateVO;
 import com.zrlog.model.WebSite;
-import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ZrLogUtil;
 
 import javax.servlet.http.Cookie;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -87,5 +82,10 @@ public class TemplateController extends BaseController {
 
     public TemplateVO configParams() {
         return templateService.loadTemplateConfig(get("template"));
+    }
+
+    public List<TemplateVO> index() {
+        return templateService.getAllTemplates(getRequest().getContextPath(),
+                templateService.getTemplatePathByCookie(getRequest().getCookies()));
     }
 }

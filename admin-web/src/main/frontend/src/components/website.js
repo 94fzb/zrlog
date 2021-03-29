@@ -2,7 +2,7 @@ import React from "react";
 import axios from "axios";
 
 import {BaseResourceComponent} from "./base-resource-component";
-import {Card, Badge, message, Tabs, Modal} from "antd";
+import {message, Modal, Tabs} from "antd";
 import Title from "antd/lib/typography/Title";
 import Form from "antd/es/form";
 import Input from "antd/es/input";
@@ -14,14 +14,7 @@ import TextArea from "antd/es/input/TextArea";
 import {Spin} from "antd/es";
 import Switch from "antd/es/switch";
 import Select from "antd/es/select";
-import {
-    CheckOutlined,
-    DeleteOutlined,
-    EyeOutlined,
-    SettingOutlined
-} from "@ant-design/icons";
-import Meta from "antd/es/card/Meta";
-import {Link} from "react-router-dom";
+import Template from "./template/template";
 
 const {Option} = Select;
 
@@ -43,7 +36,6 @@ class Website extends BaseResourceComponent {
 
     initState() {
         return {
-            templates: [],
             settingsLoading: true
         }
     }
@@ -79,9 +71,6 @@ class Website extends BaseResourceComponent {
             }
             this.setState({
                 settingsLoading: false
-            })
-            this.setState({
-                templates: data.data.templates
             })
         })
     }
@@ -228,55 +217,7 @@ class Website extends BaseResourceComponent {
                         </Row>
                     </TabPane>
                     <TabPane tab={this.state.res['admin.template.manage']} key="template">
-                        <Title level={4}>{this.state.res['admin.template.manage']}</Title>
-                        <Divider/>
-                        <Row gutter={[16, 16]}>
-                            {this.state.templates.map((template) => {
-                                return (
-                                    <Col md={8} xxl={4} xs={24}>
-                                        <Badge.Ribbon
-                                            text={template.use ? this.state.res['admin.theme.inUse'] : template.preview ? this.state.res['admin.theme.inPreview'] : ""}
-                                            style={{
-                                                fontSize: 16,
-                                                display: template.use || template.preview ? "" : "none"
-                                            }}>
-                                            <Card
-                                                cover={
-                                                    <img
-                                                        style={{width: "100%"}}
-                                                        alt={template.name}
-                                                        src={template.previewImage}
-                                                    />
-                                                }
-                                                actions={[
-                                                    <Link to={'/admin/template-config?template=' + template.template}>
-                                                        <SettingOutlined key="setting"/>
-                                                    </Link>,
-                                                    <Link target='_blank'
-                                                          to={"/admin/template/preview?template=" + template.template}>
-                                                        <EyeOutlined key="preview"/>
-                                                    </Link>,
-                                                    <DeleteOutlined disabled={!template.deleteAble} key="delete"/>,
-                                                    <Link target='_blank'
-                                                          to={"/admin/template/apply?template=" + template.template}>
-                                                        <CheckOutlined/>
-                                                    </Link>
-                                                ]}
-                                            >
-                                                <Meta
-                                                    title={template.name}
-                                                    description={template.digest}
-                                                />
-                                            </Card>
-                                        </Badge.Ribbon>
-                                    </Col>
-                                )
-                            })}
-                        </Row>
-                        <Divider/>
-                        <Link to='/admin/template-center'>
-                            <Button type={"primary"}>{this.state.res['admin.theme.download']}</Button>
-                        </Link>
+                        <Template/>
                     </TabPane>
                     <TabPane tab="其他设置" key="other">
                         <Row>
