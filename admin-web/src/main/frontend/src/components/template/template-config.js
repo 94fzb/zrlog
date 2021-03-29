@@ -2,7 +2,7 @@ import React from "react";
 
 import {BaseResourceComponent} from "../base-resource-component";
 import Spin from "antd/lib/spin";
-import {Form, Input} from "antd";
+import {Form, Input, Row} from "antd";
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
 import Button from "antd/es/button";
@@ -11,12 +11,12 @@ import Dragger from "antd/es/upload/Dragger";
 import {message} from "antd/es";
 import axios from "axios";
 import TextArea from "antd/es/input/TextArea";
+import Col from "antd/es/grid/col";
 
 const layout = {
-    labelCol: {span: 2},
-    wrapperCol: {span: 8},
+    labelCol: {span: 8},
+    wrapperCol: {span: 16},
 };
-
 
 class TemplateConfig extends BaseResourceComponent {
 
@@ -59,6 +59,8 @@ class TemplateConfig extends BaseResourceComponent {
             </>);
         } else if (value.htmlElementType === 'textarea') {
             return <TextArea rows={5} type={value.type} placeholder={value.placeholder}/>;
+        } else if (value.type === 'hidden') {
+            return <Input hidden={true}/>;
         }
         return <Input type={value.type} placeholder={value.placeholder}/>;
     }
@@ -77,6 +79,7 @@ class TemplateConfig extends BaseResourceComponent {
                     label={value.label}
                     name={key}
                     key={key}
+                    style={{display: (value.type === 'hidden') ? "none" : ""}}
                 >
                     {this.getInput(key, value)}
                 </Form.Item>
@@ -112,15 +115,20 @@ class TemplateConfig extends BaseResourceComponent {
         return (
             <Spin delay={this.getSpinDelayTime()} spinning={this.state.loading}>
                 <Title className='page-header' level={3}>{this.getSecondTitle()}</Title>
-                <Divider/>
-                <Form ref={this.configFrom}
-                      onFinish={(values) => this.onFinish(values)}
-                      onValuesChange={(k, v) => this.setValue(k, v)}
-                      {...layout}>
-                    {this.state.formInputs}
-                    <Divider/>
-                    <Button type='primary' enterbutton='true' htmlType='submit'>{this.state.res['submit']}</Button>
-                </Form>
+                <Row>
+                    <Col md={12} xs={24}>
+                        <Divider/>
+                        <Form ref={this.configFrom}
+                              onFinish={(values) => this.onFinish(values)}
+                              onValuesChange={(k, v) => this.setValue(k, v)}
+                              {...layout}>
+                            {this.state.formInputs}
+                            <Divider/>
+                            <Button type='primary' enterbutton='true'
+                                    htmlType='submit'>{this.state.res['submit']}</Button>
+                        </Form>
+                    </Col>
+                </Row>
             </Spin>
         );
     }

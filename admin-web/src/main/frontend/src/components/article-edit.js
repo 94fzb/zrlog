@@ -1,5 +1,5 @@
 import React from "react";
-import {CameraOutlined, EyeOutlined} from '@ant-design/icons';
+import {CameraOutlined, EyeOutlined, SaveOutlined, SendOutlined} from '@ant-design/icons';
 import {BaseResourceComponent} from "./base-resource-component";
 import {Button, Input, Modal, Radio} from "antd";
 import Form from "antd/es/form";
@@ -15,8 +15,6 @@ import TextArea from "antd/es/input/TextArea";
 import {ArticleEditTag} from "./article-edit-tag";
 import {message} from "antd/es";
 import Image from "antd/es/image";
-
-import {SaveOutlined, SendOutlined} from '@ant-design/icons';
 import jquery from 'jquery';
 import MyEditorMdWrapper from "./editor/my-editormd-wrapper";
 
@@ -151,7 +149,8 @@ class ArticleEdit extends BaseResourceComponent {
                 logId: data.data.id,
                 digest: data.data.digest,
                 alias: data.data.alias,
-                rubbish: allValues.rubbish
+                rubbish: allValues.rubbish,
+                version: data.data.version
             });
         }).catch((e) => {
             let msg;
@@ -241,6 +240,9 @@ class ArticleEdit extends BaseResourceComponent {
                     ref={this.articleFrom}
                     onFinish={(values) => this.onFinish(values, true, false)}>
                     <Form.Item name='logId' style={{display: "none"}}>
+                        <Input hidden={true}/>
+                    </Form.Item>
+                    <Form.Item name='version' style={{display: "none"}}>
                         <Input hidden={true}/>
                     </Form.Item>
                     <Form.Item name='thumbnail' style={{display: "none"}}>

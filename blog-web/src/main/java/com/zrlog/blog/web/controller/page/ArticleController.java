@@ -6,7 +6,7 @@ import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.business.cache.CacheService;
 import com.zrlog.business.rest.request.CreateCommentRequest;
 import com.zrlog.business.rest.response.CreateCommentResponse;
-import com.zrlog.business.service.ArticleService;
+import com.zrlog.business.service.VisitorArticleService;
 import com.zrlog.business.service.CommentService;
 import com.zrlog.business.util.PagerUtil;
 import com.zrlog.common.Constants;
@@ -26,7 +26,7 @@ import java.math.BigDecimal;
 
 public class ArticleController extends BaseController {
 
-    private final ArticleService articleService = new ArticleService();
+    private final VisitorArticleService visitorArticleService = new VisitorArticleService();
 
     private final CommentService commentService = new CommentService();
 
@@ -75,14 +75,14 @@ public class ArticleController extends BaseController {
                 } else {
                     key = getPara("key");
                 }
-                data = articleService.searchArticle(1, getDefaultRows(), key);
+                data = visitorArticleService.pageByKeywords(1, getDefaultRows(), key);
             } else {
                 return all();
             }
 
         } else {
             key = convertRequestParam(getPara(0));
-            data = articleService.searchArticle(getParaToInt(1), getDefaultRows(), key);
+            data = visitorArticleService.pageByKeywords(getParaToInt(1), getDefaultRows(), key);
         }
         // 记录回话的Key
         setAttr("key", WebTools.htmlEncode(key));
@@ -107,7 +107,7 @@ public class ArticleController extends BaseController {
         String ext = "";
         if (Constants.isStaticHtmlStatus()) {
             ext = ".html";
-            new CacheService().refreshInitDataCache(this, true);
+            new CacheService().refreshInitDataCache(this.getRequest(), true);
         }
         redirect("/" + Constants.getArticleUri() + response.getAlias() + ext);
     }
@@ -176,7 +176,7 @@ public class ArticleController extends BaseController {
 
     public String all() {
         PageRequest pageRequest = new PageRequest(ParseUtil.strToInt(getPara(1), 1), getDefaultRows());
-        PageData<Log> data = new Log().adminFind(pageRequest);
+        PageData<Log> data = new Log().visitorFind(pageRequest, null);
         setPageDataInfo(Constants.getArticleUri() + "all-", data, pageRequest);
         return "index";
     }

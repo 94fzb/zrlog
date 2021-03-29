@@ -12,6 +12,7 @@ import com.zrlog.business.cache.vo.BaseDataInitVO;
 import com.zrlog.business.util.PagerVO;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.OutlineVO;
+import com.zrlog.common.vo.TemplateVO;
 import com.zrlog.data.dto.PageData;
 import com.zrlog.model.Log;
 import com.zrlog.model.LogNav;
@@ -24,16 +25,11 @@ import com.zrlog.util.ZrLogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 public class TemplateHelper {
 
@@ -233,7 +229,8 @@ public class TemplateHelper {
             }
             data.put("toc", outlineVO);
         }
-        if (!new CommentService().isAllowComment()) {
+        //系统关闭评论
+        if (!Constants.isAllowComment()) {
             data.set("canComment", false);
         }
     }
@@ -249,5 +246,67 @@ public class TemplateHelper {
             return basePath;
         }
         return Constants.DEFAULT_TEMPLATE_PATH;
+    }
+
+    public static String getTemplatePathByCookie(Cookie[] cookies) {
+        String previewTemplate = null;
+        if (cookies != null && cookies.length > 0) {
+            for (Cookie cookie : cookies) {
+                if ("template".equals(cookie.getName()) && cookie.getValue().startsWith(Constants.TEMPLATE_BASE_PATH)) {
+                    previewTemplate = cookie.getValue();
+                    break;
+                }
+            }
+        }
+        return previewTemplate;
+    }
+
+    public static TemplateVO getTemplateVO(String contextPath, File file) {
+        String templatePath = file.toString().substring(PathKit.getWebRootPath().length()).replace("\\", "/");
+        TemplateVO templateVO = new TemplateVO();
+        File templateInfo = new File(file.toString() + "/template.properties");
+        if (templateInfo.exists()) {
+            Properties properties = new Properties();
+            try (InputStream in = new FileInputStream(templateInfo)) {
+                properties.load(in);
+                templateVO.setAuthor(properties.getProperty("author"));
+                templateVO.setName(properties.getProperty("name"));
+                templateVO.setDigest(properties.getProperty("digest"));
+                templateVO.setVersion(properties.getProperty("version"));
+                templateVO.setUrl(properties.getProperty("url"));
+                templateVO.setViewType(properties.getProperty("viewType"));
+                if (properties.get("previewImages") != null) {
+                    String[] images = properties.get("previewImages").toString().split(",");
+                    for (int i = 0; i < images.length; i++) {
+                        String image = images[i];
+                        if (!image.startsWith("https://") && !image.startsWith("http://")) {
+                            images[i] = contextPath + templatePath + "/" + image;
+                        }
+                    }
+                    if (images.length > 0) {
+                        templateVO.setPreviewImage(images[0]);
+                    }
+                    templateVO.setPreviewImages(Arrays.asList(images));
+                }
+            } catch (IOException e) {
+                //LOGGER.error("", e);
+            }
+        } else {
+            templateVO.setAuthor("");
+            templateVO.setName(templatePath.substring(Constants.TEMPLATE_BASE_PATH.length()));
+            templateVO.setUrl("");
+            templateVO.setViewType("jsp");
+            templateVO.setVersion("");
+        }
+        if (templateVO.getPreviewImages() == null || templateVO.getPreviewImages().isEmpty()) {
+            templateVO.setPreviewImages(Collections.singletonList("assets/images/template-default-preview.jpg"));
+        }
+        if (StringUtils.isEmpty(templateVO.getDigest())) {
+            templateVO.setDigest(I18nUtil.getStringFromRes("noIntroduction"));
+        }
+        File settingFile = new File(PathKit.getWebRootPath() + templatePath + "/setting/index" + ZrLogUtil.getViewExt(templateVO.getViewType()));
+        templateVO.setConfigAble(settingFile.exists());
+        templateVO.setTemplate(templatePath);
+        return templateVO;
     }
 }

@@ -3,7 +3,7 @@ package com.zrlog.blog.web.controller;
 import com.google.gson.Gson;
 import com.jfinal.core.Controller;
 import com.jfinal.kit.PathKit;
-import com.zrlog.business.service.TemplateService;
+import com.zrlog.business.service.TemplateHelper;
 import com.zrlog.common.Constants;
 import com.zrlog.common.rest.request.PageRequest;
 import org.slf4j.Logger;
@@ -36,7 +36,7 @@ public class BaseController extends Controller {
     public String getTemplatePath() {
         String templatePath = Constants.WEB_SITE.get("template").toString();
         templatePath = templatePath == null ? Constants.DEFAULT_TEMPLATE_PATH : templatePath;
-        String previewTheme = new TemplateService().getTemplatePathByCookie(getRequest().getCookies());
+        String previewTheme = TemplateHelper.getTemplatePathByCookie(getRequest().getCookies());
         if (previewTheme != null) {
             templatePath = previewTheme;
         }

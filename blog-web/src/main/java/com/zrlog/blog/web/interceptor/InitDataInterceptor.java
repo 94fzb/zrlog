@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class InitDataInterceptor implements Interceptor {
 
-    private static volatile long lastAccessTime;
+    private static volatile long lastAccessTime = System.currentTimeMillis();
 
     private final CacheService cacheService = new CacheService();
 
@@ -29,7 +29,7 @@ public class InitDataInterceptor implements Interceptor {
                 HttpServletRequest request = invocation.getController().getRequest();
                 BaseController baseController = (BaseController) invocation.getController();
                 baseController.setAttr("requrl", ZrLogUtil.getFullUrl(request));
-                cacheService.refreshInitDataCache(baseController, false);
+                cacheService.refreshInitDataCache(baseController.getRequest(), false);
                 lastAccessTime = System.currentTimeMillis();
             }
         }

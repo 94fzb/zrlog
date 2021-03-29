@@ -1,6 +1,5 @@
 package com.zrlog.blog.web.version;
 
-import com.zrlog.business.service.ArticleService;
 import com.zrlog.common.vo.AdminTokenVO;
 
 import java.sql.Connection;
@@ -26,9 +25,8 @@ public class V5UpgradeVersionHandler implements UpgradeVersionHandler {
             int id = rs.getInt("logid");
             AdminTokenVO adminTokenVO = new AdminTokenVO();
             adminTokenVO.setUserId(userId);
-            String imgUrl = new ArticleService().getFirstImgUrl(rs.getString("content"), adminTokenVO);
             PreparedStatement ups = connection.prepareStatement("update log set thumbnail = ? where logid = ?");
-            ups.setString(1, imgUrl);
+            ups.setString(1, "");
             ups.setInt(2, id);
             ups.execute();
             ups.close();

@@ -1,10 +1,10 @@
 package com.zrlog.admin.web.controller.api;
 
+import com.zrlog.admin.business.rest.request.ReadCommentRequest;
+import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
+import com.zrlog.admin.business.service.AdminCommentService;
 import com.zrlog.admin.web.annotation.RefreshCache;
 import com.zrlog.blog.web.controller.BaseController;
-import com.zrlog.business.rest.request.ReadCommentRequest;
-import com.zrlog.business.rest.response.UpdateRecordResponse;
-import com.zrlog.business.service.CommentService;
 import com.zrlog.common.rest.response.StandardResponse;
 import com.zrlog.data.dto.PageData;
 import com.zrlog.model.Comment;
@@ -12,7 +12,7 @@ import com.zrlog.util.ZrLogUtil;
 
 public class CommentController extends BaseController {
 
-    private final CommentService commentService = new CommentService();
+    private final AdminCommentService commentService = new AdminCommentService();
 
     @RefreshCache
     public StandardResponse delete() {

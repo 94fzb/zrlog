@@ -3,9 +3,9 @@ package com.zrlog.admin.web.controller.api;
 import com.hibegin.common.util.BeanUtil;
 import com.zrlog.admin.web.annotation.RefreshCache;
 import com.zrlog.blog.web.controller.BaseController;
-import com.zrlog.business.rest.base.CreateLinkRequest;
-import com.zrlog.business.rest.base.UpdateLinkRequest;
-import com.zrlog.business.rest.response.UpdateRecordResponse;
+import com.zrlog.admin.business.rest.base.CreateLinkRequest;
+import com.zrlog.admin.business.rest.base.UpdateLinkRequest;
+import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
 import com.zrlog.data.dto.PageData;
 import com.zrlog.model.Link;
 

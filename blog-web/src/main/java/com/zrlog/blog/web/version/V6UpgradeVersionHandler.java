@@ -1,6 +1,6 @@
 package com.zrlog.blog.web.version;
 
-import com.zrlog.business.service.ArticleService;
+import com.zrlog.business.service.VisitorArticleService;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,7 +17,7 @@ public class V6UpgradeVersionHandler implements UpgradeVersionHandler {
         while (rs.next()) {
             int id = rs.getInt("logid");
             PreparedStatement ups = connection.prepareStatement("update log set search_content = ? where logid = ?");
-            ups.setString(1, new ArticleService().getPlainSearchText(rs.getString("content")));
+            ups.setString(1, VisitorArticleService.getPlainSearchText(rs.getString("content")));
             ups.setInt(2, id);
             ups.execute();
             ups.close();

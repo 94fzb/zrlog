@@ -4,7 +4,6 @@ import com.hibegin.common.util.FileUtils;
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.StringUtils;
 import com.jfinal.config.*;
-import com.jfinal.core.Const;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
 import com.jfinal.plugin.IPlugin;
@@ -26,7 +25,7 @@ import com.zrlog.blog.web.interceptor.BlackListInterceptor;
 import com.zrlog.blog.web.interceptor.InitDataInterceptor;
 import com.zrlog.blog.web.interceptor.MyI18nInterceptor;
 import com.zrlog.web.inteceptor.RouterInterceptor;
-import com.zrlog.blog.web.plugin.CacheCleanerPlugin;
+import com.zrlog.blog.web.plugin.CacheManagerPlugin;
 import com.zrlog.blog.web.plugin.RequestStatisticsPlugin;
 import com.zrlog.blog.web.version.UpgradeVersionHandler;
 import com.zrlog.business.service.InstallAction;
@@ -180,7 +179,7 @@ public class ZrLogConfig extends JFinalConfig implements InstallAction {
                     //这里使用独立的线程进行启动，主要是为了防止插件服务出问题后，影响整体，同时是避免启动过慢的问题。
                     plugins.add(new PluginCorePlugin(InstallUtils.getDbPropertiesFilePath(), pluginJvmArgsObj.toString()));
                     plugins.add(new UpdateVersionPlugin());
-                    plugins.add(new CacheCleanerPlugin());
+                    plugins.add(new CacheManagerPlugin());
                 }
                 plugins.add(new RequestStatisticsPlugin());
             } catch (Exception e) {

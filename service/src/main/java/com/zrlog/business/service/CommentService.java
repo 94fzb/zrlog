@@ -2,13 +2,8 @@ package com.zrlog.business.service;
 
 import com.hibegin.common.util.StringUtils;
 import com.zrlog.business.rest.request.CreateCommentRequest;
-import com.zrlog.business.rest.request.ReadCommentRequest;
 import com.zrlog.business.rest.response.CreateCommentResponse;
-import com.zrlog.business.rest.response.UpdateRecordResponse;
 import com.zrlog.common.Constants;
-import com.zrlog.common.rest.request.PageRequest;
-import com.zrlog.common.rest.response.StandardResponse;
-import com.zrlog.data.dto.PageData;
 import com.zrlog.model.Comment;
 import com.zrlog.model.Log;
 import com.zrlog.util.ParseUtil;
@@ -26,13 +21,9 @@ public class CommentService {
         return m.matches();
     }
 
-    public boolean isAllowComment() {
-        return !Constants.getBooleanByFromWebSite("disable_comment_status");
-    }
-
     private boolean isAllowComment(int articleId) {
         Log log = new Log().findByIdOrAlias(articleId);
-        return (log != null && log.getBoolean("canComment")) && isAllowComment();
+        return (log != null && log.getBoolean("canComment")) && Constants.isAllowComment();
     }
 
     public CreateCommentResponse save(CreateCommentRequest createCommentRequest) {
@@ -71,21 +62,5 @@ public class CommentService {
             createCommentResponse.setAlias(log.getStr("alias"));
         }
         return createCommentResponse;
-    }
-
-    public StandardResponse delete(String[] ids) {
-        for (String id : ids) {
-            new Comment().deleteById(id);
-        }
-        return new StandardResponse();
-    }
-
-    public UpdateRecordResponse read(ReadCommentRequest commentRequest) {
-        new Comment().doRead(commentRequest.getId());
-        return new UpdateRecordResponse();
-    }
-
-    public PageData<Comment> page(PageRequest pageable) {
-        return new Comment().find(pageable);
     }
 }

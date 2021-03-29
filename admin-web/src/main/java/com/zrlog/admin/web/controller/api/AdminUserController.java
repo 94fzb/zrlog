@@ -2,11 +2,11 @@ package com.zrlog.admin.web.controller.api;
 
 import com.hibegin.common.util.BeanUtil;
 import com.hibegin.common.util.StringUtils;
-import com.zrlog.business.rest.request.UpdateAdminRequest;
-import com.zrlog.business.rest.request.UpdatePasswordRequest;
-import com.zrlog.business.rest.response.UpdateRecordResponse;
-import com.zrlog.business.rest.response.UserBasicInfoResponse;
-import com.zrlog.business.service.UserService;
+import com.zrlog.admin.business.rest.request.UpdateAdminRequest;
+import com.zrlog.admin.business.rest.request.UpdatePasswordRequest;
+import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
+import com.zrlog.admin.business.rest.response.UserBasicInfoResponse;
+import com.zrlog.admin.business.service.UserService;
 import com.zrlog.model.User;
 import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ZrLogUtil;

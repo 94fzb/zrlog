@@ -9,7 +9,6 @@ import com.jfinal.kit.PathKit;
 import com.zrlog.blog.web.handler.GlobalResourceHandler;
 import com.zrlog.business.exception.InstalledException;
 import com.zrlog.business.service.TemplateHelper;
-import com.zrlog.business.service.TemplateService;
 import com.zrlog.business.util.InstallUtils;
 import com.zrlog.common.exception.AbstractBusinessException;
 import com.zrlog.common.rest.response.ApiStandardResponse;
@@ -77,7 +76,7 @@ public class VisitorInterceptor implements Interceptor {
         GlobalResourceHandler.printUserTime("Template before");
         String templatePath = TemplateHelper.fullTemplateInfo(ai.getController());
         GlobalResourceHandler.printUserTime("Template after");
-        TemplateVO templateVO = new TemplateService().getTemplateVO(JFinal.me().getContextPath(), new File(PathKit.getWebRootPath() + templatePath));
+        TemplateVO templateVO = TemplateHelper.getTemplateVO(JFinal.me().getContextPath(), new File(PathKit.getWebRootPath() + templatePath));
         String ext = ZrLogUtil.getViewExt(templateVO.getViewType());
         if (ai.getController().getAttr("log") != null) {
             ai.getController().setAttr("pageLevel", 1);

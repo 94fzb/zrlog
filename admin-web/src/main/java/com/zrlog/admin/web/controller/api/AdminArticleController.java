@@ -1,24 +1,25 @@
 package com.zrlog.admin.web.controller.api;
 
 import com.hibegin.common.util.BeanUtil;
-import com.zrlog.business.cache.CacheService;
-import com.zrlog.business.exception.NotFindResourceException;
-import com.zrlog.business.rest.request.CreateArticleRequest;
-import com.zrlog.business.rest.request.UpdateArticleRequest;
-import com.zrlog.business.rest.response.*;
-import com.zrlog.business.service.ArticleService;
+import com.zrlog.admin.business.exception.NotFindResourceException;
+import com.zrlog.admin.business.rest.request.CreateArticleRequest;
+import com.zrlog.admin.business.rest.request.UpdateArticleRequest;
+import com.zrlog.admin.business.rest.response.*;
+import com.zrlog.admin.business.service.AdminArticleService;
+import com.zrlog.admin.web.annotation.RefreshCache;
+import com.zrlog.admin.web.token.AdminTokenThreadLocal;
+import com.zrlog.blog.web.controller.BaseController;
+import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.common.Constants;
 import com.zrlog.data.dto.PageData;
 import com.zrlog.model.Log;
+import com.zrlog.model.Tag;
+import com.zrlog.model.Type;
 import com.zrlog.util.ZrLogUtil;
-import com.zrlog.admin.web.annotation.RefreshCache;
-import com.zrlog.blog.web.controller.BaseController;
-import com.zrlog.admin.web.token.AdminTokenThreadLocal;
-import com.zrlog.blog.web.util.WebTools;
 
 public class AdminArticleController extends BaseController {
 
-    private final ArticleService articleService = new ArticleService();
+    private final AdminArticleService articleService = new AdminArticleService();
 
     @RefreshCache
     public DeleteLogResponse delete() {
@@ -42,14 +43,17 @@ public class AdminArticleController extends BaseController {
     }
 
     public PageData<ArticleResponseEntry> index() {
-        PageData<ArticleResponseEntry> key = articleService.page(getPageRequest(), convertRequestParam(getPara("key")));
+        PageData<ArticleResponseEntry> key = articleService.adminPage(getPageRequest(), convertRequestParam(getPara("key")));
         key.getRows().forEach(x -> x.setUrl(WebTools.getHomeUrl(getRequest()) + Constants.getArticleUri() + x.getId()));
         return key;
     }
 
 
     public ArticleGlobalResponse global() {
-        return new CacheService().global();
+        ArticleGlobalResponse response = new ArticleGlobalResponse();
+        response.setTags(new Tag().findAll());
+        response.setTypes(new Type().findAll());
+        return response;
     }
 
     public LoadEditArticleResponse detail() {

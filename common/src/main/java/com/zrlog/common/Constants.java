@@ -129,4 +129,9 @@ public class Constants {
     public static List<String> articleRouterList() {
         return Collections.singletonList("/" + getArticleRoute());
     }
+
+
+    public static boolean isAllowComment() {
+        return !Constants.getBooleanByFromWebSite("disable_comment_status");
+    }
 }

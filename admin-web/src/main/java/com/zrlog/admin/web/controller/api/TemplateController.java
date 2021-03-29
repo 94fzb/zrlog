@@ -3,13 +3,14 @@ package com.zrlog.admin.web.controller.api;
 import com.hibegin.common.util.FileUtils;
 import com.hibegin.common.util.StringUtils;
 import com.jfinal.kit.PathKit;
+import com.zrlog.admin.business.exception.BadTemplatePathException;
+import com.zrlog.admin.business.service.TemplateService;
 import com.zrlog.admin.web.annotation.RefreshCache;
 import com.zrlog.blog.web.controller.BaseController;
-import com.zrlog.business.exception.BadTemplatePathException;
-import com.zrlog.business.rest.response.UpdateRecordResponse;
-import com.zrlog.business.rest.response.UploadTemplateResponse;
-import com.zrlog.business.rest.response.WebSiteSettingUpdateResponse;
-import com.zrlog.business.service.TemplateService;
+import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
+import com.zrlog.admin.business.rest.response.UploadTemplateResponse;
+import com.zrlog.admin.business.rest.response.WebSiteSettingUpdateResponse;
+import com.zrlog.business.service.TemplateHelper;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.TemplateVO;
 import com.zrlog.model.WebSite;
@@ -86,6 +87,6 @@ public class TemplateController extends BaseController {
 
     public List<TemplateVO> index() {
         return templateService.getAllTemplates(getRequest().getContextPath(),
-                templateService.getTemplatePathByCookie(getRequest().getCookies()));
+                TemplateHelper.getTemplatePathByCookie(getRequest().getCookies()));
     }
 }

@@ -5,13 +5,12 @@ import com.jfinal.aop.Interceptor;
 import com.jfinal.aop.Invocation;
 import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
-import com.jfinal.kit.PathKit;
+import com.zrlog.admin.business.exception.AdminAuthException;
 import com.zrlog.admin.web.annotation.RefreshCache;
 import com.zrlog.admin.web.token.AdminTokenService;
 import com.zrlog.admin.web.token.AdminTokenThreadLocal;
 import com.zrlog.business.cache.CacheService;
-import com.zrlog.business.exception.AdminAuthException;
-import com.zrlog.business.rest.response.ExceptionResponse;
+import com.zrlog.admin.business.rest.response.ExceptionResponse;
 import com.zrlog.common.Constants;
 import com.zrlog.common.exception.AbstractBusinessException;
 import com.zrlog.common.vo.AdminTokenVO;
@@ -111,7 +110,7 @@ public class AdminInterceptor implements Interceptor {
         Controller controller = ai.getController();
         Object returnValue = ai.getReturnValue();
         if (ai.getMethod().getAnnotation(RefreshCache.class) != null) {
-            cacheService.refreshInitDataCache(controller, true);
+            cacheService.refreshInitDataCache(controller.getRequest(), true);
             if (JFinal.me().getConstants().getDevMode()) {
                 LOGGER.info("{} trigger refresh cache", controller.getRequest().getRequestURI());
             }

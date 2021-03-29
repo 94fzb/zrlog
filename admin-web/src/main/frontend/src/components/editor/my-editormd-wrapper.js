@@ -92,19 +92,22 @@ class MyEditorMd extends BaseResourceComponent {
                     });
                 }
 
-                $("#" + editorMdId)[0].addEventListener('paste', function (e) {
-                    const clipboardData = e.clipboardData;
-                    const items = clipboardData.items;
-                    for (let i = 0; i < items.length; i++) {
-                        if (items[i].kind === 'file' && items[i].type.match(/^image/)) {
-                            // 取消默认的粘贴操作
-                            e.preventDefault();
-                            // 上传文件
-                            uploadFile(items[i].getAsFile());
-                            break;
+                const jqMd = $("#" + editorMdId);
+                if (jqMd && jqMd[0]) {
+                    jqMd[0].addEventListener('paste', function (e) {
+                        const clipboardData = e.clipboardData;
+                        const items = clipboardData.items;
+                        for (let i = 0; i < items.length; i++) {
+                            if (items[i].kind === 'file' && items[i].type.match(/^image/)) {
+                                // 取消默认的粘贴操作
+                                e.preventDefault();
+                                // 上传文件
+                                uploadFile(items[i].getAsFile());
+                                break;
+                            }
                         }
-                    }
-                });
+                    });
+                }
             },
             onchange: function () {
                 const changed = {
@@ -128,6 +131,10 @@ class MyEditorMd extends BaseResourceComponent {
             <Spin spinning={this.state.editorLoading}>
                 <div id={editorMdId}/>
             </Spin>);
+    }
+
+    getSecondTitle() {
+        return document.title;
     }
 }
 

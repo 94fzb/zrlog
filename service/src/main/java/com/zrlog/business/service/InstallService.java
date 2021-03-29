@@ -199,7 +199,7 @@ public class InstallService {
             ps.setString(3, "hello-world");
             ps.setString(4, I18nUtil.getStringFromRes("helloWorld"));
             ps.setString(5, content);
-            ps.setString(6, new ArticleService().getPlainSearchText(content));
+            ps.setString(6, VisitorArticleService.getPlainSearchText(content));
             ps.setString(7, markdown);
             ps.setString(8, ParseUtil.autoDigest(content, Constants.getAutoDigestLength()));
             ps.setObject(9, new java.util.Date());
