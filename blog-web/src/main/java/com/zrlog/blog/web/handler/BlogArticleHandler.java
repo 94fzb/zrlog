@@ -38,7 +38,7 @@ public class BlogArticleHandler extends Handler {
 
     @Override
     public void handle(String target, HttpServletRequest request, HttpServletResponse response, boolean[] isHandled) {
-        if (target.startsWith("/admin") || target.startsWith("/api/") || target.startsWith("/install/")) {
+        if (target.startsWith("/admin/") || target.startsWith("/api/") || target.startsWith("/install/")) {
             this.next.handle(target, request, response, isHandled);
             return;
         }
