@@ -14,7 +14,6 @@
     overflow: hidden;
     position: relative;
     border: 1px solid #ddd;
-    font-family: "Meiryo UI", "Microsoft YaHei", "Malgun Gothic", "Segoe UI", "Trebuchet MS", Helvetica, Monaco, monospace, Tahoma, STXihei, "华文细黑", STHeiti, "Helvetica Neue", "Droid Sans", "wenquanyi micro hei", FreeSans, Arimo, Arial, SimSun, "宋体", Heiti, "黑体", sans-serif
 }
 
 .editormd *, .editormd :after, .editormd :before {
@@ -655,7 +654,6 @@
     float: left;
     border-right: 1px solid #ddd;
     font-size: 14px;
-    font-family: "YaHei Consolas Hybrid", Consolas, "微软雅黑", "Meiryo UI", "Malgun Gothic", "Segoe UI", "Trebuchet MS", Helvetica, Monaco, courier, monospace;
     line-height: 1.6;
     margin-top: 35px
 }
@@ -710,7 +708,6 @@
  *  License - http://fontawesome.io/license (Font: SIL OFL 1.1, CSS: MIT License)
  /*! prefixes.scss v0.1.0 | Author: Pandao | https://github.com/pandao/prefixes.scss | MIT license | Copyright (c) 2015 */
 .editormd-logo, .editormd-logo-1x, .editormd-logo-2x, .editormd-logo-3x, .editormd-logo-4x, .editormd-logo-5x, .editormd-logo-6x, .editormd-logo-7x, .editormd-logo-8x {
-    font-family: editormd-logo;
     speak: none;
     font-style: normal;
     font-weight: 400;
@@ -785,7 +782,6 @@
     -webkit-text-size-adjust: 100%;
     color: #333;
     overflow: hidden;
-    font-family: "Microsoft YaHei", Helvetica, "Meiryo UI", "Malgun Gothic", "Segoe UI", "Trebuchet MS", Monaco, monospace, Tahoma, STXihei, "华文细黑", STHeiti, "Helvetica Neue", "Droid Sans", "wenquanyi micro hei", FreeSans, Arimo, Arial, SimSun, "宋体", Heiti, "黑体", sans-serif;
     font-size: 16px;
     line-height: 1.6;
     word-wrap: break-word
@@ -869,15 +865,6 @@
 
 .markdown-body dd {
     margin-left: 0
-}
-
-.markdown-body code {
-    font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace
-}
-
-.markdown-body pre {
-    font: 12px Consolas, "Liberation Mono", Menlo, Courier, monospace;
-    word-wrap: normal
 }
 
 .markdown-body .octicon {
@@ -1295,10 +1282,6 @@
     padding: 0
 }
 
-.editormd-html-preview code, .editormd-html-preview kbd, .editormd-html-preview pre, .editormd-preview-container code, .editormd-preview-container kbd, .editormd-preview-container pre {
-    font-family: "YaHei Consolas Hybrid", Consolas, "Meiryo UI", "Malgun Gothic", "Segoe UI", "Trebuchet MS", Helvetica, monospace, monospace
-}
-
 .editormd-html-preview table thead tr, .editormd-preview-container table thead tr {
     background-color: #F8F8F8
 }
@@ -1331,7 +1314,6 @@
 
 .editormd-html-preview .flowchart text, .editormd-html-preview .sequence-diagram text, .editormd-preview-container .flowchart text, .editormd-preview-container .sequence-diagram text {
     font-size: 15px !important;
-    font-family: "YaHei Consolas Hybrid", Consolas, "Microsoft YaHei", "Malgun Gothic", "Segoe UI", Helvetica, Arial !important
 }
 
 /*! Pretty printing styles. Used with prettify.js. */
