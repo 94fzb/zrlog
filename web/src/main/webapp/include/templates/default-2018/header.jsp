@@ -12,7 +12,7 @@
     <jsp:include page="../../core/core_mate.jsp"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
     <link rel="stylesheet" type="text/css" href="${baseUrl}assets/css/video-js.css"/>
-    <link rel="stylesheet" type="text/css" media="screen" href="${templateUrl}/css/style_2018.css"/>
+    <link rel="stylesheet" type="text/css" media="screen" href="${templateUrl}/css/style.css"/>
     <link rel="stylesheet" type="text/css" media="screen" href="${templateUrl}/css/editormd.css"/>
     <script src="${templateUrl}/js/jquery-1.10.2.min.js"></script>
     <script src="${baseUrl }assets/js/video.js"></script>
