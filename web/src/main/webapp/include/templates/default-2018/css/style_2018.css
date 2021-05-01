@@ -976,7 +976,6 @@ section .content h2 {
 section .content h3 {
     color: #333333;
     margin-bottom: 1.2em;
-    font-size: 16px;
 }
 
 section .content h2, section .content h3, section .content h4, section .content h5, section .content h6, section .content {
