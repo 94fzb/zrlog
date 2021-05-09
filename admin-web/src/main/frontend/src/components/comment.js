@@ -89,7 +89,7 @@ class Comment extends BaseTableComponent {
                 <Title className='page-header' level={3}>{this.getSecondTitle()}</Title>
                 <Divider/>
                 <Table bordered loading={tableLoading} onChange={this.onShowSizeChange}
-                       scroll={{x: '100vw'}}
+                       scroll={{x: '90vw'}}
                        columns={this.state.columns} pagination={pagination} dataSource={rows}/>
             </Spin>
         )

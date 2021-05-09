@@ -7,7 +7,7 @@ import {message} from "antd/es";
 import Spin from "antd/es/spin";
 import {BaseResourceComponent} from "../base-resource-component";
 import Title from "antd/es/typography/Title";
-import './login.css'
+import './login.less'
 
 const md5 = require('md5');
 

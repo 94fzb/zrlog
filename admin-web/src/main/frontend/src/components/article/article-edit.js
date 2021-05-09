@@ -17,7 +17,7 @@ import {message} from "antd/es";
 import Image from "antd/es/image";
 import jquery from 'jquery';
 import MyEditorMdWrapper from "./editor/my-editormd-wrapper";
-import './article-edit.css'
+import './article-edit.less'
 import Constants from "../../utils/constants";
 
 const md5 = require('md5');
@@ -348,7 +348,7 @@ class ArticleEdit extends BaseResourceComponent {
                         <Col md={6} xs={24}>
                             <Row gutter={[8, 8]}>
                                 <Col span={24}>
-                                    <Card size="small">
+                                    <Card size="small"  style={{textAlign: 'center'}}>
                                         <Dragger
                                             action={"/api/admin/upload/thumbnail?dir=thumbnail"}
                                             name='imgFile'
@@ -356,12 +356,17 @@ class ArticleEdit extends BaseResourceComponent {
                                             {(this.state.article.thumbnail === undefined ||
                                                 this.state.article.thumbnail === null ||
                                                 this.state.article.thumbnail === '') && (
-                                                <div style={{height: '108px'}}>
-                                                    <CameraOutlined style={{fontSize: "28px", paddingTop: '50px'}}/>
-                                                </div>
+                                                <>
+                                                    <p className="ant-upload-drag-icon" style={{height: '88px'}}>
+                                                        <CameraOutlined style={{fontSize: "28px", paddingTop: '40px'}}/>
+                                                    </p>
+                                                    <p className="ant-upload-text">拖拽或点击，上传文章封面</p>
+                                                </>
+
                                             )}
                                             {this.state.article.thumbnail !== '' && (
-                                                <Image fallback={Constants.getFillBackImg()} preview={false} id='thumbnail'
+                                                <Image fallback={Constants.getFillBackImg()} preview={false}
+                                                       id='thumbnail'
                                                        src={this.state.article.thumbnail}/>
                                             )}
                                         </Dragger>

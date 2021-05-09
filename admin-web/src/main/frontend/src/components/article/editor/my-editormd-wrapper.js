@@ -3,9 +3,10 @@ import {BaseResourceComponent} from "../../base-resource-component";
 import './my-editormd.css';
 import $ from 'jquery';
 import Spin from "antd/es/spin";
-import {message} from "antd";
+import {Card, message} from "antd";
 import makeAsyncScriptLoader from "react-async-script";
 import {MyLoadingComponent} from "../../../App";
+import EnvUtils from "../../../utils/env-utils";
 
 const editorMdId = 'editor';
 
@@ -22,7 +23,7 @@ class MyEditorMd extends BaseResourceComponent {
         super.componentDidMount();
         let {superThis} = this.props;
         let superMd = this;
-        let dark = false;
+        let dark = EnvUtils.isDarkMode();
 
         function setDarkMode(editor, dark) {
             editor.setTheme(dark ? "dark" : "default");
@@ -142,7 +143,7 @@ class MyEditorMd extends BaseResourceComponent {
     render() {
         return (
             <Spin spinning={this.state.editorLoading}>
-                <div id={editorMdId}/>
+                <div id={editorMdId} style={{borderRadius: 2}}/>
             </Spin>);
     }
 

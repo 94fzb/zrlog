@@ -8,6 +8,7 @@ public class BlogWebSiteRequest {
     private Boolean article_thumbnail_status;
     private String language;
     private String article_route;
+    private Boolean admin_darkMode;
 
     public Long getSession_timeout() {
         return session_timeout;
@@ -55,5 +56,13 @@ public class BlogWebSiteRequest {
 
     public void setArticle_route(String article_route) {
         this.article_route = article_route;
+    }
+
+    public Boolean getAdmin_darkMode() {
+        return admin_darkMode;
+    }
+
+    public void setAdmin_darkMode(Boolean admin_darkMode) {
+        this.admin_darkMode = admin_darkMode;
     }
 }

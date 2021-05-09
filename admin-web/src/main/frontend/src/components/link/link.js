@@ -86,7 +86,7 @@ class BLink extends BaseTableComponent {
                 <Table loading={tableLoading} bordered onChange={this.onShowSizeChange} columns={this.state.columns}
                        pagination={pagination}
                        dataSource={rows}
-                       scroll={{x: '100vw'}}/>
+                       scroll={{x: '90vw'}}/>
             </Spin>
         )
     }

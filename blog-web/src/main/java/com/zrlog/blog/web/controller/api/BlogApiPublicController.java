@@ -18,6 +18,7 @@ public class BlogApiPublicController extends Controller {
         stringObjectMap.put("currentVersion", BlogBuildInfoUtil.getVersion());
         stringObjectMap.put("websiteTitle", Constants.WEB_SITE.get("title"));
         stringObjectMap.put("articleRoute", Constants.getArticleRoute());
+        stringObjectMap.put("admin_darkMode", Constants.getBooleanByFromWebSite("admin_darkMode"));
         if (ZrLogUtil.isPreviewMode()) {
             Map<String, String> defaultLoginInfo = new HashMap<>();
             defaultLoginInfo.put("userName", System.getenv("DEFAULT_USERNAME"));
