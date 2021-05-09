@@ -105,11 +105,14 @@ class User extends BaseResourceComponent {
                                 label={this.state.res.headPortrait}
                                 rules={[{required: true}]}
                             >
-                                <Dragger style={{width: "164px"}} multiple={false}
+                                <Dragger style={{width: "128px", height: "128px"}} multiple={false}
                                          onChange={(e) => this.onUploadChange(e)}
                                          name="imgFile"
                                          action="/api/admin/upload?dir=image">
-                                    <Image fallback={Constants.getFillBackImg()} preview={false} width={128} src={this.state.basic.header}/>
+                                    <Image fallback={Constants.getFillBackImg()} preview={false}
+                                           height={128}
+                                           width={128}
+                                           src={this.state.basic.header}/>
                                 </Dragger>
                             </Form.Item>
                             <Divider/>

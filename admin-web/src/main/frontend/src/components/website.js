@@ -76,40 +76,45 @@ class Website extends BaseResourceComponent {
     }
 
     setBasicFormValue(changedValues) {
-        if (this.basicForm.current !== null) {
-            this.basicForm.current.setFieldsValue(changedValues);
+        if (this.basicForm.current) {
+            let newValues = {...this.state.basic, ...changedValues}
+            this.basicForm.current.setFieldsValue(newValues);
             this.setState({
-                basic: changedValues,
+                basic: newValues,
             });
         }
     }
 
     setOtherFormValue(changedValues) {
-        if (this.otherForm.current !== null) {
-            this.otherForm.current.setFieldsValue(changedValues);
+        if (this.otherForm.current) {
+            let newValues = {...this.state.other, ...changedValues}
+            this.otherForm.current.setFieldsValue(newValues);
             this.setState({
-                other: changedValues,
+                other: newValues,
             });
         }
     }
 
     setUpgradeFormValue(changedValues) {
-        if (this.upgradeForm.current !== null) {
-            this.upgradeForm.current.setFieldsValue(changedValues);
+        if (this.upgradeForm.current) {
+            let newValues = {...this.state.upgrade, ...changedValues}
+            this.upgradeForm.current.setFieldsValue(newValues);
             this.setState({
-                upgrade: changedValues,
+                upgrade: newValues,
             });
         }
     }
 
     setBlogFormValue(changedValues) {
-        if (this.blogForm.current !== null) {
-            this.blogForm.current.setFieldsValue(changedValues);
+        if (this.blogForm.current) {
+            let newValues = {...this.state.blog, ...changedValues}
+            this.blogForm.current.setFieldsValue(newValues);
             this.setState({
-                blog: changedValues,
+                blog: newValues,
             });
+            console.info(newValues);
         }
-    }
+   }
 
     websiteFormFinish(changedValues, formName) {
         axios.post("/api/admin/website/" + formName, changedValues).then(({data}) => {
@@ -189,13 +194,16 @@ class Website extends BaseResourceComponent {
                                                min={5} placeholder=''/>
                                     </Form.Item>
                                     <Form.Item valuePropName="checked" name='generator_html_status' label='静态化文章页'>
-                                        <Switch/>
+                                        <Switch size={"small"}/>
                                     </Form.Item>
                                     <Form.Item valuePropName="checked" name='disable_comment_status' label='关闭评论'>
-                                        <Switch/>
+                                        <Switch size={"small"}/>
+                                    </Form.Item>
+                                    <Form.Item valuePropName="checked" name='admin_darkMode' label='护眼模式'>
+                                        <Switch size={"small"}/>
                                     </Form.Item>
                                     <Form.Item valuePropName="checked" name='article_thumbnail_status' label='文章封面'>
-                                        <Switch/>
+                                        <Switch size={"small"}/>
                                     </Form.Item>
                                     <Form.Item name='language' label={this.state.res['language']}>
                                         <Select style={{maxWidth: "100px"}}>
@@ -273,7 +281,7 @@ class Website extends BaseResourceComponent {
                                     </Form.Item>
                                     <Form.Item valuePropName="checked" name='upgradePreview'
                                                label={this.state.res['admin.upgrade.canPreview']}>
-                                        <Switch/>
+                                        <Switch size={"small"}/>
                                     </Form.Item>
                                     <Divider/>
                                     <Button type='primary' enterbutton='true'

@@ -1,5 +1,4 @@
 import React from 'react';
-import './App.css';
 import {Route, Switch} from "react-router-dom";
 import {Router} from "react-router";
 import {createBrowserHistory} from 'history';
@@ -7,6 +6,8 @@ import {ConfigProvider} from "antd";
 import zh_CN from 'antd/es/locale/zh_CN';
 import Loadable from "react-loadable";
 import UnknownErrorPage from "./components/unknown-error-page";
+import './theme.dark.less';
+import './theme.light.less';
 
 const history = createBrowserHistory();
 

@@ -1,5 +1,6 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {Modal} from "antd";
+import EnvUtils from "../utils/env-utils";
 
 const axios = require('axios')
 const resourceKey = "commonRes.v3";
@@ -60,6 +61,7 @@ export class BaseResourceComponent extends React.Component {
     }
 
     handleRes(data) {
+        EnvUtils.setTheme(data.data['admin_darkMode'] === true ? "dark" : "light");
         data.data.copyrightTips = data.data.copyright + ' <a target="_blank" href="https://blog.zrlog.com/about?footer">ZrLog</a>';
         this.setState({
             res: data.data,

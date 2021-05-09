@@ -27,6 +27,7 @@ public class WebSiteService {
         webSiteSettingsResponse.setUpgrade(upgrade);
         BlogWebSiteRequest blog = new BlogWebSiteRequest();
         blog.setArticle_route((String) Constants.WEB_SITE.get("article_route"));
+        blog.setAdmin_darkMode(Constants.getBooleanByFromWebSite("admin_darkMode"));
         blog.setLanguage((String) Constants.WEB_SITE.get("language"));
         blog.setGenerator_html_status(Constants.getBooleanByFromWebSite("generator_html_status"));
         blog.setDisable_comment_status(Constants.getBooleanByFromWebSite("disable_comment_status"));
