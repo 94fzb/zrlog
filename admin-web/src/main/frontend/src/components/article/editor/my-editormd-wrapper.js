@@ -22,6 +22,7 @@ class MyEditorMd extends BaseResourceComponent {
         super.componentDidMount();
         let {superThis} = this.props;
         let superMd = this;
+        let dark = false;
 
         function setDarkMode(editor, dark) {
             editor.setTheme(dark ? "dark" : "default");
@@ -114,6 +115,7 @@ class MyEditorMd extends BaseResourceComponent {
                         }
                     });
                 }
+                setDarkMode(editor, dark);
             },
 
             onchange: function () {
@@ -132,7 +134,7 @@ class MyEditorMd extends BaseResourceComponent {
             onfullscreenExit: function () {
                 superThis.onfullscreenExit();
                 editor.width("100%");
-                setDarkMode(editor, false);
+                setDarkMode(editor, dark);
             }
         });
     }

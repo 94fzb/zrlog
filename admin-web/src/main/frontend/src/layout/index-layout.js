@@ -49,6 +49,10 @@ class IndexLayout extends BaseResourceComponent {
         };
     }
 
+    constructor() {
+        super();
+    }
+
     componentDidMount() {
         super.componentDidMount();
         axios.get("/api/admin/user/basicInfo").then(({data}) => {
