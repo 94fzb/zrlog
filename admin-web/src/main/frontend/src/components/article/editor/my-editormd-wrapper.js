@@ -3,7 +3,7 @@ import {BaseResourceComponent} from "../../base-resource-component";
 import './my-editormd.css';
 import $ from 'jquery';
 import Spin from "antd/es/spin";
-import {Card, message} from "antd";
+import {message} from "antd";
 import makeAsyncScriptLoader from "react-async-script";
 import {MyLoadingComponent} from "../../../App";
 import EnvUtils from "../../../utils/env-utils";

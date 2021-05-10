@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {
     ApiOutlined,
     AppstoreOutlined,
@@ -28,7 +28,7 @@ import Constants from "../utils/constants";
 
 const {Header, Content, Footer, Sider} = Layout;
 const {SubMenu} = Menu;
-const {Title, Text} = Typography;
+const {Text} = Typography;
 
 function getDefaultOpenKeys() {
     if (window.location.pathname === '/admin/link' || window.location.pathname === '/admin/nav' || window.location.pathname === '/admin/blog/type') {
