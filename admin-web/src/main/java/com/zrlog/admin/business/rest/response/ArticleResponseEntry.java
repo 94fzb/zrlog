@@ -15,6 +15,7 @@ public class ArticleResponseEntry {
     private boolean rubbish;
     private boolean privacy;
     private String url;
+    private String alias;
 
     public int getClick() {
         return click;
@@ -102,5 +103,13 @@ public class ArticleResponseEntry {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
     }
 }

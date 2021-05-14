@@ -6,6 +6,8 @@ import com.jfinal.kit.PathKit;
 import com.jfinal.render.HtmlRender;
 import com.zrlog.admin.web.token.AdminTokenService;
 import com.zrlog.common.Constants;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import javax.servlet.http.Cookie;
 import java.io.FileInputStream;
@@ -20,13 +22,20 @@ public class AdminPageController extends Controller {
             redirect(Constants.ADMIN_URI_BASE_PATH + "/index");
             return;
         }
-        render(new HtmlRender(IOUtil.getStringInputStream(new FileInputStream(PathKit.getWebRootPath() + "/admin" +
-                "/index.html"))));
+        render(new HtmlRender(getHtmlStr()));
+    }
+
+    private String getHtmlStr() throws FileNotFoundException {
+        Document document = Jsoup.parse(IOUtil.getStringInputStream(new FileInputStream(PathKit.getWebRootPath() + "/admin" + "/index.html")));
+        //clean history
+        document.body().removeClass("dark");
+        document.body().removeClass("light");
+        document.body().addClass(Constants.getBooleanByFromWebSite("admin_darkMode") ? "dark" : "light");
+        return document.outerHtml();
     }
 
     public void login() throws FileNotFoundException {
-        render(new HtmlRender(IOUtil.getStringInputStream(new FileInputStream(PathKit.getWebRootPath() + "/admin" +
-                "/index.html"))));
+        render(new HtmlRender(getHtmlStr()));
     }
 
     public void logout() {

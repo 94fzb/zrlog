@@ -1,6 +1,7 @@
 package com.zrlog.admin.web.controller.api;
 
 import com.hibegin.common.util.BeanUtil;
+import com.hibegin.common.util.StringUtils;
 import com.jfinal.core.Controller;
 import com.zrlog.admin.business.exception.NotFindResourceException;
 import com.zrlog.admin.business.rest.request.CreateArticleRequest;
@@ -48,8 +49,15 @@ public class AdminArticleController extends Controller {
     public PageData<ArticleResponseEntry> index() {
         PageData<ArticleResponseEntry> key = articleService.adminPage(ControllerUtil.getPageRequest(this),
                 WebTools.convertRequestParam(getPara("key")));
-        key.getRows().forEach(x -> x.setUrl(WebTools.getHomeUrl(getRequest()) + Constants.getArticleUri() + x.getId()));
+        key.getRows().forEach(x -> x.setUrl(WebTools.getHomeUrl(getRequest()) + Constants.getArticleUri() + getAccessKey(x)));
         return key;
+    }
+
+    private String getAccessKey(ArticleResponseEntry articleResponseEntry) {
+        if (StringUtils.isNotEmpty(articleResponseEntry.getAlias())) {
+            return articleResponseEntry.getAlias();
+        }
+        return articleResponseEntry.getId() + "";
     }
 
     public ArticleGlobalResponse global() {
