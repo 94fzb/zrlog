@@ -1,7 +1,7 @@
 import {Route, Switch} from "react-router-dom";
 import React from "react";
 import Loadable from "react-loadable";
-import {MyLoadingComponent} from "../App";
+import {MyLoadingComponent} from "../components/my-loading-component";
 
 const AsyncArticleEdit = Loadable({
     loader: () => import("../components/article/article-edit"),

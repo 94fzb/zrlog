@@ -5,7 +5,7 @@ import $ from 'jquery';
 import Spin from "antd/es/spin";
 import {message} from "antd";
 import makeAsyncScriptLoader from "react-async-script";
-import {MyLoadingComponent} from "../../../App";
+import {MyLoadingComponent} from "../../my-loading-component";
 import EnvUtils from "../../../utils/env-utils";
 
 const editorMdId = 'editor';

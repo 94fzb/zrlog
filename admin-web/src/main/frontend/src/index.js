@@ -1,11 +1,21 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
 import * as serviceWorker from './serviceWorker';
+import {createBrowserHistory} from "history";
+import {Router} from "react-router";
+import zh_CN from "antd/es/locale/zh_CN";
+import {ConfigProvider} from "antd";
+import ThemeIndex from "./theme-index";
+
+const history = createBrowserHistory();
 
 ReactDOM.render(
-    <App/>,
+    <ConfigProvider locale={zh_CN}>
+        <Router history={history}>
+            <ThemeIndex/>
+        </Router>
+    </ConfigProvider>,
     document.getElementById('root')
 );
 
