@@ -236,12 +236,18 @@ class ArticleEdit extends BaseResourceComponent {
         }
     };
 
-    onfullscreen() {
+    onfullscreen(editor) {
         if (screenfull.isEnabled) {
             screenfull.request().then(() => {
                 this.setState({
                     "fullScreen": true,
                 });
+            });
+            screenfull.on('change', () => {
+                //console.log('Am I fullscreen?', screenfull.isFullscreen ? 'Yes' : 'No');
+                if (!screenfull.isFullscreen) {
+                    editor.fullscreenExit();
+                }
             });
         } else {
             this.setState({
@@ -250,14 +256,11 @@ class ArticleEdit extends BaseResourceComponent {
         }
     }
 
-    onfullscreenExit() {
+    onfullscreenExit(editor) {
         this.setState({
             "fullScreen": false,
-        }, () => {
-            screenfull.exit().then(r => {
-            });
         });
-
+        screenfull.exit();
     }
 
     exitTips(tips) {

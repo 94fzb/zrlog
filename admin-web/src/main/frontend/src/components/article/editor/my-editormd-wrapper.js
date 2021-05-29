@@ -127,7 +127,7 @@ class MyEditorMd extends BaseResourceComponent {
                 superThis.autoSaveToRubbish(changed, 1000);
             },
             onfullscreen: function () {
-                superThis.onfullscreen();
+                superThis.onfullscreen(editor);
                 editor.width("100%");
                 setDarkMode(editor, true);
             },
