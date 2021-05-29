@@ -342,7 +342,8 @@ class ArticleEdit extends BaseResourceComponent {
                             </Button>
                         </Col>
                         <Col xxl={2} md={3} sm={6}>
-                            <Button type="ghost" loading={this.state.rubbishSaving && this.state.previewIng} block={true} onClick={() => this.rubbish(true)}>
+                            <Button type="ghost" loading={this.state.rubbishSaving && this.state.previewIng}
+                                    block={true} onClick={() => this.rubbish(true)}>
                                 <EyeOutlined/>
                                 {this.state.res.preview}
                             </Button>
@@ -378,7 +379,7 @@ class ArticleEdit extends BaseResourceComponent {
 
                         </Col>
                     </Row>
-                    <Row gutter={8}>
+                    <Row gutter={[8, 8]}>
                         <Col md={18} xs={24} style={{zIndex: 10}}>
                             {!this.state.globalLoading &&
                             <MyEditorMdWrapper superThis={this}/>

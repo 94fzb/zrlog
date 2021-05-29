@@ -27,7 +27,7 @@
             var dialogLang = lang.dialog.help;
 
             if (editor.find("." + dialogName).length < 1) {
-                var dialogContent = "<div class=\"markdown-body\" style=\"font-family:微软雅黑, Helvetica, Tahoma, STXihei,Arial;height:390px;overflow:auto;font-size:14px;border-bottom:1px solid #ddd;padding:0 20px 20px 0;\"></div>";
+                var dialogContent = "<div class=\"markdown-body\" style=\"height:390px;overflow:auto;font-size:14px;padding:0 20px 20px 0;\"></div>";
 
                 dialog = this.createDialog({
                     name: dialogName,
