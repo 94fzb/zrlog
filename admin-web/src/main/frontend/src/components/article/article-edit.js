@@ -134,9 +134,14 @@ class ArticleEdit extends BaseResourceComponent {
         if (autoSave && currentVersion === this.state.savedVersion) {
             return;
         }
-        if (!release) {
+        if (release) {
             this.setState({
-                rubbishSaving: true
+                releaseSaving: true
+            })
+        } else {
+            this.setState({
+                rubbishSaving: true,
+                previewIng: preview,
             })
         }
         this.exitTips(this.state.res['articleEditExitWithOutSaveSuccess']);
@@ -190,9 +195,14 @@ class ArticleEdit extends BaseResourceComponent {
                 okText: '确认'
             });
         }).finally(() => {
-            if (!release) {
+            if (release) {
                 this.setState({
-                    rubbishSaving: false
+                    releaseSaving: false
+                })
+            } else {
+                this.setState({
+                    rubbishSaving: false,
+                    previewIng: preview,
                 })
             }
         });
@@ -275,7 +285,7 @@ class ArticleEdit extends BaseResourceComponent {
 
     save = async () => {
         //如果正在保存，尝试1s后再检查下
-        if (this.state.rubbishSaving) {
+        if (this.state.rubbishSaving || this.state.releaseSaving) {
             setTimeout(this.save, 1000);
             return;
         }
@@ -332,7 +342,7 @@ class ArticleEdit extends BaseResourceComponent {
                             </Button>
                         </Col>
                         <Col xxl={2} md={3} sm={6}>
-                            <Button type="ghost" block={true} onClick={() => this.rubbish(true)}>
+                            <Button type="ghost" loading={this.state.rubbishSaving && this.state.previewIng} block={true} onClick={() => this.rubbish(true)}>
                                 <EyeOutlined/>
                                 {this.state.res.preview}
                             </Button>
@@ -340,6 +350,7 @@ class ArticleEdit extends BaseResourceComponent {
                         <Col xxl={2} md={3} sm={6} className={this.state.fullScreen ? 'save-btn-full-screen' : ''}>
                             <Button id='save'
                                     type='primary'
+                                    loading={this.state.releaseSaving}
                                     block={true} enterbutton='true'
                                     htmlType='submit'>
                                 <SendOutlined/>
