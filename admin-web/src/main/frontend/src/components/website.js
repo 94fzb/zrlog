@@ -120,7 +120,7 @@ class Website extends BaseResourceComponent {
         axios.post("/api/admin/website/" + formName, changedValues).then(({data}) => {
             if (!data.error) {
                 message.info(data.message);
-                this.reloadServerRes();
+                this.loadResourceFromServer();
             }
         });
     }

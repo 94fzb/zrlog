@@ -1,10 +1,12 @@
 package com.zrlog.admin.web.controller.page;
 
+import com.google.gson.Gson;
 import com.hibegin.common.util.IOUtil;
 import com.jfinal.core.Controller;
 import com.jfinal.kit.PathKit;
 import com.jfinal.render.HtmlRender;
 import com.zrlog.admin.web.token.AdminTokenService;
+import com.zrlog.business.service.CommonService;
 import com.zrlog.common.Constants;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -31,6 +33,8 @@ public class AdminPageController extends Controller {
         document.body().removeClass("dark");
         document.body().removeClass("light");
         document.body().addClass(Constants.getBooleanByFromWebSite("admin_darkMode") ? "dark" : "light");
+        document.title(Constants.WEB_SITE.get("title") + "");
+        document.getElementById("resourceInfo").text(new Gson().toJson(new CommonService().resourceInfo(getRequest())));
         return document.outerHtml();
     }
 

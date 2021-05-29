@@ -53,7 +53,7 @@ export class BaseResourceComponent extends React.Component {
     }
 
     componentDidMount() {
-        this.fetchRes();
+        this.initRes();
     }
 
     getSpinDelayTime() {
@@ -69,6 +69,7 @@ export class BaseResourceComponent extends React.Component {
         }, () => {
             this.fetchResSuccess(data.data);
             this.reloadTitle(data.data);
+            window.sessionStorage.setItem(resourceKey, JSON.stringify(data));
         });
     }
 
@@ -76,10 +77,15 @@ export class BaseResourceComponent extends React.Component {
         document.title = [this.getSecondTitle(), res['admin.management'], this.state.res.websiteTitle].filter(Boolean).join(" | ");
     }
 
-    fetchRes() {
+    initRes() {
         const resourceData = window.sessionStorage.getItem(resourceKey);
         if (resourceData === null) {
-            this.reloadServerRes();
+            const jsonStr = document.getElementById("resourceInfo").textContent;
+            if (jsonStr && jsonStr !== '') {
+                this.handleRes({"data": JSON.parse(jsonStr)});
+            } else {
+                this.loadResourceFromServer();
+            }
         } else {
             this.handleRes(JSON.parse(resourceData));
         }
@@ -89,10 +95,9 @@ export class BaseResourceComponent extends React.Component {
         return null;
     }
 
-    reloadServerRes() {
+    loadResourceFromServer() {
         this.getAxios().get('/api/public/resource').then(({data}) => {
             this.handleRes(data);
-            window.sessionStorage.setItem(resourceKey, JSON.stringify(data));
         })
     }
 
