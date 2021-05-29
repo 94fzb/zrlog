@@ -19,6 +19,7 @@ import jquery from 'jquery';
 import MyEditorMdWrapper from "./editor/my-editormd-wrapper";
 import './article-edit.less'
 import Constants from "../../utils/constants";
+import screenfull from "screenfull";
 
 const md5 = require('md5');
 const axios = require('axios');
@@ -138,6 +139,7 @@ class ArticleEdit extends BaseResourceComponent {
                 rubbishSaving: true
             })
         }
+        this.exitTips(this.state.res['articleEditExitWithOutSaveSuccess']);
         await axios.post(uri, allValues).then(({data}) => {
             if (data.error) {
                 Modal.error({
@@ -147,6 +149,7 @@ class ArticleEdit extends BaseResourceComponent {
                 });
                 return;
             }
+            this.exitNotTips();
             if (release) {
                 message.info(this.state.res['releaseSuccess']);
             } else {
@@ -234,15 +237,37 @@ class ArticleEdit extends BaseResourceComponent {
     };
 
     onfullscreen() {
-        this.setState({
-            "fullScreen": true,
-        })
+        if (screenfull.isEnabled) {
+            screenfull.request().then(() => {
+                this.setState({
+                    "fullScreen": true,
+                });
+            });
+        } else {
+            this.setState({
+                "fullScreen": true,
+            });
+        }
     }
 
     onfullscreenExit() {
         this.setState({
             "fullScreen": false,
-        })
+        }, () => {
+            screenfull.exit().then(r => {
+            });
+        });
+
+    }
+
+    exitTips(tips) {
+        window.onbeforeunload = function () {
+            return tips;
+        };
+    }
+
+    exitNotTips() {
+        window.onbeforeunload = null;
     }
 
     save = async () => {
@@ -348,7 +373,7 @@ class ArticleEdit extends BaseResourceComponent {
                         <Col md={6} xs={24}>
                             <Row gutter={[8, 8]}>
                                 <Col span={24}>
-                                    <Card size="small"  style={{textAlign: 'center'}}>
+                                    <Card size="small" style={{textAlign: 'center'}}>
                                         <Dragger
                                             action={"/api/admin/upload/thumbnail?dir=thumbnail"}
                                             name='imgFile'

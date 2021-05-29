@@ -124,7 +124,7 @@ class MyEditorMd extends BaseResourceComponent {
                     markdown: this.getMarkdown(),
                     content: this.getPreviewedHTML()
                 }
-                superThis.autoSaveToRubbish(changed, 3000);
+                superThis.autoSaveToRubbish(changed, 1000);
             },
             onfullscreen: function () {
                 superThis.onfullscreen();

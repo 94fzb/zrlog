@@ -3,7 +3,7 @@ import {Modal} from "antd";
 import EnvUtils from "../utils/env-utils";
 
 const axios = require('axios')
-const resourceKey = "commonRes.v3";
+const resourceKey = "commonRes.v4";
 
 export class BaseResourceComponent extends React.Component {
 
