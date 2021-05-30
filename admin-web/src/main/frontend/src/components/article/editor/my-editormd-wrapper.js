@@ -31,6 +31,13 @@ class MyEditorMd extends BaseResourceComponent {
             editor.setEditorTheme(dark ? "pastel-on-dark" : "default");
         }
 
+        function initSuccess() {
+            $(".CodeMirror-gutters").css("left", "0px");
+            superMd.setState({
+                editorLoading: false
+            });
+        }
+
         // eslint-disable-next-line no-undef,no-unused-vars
         let editor = editormd(editorMdId, $, {
             codeFold: true,
@@ -46,9 +53,9 @@ class MyEditorMd extends BaseResourceComponent {
             imageUpload: true,
             watch: true,
             toolbarIcons: function () {
-                return ["bold", "del", "italic", "quote", "|", "h1", "h2", "h3", "h4", "h5", "|", "list-ul", "list-ol",
+                return ["bold", "del", "italic", "quote", "|", "h2", "h3", "h4", "|", "list-ul", "list-ol",
                     "hr", "pagebreak", "|", "link", "reference-link", "image", "file", "video", "|", "preformatted-text",
-                    "code-block", "table", "|", "fullscreen", "copyPreviewHtml", "|", "info", "help"]
+                    "code-block", "table", "copyPreviewHtml", "|", "fullscreen", "info", "help"]
             },
             imageUploadURL: "/api/admin/upload",
             path: "/admin/vendors/markdown/lib/",
@@ -74,9 +81,6 @@ class MyEditorMd extends BaseResourceComponent {
 
                     copyToClipboard('<div class="markdown-body" style="padding:0">' + editor.getPreviewedHTML() + "</div>");
                     message.info(superMd.state.res.copPreviewHtmlToClipboardSuccess);
-                });
-                superMd.setState({
-                    editorLoading: false
                 });
 
                 function uploadFile(file) {
@@ -117,6 +121,7 @@ class MyEditorMd extends BaseResourceComponent {
                     });
                 }
                 setDarkMode(editor, dark);
+                setTimeout(initSuccess, 100);
             },
 
             onchange: function () {

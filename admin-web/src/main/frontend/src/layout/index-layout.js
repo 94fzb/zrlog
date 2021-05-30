@@ -116,7 +116,7 @@ class IndexLayout extends BaseResourceComponent {
                                    fallback={Constants.getFillBackImg()}
                                    className="userAvatarImg"
                                    src={this.state.basicInfo.header}
-                                   style={{float: "right"}}/>
+                                   style={{float: "right", cursor: "pointer"}}/>
                         </div>
                     </Dropdown>
                 </Header>

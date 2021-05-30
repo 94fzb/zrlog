@@ -148,12 +148,6 @@
     -o-border-radius: 2px;
     border-radius: 2px;
     border: 1px solid #fff;
-    transition: all 300ms ease-out
-}
-
-.editormd-dropdown-menu > li > a:hover, .editormd-menu > li > a {
-    -webkit-transition: all 300ms ease-out;
-    -moz-transition: all 300ms ease-out
 }
 
 .editormd-menu > li > a.active, .editormd-menu > li > a:hover {
@@ -701,74 +695,6 @@
 
 .editormd .cm-tab {
     background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAMCAYAAAAkuj5RAAAAAXNSR0IArs4c6QAAAGFJREFUSMft1LsRQFAQheHPowAKoACx3IgEKtaEHujDjORSgWTH/ZOdnZOcM/sgk/kFFWY0qV8foQwS4MKBCS3qR6ixBJvElOobYAtivseIE120FaowJPN75GMu8j/LfMwNjh4HUpwg4LUAAAAASUVORK5CYII=) right no-repeat
-}
-
-/*! prefixes.scss v0.1.0 | Author: Pandao | https://github.com/pandao/prefixes.scss | MIT license | Copyright (c) 2015 *//*!
- *  Font Awesome 4.6.3 by @davegandy - http://fontawesome.io - @fontawesome
- *  License - http://fontawesome.io/license (Font: SIL OFL 1.1, CSS: MIT License)
- /*! prefixes.scss v0.1.0 | Author: Pandao | https://github.com/pandao/prefixes.scss | MIT license | Copyright (c) 2015 */
-.editormd-logo, .editormd-logo-1x, .editormd-logo-2x, .editormd-logo-3x, .editormd-logo-4x, .editormd-logo-5x, .editormd-logo-6x, .editormd-logo-7x, .editormd-logo-8x {
-    speak: none;
-    font-style: normal;
-    font-weight: 400;
-    font-variant: normal;
-    text-transform: none;
-    font-size: inherit;
-    line-height: 1;
-    display: inline-block;
-    text-rendering: auto;
-    vertical-align: inherit;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale
-}
-
-.markdown-body hr:after, .markdown-body hr:before {
-    content: "";
-    display: table
-}
-
-.editormd-logo-1x:before, .editormd-logo-2x:before, .editormd-logo-3x:before, .editormd-logo-4x:before, .editormd-logo-5x:before, .editormd-logo-6x:before, .editormd-logo-7x:before, .editormd-logo-8x:before, .editormd-logo:before {
-    content: "\e1987"
-}
-
-.editormd-logo-1x {
-    font-size: 1em
-}
-
-.editormd-logo-lg {
-    font-size: 1.2em
-}
-
-.editormd-logo-2x {
-    font-size: 2em
-}
-
-.editormd-logo-3x {
-    font-size: 3em
-}
-
-.editormd-logo-4x {
-    font-size: 4em
-}
-
-.editormd-logo-5x {
-    font-size: 5em
-}
-
-.editormd-logo-6x {
-    font-size: 6em
-}
-
-.editormd-logo-7x {
-    font-size: 7em
-}
-
-.editormd-logo-8x {
-    font-size: 8em
-}
-
-.editormd-logo-color {
-    color: #2196F3
 }
 
 /*! github-markdown-css | The MIT License (MIT) | Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com) | https://github.com/sindresorhus/github-markdown-css */
@@ -1820,7 +1746,13 @@ hr.editormd-page-break {
 }
 
 .editormd-theme-dark {
-    border-color: #1a1a17
+    border-color: #1a1a17;
+    background-color: #1a1a17;
+}
+
+.editormd-theme-dark .CodeMirror {
+    border-color: #1a1a17;
+    background-color: #1a1a17;
 }
 
 .editormd-theme-dark .editormd-toolbar {
@@ -1883,4 +1815,11 @@ hr.editormd-page-break {
 
 .dark .editormd-dialog-header:hover {
     border-bottom: 1px solid #2c2827;
+}
+
+.dark .editormd-container-mask {
+    z-index: 20;
+    display: block;
+    background: #1A1A17;
+    border-color: #1a1a17;
 }

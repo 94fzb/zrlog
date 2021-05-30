@@ -43,6 +43,6 @@ web/src/main/zrlog
 web/src/main/lib
 web/src/main/webapp/install
 web/src/main/webapp/admin
-
-**/node_modules/**
-/admin-frontend/node_modules/**
+web/src/main/webapp/WEB-INF/update-temp/zrlog.zip
+/blog-web/src/main/frontend/node_modules/
+/admin-web/src/main/frontend/node_modules/
