@@ -86,7 +86,7 @@ public class ArticleController extends Controller {
         // 记录回话的Key
         setAttr("key", WebTools.htmlEncode(key));
 
-        setAttr("tipsType", I18nUtil.getStringFromRes("search"));
+        setAttr("tipsType", I18nUtil.getBlogStringFromRes("search"));
         setAttr("tipsName", WebTools.htmlEncode(key));
 
         setPageDataInfo(Constants.getArticleUri() + "search/" + key + "-", data, new PageRequest(getParaToInt(1, 1),
@@ -95,7 +95,7 @@ public class ArticleController extends Controller {
     }
 
     public String record() {
-        setAttr("tipsType", I18nUtil.getStringFromRes("archive"));
+        setAttr("tipsType", I18nUtil.getBlogStringFromRes("archive"));
         setAttr("tipsName", getPara(0));
 
         setPageDataInfo(Constants.getArticleUri() + "record/" + getPara(0) + "-", new Log().findByDate(getParaToInt(1
@@ -136,8 +136,8 @@ public class ArticleController extends Controller {
         }
         if (log != null) {
             Integer logId = log.get("logId");
-            log.put("lastLog", new Log().findLastLog(logId, I18nUtil.getStringFromRes("noLastLog")));
-            log.put("nextLog", new Log().findNextLog(logId, I18nUtil.getStringFromRes("noNextLog")));
+            log.put("lastLog", new Log().findLastLog(logId, I18nUtil.getBlogStringFromRes("noLastLog")));
+            log.put("nextLog", new Log().findNextLog(logId, I18nUtil.getBlogStringFromRes("noNextLog")));
             log.put("comments", new Comment().findAllByLogId(logId));
             setAttr("log", log);
             return "detail";
@@ -153,7 +153,7 @@ public class ArticleController extends Controller {
 
         Type type = new Type().findByAlias(typeStr);
         setAttr("type", type);
-        setAttr("tipsType", I18nUtil.getStringFromRes("category"));
+        setAttr("tipsType", I18nUtil.getBlogStringFromRes("category"));
         if (type != null) {
             setAttr("tipsName", type.getStr("typeName"));
         }
@@ -167,7 +167,7 @@ public class ArticleController extends Controller {
                     , 1), Constants.getDefaultRows(), tag), new PageRequest(getParaToInt(1, 1),
                     Constants.getDefaultRows()));
 
-            setAttr("tipsType", I18nUtil.getStringFromRes("tag"));
+            setAttr("tipsType", I18nUtil.getBlogStringFromRes("tag"));
             setAttr("tipsName", tag);
         }
         return "page";

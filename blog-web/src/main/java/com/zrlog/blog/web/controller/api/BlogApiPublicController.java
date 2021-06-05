@@ -9,8 +9,12 @@ import java.util.Map;
 
 public class BlogApiPublicController extends Controller {
 
-    public Map<String, Object> resource() {
-        return new CommonService().resourceInfo(getRequest());
+    public Map<String, Object> blogResource() {
+        return new CommonService().blogResourceInfo(getRequest());
+    }
+
+    public Map<String, Object> installResource() {
+        return new CommonService().installResourceInfo(getRequest());
     }
 
     public Map<String, Boolean> installed() {

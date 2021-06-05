@@ -11,6 +11,6 @@ public class TemplatePathNotNullException extends AbstractBusinessException {
 
     @Override
     public String getMessage() {
-        return I18nUtil.getStringFromRes("templatePathNotNull");
+        return I18nUtil.getBlogStringFromRes("templatePathNotNull");
     }
 }

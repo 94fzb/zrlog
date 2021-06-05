@@ -8,11 +8,11 @@ import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
 import com.jfinal.plugin.IPlugin;
-import com.zrlog.admin.web.plugin.*;
-import com.zrlog.admin.web.token.AdminTokenThreadLocal;
 import com.zrlog.admin.business.rest.response.CheckVersionResponse;
 import com.zrlog.admin.business.rest.response.DownloadUpdatePackageResponse;
 import com.zrlog.admin.business.rest.response.UpgradeProcessResponse;
+import com.zrlog.admin.web.plugin.*;
+import com.zrlog.admin.web.token.AdminTokenThreadLocal;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.Version;
 

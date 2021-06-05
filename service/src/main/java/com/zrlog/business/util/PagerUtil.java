@@ -11,7 +11,7 @@ public class PagerUtil {
         PagerVO pager = new PagerVO();
         List<PagerVO.PageEntry> pageList = new ArrayList<>();
         if (currentPage != 1) {
-            pageList.add(pageEntity(currentUri, currentPage, I18nUtil.getStringFromRes("prevPage"), currentPage - 1));
+            pageList.add(pageEntity(currentUri, currentPage, I18nUtil.getBlogStringFromRes("prevPage"), currentPage - 1));
         }
         if (totalPage > 10) {
             if (currentPage < 3 || totalPage - 4 < currentPage) {
@@ -38,7 +38,7 @@ public class PagerUtil {
             }
         }
         if (currentPage != totalPage) {
-            pageList.add(pageEntity(currentUri, currentPage, I18nUtil.getStringFromRes("nextPage"), currentPage + 1));
+            pageList.add(pageEntity(currentUri, currentPage, I18nUtil.getBlogStringFromRes("nextPage"), currentPage + 1));
         }
         pager.setPageList(pageList);
         pager.setPageStartUrl(currentUri + 1);

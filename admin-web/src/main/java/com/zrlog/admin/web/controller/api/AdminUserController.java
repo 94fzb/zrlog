@@ -32,7 +32,7 @@ public class AdminUserController extends Controller {
                 updateRecordResponse.setError(1);
             } else {
                 userService.update(AdminTokenThreadLocal.getUserId(), updateAdminRequest);
-                updateRecordResponse.setMessage(I18nUtil.getStringFromRes("updatePersonInfoSuccess"));
+                updateRecordResponse.setMessage(I18nUtil.getBlogStringFromRes("updatePersonInfoSuccess"));
             }
         } else {
             updateRecordResponse.setError(1);

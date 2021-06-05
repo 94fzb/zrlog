@@ -19,6 +19,6 @@ public class InstallException extends AbstractBusinessException {
 
     @Override
     public String getMessage() {
-        return "[Error-" + result + "] - " + I18nUtil.getStringFromRes("connectDbError_" + result.getError());
+        return "[Error-" + result + "] - " + I18nUtil.getInstallStringFromRes("connectDbError_" + result.getError());
     }
 }

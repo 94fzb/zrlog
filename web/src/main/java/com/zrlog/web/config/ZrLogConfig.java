@@ -110,8 +110,6 @@ public class ZrLogConfig extends JFinalConfig implements InstallAction {
         con.setViewType(ViewType.JSP);
         con.setEncoding("utf-8");
         con.setJsonDatePattern("yyyy-MM-dd");
-        con.setI18nDefaultBaseName(com.zrlog.common.Constants.I18N);
-        con.setI18nDefaultLocale("zh_CN");
         con.setError404View(com.zrlog.common.Constants.NOT_FOUND_PAGE);
         con.setError500View(com.zrlog.common.Constants.ERROR_PAGE);
         con.setError403View(com.zrlog.common.Constants.FORBIDDEN_PAGE);

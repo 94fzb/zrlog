@@ -12,8 +12,8 @@ import java.util.Map;
 
 public class CommonService {
 
-    public Map<String, Object> resourceInfo(HttpServletRequest request) {
-        Map<String, Object> stringObjectMap = I18nUtil.threadLocal.get();
+    public Map<String, Object> blogResourceInfo(HttpServletRequest request) {
+        Map<String, Object> stringObjectMap = I18nUtil.threadLocal.get().getBlog().get(I18nUtil.getCurrentLocale());
         stringObjectMap.put("currentVersion", BlogBuildInfoUtil.getVersion());
         stringObjectMap.put("websiteTitle", Constants.WEB_SITE.get("title"));
         stringObjectMap.put("articleRoute", Constants.getArticleRoute());
@@ -27,6 +27,12 @@ public class CommonService {
         stringObjectMap.put("templateDownloadFromUrl", "https://store.zrlog.com/template/?from=http:" + WebTools.getHomeUrlWithHost(request) +
                 "admin/template&v=" + BlogBuildInfoUtil.getVersion() +
                 "&id=" + BlogBuildInfoUtil.getBuildId());
+        return stringObjectMap;
+    }
+
+    public Map<String, Object> installResourceInfo(HttpServletRequest request) {
+        Map<String, Object> stringObjectMap = I18nUtil.threadLocal.get().getInstall().get(I18nUtil.getAcceptLocal(request));
+        stringObjectMap.put("currentVersion", BlogBuildInfoUtil.getVersion());
         return stringObjectMap;
     }
 }

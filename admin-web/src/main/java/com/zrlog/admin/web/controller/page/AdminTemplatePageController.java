@@ -43,7 +43,7 @@ public class AdminTemplatePageController extends Controller {
             throw new TemplateExistsException();
         }
         HttpFileHandle fileHandle = (HttpFileHandle) HttpUtil.getInstance().sendGetRequest(getPara("host") +
-                "/template/download?id=" + getParaToInt("id"),
+                        "/template/download?id=" + getParaToInt("id"),
                 new HttpFileHandle(PathKit.getWebRootPath() + Constants.TEMPLATE_BASE_PATH), new HashMap<>());
         String target = fileHandle.getT().getParent() + "/" + fileName;
         FileUtils.moveOrCopyFile(fileHandle.getT().toString(), target, true);

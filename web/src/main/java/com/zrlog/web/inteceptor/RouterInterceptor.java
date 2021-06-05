@@ -2,6 +2,7 @@ package com.zrlog.web.inteceptor;
 
 import com.jfinal.aop.Interceptor;
 import com.jfinal.aop.Invocation;
+import com.jfinal.core.ActionException;
 import com.zrlog.admin.web.interceptor.AdminInterceptor;
 import com.zrlog.blog.web.handler.GlobalResourceHandler;
 import com.zrlog.blog.web.interceptor.VisitorInterceptor;
@@ -29,6 +30,8 @@ public class RouterInterceptor implements Interceptor {
                 visitorInterceptor.intercept(invocation);
             }
             GlobalResourceHandler.printUserTime("Router");
+        } catch (ActionException e) {
+            invocation.getController().renderError(e.getErrorCode());
         } catch (Exception e) {
             LOGGER.error("interceptor exception ", e);
             invocation.getController().renderError(500);

@@ -12,6 +12,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import javax.servlet.http.Cookie;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
@@ -24,22 +25,27 @@ public class AdminPageController extends Controller {
             redirect(Constants.ADMIN_URI_BASE_PATH + "/index");
             return;
         }
-        render(new HtmlRender(getHtmlStr()));
+        renderIndex();
     }
 
-    private String getHtmlStr() throws FileNotFoundException {
-        Document document = Jsoup.parse(IOUtil.getStringInputStream(new FileInputStream(PathKit.getWebRootPath() + "/admin" + "/index.html")));
+    private void renderIndex() throws FileNotFoundException {
+        File file = new File(PathKit.getWebRootPath() + "/admin/index.html");
+        if (!file.exists()) {
+            renderError(404);
+            return;
+        }
+        Document document = Jsoup.parse(IOUtil.getStringInputStream(new FileInputStream(file)));
         //clean history
         document.body().removeClass("dark");
         document.body().removeClass("light");
         document.body().addClass(Constants.getBooleanByFromWebSite("admin_darkMode") ? "dark" : "light");
         document.title(Constants.WEB_SITE.get("title") + "");
-        document.getElementById("resourceInfo").text(new Gson().toJson(new CommonService().resourceInfo(getRequest())));
-        return document.outerHtml();
+        document.getElementById("resourceInfo").text(new Gson().toJson(new CommonService().blogResourceInfo(getRequest())));
+        render(new HtmlRender(document.html()));
     }
 
     public void login() throws FileNotFoundException {
-        render(new HtmlRender(getHtmlStr()));
+        renderIndex();
     }
 
     public void logout() {

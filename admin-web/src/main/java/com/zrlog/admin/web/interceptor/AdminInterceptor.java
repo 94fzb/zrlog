@@ -3,14 +3,15 @@ package com.zrlog.admin.web.interceptor;
 import com.hibegin.common.util.ExceptionUtils;
 import com.jfinal.aop.Interceptor;
 import com.jfinal.aop.Invocation;
+import com.jfinal.core.ActionException;
 import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.zrlog.admin.business.exception.AdminAuthException;
+import com.zrlog.admin.business.rest.response.ExceptionResponse;
 import com.zrlog.admin.web.annotation.RefreshCache;
 import com.zrlog.admin.web.token.AdminTokenService;
 import com.zrlog.admin.web.token.AdminTokenThreadLocal;
 import com.zrlog.business.cache.CacheService;
-import com.zrlog.admin.business.rest.response.ExceptionResponse;
 import com.zrlog.common.Constants;
 import com.zrlog.common.exception.AbstractBusinessException;
 import com.zrlog.common.vo.AdminTokenVO;
@@ -70,6 +71,8 @@ public class AdminInterceptor implements Interceptor {
             response.setError(e.getError());
             response.setMessage(e.getMessage());
             controller.renderJson(response);
+        } catch (ActionException e) {
+            throw e;
         } catch (Exception e) {
             LOGGER.error("", e);
             if (ai.getActionKey().startsWith("/api")) {

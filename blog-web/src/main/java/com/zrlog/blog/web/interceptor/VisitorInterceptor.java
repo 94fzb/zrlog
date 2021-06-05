@@ -11,6 +11,7 @@ import com.zrlog.business.exception.InstalledException;
 import com.zrlog.business.service.TemplateHelper;
 import com.zrlog.business.util.InstallUtils;
 import com.zrlog.common.exception.AbstractBusinessException;
+import com.zrlog.common.exception.NotImplementException;
 import com.zrlog.common.rest.response.ApiStandardResponse;
 import com.zrlog.common.rest.response.StandardResponse;
 import com.zrlog.common.vo.TemplateVO;
@@ -49,7 +50,7 @@ public class VisitorInterceptor implements Interceptor {
                 StandardResponse standardResponse = new StandardResponse();
                 standardResponse.setError(e.getError());
                 standardResponse.setMessage(e.getMessage());
-                ai.getController().renderJson(e);
+                ai.getController().renderJson(standardResponse);
             }
         } else {
             if (InstallUtils.isInstalled()) {
@@ -92,7 +93,7 @@ public class VisitorInterceptor implements Interceptor {
         fullDevData(ai.getController());
         String viewPath = templatePath + "/" + templateName + ext;
         if (".ftl".equals(ext)) {
-            throw new RuntimeException("Not implement");
+            throw new NotImplementException();
         }
         ai.getController().render(viewPath);
     }

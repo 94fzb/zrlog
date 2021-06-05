@@ -96,7 +96,7 @@ export class BaseResourceComponent extends React.Component {
     }
 
     loadResourceFromServer() {
-        this.getAxios().get('/api/public/resource').then(({data}) => {
+        this.getAxios().get('/api/public/blogResource').then(({data}) => {
             this.handleRes(data);
         })
     }

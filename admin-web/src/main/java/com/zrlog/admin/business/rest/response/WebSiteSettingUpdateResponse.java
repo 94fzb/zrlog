@@ -7,6 +7,6 @@ public class WebSiteSettingUpdateResponse extends StandardResponse {
 
     @Override
     public String getMessage() {
-        return I18nUtil.getStringFromRes("updateSuccess");
+        return I18nUtil.getBlogStringFromRes("updateSuccess");
     }
 }

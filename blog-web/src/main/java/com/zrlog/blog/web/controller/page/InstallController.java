@@ -5,6 +5,7 @@ import com.jfinal.core.Controller;
 import com.jfinal.kit.PathKit;
 import com.jfinal.render.HtmlRender;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
@@ -23,6 +24,11 @@ public class InstallController extends Controller {
             redirect("/install/");
             return;
         }
-        render(new HtmlRender(IOUtil.getStringInputStream(new FileInputStream(PathKit.getWebRootPath() + "/install/index.html"))));
+        File file = new File(PathKit.getWebRootPath() + "/install/index.html");
+        if (!file.exists()) {
+            renderError(404);
+            return;
+        }
+        render(new HtmlRender(IOUtil.getStringInputStream(new FileInputStream(file))));
     }
 }

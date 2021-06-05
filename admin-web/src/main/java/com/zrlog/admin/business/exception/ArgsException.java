@@ -11,6 +11,6 @@ public class ArgsException extends AbstractBusinessException {
 
     @Override
     public String getMessage() {
-        return I18nUtil.getStringFromRes("argsError");
+        return I18nUtil.getBlogStringFromRes("argsError");
     }
 }

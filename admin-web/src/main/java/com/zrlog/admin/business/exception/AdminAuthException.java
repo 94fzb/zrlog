@@ -11,6 +11,6 @@ public class AdminAuthException extends AbstractBusinessException {
 
     @Override
     public String getMessage() {
-        return I18nUtil.getStringFromRes("admin.session.timeout");
+        return I18nUtil.getBlogStringFromRes("admin.session.timeout");
     }
 }

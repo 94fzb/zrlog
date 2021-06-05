@@ -103,7 +103,7 @@ public class Log extends Model<Log> implements Serializable {
         data.setRows(find(sql, false, false, "%" + keywords + "%", "%" + keywords + "%", pageRequest.getOffset(),
                 pageRequest.getSize()));
         ModelUtil.fillPageData(this, "from " + TABLE_NAME + " l inner join user u,type t where rubbish=? and " +
-                "privacy=? and u.userId=l.userId and t.typeId=l.typeId and (l.title like ? or l.plain_content like ?)"
+                        "privacy=? and u.userId=l.userId and t.typeId=l.typeId and (l.title like ? or l.plain_content like ?)"
                 , data, new Object[]{false, false, "%" + keywords + "%", "%" + keywords + "%"});
         return data;
     }
@@ -207,7 +207,7 @@ public class Log extends Model<Log> implements Serializable {
                         + "where logId=l.logId ) commentSize,u.userName from " + TABLE_NAME + " l inner join user u," + "type t where rubbish=? and privacy=? and u.userId=l.userId and t.typeId=l.typeId and " + "DATE_FORMAT(releaseTime,'%Y_%m')=? order by l.logId desc limit ?,?";
         data.setRows(find(sql, false, false, date, new PageRequest(page, pageSize).getOffset(), pageSize));
         ModelUtil.fillPageData(this, "from " + TABLE_NAME + " l inner join user u,type t where rubbish=? and " +
-                "privacy=? and u.userId=l.userId and t.typeId=l.typeId and  DATE_FORMAT(releaseTime,'%Y_%m')=?", data
+                        "privacy=? and u.userId=l.userId and t.typeId=l.typeId and  DATE_FORMAT(releaseTime,'%Y_%m')=?", data
                 , new Object[]{false, false, date});
         return data;
     }

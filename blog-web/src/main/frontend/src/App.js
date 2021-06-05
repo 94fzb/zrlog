@@ -69,7 +69,7 @@ class App extends React.Component {
     }
 
     fetchRes(installed) {
-        axios.get('/api/public/resource').then(({data}) => {
+        axios.get('/api/public/installResource').then(({data}) => {
             data.data.copyrightTips = data.data.copyright + ' ZrLog'
             this.setState({
                 res: data.data,

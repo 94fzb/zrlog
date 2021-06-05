@@ -322,7 +322,7 @@ public class TemplateHelper {
             templateVO.setPreviewImages(Collections.singletonList("assets/images/template-default-preview.jpg"));
         }
         if (StringUtils.isEmpty(templateVO.getDigest())) {
-            templateVO.setDigest(I18nUtil.getStringFromRes("noIntroduction"));
+            templateVO.setDigest(I18nUtil.getBlogStringFromRes("noIntroduction"));
         }
         File settingFile =
                 new File(PathKit.getWebRootPath() + templatePath + "/setting/index" + ZrLogUtil.getViewExt(templateVO.getViewType()));

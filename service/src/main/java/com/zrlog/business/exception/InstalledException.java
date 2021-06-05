@@ -11,6 +11,6 @@ public class InstalledException extends AbstractBusinessException {
 
     @Override
     public String getMessage() {
-        return I18nUtil.getStringFromRes("installed");
+        return I18nUtil.getInstallStringFromRes("installed");
     }
 }
