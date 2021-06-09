@@ -390,6 +390,7 @@ class ArticleEdit extends BaseResourceComponent {
                                 <Col span={24}>
                                     <Card size="small" style={{textAlign: 'center'}}>
                                         <Dragger
+                                            accept={"image/*"}
                                             action={"/api/admin/upload/thumbnail?dir=thumbnail"}
                                             name='imgFile'
                                             onChange={(e) => this.onUploadChange(e)}>
