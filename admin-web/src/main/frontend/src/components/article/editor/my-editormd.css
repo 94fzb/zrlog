@@ -1823,3 +1823,23 @@ hr.editormd-page-break {
     background: #1A1A17;
     border-color: #1a1a17;
 }
+
+.light .CodeMirror-activeline-background {
+    background: #e8f2ff
+}
+
+.dark .CodeMirror-activeline-background {
+    background: #1A1A17
+}
+
+.light .CodeMirror-gutters {
+    border-right: 1px solid #ddd;
+    background-color: #f7f7f7;
+    white-space: nowrap
+}
+
+.dark .CodeMirror-gutters {
+    border-right: 1px solid #1A1A17;
+    background-color: #1A1A17;
+    white-space: nowrap
+}
