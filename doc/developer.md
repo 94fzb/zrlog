@@ -17,6 +17,7 @@
 帮助使用`zrlog`做定制开发，或者是二次开发
 
 ## 数据字典
+
 [看这里](http://doc.zrlog.com/database/index.html)
 
 ## 快速开发
@@ -33,8 +34,7 @@
 
 > 为了方便快速上手，简单说下项目中使用JFinal
 
-JFinal 与 Strust，SpringMVC 这些框架类似,通过全局拦截器，或者是全局servlet类似，JFinal 使用的前者。
-WEB-INF/web.xml
+JFinal 与 Strust，SpringMVC 这些框架类似,通过全局拦截器，或者是全局servlet类似，JFinal 使用的前者。 WEB-INF/web.xml
 
 ```xml
  <filter>
@@ -53,8 +53,8 @@ WEB-INF/web.xml
 
 然后在 ZrlogConfig 中配置 JFinal 的核心组件
 
-
 ### Controller 说明
+
 **由于只是个人博客系统,设计之初就没有太多的权限控制**
 
 Zrlog 只有2种用户模式（需要登陆的，和访客模式）
@@ -67,8 +67,7 @@ Zrlog 只有2种用户模式（需要登陆的，和访客模式）
 /api/ (开放与博客相关的所有JSON数据)
 / (可以自行进行扩展)
 
-管理员才可以访问的
-/admin/
+管理员才可以访问的 /admin/
 
 ### 主题
 
@@ -79,6 +78,7 @@ index.jsp 为默认的打开的页面，若无其他定制与 page.jsp 相同就
 **通过`ThemeUtil.createTemplate`方法可以快速创建这些页面**
 
 ### 插件
+
 [如何编写一个zrlog插件 http://blog.94fzb.com/post/175](http://blog.94fzb.com/post/175)
 
 ### 设计原则
@@ -98,7 +98,6 @@ JSON API 主要用于非网页展示，用于客户端程序开发定制
 * QQ群 6399942
 * QQ 504008147
 * 邮箱 xchun@zrlog.com
-
 
 ## 开源协议
 

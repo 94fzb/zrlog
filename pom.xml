@@ -3,12 +3,15 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.zrlog</groupId>
     <artifactId>zrlog</artifactId>
-    <version>2.1.15-SNAPSHOT</version>
+    <version>2.2.1-SNAPSHOT</version>
     <modules>
         <module>web</module>
         <module>service</module>
         <module>common</module>
         <module>data</module>
+        <module>blog-web</module>
+        <module>admin-web</module>
+        <module>admin-token</module>
     </modules>
     <packaging>pom</packaging>
     <name>zrlog</name>
@@ -18,7 +21,7 @@
 
     <properties>
         <java.version>1.8</java.version>
-        <jfinal.version>4.8</jfinal.version>
+        <jfinal.version>4.9.06</jfinal.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <servlet.version>3.1.0</servlet.version>
         <maven.test.skip>true</maven.test.skip>
@@ -83,7 +86,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
+            <version>4.13.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -107,5 +110,14 @@
                 <version>2.7</version>
             </plugin>
         </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>com.github.eirslett</groupId>
+                    <artifactId>frontend-maven-plugin</artifactId>
+                    <version>1.11.0</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 </project>

@@ -1,21 +1,14 @@
 package com.zrlog.model;
 
 import com.jfinal.plugin.activerecord.Model;
-import com.zrlog.util.ParseUtil;
-
-import java.util.List;
-import java.util.Map;
+import com.zrlog.data.dto.PageData;
 
 class ModelUtil {
 
-    static void fillPageData(Model<? extends Model> model, int page, int pageSize, String where, Map<String, Object> data, Object[] obj) {
-        if (!((List) data.get("rows")).isEmpty()) {
-            data.put("page", page);
+    static <T extends Model<T>> void fillPageData(T model, String where, PageData<T> pageData, Object[] obj) {
+        if (!pageData.getRows().isEmpty()) {
             long count = model.findFirst("select count(1) cnt " + where, obj).getLong("cnt");
-            data.put("total", ParseUtil.getTotalPate(count, pageSize));
-            data.put("records", count);
-        } else {
-            data.clear();
+            pageData.setTotalElements(count);
         }
     }
 }

@@ -1,0 +1,26 @@
+{
+  "navBarBrand": {
+    "label": "导航栏",
+    "htmlElementType": "input",
+    "placeholder": "",
+    "type": "text"
+  },
+  "footerLink": {
+    "label": "底部链接",
+    "htmlElementType": "textarea",
+    "placeholder": "html格式",
+    "type": "text"
+  },
+  "widgetAd": {
+    "label": "侧边栏广告",
+    "htmlElementType": "textarea",
+    "placeholder": "html格式",
+    "type": "text"
+  },
+  "detailAd": {
+    "label": "文章页广告",
+    "htmlElementType": "textarea",
+    "placeholder": "html格式",
+    "type": "text"
+  }
+}

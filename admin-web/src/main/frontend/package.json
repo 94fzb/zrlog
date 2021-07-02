@@ -1,0 +1,52 @@
+{
+  "name": "admin-web-frontend",
+  "version": "0.1.0",
+  "homepage": "./",
+  "private": true,
+  "_location": "/vendors",
+  "license": "MIT",
+  "dependencies": {
+    "@ant-design/icons": "4.6.2",
+    "antd": "4.15.5",
+    "axios": "0.21.1",
+    "font-awesome": "4.7.0",
+    "history": "4.10.1",
+    "jquery": "3.6.0",
+    "md5": "2.3.0",
+    "react": "17.0.2",
+    "react-async-script": "1.2.0",
+    "react-dom": "17.0.2",
+    "react-router": "5.2.0",
+    "react-router-dom": "5.2.0",
+    "screenfull": "5.1.0"
+  },
+  "scripts": {
+    "start": "craco start",
+    "build": "GENERATE_SOURCEMAP=false craco build",
+    "test": "craco test"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "rc-input-number": "7.0.1",
+    "rc-tween-one": "2.7.3",
+    "rc-util": "5.8.1",
+    "react-loadable": "5.5.0",
+    "react-scripts": "4.0.3",
+    "craco-less": "1.17.1",
+    "@craco/craco": "6.1.2"
+  }
+}

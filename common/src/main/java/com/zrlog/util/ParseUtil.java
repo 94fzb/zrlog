@@ -1,5 +1,6 @@
 package com.zrlog.util;
 
+import com.hibegin.common.util.StringUtils;
 import com.zrlog.common.Constants;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -16,15 +17,15 @@ import java.util.Set;
  * 一些常见的转化的工具方法。
  */
 public class ParseUtil {
-    public static int getFirstRecord(int page, int pageSize) {
-        return (page - 1) * pageSize;
-    }
 
     public static int getTotalPate(long count, int pageSize) {
         return (int) Math.ceil(count / (pageSize * 1.0D));
     }
 
     public static String autoDigest(String str, int size) {
+        if (StringUtils.isEmpty(str)) {
+            return str;
+        }
         StringBuilder sb = new StringBuilder();
         Document document = Jsoup.parseBodyFragment(str);
         List<Node> allTextNode = new ArrayList<>();
@@ -67,9 +68,7 @@ public class ParseUtil {
     }
 
     /**
-     * @param str
-     * @param defaultValue
-     * @return
+     *
      */
     public static int strToInt(String str, int defaultValue) {
         if (str == null) {
@@ -99,10 +98,6 @@ public class ParseUtil {
 
     /**
      * 输入一段纯文本，通过指定关键字提取相关的上下文
-     *
-     * @param content
-     * @param keyword
-     * @return
      */
     public static String wrapperKeyword(String content, String keyword) {
         String newContent = content;
@@ -118,7 +113,7 @@ public class ParseUtil {
                     for (int i = 0; i < strings.length - 1; i++) {
                         count += strings[i].length();
                         String str = wrapperFontRed(content.substring(count, count + keyword.length()));
-                        sb.append(content.substring(count - strings[i].length(), count));
+                        sb.append(content, count - strings[i].length(), count);
                         sb.append(str);
                         count += keyword.length();
                     }
@@ -126,8 +121,9 @@ public class ParseUtil {
                     sb.append(content.substring(count).replace(keyword.toLowerCase(), wrapperFontRed(keyword)));
                     newContent = sb.toString();
                 } else if (strings.length > 0) {
-                    sb.append(content.substring(0, strings[0].length()));
-                    sb.append(lowerContent.substring(strings[0].length()).replace(keyword.toLowerCase(), wrapperFontRed(content.substring(strings[0].length()))));
+                    sb.append(content, 0, strings[0].length());
+                    sb.append(lowerContent.substring(strings[0].length()).replace(keyword.toLowerCase(),
+                            wrapperFontRed(content.substring(strings[0].length()))));
                     newContent = sb.toString();
                 } else {
                     newContent = wrapperFontRed(content);
@@ -152,7 +148,6 @@ public class ParseUtil {
         }
         return ParseUtil.optimizeContent(newContent, keyword);
     }
-
 
     private static String wrapperFontRed(String content) {
         return "<font color=\"#CC0000\">" + content + "</font>";
@@ -181,6 +176,10 @@ public class ParseUtil {
             }
         }
         return newContent;
+    }
+
+    public static boolean isNumeric(String str) {
+        return str.matches("-?\\d+(.\\d+)?");
     }
 
     public static void main(String[] args) {

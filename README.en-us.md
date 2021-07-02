@@ -10,14 +10,14 @@ ZrLog is a blog/CMS program developed in Java. It is simple, easy to use, compon
 
 ### Pictures
 
-![](http://dl.zrlog.com/assets/screenprint/post-detail.png)
+![](https://www.zrlog.com/assets/screenprint/post-detail.png)
 
-![](http://dl.zrlog.com/assets/screenprint/article-edit.png)
+![](https://www.zrlog.com/assets/screenprint/article-edit.png)
 
 ### Features
 
 1. Provide management of logs, categories, tags, and comments
-2. Support plugin mode [How to write a plugin](http://blog.zrlog.com/post/zrlog-plugin-dev)
+2. Support plugin mode [How to write a plugin](https://blog.zrlog.com/post/zrlog-plugin-dev)
 3. Highly customizable theme features [How to make a set of themes](https://blog.zrlog.com/post/make-theme-for-zrlog)
 4. Support third party comment plugin
 5. Provide `editormd` mainstream rich text editor, basically meet the editing needs of administrators
@@ -42,13 +42,13 @@ ZrLog is a blog/CMS program developed in Java. It is simple, easy to use, compon
     - 2.tomcat version >=8,jetty > 8
     - 3.mysql
 - Data initialization
-    - 1.Download [latest war](http://dl.zrlog.com/release/zrlog.war) in the webapps directory of tomcat (change zrlog.war to ROOT.war to avoid entering the secondary directory)    
+    - 1.Download [latest war](https://dl.zrlog.com/release/zrlog.war) in the webapps directory of tomcat (change zrlog.war to ROOT.war to avoid entering the secondary directory)    
     - 2.Visit http://host:port/zrlog/install
     - 3.Fill in the database, administrator information, complete the installation
 
 ### ChangeLog
 
-[View the full ChangeLog](https://www.zrlog.com/changelog?ref=md)
+[View the full ChangeLog](https://www.zrlog.com/changelog/index.html?ref=md)
 
 ### Sample Website
 
@@ -70,13 +70,14 @@ If you have some problems, you can go here to find [FAQ](https://blog.zrlog.com/
 
 ### Thanks
 
-* [JFinal](http://jfinal.com)
+* [JFinal](https://jfinal.com)
 * [Editor.md](https://pandao.github.io/editor.md/)
 * [SheShui.me](http://sheshui.me)
 * [Gentelella](https://github.com/puikinsh/gentelella)
+* [AntD](https://ant.design)
 * [Jetbrains](https://www.jetbrains.com/)
 * [e-lionel](http://www.e-lionel.com)
 
 ### License
 
-ZrLog is Open Source software released under the [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0.html).
+ZrLog is Open Source software released under the [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0.html).
