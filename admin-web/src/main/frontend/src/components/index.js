@@ -5,7 +5,7 @@ import {BaseResourceComponent} from "./base-resource-component";
 import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
 import Alert from "antd/es/alert";
-import {CommentOutlined, ContainerOutlined} from "@ant-design/icons";
+import {CommentOutlined, ContainerOutlined, createFromIconfontCN} from "@ant-design/icons";
 import Spin from "antd/lib/spin";
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
@@ -46,12 +46,19 @@ const system = [
     }
 ];
 
+const IconFont = createFromIconfontCN({
+    scriptUrl: [
+        '//at.alicdn.com/t/font_2648654_3fp5nkjaia7.js',
+    ],
+});
+
 class Index extends BaseResourceComponent {
 
     initState() {
         return {
             statisticsInfo: {},
-            system: system
+            system: system,
+            docker: false,
         };
     }
 
@@ -72,7 +79,8 @@ class Index extends BaseResourceComponent {
             system[6].value = data.data['file.encoding'];
             system[7].value = data.data['zrlog.version'] + " - " + data.data['zrlog.buildId'] + " (" + data.data['zrlog.buildTime'] + ")";
             this.setState({
-                system: system
+                system: system,
+                docker: data.data['docker'] === 'docker'
             })
         })
 
@@ -91,6 +99,18 @@ class Index extends BaseResourceComponent {
                 title: this.state.res.value,
                 key: 'value',
                 dataIndex: 'value',
+                render: (e, r, a, b) => {
+                    if (r.name !== '运行环境') {
+                        return e;
+                    } else {
+                        console.info(b);
+                        if (!this.state.docker) {
+                            return e;
+                        } else {
+                            return (<div><IconFont type='icon-docker'/> {e}</div>);
+                        }
+                    }
+                }
             },
         ];
     }
@@ -106,7 +126,7 @@ class Index extends BaseResourceComponent {
         return (
             <Spin delay={this.getSpinDelayTime()}
                   spinning={this.state.resLoading}>
-                <Title className='page-header' level={3}>{this.getSecondTitle()}</Title>
+                <Title className='page-header' level={3}>{this.getSecondTitle()} </Title>
                 <Divider/>
                 <Alert message={this.state.res['admin.index.welcomeTips']} type="info" showIcon/>
                 <Row gutter={[8, 8]} style={{paddingTop: "20px"}}>
