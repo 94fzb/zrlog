@@ -57,7 +57,7 @@ export class BaseTableComponent extends BaseResourceComponent {
     handleDelete = async (key) => {
         await this.getAxios().post(this.getDeleteApiUri() + "?id=" + key).then(({data}) => {
             if (data.error) {
-                message.error(this.state.res['deleteError']);
+                message.error(data.message);
                 return;
             }
             message.info("删除成功");
