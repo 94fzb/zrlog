@@ -11,6 +11,7 @@ import {
     KeyOutlined,
     LogoutOutlined,
     SettingOutlined,
+    SoundOutlined,
     UserOutlined
 } from '@ant-design/icons';
 import {Badge, Col, Layout, Menu, Row, Spin, Typography} from 'antd';
@@ -79,7 +80,7 @@ class IndexLayout extends BaseResourceComponent {
                 <Menu.Item key="0" hidden={!this.state.upgrade}>
                     <Link to="/admin/upgrade">
                         <Badge dot={this.state.upgrade}>
-                            <SettingOutlined/>
+                            <SoundOutlined/>
                             <Text
                                 style={{paddingLeft: "12px"}}>{res['newVersion']} -
                                 ({this.state.newVersion}#{this.state.versionType})</Text>
