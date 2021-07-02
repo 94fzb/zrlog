@@ -45,7 +45,7 @@ class IndexLayout extends BaseResourceComponent {
         return {
             basicInfoLoading: true,
             basicInfo: {},
-            upgrade: true,
+            upgrade: false,
             newVersion: "",
             versionType: ""
         };
