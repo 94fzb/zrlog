@@ -103,7 +103,6 @@ class Index extends BaseResourceComponent {
                     if (r.name !== '运行环境') {
                         return e;
                     } else {
-                        console.info(b);
                         if (!this.state.docker) {
                             return e;
                         } else {
