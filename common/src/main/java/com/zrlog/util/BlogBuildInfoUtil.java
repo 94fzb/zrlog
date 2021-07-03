@@ -9,11 +9,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.Properties;
 
 /**
- * 读取Zrlog构建信息，及build.properties。
+ * 读取ZrLog构建信息，及build.properties。
  * 注 build.properties 为使用CI工具自动加入的，git代码仓库并没有该文件。
  */
 public class BlogBuildInfoUtil {
@@ -26,7 +28,7 @@ public class BlogBuildInfoUtil {
     private static String buildId;
     private static String version;
     private static Date time;
-    private static String runMode = "DEV";
+    private static String runMode = "RELEASE";
 
     static {
         Properties properties = new Properties();
@@ -75,7 +77,8 @@ public class BlogBuildInfoUtil {
     public static Date getTime() {
         //仅存在开发环境为空
         if (time == null) {
-            return new Date();
+            return Date.from(LocalDateTime.of(2015, 3, 29, 0, 0, 0)
+                    .atZone(ZoneOffset.systemDefault()).toInstant());
         }
         return time;
     }
@@ -101,5 +104,19 @@ public class BlogBuildInfoUtil {
         LOGGER.info("version = " + getVersion());
         LOGGER.info("buildId = " + getBuildId());
         LOGGER.info("time = " + getTime());
+    }
+
+    public static Properties getBlogProp() {
+        Properties blogProperties = new Properties();
+        try {
+            blogProperties.load(BlogBuildInfoUtil.class.getResourceAsStream("/zrlog.properties"));
+        } catch (IOException e) {
+            LOGGER.error("load blogProperties error", e);
+        }
+        blogProperties.put("version", BlogBuildInfoUtil.getVersion());
+        blogProperties.put("buildId", BlogBuildInfoUtil.getBuildId());
+        blogProperties.put("buildTime", new SimpleDateFormat("yyyy-MM-dd").format(BlogBuildInfoUtil.getTime()));
+        blogProperties.put("runMode", BlogBuildInfoUtil.getRunMode());
+        return blogProperties;
     }
 }

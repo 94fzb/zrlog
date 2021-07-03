@@ -6,7 +6,6 @@ import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.common.util.VersionComparator;
 import com.zrlog.common.Constants;
-import com.zrlog.common.response.PageableResponse;
 import eu.bitwalker.useragentutils.BrowserType;
 import eu.bitwalker.useragentutils.UserAgent;
 import org.slf4j.Logger;
@@ -43,29 +42,6 @@ public class ZrLogUtil {
         }
     }
 
-    /**
-     * 将输入的分页过后的对象，转化PageableResponse的对象
-     *
-     * @param object
-     * @param toClazz
-     * @param <T>
-     * @return
-     */
-    public static <T> PageableResponse<T> convertPageable(Object object, Class<T> toClazz) {
-        String jsonStr = new Gson().toJson(object);
-        PageableResponse pageableResponse = new Gson().fromJson(jsonStr, PageableResponse.class);
-        List<T> dataList = new ArrayList<>();
-        List oldDataList = pageableResponse.getRows();
-        for (Object obj : oldDataList) {
-            dataList.add(BeanUtil.convert(obj, toClazz));
-        }
-        PageableResponse<T> response = new PageableResponse<>();
-        response.setPage(pageableResponse.getPage());
-        response.setTotal(pageableResponse.getTotal());
-        response.setRecords(pageableResponse.getRecords());
-        response.setRows(dataList);
-        return response;
-    }
 
     public static <T> T convertRequestParam(Map<String, String[]> requestParam, Class<T> clazz) {
         Map<String, Object> tempMap = new HashMap<>();
@@ -171,7 +147,7 @@ public class ZrLogUtil {
             File[] fs = file.listFiles();
             if (fs != null && fs.length > 0) {
                 fileList = Arrays.asList(fs);
-                fileList.sort(Comparator.comparingInt(e -> Integer.valueOf(e.getName().replace(".sql", ""))));
+                fileList.sort(Comparator.comparingInt(e -> Integer.parseInt(e.getName().replace(".sql", ""))));
             }
         }
         return fileList;
@@ -179,15 +155,15 @@ public class ZrLogUtil {
 
     public static List<Map.Entry<Integer, List<String>>> getExecSqlList(String sqlVersion, String basePath) {
         List<Map.Entry<Integer, List<String>>> sqlList = new ArrayList<>();
-        Integer version = 0;
+        int version = 0;
         try {
-            version = Integer.valueOf(sqlVersion);
+            version = Integer.parseInt(sqlVersion);
         } catch (Exception e) {
             LOGGER.error("", e);
         }
         for (File f : getSqlFileList(basePath)) {
             try {
-                Integer fileVersion = Integer.valueOf(f.getName().replace(".sql", ""));
+                int fileVersion = Integer.parseInt(f.getName().replace(".sql", ""));
                 if (fileVersion > version) {
                     LOGGER.info("need update sql " + f);
                     Map.Entry<Integer, List<String>> entry = new AbstractMap.SimpleEntry<>(fileVersion, Arrays.asList(IOUtil.getStringInputStream(new FileInputStream(f)).split("\n")));

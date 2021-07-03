@@ -5,7 +5,7 @@
     <parent>
         <artifactId>zrlog</artifactId>
         <groupId>com.zrlog</groupId>
-        <version>2.1.15-SNAPSHOT</version>
+        <version>2.2.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -13,7 +13,7 @@
     <packaging>war</packaging>
 
     <properties>
-        <tomcat9Version>9.0.35</tomcat9Version>
+        <tomcatVersion>9.0.35</tomcatVersion>
         <tomcat-scope>compile</tomcat-scope>
         <contextPath>/${finalName}</contextPath>
         <jarOutputDirectory>${project.basedir}/src/main/</jarOutputDirectory>
@@ -23,24 +23,13 @@
     <dependencies>
         <dependency>
             <groupId>com.zrlog</groupId>
-            <artifactId>service</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.jfinal</groupId>
-            <artifactId>cos</artifactId>
-            <version>2019.8</version>
+            <artifactId>blog-web</artifactId>
+            <version>2.2.1-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>jstl</groupId>
-            <artifactId>jstl</artifactId>
-            <version>1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>net.sourceforge.htmlcleaner</groupId>
-            <artifactId>htmlcleaner</artifactId>
-            <version>2.21</version>
+            <groupId>com.zrlog</groupId>
+            <artifactId>admin-web</artifactId>
+            <version>2.2.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -48,24 +37,19 @@
             <version>${servlet.version}</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.freemarker</groupId>
-            <artifactId>freemarker</artifactId>
-            <version>2.3.23</version>
-        </dependency>
 
 
         <!--tomcat embed mode-->
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
-            <version>${tomcat9Version}</version>
+            <version>${tomcatVersion}</version>
             <scope>${tomcat-scope}</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-jasper</artifactId>
-            <version>${tomcat9Version}</version>
+            <version>${tomcatVersion}</version>
             <scope>${tomcat-scope}</scope>
         </dependency>
     </dependencies>
@@ -74,7 +58,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>3.2.3</version>
+                <version>3.3.1</version>
                 <configuration>
                     <resourceEncoding>${project.build.sourceEncoding}</resourceEncoding>
                     <warSourceDirectory>src/main/webapp</warSourceDirectory>
@@ -90,8 +74,16 @@
                         WEB-INF/update-temp/**,
                         WEB-INF/lib/tomcat*,
                         WEB-INF/lib/ecj*,
-                        post/**
-                        _cache/**
+                        post/**,
+                        _cache/**,
+                        **/css/*.map,
+                        **/js/*.map,
+                        admin/service-worker.js,
+                        admin/asset-manifest.json,
+                        admin/precache-manifest*,
+                        install/service-worker.js,
+                        install/asset-manifest.json,
+                        install/precache-manifest*,
                     </packagingExcludes>
                     <warName>${finalName}-${project.version}</warName>
                     <outputDirectory>${project.build.directory}/../../target</outputDirectory>

@@ -10,7 +10,7 @@ import java.util.List;
 public class Plugin extends Model<Plugin> {
     public static final String TABLE_NAME = "plugin";
 
-    public List<Plugin> find() {
+    public List<Plugin> findAll() {
         return find("select * from " + TABLE_NAME + " where level>?", 0);
     }
 }

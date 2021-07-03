@@ -3,7 +3,8 @@ package com.zrlog.model;
 import com.hibegin.common.util.StringUtils;
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Model;
-import com.zrlog.common.request.PageableRequest;
+import com.zrlog.common.rest.request.PageRequest;
+import com.zrlog.data.dto.PageData;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
@@ -17,7 +18,7 @@ public class Tag extends Model<Tag> {
 
     public static final String TABLE_NAME = "tag";
 
-    public List<Tag> find() {
+    public List<Tag> findAll() {
         return find("select tagId as id,text,count from " + TABLE_NAME);
     }
 
@@ -74,7 +75,7 @@ public class Tag extends Model<Tag> {
             if (StringUtils.isNotEmpty(log.getStr("keywords")) && log.getStr("keywords").trim().length() > 0) {
                 Set<String> tagSet = strToSet(log.getStr("keywords") + ",");
                 for (String tag : tagSet) {
-                    countMap.merge(tag, 1, (a, b) -> a + b);
+                    countMap.merge(tag, 1, Integer::sum);
                 }
             }
         }
@@ -113,10 +114,10 @@ public class Tag extends Model<Tag> {
         }
     }
 
-    public Map<String, Object> find(PageableRequest page) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("rows", find("select tagId as id,text,count from " + TABLE_NAME + " limit ?,?", page.getOffset(), page.getRows()));
-        ModelUtil.fillPageData(this, page.getPage(), page.getRows(), "from " + TABLE_NAME + "", data, new Object[0]);
+    public PageData<Tag> find(PageRequest page) {
+        PageData<Tag> data = new PageData<>();
+        data.setRows(find("select tagId as id,text,count from " + TABLE_NAME + " limit ?,?", page.getOffset(), page.getSize()));
+        ModelUtil.fillPageData(this, "from " + TABLE_NAME + "", data, new Object[0]);
         return data;
     }
 }

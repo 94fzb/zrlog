@@ -1,0 +1,1 @@
+./mvnw clean package -pl '!web,!admin-web'

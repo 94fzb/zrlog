@@ -2,13 +2,12 @@ package com.zrlog.model;
 
 import com.jfinal.plugin.activerecord.Db;
 import com.jfinal.plugin.activerecord.Model;
-import com.zrlog.common.request.PageableRequest;
+import com.zrlog.common.rest.request.PageRequest;
+import com.zrlog.data.dto.PageData;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 对应数据里面的comment表，用于存放文章对应的评论信息。
@@ -20,11 +19,11 @@ public class Comment extends Model<Comment> {
      */
     private static final long serialVersionUID = 1L;
 
-    public Map<String, Object> find(PageableRequest page) {
-        Map<String, Object> data = new HashMap<>();
+    public PageData<Comment> find(PageRequest page) {
+        PageData<Comment> data = new PageData<>();
         String sql = "select commentId as id,userComment,header,commTime,userMail,userHome,userIp,userName,hide,logId from " + TABLE_NAME + " order by commTime desc limit ?,?";
-        data.put("rows", find(sql, page.getOffset(), page.getRows()));
-        ModelUtil.fillPageData(this, page.getPage(), page.getRows(), "from " + TABLE_NAME, data, new Object[0]);
+        data.setRows(find(sql, page.getOffset(), page.getSize()));
+        ModelUtil.fillPageData(this, "from " + TABLE_NAME, data, new Object[0]);
         return data;
     }
 

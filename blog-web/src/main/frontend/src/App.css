@@ -1,0 +1,17 @@
+@import '~antd/dist/antd.css';
+
+.App {
+    text-align: center;
+}
+
+.container {
+    width: 100%;
+    margin-top: 15px;
+    margin-right: auto;
+    margin-left: auto;
+    max-width: 1140px;
+}
+
+.ant-layout {
+    min-height: 100vh;
+}

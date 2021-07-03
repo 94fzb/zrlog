@@ -1,1 +1,4 @@
 language: java
+install: skip
+script:
+  - sh bin/package-zip.sh
