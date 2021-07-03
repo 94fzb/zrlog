@@ -94,8 +94,9 @@ class Template extends BaseResourceComponent {
                                 <Card
                                     cover={
                                         <img
-                                            style={{width: "100%"}}
+                                            style={{width: "100%", minHeight: 250}}
                                             alt={template.name}
+                                            title={template.name}
                                             src={template.previewImage}
                                         />
                                     }
