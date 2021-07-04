@@ -23,8 +23,11 @@ import java.util.concurrent.locks.ReentrantLock;
 public class CacheService {
 
     private static final String CACHE_HTML_PATH = PathKit.getWebRootPath() + "/_cache/";
+
     private static final Map<String, String> cacheFileMap = new HashMap<>();
+
     private static final ReentrantLock lock = new ReentrantLock();
+
     private static BaseDataInitVO cacheInit;
 
     public static String getFileFlag(String uri) {
@@ -46,7 +49,8 @@ public class CacheService {
             return;
         }
         byte[] bytes = copy.getBytes(StandardCharsets.UTF_8);
-        FileUtils.tryResizeDiskSpace(CACHE_HTML_PATH + Constants.getArticleUri(), bytes.length, Constants.getMaxCacheHtmlSize());
+        FileUtils.tryResizeDiskSpace(CACHE_HTML_PATH + Constants.getArticleUri(), bytes.length,
+                Constants.getMaxCacheHtmlSize());
         if (!file.exists()) {
             file.getParentFile().mkdirs();
         }
@@ -60,9 +64,7 @@ public class CacheService {
         Map<String, String> cacheMap = new HashMap<>();
         for (File file : staticFiles) {
             String uri = file.toString().substring(PathKit.getWebRootPath().length());
-            if (!uri.startsWith("/assets") &&
-                    !uri.startsWith("/include") &&
-                    !Objects.equals("/favicon.ico", uri)) {
+            if (!uri.startsWith("/assets") && !uri.startsWith("/include") && !Objects.equals("/favicon.ico", uri)) {
                 continue;
             }
             if (uri.endsWith(".jsp")) {
@@ -75,7 +77,7 @@ public class CacheService {
 
     public void refreshInitDataCacheAsync(HttpServletRequest servletRequest, boolean cleanAble) {
         CompletableFuture.runAsync(() -> {
-            refreshInitDataCacheAsync(servletRequest, cleanAble);
+            refreshInitDataCache(servletRequest, cleanAble);
         });
     }
 
@@ -94,7 +96,8 @@ public class CacheService {
                 cacheFileMap.putAll(tempMap);
             } finally {
                 lock.unlock();
-                LoggerFactory.getLogger(CacheService.class).info("refreshInitDataCache used time {}ms", (System.currentTimeMillis() - start));
+                LoggerFactory.getLogger(CacheService.class).info("refreshInitDataCache used time {}ms",
+                        (System.currentTimeMillis() - start));
             }
         }
         if (servletRequest != null) {

@@ -24,7 +24,8 @@ class TemplateConfig extends BaseResourceComponent {
 
     initState() {
         return {
-            "loading": true
+            "loading": true,
+            configParams: []
         }
     }
 
@@ -40,21 +41,21 @@ class TemplateConfig extends BaseResourceComponent {
         const {status} = info.file;
         if (status === 'done') {
             this.state.dataMap[key] = info.file.response.data.url;
-            this.setValue(null, this.state.dataMap);
+            this.setValue(this.state.dataMap);
         } else if (status === 'error') {
             message.error(`${info.file.name} file upload failed.`);
         }
     };
 
 
-    getInput(key, value) {
+    getInput(key, value, dataMap) {
         if (value.type === 'file') {
             return (<>
-                <Dragger style={{width: "164px"}} multiple={false}
+                <Dragger style={{width: "128px"}} multiple={false}
                          onChange={(e) => this.onUploadChange(e, key)}
                          name="imgFile"
                          action="/api/admin/upload?dir=image">
-                    <Image preview={false} width={128} src={value.value}/>
+                    <Image preview={false} width={128} src={dataMap[key]}/>
                 </Dragger>
             </>);
         } else if (value.htmlElementType === 'textarea') {
@@ -72,28 +73,34 @@ class TemplateConfig extends BaseResourceComponent {
         const template = query.get("template");
 
         this.getAxios().get("/api/admin/template/configParams?template=" + template).then(({data}) => {
-            const formInputs = [];
             const dataMap = {};
             for (const [key, value] of Object.entries(data.data.config)) {
-                const input = <Form.Item
-                    label={value.label}
-                    name={key}
-                    key={key}
-                    style={{display: (value.type === 'hidden') ? "none" : ""}}
-                >
-                    {this.getInput(key, value)}
-                </Form.Item>
-                formInputs.push(input);
                 dataMap[key] = value.value;
             }
             this.setState({
-                formInputs: formInputs,
+                configParams: data.data.config,
                 dataMap: dataMap,
                 loading: false
             })
             //console.info(dataMap);
             this.setValue(dataMap);
         });
+    }
+
+    getFormItems() {
+        const formInputs = [];
+        for (const [key, value] of Object.entries(this.state.configParams)) {
+            const input = <Form.Item
+                label={value.label}
+                name={key}
+                key={key}
+                style={{display: (value.type === 'hidden') ? "none" : ""}}
+            >
+                {this.getInput(key, value, this.state.dataMap)}
+            </Form.Item>
+            formInputs.push(input);
+        }
+        return formInputs;
     }
 
     getSecondTitle() {
@@ -122,7 +129,7 @@ class TemplateConfig extends BaseResourceComponent {
                               onFinish={(values) => this.onFinish(values)}
                               onValuesChange={(k, v) => this.setValue(k, v)}
                               {...layout}>
-                            {this.state.formInputs}
+                            {this.getFormItems()}
                             <Divider/>
                             <Button type='primary' enterbutton='true'
                                     htmlType='submit'>{this.state.res['submit']}</Button>
