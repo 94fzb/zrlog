@@ -1756,13 +1756,13 @@ hr.editormd-page-break {
 }
 
 .editormd-theme-dark .editormd-toolbar {
-    background: #1A1A17;
-    border-color: #1a1a17
+    background: #141414;
+    border-color: #141414;
 }
 
 .editormd-theme-dark .editormd-menu > li > a {
     color: #777;
-    border-color: #1a1a17
+    border-color: #141414
 }
 
 .editormd-theme-dark .editormd-menu > li > a.active, .editormd-theme-dark .editormd-menu > li > a:hover {
