@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 #!/bin/sh
+version=$(printf 'VER\t${project.version}' | ./mvnw help:evaluate | grep '^VER' | cut -f2)
 BasePath="${1}"
 
 cd ${BasePath}
 echo "current " $PWD
 PWD=`pwd`
 
-version=${2}
-runMode=${3}
-runModeDesc=${4}
+runMode=${2}
+runModeDesc=${3}
 Date=$(date --rfc-3339="seconds")
 length=7
 commitId=$(git log --format="%H" -n 1)
