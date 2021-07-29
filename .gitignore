@@ -46,3 +46,5 @@ web/src/main/webapp/admin
 web/src/main/webapp/WEB-INF/update-temp/zrlog.zip
 /blog-web/src/main/frontend/node_modules/
 /admin-web/src/main/frontend/node_modules/
+zrlog.zip
+release

@@ -1,27 +1,24 @@
 #!/usr/bin/env bash
 #!/bin/sh
 version=$(printf 'VER\t${project.version}' | ./mvnw help:evaluate | grep '^VER' | cut -f2)
-BasePath="${1}"
-
-cd ${BasePath}
 echo "current " $PWD
 PWD=`pwd`
 
-runMode=${2}
-runModeDesc=${3}
+runMode=${1}
+runModeDesc=${2}
 Date=$(date --rfc-3339="seconds")
 length=7
 commitId=$(git log --format="%H" -n 1)
 buildId=$(expr substr ${commitId} 1 ${length})
-mkdir -p ${BasePath}/data/src/main/resources
+mkdir -p data/src/main/resources
 echo "version=${version}\nrunMode=${runMode}\nbuildId=${buildId}\nbuildTime=${Date}" > data/src/main/resources/build.properties
 sh bin/package-zip.sh
-mv target/zrlog-${2}.war zrlog.war
-mv target/zrlog-${2}.zip  zrlog.zip
+mv target/zrlog-${version}.war zrlog.war
+mv target/zrlog-${version}.zip  zrlog.zip
 zip zrlog.war -d WEB-INF/install.lock WEB-INF/db.properties
 
 #finnally workPath, https://dl.zrlog.com mirror folder
-syncPath=/var/lib/jenkins/download
+syncPath=${3}
 mirrorWebSite=http://dl.zrlog.com/
 mkdir -p ${syncPath}/${runMode}
 relativeFileName=${runMode}/zrlog-${version}-${buildId}-${runMode}.war
