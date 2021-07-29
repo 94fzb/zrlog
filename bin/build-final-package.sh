@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #!/bin/sh
 version=$(printf 'VER\t${project.version}' | ./mvnw help:evaluate | grep '^VER' | cut -f2)
-echo "current " $PWD
+echo "current "$PWD
 PWD=`pwd`
 
 runMode=${1}
