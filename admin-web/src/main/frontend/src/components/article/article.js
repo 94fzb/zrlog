@@ -1,7 +1,7 @@
 import React from "react";
 import {DeleteOutlined, EditOutlined, TagOutlined} from '@ant-design/icons';
 
-import {Col, Row, Space, Table, Tag} from "antd";
+import {Col, Row, Space, Table, Tag, Tooltip} from "antd";
 import Search from "antd/lib/input/Search";
 import {BaseTableComponent} from "../base-table-component";
 import Spin from "antd/es/spin";
@@ -32,12 +32,14 @@ class Article extends BaseTableComponent {
                 {
                     title: 'ID',
                     dataIndex: 'id',
-                    key: 'id'
+                    key: 'id',
+                    width: 80,
                 },
                 {
                     title: '',
                     dataIndex: 'id',
                     key: 'action',
+                    width: 100,
                     render: (text, record) =>
                         this.state.rows.length >= 1 ? (
                             <Space size={16}>
@@ -55,58 +57,71 @@ class Article extends BaseTableComponent {
                     title: '标题',
                     dataIndex: 'title',
                     key: 'title',
+                    ellipsis: {
+                        showTitle: false,
+                    },
+                    width: 300,
                     render: (text, record) =>
                         this.state.rows.length >= 1 ? (
                             <a style={{display: "inline"}} rel="noopener noreferrer" target={"_blank"}
                                href={record.url}>
-                                <div style={{display: "inline"}} dangerouslySetInnerHTML={{__html: text}}/>
+                                <Tooltip placement="topLeft" title={text}>
+                                    <div style={{display: "inline"}} dangerouslySetInnerHTML={{__html: text}}/>
+                                </Tooltip>
                             </a>
                         ) : null,
-                    width: "400px"
                 },
                 {
                     title: '标签',
                     dataIndex: 'keywords',
                     key: 'keywords',
+                    width: 150,
                     render: (text) =>
                         this.state.rows.length >= 1 && text ? (text.split(',').map(this.tagForMap)) : null,
                 },
                 {
                     title: '作者',
                     key: 'userName',
-                    dataIndex: 'userName'
+                    dataIndex: 'userName',
+                    width: 80,
                 },
                 {
                     title: '分类',
                     key: 'typeName',
-                    dataIndex: 'typeName'
+                    dataIndex: 'typeName',
+                    width: 100,
                 },
                 {
                     title: '浏览量',
                     key: 'click',
-                    dataIndex: 'click'
+                    dataIndex: 'click',
+                    width: 80,
                 },
                 {
                     title: '草稿',
                     key: 'rubbish',
                     dataIndex: 'rubbish',
-                    render: text => text ? "是" : "否"
+                    render: text => text ? "是" : "否",
+                    width: 80,
                 },
                 {
                     title: '公开',
                     key: 'privacy',
                     dataIndex: 'privacy',
-                    render: text => text ? "否" : "是"
+                    render: text => text ? "否" : "是",
+                    width: 80,
                 },
                 {
                     title: '创建时间',
                     key: 'releaseTime',
-                    dataIndex: 'releaseTime'
+                    dataIndex: 'releaseTime',
+                    width: 120,
                 },
                 {
                     title: '最后更新时间',
                     key: 'lastUpdateDate',
-                    dataIndex: 'lastUpdateDate'
+                    dataIndex: 'lastUpdateDate',
+                    width: 120,
                 }
             ]
         }
@@ -138,7 +153,8 @@ class Article extends BaseTableComponent {
                 <Divider/>
                 <Row style={{paddingBottom: "10px"}}>
                     <Col span={24}>
-                        <Search placeholder={this.state.res.searchTip} onSearch={this.onErrSearch} enterButton={this.state.res['search']}
+                        <Search placeholder={this.state.res.searchTip} onSearch={this.onErrSearch}
+                                enterButton={this.state.res['search']}
                                 style={{maxWidth: "240px", float: "right"}}/>
                     </Col>
                 </Row>
