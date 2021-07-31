@@ -33,7 +33,7 @@
 
             if (editor.find("." + dialogName).length < 1) {
                 var guid = (new Date).getTime();
-                var action = settings.imageUploadURL + "?guid=" + guid + "&dir=file";
+                var action = settings.imageUploadURL + "?guid=" + guid + "&dir=video";
 
                 if (settings.crossDomainUpload) {
                     action += "&callback=" + settings.uploadCallbackURL + "&dialog_id=editormd-image-dialog-" + guid;
