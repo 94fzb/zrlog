@@ -22,7 +22,7 @@ public class AdminPageController extends Controller {
 
     public void index() throws FileNotFoundException {
         if (getRequest().getRequestURI().endsWith(Constants.ADMIN_URI_BASE_PATH) || getRequest().getRequestURI().endsWith(Constants.ADMIN_URI_BASE_PATH + "/")) {
-            redirect(Constants.ADMIN_URI_BASE_PATH + "/index");
+            redirect(Constants.ADMIN_URI_BASE_PATH + Constants.INDEX_URI_PATH);
             return;
         }
         renderIndex();

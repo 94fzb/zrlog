@@ -2,7 +2,6 @@ package com.zrlog.blog.web.util;
 
 import com.zrlog.common.Constants;
 import com.zrlog.common.exception.AdminAuthException;
-import com.zrlog.util.RequestUtil;
 import com.zrlog.util.ZrLogUtil;
 import org.apache.http.conn.util.InetAddressUtils;
 import org.slf4j.LoggerFactory;
@@ -124,11 +123,19 @@ public class WebTools {
             try {
                 String url = request.getContextPath()
                         + Constants.ADMIN_LOGIN_URI_PATH + "?redirectFrom="
-                        + URLEncoder.encode(RequestUtil.getRequestUriWithQueryString(request), "UTF-8");
+                        + URLEncoder.encode(getRequestUriWithQueryString(request), "UTF-8");
                 response.sendRedirect(url);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    private static String getRequestUriWithQueryString(HttpServletRequest request) {
+        String realUri = request.getRequestURI();
+        if (request.getRequestURI().endsWith(Constants.ADMIN_URI_BASE_PATH)) {
+            realUri = realUri + Constants.INDEX_URI_PATH;
+        }
+        return realUri + (request.getQueryString() != null ? "?" + request.getQueryString() : "");
     }
 }

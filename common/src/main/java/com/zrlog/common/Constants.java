@@ -37,6 +37,8 @@ public class Constants {
 
     public static final String ADMIN_LOGIN_URI_PATH = ADMIN_URI_BASE_PATH + "/login";
 
+    public static final String INDEX_URI_PATH = "/index";
+
     public static final String ATTACHED_FOLDER = "/attached/";
 
     public static final String TEMPLATE_CONFIG_SUFFIX = "_setting";

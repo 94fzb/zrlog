@@ -44,7 +44,7 @@ public class AdminInterceptor implements Interceptor {
             if (Constants.ADMIN_LOGIN_URI_PATH.equals(ai.getActionKey())) {
                 AdminTokenVO adminTokenVO = adminTokenService.getAdminTokenVO(controller.getRequest());
                 if (adminTokenVO != null) {
-                    controller.redirect(Constants.ADMIN_URI_BASE_PATH + "/index");
+                    controller.redirect(Constants.ADMIN_URI_BASE_PATH + Constants.INDEX_URI_PATH);
                 } else {
                     tryDoRender(ai);
                 }
