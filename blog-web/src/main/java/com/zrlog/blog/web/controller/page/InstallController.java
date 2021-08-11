@@ -33,6 +33,6 @@ public class InstallController extends Controller {
         }
         Document document = Jsoup.parse(IOUtil.getStringInputStream(new FileInputStream(file)));
         document.selectFirst("base").attr("href", getRequest().getContextPath() + "/");
-        render(new HtmlRender(document.outerHtml()));
+        render(new HtmlRender(document.html()));
     }
 }
