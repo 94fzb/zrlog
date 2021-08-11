@@ -9,7 +9,6 @@ import Button from "antd/es/button";
 import Image from "antd/es/image";
 import Dragger from "antd/es/upload/Dragger";
 import {message} from "antd/es";
-import axios from "axios";
 import TextArea from "antd/es/input/TextArea";
 import Col from "antd/es/grid/col";
 

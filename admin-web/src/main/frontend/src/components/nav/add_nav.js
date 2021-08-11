@@ -2,7 +2,6 @@ import React from "react";
 import {BaseResourceComponent} from "../base-resource-component";
 import {Button, Col, Form, Input, InputNumber, Modal} from "antd";
 import Row from "antd/es/grid/row";
-import axios from "axios";
 
 const layout = {
     labelCol: {span: 4},

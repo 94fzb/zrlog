@@ -225,7 +225,7 @@ class App extends React.Component {
                                         {current === 2 && (
                                             <div style={{textAlign: 'center'}}>
                                                 <Title level={3} type='success'>{this.state.res.installSuccess}</Title>
-                                                <a href="../">{this.state.res.installSuccessView}</a>
+                                                <a href={document.baseURI}>{this.state.res.installSuccessView}</a>
                                             </div>
                                         )}
                                     </div>

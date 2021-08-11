@@ -7,7 +7,6 @@ import Form from "antd/es/form";
 import {Input, Row} from "antd";
 import Button from "antd/es/button";
 import {message} from "antd/es";
-import axios from "axios";
 import Col from "antd/es/grid/col";
 
 const layout = {

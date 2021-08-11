@@ -8,7 +8,6 @@ import {Button, Input} from "antd";
 import Dragger from "antd/es/upload/Dragger";
 import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
-import axios from "axios";
 import {message} from "antd/es";
 import Image from "antd/es/image";
 import Constants from "../utils/constants";

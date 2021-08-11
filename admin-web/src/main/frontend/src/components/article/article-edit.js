@@ -22,7 +22,6 @@ import Constants from "../../utils/constants";
 import screenfull from "screenfull";
 
 const md5 = require('md5');
-const axios = require('axios');
 
 class ArticleEdit extends BaseResourceComponent {
 

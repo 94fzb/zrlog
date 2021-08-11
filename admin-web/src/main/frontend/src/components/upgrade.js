@@ -4,7 +4,6 @@ import {BaseResourceComponent} from "./base-resource-component";
 import {Button, Card, Col, Modal, Progress, Row, Spin, Steps} from 'antd';
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
-import axios from "axios";
 
 const {Step} = Steps;
 

@@ -46,7 +46,7 @@ class Login extends BaseResourceComponent {
             if (data.error) {
                 message.error(data.message);
             } else {
-                const query = new URLSearchParams(this.props.location.search);
+                const query = new URLSearchParams(window.location.search);
                 if (query.get("redirectFrom") !== null && query.get("redirectFrom") !== '') {
                     Constants.getHistory().push(decodeURIComponent(query.get("redirectFrom")));
                 } else {

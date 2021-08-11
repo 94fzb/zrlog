@@ -1,7 +1,6 @@
 import React from "react";
 import {BaseResourceComponent} from "../base-resource-component";
 import {Col, Form, Input, InputNumber, Modal} from "antd";
-import axios from "axios";
 import Row from "antd/es/grid/row";
 import TextArea from "antd/lib/input/TextArea";
 import {EditOutlined} from "@ant-design/icons";
