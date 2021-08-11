@@ -108,7 +108,7 @@ class TemplateConfig extends BaseResourceComponent {
     }
 
     onFinish() {
-        axios.post("/api/admin/template/config", this.state.dataMap).then(({data}) => {
+        this.getAxios().post("/api/admin/template/config", this.state.dataMap).then(({data}) => {
             if (data.error) {
                 message.error(data.message);
             } else {

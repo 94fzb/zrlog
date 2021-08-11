@@ -47,7 +47,7 @@ class Article extends BaseTableComponent {
                                             onConfirm={() => this.handleDelete(record.id)}>
                                     <DeleteOutlined style={{color: "red"}}/>
                                 </Popconfirm>
-                                <Link to={"/admin/article-edit?id=" + text}>
+                                <Link to={"./article-edit?id=" + text}>
                                     <EditOutlined/>
                                 </Link>
                             </Space>

@@ -1,7 +1,7 @@
 {
   "name": "blog-web-frontend",
   "version": "0.1.0",
-  "homepage": "./",
+  "homepage": "./install",
   "private": true,
   "dependencies": {
     "axios": "0.21.1",

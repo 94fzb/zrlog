@@ -60,8 +60,8 @@ class MyEditorMd extends BaseResourceComponent {
                     "hr", "pagebreak", "|", "link", "reference-link", "image", "file", "video", "|", "preformatted-text",
                     "code-block", "table", "copyPreviewHtml", "|", "fullscreen", "info", "help"]
             },
-            imageUploadURL: "/api/admin/upload",
-            path: "/admin/vendors/markdown/lib/",
+            imageUploadURL: document.baseURI + "api/admin/upload",
+            path: document.baseURI + "admin/vendors/markdown/lib/",
             width: "100%",
             height: "1240px",
             placeholder: superThis.state.res['editorPlaceholder'],
@@ -93,7 +93,7 @@ class MyEditorMd extends BaseResourceComponent {
                     formData.append('imgFile', file, fileName);
                     $.ajax({
                         method: 'post',
-                        url: "/api/admin/upload?dir=image",
+                        url: document.baseURI + "/api/admin/upload?dir=image",
                         data: formData,
                         contentType: false,
                         processData: false,
@@ -170,7 +170,7 @@ class MyEditorMdWrapper extends React.Component {
     }
 
     render() {
-        const EditMdAsyncScriptLoader = makeAsyncScriptLoader("/admin/vendors/markdown/js/editormd.min.js")(MyLoadingComponent);
+        const EditMdAsyncScriptLoader = makeAsyncScriptLoader(document.baseURI + "/admin/vendors/markdown/js/editormd.min.js")(MyLoadingComponent);
         if (this.state.mdEditorScriptLoaded) {
             return (
                 <MyEditorMd superThis={this.props.superThis}/>

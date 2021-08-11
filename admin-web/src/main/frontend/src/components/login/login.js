@@ -2,7 +2,6 @@ import React from 'react'
 import {LoginOutlined} from '@ant-design/icons';
 import {Button, Col, Form, Input, Layout} from 'antd';
 import Card from "antd/es/card";
-import axios from "axios";
 import {message} from "antd/es";
 import Spin from "antd/es/spin";
 import {BaseResourceComponent} from "../base-resource-component";
@@ -43,7 +42,7 @@ class Login extends BaseResourceComponent {
         this.setState({
             logging: true
         })
-        axios.post("/api/admin/login", loginForm).then(({data}) => {
+        this.getAxios().post("/api/admin/login", loginForm).then(({data}) => {
             if (data.error) {
                 message.error(data.message);
             } else {
@@ -51,7 +50,7 @@ class Login extends BaseResourceComponent {
                 if (query.get("redirectFrom") !== null && query.get("redirectFrom") !== '') {
                     Constants.getHistory().push(decodeURIComponent(query.get("redirectFrom")));
                 } else {
-                    Constants.getHistory().push("/admin/index");
+                    Constants.getHistory().push("./index");
                 }
             }
         }).finally(() => {
@@ -83,7 +82,7 @@ class Login extends BaseResourceComponent {
                                       <div
                                           className='dim'
                                           style={{
-                                              backgroundImage: "url('/admin/vendors/images/login-bg.jpg')",
+                                              backgroundImage: "url('./admin/vendors/images/login-bg.jpg')",
                                               height: "120px"
                                           }}>
                                       </div>

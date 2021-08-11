@@ -4,6 +4,8 @@ import com.hibegin.common.util.IOUtil;
 import com.jfinal.core.Controller;
 import com.jfinal.kit.PathKit;
 import com.jfinal.render.HtmlRender;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,6 +31,8 @@ public class InstallController extends Controller {
             renderError(404);
             return;
         }
-        render(new HtmlRender(IOUtil.getStringInputStream(new FileInputStream(file))));
+        Document document = Jsoup.parse(IOUtil.getStringInputStream(new FileInputStream(file)));
+        document.selectFirst("base").attr("href", getRequest().getContextPath() + "/");
+        render(new HtmlRender(document.outerHtml()));
     }
 }

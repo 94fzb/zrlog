@@ -46,7 +46,7 @@ class User extends BaseResourceComponent {
     };
 
     onFinish() {
-        axios.post("/api/admin/user/update", this.state.basic).then(({data}) => {
+        this.getAxios().post("/api/admin/user/update", this.state.basic).then(({data}) => {
             if (data.error) {
                 message.error(data.message);
             } else {
@@ -64,7 +64,7 @@ class User extends BaseResourceComponent {
     }
 
     fetchData() {
-        axios.get("/api/admin/user/basicInfo").then(({data}) => {
+        this.getAxios().get("/api/admin/user/basicInfo").then(({data}) => {
             this.setValue(data.data)
         })
     }

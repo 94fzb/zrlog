@@ -48,7 +48,7 @@ const system = [
 
 const IconFont = createFromIconfontCN({
     scriptUrl: [
-        './vendors/js/fonts.js',
+        document.baseURI + './admin/vendors/js/fonts.js',
     ],
 });
 

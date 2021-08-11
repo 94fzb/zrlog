@@ -87,21 +87,21 @@ class AdminLoginedRouter extends React.Component {
     render() {
         return (
             <Switch>
-                <Route path="/admin/index" component={AsyncIndex}/>
-                <Route path="/admin/article-edit" component={AsyncArticleEdit}/>
-                <Route path="/admin/comment" component={AsyncComment}/>
-                <Route path="/admin/plugin" component={AsyncPlugin}/>
-                <Route path="/admin/website" component={AsyncWebSite}/>
-                <Route path="/admin/article-type" component={AsyncType}/>
-                <Route path="/admin/link" component={AsyncLink}/>
-                <Route path="/admin/nav" component={AsyncNav}/>
-                <Route path="/admin/article" component={AsyncArticle}/>
-                <Route path="/admin/user" component={AsyncUser}/>
-                <Route path="/admin/template-center" component={AsyncTemplateCenter}/>
-                <Route path="/admin/user-update-password" component={AsyncUserUpdatePassword}/>
-                <Route path="/admin/upgrade" component={AsyncUpgrade}/>
-                <Route path="/admin/template-config" component={AsyncTemplateConfig}/>
-                <Route path="/admin/" component={AsyncIndex}/>
+                <Route path="*/index" component={AsyncIndex}/>
+                <Route path="*/article-edit" component={AsyncArticleEdit}/>
+                <Route path="*/comment" component={AsyncComment}/>
+                <Route path="*/plugin" component={AsyncPlugin}/>
+                <Route path="*/website" component={AsyncWebSite}/>
+                <Route path="*/article-type" component={AsyncType}/>
+                <Route path="*/link" component={AsyncLink}/>
+                <Route path="*/nav" component={AsyncNav}/>
+                <Route path="*/article" component={AsyncArticle}/>
+                <Route path="*/user" component={AsyncUser}/>
+                <Route path="*/template-center" component={AsyncTemplateCenter}/>
+                <Route path="*/user-update-password" component={AsyncUserUpdatePassword}/>
+                <Route path="*/upgrade" component={AsyncUpgrade}/>
+                <Route path="*/template-config" component={AsyncTemplateConfig}/>
+                <Route path="*/" component={AsyncIndex}/>
                 <Route component={AsyncNotFoundPage}/>
             </Switch>
         );

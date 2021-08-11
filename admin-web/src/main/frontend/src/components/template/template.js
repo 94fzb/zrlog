@@ -9,7 +9,6 @@ import {CheckOutlined, DeleteOutlined, EyeOutlined, SettingOutlined} from "@ant-
 import Meta from "antd/es/card/Meta";
 import Button from "antd/es/button";
 import React from "react";
-import axios from "axios";
 
 class Template extends BaseResourceComponent {
 
@@ -21,7 +20,7 @@ class Template extends BaseResourceComponent {
     }
 
     load() {
-        axios.get("/api/admin/template").then(({data}) => {
+        this.getAxios().get("/api/admin/template").then(({data}) => {
             this.setState({
                 templates: data.data,
                 loading: false,
@@ -35,20 +34,20 @@ class Template extends BaseResourceComponent {
     }
 
     delete(template) {
-        axios.post("/api/admin/template/delete?template=" + template).then(e => {
+        this.getAxios().post("/api/admin/template/delete?template=" + template).then(e => {
             this.load();
         })
     }
 
     preview(template) {
-        axios.post("/api/admin/template/preview?template=" + template).then(e => {
-            window.open("/", '_blank');
+        this.getAxios().post("/api/admin/template/preview?template=" + template).then(e => {
+            window.open(document.baseURI, '_blank');
             this.load();
         })
     }
 
     apply(template) {
-        axios.post("/api/admin/template/apply?template=" + template).then(e => {
+        this.getAxios().post("/api/admin/template/apply?template=" + template).then(e => {
             this.load();
         })
     }
@@ -60,7 +59,7 @@ class Template extends BaseResourceComponent {
             <div onClick={e => this.preview(template.template)}>
                 <EyeOutlined key="preview"/>
             </div>,
-            <Link to={'/admin/template-config?template=' + template.template}>
+            <Link to={'./template-config?template=' + template.template}>
                 <SettingOutlined key="setting"/>
             </Link>,
             <div onClick={e => this.apply(template.template)}>
@@ -68,7 +67,7 @@ class Template extends BaseResourceComponent {
             </div>
         )
         if (template.deleteAble) {
-            links.push(<Link onClick={e => this.delete(template.template)}><DeleteOutlined key="delete"/></Link>);
+            links.push(<Link onClick={_e => this.delete(template.template)}><DeleteOutlined key="delete"/></Link>);
         }
         return links;
     }
@@ -113,7 +112,7 @@ class Template extends BaseResourceComponent {
                 })}
             </Row>
             <Divider/>
-            <Link to='/admin/template-center'>
+            <Link to='./template-center'>
                 <Button type={"primary"}>{this.state.res['admin.theme.download']}</Button>
             </Link>
         </Spin>)

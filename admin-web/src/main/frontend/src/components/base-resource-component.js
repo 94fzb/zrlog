@@ -9,6 +9,7 @@ export class BaseResourceComponent extends React.Component {
 
     constructor(props) {
         super(props);
+        axios.defaults.baseURL = document.baseURI
         axios.interceptors.response.use((response) => {
             if (response.data.error === 9001) {
                 Modal.warn({

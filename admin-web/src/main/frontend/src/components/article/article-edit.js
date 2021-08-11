@@ -70,7 +70,7 @@ class ArticleEdit extends BaseResourceComponent {
             const query = new URLSearchParams(this.props.location.search);
             const id = query.get("id");
             if (id !== null && id !== '') {
-                axios.get("/api/admin/article/detail?id=" + id).then(({data}) => {
+                this.getAxios().get("/api/admin/article/detail?id=" + id).then(({data}) => {
                     pageState.globalLoading = false;
                     if (data.error) {
                         this.setState(pageState);
@@ -151,7 +151,7 @@ class ArticleEdit extends BaseResourceComponent {
             })
         }
         this.exitTips(this.state.res['articleEditExitWithOutSaveSuccess']);
-        await axios.post(uri, allValues).then(({data}) => {
+        await this.getAxios().post(uri, allValues).then(({data}) => {
             if (data.error) {
                 Modal.error({
                     title: '保存失败',
@@ -168,7 +168,7 @@ class ArticleEdit extends BaseResourceComponent {
                     message.info(this.state.res['saveSuccess']);
                 }
                 if (preview) {
-                    window.open("/post/" + allValues.logId, '_blank');
+                    window.open(document.baseURI + "post/" + allValues.logId, '_blank');
                 }
             }
             const respData = data.data;

@@ -35,7 +35,7 @@ export class EditLink extends BaseResourceComponent {
         this.setState({
             visible: false,
         });
-        axios.post("/api/admin/link/update", this.state.updateForm).then(e => {
+        this.getAxios().post("/api/admin/link/update", this.state.updateForm).then(e => {
             this.props.tableComponent.fetchData();
         })
     };

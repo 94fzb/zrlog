@@ -17,7 +17,7 @@ class NotFoundPage extends BaseResourceComponent {
                 status="404"
                 title="404"
                 subTitle={this.getSecondTitle()}
-                extra={<Button type="primary"><Link target='_top' to='/admin/index'>Back Home</Link></Button>}
+                extra={<Button type="primary"><Link target='_top' to='./index'>Back Home</Link></Button>}
             />
         )
     }

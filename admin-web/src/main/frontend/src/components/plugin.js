@@ -1,7 +1,7 @@
 import React from "react";
 import {BaseResourceComponent} from "./base-resource-component";
 
-const iframe = '<iframe width="100%" style="border: 0" height="1200px" src="/admin/plugins/">';
+const iframe = '<iframe width="100%" style="border: 0" height="1200px" src="./admin/plugins/">';
 
 function Iframe(props) {
     return (<div dangerouslySetInnerHTML={{__html: props.iframe ? props.iframe : ""}}/>);

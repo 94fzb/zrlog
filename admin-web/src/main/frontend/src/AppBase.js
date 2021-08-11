@@ -10,8 +10,8 @@ class AppBase extends BaseResourceComponent {
     render() {
         return (
             <Switch>
-                <Route path="/admin/login" component={Login}/>
-                <Route exact path="/admin/*" component={IndexLayout}/>
+                <Route path="*/login" component={Login}/>
+                <Route exact path="*" component={IndexLayout}/>
                 <Route component={IndexLayout}/>
             </Switch>
         );

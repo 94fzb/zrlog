@@ -38,6 +38,7 @@ public class AdminPageController extends Controller {
         //clean history
         document.body().removeClass("dark");
         document.body().removeClass("light");
+        document.selectFirst("base").attr("href", getRequest().getContextPath() + "/");
         document.body().addClass(Constants.getBooleanByFromWebSite("admin_darkMode") ? "dark" : "light");
         document.title(Constants.WEB_SITE.get("title") + "");
         document.getElementById("resourceInfo").text(new Gson().toJson(new CommonService().blogResourceInfo()));

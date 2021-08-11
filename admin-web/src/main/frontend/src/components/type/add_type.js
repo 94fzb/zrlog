@@ -3,7 +3,6 @@ import {BaseResourceComponent} from "../base-resource-component";
 import {Button, Col, Form, Input, Modal} from "antd";
 import Row from "antd/es/grid/row";
 import TextArea from "antd/lib/input/TextArea";
-import axios from "axios";
 
 const layout = {
     labelCol: {span: 4},
@@ -27,7 +26,7 @@ export class AddType extends BaseResourceComponent {
         this.setState({
             visible: false,
         });
-        axios.post("/api/admin/type/add", this.state.addForm).then(e => {
+        this.getAxios().post("/api/admin/type/add", this.state.addForm).then(e => {
             this.props.tableComponent.fetchData();
         })
     };

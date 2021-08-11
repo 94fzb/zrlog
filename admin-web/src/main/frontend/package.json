@@ -1,7 +1,7 @@
 {
   "name": "admin-web-frontend",
   "version": "0.1.0",
-  "homepage": "./",
+  "homepage": "./admin",
   "private": true,
   "_location": "/vendors",
   "license": "MIT",

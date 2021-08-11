@@ -21,7 +21,6 @@ import Button from "antd/es/button";
 import Dropdown from "antd/es/dropdown";
 import Divider from "antd/es/divider";
 import Image from "antd/es/image";
-import * as axios from "axios";
 
 import {BaseResourceComponent} from "../components/base-resource-component";
 import AdminLoginedRouter from "../routers/admin-logined-router";
@@ -32,7 +31,7 @@ const {SubMenu} = Menu;
 const {Text} = Typography;
 
 function getDefaultOpenKeys() {
-    if (window.location.pathname === '/admin/link' || window.location.pathname === '/admin/nav' || window.location.pathname === '/admin/blog/type') {
+    if (window.location.pathname === './link' || window.location.pathname === './nav' || window.location.pathname === './blog/type') {
         return "more";
     }
     return "";
@@ -55,7 +54,7 @@ class IndexLayout extends BaseResourceComponent {
 
     componentDidMount() {
         super.componentDidMount();
-        axios.get("/api/admin/user/basicInfo").then(({data}) => {
+        this.getAxios().get("/api/admin/user/basicInfo").then(({data}) => {
             this.setState({
                 basicInfo: data.data,
                 basicInfoLoading: false,
@@ -78,7 +77,7 @@ class IndexLayout extends BaseResourceComponent {
         return (
             <Menu className="userInfoMenu">
                 <Menu.Item key="0" hidden={!this.state.upgrade}>
-                    <Link to="/admin/upgrade">
+                    <Link to="./upgrade">
                         <Badge dot={this.state.upgrade}>
                             <SoundOutlined/>
                             <Text
@@ -88,20 +87,20 @@ class IndexLayout extends BaseResourceComponent {
                     </Link>
                 </Menu.Item>
                 <Menu.Item key="2">
-                    <Link to="/admin/user">
+                    <Link to="./user">
                         <UserOutlined/>
                         <Text style={{paddingLeft: "5px"}}>{res['admin.user.info']}</Text>
                     </Link>
                 </Menu.Item>
                 <Menu.Item key="1">
-                    <Link to="/admin/user-update-password">
+                    <Link to="./user-update-password">
                         <KeyOutlined/>
                         <Text style={{paddingLeft: "5px"}}>{res['admin.changePwd']}</Text>
                     </Link>
                 </Menu.Item>
                 <Divider style={{marginTop: "5px", marginBottom: "5px"}}/>
                 <Menu.Item key="3">
-                    <a href="/admin/logout">
+                    <a href="./admin/logout">
                         <LogoutOutlined/>
                         <Text style={{paddingLeft: "5px"}}>{res['admin.user.logout']}</Text>
                     </a>
@@ -110,13 +109,17 @@ class IndexLayout extends BaseResourceComponent {
         );
     }
 
+    getSelectKey = () => {
+        return "." + window.location.pathname.substring(window.location.pathname.lastIndexOf("/"));
+    }
+
     render() {
 
         return (
             <Spin spinning={this.state.resLoading} style={{height: "100vh"}}>
                 <div hidden={this.state.resLoading} style={{height: "100vh"}}>
                     <Header>
-                        <a href="/" id='logo' target="_blank" title={this.state.res['websiteTitle']}
+                        <a href={document.baseURI} id='logo' target="_blank" title={this.state.res['websiteTitle']}
                            rel="noopener noreferrer">
                             <HomeOutlined/>
                         </a>
@@ -146,41 +149,41 @@ class IndexLayout extends BaseResourceComponent {
                     <Row>
                         <Col style={{minHeight: "100vh"}} id='sider'>
                             <Sider width={70} style={{minHeight: "100vh"}}>
-                                <Menu defaultOpenKeys={[defaultOpenKeys]} selectedKeys={[window.location.pathname]}
-                                      defaultSelectedKeys={[window.location.pathname]}
+                                <Menu defaultOpenKeys={[defaultOpenKeys]} selectedKeys={[this.getSelectKey()]}
+                                      defaultSelectedKeys={[this.getSelectKey()]}
                                       mode="vertical">
-                                    <Menu.Item key="/admin/index">
-                                        <Link to='/admin/index'>
+                                    <Menu.Item key="./index">
+                                        <Link to='./index'>
                                             <DashboardOutlined/>
                                             <span>{this.state.res.dashboard}</span>
                                         </Link>
                                     </Menu.Item>
-                                    <Menu.Item key="/admin/article-edit">
-                                        <Link to='/admin/article-edit'>
+                                    <Menu.Item key="./article-edit">
+                                        <Link to='./article-edit'>
                                             <FormOutlined/>
                                             <span>{this.state.res['admin.log.edit']}</span>
                                         </Link>
                                     </Menu.Item>
-                                    <Menu.Item key="/admin/article">
-                                        <Link to='/admin/article'>
+                                    <Menu.Item key="./article">
+                                        <Link to='./article'>
                                             <ContainerOutlined/>
                                             <span>{this.state.res['blogManage']}</span>
                                         </Link>
                                     </Menu.Item>
-                                    <Menu.Item key="/admin/comment">
-                                        <Link to='/admin/comment'>
+                                    <Menu.Item key="./comment">
+                                        <Link to='./comment'>
                                             <CommentOutlined/>
                                             <span>{this.state.res['admin.comment.manage']}</span>
                                         </Link>
                                     </Menu.Item>
-                                    <Menu.Item key="/admin/plugin">
-                                        <Link to='/admin/plugin'>
+                                    <Menu.Item key="./plugin">
+                                        <Link to='./plugin'>
                                             <ApiOutlined/>
                                             <span>{this.state.res['admin.plugin.manage']}</span>
                                         </Link>
                                     </Menu.Item>
-                                    <Menu.Item key="/admin/website">
-                                        <Link to='/admin/website'>
+                                    <Menu.Item key="./website">
+                                        <Link to='./website'>
                                             <SettingOutlined/>
                                             <span>{this.state.res['admin.setting']}</span>
                                         </Link>
@@ -188,18 +191,18 @@ class IndexLayout extends BaseResourceComponent {
                                     <SubMenu key='more' inlineCollapsed={false}
                                              icon={<AppstoreOutlined/>}
                                              title={this.state.res['admin.more']}>
-                                        <Menu.Item style={{width: 120}} key="/admin/article-type">
-                                            <Link to='/admin/article-type'>
+                                        <Menu.Item style={{width: 120}} key="./article-type">
+                                            <Link to='./article-type'>
                                                 <span>{this.state.res['admin.type.manage']}</span>
                                             </Link>
                                         </Menu.Item>
-                                        <Menu.Item style={{width: 120}} key="/admin/link">
-                                            <Link to='/admin/link'>
+                                        <Menu.Item style={{width: 120}} key="./link">
+                                            <Link to='./link'>
                                                 <span>{this.state.res['admin.link.manage']}</span>
                                             </Link>
                                         </Menu.Item>
-                                        <Menu.Item style={{width: 120}} key="/admin/nav">
-                                            <Link to='/admin/nav'>
+                                        <Menu.Item style={{width: 120}} key="./nav">
+                                            <Link to='./nav'>
                                                 <span>{this.state.res['admin.nav.manage']}</span>
                                             </Link>
                                         </Menu.Item>

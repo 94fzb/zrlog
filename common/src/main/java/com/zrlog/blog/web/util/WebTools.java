@@ -117,7 +117,8 @@ public class WebTools {
 
 
     public static void blockUnLoginRequestHandler(HttpServletRequest request, HttpServletResponse response) {
-        if (request.getRequestURI().startsWith("/api")) {
+        String actionKey = request.getRequestURI().substring(request.getContextPath().length());
+        if (actionKey.startsWith("/api")) {
             throw new AdminAuthException();
         } else {
             try {

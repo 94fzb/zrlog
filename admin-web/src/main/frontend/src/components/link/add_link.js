@@ -27,7 +27,7 @@ export class AddLink extends BaseResourceComponent {
         this.setState({
             visible: false,
         });
-        axios.post("/api/admin/link/add", this.state.addForm).then(e => {
+        this.getAxios().post("/api/admin/link/add", this.state.addForm).then(e => {
             this.props.tableComponent.fetchData();
         });
     };

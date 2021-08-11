@@ -35,7 +35,7 @@ class Upgrade extends BaseResourceComponent {
 
     componentDidMount() {
         super.componentDidMount();
-        axios.get("/api/admin/upgrade/checkNewVersion").then(async ({data}) => {
+        this.getAxios().get("/api/admin/upgrade/checkNewVersion").then(async ({data}) => {
             if (data.data.upgrade) {
                 this.setState({
                     changeLog: data.data.version.changeLog,
@@ -55,12 +55,12 @@ class Upgrade extends BaseResourceComponent {
                 okText: '确认',
                 cancelText: '取消',
                 onOk: function () {
-                    window.location.href = "/admin/"
+                    window.location.href = "../"
                 }
             });
             return;
         }
-        axios.get('/api/admin/website/version').then(({data}) => {
+        this.getAxios().get('/api/admin/website/version').then(({data}) => {
             this.setState({
                 restartSuccess: data.data.buildId === this.state.newBuildId,
             })
@@ -75,7 +75,7 @@ class Upgrade extends BaseResourceComponent {
             clearInterval(timer);
             return;
         }
-        axios.get('/api/admin/upgrade/download').then(({data}) => {
+        this.getAxios().get('/api/admin/upgrade/download').then(({data}) => {
             this.setState({
                 downloadProcess: data.data.process
             })
@@ -89,7 +89,7 @@ class Upgrade extends BaseResourceComponent {
             this.checkRestartSuccess();
             return;
         }
-        axios.get('/api/admin/upgrade/doUpgrade').then(({data}) => {
+        this.getAxios().get('/api/admin/upgrade/doUpgrade').then(({data}) => {
             this.setState({
                 finish: data.data.finish,
                 upgradeMessage: data.data.message,

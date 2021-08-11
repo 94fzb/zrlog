@@ -1,6 +1,5 @@
 import React from "react";
 import {BaseResourceComponent} from "../base-resource-component";
-import axios from "axios";
 
 
 function Iframe(props) {
@@ -14,7 +13,7 @@ class TemplateCenter extends BaseResourceComponent {
     }
 
     componentDidMount() {
-        axios.get("/api/admin/template/downloadUrl").then(({data}) => {
+        this.getAxios().get("/api/admin/template/downloadUrl").then(({data}) => {
             this.setState({
                 url: data.data.url
             })
@@ -22,9 +21,9 @@ class TemplateCenter extends BaseResourceComponent {
     }
 
     render() {
-        if(!this.state.url){
-	   return (<div/>);
-	}
+        if (!this.state.url) {
+            return (<div/>);
+        }
         // eslint-disable-next-line no-template-curly-in-string
         const iframe = '<iframe width="100%" style="border: 0" height="1200px" src=' + this.state.url + '>';
 

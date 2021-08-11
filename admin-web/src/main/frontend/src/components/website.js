@@ -1,5 +1,4 @@
 import React from "react";
-import axios from "axios";
 
 import {BaseResourceComponent} from "./base-resource-component";
 import {message, Modal, Tabs} from "antd";
@@ -42,7 +41,7 @@ class Website extends BaseResourceComponent {
     }
 
     handleTabClick = key => {
-        this.props.history.push(`/admin/website#${key}`)
+        this.props.history.push(`./website#${key}`)
         this.initForm();
 
     }
@@ -57,7 +56,7 @@ class Website extends BaseResourceComponent {
     }
 
     initForm() {
-        axios.get("/api/admin/website/settings").then(({data}) => {
+        this.getAxios().get("/api/admin/website/settings").then(({data}) => {
             if (data.data.basic != null) {
                 this.setBasicFormValue(data.data.basic);
             }
@@ -118,7 +117,7 @@ class Website extends BaseResourceComponent {
     }
 
     websiteFormFinish(changedValues, formName) {
-        axios.post("/api/admin/website/" + formName, changedValues).then(({data}) => {
+        this.getAxios().post("/api/admin/website/" + formName, changedValues).then(({data}) => {
             if (!data.error) {
                 message.info(data.message);
                 this.loadResourceFromServer();
@@ -127,7 +126,7 @@ class Website extends BaseResourceComponent {
     }
 
     checkNewVersion = () => {
-        axios.get("/api/admin/upgrade/checkNewVersion").then(async ({data}) => {
+        this.getAxios().get("/api/admin/upgrade/checkNewVersion").then(async ({data}) => {
             if (data.data.upgrade) {
                 const title = "V" + data.data.version.version + "-" + data.data.version.buildId + " (" + data.data.version.type + ")";
                 Modal.info({
@@ -136,7 +135,7 @@ class Website extends BaseResourceComponent {
                     closable: true,
                     okText: "去更新",
                     onOk: function () {
-                        Constants.getHistory().push("/admin/upgrade");
+                        Constants.getHistory().push("./upgrade");
                     }
                 });
             } else {

@@ -35,7 +35,7 @@ export class EditType extends BaseResourceComponent {
         this.setState({
             visible: false,
         });
-        axios.post("/api/admin/type/update", this.state.updateForm).then(e => {
+        this.getAxios().post("/api/admin/type/update", this.state.updateForm).then(e => {
             this.props.tableComponent.fetchData();
         })
     };

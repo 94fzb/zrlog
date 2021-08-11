@@ -25,7 +25,7 @@ class UserUpdatePassword extends BaseResourceComponent {
     }
 
     onFinish(allValues) {
-        axios.post("/api/admin/user/updatePassword", allValues).then(({data}) => {
+        this.getAxios().post("/api/admin/user/updatePassword", allValues).then(({data}) => {
             if (data.error) {
                 message.error(data.message);
             } else {

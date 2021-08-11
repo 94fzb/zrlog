@@ -30,7 +30,7 @@ public class WarUpdateVersionThread extends Thread implements Serializable, Upda
 
     public WarUpdateVersionThread(File file) {
         this.file = file;
-        tempFilePath = new File(System.getProperty("java.io.tmpdir") + File.separator + UUID.randomUUID().toString());
+        tempFilePath = new File(System.getProperty("java.io.tmpdir") + File.separator + UUID.randomUUID());
         tempFilePath.mkdirs();
     }
 

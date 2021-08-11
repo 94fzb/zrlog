@@ -26,7 +26,7 @@ export class AddNav extends BaseResourceComponent {
         this.setState({
             visible: false,
         });
-        axios.post("/api/admin/nav/add", this.state.addForm).then(() => {
+        this.getAxios().post("/api/admin/nav/add", this.state.addForm).then(() => {
             this.props.tableComponent.fetchData();
         })
     };

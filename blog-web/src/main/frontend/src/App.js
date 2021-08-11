@@ -50,6 +50,7 @@ class App extends React.Component {
                 utfTips: ''
             }
         };
+        axios.defaults.baseURL = document.baseURI
     }
 
     formDataBaseInfoRef = React.createRef();
