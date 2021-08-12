@@ -91,6 +91,46 @@
         </dependency>
     </dependencies>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.zrlog</groupId>
+                <artifactId>common</artifactId>
+                <version>2.2.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.zrlog</groupId>
+                <artifactId>data</artifactId>
+                <version>2.2.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.zrlog</groupId>
+                <artifactId>admin-token</artifactId>
+                <version>2.2.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.zrlog</groupId>
+                <artifactId>blog-web</artifactId>
+                <version>2.2.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.zrlog</groupId>
+                <artifactId>service</artifactId>
+                <version>2.2.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.zrlog</groupId>
+                <artifactId>admin-web</artifactId>
+                <version>2.2.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>javax.servlet-api</artifactId>
+                <version>${servlet.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
         <testSourceDirectory>src/test/java</testSourceDirectory>
