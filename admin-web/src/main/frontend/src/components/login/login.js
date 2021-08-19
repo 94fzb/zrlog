@@ -48,7 +48,13 @@ class Login extends BaseResourceComponent {
             } else {
                 const query = new URLSearchParams(window.location.search);
                 if (query.get("redirectFrom") !== null && query.get("redirectFrom") !== '') {
-                    Constants.getHistory().push(decodeURIComponent(query.get("redirectFrom")));
+                    const jumpTo = decodeURIComponent(query.get("redirectFrom"));
+                    //need reload page, for iframe (maybe)
+                    if (jumpTo.startsWith(new URL(document.baseURI).pathname + "admin/plugins/download")) {
+                        window.location.href = jumpTo;
+                    } else {
+                        Constants.getHistory().push(jumpTo);
+                    }
                 } else {
                     Constants.getHistory().push("./index");
                 }

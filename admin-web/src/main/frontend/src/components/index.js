@@ -5,10 +5,11 @@ import {BaseResourceComponent} from "./base-resource-component";
 import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
 import Alert from "antd/es/alert";
-import {CommentOutlined, ContainerOutlined, createFromIconfontCN} from "@ant-design/icons";
+import {CommentOutlined, ContainerOutlined} from "@ant-design/icons";
 import Spin from "antd/lib/spin";
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
+import DockerOutlined from "../icons/DockerOutlined";
 
 const system = [
     {
@@ -45,12 +46,6 @@ const system = [
         "value": ""
     }
 ];
-
-const IconFont = createFromIconfontCN({
-    scriptUrl: [
-        document.baseURI + './admin/vendors/js/fonts.js',
-    ],
-});
 
 class Index extends BaseResourceComponent {
 
@@ -103,10 +98,10 @@ class Index extends BaseResourceComponent {
                     if (r.name !== '运行环境') {
                         return e;
                     } else {
-                        if (!this.state.docker) {
+                        if (this.state.docker) {
                             return e;
                         } else {
-                            return (<div><IconFont type='icon-docker'/> {e}</div>);
+                            return (<><DockerOutlined/><span style={{marginLeft: 3}}>{e}</span></>);
                         }
                     }
                 }

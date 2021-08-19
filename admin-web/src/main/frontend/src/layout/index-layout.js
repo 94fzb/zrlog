@@ -155,41 +155,42 @@ class IndexLayout extends BaseResourceComponent {
                                     <Menu.Item key="./index">
                                         <Link to='./index'>
                                             <DashboardOutlined/>
-                                            <span>{this.state.res.dashboard}</span>
+                                            <span className='menu-title'>{this.state.res.dashboard}</span>
                                         </Link>
                                     </Menu.Item>
                                     <Menu.Item key="./article-edit">
                                         <Link to='./article-edit'>
                                             <FormOutlined/>
-                                            <span>{this.state.res['admin.log.edit']}</span>
+                                            <span className='menu-title'>{this.state.res['admin.log.edit']}</span>
                                         </Link>
                                     </Menu.Item>
                                     <Menu.Item key="./article">
                                         <Link to='./article'>
                                             <ContainerOutlined/>
-                                            <span>{this.state.res['blogManage']}</span>
+                                            <span className='menu-title'>{this.state.res['blogManage']}</span>
                                         </Link>
                                     </Menu.Item>
                                     <Menu.Item key="./comment">
                                         <Link to='./comment'>
                                             <CommentOutlined/>
-                                            <span>{this.state.res['admin.comment.manage']}</span>
+                                            <span className='menu-title'>{this.state.res['admin.comment.manage']}</span>
                                         </Link>
                                     </Menu.Item>
                                     <Menu.Item key="./plugin">
                                         <Link to='./plugin'>
                                             <ApiOutlined/>
-                                            <span>{this.state.res['admin.plugin.manage']}</span>
+                                            <span className='menu-title'>{this.state.res['admin.plugin.manage']}</span>
                                         </Link>
                                     </Menu.Item>
                                     <Menu.Item key="./website">
                                         <Link to='./website'>
                                             <SettingOutlined/>
-                                            <span>{this.state.res['admin.setting']}</span>
+                                            <span className='menu-title'>{this.state.res['admin.setting']}</span>
                                         </Link>
                                     </Menu.Item>
                                     <SubMenu key='more' inlineCollapsed={false}
                                              icon={<AppstoreOutlined/>}
+                                             className='menu-title'
                                              title={this.state.res['admin.more']}>
                                         <Menu.Item style={{width: 120}} key="./article-type">
                                             <Link to='./article-type'>

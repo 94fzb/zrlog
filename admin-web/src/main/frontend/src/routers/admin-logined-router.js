@@ -101,7 +101,6 @@ class AdminLoginedRouter extends React.Component {
                 <Route path="*/user-update-password" component={AsyncUserUpdatePassword}/>
                 <Route path="*/upgrade" component={AsyncUpgrade}/>
                 <Route path="*/template-config" component={AsyncTemplateConfig}/>
-                <Route path="*/" component={AsyncIndex}/>
                 <Route component={AsyncNotFoundPage}/>
             </Switch>
         );

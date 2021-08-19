@@ -7,7 +7,7 @@
   "license": "MIT",
   "dependencies": {
     "@ant-design/icons": "4.6.2",
-    "antd": "4.15.5",
+    "antd": "4.16.13",
     "axios": "0.21.1",
     "font-awesome": "4.7.0",
     "history": "4.10.1",

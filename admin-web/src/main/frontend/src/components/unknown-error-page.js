@@ -16,7 +16,7 @@ class UnknownErrorPage extends BaseResourceComponent {
                 status="500"
                 title="500"
                 subTitle={this.getSecondTitle()}
-                extra={<Button type="primary">Unknown Error</Button>}
+                extra={<Button type="primary" href={window.location.href}>重新加载</Button>}
             />
         )
     }

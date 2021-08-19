@@ -25,7 +25,7 @@ const md5 = require('md5');
 
 class ArticleEdit extends BaseResourceComponent {
 
-    articleFrom = React.createRef();
+    articleForm = React.createRef();
 
     initState() {
         return {
@@ -98,8 +98,8 @@ class ArticleEdit extends BaseResourceComponent {
 
     setValue = (changedValues) => {
         let currentArticle = {...this.state.article, ...changedValues};
-        if (this.articleFrom.current) {
-            this.articleFrom.current.setFieldsValue(currentArticle);
+        if (this.articleForm.current) {
+            this.articleForm.current.setFieldsValue(currentArticle);
         }
         this.setState({
             article: currentArticle
@@ -107,7 +107,7 @@ class ArticleEdit extends BaseResourceComponent {
     }
 
     initValue = (pageState) => {
-        this.articleFrom.current.setFieldsValue(pageState.article);
+        this.articleForm.current.setFieldsValue(pageState.article);
         this.setState(pageState);
     }
 
@@ -119,10 +119,8 @@ class ArticleEdit extends BaseResourceComponent {
     }
 
     onSubmit = async (allValues, release, preview, autoSave) => {
-        if (allValues.title === undefined || allValues.title === '') {
-            return;
-        }
-        if (allValues.typeId === undefined || allValues.typeId === '') {
+        let errors = await this.articleForm.current.validateFields();
+        if (errors.length > 0) {
             return;
         }
         allValues.rubbish = !release;
@@ -211,6 +209,10 @@ class ArticleEdit extends BaseResourceComponent {
                 })
             }
         });
+    }
+
+    realSubmit = async (allValues, release, preview, autoSave) => {
+
     }
 
     getArticleRoute() {
@@ -318,7 +320,7 @@ class ArticleEdit extends BaseResourceComponent {
                 <Divider/>
                 <Form
                     onValuesChange={(v) => this.autoSaveToRubbish(v, 0)}
-                    ref={this.articleFrom}
+                    ref={this.articleForm}
                     onFinish={(values) => this.onSubmit(values, true, false)}>
                     <Form.Item name='logId' style={{display: "none"}}>
                         <Input hidden={true}/>
@@ -449,7 +451,10 @@ class ArticleEdit extends BaseResourceComponent {
                                           title={this.state.res['admin.type.manage']}>
                                         <Form.Item label=''
                                                    style={{marginBottom: 0}}
-                                                   name='typeId' rules={[{required: true}]}>
+                                                   name='typeId' rules={[{
+                                            required: true,
+                                            message: "请选择" + this.state.res['admin.type.manage']
+                                        }]}>
                                             <Radio.Group style={{width: "100%"}}>
                                                 {this.state.typeOptions}
                                             </Radio.Group>
