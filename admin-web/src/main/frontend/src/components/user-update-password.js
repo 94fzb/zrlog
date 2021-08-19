@@ -40,7 +40,7 @@ class UserUpdatePassword extends BaseResourceComponent {
                 <Divider/>
                 <Row>
                     <Col md={12} xs={24}>
-                        <Form {...layout} ref={this.pwdFrom} onFinish={this.onFinish}>
+                        <Form {...layout} ref={this.pwdFrom} onFinish={(value) => this.onFinish(value)}>
                             <Form.Item name='oldPassword' label={this.state.res['admin.oldPassword']}
                                        rules={[{required: true}]}>
                                 <Input.Password/>
