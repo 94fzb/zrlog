@@ -22,14 +22,12 @@ public class VisitorArticleService {
             List<Log> logs = data.getRows();
             if (logs != null && !logs.isEmpty()) {
                 for (Log log : logs) {
-                    String title = log.get("title").toString();
-                    String content = log.get("content").toString();
-                    String digest = log.get("digest").toString();
+                    String title = log.get("title");
+                    String content = log.get("content");
+                    String digest = log.get("digest");
                     log.put("title", ParseUtil.wrapperKeyword(title, keywords));
                     String tryWrapperDigest = ParseUtil.wrapperKeyword(digest, keywords);
-                    boolean findInDigest = tryWrapperDigest.length() != digest.length();
-
-                    if (findInDigest) {
+                    if (tryWrapperDigest != null && tryWrapperDigest.length() != digest.length()) {
                         log.put("digest", tryWrapperDigest);
                     } else {
                         log.put("digest", ParseUtil.wrapperKeyword(ParseUtil.removeHtmlElement(content), keywords));

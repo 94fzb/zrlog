@@ -94,14 +94,14 @@ class Index extends BaseResourceComponent {
                 title: this.state.res.value,
                 key: 'value',
                 dataIndex: 'value',
-                render: (e, r, a, b) => {
+                render: (e, r) => {
                     if (r.name !== '运行环境') {
                         return e;
                     } else {
                         if (this.state.docker) {
-                            return e;
-                        } else {
                             return (<><DockerOutlined/><span style={{marginLeft: 3}}>{e}</span></>);
+                        } else {
+                            return e;
                         }
                     }
                 }

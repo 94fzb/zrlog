@@ -64,6 +64,9 @@ public class ParseUtil {
     }
 
     public static String removeHtmlElement(String str) {
+        if (StringUtils.isEmpty(str)) {
+            return str;
+        }
         return Jsoup.parse(str).body().text();
     }
 
@@ -100,6 +103,9 @@ public class ParseUtil {
      * 输入一段纯文本，通过指定关键字提取相关的上下文
      */
     public static String wrapperKeyword(String content, String keyword) {
+        if (content == null) {
+            return null;
+        }
         String newContent = content;
         if (content.contains(keyword)) {
             newContent = content.replace(keyword, wrapperFontRed(keyword));
