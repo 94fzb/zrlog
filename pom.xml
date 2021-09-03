@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.zrlog</groupId>
     <artifactId>zrlog</artifactId>
-    <version>2.2.1</version>
+    <version>2.2.2-SNAPSHOT</version>
     <modules>
         <module>web</module>
         <module>service</module>
@@ -96,32 +96,32 @@
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>common</artifactId>
-                <version>2.2.1</version>
+                <version>2.2.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>data</artifactId>
-                <version>2.2.1</version>
+                <version>2.2.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>admin-token</artifactId>
-                <version>2.2.1</version>
+                <version>2.2.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>blog-web</artifactId>
-                <version>2.2.1</version>
+                <version>2.2.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>service</artifactId>
-                <version>2.2.1</version>
+                <version>2.2.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>admin-web</artifactId>
-                <version>2.2.1</version>
+                <version>2.2.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>javax.servlet</groupId>
