@@ -1,1 +1,1 @@
-.\mvnw clean package -Dmaven.war.skip && xcopy /y web\src\main\zrlog*.jar web\src\main\zrlog.jar && cd web\src\main\ && bin\run.sh
+.\mvnw clean package -Dmaven.war.skip && xcopy /y web\src\main\zrlog*.jar web\src\main\zrlog.jar && cd web\src\main\ && bin\start.bat
