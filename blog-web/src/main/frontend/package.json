@@ -11,7 +11,7 @@
   },
   "scripts": {
     "start": "craco start",
-    "build": "cross-env GENERATE_SOURCEMAP=false react-scripts build",
+    "build": "cross-env GENERATE_SOURCEMAP=false craco build",
     "test": "cross-env  test"
   },
   "eslintConfig": {
@@ -20,7 +20,8 @@
   "devDependencies": {
     "react-scripts": "4.0.3",
     "@craco/craco": "6.1.2",
-    "cross-env":"7.0.3"
+    "cross-env":"7.0.3",
+    "craco-less": "1.17.1"
   },
   "browserslist": {
     "production": [

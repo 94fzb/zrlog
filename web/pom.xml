@@ -128,7 +128,6 @@
                 </executions>
                 <configuration>
                     <finalName>${finalName}</finalName>
-                    <classifier>${project.version}</classifier>
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
