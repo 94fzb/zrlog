@@ -10,16 +10,17 @@
     "antd": "4.16.5"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "GENERATE_SOURCEMAP=false react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "craco start",
+    "build": "cross-env GENERATE_SOURCEMAP=false react-scripts build",
+    "test": "cross-env  test"
   },
   "eslintConfig": {
     "extends": "react-app"
   },
   "devDependencies": {
-    "react-scripts": "4.0.3"
+    "react-scripts": "4.0.3",
+    "@craco/craco": "6.1.2",
+    "cross-env":"7.0.3"
   },
   "browserslist": {
     "production": [
