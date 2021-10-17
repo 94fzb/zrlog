@@ -71,8 +71,8 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <nodeVersion>v15.4.0</nodeVersion>
-                    <yarnVersion>v1.22.10</yarnVersion>
+                    <nodeVersion>v16.11.1</nodeVersion>
+                    <yarnVersion>v1.22.17</yarnVersion>
                     <workingDirectory>src/main/frontend</workingDirectory>
                     <installDirectory>target</installDirectory>
                     <nodeDownloadRoot>https://npm.taobao.org/mirrors/node/</nodeDownloadRoot>
