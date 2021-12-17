@@ -161,8 +161,8 @@
                         <yarnVersion>v1.22.17</yarnVersion>
                         <workingDirectory>src/main/frontend</workingDirectory>
                         <installDirectory>target</installDirectory>
-                        <nodeDownloadRoot>https://registry.npmmirror.com/mirrors/node/</nodeDownloadRoot>
-                        <yarnDownloadRoot>https://registry.npmmirror.com/mirrors/yarn/</yarnDownloadRoot>
+                        <nodeDownloadRoot>https://npmmirror.com/mirrors/node/</nodeDownloadRoot>
+                        <yarnDownloadRoot>https://npmmirror.com/mirrors/yarn/</yarnDownloadRoot>
                         <npmRegistryURL>https://registry.npmmirror.com</npmRegistryURL>
                     </configuration>
                 </plugin>
