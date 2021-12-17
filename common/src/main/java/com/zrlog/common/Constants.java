@@ -5,10 +5,7 @@ import com.hibegin.common.util.StringUtils;
 import com.zrlog.common.type.AutoUpgradeVersionType;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 存放全局的静态变量，有多个地方使用一个key时，存放在这里，方便代码的维护。
@@ -28,6 +25,8 @@ public class Constants {
     public static final String NOT_FOUND_PAGE = "/error/404.html";
 
     public static final String ZRLOG_RESOURCE_DOWNLOAD_URL = "http://dl.zrlog.com";
+
+    public static final Set<String> TEMPLATE_REPO_HOSTS = new HashSet<>(Arrays.asList("https://store.zrlog.com", "https://www.zrlog.com"));
 
     public static final String AUTO_UPGRADE_VERSION_KEY = "autoUpgradeVersion";
 

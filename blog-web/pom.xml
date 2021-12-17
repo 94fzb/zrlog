@@ -68,15 +68,6 @@
                         </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <nodeVersion>v16.11.1</nodeVersion>
-                    <yarnVersion>v1.22.17</yarnVersion>
-                    <workingDirectory>src/main/frontend</workingDirectory>
-                    <installDirectory>target</installDirectory>
-                    <nodeDownloadRoot>https://npm.taobao.org/mirrors/node/</nodeDownloadRoot>
-                    <yarnDownloadRoot>https://npm.taobao.org/mirrors/yarn/</yarnDownloadRoot>
-                    <npmRegistryURL>https://registry.npm.taobao.org</npmRegistryURL>
-                </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>

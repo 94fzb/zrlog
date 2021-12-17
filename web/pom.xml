@@ -13,7 +13,7 @@
     <packaging>war</packaging>
 
     <properties>
-        <tomcatVersion>9.0.43</tomcatVersion>
+        <tomcatVersion>9.0.56</tomcatVersion>
         <tomcat-scope>compile</tomcat-scope>
         <contextPath>/${finalName}</contextPath>
         <jarOutputDirectory>${project.basedir}/src/main/</jarOutputDirectory>
