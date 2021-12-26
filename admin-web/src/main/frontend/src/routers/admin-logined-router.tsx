@@ -1,5 +1,4 @@
 import {Route, Switch} from "react-router-dom";
-import React from "react";
 import Loadable from "react-loadable";
 import {MyLoadingComponent} from "../components/my-loading-component";
 
@@ -82,29 +81,27 @@ const AsyncUser = Loadable({
 });
 
 
-class AdminLoginedRouter extends React.Component {
+const AdminLoginedRouter = () => {
 
-    render() {
-        return (
-            <Switch>
-                <Route path="*/index" component={AsyncIndex}/>
-                <Route path="*/article-edit" component={AsyncArticleEdit}/>
-                <Route path="*/comment" component={AsyncComment}/>
-                <Route path="*/plugin" component={AsyncPlugin}/>
-                <Route path="*/website" component={AsyncWebSite}/>
-                <Route path="*/article-type" component={AsyncType}/>
-                <Route path="*/link" component={AsyncLink}/>
-                <Route path="*/nav" component={AsyncNav}/>
-                <Route path="*/article" component={AsyncArticle}/>
-                <Route path="*/user" component={AsyncUser}/>
-                <Route path="*/template-center" component={AsyncTemplateCenter}/>
-                <Route path="*/user-update-password" component={AsyncUserUpdatePassword}/>
-                <Route path="*/upgrade" component={AsyncUpgrade}/>
-                <Route path="*/template-config" component={AsyncTemplateConfig}/>
-                <Route component={AsyncNotFoundPage}/>
-            </Switch>
-        );
-    }
+    return (
+        <Switch>
+            <Route path="*/index" component={AsyncIndex}/>
+            <Route path="*/article-edit" component={AsyncArticleEdit}/>
+            <Route path="*/comment" component={AsyncComment}/>
+            <Route path="*/plugin" component={AsyncPlugin}/>
+            <Route path="*/website" component={AsyncWebSite}/>
+            <Route path="*/article-type" component={AsyncType}/>
+            <Route path="*/link" component={AsyncLink}/>
+            <Route path="*/nav" component={AsyncNav}/>
+            <Route path="*/article" component={AsyncArticle}/>
+            <Route path="*/user" component={AsyncUser}/>
+            <Route path="*/template-center" component={AsyncTemplateCenter}/>
+            <Route path="*/user-update-password" component={AsyncUserUpdatePassword}/>
+            <Route path="*/upgrade" component={AsyncUpgrade}/>
+            <Route path="*/template-config" component={AsyncTemplateConfig}/>
+            <Route component={AsyncNotFoundPage}/>
+        </Switch>
+    );
 }
 
 export default AdminLoginedRouter;
