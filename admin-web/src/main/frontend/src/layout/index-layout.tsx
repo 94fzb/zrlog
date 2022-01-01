@@ -65,8 +65,7 @@ const IndexLayout = () => {
         versionType: "",
     })
 
-
-    useEffect(() => {
+    const loadInfo = () => {
         axios.get("/api/admin/user/basicInfo").then(({data}) => {
             if (data.data.lastVersion.version) {
                 setLayoutState({
@@ -85,6 +84,10 @@ const IndexLayout = () => {
                 })
             }
         })
+    }
+
+    useEffect(() => {
+        loadInfo();
     }, [])
 
 

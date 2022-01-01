@@ -11,14 +11,14 @@ type BaseTableProps = {
     deleteApi: string,
     columns: any[],
     searchKey?: string,
-    addBtnRender?: (addSuccessCall: () => void) => {}
-    editBtnRender?: (id: number, record: any, editSuccessCall: () => void) => {}
+    addBtnRender?: (addSuccessCall: () => void) => any,
+    editBtnRender?: (id: number, record: any, editSuccessCall: () => void) => any
 }
 
 export type TableData = {
     tableLoaded: boolean,
     pagination: MyPagination,
-    tablePagination?: PaginationProps
+    tablePagination?: PaginationProps,
     rows: [],
     query: string | undefined,
 }
@@ -116,7 +116,7 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
                     </Space>
                 ) : null,
         })
-        columns.map(e => {
+        columns.forEach(e => {
             c.push(e);
         })
         return c;

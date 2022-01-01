@@ -36,7 +36,7 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({
     })
 
     useEffect(() => {
-        let dark = EnvUtils.isDarkMode();
+        const dark = EnvUtils.isDarkMode();
 
         function setDarkMode(editor: any, dark: boolean) {
             editor.setTheme(dark ? "dark" : "default");

@@ -17,11 +17,11 @@ type UpgradeState = {
     restartSuccess: boolean,
     downloadProcess: number,
     changeLogLoading: boolean,
-    changeLog?: string,
+    changeLog: string,
     disabled: boolean,
     newBuildId?: string,
     finish?: boolean,
-    upgradeMessage?: string,
+    upgradeMessage: string,
 }
 
 const Upgrade = () => {
@@ -42,6 +42,8 @@ const Upgrade = () => {
             downloadProcess: 0,
             changeLogLoading: true,
             disabled: true,
+            changeLog: "",
+            upgradeMessage: ""
         }
     );
 
@@ -146,7 +148,7 @@ const Upgrade = () => {
                         {state.current === 0 && (
                             <>
                                 <Title level={4}>{getRes().changeLog}</Title>
-                                <div dangerouslySetInnerHTML={{__html: state.changeLog!}}/>
+                                <div dangerouslySetInnerHTML={{__html: state.changeLog}}/>
                             </>
                         )}
                         {state.current === 1 && (
@@ -158,7 +160,7 @@ const Upgrade = () => {
                         {state.current === 2 && (
                             <div>
                                 <Title level={4}>正在执行更新...</Title>
-                                <div dangerouslySetInnerHTML={{__html: state.upgradeMessage!}}/>
+                                <div dangerouslySetInnerHTML={{__html: state.upgradeMessage}}/>
                             </div>
                         )}
                     </div>

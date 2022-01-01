@@ -237,11 +237,11 @@ const ArticleEdit = () => {
     }
 
     const setThumbnailHeight = (url: string) => {
-        let h = Number.parseInt(gup("h", url) + "");
-        if (h) {
+        const height = Number.parseInt(gup("h", url) + "");
+        if (height) {
             const originW = Number.parseInt(jquery("#thumbnail").width() + "");
             const w = Number.parseInt(gup("w", url) + "");
-            jquery("#thumbnail").width(w / originW * h);
+            jquery("#thumbnail").width(w / originW * height);
         }
     }
 

@@ -119,7 +119,7 @@ const ArticleEditTag: FunctionComponent<ArticleEditTagProps> = ({allTags, keywor
         }
     }
     if (state.keywords !== undefined && state.keywords != null) {
-        let newTags = Array.from(new Set(state.keywords.split(",").filter(x => x !== '')));
+        const newTags = Array.from(new Set(state.keywords.split(",").filter(x => x !== '')));
         state.keywords = newTags.join(",");
         tagChild = newTags.map(forMap);
     } else {

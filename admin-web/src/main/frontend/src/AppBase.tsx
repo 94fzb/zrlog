@@ -52,7 +52,7 @@ const AppBase = () => {
     const initRes = () => {
         const resourceData = window.sessionStorage.getItem(resourceKey);
         if (resourceData === null) {
-            const jsonStr = document.getElementById("resourceInfo")!.textContent;
+            const jsonStr = document.getElementById("resourceInfo")?.textContent;
             if (jsonStr && jsonStr !== '') {
                 handleRes({"data": JSON.parse(jsonStr)});
             } else {
