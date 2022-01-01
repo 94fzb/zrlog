@@ -1805,7 +1805,7 @@
   resolved "https://registry.npmmirror.com/@types/q/download/@types/q-1.5.5.tgz#75a2a8e7d8ab4b230414505d92335d1dcb53a6df"
   integrity sha512-L28j2FcJfSZOnL1WBjDYp2vUHCeIFlyYI/53EwD/rKUBQ7MtUUfbQWiyKJGpcnv4/WgrhWsFKrcPstcAt/J0tQ==
 
-"@types/react-async-script@^1.2.1":
+"@types/react-async-script@1.2.1":
   version "1.2.1"
   resolved "https://registry.npmmirror.com/@types/react-async-script/download/@types/react-async-script-1.2.1.tgz#165648718fa069a794e672b2300ae6276e2fd080"
   integrity sha1-FlZIcY+gaaeU5nKyMArmJ24v0IA=
