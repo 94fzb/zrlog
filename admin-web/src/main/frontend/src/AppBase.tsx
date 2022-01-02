@@ -54,7 +54,7 @@ const AppBase = () => {
         if (resourceData === null) {
             const jsonStr = document.getElementById("resourceInfo")?.textContent;
             if (jsonStr && jsonStr !== '') {
-                handleRes({"data": JSON.parse(jsonStr)});
+                handleRes(JSON.parse(jsonStr));
             } else {
                 loadResourceFromServer();
             }
