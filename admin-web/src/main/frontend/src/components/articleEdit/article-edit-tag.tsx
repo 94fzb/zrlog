@@ -2,13 +2,13 @@ import {Input, Tag} from 'antd';
 import {TweenOneGroup} from 'rc-tween-one';
 import {PlusOutlined, TagOutlined} from '@ant-design/icons';
 import Title from "antd/es/typography/Title";
-import {FunctionComponent, useState} from "react";
+import {FunctionComponent, useRef, useState} from "react";
 import {getRes} from "../../utils/constants";
 
 
 type ArticleEditTagProps = {
     allTags: string[],
-    keywords?: string,
+    keywords: string,
 }
 
 type ArticleEditTagState = {
@@ -25,11 +25,11 @@ const ArticleEditTag: FunctionComponent<ArticleEditTagProps> = ({allTags, keywor
         inputValue: ''
     })
 
+    const inputRef = useRef(null);
 
     const handleClose = (removedTag: string) => {
         const tags = state.keywords.split(",").filter(tag => tag !== removedTag);
         console.info(tags.join(","));
-        //props.tags = tags;
         setState({
             ...state,
             keywords: tags.join(",")
@@ -37,7 +37,7 @@ const ArticleEditTag: FunctionComponent<ArticleEditTagProps> = ({allTags, keywor
     };
 
     const showInput = () => {
-        //setState({inputVisible: true}, () => input.focus());
+        setState({...state, inputVisible: true});
     };
 
     const handleInputChange = (e: any) => {
@@ -148,6 +148,7 @@ const ArticleEditTag: FunctionComponent<ArticleEditTagProps> = ({allTags, keywor
             </div>
             {inputVisible && (
                 <Input
+                    ref={inputRef}
                     type="text"
                     size="small"
                     style={{width: 78}}

@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {CameraOutlined, EyeOutlined, SaveOutlined, SendOutlined} from '@ant-design/icons';
 import {Button, Input, Modal, Radio} from "antd";
 import Form from "antd/es/form";
@@ -24,7 +24,7 @@ import {UploadChangeParam} from "antd/es/upload";
 const md5 = require('md5');
 
 export type ArticleEntry = ChangedContent & {
-    keywords?: string,
+    keywords: string,
     rubbish?: boolean,
     alias?: string,
     logId?: number,
@@ -38,12 +38,11 @@ type ArticleEditState = {
     typeOptions: any[],
     tags: any[],
     globalLoading: boolean,
-    article: ArticleEntry,
     fullScreen: boolean,
     editorInitSuccess: boolean,
 }
 
-type ActicleSavingState = {
+type ArticleSavingState = {
     rubbishSaving: boolean,
     savedVersion: number,
     previewIng: boolean,
@@ -55,26 +54,28 @@ const ArticleEdit = () => {
 
     const [state, setState] = useState<ArticleEditState>({
         typeOptions: [],
-        article: {
-            version: 0,
-        },
         editorInitSuccess: false,
-
-
         fullScreen: false, globalLoading: true,
         tags: [],
         types: []
     })
 
-    const [savingState, setSavingState] = useState<ActicleSavingState>({
+    const [articleState, setArticleState] = useState<ArticleEntry>({
+        keywords: "",
+        version: -1,
+    });
+
+    const [savingState, setSavingState] = useState<ArticleSavingState>({
         previewIng: false,
         releaseSaving: false,
         rubbishSaving: false,
         savedVersion: 0,
     })
 
+    const articleForm = useRef(null);
+
     const rubbish = async (preview: boolean) => {
-        await onSubmit(state.article, true, false, preview);
+        await onSubmit(articleState, false, false, preview);
     }
 
     useEffect(() => {
@@ -95,11 +96,11 @@ const ArticleEdit = () => {
                     setState({
                         ...state,
                         globalLoading: false,
-                        article: data.data,
                         typeOptions: options,
                         types: nDate.data.types,
                         tags: nDate.data.tags,
                     })
+                    setArticleState(data.data);
                 })
             } else {
                 setState({
@@ -109,6 +110,7 @@ const ArticleEdit = () => {
                     tags: nDate.data.tags,
                     globalLoading: false
                 });
+                setArticleState({keywords: "", version: 0});
             }
         });
     }, [])
@@ -120,7 +122,12 @@ const ArticleEdit = () => {
         return md5(JSON.stringify(signObj));
     }
 
-    const onSubmit = async (allValues: ArticleEntry, release: boolean, preview: boolean, autoSave: boolean) => {
+    const onSubmit = async (allValues: ArticleEntry, release: boolean, preview: boolean, autoSave: boolean): Promise<ArticleEntry> => {
+        // @ts-ignore
+        const errors = await articleForm.current.validateFields();
+        if (errors.length > 0) {
+            return Promise.resolve(allValues);
+        }
         allValues.rubbish = !release;
         allValues.keywords = jquery("#keywords").val() as unknown as string;
         let uri;
@@ -133,7 +140,7 @@ const ArticleEdit = () => {
         const currentVersion = getCurrentSignVersion(allValues);
         //自动保存模式下，没有变化
         if (autoSave && currentVersion === savingState.savedVersion) {
-            return;
+            return Promise.resolve(allValues);
         }
         if (release) {
             setSavingState({
@@ -148,63 +155,60 @@ const ArticleEdit = () => {
             })
         }
         exitTips(getRes()['articleEditExitWithOutSaveSuccess']);
-        if (allValues.version < state.article.version) {
-            return;
-        }
-        await axios.post(uri, allValues).then(({data}) => {
-            if (data.error) {
+        try {
+            await axios.post(uri, allValues).then(({data}) => {
+                if (data.error) {
+                    Modal.error({
+                        title: '保存失败',
+                        content: data.message,
+                        okText: '确认'
+                    });
+                    return;
+                }
+                exitNotTips();
+                if (release) {
+                    message.info(getRes()['releaseSuccess']);
+                } else {
+                    if (!autoSave) {
+                        message.info(getRes()['saveSuccess']);
+                    }
+                    if (preview) {
+                        window.open(document.baseURI + "post/" + allValues!.logId, '_blank');
+                    }
+                }
+                const respData = data.data;
+                //当前文本已经存在了，就不用服务器端的覆盖了
+                if (allValues!.alias && allValues!.alias !== '') {
+                    delete respData.alias;
+                }
+                if (allValues!.digest && allValues!.digest !== '') {
+                    delete respData.digest;
+                }
+                allValues = {...allValues, ...respData};
+                console.info(allValues.version + "aaaa");
+                setSavingState({
+                    ...savingState,
+                    savedVersion: currentVersion
+                })
+                if (create) {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('id', data.data.logId);
+                    window.history.replaceState(null, "", url.toString());
+                }
+            }).catch((e) => {
+                let msg;
+                if (e.error) {
+                    msg = e.message;
+                } else {
+                    msg = e.toString();
+                }
                 Modal.error({
-                    title: '保存失败',
-                    content: data.message,
+                    title: "保存失败",
+                    content: msg,
                     okText: '确认'
                 });
-                return;
-            }
-            exitNotTips();
-            if (release) {
-                message.info(getRes()['releaseSuccess']);
-            } else {
-                if (!autoSave) {
-                    message.info(getRes()['saveSuccess']);
-                }
-                if (preview) {
-                    window.open(document.baseURI + "post/" + allValues!.logId, '_blank');
-                }
-            }
-            const respData = data.data;
-            //当前文本已经存在了，就不用服务器端的覆盖了
-            if (allValues!.alias && allValues!.alias !== '') {
-                delete respData.alias;
-            }
-            if (allValues!.digest && allValues!.digest !== '') {
-                delete respData.digest;
-            }
-            setState({
-                ...state,
-                article: {...state, ...respData}
             })
-            setSavingState({
-                ...savingState,
-                savedVersion: currentVersion
-            })
-            if (create) {
-                const url = new URL(window.location.href);
-                url.searchParams.set('id', data.data.logId);
-                window.history.replaceState(null, "", url.toString());
-            }
-        }).catch((e) => {
-            let msg;
-            if (e.error) {
-                msg = e.message;
-            } else {
-                msg = e.toString();
-            }
-            Modal.error({
-                title: "保存失败",
-                content: msg,
-                okText: '确认'
-            });
-        }).finally(() => {
+        } finally {
             if (release) {
                 setSavingState({
                     ...savingState,
@@ -217,7 +221,8 @@ const ArticleEdit = () => {
                     previewIng: preview,
                 })
             }
-        });
+        }
+        return Promise.resolve(allValues);
     }
 
     const getArticleRoute = () => {
@@ -299,39 +304,49 @@ const ArticleEdit = () => {
 
     const save = async (article: ArticleEntry) => {
         //如果正在保存，尝试1s后再检查下
+        // @ts-ignore
         if (savingState.rubbishSaving || savingState.releaseSaving) {
-            setTimeout(() => {
-                save(article)
+            setTimeout(async () => {
+                if (article.version < savingState.savedVersion) {
+                    return;
+                }
+                await save(article)
             }, 1000);
             return;
         }
-        await onSubmit(article, false, false, true);
+        const savedResult = await onSubmit(article, false, false, true);
+        setArticleState(savedResult);
     };
 
     const autoSaveToRubbish = (changedValues: any, delayMs: number) => {
-        //editor loading
-        /*if (!state.editorInitSuccess) {
-            return;
-        }*/
+        const newV = JSON.parse(JSON.stringify(articleState));
         setTimeout(async () => {
-            await save({...state.article, ...changedValues})
+            await save({...newV, ...changedValues});
         }, delayMs);
     }
 
-    if (state.globalLoading) {
+    if (state.globalLoading || articleState.version < 0) {
         return <></>
+    }
+
+    const editorLoadSuccess = () => {
+        //setState({...state, editorInitSuccess: true})
     }
 
     return (
         <>
             <Title className='page-header'
-                   level={3}>{getRes()['admin.log.edit'] + (state.article!.rubbish ? '-当前为草稿' : '')}</Title>
+                   level={3}>{getRes()['admin.log.edit'] + (articleState!.rubbish ? '-当前为草稿' : '')}</Title>
             <Divider/>
             <Form
-                onValuesChange={(_k, v) => autoSaveToRubbish(v, 0)}
-                initialValues={state.article}
-                onFinish={() => onSubmit(state.article, true, false, false)}>
+                ref={articleForm}
+                onValuesChange={(cv) => autoSaveToRubbish(cv, 0)}
+                initialValues={articleState}
+                onFinish={() => onSubmit(articleState, true, false, false)}>
                 <Form.Item name='logId' style={{display: "none"}}>
+                    <Input hidden={true}/>
+                </Form.Item>
+                <Form.Item name='version' style={{display: "none"}}>
                     <Input hidden={true}/>
                 </Form.Item>
                 <Form.Item name='thumbnail' style={{display: "none"}}>
@@ -398,15 +413,10 @@ const ArticleEdit = () => {
                 </Row>
                 <Row gutter={[8, 8]}>
                     <Col md={18} xs={24} style={{zIndex: 10}}>
-                        {!state.globalLoading &&
-                            <MyEditorMdWrapper onfullscreen={onfullscreen} onfullscreenExit={onfullscreenExit}
-                                               markdown={state.article!.markdown}
-                                               loadSuccess={() => {
-                                                   setState({...state, editorInitSuccess: true})
-                                               }
-                                               }
-                                               autoSaveToRubbish={autoSaveToRubbish}/>
-                        }
+                        <MyEditorMdWrapper onfullscreen={onfullscreen} onfullscreenExit={onfullscreenExit}
+                                           markdown={articleState!.markdown}
+                                           loadSuccess={editorLoadSuccess}
+                                           autoSaveToRubbish={autoSaveToRubbish}/>
                     </Col>
                     <Col md={6} xs={24}>
                         <Row gutter={[8, 8]}>
@@ -417,9 +427,9 @@ const ArticleEdit = () => {
                                         action={"/api/admin/upload/thumbnail?dir=thumbnail"}
                                         name='imgFile'
                                         onChange={(e) => onUploadChange(e)}>
-                                        {(state.article!.thumbnail === undefined ||
-                                            state.article!.thumbnail === null ||
-                                            state.article!.thumbnail === '') && (
+                                        {(articleState!.thumbnail === undefined ||
+                                            articleState!.thumbnail === null ||
+                                            articleState!.thumbnail === '') && (
                                             <>
                                                 <p className="ant-upload-drag-icon" style={{height: '88px'}}>
                                                     <CameraOutlined style={{fontSize: "28px", paddingTop: '40px'}}/>
@@ -428,10 +438,10 @@ const ArticleEdit = () => {
                                             </>
 
                                         )}
-                                        {state.article!.thumbnail !== '' && (
+                                        {articleState!.thumbnail !== '' && (
                                             <Image fallback={Constants.getFillBackImg()} preview={false}
                                                    id='thumbnail'
-                                                   src={state.article!.thumbnail}/>
+                                                   src={articleState!.thumbnail}/>
                                         )}
                                     </Dragger>
                                 </Card>
@@ -475,7 +485,7 @@ const ArticleEdit = () => {
                             </Col>
                             <Col span={24}>
                                 <Card size="small" title={getRes().tag}>
-                                    <ArticleEditTag keywords={state.article!.keywords}
+                                    <ArticleEditTag keywords={articleState!.keywords}
                                                     allTags={state.tags.map(x => x.text)}/>
                                 </Card>
                             </Col>

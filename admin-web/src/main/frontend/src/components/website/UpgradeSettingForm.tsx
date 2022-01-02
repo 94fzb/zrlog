@@ -26,7 +26,7 @@ const UpgradeSettingForm = () => {
 
     const [checking, setChecking] = useState<boolean>(false)
 
-    const [form, setForm] = useState<UpgradeFormState>({autoUpgradeVersion: -1, upgradePreview: false})
+    const [form, setForm] = useState<UpgradeFormState>({autoUpgradeVersion: -2, upgradePreview: false})
 
     const websiteFormFinish = (changedValues: any) => {
         axios.post("/api/admin/website/upgrade", changedValues).then(({data}) => {
@@ -41,13 +41,14 @@ const UpgradeSettingForm = () => {
 
     useEffect(() => {
         axios.get("/api/admin/website/settings").then(({data}) => {
-            if (data.data.basic != null) {
+            if (data.data.upgrade != null) {
                 setForm(data.data.upgrade);
+                console.info(data.data.upgrade);
             }
         })
     }, [])
 
-    if (form === undefined) {
+    if (form === undefined || form.autoUpgradeVersion === -2) {
         return <></>
     }
 

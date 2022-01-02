@@ -81,6 +81,9 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
     }, [])
 
     useEffect(() => {
+        if (searchKey === undefined) {
+            return;
+        }
         fetchData({...tableDataState.pagination, key: searchKey}, dataApi).then((r) => {
             setTableDataState(r)
         })
@@ -130,7 +133,7 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
                 })
             }) : undefined}
             <Table loading={!tableDataState.tableLoaded} bordered
-                   onChange={(pagination) => () => {
+                   onChange={(pagination) => {
                        fetchData({
                            page: pagination.current,
                            size: pagination.pageSize,

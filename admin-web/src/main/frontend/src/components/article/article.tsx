@@ -113,7 +113,7 @@ const Article = () => {
         return "/api/admin/article/delete";
     }
 
-    const [searchKey, setSearchKey] = useState<string>("")
+    const [searchKey, setSearchKey] = useState<string>()
 
 
     return (

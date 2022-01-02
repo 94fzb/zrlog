@@ -46,11 +46,11 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({
 
         function initSuccess() {
             $(".CodeMirror-gutters").css("left", "0px");
-            loadSuccess();
             setState({
                 ...state,
                 editorLoading: false
             })
+            loadSuccess();
         }
 
         // eslint-disable-next-line no-undef,no-unused-vars
