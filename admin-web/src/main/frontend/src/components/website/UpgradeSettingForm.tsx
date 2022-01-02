@@ -17,11 +17,16 @@ const layout = {
 };
 
 
+type UpgradeFormState = {
+    autoUpgradeVersion: number,
+    upgradePreview: boolean,
+}
+
 const UpgradeSettingForm = () => {
 
     const [checking, setChecking] = useState<boolean>(false)
 
-    const [form, setForm] = useState<any>(undefined)
+    const [form, setForm] = useState<UpgradeFormState>({autoUpgradeVersion: -1, upgradePreview: false})
 
     const websiteFormFinish = (changedValues: any) => {
         axios.post("/api/admin/website/upgrade", changedValues).then(({data}) => {

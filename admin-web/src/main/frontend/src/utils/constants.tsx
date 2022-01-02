@@ -16,7 +16,7 @@ class Constants {
 
 export const resourceKey = "commonRes.v5";
 
-export const getRes = (): Record<string, any> => {
+export const getRes = (): Record<string, never> => {
     return JSON.parse(window.sessionStorage.getItem(resourceKey) + "");
 }
 

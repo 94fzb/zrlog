@@ -1,4 +1,4 @@
-export const mapToQueryString = (map: Record<string, any>): string => {
+export const mapToQueryString = (map: Record<string, string | boolean | number | undefined>): string => {
     return Object.keys(map).reduce(function (a, k) {
         if (map[k] === undefined) {
             // @ts-ignore
@@ -11,6 +11,6 @@ export const mapToQueryString = (map: Record<string, any>): string => {
     }, []).join('&');
 }
 
-export const reloadTitle = (secondTitle: string, res: Record<string, any>) => {
+export const reloadTitle = (secondTitle: string, res: Record<string, never>) => {
     document.title = [secondTitle, res['admin.management'], res.websiteTitle].filter(Boolean).join(" | ");
 }

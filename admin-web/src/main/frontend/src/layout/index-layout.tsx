@@ -91,7 +91,7 @@ const IndexLayout = () => {
     }, [])
 
 
-    const adminSettings = (res: Record<string, any>) => {
+    const adminSettings = (res: Record<string, never>) => {
         return (
             <Menu className="userInfoMenu">
                 <Menu.Item key="0" hidden={!layoutState.upgrade}>
