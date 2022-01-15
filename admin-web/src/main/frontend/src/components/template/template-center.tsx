@@ -1,11 +1,6 @@
 import {useEffect, useState} from "react";
 import axios from "axios";
 
-
-function Iframe(props: any) {
-    return (<div dangerouslySetInnerHTML={{__html: props.iframe ? props.iframe : ""}}/>);
-}
-
 const TemplateCenter = () => {
 
     const [url, setUrl] = useState<string>("");
@@ -19,10 +14,9 @@ const TemplateCenter = () => {
     if (url === "") {
         return (<div/>);
     }
-    const iframe = '<iframe width="100%" style="border: 0" height="1200px" src=' + url + '>';
 
     return (
-        <Iframe iframe={iframe}/>
+        <iframe width="100%" style={{border: 0}} height={1200} src={url}/>
     )
 }
 
