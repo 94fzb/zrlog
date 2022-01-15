@@ -17,6 +17,10 @@ class Constants {
 export const resourceKey = "commonRes.v5";
 
 export const getRes = (): Record<string, never> => {
+    const cacheRes = window.sessionStorage.getItem(resourceKey);
+    if (cacheRes === null || cacheRes === "") {
+        return {};
+    }
     return JSON.parse(window.sessionStorage.getItem(resourceKey) + "");
 }
 
