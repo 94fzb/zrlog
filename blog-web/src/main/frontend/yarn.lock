@@ -7477,9 +7477,9 @@ nan@^2.12.1:
   integrity sha1-PzSkc/8Y4VwbVia2KQO1rW5mX+4=
 
 nanoid@^3.1.28:
-  version "3.1.30"
-  resolved "https://registry.npmmirror.com/nanoid/download/nanoid-3.1.30.tgz#63f93cc548d2a113dc5dfbc63bfa09e2b9b64362"
-  integrity sha1-Y/k8xUjSoRPcXfvGO/oJ4rm2Q2I=
+  version "3.3.2"
+  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.3.2.tgz#c89622fafb4381cd221421c69ec58547a1eec557"
+  integrity sha512-CuHBogktKwpm5g2sRgv83jEy2ijFzBwMoYA60orPDR7ynsLijJDqgsi4RDGj3OJpy3Ieb+LYwiRmIOGyytgITA==
 
 nanomatch@^1.2.9:
   version "1.2.13"
