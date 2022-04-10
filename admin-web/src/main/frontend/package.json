@@ -22,7 +22,11 @@
     "screenfull": "5.1.0"
   },
   "scripts": {
+    "lint": "yarn type-check",
+    "prepare": "cd ../../../../ && husky install admin-web/src/main/frontend/.husky",
+    "pre-commit": "yarn lint",
     "start": "craco start",
+    "type-check": "tsc --project tsconfig.json --pretty --noEmit",
     "build": "cross-env GENERATE_SOURCEMAP=false craco build",
     "test": "craco test"
   },
@@ -43,7 +47,10 @@
     "cross-env": "7.0.3",
     "react-loadable": "5.5.0",
     "react-scripts": "4.0.3",
-    "typescript": "4.5.4"
+    "typescript": "4.5.4",
+    "husky": "7.0.4",
+    "lint-staged": "11.1.2",
+    "prettier": "2.3.2"
   },
   "browserslist": {
     "production": [
@@ -55,6 +62,13 @@
       "last 1 chrome version",
       "last 1 firefox version",
       "last 1 safari version"
+    ]
+  },
+  "lint-staged": {
+    "*.{js,jsx,tsx}": [
+      "prettier --write",
+      "eslint --fix --max-warnings=0",
+      "git add"
     ]
   }
 }
