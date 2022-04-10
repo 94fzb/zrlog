@@ -8,6 +8,7 @@
     "jsx": "react-jsx",
     "baseUrl": "src",
     "sourceRoot": "src",
+    "sourceMap": true,
     "lib": [
       "dom",
       "es2017"
