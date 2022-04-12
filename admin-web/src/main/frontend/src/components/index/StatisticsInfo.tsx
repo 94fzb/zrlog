@@ -23,7 +23,7 @@ const StatisticsInfo = () => {
 
     useEffect(() => {
         axios.get("/api/admin/statisticsInfo").then(({data}) => {
-            setStatisticsInfoState(data)
+            setStatisticsInfoState(data.data)
         });
     }, [])
 

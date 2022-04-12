@@ -158,11 +158,11 @@
                     <version>1.12.0</version>
                     <configuration>
                         <nodeVersion>v16.13.1</nodeVersion>
-                        <yarnVersion>v1.22.17</yarnVersion>
+                        <yarnVersion>v1.22.18</yarnVersion>
                         <workingDirectory>src/main/frontend</workingDirectory>
                         <installDirectory>target</installDirectory>
                         <nodeDownloadRoot>https://npmmirror.com/mirrors/node/</nodeDownloadRoot>
-                        <yarnDownloadRoot>https://npmmirror.com/mirrors/yarn/</yarnDownloadRoot>
+                        <yarnDownloadRoot>https://dl.zrlog.com/yarnpkg/yarn/releases/download/</yarnDownloadRoot>
                         <npmRegistryURL>https://registry.npmmirror.com</npmRegistryURL>
                     </configuration>
                 </plugin>
