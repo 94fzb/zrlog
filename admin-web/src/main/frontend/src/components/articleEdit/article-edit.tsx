@@ -290,7 +290,7 @@ const ArticleEdit = () => {
     if (status === "done") {
       //message.success(`${info.file.name} file uploaded successfully.`);
       setThumbnailHeight(info.file.response.data.url);
-      await autoSaveToRubbish({ thumbnail: info.file.response.data.url }, 0);
+      await autoSaveToRubbish({ thumbnail: info.file.response.data.url });
     } else if (status === "error") {
       message.error(`${info.file.name} file upload failed.`);
     }
@@ -355,11 +355,9 @@ const ArticleEdit = () => {
     }
   };
 
-  const autoSaveToRubbish = (changedValues: any, delayMs: number) => {
-    setTimeout(async () => {
-      const newV = JSON.parse(JSON.stringify(articleState));
-      await save({ ...newV, ...changedValues });
-    }, delayMs);
+  const autoSaveToRubbish = async (changedValues: any) => {
+    const newV = JSON.parse(JSON.stringify(articleState));
+    await save({ ...newV, ...changedValues });
   };
 
   if (state.globalLoading || articleState.version < 0) {
@@ -380,7 +378,7 @@ const ArticleEdit = () => {
       <input hidden={true} id={"version"} />
       <Form
         ref={articleForm}
-        onValuesChange={(cv) => autoSaveToRubbish(cv, 0)}
+        onValuesChange={(cv) => autoSaveToRubbish(cv)}
         initialValues={articleState}
         onFinish={() => onSubmit(articleState, true, false, false)}
       >
@@ -466,16 +464,17 @@ const ArticleEdit = () => {
               />
             </Form.Item>
           </Col>
-          <Col md={5} xs={0}></Col>
+          <Col md={5} xs={0} />
         </Row>
         <Row gutter={[8, 8]}>
           <Col md={18} xs={24} style={{ zIndex: 10 }}>
             <MyEditorMdWrapper
+              onChangeDelay={1000}
               onfullscreen={onfullscreen}
               onfullscreenExit={onfullscreenExit}
               markdown={articleState!.markdown}
               loadSuccess={editorLoadSuccess}
-              autoSaveToRubbish={autoSaveToRubbish}
+              onChange={(v) => autoSaveToRubbish(v)}
             />
           </Col>
           <Col md={6} xs={24}>
@@ -569,7 +568,6 @@ const ArticleEdit = () => {
                   />
                 </Card>
               </Col>
-
               <Col span={24}>
                 <Card size="small" title={getRes().digest}>
                   <Form.Item style={{ marginBottom: 0 }} name="digest">

@@ -3,7 +3,7 @@ import AsyncDarkApp from "./DarkApp";
 import AsyncLightApp from "./LightApp";
 
 const ThemeIndex = () => {
-    return EnvUtils.isDarkMode() ? <AsyncDarkApp/> : <AsyncLightApp/>;
-}
+  return EnvUtils.isDarkMode() ? <AsyncDarkApp /> : <AsyncLightApp />;
+};
 
 export default ThemeIndex;
