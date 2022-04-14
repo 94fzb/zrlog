@@ -1,7 +1,4 @@
 {
-  "parserOptions": {
-    "warnOnUnsupportedTypeScriptVersion": false
-  },
   "root": true,
   "extends": [
     "eslint:recommended",
