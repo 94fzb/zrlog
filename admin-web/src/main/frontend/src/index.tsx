@@ -8,12 +8,12 @@ import ThemeIndex from "./theme-index";
 import Constants from "./utils/constants";
 
 ReactDOM.render(
-  <ConfigProvider locale={zh_CN}>
-    <Router history={Constants.getHistory()}>
-      <ThemeIndex />
-    </Router>
-  </ConfigProvider>,
-  document.getElementById("root")
+    <ConfigProvider locale={zh_CN}>
+        <Router history={Constants.getHistory()}>
+            <ThemeIndex />
+        </Router>
+    </ConfigProvider>,
+    document.getElementById("root")
 );
 
 // If you want your app to work offline and load faster, you can change

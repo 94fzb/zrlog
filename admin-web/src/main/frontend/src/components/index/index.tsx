@@ -8,27 +8,23 @@ import ServerInfo from "./ServerInfo";
 import StatisticsInfo from "./StatisticsInfo";
 
 const Index = () => {
-  return (
-    <>
-      <Title className="page-header" level={3}>
-        {getRes().dashboard}{" "}
-      </Title>
-      <Divider />
-      <Alert
-        message={getRes()["admin.index.welcomeTips"]}
-        type="info"
-        showIcon
-      />
-      <Row gutter={[8, 8]} style={{ paddingTop: "20px" }}>
-        <Col xs={24} md={14}>
-          <ServerInfo />
-        </Col>
-        <Col xs={24} md={10}>
-          <StatisticsInfo />
-        </Col>
-      </Row>
-    </>
-  );
+    return (
+        <>
+            <Title className="page-header" level={3}>
+                {getRes().dashboard}{" "}
+            </Title>
+            <Divider />
+            <Alert message={getRes()["admin.index.welcomeTips"]} type="info" showIcon />
+            <Row gutter={[8, 8]} style={{ paddingTop: "20px" }}>
+                <Col xs={24} md={14}>
+                    <ServerInfo />
+                </Col>
+                <Col xs={24} md={10}>
+                    <StatisticsInfo />
+                </Col>
+            </Row>
+        </>
+    );
 };
 
 export default Index;

@@ -9,57 +9,57 @@ import { getRes } from "../utils/constants";
 import axios from "axios";
 
 const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
+    labelCol: { span: 8 },
+    wrapperCol: { span: 16 },
 };
 
 const UserUpdatePassword = () => {
-  const onFinish = (allValues: Record<string, any>) => {
-    axios.post("/api/admin/user/updatePassword", allValues).then(({ data }) => {
-      if (data.error) {
-        message.error(data.message).then(() => {
-          //ignore
+    const onFinish = (allValues: Record<string, any>) => {
+        axios.post("/api/admin/user/updatePassword", allValues).then(({ data }) => {
+            if (data.error) {
+                message.error(data.message).then(() => {
+                    //ignore
+                });
+            } else {
+                message.success(data.message).then(() => {
+                    //ignore
+                });
+            }
         });
-      } else {
-        message.success(data.message).then(() => {
-          //ignore
-        });
-      }
-    });
-  };
+    };
 
-  return (
-    <>
-      <Title className="page-header" level={3}>
-        {getRes()["admin.changePwd"]}
-      </Title>
-      <Divider />
-      <Row>
-        <Col md={12} xs={24}>
-          <Form {...layout} onFinish={(value) => onFinish(value)}>
-            <Form.Item
-              name="oldPassword"
-              label={getRes()["admin.oldPassword"]}
-              rules={[{ required: true }]}
-            >
-              <Input.Password />
-            </Form.Item>
-            <Form.Item
-              name="newPassword"
-              label={getRes()["admin.newPassword"]}
-              rules={[{ required: true }]}
-            >
-              <Input.Password />
-            </Form.Item>
+    return (
+        <>
+            <Title className="page-header" level={3}>
+                {getRes()["admin.changePwd"]}
+            </Title>
             <Divider />
-            <Button type="primary" htmlType="submit">
-              {getRes().submit}
-            </Button>
-          </Form>
-        </Col>
-      </Row>
-    </>
-  );
+            <Row>
+                <Col md={12} xs={24}>
+                    <Form {...layout} onFinish={(value) => onFinish(value)}>
+                        <Form.Item
+                            name="oldPassword"
+                            label={getRes()["admin.oldPassword"]}
+                            rules={[{ required: true }]}
+                        >
+                            <Input.Password />
+                        </Form.Item>
+                        <Form.Item
+                            name="newPassword"
+                            label={getRes()["admin.newPassword"]}
+                            rules={[{ required: true }]}
+                        >
+                            <Input.Password />
+                        </Form.Item>
+                        <Divider />
+                        <Button type="primary" htmlType="submit">
+                            {getRes().submit}
+                        </Button>
+                    </Form>
+                </Col>
+            </Row>
+        </>
+    );
 };
 
 export default UserUpdatePassword;
