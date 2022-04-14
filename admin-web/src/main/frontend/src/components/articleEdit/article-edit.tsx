@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { CameraOutlined, EyeOutlined, SaveOutlined, SendOutlined } from "@ant-design/icons";
-import { Button, Input, Modal, Radio } from "antd";
+import { Button, FormInstance, Input, Modal, Radio } from "antd";
 import Form from "antd/es/form";
 import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
@@ -70,7 +70,7 @@ const ArticleEdit = () => {
         savedVersion: 0,
     });
 
-    const articleForm = useRef(null);
+    const articleForm = useRef<FormInstance>(null);
 
     const rubbish = (preview: boolean) => {
         onSubmit(articleState, false, false, preview);
@@ -315,7 +315,16 @@ const ArticleEdit = () => {
         window.onbeforeunload = null;
     };
 
-    const save = (article: ArticleEntry) => {
+    const save = async (article: ArticleEntry) => {
+        if (articleForm.current === undefined || articleForm.current === null) {
+            return;
+        }
+        try {
+            await articleForm.current.validateFields();
+        } catch (e) {
+            console.error(e);
+            return;
+        }
         //如果正在保存，尝试1s后再检查下
         if (savingState.rubbishSaving || savingState.releaseSaving || savingState.previewIng) {
             setTimeout(() => {
@@ -326,7 +335,7 @@ const ArticleEdit = () => {
         if (article.version < articleState.version) {
             return;
         }
-        onSubmit(article, false, false, true);
+        await onSubmit(article, false, false, true);
     };
 
     if (state.globalLoading || articleState.version < 0) {
