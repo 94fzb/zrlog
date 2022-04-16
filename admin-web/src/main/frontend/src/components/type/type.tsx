@@ -12,16 +12,19 @@ const Type = () => {
                 title: "分类名称",
                 dataIndex: "typeName",
                 key: "typeName",
+                width: 240,
             },
             {
                 title: "别名",
                 dataIndex: "alias",
                 key: "alias",
+                width: 120,
             },
             {
                 title: "介绍",
                 key: "remark",
                 dataIndex: "remark",
+                width: 240,
             },
         ];
     };
