@@ -21,8 +21,6 @@ import ArticleEditTag from "./article-edit-tag";
 import axios from "axios";
 import { UploadChangeParam } from "antd/es/upload";
 
-const md5 = require("md5");
-
 export type ArticleEntry = ChangedContent & {
     keywords: string;
     rubbish?: boolean;
@@ -44,7 +42,6 @@ type ArticleEditState = {
 
 type ArticleSavingState = {
     rubbishSaving: boolean;
-    savedVersion: number;
     previewIng: boolean;
     releaseSaving: boolean;
 };
@@ -67,7 +64,6 @@ const ArticleEdit = () => {
         previewIng: false,
         releaseSaving: false,
         rubbishSaving: false,
-        savedVersion: 0,
     });
 
     const articleForm = useRef<FormInstance>(null);
@@ -95,6 +91,7 @@ const ArticleEdit = () => {
                         message.error(data.message);
                         return;
                     }
+                    setArticleState(data.data);
                     setState({
                         ...state,
                         globalLoading: false,
@@ -102,7 +99,6 @@ const ArticleEdit = () => {
                         types: nDate.data.types,
                         tags: nDate.data.tags,
                     });
-                    setArticleState(data.data);
                     (document.getElementById("version") as HTMLInputElement).value = data.data.version;
                 });
             } else {
@@ -118,13 +114,6 @@ const ArticleEdit = () => {
         });
     }, []);
 
-    const getCurrentSignVersion = (allValues: ArticleEntry | undefined) => {
-        const signObj = JSON.parse(JSON.stringify(allValues));
-        //version会改变随着保存，所以不参与变更检查
-        delete signObj.version;
-        return md5(JSON.stringify(signObj));
-    };
-
     const getVersion = () => {
         return Number((document.getElementById("version") as HTMLInputElement).value);
     };
@@ -139,11 +128,6 @@ const ArticleEdit = () => {
             uri = "/api/admin/article/create";
         } else {
             uri = "/api/admin/article/update";
-        }
-        const currentVersion = getCurrentSignVersion(allValues);
-        //自动保存模式下，没有变化
-        if (autoSave && currentVersion === savingState.savedVersion) {
-            return;
         }
         if (release) {
             setSavingState({
@@ -163,6 +147,10 @@ const ArticleEdit = () => {
                 .post(uri, allValues)
                 .then(({ data }) => {
                     if (data.error) {
+                        if (data.error === 9094) {
+                            console.warn("Save error ", data);
+                            return;
+                        }
                         Modal.error({
                             title: "保存失败",
                             content: data.message,
@@ -182,59 +170,41 @@ const ArticleEdit = () => {
                         }
                     }
                     const respData = data.data;
-                    //当前文本已经存在了，就不用服务器端的覆盖了
-                    if (allValues!.alias && allValues!.alias !== "") {
-                        delete respData.alias;
-                    }
-                    if (allValues!.digest && allValues!.digest !== "") {
-                        delete respData.digest;
-                    }
                     (document.getElementById("version") as HTMLInputElement).value = respData.version;
                     allValues = { ...allValues, ...respData };
                     setArticleState(allValues);
-                    setSavingState({
-                        ...savingState,
-                        savedVersion: currentVersion,
-                    });
                     if (create) {
                         const url = new URL(window.location.href);
-                        url.searchParams.set("id", data.data.logId);
+                        url.searchParams.set("id", respData.logId);
                         window.history.replaceState(null, "", url.toString());
+                        //@ts-ignore
+                        articleForm.current.setFieldsValue({
+                            alias: respData.alias,
+                            digest: respData.digest,
+                            logId: respData.logId,
+                        });
                     }
                 })
                 .catch((e) => {
-                    let msg;
-                    if (e.error) {
-                        if (e.error === 9094) {
-                            console.warn("Save error ", e);
-                            return;
-                        }
-                        msg = e.message;
-                    } else {
-                        msg = e.toString();
-                    }
-
                     Modal.error({
                         title: "保存失败",
-                        content: msg,
+                        content: e.toString(),
                         okText: "确认",
                     });
                 });
         } finally {
-            setTimeout(() => {
-                if (release) {
-                    setSavingState({
-                        ...savingState,
-                        releaseSaving: false,
-                    });
-                } else {
-                    setSavingState({
-                        ...savingState,
-                        rubbishSaving: false,
-                        previewIng: preview,
-                    });
-                }
-            }, 500);
+            if (release) {
+                setSavingState({
+                    ...savingState,
+                    releaseSaving: false,
+                });
+            } else {
+                setSavingState({
+                    ...savingState,
+                    rubbishSaving: false,
+                    previewIng: preview,
+                });
+            }
         }
     };
 
@@ -266,7 +236,6 @@ const ArticleEdit = () => {
     const onUploadChange = async (info: UploadChangeParam) => {
         const { status } = info.file;
         if (status === "done") {
-            //message.success(`${info.file.name} file uploaded successfully.`);
             setThumbnailHeight(info.file.response.data.url);
             await save({ ...articleState, thumbnail: info.file.response.data.url });
         } else if (status === "error") {
@@ -315,27 +284,31 @@ const ArticleEdit = () => {
         window.onbeforeunload = null;
     };
 
-    const save = async (article: ArticleEntry) => {
+    const save = async (article: ArticleEntry | ChangedContent) => {
         if (articleForm.current === undefined || articleForm.current === null) {
             return;
         }
         try {
             await articleForm.current.validateFields();
         } catch (e) {
-            console.error(e);
-            return;
+            // @ts-ignore
+            if (e.errorFields.length > 0) {
+                console.error(e);
+                return;
+            }
         }
+        const newArticle: ArticleEntry = { ...articleForm.current.getFieldsValue(), ...article };
         //如果正在保存，尝试1s后再检查下
         if (savingState.rubbishSaving || savingState.releaseSaving || savingState.previewIng) {
             setTimeout(() => {
-                save(article);
+                save(newArticle);
             }, 1000);
             return;
         }
-        if (article.version < articleState.version) {
+        if (newArticle.version < getVersion()) {
             return;
         }
-        await onSubmit(article, false, false, true);
+        await onSubmit(newArticle, false, false, true);
     };
 
     if (state.globalLoading || articleState.version < 0) {
@@ -343,43 +316,32 @@ const ArticleEdit = () => {
     }
 
     const editorLoadSuccess = () => {
-        //setState({...state, editorInitSuccess: true})
+        //setState({ ...state, editorInitSuccess: true });
     };
 
     return (
         <>
+            <input hidden={true} id={"version"} />
             <Title className="page-header" level={3}>
                 {getRes()["admin.log.edit"] + (articleState!.rubbish ? "-当前为草稿" : "")}
             </Title>
             <Divider />
-            <input hidden={true} id={"version"} />
             <Form
                 ref={articleForm}
-                onValuesChange={(cv) => save({ ...articleState, ...cv })}
+                onValuesChange={(_key, cv) => save(cv)}
                 initialValues={articleState}
                 onFinish={() => onSubmit(articleState, true, false, false)}
             >
                 <Form.Item name="logId" style={{ display: "none" }}>
                     <Input hidden={true} />
                 </Form.Item>
-                <Form.Item name="thumbnail" style={{ display: "none" }}>
-                    <Input hidden={true} />
-                </Form.Item>
-                <Form.Item name="rubbish" style={{ display: "none" }}>
-                    <Input hidden={true} />
-                </Form.Item>
-                <Form.Item name="markdown" style={{ display: "none" }}>
-                    <Input hidden={true} />
-                </Form.Item>
-                <Form.Item name="content" style={{ display: "none" }}>
-                    <Input hidden={true} />
-                </Form.Item>
+
                 <Row gutter={[8, 8]} style={{ paddingBottom: "5px" }}>
                     <Col md={14} xxl={18} sm={6} span={0} />
                     <Col xxl={2} md={4} sm={6} className={state.fullScreen ? "saveToRubbish-btn-full-screen" : ""}>
                         <Button
                             type={state.fullScreen ? "default" : "ghost"}
-                            block={true}
+                            style={{ width: "100%" }}
                             loading={savingState.rubbishSaving}
                             onClick={() => rubbish(false)}
                         >
@@ -391,7 +353,7 @@ const ArticleEdit = () => {
                         <Button
                             type="ghost"
                             loading={savingState.rubbishSaving && savingState.previewIng}
-                            block={true}
+                            style={{ width: "100%" }}
                             onClick={() => rubbish(true)}
                         >
                             <EyeOutlined />
@@ -403,7 +365,7 @@ const ArticleEdit = () => {
                             id="save"
                             type="primary"
                             loading={savingState.releaseSaving}
-                            block={true}
+                            style={{ width: "100%" }}
                             htmlType="submit"
                         >
                             <SendOutlined />
@@ -433,9 +395,9 @@ const ArticleEdit = () => {
                         <MyEditorMdWrapper
                             onfullscreen={onfullscreen}
                             onfullscreenExit={onfullscreenExit}
-                            markdown={articleState!.markdown}
+                            markdown={articleState.markdown}
                             loadSuccess={editorLoadSuccess}
-                            onChange={(v) => save({ ...articleState, ...v })}
+                            onChange={(v) => save(v)}
                         />
                     </Col>
                     <Col md={6} xs={24}>

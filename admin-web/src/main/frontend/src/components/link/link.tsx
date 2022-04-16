@@ -4,6 +4,7 @@ import BaseTable from "../../common/BaseTable";
 import { getRes } from "../../utils/constants";
 import EditLink from "./edit_link";
 import AddLink from "./add_link";
+import { Tooltip } from "antd";
 
 const BLink = () => {
     const getColumns = () => {
@@ -12,9 +13,12 @@ const BLink = () => {
                 title: "链接",
                 dataIndex: "url",
                 key: "url",
+                width: 240,
                 render: (url: string) => (
                     <a style={{ display: "inline" }} rel="noopener noreferrer" target={"_blank"} href={url}>
-                        <div style={{ display: "inline" }} dangerouslySetInnerHTML={{ __html: url }} />
+                        <Tooltip placement="topLeft" title={url}>
+                            <div style={{ display: "inline" }} dangerouslySetInnerHTML={{ __html: url }} />
+                        </Tooltip>
                     </a>
                 ),
             },
@@ -22,16 +26,19 @@ const BLink = () => {
                 title: "网站名称",
                 key: "linkName",
                 dataIndex: "linkName",
+                width: 240,
             },
             {
                 title: "描述",
                 key: "alt",
                 dataIndex: "alt",
+                width: 240,
             },
             {
                 title: "排序",
                 key: "sort",
                 dataIndex: "sort",
+                width: 60,
             },
         ];
     };
