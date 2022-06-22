@@ -1,16 +1,15 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import ReactDOM from "react-dom";
+import "./index.css";
+import * as serviceWorker from "./serviceWorker";
 import zh_CN from "antd/es/locale/zh_CN";
 import {ConfigProvider} from "antd";
+import ThemeIndex from "./theme-index";
 
 ReactDOM.render(
     <ConfigProvider locale={zh_CN}>
-        <App/>
+        <ThemeIndex/>
     </ConfigProvider>,
-    document.getElementById('root')
+    document.getElementById("root")
 );
 
 // If you want your app to work offline and load faster, you can change
