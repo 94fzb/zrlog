@@ -17,6 +17,7 @@ public class BlogApiPublicController extends Controller {
         return new CommonService().installResourceInfo(getRequest());
     }
 
+    @Deprecated
     public Map<String, Boolean> installed() {
         Map<String, Boolean> result = new HashMap<>();
         result.put("installed", InstallUtils.isInstalled());

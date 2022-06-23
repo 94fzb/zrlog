@@ -1,16 +1,15 @@
 package com.zrlog.business.exception;
 
 import com.zrlog.common.exception.AbstractBusinessException;
-import com.zrlog.util.I18nUtil;
 
-public class InstalledException extends AbstractBusinessException {
+public class MissingDbPortException extends AbstractBusinessException {
     @Override
     public int getError() {
-        return 9020;
+        return 9022;
     }
 
     @Override
     public String getMessage() {
-        return I18nUtil.getInstallStringFromRes("installedTips");
+        return "数据库端口不能为空";
     }
 }

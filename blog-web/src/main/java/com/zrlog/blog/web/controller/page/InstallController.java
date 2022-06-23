@@ -1,15 +1,20 @@
 package com.zrlog.blog.web.controller.page;
 
+import com.google.gson.Gson;
 import com.hibegin.common.util.IOUtil;
 import com.jfinal.core.Controller;
 import com.jfinal.kit.PathKit;
 import com.jfinal.render.HtmlRender;
+import com.zrlog.business.service.CommonService;
+import com.zrlog.common.Constants;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * 与安装向导相关的路由进行控制
@@ -32,7 +37,13 @@ public class InstallController extends Controller {
             return;
         }
         Document document = Jsoup.parse(IOUtil.getStringInputStream(new FileInputStream(file)));
+        //clean history
+        document.body().removeClass("dark");
+        document.body().removeClass("light");
         document.selectFirst("base").attr("href", getRequest().getContextPath() + "/");
+        Map<String, Object> stringObjectMap = new CommonService().installResourceInfo(getRequest());
+        Objects.requireNonNull(document.getElementById("resourceInfo")).text(new Gson().toJson(stringObjectMap));
+        document.title(String.valueOf(stringObjectMap.get("installWizard")));
         render(new HtmlRender(document.html()));
     }
 }

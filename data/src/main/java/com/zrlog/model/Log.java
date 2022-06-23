@@ -11,6 +11,8 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -168,12 +170,19 @@ public class Log extends Model<Log> implements Serializable {
     }
 
     public Map<String, Long> getArchives() {
-        List<Timestamp> lo =
+        List<Object> lo =
                 Db.query("select  releaseTime from " + TABLE_NAME + "  where rubbish=? and privacy=? " + "order by " + "releaseTime desc", false, false);
         Map<String, Long> archives = new LinkedHashMap<>();
-        for (Timestamp objects : lo) {
+        for (Object objects : lo) {
             if (objects != null) {
-                String key = new SimpleDateFormat("yyyy_MM").format(new Date(objects.getTime()));
+                String key;
+                if (objects instanceof LocalDateTime) {
+                    key = ((LocalDateTime) objects).format(DateTimeFormatter.ofPattern("yyyy_MM"));
+                } else if (objects instanceof Timestamp) {
+                    key = new SimpleDateFormat("yyyy_MM").format(new Date(((Timestamp) objects).getTime()));
+                } else {
+                    key = "";
+                }
                 if (archives.containsKey(key)) {
                     archives.put(key, archives.get(key) + 1);
                 } else {

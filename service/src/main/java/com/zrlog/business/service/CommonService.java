@@ -1,5 +1,6 @@
 package com.zrlog.business.service;
 
+import com.zrlog.business.util.InstallUtils;
 import com.zrlog.common.Constants;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.I18nUtil;
@@ -34,6 +35,7 @@ public class CommonService {
         if (System.getProperty("file.encoding").toLowerCase().contains("utf")) {
             stringObjectMap.put("utfTips", "");
         }
+        stringObjectMap.put("installed", InstallUtils.isInstalled());
         return stringObjectMap;
     }
 }
