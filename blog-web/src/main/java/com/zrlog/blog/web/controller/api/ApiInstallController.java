@@ -1,9 +1,10 @@
 package com.zrlog.blog.web.controller.api;
 
+import com.hibegin.common.util.StringUtils;
 import com.jfinal.core.Controller;
 import com.jfinal.core.JFinal;
 import com.jfinal.kit.PathKit;
-import com.zrlog.business.exception.InstallException;
+import com.zrlog.business.exception.*;
 import com.zrlog.business.service.InstallAction;
 import com.zrlog.business.service.InstallService;
 import com.zrlog.business.type.TestConnectDbResult;
@@ -32,12 +33,25 @@ public class ApiInstallController extends Controller {
     }
 
     private Map<String, String> getDbConn() {
+        if (StringUtils.isEmpty(getPara("dbHost"))) {
+            throw new MissingDbHostException();
+        }
+        if (StringUtils.isEmpty(getPara("dbPort"))) {
+            throw new MissingDbPortException();
+        }
+        if (StringUtils.isEmpty(getPara("dbUserName"))) {
+            throw new MissingDbUserNameException();
+        }
+        if (StringUtils.isEmpty(getPara("dbName"))) {
+            throw new MissingDbNameException();
+        }
         Map<String, String> dbConn = new HashMap<>();
         dbConn.put("jdbcUrl", "jdbc:mysql://" + getPara("dbHost") + ":" + getPara("dbPort") + "/" + getPara("dbName")
                 + "?" + JDBC_URL_BASE_QUERY_PARAM);
         dbConn.put("user", getPara("dbUserName"));
         dbConn.put("password", getPara("dbPassword"));
         dbConn.put("driverClass", "com.mysql.cj.jdbc.Driver");
+
         return dbConn;
     }
 
