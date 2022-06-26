@@ -3,7 +3,7 @@ import Divider from "antd/es/divider";
 import Form from "antd/es/form";
 import Input from "antd/es/input";
 import Switch from "antd/es/switch";
-import { getRes, resourceKey } from "../../utils/constants";
+import { getRes, removeRes } from "../../utils/constants";
 import Select from "antd/es/select";
 import Button from "antd/es/button";
 import { useEffect, useState } from "react";
@@ -24,7 +24,7 @@ const BlogForm = () => {
         axios.post("/api/admin/website/blog", changedValues).then(({ data }) => {
             if (!data.error) {
                 message.info(data.message).then(() => {
-                    sessionStorage.removeItem(resourceKey);
+                    removeRes();
                     window.location.reload();
                 });
             }

@@ -6,8 +6,9 @@ import { message } from "antd/es";
 import Title from "antd/es/typography/Title";
 import "./login.less";
 import Row from "antd/es/grid/row";
-import Constants, { getRes } from "../../utils/constants";
+import { getRes } from "../../utils/constants";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const md5 = require("md5");
 
@@ -29,6 +30,8 @@ const Login = () => {
         userName: "",
         password: "",
     });
+
+    const navigate = useNavigate();
 
     const setValue = (value: LoginState) => {
         setLoginState(value);
@@ -56,10 +59,10 @@ const Login = () => {
                         if (jumpTo.startsWith(new URL(document.baseURI).pathname + "admin/plugins/download")) {
                             window.location.href = jumpTo;
                         } else {
-                            Constants.getHistory().push(jumpTo);
+                            navigate(jumpTo);
                         }
                     } else {
-                        Constants.getHistory().push("./index");
+                        navigate("/index");
                     }
                 }
             })

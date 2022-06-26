@@ -1,7 +1,7 @@
 import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
 import Button from "antd/es/button";
-import Constants, { getRes, resourceKey } from "../../utils/constants";
+import { getRes, removeRes } from "../../utils/constants";
 import Form from "antd/es/form";
 import Select from "antd/es/select";
 import Switch from "antd/es/switch";
@@ -9,6 +9,7 @@ import Divider from "antd/es/divider";
 import { message, Modal } from "antd";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const layout = {
     labelCol: { span: 8 },
@@ -28,11 +29,13 @@ const UpgradeSettingForm = () => {
         upgradePreview: false,
     });
 
+    const navigate = useNavigate();
+
     const websiteFormFinish = (changedValues: any) => {
         axios.post("/api/admin/website/upgrade", changedValues).then(({ data }) => {
             if (!data.error) {
                 message.info(data.message).then(() => {
-                    sessionStorage.removeItem(resourceKey);
+                    removeRes();
                     window.location.reload();
                 });
             }
@@ -80,7 +83,7 @@ const UpgradeSettingForm = () => {
                         closable: true,
                         okText: "去更新",
                         onOk: function () {
-                            Constants.getHistory().push("./upgrade");
+                            navigate("/upgrade");
                         },
                     });
                 } else {

@@ -14,7 +14,7 @@ import {
     UserOutlined,
 } from "@ant-design/icons";
 import { Badge, Col, Layout, Menu, Row, Spin, Typography } from "antd";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 import Button from "antd/es/button";
 import Dropdown from "antd/es/dropdown";
@@ -22,26 +22,13 @@ import Divider from "antd/es/divider";
 import Image from "antd/es/image";
 import AdminLoginedRouter from "../routers/admin-logined-router";
 import Constants, { getRes } from "../utils/constants";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import axios from "axios";
 import "./index-layout.less";
 
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
 const { Text } = Typography;
-
-function getDefaultOpenKeys() {
-    if (
-        window.location.pathname === "./link" ||
-        window.location.pathname === "./nav" ||
-        window.location.pathname === "./blog/type"
-    ) {
-        return "more";
-    }
-    return "";
-}
-
-const defaultOpenKeys = getDefaultOpenKeys();
 
 type BasicInfo = {
     userName: string;
@@ -97,7 +84,7 @@ const IndexLayout = () => {
         return (
             <Menu className="userInfoMenu">
                 <Menu.Item key="0" hidden={!layoutState.upgrade}>
-                    <Link to="./upgrade">
+                    <Link to="/upgrade">
                         <Badge dot={layoutState.upgrade}>
                             <SoundOutlined />
                             <Text style={{ paddingLeft: "12px" }}>
@@ -107,13 +94,13 @@ const IndexLayout = () => {
                     </Link>
                 </Menu.Item>
                 <Menu.Item key="2">
-                    <Link to="./user">
+                    <Link to="/user">
                         <UserOutlined />
                         <Text style={{ paddingLeft: "5px" }}>{res["admin.user.info"]}</Text>
                     </Link>
                 </Menu.Item>
                 <Menu.Item key="1">
-                    <Link to="./user-update-password">
+                    <Link to="/user-update-password">
                         <KeyOutlined />
                         <Text style={{ paddingLeft: "5px" }}>{res["admin.changePwd"]}</Text>
                     </Link>
@@ -129,13 +116,20 @@ const IndexLayout = () => {
         );
     };
 
-    const getSelectKey = () => {
-        return "." + window.location.pathname.substring(window.location.pathname.lastIndexOf("/"));
-    };
+    const [selectMenu, setSelectMenu] = useState<string>("");
 
     if (layoutState.basicInfoLoading) {
         return <Spin style={{ height: "100vh" }} />;
     }
+
+    const location = useLocation();
+    useLayoutEffect(() => {
+        if (location.pathname === "") {
+            setSelectMenu("index");
+            return;
+        }
+        setSelectMenu(location.pathname);
+    }, [location]);
 
     return (
         <>
@@ -186,44 +180,39 @@ const IndexLayout = () => {
                 <Row>
                     <Col style={{ minHeight: "100vh" }} id="sider">
                         <Sider width={70} style={{ minHeight: "100vh" }}>
-                            <Menu
-                                defaultOpenKeys={[defaultOpenKeys]}
-                                selectedKeys={[getSelectKey()]}
-                                defaultSelectedKeys={[getSelectKey()]}
-                                mode="vertical"
-                            >
-                                <Menu.Item key="./index">
-                                    <Link to="./index">
+                            <Menu selectedKeys={[selectMenu]} mode="vertical">
+                                <Menu.Item key="/index">
+                                    <Link to="/index">
                                         <DashboardOutlined />
                                         <span className="menu-title">{getRes().dashboard}</span>
                                     </Link>
                                 </Menu.Item>
-                                <Menu.Item key="./article-edit">
-                                    <Link to="./article-edit">
+                                <Menu.Item key="/article-edit">
+                                    <Link to="/article-edit">
                                         <FormOutlined />
                                         <span className="menu-title">{getRes()["admin.log.edit"]}</span>
                                     </Link>
                                 </Menu.Item>
-                                <Menu.Item key="./article">
-                                    <Link to="./article">
+                                <Menu.Item key="/article">
+                                    <Link to="/article">
                                         <ContainerOutlined />
                                         <span className="menu-title">{getRes()["blogManage"]}</span>
                                     </Link>
                                 </Menu.Item>
-                                <Menu.Item key="./comment">
-                                    <Link to="./comment">
+                                <Menu.Item key="/comment">
+                                    <Link to="/comment">
                                         <CommentOutlined />
                                         <span className="menu-title">{getRes()["admin.comment.manage"]}</span>
                                     </Link>
                                 </Menu.Item>
-                                <Menu.Item key="./plugin">
-                                    <Link to="./plugin">
+                                <Menu.Item key="/plugin">
+                                    <Link to="/plugin">
                                         <ApiOutlined />
                                         <span className="menu-title">{getRes()["admin.plugin.manage"]}</span>
                                     </Link>
                                 </Menu.Item>
-                                <Menu.Item key="./website">
-                                    <Link to="./website">
+                                <Menu.Item key="/website">
+                                    <Link to="/website">
                                         <SettingOutlined />
                                         <span className="menu-title">{getRes()["admin.setting"]}</span>
                                     </Link>
@@ -234,18 +223,18 @@ const IndexLayout = () => {
                                     className="menu-title"
                                     title={getRes()["admin.more"]}
                                 >
-                                    <Menu.Item style={{ width: 120 }} key="./article-type">
-                                        <Link to="./article-type">
+                                    <Menu.Item style={{ width: 120 }} key="/article-type">
+                                        <Link to="/article-type">
                                             <span>{getRes()["admin.type.manage"]}</span>
                                         </Link>
                                     </Menu.Item>
-                                    <Menu.Item style={{ width: 120 }} key="./link">
-                                        <Link to="./link">
+                                    <Menu.Item style={{ width: 120 }} key="/link">
+                                        <Link to="/link">
                                             <span>{getRes()["admin.link.manage"]}</span>
                                         </Link>
                                     </Menu.Item>
-                                    <Menu.Item style={{ width: 120 }} key="./nav">
-                                        <Link to="./nav">
+                                    <Menu.Item style={{ width: 120 }} key="/nav">
+                                        <Link to="/nav">
                                             <span>{getRes()["admin.nav.manage"]}</span>
                                         </Link>
                                     </Menu.Item>

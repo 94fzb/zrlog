@@ -3,7 +3,7 @@ import Divider from "antd/es/divider";
 import Form from "antd/es/form";
 import TextArea from "antd/es/input/TextArea";
 import Button from "antd/es/button";
-import { getRes, resourceKey } from "../../utils/constants";
+import { getRes, removeRes } from "../../utils/constants";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { message } from "antd";
@@ -20,7 +20,7 @@ const OtherForm = () => {
         axios.post("/api/admin/website/other", changedValues).then(({ data }) => {
             if (!data.error) {
                 message.info(data.message).then(() => {
-                    sessionStorage.removeItem(resourceKey);
+                    removeRes();
                     window.location.reload();
                 });
             }

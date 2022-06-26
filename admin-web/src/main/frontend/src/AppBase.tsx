@@ -3,9 +3,9 @@ import axios from "axios";
 import { Modal, Spin } from "antd";
 import EnvUtils from "./utils/env-utils";
 import { useEffect, useState } from "react";
-import { resourceKey } from "./utils/constants";
-import { Route, Switch } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import IndexLayout from "./layout/index-layout";
+import { getRes, setRes } from "./utils/constants";
 
 axios.defaults.baseURL = document.baseURI;
 axios.interceptors.response.use(
@@ -44,17 +44,18 @@ type AppState = {
 const AppBase = () => {
     const [appState, setAppState] = useState<AppState>({ resLoaded: false });
 
-    const handleRes = (data: Record<string, any>) => {
+    const handleRes = (data: Record<string, never>) => {
         EnvUtils.setTheme(data["admin_darkMode"] === true ? "dark" : "light");
+        // @ts-ignore
         data.copyrightTips =
             data.copyright + ' <a target="_blank" href="https://blog.zrlog.com/about?footer">ZrLog</a>';
-        window.sessionStorage.setItem(resourceKey, JSON.stringify(data));
+        setRes(data);
         setAppState({ resLoaded: true });
     };
 
     const initRes = () => {
-        const resourceData = window.sessionStorage.getItem(resourceKey);
-        if (resourceData === null) {
+        const resourceData = getRes();
+        if (resourceData === null || Object.keys(resourceData).length === 0) {
             const jsonStr = document.getElementById("resourceInfo")?.textContent;
             if (jsonStr && jsonStr !== "") {
                 handleRes(JSON.parse(jsonStr));
@@ -62,7 +63,7 @@ const AppBase = () => {
                 loadResourceFromServer();
             }
         } else {
-            handleRes(JSON.parse(resourceData));
+            handleRes(resourceData);
         }
     };
 
@@ -93,11 +94,10 @@ const AppBase = () => {
     }
 
     return (
-        <Switch>
-            <Route path="*/login" component={Login} />
-            <Route exact path="*" component={IndexLayout} />
-            <Route component={IndexLayout} />
-        </Switch>
+        <Routes>
+            <Route path={"login"} element={<Login />} />
+            <Route path={"*"} element={<IndexLayout />} />
+        </Routes>
     );
 };
 

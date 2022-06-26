@@ -1,17 +1,18 @@
 import ReactDOM from "react-dom";
 import "./index.css";
 import * as serviceWorker from "./serviceWorker";
-import { Router } from "react-router";
 import zh_CN from "antd/es/locale/zh_CN";
 import { ConfigProvider } from "antd";
 import ThemeIndex from "./theme-index";
-import Constants from "./utils/constants";
+import { BrowserRouter } from "react-router-dom";
+
+export const basePath = "/admin/";
 
 ReactDOM.render(
     <ConfigProvider locale={zh_CN}>
-        <Router history={Constants.getHistory()}>
+        <BrowserRouter basename={basePath}>
             <ThemeIndex />
-        </Router>
+        </BrowserRouter>
     </ConfigProvider>,
     document.getElementById("root")
 );

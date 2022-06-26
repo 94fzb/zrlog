@@ -70,7 +70,7 @@ const Template = () => {
             <div onClick={() => preview(template.template)}>
                 <EyeOutlined key="preview" />
             </div>,
-            <Link to={"./template-config?template=" + template.template}>
+            <Link to={"/template-config?template=" + template.template}>
                 <SettingOutlined key="setting" />
             </Link>,
             <div onClick={() => apply(template.template)}>
@@ -127,7 +127,7 @@ const Template = () => {
                 })}
             </Row>
             <Divider />
-            <Link to="./template-center">
+            <Link to="/template-center">
                 <Button type={"primary"}>{getRes()["admin.theme.download"]}</Button>
             </Link>
         </>

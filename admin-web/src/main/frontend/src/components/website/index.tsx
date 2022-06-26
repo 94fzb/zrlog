@@ -4,19 +4,22 @@ import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
 import Divider from "antd/es/divider";
 import Index from "../template";
-import Constants, { getRes } from "../../utils/constants";
+import { getRes } from "../../utils/constants";
 import BlogForm from "./BlogForm";
 import BasicForm from "./BasicForm";
 import OtherForm from "./OtherForm";
 import UpgradeSettingForm from "./UpgradeSettingForm";
+import { useNavigate } from "react-router-dom";
 
 const { TabPane } = Tabs;
 
 const activeKey = window.location.hash !== "" ? window.location.hash.substr(1) : "basic";
 
 const WebSite = () => {
+    const navigate = useNavigate();
+
     const handleTabClick = (key: string) => {
-        Constants.getHistory().push(`./website#${key}`);
+        navigate(`/website#${key}`);
     };
 
     return (

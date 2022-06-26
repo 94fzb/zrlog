@@ -1,12 +1,10 @@
-import UnknownErrorPage from "./unknown-error-page";
-
-export const MyLoadingComponent = ({ isLoading, error }: { isLoading: boolean; error: any }) => {
+export const MyLoadingComponent = ({ isLoading }: { isLoading: boolean }) => {
     if (isLoading) {
         return <div />;
-    } else if (error) {
+    } /*if (error) {
         console.error(error);
         return <UnknownErrorPage message={error.toString()} />;
-    } else {
+    } else */ else {
         return null;
     }
 };

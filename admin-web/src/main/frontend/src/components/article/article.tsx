@@ -128,7 +128,7 @@ const Article = () => {
             <BaseTable
                 columns={getColumns()}
                 editBtnRender={(id) => (
-                    <Link to={"./article-edit?id=" + id}>
+                    <Link to={"/article-edit?id=" + id}>
                         <EditOutlined />
                     </Link>
                 )}

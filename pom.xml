@@ -155,10 +155,11 @@
                 <plugin>
                     <groupId>com.github.eirslett</groupId>
                     <artifactId>frontend-maven-plugin</artifactId>
-                    <version>1.12.0</version>
+                    <version>1.12.1</version>
                     <configuration>
-                        <nodeVersion>v16.13.1</nodeVersion>
+                        <nodeVersion>v16.15.1</nodeVersion>
                         <yarnVersion>v1.22.18</yarnVersion>
+                        <npmVersion>8.11.0</npmVersion>
                         <workingDirectory>src/main/frontend</workingDirectory>
                         <installDirectory>target</installDirectory>
                         <nodeDownloadRoot>https://npmmirror.com/mirrors/node/</nodeDownloadRoot>

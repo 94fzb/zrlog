@@ -4,7 +4,7 @@ import Form from "antd/es/form";
 import Input from "antd/es/input";
 import TextArea from "antd/es/input/TextArea";
 import Button from "antd/es/button";
-import { getRes, resourceKey } from "../../utils/constants";
+import { getRes, removeRes } from "../../utils/constants";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { message } from "antd";
@@ -21,7 +21,7 @@ const BasicForm = () => {
         axios.post("/api/admin/website/basic", changedValues).then(({ data }) => {
             if (!data.error) {
                 message.info(data.message).then(() => {
-                    sessionStorage.removeItem(resourceKey);
+                    removeRes();
                     window.location.reload();
                 });
             }
