@@ -27,9 +27,11 @@ const formItemLayout = {
 
 type AppState = {
     current: number;
-    installed: false,
-    dataBaseInfo: Record<string, unknown>,
-    weblogInfo: Record<string, unknown>;
+    installed: boolean,
+    testConnecting: boolean,
+    installing: boolean
+    dataBaseInfo: Record<string, string | number>,
+    weblogInfo: Record<string, string | number>;
 }
 
 
@@ -38,6 +40,8 @@ const App = () => {
     const [state, setState] = useState<AppState>({
         current: 0,
         installed: false,
+        testConnecting: false,
+        installing: false,
         dataBaseInfo: {},
         weblogInfo: {},
     })
@@ -63,7 +67,7 @@ const App = () => {
     const formDataBaseInfoRef = useRef<FormInstance>(null);
     const formWeblogInfoRef = useRef<FormInstance>(null);
 
-    const setDatabaseValue = (changedValues: Record<string, unknown>, allValues: Record<string, unknown>) => {
+    const setDatabaseValue = (changedValues: Record<string, string | number>, allValues: Record<string, string | number>) => {
         if (formDataBaseInfoRef === undefined || formDataBaseInfoRef.current === undefined || formDataBaseInfoRef.current === null) {
             return;
         }
@@ -74,7 +78,7 @@ const App = () => {
         });
     }
 
-    const setWeblogValue = (changedValues: Record<string, unknown>, allValues: Record<string, unknown>) => {
+    const setWeblogValue = (changedValues: Record<string, string | number>, allValues: Record<string, string | number>) => {
         if (formWeblogInfoRef === undefined || formWeblogInfoRef.current === undefined || formWeblogInfoRef.current === null) {
             return;
         }
@@ -87,17 +91,18 @@ const App = () => {
 
     const next = () => {
         if (state.current === 0) {
-            // @ts-ignore
+            setState({...state, testConnecting: true})
             axios.get("/api/install/testDbConn?" + mapToQueryString(state.dataBaseInfo)).then(({data}) => {
                 if (!data.error) {
                     const current = state.current + 1;
-                    setState({...state, current: current});
+                    setState({...state, current: current, testConnecting: false});
                 } else {
                     message.error(data.message);
+                    setState({...state, testConnecting: false})
                 }
             })
         } else if (state.current === 1) {
-            // @ts-ignore
+            setState({...state, installing: true})
             axios.post("/api/install/startInstall", mapToQueryString({
                 ...state.dataBaseInfo,
                 ...state.weblogInfo
@@ -108,9 +113,10 @@ const App = () => {
             }).then(({data}) => {
                 if (!data.error) {
                     const current = state.current + 1;
-                    setState({...state, current: current});
+                    setState({...state, current: current, installing: false});
                 } else {
                     message.error(data.message);
+                    setState({...state, installing: false})
                 }
             })
         } else {
@@ -127,13 +133,13 @@ const App = () => {
 
     return (
         <Layout style={{height: "100vh", display: "flex", alignItems: "center"}}>
-            <Card title={getRes().installWizard} className='container'>
+            <Card title={getRes().installWizard} className='container' style={{marginTop: 32, marginBottom: 32}}>
                 {state.installed && (
                     <Title level={3} type={"danger"}
                            style={{textAlign: 'center'}}>{getRes().installedTips}</Title>
                 )}
                 {!state.installed && (
-                    <div>
+                    <>
                         {/*utf tips for some window env*/}
                         <div hidden={getRes()['utfTips'] === ''}>
                             <Alert type='error'
@@ -159,6 +165,8 @@ const App = () => {
                                             </li>
                                             <li><Text type="danger">{getRes().installWarn2}</Text>
                                             </li>
+                                            <li><Text type="danger">{getRes().installWarn3}</Text>
+                                            </li>
                                         </ul>
                                     </div>
                                     <Title level={4}>{getRes().installInputDbInfo}</Title>
@@ -172,7 +180,7 @@ const App = () => {
                                     </FormItem>
                                     <FormItem name='dbUserName' label={getRes().installDbUserName}
                                               rules={[{required: true}]}>
-                                        <Input placeholder='root'/>
+                                        <Input placeholder=''/>
                                     </FormItem>
                                     <FormItem name='dbPassword' label={getRes().installDbPassword}>
                                         <Input type='password'/>
@@ -216,24 +224,23 @@ const App = () => {
                             )}
                         </div>
                         <div className="steps-action" style={{paddingTop: '20px'}}>
-                            {state.current < getSteps().length - 1 && (
-                                <Button type="primary" onClick={() => next()}>
+                            {state.current === 0 && (
+                                <Button loading={state.testConnecting} type="primary" onClick={() => next()}>
                                     {getRes().installNextStep}
                                 </Button>
                             )}
-                            {state.current === getSteps().length - 1 && (
-                                <Button type="primary"
-                                        onClick={() => message.success(getRes().installSuccess)}>
-                                    {getRes().installDone}
-                                </Button>
-                            )}
-                            {state.current > 0 && (
-                                <Button style={{margin: '0 8px'}} onClick={() => prev()}>
-                                    {getRes().installPreviousStep}
-                                </Button>
+                            {state.current === 1 && (
+                                <>
+                                    <Button loading={state.installing} type="primary" onClick={() => next()}>
+                                        {getRes().installNextStep}
+                                    </Button>
+                                    <Button style={{margin: '0 8px'}} onClick={() => prev()}>
+                                        {getRes().installPreviousStep}
+                                    </Button>
+                                </>
                             )}
                         </div>
-                    </div>
+                    </>
                 )}
                 <Divider/>
                 <Title level={4} style={{textAlign: "center", marginTop: '20px'}}>
