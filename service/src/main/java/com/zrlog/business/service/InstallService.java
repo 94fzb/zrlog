@@ -106,6 +106,7 @@ public class InstallService {
 
     private Connection getConnection() throws ClassNotFoundException, SQLException {
         Class.forName(dbConn.get("driverClass"));
+        DriverManager.setLoginTimeout(20);
         return DriverManager.getConnection(dbConn.get("jdbcUrl"), dbConn.get("user"), dbConn.get("password"));
     }
 
