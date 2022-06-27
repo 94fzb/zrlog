@@ -119,10 +119,7 @@ const App = () => {
                     setState({...state, installing: false})
                 }
             })
-        } else {
-
         }
-
     }
 
     const prev = () => {
