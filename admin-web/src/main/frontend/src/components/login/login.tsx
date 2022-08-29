@@ -8,6 +8,7 @@ import "./login.less";
 import Row from "antd/es/grid/row";
 import Constants, { getRes } from "../../utils/constants";
 import axios from "axios";
+import { basePath } from "../../index";
 
 const md5 = require("md5");
 
@@ -59,7 +60,7 @@ const Login = () => {
                             Constants.getHistory().push(jumpTo);
                         }
                     } else {
-                        Constants.getHistory().push("./index");
+                        Constants.getHistory().push(basePath + "index");
                     }
                 }
             })

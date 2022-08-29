@@ -9,6 +9,7 @@ import BlogForm from "./BlogForm";
 import BasicForm from "./BasicForm";
 import OtherForm from "./OtherForm";
 import UpgradeSettingForm from "./UpgradeSettingForm";
+import { basePath } from "../../index";
 
 const { TabPane } = Tabs;
 
@@ -16,7 +17,7 @@ const activeKey = window.location.hash !== "" ? window.location.hash.substr(1) :
 
 const WebSite = () => {
     const handleTabClick = (key: string) => {
-        Constants.getHistory().push(`./website#${key}`);
+        Constants.getHistory().push(basePath + `website#${key}`);
     };
 
     return (

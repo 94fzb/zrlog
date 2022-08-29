@@ -4,7 +4,7 @@ import { Modal, Spin } from "antd";
 import EnvUtils from "./utils/env-utils";
 import { useEffect, useState } from "react";
 import { resourceKey } from "./utils/constants";
-import { Route, Switch } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import IndexLayout from "./layout/index-layout";
 
 axios.defaults.baseURL = document.baseURI;
@@ -93,11 +93,10 @@ const AppBase = () => {
     }
 
     return (
-        <Switch>
-            <Route path="*/login" component={Login} />
-            <Route exact path="*" component={IndexLayout} />
-            <Route component={IndexLayout} />
-        </Switch>
+        <Routes>
+            <Route path={"login"} element={<Login />} />
+            <Route path={"*"} element={<IndexLayout />} />
+        </Routes>
     );
 };
 

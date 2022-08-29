@@ -1,4 +1,4 @@
-import { FunctionComponent, useEffect, useState } from "react";
+import { FunctionComponent, ReactNode, useEffect, useState } from "react";
 import "./my-editormd.css";
 import $ from "jquery";
 import Spin from "antd/es/spin";
@@ -18,6 +18,12 @@ type MyEditorMdWrapperState = {
 export type ChangedContent = {
     content?: string;
     markdown?: string;
+};
+
+export type ScriptLoaderProps = {
+    asyncScriptOnLoad?: (() => void) | undefined;
+    isLoading: boolean;
+    error: ReactNode;
 };
 
 const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({
@@ -214,8 +220,8 @@ const MyEditorMdWrapper: FunctionComponent<MyEditorMdWrapperProps> = ({
     const [mdEditorScriptLoaded, setMdEditorScriptLoaded] = useState<boolean>(false);
 
     const EditMdAsyncScriptLoader = makeAsyncScriptLoader(
-        document.baseURI + "/admin/vendors/markdown/js/editormd.min.js"
-    )(MyLoadingComponent);
+        document.baseURI + "admin/vendors/markdown/js/editormd.min.js"
+    )(MyLoadingComponent) as unknown as FunctionComponent<ScriptLoaderProps>;
     if (mdEditorScriptLoaded) {
         return (
             <MyEditorMd
@@ -228,13 +234,15 @@ const MyEditorMdWrapper: FunctionComponent<MyEditorMdWrapperProps> = ({
         );
     }
     return (
-        <EditMdAsyncScriptLoader
-            asyncScriptOnLoad={() => {
-                setMdEditorScriptLoaded(true);
-            }}
-            isLoading={false}
-            error={undefined}
-        />
+        <>
+            <EditMdAsyncScriptLoader
+                asyncScriptOnLoad={() => {
+                    setMdEditorScriptLoaded(true);
+                }}
+                isLoading={false}
+                error={<></>}
+            />
+        </>
     );
 };
 

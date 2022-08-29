@@ -130,7 +130,9 @@ const IndexLayout = () => {
     };
 
     const getSelectKey = () => {
-        return "." + window.location.pathname.substring(window.location.pathname.lastIndexOf("/"));
+        const key = "." + window.location.pathname.substring(window.location.pathname.lastIndexOf("/"));
+        console.info(key);
+        return key;
     };
 
     if (layoutState.basicInfoLoading) {

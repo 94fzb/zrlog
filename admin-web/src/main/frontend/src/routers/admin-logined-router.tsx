@@ -1,4 +1,4 @@
-import { Route, Switch } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import Loadable from "react-loadable";
 import { MyLoadingComponent } from "../components/my-loading-component";
 
@@ -79,23 +79,23 @@ const AsyncUser = Loadable({
 
 const AdminLoginedRouter = () => {
     return (
-        <Switch>
-            <Route path="*/index" component={AsyncIndex} />
-            <Route path="*/article-edit" component={AsyncArticleEdit} />
-            <Route path="*/comment" component={AsyncComment} />
-            <Route path="*/plugin" component={AsyncPlugin} />
-            <Route path="*/website" component={AsyncWebSite} />
-            <Route path="*/article-type" component={AsyncType} />
-            <Route path="*/link" component={AsyncLink} />
-            <Route path="*/nav" component={AsyncNav} />
-            <Route path="*/article" component={AsyncArticle} />
-            <Route path="*/user" component={AsyncUser} />
-            <Route path="*/template-center" component={AsyncTemplateCenter} />
-            <Route path="*/user-update-password" component={AsyncUserUpdatePassword} />
-            <Route path="*/upgrade" component={AsyncUpgrade} />
-            <Route path="*/template-config" component={AsyncTemplateConfig} />
-            <Route component={AsyncNotFoundPage} />
-        </Switch>
+        <Routes>
+            <Route path="index" element={<AsyncIndex />} />
+            <Route path="article-edit" element={<AsyncArticleEdit />} />
+            <Route path="comment" element={<AsyncComment />} />
+            <Route path="plugin" element={<AsyncPlugin />} />
+            <Route path="website" element={<AsyncWebSite />} />
+            <Route path="article-type" element={<AsyncType />} />
+            <Route path="link" element={<AsyncLink />} />
+            <Route path="nav" element={<AsyncNav />} />
+            <Route path="article" element={<AsyncArticle />} />
+            <Route path="user" element={<AsyncUser />} />
+            <Route path="template-center" element={<AsyncTemplateCenter />} />
+            <Route path="user-update-password" element={<AsyncUserUpdatePassword />} />
+            <Route path="upgrade" element={<AsyncUpgrade />} />
+            <Route path="template-config" element={<AsyncTemplateConfig />} />
+            <Route element={<AsyncNotFoundPage />} />
+        </Routes>
     );
 };
 
