@@ -20,6 +20,6 @@ jobs:
           cache: 'maven'
       - name: Build with Maven
         run: |
-          mkdir -p /var/lib/jenkins/download
-          bash -e bin/build-final-package.sh release 正式版本 /var/lib/jenkins/download
-          bash shell/upload-bin.sh ${{ secrets.SECRET_ID }} ${{ secrets.SECRET_KEY }} ${{ secrets.BUCKET }} /var/lib/jenkins/download
+          mkdir -p /tmp/download
+          bash -e bin/build-final-package.sh release 正式版本 /tmp/download
+          bash shell/upload-bin.sh ${{ secrets.SECRET_ID }} ${{ secrets.SECRET_KEY }} ${{ secrets.BUCKET }} /tmp/download
