@@ -1,19 +1,22 @@
 package com.zrlog.admin.web.plugin;
 
 import com.hibegin.common.util.CmdUtil;
+import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.http.HttpUtil;
 import com.hibegin.common.util.http.handle.HttpFileHandle;
 import com.zrlog.common.Constants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class PluginCoreProcess {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PluginCoreProcess.class);
+    private static final Logger LOGGER = LoggerUtil.getLogger(PluginCoreProcess.class);
 
     /**
      * 插件服务的下载地址
@@ -44,7 +47,7 @@ public class PluginCoreProcess {
     public int pluginServerStart(final File pluginCoreFile, final String dbProperties, final String pluginJvmArgs,
                                  final String runtimePath, final String runTimeVersion) {
         canStart = true;
-        //简单处理，为了能在一个服务器上面启动多个Zrlog程序，使用Random端口的方式，（感兴趣可以算算概率）
+        //简单处理，为了能在一个服务器上面启动多个ZrLog程序，使用Random端口的方式，（感兴趣可以算算概率）
         final int randomServerPort = new Random().nextInt(10000) + 20000;
         final int randomMasterPort = randomServerPort + 20000;
         final int randomListenPort = randomServerPort + 30000;
@@ -79,7 +82,7 @@ public class PluginCoreProcess {
                                 try {
                                     Thread.sleep(1000);
                                 } catch (InterruptedException e) {
-                                    LOGGER.error("", e);
+                                    LOGGER.log(Level.SEVERE, "", e);
                                 }
                             }
                             if (!canStart) {
@@ -103,14 +106,14 @@ public class PluginCoreProcess {
                                     System.out.println(str);
                                 }
                             } catch (IOException e) {
-                                LOGGER.error("plugin output error", e);
+                                LOGGER.log(Level.SEVERE, "plugin output error", e);
                             }
                         }).start();
                     }
                 }.start();
             }
         } catch (Exception e) {
-            LOGGER.warn("start plugin exception ", e);
+            LOGGER.log(Level.WARNING, "start plugin exception ", e);
         }
         return randomServerPort;
 
@@ -122,15 +125,16 @@ public class PluginCoreProcess {
             String filePath = serverFileName.getParentFile().toString();
             try {
                 LOGGER.info("plugin-core.jar not exists will download from " + PLUGIN_CORE_DOWNLOAD_URL);
-                HttpUtil.getInstance().sendGetRequest(PLUGIN_CORE_DOWNLOAD_URL + "?_=" + System.currentTimeMillis(), new HashMap<>(), new HttpFileHandle(filePath), new HashMap<>());
-            } catch (IOException e) {
-                LOGGER.warn("download plugin core error", e);
+                HttpUtil.getInstance().sendGetRequest(PLUGIN_CORE_DOWNLOAD_URL + "?_=" + System.currentTimeMillis(),
+                        new HashMap<>(), new HttpFileHandle(filePath), Map.of("Cache-Control", "no-cache"));
+            } catch (IOException | URISyntaxException | InterruptedException e) {
+                LOGGER.log(Level.WARNING, "download plugin core error", e);
             }
         }
     }
 
     /**
-     * Zrlog异常终止后，停止对应的插件服务。
+     * ZrLog异常终止后，停止对应的插件服务。
      */
     private void registerShutdownHook() {
         Runtime rt = Runtime.getRuntime();

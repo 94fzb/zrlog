@@ -1,40 +1,35 @@
 package com.zrlog.web.inteceptor;
 
-import com.jfinal.aop.Interceptor;
-import com.jfinal.aop.Invocation;
-import com.jfinal.core.ActionException;
+import com.hibegin.http.server.api.HttpRequest;
+import com.hibegin.http.server.api.HttpResponse;
+import com.hibegin.http.server.api.Interceptor;
 import com.zrlog.admin.web.interceptor.AdminInterceptor;
-import com.zrlog.blog.web.handler.GlobalResourceHandler;
-import com.zrlog.blog.web.interceptor.VisitorInterceptor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.zrlog.blog.web.interceptor.BlogArticleInterceptor;
 
 /**
- * JFinal没有对应URI path的过滤的配置，于是需要手动通过URI path进行划分到不同的Interception。
+ * 没有对应URI path的过滤的配置，于是需要手动通过URI path进行划分到不同的Interception。
  */
 public class RouterInterceptor implements Interceptor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RouterInterceptor.class);
-
-    private final VisitorInterceptor visitorInterceptor = new VisitorInterceptor();
     private final AdminInterceptor adminInterceptor = new AdminInterceptor();
 
+    private final PluginInterceptor pluginInterceptor = new PluginInterceptor();
+
+    private final BlogArticleInterceptor blogArticleInterceptor = new BlogArticleInterceptor();
+
     @Override
-    public void intercept(Invocation invocation) {
-        try {
-            String actionKey = invocation.getActionKey();
-            //这样写一点页不优雅，路径少还好，多了就痛苦了
-            if (actionKey.startsWith("/admin") || actionKey.startsWith("/api/admin")) {
-                adminInterceptor.intercept(invocation);
-            } else {
-                visitorInterceptor.intercept(invocation);
-            }
-            GlobalResourceHandler.printUserTime("Router");
-        } catch (ActionException e) {
-            invocation.getController().renderError(e.getErrorCode());
-        } catch (Exception e) {
-            LOGGER.error("interceptor exception ", e);
-            invocation.getController().renderError(500);
+    public boolean doInterceptor(HttpRequest request, HttpResponse response) throws Exception {
+        String actionKey = request.getUri();
+        if (PluginInterceptor.pluginHandlerPaths.stream().anyMatch(actionKey::startsWith)) {
+            pluginInterceptor.doInterceptor(request, response);
+            return false;
         }
+        //这样写一点页不优雅，路径少还好，多了就痛苦了
+        if (actionKey.startsWith("/admin") || actionKey.startsWith("/api/admin")) {
+            adminInterceptor.doInterceptor(request, response);
+        } else {
+            blogArticleInterceptor.doInterceptor(request, response);
+        }
+        return true;
     }
 }

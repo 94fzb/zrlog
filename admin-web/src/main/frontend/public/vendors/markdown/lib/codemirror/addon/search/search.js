@@ -74,8 +74,7 @@
         if (isRE) {
             try {
                 query = new RegExp(isRE[1], isRE[2].indexOf("i") == -1 ? "" : "i");
-            }
-            catch (e) {
+            } catch (e) {
             } // Not a regular expression after all, do a string search
         }
         if (typeof query == "string" ? query == "" : query.test(""))

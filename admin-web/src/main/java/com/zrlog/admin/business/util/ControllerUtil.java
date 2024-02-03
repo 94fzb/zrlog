@@ -1,6 +1,6 @@
 package com.zrlog.admin.business.util;
 
-import com.jfinal.core.Controller;
+import com.hibegin.http.server.web.Controller;
 import com.zrlog.common.rest.request.PageRequest;
 
 public class ControllerUtil {
@@ -10,10 +10,9 @@ public class ControllerUtil {
      */
     public static PageRequest getPageRequest(Controller controller) {
         PageRequest pageRequest = new PageRequest();
-        pageRequest.setSize(controller.getParaToInt("size", 10));
-        pageRequest.setSort(controller.getPara("sidx"));
-        pageRequest.setOrder(controller.getPara("sord"));
-        pageRequest.setPage(controller.getParaToInt("page", 1));
+        pageRequest.setSize(controller.getRequest().getParaToInt("size"));
+        pageRequest.setSort(controller.getRequest().getParaToStr("sidx"));
+        pageRequest.setPage(controller.getRequest().getParaToInt("page"));
         return pageRequest;
     }
 }

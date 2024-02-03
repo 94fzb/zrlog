@@ -1,18 +1,19 @@
 package com.zrlog.admin.web.plugin;
 
 import com.hibegin.common.util.IOUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.hibegin.common.util.LoggerUtil;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * 处理由于未知原因插件异常停止后，还可以通过命令重新加载，保证插件的高可用。
  */
 class PluginGhostThread extends Thread {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PluginGhostThread.class);
+    private static final Logger LOGGER = LoggerUtil.getLogger(PluginGhostThread.class);
     private final int port;
     private final String host;
 
@@ -42,7 +43,7 @@ class PluginGhostThread extends Thread {
             }
             stop = true;
         } catch (IOException e) {
-            LOGGER.warn("plugin exception stop ", e);
+            LOGGER.log(Level.WARNING, "plugin exception stop ", e);
         }
     }
 

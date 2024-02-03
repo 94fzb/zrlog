@@ -1,34 +1,33 @@
 package com.zrlog.business.service;
 
 import com.hibegin.common.util.IOUtil;
+import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.SecurityUtils;
-import com.jfinal.core.JFinal;
 import com.zrlog.business.type.TestConnectDbResult;
+import com.zrlog.util.DbConnectUtils;
 import com.zrlog.common.Constants;
 import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ParseUtil;
-import com.zrlog.util.ZrLogUtil;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.net.ConnectException;
 import java.sql.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * 与安装向导相关的业务代码
  */
 public class InstallService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(InstallService.class);
+    private static final Logger LOGGER = LoggerUtil.getLogger(InstallService.class);
     private final String basePath;
     private Map<String, String> dbConn;
     private Map<String, String> configMsg;
@@ -48,6 +47,13 @@ public class InstallService {
         this.dbConn = dbConn;
     }
 
+    public static String renderMd(String md) {
+        Parser parser = Parser.builder().build();
+        Node document = parser.parse(md);
+        HtmlRenderer renderer = HtmlRenderer.builder().build();
+        return renderer.render(document);
+    }
+
     /**
      * 封装网站设置的数据数据，返回Map形式方便调用者进行遍历
      *
@@ -62,7 +68,7 @@ public class InstallService {
         map.put("title", webSite.get("title"));
         map.put("second_title", webSite.get("second_title"));
         map.put("language", I18nUtil.getCurrentLocale());
-        map.put(Constants.ZRLOG_SQL_VERSION_KEY, ZrLogUtil.getSqlVersion(basePath + "/update-sql"));
+        map.put(Constants.ZRLOG_SQL_VERSION_KEY, Constants.SQL_VERSION);
         return map;
     }
 
@@ -71,34 +77,32 @@ public class InstallService {
      */
     public TestConnectDbResult testDbConn() {
         TestConnectDbResult testConnectDbResult;
-        try {
-            Connection connection = getConnection();
-            connection.close();
+        Properties properties = new Properties();
+        properties.putAll(dbConn);
+        try (Connection connection = DbConnectUtils.getConnection(properties)) {
+            LOGGER.info("Db connect success " + connection.getCatalog());
             testConnectDbResult = TestConnectDbResult.SUCCESS;
         } catch (ClassNotFoundException e) {
-            LOGGER.error("", e);
+            LOGGER.log(Level.SEVERE, "", e);
             testConnectDbResult = TestConnectDbResult.MISSING_MYSQL_DRIVER;
+        } catch (SQLRecoverableException e) {
+            LOGGER.log(Level.SEVERE, "", e);
+            testConnectDbResult = TestConnectDbResult.CREATE_CONNECT_ERROR;
+        } catch (SQLSyntaxErrorException e) {
+            LOGGER.log(Level.SEVERE, "", e);
+            testConnectDbResult = TestConnectDbResult.DB_NOT_EXISTS;
         } catch (SQLException e) {
-            LOGGER.error("", e);
-            if (e.getCause() instanceof ConnectException) {
-                testConnectDbResult = TestConnectDbResult.CREATE_CONNECT_ERROR;
+            LOGGER.log(Level.SEVERE, "", e);
+            if (e.getMessage().contains("Access denied for user") && e.getMessage().contains("using password")) {
+                testConnectDbResult = TestConnectDbResult.USERNAME_OR_PASSWORD_ERROR;
             } else {
-                if (e.getMessage().contains("Access denied for user") || e.getMessage().contains("Unknown database")) {
-                    testConnectDbResult = TestConnectDbResult.DB_NOT_EXISTS;
-                } else {
-                    testConnectDbResult = TestConnectDbResult.USERNAME_OR_PASSWORD_ERROR;
-                }
+                testConnectDbResult = TestConnectDbResult.SQL_EXCEPTION_UNKNOWN;
             }
         } catch (Exception e) {
-            LOGGER.error("", e);
+            LOGGER.log(Level.SEVERE, "", e);
             testConnectDbResult = TestConnectDbResult.UNKNOWN;
         }
         return testConnectDbResult;
-    }
-
-    private Connection getConnection() throws ClassNotFoundException, SQLException {
-        Class.forName(dbConn.get("driverClass"));
-        return DriverManager.getConnection(dbConn.get("jdbcUrl"), dbConn.get("user"), dbConn.get("password"));
     }
 
     /**
@@ -124,7 +128,9 @@ public class InstallService {
     private boolean startInstall(Map<String, String> dbConn, Map<String, String> blogMsg, File lock) {
         Connection connect;
         try {
-            connect = getConnection();
+            Properties properties = new Properties();
+            properties.putAll(dbConn);
+            connect = DbConnectUtils.getConnection(properties);
         } catch (Exception e) {
             return false;
         }
@@ -169,23 +175,16 @@ public class InstallService {
             insertFirstArticle(connect);
             return true;
         } catch (Exception e) {
-            LOGGER.error("install error ", e);
+            LOGGER.log(Level.SEVERE, "install error ", e);
             lock.delete();
         } finally {
             try {
                 connect.close();
             } catch (SQLException e) {
-                LOGGER.error("install error ", e);
+                LOGGER.log(Level.SEVERE, "install error ", e);
             }
         }
         return false;
-    }
-
-    public static String renderMd(String md) {
-        Parser parser = Parser.builder().build();
-        Node document = parser.parse(md);
-        HtmlRenderer renderer = HtmlRenderer.builder().build();
-        return renderer.render(document);
     }
 
     private void insertFirstArticle(Connection connect) throws SQLException {
@@ -193,7 +192,7 @@ public class InstallService {
         try (PreparedStatement ps = connect.prepareStatement(insetLog)) {
             ps.setBoolean(1, true);
             String markdown = IOUtil.getStringInputStream(InstallService.class.getResourceAsStream("/init-blog/" + I18nUtil.getCurrentLocale() + ".md"));
-            markdown = markdown.replace("${basePath}", JFinal.me().getContextPath());
+            markdown = markdown.replace("${basePath}", "/");
             String content = renderMd(markdown);
             ps.setString(2, I18nUtil.getBlogStringFromRes("defaultType"));
             ps.setString(3, "hello-world");

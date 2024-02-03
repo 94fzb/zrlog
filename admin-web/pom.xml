@@ -5,7 +5,7 @@
     <parent>
         <artifactId>zrlog</artifactId>
         <groupId>com.zrlog</groupId>
-        <version>2.2.1</version>
+        <version>3.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>admin-web</artifactId>
@@ -18,16 +18,6 @@
         <dependency>
             <groupId>com.zrlog</groupId>
             <artifactId>admin-token</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.jfinal</groupId>
-            <artifactId>cos</artifactId>
-            <version>2020.4</version>
         </dependency>
         <dependency>
             <groupId>net.coobird</groupId>
@@ -70,35 +60,6 @@
                         <phase>generate-resources</phase>
                     </execution>
                 </executions>
-                <configuration>
-                    <nodeVersion>v15.4.0</nodeVersion>
-                    <yarnVersion>v1.22.10</yarnVersion>
-                    <workingDirectory>src/main/frontend</workingDirectory>
-                    <installDirectory>target</installDirectory>
-                    <nodeDownloadRoot>https://npm.taobao.org/mirrors/node/</nodeDownloadRoot>
-                    <yarnDownloadRoot>https://npm.taobao.org/mirrors/yarn/</yarnDownloadRoot>
-                    <npmRegistryURL>https://registry.npm.taobao.org</npmRegistryURL>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-clean-plugin</artifactId>
-                <version>3.1.0</version>
-                <executions>
-                    <execution>
-                        <id>clean</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>clean</goal>
-                        </goals>
-                        <configuration>
-                            <filesets>
-                                <fileset>
-                                    <directory>../web/src/main/webapp/admin</directory>
-                                </fileset>
-                            </filesets>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
@@ -106,12 +67,12 @@
                 <executions>
                     <execution>
                         <id>copy-resources</id>
-                        <phase>package</phase>
+                        <phase>prepare-package</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>../web/src/main/webapp/admin</outputDirectory>
+                            <outputDirectory>target/classes/admin</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>src/main/frontend/build</directory>

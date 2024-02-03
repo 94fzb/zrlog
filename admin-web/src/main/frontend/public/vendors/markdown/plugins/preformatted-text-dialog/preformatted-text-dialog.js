@@ -37,8 +37,7 @@
                 this.dialogShowMask(dialog);
                 this.dialogLockScreen();
                 dialog.show();
-            }
-            else {
+            } else {
                 var dialogContent = "<textarea placeholder=\"coding now....\" style=\"display:none;\">" + selection + "</textarea>";
 
                 dialog = this.createDialog({
@@ -134,8 +133,7 @@
                 cmEditor.on("change", function (cm) {
                     textarea.val(cm.getValue());
                 });
-            }
-            else {
+            } else {
                 cmEditor.setValue(cm.getSelection());
             }
         };
@@ -145,8 +143,7 @@
     // CommonJS/Node.js
     if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
         module.exports = factory;
-    }
-    else if (typeof define === "function")  // AMD/CMD/Sea.js
+    } else if (typeof define === "function")  // AMD/CMD/Sea.js
     {
         if (define.amd) { // for Require.js
 
@@ -160,8 +157,7 @@
                 factory(editormd);
             });
         }
-    }
-    else {
+    } else {
         factory(window.editormd);
     }
 

@@ -43,8 +43,7 @@
                     if (!matchLen) {
                         if (start == 0 && line.length == 0) {
                             match = undefined;
-                        }
-                        else if (start != doc.getLine(pos.line).length) {
+                        } else if (start != doc.getLine(pos.line).length) {
                             matchLen++;
                         }
                     }
@@ -151,8 +150,7 @@
                 if (reverse) {
                     if (!pos.line) return savePosAndFail(0);
                     pos = Pos(pos.line - 1, this.doc.getLine(pos.line - 1).length);
-                }
-                else {
+                } else {
                     var maxLine = this.doc.lineCount();
                     if (pos.line == maxLine - 1) return savePosAndFail(maxLine);
                     pos = Pos(pos.line + 1, 0);

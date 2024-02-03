@@ -1,19 +1,21 @@
 package com.zrlog.admin.web.plugin;
 
 import com.google.gson.Gson;
+import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.http.HttpUtil;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.Version;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.ZrLogUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * 定时检查是否有新的更新包可用，原则比较简单，比对服务器罪行buildId和war包的构建时间（与resources/build.properties对比）
@@ -21,7 +23,7 @@ import java.util.TimerTask;
  */
 class UpdateVersionTimerTask extends TimerTask {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UpdateVersionTimerTask.class);
+    private static final Logger LOGGER = LoggerUtil.getLogger(UpdateVersionTimerTask.class);
 
     private final boolean checkPreview;
     private Version version;
@@ -35,11 +37,11 @@ class UpdateVersionTimerTask extends TimerTask {
         try {
             this.version = fetchLastVersion(checkPreview);
         } catch (Exception e) {
-            LOGGER.error("", e);
+            LOGGER.log(Level.SEVERE, "", e);
         }
     }
 
-    Version fetchLastVersion(boolean ckPreview) throws IOException, ParseException {
+    Version fetchLastVersion(boolean ckPreview) throws IOException, ParseException, URISyntaxException, InterruptedException {
         String versionUrl;
         if (ckPreview) {
             versionUrl = Constants.ZRLOG_RESOURCE_DOWNLOAD_URL + "/preview/last.version.json";
@@ -62,7 +64,7 @@ class UpdateVersionTimerTask extends TimerTask {
         return null;
     }
 
-    private Version getVersion(String versionUrl) throws IOException {
+    private Version getVersion(String versionUrl) throws IOException, URISyntaxException, InterruptedException {
         String txtContent = HttpUtil.getInstance().getTextByUrl(versionUrl + "?_" + System.currentTimeMillis() + "&v=" + BlogBuildInfoUtil.getBuildId()).trim();
         Version tLastVersion = new Gson().fromJson(txtContent, Version.class);
         //手动设置对应ChangeLog

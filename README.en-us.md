@@ -1,8 +1,10 @@
-## ZrLog [![Build Status](https://travis-ci.org/94fzb/zrlog.svg?branch=master)](https://travis-ci.org/94fzb/zrlog) [![Apache License](http://img.shields.io/badge/license-apache2-orange.svg?style=flat)](http://www.apache.org/licenses/LICENSE-2.0)
+## ZrLog ![build-preview](https://github.com/94fzb/zrlog/actions/workflows/build-preview-packge.yml/badge.svg) ![build-release](https://github.com/94fzb/zrlog/actions/workflows/build-release-packge.yml/badge.svg) [![Apache License](http://img.shields.io/badge/license-apache2-orange.svg?style=flat)](http://www.apache.org/licenses/LICENSE-2.0)
 
 [Chinese](README.md) | [English](README.en-us.md)
 
-ZrLog is a blog/CMS program developed in Java. It is simple, easy to use, componentized, and has low memory footprint. Bring your own Markdown editor and let more focus on writing, rather than spending a lot of time learning the use of the program.
+ZrLog is a blog/CMS program developed in Java. It is simple, easy to use, componentized, and has low memory footprint.
+Bring your own Markdown editor and let more focus on writing, rather than spending a lot of time learning the use of the
+program.
 
 ### Homepage
 
@@ -17,8 +19,8 @@ ZrLog is a blog/CMS program developed in Java. It is simple, easy to use, compon
 ### Features
 
 1. Provide management of logs, categories, tags, and comments
-2. Support plugin mode [How to write a plugin](https://blog.zrlog.com/post/zrlog-plugin-dev)
-3. Highly customizable theme features [How to make a set of themes](https://blog.zrlog.com/post/make-theme-for-zrlog)
+2. Support plugin mode [How to write a plugin](https://blog.zrlog.com/zrlog-plugin-dev)
+3. Highly customizable theme features [How to make a set of themes](https://blog.zrlog.com/make-theme-for-zrlog)
 4. Support third party comment plugin
 5. Provide `editormd` mainstream rich text editor, basically meet the editing needs of administrators
 6. Page static, cache public data, faster access
@@ -31,19 +33,17 @@ ZrLog is a blog/CMS program developed in Java. It is simple, easy to use, compon
 
 - Start directly by embedding tomcat and find `com.zrlog.web.Application` to start with this `main()`
 - Start with Maven commands (without relying on any IDE)
-    - Windows uses `bin\mvn-tomcat-run.cmd`
-    - Unix uses `sh bin/mvn-tomcat-run.sh`
-- The way to configure the server is the same as other web applications (not recommended, the above method is less likely to cause problems)
+    - Windows uses `bin\mvn-run.cmd`
+    - Unix uses `sh bin/mvn-run.sh`
 
 ### Program installation
 
 - Deployment environment prerequisites
-    - 1.jre version >= 1.8
-    - 2.tomcat version >=8,jetty > 8
-    - 3.mysql
+    - 1.jre version >= 21
+    - 2.mysql
 - Data initialization
-    - 1.Download [latest war](https://dl.zrlog.com/release/zrlog.war) in the webapps directory of tomcat (change zrlog.war to ROOT.war to avoid entering the secondary directory)    
-    - 2.Visit http://host:port/zrlog/install
+    - 1.Download [latest zip](https://dl.zrlog.com/release/zrlog.zip) unzip, and run sh bin/run.sh or bin\run.bat (for windows)
+    - 2.Visit http://host:port/install
     - 3.Fill in the database, administrator information, complete the installation
 
 ### ChangeLog
@@ -57,16 +57,16 @@ ZrLog is a blog/CMS program developed in Java. It is simple, easy to use, compon
 * Username admin
 * Password 123456
 
-
 ### Getting help
 
 * QQ group 6399942
 * Mail xchun90@163.com
-* Have any questions about the program, welcome feedback [http://blog.zrlog.com/post/feedback](http://blog.zrlog.com/post/feedback)
+* Have any questions about the program, welcome
+  feedback [http://blog.zrlog.com/feedback](http://blog.zrlog.com/feedback)
 
 ### FAQ
 
-If you have some problems, you can go here to find [FAQ](https://blog.zrlog.com/post/faq-collect)
+If you have some problems, you can go here to find [FAQ](https://blog.zrlog.com/faq-collect)
 
 ### Thanks
 

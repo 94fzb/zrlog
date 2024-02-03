@@ -9,6 +9,7 @@ public class BlogWebSiteRequest {
     private String language;
     private String article_route;
     private Boolean admin_darkMode;
+    private String admin_color_primary;
 
     public Long getSession_timeout() {
         return session_timeout;
@@ -64,5 +65,13 @@ public class BlogWebSiteRequest {
 
     public void setAdmin_darkMode(Boolean admin_darkMode) {
         this.admin_darkMode = admin_darkMode;
+    }
+
+    public String getAdmin_color_primary() {
+        return admin_color_primary;
+    }
+
+    public void setAdmin_color_primary(String admin_color_primary) {
+        this.admin_color_primary = admin_color_primary;
     }
 }

@@ -95,8 +95,7 @@
                 this.dialogShowMask(dialog);
                 this.dialogLockScreen();
                 dialog.show();
-            }
-            else {
+            } else {
                 dialog = this.createDialog({
                     name: dialogName,
                     title: dialogLang.title,
@@ -186,8 +185,7 @@
     // CommonJS/Node.js
     if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
         module.exports = factory;
-    }
-    else if (typeof define === "function")  // AMD/CMD/Sea.js
+    } else if (typeof define === "function")  // AMD/CMD/Sea.js
     {
         if (define.amd) { // for Require.js
 
@@ -201,8 +199,7 @@
                 factory(editormd);
             });
         }
-    }
-    else {
+    } else {
         factory(window.editormd);
     }
 

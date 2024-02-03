@@ -1,51 +1,33 @@
 package com.zrlog.web;
 
+import com.hibegin.http.server.WebServerBuilder;
+import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.common.Constants;
-import org.apache.catalina.LifecycleException;
-import org.apache.catalina.startup.Tomcat;
+import com.zrlog.web.config.ZrLogConfig;
 
 import java.io.File;
+import java.net.URISyntaxException;
 
 public class Application {
 
-    public static void main(String[] args) throws LifecycleException {
-        String webappDirLocation;
-        if (Constants.IN_JAR) {
-            webappDirLocation = "webapp";
-        } else {
-            webappDirLocation = "src/main/webapp/";
+    public static void main(String[] args) throws URISyntaxException {
+        System.getProperties().put("java.util.logging.SimpleFormatter.format", "%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %4$s %5$s%6$s%n");
+        String programDir = new File(Application.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath();
+        //对应的开发模式
+        if (programDir.contains("web/target/class") || programDir.contains("web\\target\\class")) {
+            programDir = new File(programDir).getParentFile().getParentFile().getParent();
         }
-
-        Tomcat tomcat = new Tomcat();
-
-        String webPort = System.getenv("PORT");
-        if (webPort == null || webPort.isEmpty()) {
-            webPort = "8080";
+        if (programDir.endsWith(".jar")) {
+            programDir = new File(programDir).getParent();
         }
-
-        tomcat.setPort(Integer.parseInt(webPort));
-        tomcat.getConnector();
-
-        // Declare an alternative location for your "WEB-INF/classes" dir
-        // Servlet 3.0 annotation will work
-        File additionWebInfClasses;
-        if (Constants.IN_JAR) {
-            additionWebInfClasses = new File("");
-        } else {
-            additionWebInfClasses = new File("target/classes");
-        }
-
-        tomcat.setBaseDir(additionWebInfClasses.toString());
-        //idea的路径eclipse启动的路径有区别
-        if (!Constants.IN_JAR && !new File("").getAbsolutePath().endsWith(File.separator + "web")) {
-            webappDirLocation = "web/" + webappDirLocation;
-        }
-        String contextPath = System.getenv("contextPath");
-        if (contextPath == null || contextPath.trim().length() == 0) {
-            contextPath = "";
-        }
-        tomcat.addWebapp(contextPath, new File(webappDirLocation).getAbsolutePath());
-        tomcat.start();
-        tomcat.getServer().await();
+        PathUtil.setRootPath(programDir);
+        ZrLogConfig zrLogConfig = new ZrLogConfig();
+        Constants.installAction = zrLogConfig;
+        WebServerBuilder builder = new WebServerBuilder.Builder().config(zrLogConfig).build();
+        builder.addStartErrorHandle(() -> {
+            System.exit(-1);
+            return null;
+        });
+        builder.start();
     }
 }

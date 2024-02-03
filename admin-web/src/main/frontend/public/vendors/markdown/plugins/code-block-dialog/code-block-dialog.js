@@ -78,8 +78,7 @@
                 this.dialogShowMask(dialog);
                 this.dialogLockScreen();
                 dialog.show();
-            }
-            else {
+            } else {
                 var dialogHTML = "<div class=\"" + classPrefix + "code-toolbar\">" +
                     dialogLang.selectLabel + "<select><option selected=\"selected\" value=\"\">" + dialogLang.selectDefaultText + "</option></select>" +
                     "</div>" +
@@ -191,8 +190,7 @@
                 cmEditor.on("change", function (cm) {
                     textarea.val(cm.getValue());
                 });
-            }
-            else {
+            } else {
 
                 cmEditor.setValue(cm.getSelection());
             }
@@ -208,8 +206,7 @@
     // CommonJS/Node.js
     if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
         module.exports = factory;
-    }
-    else if (typeof define === "function")  // AMD/CMD/Sea.js
+    } else if (typeof define === "function")  // AMD/CMD/Sea.js
     {
         if (define.amd) { // for Require.js
 
@@ -223,8 +220,7 @@
                 factory(editormd);
             });
         }
-    }
-    else {
+    } else {
         factory(window.editormd);
     }
 

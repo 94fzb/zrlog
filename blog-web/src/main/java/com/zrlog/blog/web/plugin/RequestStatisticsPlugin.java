@@ -1,11 +1,11 @@
 package com.zrlog.blog.web.plugin;
 
+import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.StringUtils;
-import com.jfinal.plugin.IPlugin;
 import com.zrlog.common.Constants;
 import com.zrlog.model.Log;
+import com.zrlog.plugin.IPlugin;
 import com.zrlog.util.ZrLogUtil;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,6 +15,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
 
 public class RequestStatisticsPlugin implements IPlugin {
 
@@ -61,7 +62,7 @@ public class RequestStatisticsPlugin implements IPlugin {
                     }
                     requestInfoList.removeAll(removeList);
                 } catch (Exception e) {
-                    LoggerFactory.getLogger(RequestStatisticsPlugin.class).error("Save error", e);
+                    LoggerUtil.getLogger(RequestStatisticsPlugin.class).log(Level.SEVERE, "Save error", e);
                 } finally {
                     saveLock.unlock();
                 }

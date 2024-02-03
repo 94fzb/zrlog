@@ -8,9 +8,11 @@ import com.zrlog.model.Comment;
 import com.zrlog.model.Log;
 import com.zrlog.util.ParseUtil;
 import org.jsoup.Jsoup;
-import org.jsoup.safety.Whitelist;
+import org.jsoup.safety.Safelist;
 
+import java.sql.SQLException;
 import java.util.Date;
+import java.util.Map;
 
 public class CommentService {
 
@@ -21,16 +23,16 @@ public class CommentService {
         return m.matches();
     }
 
-    private boolean isAllowComment(int articleId) {
-        Log log = new Log().findByIdOrAlias(articleId);
-        return (log != null && log.getBoolean("canComment")) && Constants.isAllowComment();
+    private boolean isAllowComment(int articleId) throws SQLException {
+        Map<String, Object> log = new Log().findByIdOrAlias(articleId);
+        return (log != null && (Boolean) log.get("canComment")) && Constants.isAllowComment();
     }
 
-    public CreateCommentResponse save(CreateCommentRequest createCommentRequest) {
+    public CreateCommentResponse save(CreateCommentRequest createCommentRequest) throws SQLException {
         CreateCommentResponse createCommentResponse = new CreateCommentResponse();
         if (createCommentRequest.getLogId() != null && createCommentRequest.getComment() != null) {
             if (isAllowComment(Integer.parseInt(createCommentRequest.getLogId()))) {
-                String comment = Jsoup.clean(createCommentRequest.getComment(), Whitelist.basic());
+                String comment = Jsoup.clean(createCommentRequest.getComment(), Safelist.basic());
                 String email = createCommentRequest.getMail();
                 if (StringUtils.isNotEmpty(email) && !isValidEmailAddress(email)) {
                     throw new IllegalArgumentException(email + "not email address");
@@ -39,12 +41,12 @@ public class CommentService {
                 if (StringUtils.isEmpty(nickname)) {
                     throw new IllegalArgumentException("nickname not block");
                 }
-                nickname = Jsoup.clean(createCommentRequest.getUserName(), Whitelist.basic());
+                nickname = Jsoup.clean(createCommentRequest.getUserName(), Safelist.basic());
                 String userHome = createCommentRequest.getUserHome();
                 if (StringUtils.isNotEmpty(userHome)) {
-                    userHome = Jsoup.clean(createCommentRequest.getUserHome(), Whitelist.basic());
+                    userHome = Jsoup.clean(createCommentRequest.getUserHome(), Safelist.basic());
                 }
-                if (comment.length() > 0 && !ParseUtil.isGarbageComment(comment)) {
+                if (!comment.isEmpty() && !ParseUtil.isGarbageComment(comment)) {
                     new Comment().set("userHome", userHome)
                             .set("userMail", email)
                             .set("userIp", createCommentRequest.getIp())
@@ -57,9 +59,9 @@ public class CommentService {
                 }
             }
         }
-        Log log = new Log().findByIdOrAlias(createCommentRequest.getLogId());
+        Map<String, Object> log = new Log().findByIdOrAlias(createCommentRequest.getLogId());
         if (log != null) {
-            createCommentResponse.setAlias(log.getStr("alias"));
+            createCommentResponse.setAlias((String) log.get("alias"));
         }
         return createCommentResponse;
     }

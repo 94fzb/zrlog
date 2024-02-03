@@ -1,6 +1,5 @@
 package com.zrlog.util;
 
-import com.hibegin.common.util.StringUtils;
 import com.zrlog.common.Constants;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -8,10 +7,7 @@ import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 一些常见的转化的工具方法。
@@ -23,7 +19,7 @@ public class ParseUtil {
     }
 
     public static String autoDigest(String str, int size) {
-        if (StringUtils.isEmpty(str)) {
+        if (Objects.isNull(str) || str.trim().isEmpty()) {
             return str;
         }
         StringBuilder sb = new StringBuilder();
@@ -64,7 +60,7 @@ public class ParseUtil {
     }
 
     public static String removeHtmlElement(String str) {
-        if (StringUtils.isEmpty(str)) {
+        if (Objects.isNull(str) || str.trim().isEmpty()) {
             return str;
         }
         return Jsoup.parse(str).body().text();

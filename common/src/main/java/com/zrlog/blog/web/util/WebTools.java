@@ -1,14 +1,11 @@
 package com.zrlog.blog.web.util;
 
+import com.hibegin.http.server.api.HttpRequest;
+import com.hibegin.http.server.api.HttpResponse;
 import com.zrlog.common.Constants;
 import com.zrlog.common.exception.AdminAuthException;
 import com.zrlog.util.ZrLogUtil;
-import org.apache.http.conn.util.InetAddressUtils;
-import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -21,7 +18,7 @@ public class WebTools {
     /**
      * 处理由于浏览器使用透明代理，或者是WebServer运行在诸如 nginx/apache 这类 HttpServer后面的情况，通过获取请求头真实IP地址
      */
-    public static String getRealIp(HttpServletRequest request) {
+    public static String getRealIp(HttpRequest request) {
         String ip = null;
         //bae env
         if (ZrLogUtil.isBae() && request.getHeader("clientip") != null) {
@@ -40,24 +37,21 @@ public class WebTools {
             ip = request.getHeader("WL-Proxy-Client-IP");
         }
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
+            ip = request.getRemoteHost();
         }
-        if (InetAddressUtils.isIPv4Address(ip) || InetAddressUtils.isIPv6Address(ip)) {
-            return ip;
-        }
-        throw new IllegalArgumentException(ip + " not ipAddress");
+        return ip;
     }
 
-    public static String getHomeUrlWithHost(HttpServletRequest request) {
-        return "//" + request.getHeader("host") + request.getContextPath() + "/";
+    public static String getHomeUrlWithHost(HttpRequest request) {
+        return "//" + request.getHeader("host") + "/";
     }
 
-    public static String getHomeUrlWithHostNotProtocol(HttpServletRequest request) {
-        return request.getHeader("host") + request.getContextPath() + "/";
+    public static String getHomeUrlWithHostNotProtocol(HttpRequest request) {
+        return request.getHeader("host") + "/";
     }
 
-    public static String getHomeUrl(HttpServletRequest request) {
-        return request.getContextPath() + "/";
+    public static String getHomeUrl(HttpRequest request) {
+        return "/";
     }
 
     public static String htmlEncode(String source) {
@@ -107,36 +101,30 @@ public class WebTools {
         if (containsHanScript(param)) {
             return param;
         }
-        try {
-            return URLDecoder.decode(new String(param.getBytes(StandardCharsets.ISO_8859_1)), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            LoggerFactory.getLogger(WebTools.class).error("request convert to UTF-8 error ", e);
-        }
-        return "";
+        return URLDecoder.decode(new String(param.getBytes(StandardCharsets.ISO_8859_1)), StandardCharsets.UTF_8);
     }
 
 
-    public static void blockUnLoginRequestHandler(HttpServletRequest request, HttpServletResponse response) {
-        String actionKey = request.getRequestURI().substring(request.getContextPath().length());
+    public static void blockUnLoginRequestHandler(HttpRequest request, HttpResponse response) {
+        String actionKey = request.getUri();
         if (actionKey.startsWith("/api")) {
             throw new AdminAuthException();
         } else {
             try {
-                String url = request.getContextPath()
-                        + Constants.ADMIN_LOGIN_URI_PATH + "?redirectFrom="
+                String url = Constants.ADMIN_LOGIN_URI_PATH + "?redirectFrom="
                         + URLEncoder.encode(getRequestUriWithQueryString(request), "UTF-8");
-                response.sendRedirect(url);
+                response.redirect(url);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
     }
 
-    private static String getRequestUriWithQueryString(HttpServletRequest request) {
-        String realUri = request.getRequestURI();
-        if (request.getRequestURI().endsWith(Constants.ADMIN_URI_BASE_PATH)) {
+    private static String getRequestUriWithQueryString(HttpRequest request) {
+        String realUri = request.getUri();
+        if (request.getUri().endsWith(Constants.ADMIN_URI_BASE_PATH)) {
             realUri = realUri + Constants.INDEX_URI_PATH;
         }
-        return realUri + (request.getQueryString() != null ? "?" + request.getQueryString() : "");
+        return realUri + (request.getQueryStr() != null ? "?" + request.getQueryStr() : "");
     }
 }

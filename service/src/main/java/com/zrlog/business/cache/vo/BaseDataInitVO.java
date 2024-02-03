@@ -1,7 +1,5 @@
 package com.zrlog.business.cache.vo;
 
-import com.zrlog.model.*;
-
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -11,47 +9,47 @@ import java.util.Map;
  */
 public class BaseDataInitVO implements Serializable {
 
-    private List<Tag> tags;
-    private List<Type> types;
-    private List<Link> links;
-    private List<Plugin> plugins;
+    private List<Map<String, Object>> tags;
+    private List<Map<String, Object>> types;
+    private List<Map<String, Object>> links;
+    private List<Map<String, Object>> plugins;
     private Map<String, Long> archives;
     private List<Archive> archiveList;
     private Map<String, Object> webSite;
-    private List<Log> hotLogs;
-    private List<LogNav> logNavs;
-    private Map<Map<String, Object>, List<Log>> indexHotLogs;
+    private List<Map<String, Object>> hotLogs;
+    private List<Map<String, Object>> logNavs;
+    private Map<Map<String, Object>, List<Map<String, Object>>> indexHotLogs;
     private Statistics statistics;
 
-    public List<Tag> getTags() {
+    public List<Map<String, Object>> getTags() {
         return tags;
     }
 
-    public void setTags(List<Tag> tags) {
+    public void setTags(List<Map<String, Object>> tags) {
         this.tags = tags;
     }
 
-    public List<Type> getTypes() {
+    public List<Map<String, Object>> getTypes() {
         return types;
     }
 
-    public void setTypes(List<Type> types) {
+    public void setTypes(List<Map<String, Object>> types) {
         this.types = types;
     }
 
-    public List<Link> getLinks() {
+    public List<Map<String, Object>> getLinks() {
         return links;
     }
 
-    public void setLinks(List<Link> links) {
+    public void setLinks(List<Map<String, Object>> links) {
         this.links = links;
     }
 
-    public List<Plugin> getPlugins() {
+    public List<Map<String, Object>> getPlugins() {
         return plugins;
     }
 
-    public void setPlugins(List<Plugin> plugins) {
+    public void setPlugins(List<Map<String, Object>> plugins) {
         this.plugins = plugins;
     }
 
@@ -63,6 +61,14 @@ public class BaseDataInitVO implements Serializable {
         this.archives = archives;
     }
 
+    public List<Archive> getArchiveList() {
+        return archiveList;
+    }
+
+    public void setArchiveList(List<Archive> archiveList) {
+        this.archiveList = archiveList;
+    }
+
     public Map<String, Object> getWebSite() {
         return webSite;
     }
@@ -71,36 +77,28 @@ public class BaseDataInitVO implements Serializable {
         this.webSite = webSite;
     }
 
-    public List<Log> getHotLogs() {
+    public List<Map<String, Object>> getHotLogs() {
         return hotLogs;
     }
 
-    public void setHotLogs(List<Log> hotLogs) {
+    public void setHotLogs(List<Map<String, Object>> hotLogs) {
         this.hotLogs = hotLogs;
     }
 
-    public List<LogNav> getLogNavs() {
+    public List<Map<String, Object>> getLogNavs() {
         return logNavs;
     }
 
-    public void setLogNavs(List<LogNav> logNavs) {
+    public void setLogNavs(List<Map<String, Object>> logNavs) {
         this.logNavs = logNavs;
     }
 
-    public Map<Map<String, Object>, List<Log>> getIndexHotLogs() {
+    public Map<Map<String, Object>, List<Map<String, Object>>> getIndexHotLogs() {
         return indexHotLogs;
     }
 
-    public void setIndexHotLogs(Map<Map<String, Object>, List<Log>> indexHotLogs) {
+    public void setIndexHotLogs(Map<Map<String, Object>, List<Map<String, Object>>> indexHotLogs) {
         this.indexHotLogs = indexHotLogs;
-    }
-
-    public List<Archive> getArchiveList() {
-        return archiveList;
-    }
-
-    public void setArchiveList(List<Archive> archiveList) {
-        this.archiveList = archiveList;
     }
 
     public Statistics getStatistics() {
