@@ -35,8 +35,6 @@ export type ArticleEntry = ChangedContent &
     };
 
 type ArticleEditState = {
-    types: [];
-
     typeOptions: any[];
     tags: any[];
     rubbish: boolean;
@@ -136,7 +134,6 @@ const Index = () => {
         fullScreen: false,
         globalLoading: true,
         tags: [],
-        types: [],
         rubbish: false,
         article: {
             keywords: "",
@@ -574,6 +571,10 @@ const Index = () => {
                                 v.markdown === "" &&
                                 (state.article.markdown === "" || state.article.markdown === null)
                             ) {
+                                return;
+                            }
+                            //不检查 content，避免因为 markdown 渲染库升级，载入文章时自动更新为草稿
+                            if (v.markdown === state.article.markdown) {
                                 return;
                             }
                             setContent(v);
