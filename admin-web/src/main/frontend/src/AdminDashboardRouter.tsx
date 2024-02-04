@@ -42,7 +42,7 @@ const AdminDashboardRouter = () => {
 
     useEffect(() => {
         setData(getCsrData(location.pathname.replace("/admin/", "")));
-    }, [location]);
+    }, []);
 
     return (
         <Routes>
