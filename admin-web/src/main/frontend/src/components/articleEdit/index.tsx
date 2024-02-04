@@ -501,7 +501,6 @@ const Index = () => {
                 </Col>
                 <Col xxl={2} md={3} sm={4} className={state.fullScreen ? "save-btn-full-screen" : ""}>
                     <Button
-                        id="save"
                         type="primary"
                         loading={state.saving.releaseSaving}
                         style={{ width: "100%" }}
