@@ -4,10 +4,17 @@ import Alert from "antd/es/alert";
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
 import { getRes } from "../../utils/constants";
+
+import { FunctionComponent } from "react";
+import { IndexData } from "../../type";
 import ServerInfo from "./ServerInfo";
 import StatisticsInfo from "./StatisticsInfo";
 
-const Index = () => {
+type IndexProps = {
+    data: IndexData;
+};
+
+const Index: FunctionComponent<IndexProps> = ({ data }) => {
     return (
         <>
             <Title className="page-header" level={3}>
@@ -17,10 +24,10 @@ const Index = () => {
             <Alert message={getRes()["admin.index.welcomeTips"]} type="info" showIcon />
             <Row gutter={[8, 8]} style={{ paddingTop: "12px" }}>
                 <Col xs={24} md={14}>
-                    <ServerInfo />
+                    <ServerInfo data={data.serverInfo} />
                 </Col>
                 <Col xs={24} md={10}>
-                    <StatisticsInfo />
+                    <StatisticsInfo data={data.statisticsInfo} />
                 </Col>
             </Row>
         </>

@@ -1,5 +1,7 @@
 import { Route, Routes } from "react-router-dom";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
+import { useLocation } from "react-router";
+import { getCsrData } from "./api";
 
 const AsyncArticleEdit = lazy(() => import("components/articleEdit"));
 
@@ -34,15 +36,21 @@ const AsyncUser = lazy(() => import("components/user"));
 const AdminManageLayout = lazy(() => import("layout/index"));
 
 const AdminDashboardRouter = () => {
+    const [data, setData] = useState<any>(null);
+
+    const location = useLocation();
+
+    useEffect(() => {
+        setData(getCsrData(location.pathname.replace("/admin/", "")));
+    }, [location]);
+
     return (
         <Routes>
             <Route
                 path=""
                 element={
                     <AdminManageLayout>
-                        <Suspense>
-                            <AsyncIndex />
-                        </Suspense>
+                        <Suspense>{data && <AsyncIndex data={data} />}</Suspense>
                     </AdminManageLayout>
                 }
             />
@@ -50,9 +58,7 @@ const AdminDashboardRouter = () => {
                 path="index"
                 element={
                     <AdminManageLayout>
-                        <Suspense>
-                            <AsyncIndex />
-                        </Suspense>
+                        <Suspense>{data && <AsyncIndex data={data} />}</Suspense>
                     </AdminManageLayout>
                 }
             />

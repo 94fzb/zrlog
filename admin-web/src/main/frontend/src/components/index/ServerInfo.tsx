@@ -2,54 +2,42 @@ import { Card } from "antd";
 import { getRes } from "../../utils/constants";
 import Table from "antd/es/table";
 import DockerOutlined from "../../icons/DockerOutlined";
-import { useEffect, useState } from "react";
-import axios from "axios";
 
-type ServerInfoState = {
-    system: Record<string, any>[];
-    docker: boolean;
-    loading: boolean;
-};
-
-const ServerInfo = () => {
-    const [indexState, setIndexState] = useState<ServerInfoState>({
-        docker: false,
-        loading: true,
-        system: [
-            {
-                name: "运行环境",
-                value: "",
-            },
-            {
-                name: "容器信息",
-                value: "",
-            },
-            {
-                name: "运行路径",
-                value: "",
-            },
-            {
-                name: "操作系统",
-                value: "",
-            },
-            {
-                name: "系统时区 - 地域/语言",
-                value: "",
-            },
-            {
-                name: "数据库版本",
-                value: "",
-            },
-            {
-                name: "系统编码",
-                value: "",
-            },
-            {
-                name: "程序版本",
-                value: "",
-            },
-        ],
-    });
+const ServerInfo = ({ data }: { data: Record<string, any> }) => {
+    const system = [
+        {
+            name: "运行环境",
+            value: "",
+        },
+        {
+            name: "容器信息",
+            value: "",
+        },
+        {
+            name: "运行路径",
+            value: "",
+        },
+        {
+            name: "操作系统",
+            value: "",
+        },
+        {
+            name: "系统时区 - 地域/语言",
+            value: "",
+        },
+        {
+            name: "数据库版本",
+            value: "",
+        },
+        {
+            name: "系统编码",
+            value: "",
+        },
+        {
+            name: "程序版本",
+            value: "",
+        },
+    ];
 
     const getFixedColumns = () => {
         return [
@@ -68,7 +56,7 @@ const ServerInfo = () => {
                     if (r.name !== "运行环境") {
                         return e;
                     } else {
-                        if (indexState.docker) {
+                        if (data["docker"] === "docker") {
                             return (
                                 <>
                                     <DockerOutlined />
@@ -84,39 +72,21 @@ const ServerInfo = () => {
         ];
     };
 
-    useEffect(() => {
-        axios.get("/api/admin/serverInfo").then(({ data }) => {
-            const system = indexState.system;
-            system[0].value = data.data["java.vm.name"] + " - " + data.data["java.runtime.version"];
-            system[1].value = data.data["server.info"];
-            system[2].value = data.data["zrlog.runtime.path"];
-            system[3].value = data.data["os.name"] + " - " + data.data["os.arch"] + " - " + data.data["os.version"];
-            system[4].value =
-                data.data["user.timezone"] + " - " + data.data["user.country"] + "/" + data.data["user.language"];
-            system[5].value = data.data["dbServer.version"];
-            system[6].value = data.data["file.encoding"];
-            system[7].value =
-                data.data["zrlog.version"] +
-                " - " +
-                data.data["zrlog.buildId"] +
-                " (" +
-                data.data["zrlog.buildTime"] +
-                ")";
-            setIndexState({
-                ...indexState,
-                loading: false,
-                system: system,
-                docker: data.data["docker"] === "docker",
-            });
-        });
-    }, []);
+    system[0].value = data["java.vm.name"] + " - " + data["java.runtime.version"];
+    system[1].value = data["server.info"];
+    system[2].value = data["zrlog.runtime.path"];
+    system[3].value = data["os.name"] + " - " + data["os.arch"] + " - " + data["os.version"];
+    system[4].value = data["user.timezone"] + " - " + data["user.country"] + "/" + data["user.language"];
+    system[5].value = data["dbServer.version"];
+    system[6].value = data["file.encoding"];
+    system[7].value =
+        data.data["zrlog.version"] + " - " + data.data["zrlog.buildId"] + " (" + data.data["zrlog.buildTime"] + ")";
 
     return (
         <Card size={"small"} title={getRes()["serverInfo"]}>
             <Table
                 style={{ wordBreak: "break-all", whiteSpace: "unset" }}
                 size="small"
-                loading={{ spinning: indexState.loading, delay: 500 }}
                 columns={getFixedColumns()}
                 //@ts-ignore
                 dataSource={indexState.system}
