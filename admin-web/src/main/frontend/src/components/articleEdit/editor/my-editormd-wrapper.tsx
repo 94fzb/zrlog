@@ -2320,7 +2320,7 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({
                 <div
                     id={state.id}
                     className={EnvUtils.isDarkMode() ? "editor-dark" : "editor-light"}
-                    style={{ borderRadius: 8 }}
+                    style={{ borderRadius: 8, height: 1240 }}
                 />
             </Spin>
         </StyledEditor>
