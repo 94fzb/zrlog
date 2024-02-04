@@ -47,7 +47,7 @@ const AdminDashboardRouter = () => {
     return (
         <Routes>
             <Route
-                path=""
+                path={""}
                 element={
                     <AdminManageLayout>
                         <Suspense>{data && <AsyncIndex data={data} />}</Suspense>

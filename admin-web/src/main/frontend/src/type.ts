@@ -9,5 +9,5 @@ export type StatisticsInfoState = {
 
 export type IndexData = {
     serverInfo: Record<string, any>[],
-    statisticsInfo: Record<string, any>[]
+    statisticsInfo: StatisticsInfoState
 }
