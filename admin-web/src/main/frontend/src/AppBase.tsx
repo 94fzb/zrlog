@@ -58,7 +58,9 @@ const AppBase = () => {
 
     useEffect(() => {
         initAxios();
-        setData(getCsrData(location.pathname.replace("/admin/", "")));
+        getCsrData(location.pathname.replace("/admin/", "")).then((e) => {
+            setData(e);
+        });
     }, []);
 
     return (
