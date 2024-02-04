@@ -480,11 +480,7 @@ const Index = () => {
 
     return (
         <StyledArticleEdit>
-            <Form
-                ref={articleForm}
-                initialValues={state.article}
-                onFinish={() => onSubmit(state.article, true, false, false)}
-            >
+            <Form ref={articleForm} onFinish={() => onSubmit(state.article, true, false, false)}>
                 <Row gutter={[8, 8]} style={{ paddingTop: 20 }}>
                     <Col md={12} xxl={15} sm={6} span={24}>
                         <Title className="page-header" style={{ marginTop: 0, marginBottom: 0 }} level={3}>
@@ -533,7 +529,6 @@ const Index = () => {
                             <Form.Item
                                 label=""
                                 style={{ marginBottom: 8, minWidth: 156 }}
-                                name="typeId"
                                 rules={[
                                     {
                                         required: true,
@@ -542,6 +537,7 @@ const Index = () => {
                                 ]}
                             >
                                 <Select
+                                    defaultValue={state.article.typeId}
                                     showSearch={true}
                                     optionFilterProp="children"
                                     filterOption={(input, option) => (option?.label ?? "").includes(input)}
@@ -616,10 +612,10 @@ const Index = () => {
                                             <Form.Item
                                                 style={{ marginBottom: 0 }}
                                                 valuePropName="checked"
-                                                name="canComment"
                                                 label={getRes()["commentAble"]}
                                             >
                                                 <Switch
+                                                    defaultValue={state.article.canComment}
                                                     size="small"
                                                     onChange={async (checked) => {
                                                         await handleValuesChange({ canComment: checked });
@@ -631,10 +627,10 @@ const Index = () => {
                                             <Form.Item
                                                 style={{ marginBottom: 0 }}
                                                 valuePropName="checked"
-                                                name="privacy"
                                                 label={getRes()["private"]}
                                             >
                                                 <Switch
+                                                    defaultValue={state.article.privacy}
                                                     size="small"
                                                     onChange={async (checked) => {
                                                         await handleValuesChange({ privacy: checked });
