@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { EyeOutlined, SaveOutlined, SendOutlined } from "@ant-design/icons";
-import { App, Button, FormInstance, Space } from "antd";
-import Form from "antd/es/form";
+import { App, Button, Space } from "antd";
 import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
 import Divider from "antd/es/divider";
@@ -19,6 +18,7 @@ import Select from "antd/es/select";
 import ThumbnailUpload from "./thumbnail-upload";
 import BaseInput from "../../common/BaseInput";
 import BaseTextArea from "../../common/BaseTextArea";
+import Form from "antd/es/form";
 
 export type ArticleEntry = ChangedContent &
     ThumbnailChanged &
@@ -36,6 +36,8 @@ export type ArticleEntry = ChangedContent &
 
 type ArticleEditState = {
     types: [];
+    titleError: boolean;
+    typeError: boolean;
     typeOptions: any[];
     tags: any[];
     rubbish: boolean;
@@ -57,7 +59,7 @@ export type ThumbnailChanged = {
 };
 
 export type TitleChanged = {
-    title?: string;
+    title: string;
 };
 
 export type AliasChanged = {
@@ -129,12 +131,15 @@ const Index = () => {
         editorInitSuccess: false,
         fullScreen: false,
         globalLoading: true,
+        titleError: false,
+        typeError: false,
         tags: [],
         types: [],
         rubbish: false,
         article: {
             keywords: "",
             version: -1,
+            title: "",
         },
         saving: {
             previewIng: false,
@@ -146,7 +151,6 @@ const Index = () => {
     const [content, setContent] = useState<ChangedContent>({});
 
     const { message, modal } = App.useApp();
-    const articleForm = useRef<FormInstance>(null);
 
     useEffect(() => {
         axios.get("/api/admin/article/global").then(({ data }) => {
@@ -184,7 +188,7 @@ const Index = () => {
                         types: nDate.data.types,
                         tags: nDate.data.tags,
                         globalLoading: false,
-                        article: { keywords: "", version: 0, content: "", markdown: "" },
+                        article: { keywords: "", title: "", version: 0, content: "", markdown: "" },
                     };
                 });
                 articleVersion = 0;
@@ -372,9 +376,6 @@ const Index = () => {
     };
 
     const save = async (article: ArticleEntry) => {
-        if (articleForm.current === undefined || articleForm.current === null) {
-            return;
-        }
         //如果正在保存，尝试10ms后再检查下
         if (isSaving()) {
             setTimeout(() => {
@@ -398,21 +399,11 @@ const Index = () => {
         handleValuesChange(content).then();
     }, [content]);
 
-    const validForm = async (): Promise<boolean> => {
-        if (articleForm.current === undefined || articleForm.current === null) {
-            return false;
-        }
-        try {
-            await articleForm.current.validateFields();
-            return true;
-        } catch (e) {
-            // @ts-ignore
-            if (e.errorFields.length > 0) {
-                console.error(e);
-                return false;
-            }
-        }
-        return true;
+    const validForm = (): boolean => {
+        const titleError = state.article.title === "";
+        const typeError = state.article.typeId === undefined || state.article.typeId < 0;
+        setState({ ...state, titleError: titleError, typeError: typeError });
+        return !(titleError || typeError);
     };
 
     const handleValuesChange = async (
@@ -480,194 +471,181 @@ const Index = () => {
 
     return (
         <StyledArticleEdit>
-            <Form ref={articleForm} onFinish={() => onSubmit(state.article, true, false, false)}>
-                <Row gutter={[8, 8]} style={{ paddingTop: 20 }}>
-                    <Col md={12} xxl={15} sm={6} span={24}>
-                        <Title className="page-header" style={{ marginTop: 0, marginBottom: 0 }} level={3}>
-                            {getRes()["admin.log.edit"]}
-                        </Title>
-                    </Col>
-                    {getRubbishText()}
-                    <Col xxl={2} md={3} sm={4} className={state.fullScreen ? "saveToRubbish-btn-full-screen" : ""}>
-                        <Button
-                            type={state.fullScreen ? "default" : "dashed"}
-                            style={{ width: "100%" }}
-                            onClick={() => onSubmit(state.article, false, false, false)}
-                        >
-                            <SaveOutlined hidden={state.saving.rubbishSaving} />
-                            {state.saving.rubbishSaving ? getRes().saving : getRes().saveAsDraft}
-                        </Button>
-                    </Col>
-                    <Col xxl={2} md={3} sm={4}>
-                        <Button
-                            type="dashed"
-                            loading={state.saving.rubbishSaving && state.saving.previewIng}
-                            style={{ width: "100%" }}
-                            onClick={() => onSubmit(state.article, !state.rubbish, true, false)}
-                        >
-                            <EyeOutlined />
-                            {getRes().preview}
-                        </Button>
-                    </Col>
-                    <Col xxl={2} md={3} sm={4} className={state.fullScreen ? "save-btn-full-screen" : ""}>
-                        <Button
-                            id="save"
-                            type="primary"
-                            loading={state.saving.releaseSaving}
-                            style={{ width: "100%" }}
-                            htmlType="submit"
-                        >
-                            <SendOutlined />
-                            {getRes().release}
-                        </Button>
-                    </Col>
-                </Row>
-                <Divider />
-                <Row gutter={8}>
-                    <Col md={13} xs={24}>
-                        <Space.Compact style={{ display: "flex" }}>
-                            <Form.Item
-                                label=""
-                                style={{ marginBottom: 8, minWidth: 156 }}
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: "",
-                                    },
-                                ]}
-                            >
-                                <Select
-                                    defaultValue={state.article.typeId}
-                                    showSearch={true}
-                                    optionFilterProp="children"
-                                    filterOption={(input, option) => (option?.label ?? "").includes(input)}
-                                    filterSort={(optionA, optionB) =>
-                                        (optionA?.label ?? "")
-                                            .toLowerCase()
-                                            .localeCompare((optionB?.label ?? "").toLowerCase())
-                                    }
-                                    onChange={async (value) => {
-                                        await handleValuesChange({ typeId: value });
-                                    }}
-                                    options={state.typeOptions}
-                                    placeholder={"请选择" + getRes()["admin.type.manage"]}
-                                    style={{ width: "100%" }}
-                                />
-                            </Form.Item>
-                            <BaseInput
-                                name={"title"}
-                                placeholder={getRes().inputArticleTitle}
-                                required={true}
-                                defaultValue={state.article.title ? state.article.title : undefined}
-                                onChange={async (e) => {
-                                    await handleValuesChange({ title: e });
-                                }}
-                            />
-                        </Space.Compact>
-                    </Col>
-                    <Col md={5} xs={24}>
+            <Row gutter={[8, 8]} style={{ paddingTop: 20 }}>
+                <Col md={12} xxl={15} sm={6} span={24}>
+                    <Title className="page-header" style={{ marginTop: 0, marginBottom: 0 }} level={3}>
+                        {getRes()["admin.log.edit"]}
+                    </Title>
+                </Col>
+                {getRubbishText()}
+                <Col xxl={2} md={3} sm={4} className={state.fullScreen ? "saveToRubbish-btn-full-screen" : ""}>
+                    <Button
+                        type={state.fullScreen ? "default" : "dashed"}
+                        style={{ width: "100%" }}
+                        onClick={() => onSubmit(state.article, false, false, false)}
+                    >
+                        <SaveOutlined hidden={state.saving.rubbishSaving} />
+                        {state.saving.rubbishSaving ? getRes().saving : getRes().saveAsDraft}
+                    </Button>
+                </Col>
+                <Col xxl={2} md={3} sm={4}>
+                    <Button
+                        type="dashed"
+                        loading={state.saving.rubbishSaving && state.saving.previewIng}
+                        style={{ width: "100%" }}
+                        onClick={() => onSubmit(state.article, !state.rubbish, true, false)}
+                    >
+                        <EyeOutlined />
+                        {getRes().preview}
+                    </Button>
+                </Col>
+                <Col xxl={2} md={3} sm={4} className={state.fullScreen ? "save-btn-full-screen" : ""}>
+                    <Button
+                        id="save"
+                        type="primary"
+                        loading={state.saving.releaseSaving}
+                        style={{ width: "100%" }}
+                        onClick={async () => {
+                            await onSubmit(state.article, true, false, false);
+                        }}
+                    >
+                        <SendOutlined />
+                        {getRes().release}
+                    </Button>
+                </Col>
+            </Row>
+            <Divider />
+            <Row gutter={[8, 8]}>
+                <Col md={13} xs={24}>
+                    <Space.Compact style={{ display: "flex" }}>
+                        <Select
+                            style={{ minWidth: 156, width: "100%" }}
+                            status={state.typeError ? "error" : ""}
+                            defaultValue={state.article.typeId}
+                            showSearch={true}
+                            optionFilterProp="children"
+                            filterOption={(input, option) => (option?.label ?? "").includes(input)}
+                            filterSort={(optionA, optionB) =>
+                                (optionA?.label ?? "").toLowerCase().localeCompare((optionB?.label ?? "").toLowerCase())
+                            }
+                            onChange={async (value) => {
+                                await handleValuesChange({ typeId: value });
+                            }}
+                            options={state.typeOptions}
+                            placeholder={"请选择" + getRes()["admin.type.manage"]}
+                        />
                         <BaseInput
-                            defaultValue={state.article.alias}
+                            status={state.titleError ? "error" : ""}
+                            placeholder={getRes().inputArticleTitle}
+                            defaultValue={state.article.title ? state.article.title : undefined}
                             onChange={async (e) => {
-                                await handleValuesChange({ alias: e });
-                            }}
-                            addonBefore={getArticleRoute() + "/"}
-                            placeholder={getRes().inputArticleAlias}
-                        />
-                    </Col>
-                </Row>
-                <Row gutter={[8, 8]}>
-                    <Col md={18} sm={24} xs={24} style={{ zIndex: 10 }}>
-                        <MyEditorMdWrapper
-                            onfullscreen={onfullscreen}
-                            onfullscreenExit={onfullscreenExit}
-                            markdown={state.article.markdown}
-                            onChange={async (v) => {
-                                if (
-                                    v.markdown === "" &&
-                                    (state.article.markdown === "" || state.article.markdown === null)
-                                ) {
-                                    return;
-                                }
-                                setContent(v);
+                                await handleValuesChange({ title: e });
                             }}
                         />
-                    </Col>
-                    <Col md={6} sm={24} xs={24} style={{ cursor: isSaving() ? "none" : "inherit" }}>
-                        <Row gutter={[8, 8]}>
-                            <Col span={24}>
-                                <Card size="small" style={{ textAlign: "center" }}>
-                                    <ThumbnailUpload
-                                        thumbnail={state.article.thumbnail}
-                                        onChange={async (e) => {
-                                            await handleValuesChange({ thumbnail: e });
-                                        }}
-                                    />
-                                </Card>
-                            </Col>
-                            <Col span={24}>
-                                <Card size="small" title={getRes()["admin.setting"]}>
-                                    <Row>
-                                        <Col xs={24} md={12}>
-                                            <Form.Item
-                                                style={{ marginBottom: 0 }}
-                                                valuePropName="checked"
-                                                label={getRes()["commentAble"]}
-                                            >
-                                                <Switch
-                                                    defaultValue={state.article.canComment}
-                                                    size="small"
-                                                    onChange={async (checked) => {
-                                                        await handleValuesChange({ canComment: checked });
-                                                    }}
-                                                />
-                                            </Form.Item>
-                                        </Col>
-                                        <Col xs={24} md={12}>
-                                            <Form.Item
-                                                style={{ marginBottom: 0 }}
-                                                valuePropName="checked"
-                                                label={getRes()["private"]}
-                                            >
-                                                <Switch
-                                                    defaultValue={state.article.privacy}
-                                                    size="small"
-                                                    onChange={async (checked) => {
-                                                        await handleValuesChange({ privacy: checked });
-                                                    }}
-                                                />
-                                            </Form.Item>
-                                        </Col>
-                                    </Row>
-                                </Card>
-                            </Col>
-                            <Col span={24}>
-                                <Card size="small" title={getRes().tag}>
-                                    <ArticleEditTag
-                                        onKeywordsChange={async (text: string) => {
-                                            await handleValuesChange({ keywords: text });
-                                        }}
-                                        keywords={state.article!.keywords ? state.article.keywords : ""}
-                                        allTags={state.tags.map((x) => x.text)}
-                                    />
-                                </Card>
-                            </Col>
-                            <Col span={24}>
-                                <Card size="small" title={getRes().digest}>
-                                    <BaseTextArea
-                                        defaultValue={state.article.digest}
-                                        placeholder={getRes().digestTips}
-                                        rows={3}
-                                        onChange={async (text: string) => {
-                                            await handleValuesChange({ digest: text });
-                                        }}
-                                    />
-                                </Card>
-                            </Col>
-                        </Row>
-                    </Col>
-                </Row>
-            </Form>
+                    </Space.Compact>
+                </Col>
+                <Col md={5} xs={24}>
+                    <BaseInput
+                        defaultValue={state.article.alias}
+                        onChange={async (e) => {
+                            await handleValuesChange({ alias: e });
+                        }}
+                        addonBefore={getArticleRoute() + "/"}
+                        placeholder={getRes().inputArticleAlias}
+                    />
+                </Col>
+            </Row>
+            <Row gutter={[8, 8]}>
+                <Col md={18} sm={24} xs={24} style={{ zIndex: 10 }}>
+                    <MyEditorMdWrapper
+                        onfullscreen={onfullscreen}
+                        onfullscreenExit={onfullscreenExit}
+                        markdown={state.article.markdown}
+                        onChange={async (v) => {
+                            if (
+                                v.markdown === "" &&
+                                (state.article.markdown === "" || state.article.markdown === null)
+                            ) {
+                                return;
+                            }
+                            setContent(v);
+                        }}
+                    />
+                </Col>
+                <Col md={6} sm={24} xs={24} style={{ cursor: isSaving() ? "none" : "inherit" }}>
+                    <Row gutter={[8, 8]}>
+                        <Col span={24}>
+                            <Card size="small" style={{ textAlign: "center" }}>
+                                <ThumbnailUpload
+                                    thumbnail={state.article.thumbnail}
+                                    onChange={async (e) => {
+                                        await handleValuesChange({ thumbnail: e });
+                                    }}
+                                />
+                            </Card>
+                        </Col>
+                        <Col span={24}>
+                            <Card size="small" title={getRes()["admin.setting"]}>
+                                <Row>
+                                    <Col xs={24} md={12}>
+                                        <Form.Item
+                                            style={{ marginBottom: 0 }}
+                                            valuePropName="checked"
+                                            label={getRes()["commentAble"]}
+                                        >
+                                            <Switch
+                                                defaultValue={state.article.canComment}
+                                                size="small"
+                                                onChange={async (checked) => {
+                                                    await handleValuesChange({ canComment: checked });
+                                                }}
+                                            />
+                                        </Form.Item>
+                                    </Col>
+                                    <Col xs={24} md={12}>
+                                        <Form.Item
+                                            style={{ marginBottom: 0 }}
+                                            valuePropName="checked"
+                                            label={getRes()["private"]}
+                                        >
+                                            <Switch
+                                                defaultValue={state.article.privacy}
+                                                size="small"
+                                                onChange={async (checked) => {
+                                                    await handleValuesChange({ privacy: checked });
+                                                }}
+                                            />
+                                        </Form.Item>
+                                    </Col>
+                                </Row>
+                            </Card>
+                        </Col>
+                        <Col span={24}>
+                            <Card size="small" title={getRes().tag}>
+                                <ArticleEditTag
+                                    onKeywordsChange={async (text: string) => {
+                                        await handleValuesChange({ keywords: text });
+                                    }}
+                                    keywords={state.article!.keywords ? state.article.keywords : ""}
+                                    allTags={state.tags.map((x) => x.text)}
+                                />
+                            </Card>
+                        </Col>
+                        <Col span={24}>
+                            <Card size="small" title={getRes().digest}>
+                                <BaseTextArea
+                                    defaultValue={state.article.digest}
+                                    placeholder={getRes().digestTips}
+                                    rows={3}
+                                    onChange={async (text: string) => {
+                                        await handleValuesChange({ digest: text });
+                                    }}
+                                />
+                            </Card>
+                        </Col>
+                    </Row>
+                </Col>
+            </Row>
         </StyledArticleEdit>
     );
 };

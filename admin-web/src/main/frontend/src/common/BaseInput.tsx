@@ -1,23 +1,17 @@
 import { Input, InputRef } from "antd";
-import Form from "antd/es/form";
 import { FunctionComponent, ReactElement, useRef, useState } from "react";
+import { InputStatus } from "antd/es/_util/statusUtils";
 
 type BaseInputProps = {
     addonBefore?: ReactElement | string;
     placeholder?: string;
     defaultValue?: string;
     name?: string;
+    status?: InputStatus;
     onChange: (value: string) => Promise<void>;
     required?: boolean;
 };
-const BaseInput: FunctionComponent<BaseInputProps> = ({
-    name,
-    defaultValue,
-    onChange,
-    addonBefore,
-    required,
-    placeholder,
-}) => {
+const BaseInput: FunctionComponent<BaseInputProps> = ({ defaultValue, onChange, addonBefore, status, placeholder }) => {
     const [composing, setComposing] = useState<boolean>(false);
     const inputRef = useRef<InputRef>(null);
     const [changing, setChanging] = useState<boolean>(false);
@@ -40,37 +34,31 @@ const BaseInput: FunctionComponent<BaseInputProps> = ({
     };
 
     return (
-        <Form.Item
-            name={name}
-            style={{ marginBottom: 8, width: "100%" }}
-            validateTrigger={["onChange", "onBlur", "onSubmit"]}
-            rules={[{ required: required, message: "" }]}
-        >
-            <Input
-                addonBefore={addonBefore}
-                ref={inputRef}
-                defaultValue={defaultValue}
-                onCompositionStart={() => {
-                    setComposing(true);
-                }}
-                onCompositionUpdate={() => {
-                    setComposing(true);
-                }}
-                onChange={async () => {
-                    if (composing) {
-                        return;
-                    }
+        <Input
+            status={status}
+            addonBefore={addonBefore}
+            ref={inputRef}
+            defaultValue={defaultValue}
+            onCompositionStart={() => {
+                setComposing(true);
+            }}
+            onCompositionUpdate={() => {
+                setComposing(true);
+            }}
+            onChange={async () => {
+                if (composing) {
+                    return;
+                }
+                await loopSubmit();
+            }}
+            onCompositionEnd={() => {
+                setComposing(false);
+                setTimeout(async () => {
                     await loopSubmit();
-                }}
-                onCompositionEnd={() => {
-                    setComposing(false);
-                    setTimeout(async () => {
-                        await loopSubmit();
-                    }, 20);
-                }}
-                placeholder={placeholder}
-            />
-        </Form.Item>
+                }, 20);
+            }}
+            placeholder={placeholder}
+        />
     );
 };
 export default BaseInput;
