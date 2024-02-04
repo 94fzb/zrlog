@@ -18,6 +18,7 @@ const Index: FunctionComponent<IndexProps> = ({ data }) => {
     if (data === undefined || data === null) {
         return <></>;
     }
+    console.info(data);
     return (
         <>
             <Title className="page-header" level={3}>
