@@ -1,8 +1,10 @@
 import { Route, Routes } from "react-router-dom";
-import { lazy, useEffect } from "react";
+import { lazy, useEffect, useState } from "react";
 import { Suspense } from "react";
 import { App } from "antd";
 import axios from "axios";
+import { useLocation } from "react-router";
+import { getCsrData } from "./api";
 
 const AsyncLogin = lazy(() => import("components/login"));
 const AsyncAdminDashboardRouter = lazy(() => import("AdminDashboardRouter"));
@@ -50,8 +52,13 @@ const AppBase = () => {
         );
     };
 
+    const [data, setData] = useState<any>(null);
+
+    const location = useLocation();
+
     useEffect(() => {
         initAxios();
+        setData(getCsrData(location.pathname.replace("/admin/", "")));
     }, []);
 
     return (
@@ -69,7 +76,7 @@ const AppBase = () => {
                     path={"*"}
                     element={
                         <Suspense fallback={<div />}>
-                            <AsyncAdminDashboardRouter />
+                            <AsyncAdminDashboardRouter data={data} />
                         </Suspense>
                     }
                 />
