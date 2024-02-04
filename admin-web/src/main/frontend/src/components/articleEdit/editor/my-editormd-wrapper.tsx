@@ -104,13 +104,12 @@ const StyledEditor = styled("div")`
     }
 
     .editormd {
-        width: 90%;
-        height: 640px;
+        width: 100%;
+        height: 1240px;
         margin: 0 auto 0;
         text-align: left;
         overflow: hidden;
         position: relative;
-        border: 1px solid #ddd;
     }
 
     .editormd *,
@@ -2217,8 +2216,6 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({
             },
             imageUploadURL: document.baseURI + "api/admin/upload",
             path: document.baseURI + "admin/vendors/markdown/lib/",
-            width: "100%",
-            height: "1240px",
             placeholder: getRes()["editorPlaceholder"],
             markdown: markdown,
             onload: function () {
