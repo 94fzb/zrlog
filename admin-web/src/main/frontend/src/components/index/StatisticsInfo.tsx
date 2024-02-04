@@ -31,7 +31,7 @@ const StatisticsInfo = () => {
 
     return (
         <Card size={"small"} title={getRes()["admin.index.outline"]}>
-            <Spin spinning={statisticsInfoState.loading}>
+            <Spin spinning={statisticsInfoState.loading} delay={500}>
                 <Row gutter={[8, 8]}>
                     <Col xs={24} md={12}>
                         <Card>

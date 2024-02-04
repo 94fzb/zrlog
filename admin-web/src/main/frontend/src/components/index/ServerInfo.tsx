@@ -116,7 +116,7 @@ const ServerInfo = () => {
             <Table
                 style={{ wordBreak: "break-all", whiteSpace: "unset" }}
                 size="small"
-                loading={indexState.loading}
+                loading={{ spinning: indexState.loading, delay: 500 }}
                 columns={getFixedColumns()}
                 //@ts-ignore
                 dataSource={indexState.system}

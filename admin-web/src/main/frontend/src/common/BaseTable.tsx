@@ -146,7 +146,7 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
                   })
                 : undefined}
             <Table
-                loading={!tableDataState.tableLoaded}
+                loading={{ spinning: !tableDataState.tableLoaded, delay: 500 }}
                 bordered
                 onChange={(pagination) => {
                     fetchData(

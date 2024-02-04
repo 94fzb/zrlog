@@ -2318,7 +2318,7 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({
 
     return (
         <StyledEditor>
-            <Spin spinning={state.editorLoading}>
+            <Spin spinning={state.editorLoading} delay={500}>
                 {contextHolder}
                 <div
                     id={state.id}
