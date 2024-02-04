@@ -201,7 +201,7 @@ const Index = () => {
     };
 
     const onSubmit = async (article: ArticleEntry, release: boolean, preview: boolean, autoSave: boolean) => {
-        if (!(await validForm())) {
+        if (!validForm(article)) {
             return;
         }
         let uri;
@@ -399,10 +399,10 @@ const Index = () => {
         handleValuesChange(content).then();
     }, [content]);
 
-    const validForm = (): boolean => {
-        const titleError = state.article.title === "";
-        const typeError = state.article.typeId === undefined || state.article.typeId < 0;
-        setState({ ...state, titleError: titleError, typeError: typeError });
+    const validForm = (changedArticle: ArticleEntry): boolean => {
+        const titleError = changedArticle.title === "";
+        const typeError = changedArticle.typeId === undefined || changedArticle.typeId < 0;
+        setState({ ...state, titleError: titleError, typeError: typeError, article: changedArticle });
         return !(titleError || typeError);
     };
 
@@ -423,7 +423,7 @@ const Index = () => {
             ...state.article,
             ...cv,
         };
-        const ok = validForm();
+        const ok = validForm(newArticle);
         if (!ok) {
             return;
         }
@@ -514,11 +514,11 @@ const Index = () => {
                 </Col>
             </Row>
             <Divider />
-            <Row gutter={[8, 8]}>
+            <Row gutter={[8, 8]} style={{ paddingBottom: 8 }}>
                 <Col md={13} xs={24}>
                     <Space.Compact style={{ display: "flex" }}>
                         <Select
-                            style={{ minWidth: 156, width: "100%" }}
+                            style={{ minWidth: 156 }}
                             status={state.typeError ? "error" : ""}
                             defaultValue={state.article.typeId}
                             showSearch={true}
