@@ -423,6 +423,7 @@ const Index = () => {
             ...state.article,
             ...cv,
         };
+        console.info(cv);
         const ok = validForm(newArticle);
         if (!ok) {
             return;
