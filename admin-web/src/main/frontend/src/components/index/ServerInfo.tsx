@@ -79,8 +79,7 @@ const ServerInfo = ({ data }: { data: Record<string, any> }) => {
     system[4].value = data["user.timezone"] + " - " + data["user.country"] + "/" + data["user.language"];
     system[5].value = data["dbServer.version"];
     system[6].value = data["file.encoding"];
-    system[7].value =
-        data.data["zrlog.version"] + " - " + data.data["zrlog.buildId"] + " (" + data.data["zrlog.buildTime"] + ")";
+    system[7].value = data["zrlog.version"] + " - " + data["zrlog.buildId"] + " (" + data["zrlog.buildTime"] + ")";
 
     return (
         <Card size={"small"} title={getRes()["serverInfo"]}>

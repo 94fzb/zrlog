@@ -11,4 +11,5 @@ export const getCsrData = async (uri: string) => {
         const [serverResponse, statisticsResponse] = await Promise.all([getServerInfo(), getStatisticsInfo()]);
         return {statisticsInfo: statisticsResponse.data.data, serverInfo: serverResponse.data.data} as IndexData;
     }
+    return {"data": "notMatchUri"}
 }
