@@ -135,6 +135,10 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
         return c;
     };
 
+    if (!tableDataState.tableLoaded) {
+        return <></>;
+    }
+
     return (
         <>
             {contextHolder}
@@ -146,7 +150,6 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
                   })
                 : undefined}
             <Table
-                loading={{ spinning: !tableDataState.tableLoaded, delay: 500 }}
                 bordered
                 onChange={(pagination) => {
                     fetchData(
@@ -160,6 +163,7 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
                         setTableDataState(r);
                     });
                 }}
+                style={{ minHeight: 512 }}
                 columns={getActionedColumns()}
                 pagination={tableDataState.tablePagination}
                 dataSource={tableDataState.rows}
