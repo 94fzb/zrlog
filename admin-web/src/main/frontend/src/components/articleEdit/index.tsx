@@ -148,7 +148,7 @@ const Index = () => {
         },
     });
 
-    const [content, setContent] = useState<ChangedContent>({});
+    const [content, setContent] = useState<ChangedContent | undefined>(undefined);
 
     const { message, modal } = App.useApp();
 
@@ -396,7 +396,9 @@ const Index = () => {
     };
 
     useEffect(() => {
-        handleValuesChange(content).then();
+        if (content) {
+            handleValuesChange(content).then();
+        }
     }, [content]);
 
     const validForm = (changedArticle: ArticleEntry): boolean => {
