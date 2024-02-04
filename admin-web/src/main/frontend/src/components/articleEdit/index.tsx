@@ -36,8 +36,7 @@ export type ArticleEntry = ChangedContent &
 
 type ArticleEditState = {
     types: [];
-    titleError: boolean;
-    typeError: boolean;
+
     typeOptions: any[];
     tags: any[];
     rubbish: boolean;
@@ -125,14 +124,17 @@ const StyledArticleEdit = styled("div")`
     }
 `;
 let articleVersion = -1;
+type FormValidState = {
+    titleError: boolean;
+    typeError: boolean;
+};
+
 const Index = () => {
     const [state, setState] = useState<ArticleEditState>({
         typeOptions: [],
         editorInitSuccess: false,
         fullScreen: false,
         globalLoading: true,
-        titleError: false,
-        typeError: false,
         tags: [],
         types: [],
         rubbish: false,
@@ -149,6 +151,7 @@ const Index = () => {
     });
 
     const [content, setContent] = useState<ChangedContent | undefined>(undefined);
+    const [formValidState, setFormValidState] = useState<FormValidState>({ titleError: false, typeError: false });
 
     const { message, modal } = App.useApp();
 
@@ -404,7 +407,7 @@ const Index = () => {
     const validForm = (changedArticle: ArticleEntry): boolean => {
         const titleError = changedArticle.title === "";
         const typeError = changedArticle.typeId === undefined || changedArticle.typeId < 0;
-        setState({ ...state, titleError: titleError, typeError: typeError, article: changedArticle });
+        setFormValidState({ titleError: titleError, typeError: typeError });
         return !(titleError || typeError);
     };
 
@@ -428,6 +431,9 @@ const Index = () => {
         console.info(cv);
         const ok = validForm(newArticle);
         if (!ok) {
+            setState((prev) => {
+                return { ...prev, article: newArticle };
+            });
             return;
         }
         await save(newArticle);
@@ -522,7 +528,7 @@ const Index = () => {
                     <Space.Compact style={{ display: "flex" }}>
                         <Select
                             style={{ minWidth: 156 }}
-                            status={state.typeError ? "error" : ""}
+                            status={formValidState.typeError ? "error" : ""}
                             defaultValue={state.article.typeId}
                             showSearch={true}
                             optionFilterProp="children"
@@ -537,7 +543,7 @@ const Index = () => {
                             placeholder={"请选择" + getRes()["admin.type.manage"]}
                         />
                         <BaseInput
-                            status={state.titleError ? "error" : ""}
+                            status={formValidState.titleError ? "error" : ""}
                             placeholder={getRes().inputArticleTitle}
                             defaultValue={state.article.title ? state.article.title : undefined}
                             onChange={async (e) => {
