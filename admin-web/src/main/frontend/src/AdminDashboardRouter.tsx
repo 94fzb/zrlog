@@ -40,7 +40,11 @@ const AdminDashboardRouter = ({ data }: { data: any }) => {
                 path={""}
                 element={
                     <AdminManageLayout>
-                        <Suspense>{data && <AsyncIndex data={data} />}</Suspense>
+                        {data && (
+                            <Suspense>
+                                <AsyncIndex data={data} />
+                            </Suspense>
+                        )}
                     </AdminManageLayout>
                 }
             />
@@ -48,7 +52,11 @@ const AdminDashboardRouter = ({ data }: { data: any }) => {
                 path="index"
                 element={
                     <AdminManageLayout>
-                        <Suspense>{data && <AsyncIndex data={data} />}</Suspense>
+                        {data && (
+                            <Suspense>
+                                <AsyncIndex data={data} />
+                            </Suspense>
+                        )}
                     </AdminManageLayout>
                 }
             />
