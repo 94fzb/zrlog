@@ -47,7 +47,7 @@ public class AdminArticleController extends Controller {
         return new ApiStandardResponse(deleteLogResponse);
     }
 
-    @RefreshCache
+    @RefreshCache(async = true)
     @ResponseBody
     public ApiStandardResponse create() {
         return new ApiStandardResponse(articleService.create(AdminTokenThreadLocal.getUser(), ZrLogUtil.convertRequestBody(getRequest(),

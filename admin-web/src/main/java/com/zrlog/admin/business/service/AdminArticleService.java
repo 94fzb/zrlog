@@ -7,6 +7,8 @@ import com.hibegin.common.util.StringUtils;
 import com.hibegin.common.util.http.HttpUtil;
 import com.hibegin.common.util.http.handle.HttpFileHandle;
 import com.hibegin.http.server.util.PathUtil;
+import com.zrlog.admin.business.exception.ArticleMissingTitleException;
+import com.zrlog.admin.business.exception.ArticleMissingTypeException;
 import com.zrlog.admin.business.exception.UpdateArticleExpireException;
 import com.zrlog.admin.business.rest.request.CreateArticleRequest;
 import com.zrlog.admin.business.rest.request.UpdateArticleRequest;
@@ -118,6 +120,12 @@ public class AdminArticleService {
     }
 
     private CreateOrUpdateArticleResponse save(AdminTokenVO adminTokenVO, CreateArticleRequest createArticleRequest) {
+        if (StringUtils.isEmpty(createArticleRequest.getTitle())) {
+            throw new ArticleMissingTitleException();
+        }
+        if (Objects.isNull(createArticleRequest.getTypeId()) || createArticleRequest.getTypeId() < 1) {
+            throw new ArticleMissingTypeException();
+        }
         WRITE_ARTICLE_LOCK.lock();
         try {
             Map<String, Object> log = getLog(adminTokenVO, createArticleRequest);
