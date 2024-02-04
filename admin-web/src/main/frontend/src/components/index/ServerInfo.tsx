@@ -87,8 +87,7 @@ const ServerInfo = ({ data }: { data: Record<string, any> }) => {
                 style={{ wordBreak: "break-all", whiteSpace: "unset" }}
                 size="small"
                 columns={getFixedColumns()}
-                //@ts-ignore
-                dataSource={indexState.system}
+                dataSource={system}
                 pagination={false}
                 bordered
             />
