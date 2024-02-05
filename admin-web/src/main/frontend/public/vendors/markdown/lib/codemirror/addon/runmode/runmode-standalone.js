@@ -93,8 +93,7 @@ window.CodeMirror = {};
             this.lineStart += n;
             try {
                 return inner();
-            }
-            finally {
+            } finally {
                 this.lineStart -= n;
             }
         }

@@ -1,24 +1,31 @@
 package com.zrlog.model;
 
-import com.jfinal.plugin.activerecord.Model;
+import com.hibegin.dao.DAO;
 import com.zrlog.common.rest.request.PageRequest;
 import com.zrlog.data.dto.PageData;
 
+import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 存放程序的友情链接，对应数据库link表
  */
-public class Link extends Model<Link> {
-    public static final String TABLE_NAME = "link";
+public class Link extends DAO {
 
-    public List<Link> findAll() {
-        return find("select linkName,linkId as id,sort,url,alt from " + TABLE_NAME + " order by sort");
+
+    public Link() {
+        this.tableName = "link";
+        this.pk = "linkId";
     }
 
-    public PageData<Link> find(PageRequest page) {
-        PageData<Link> data = new PageData<>();
-        data.setRows(find("select linkName,linkId as id,sort,url,alt from " + TABLE_NAME + " order by sort limit ?,?", page.getOffset(), page.getSize()));
+    public List<Map<String, Object>> findAll() throws SQLException {
+        return queryListWithParams("select linkName,linkId as id,sort,url,alt from " + tableName + " order by sort");
+    }
+
+    public PageData<Map<String, Object>> find(PageRequest page) throws SQLException {
+        PageData<Map<String, Object>> data = new PageData<>();
+        data.setRows(queryListWithParams("select linkName,linkId as id,sort,url,alt from " + tableName + " order by sort limit ?,?", page.getOffset(), page.getSize()));
         ModelUtil.fillPageData(this, "from link", data, new Object[0]);
         return data;
     }

@@ -3,12 +3,31 @@
 <head>
     <base href="/"/>
     <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <meta name="theme-color" content="#000000"/>
-    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>&nbsp;</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+            'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+            sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* 暗黑模式样式 */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: black;
+                color: white;
+            }
+        }
+
+    </style>
 </head>
 <body>
 <noscript>You need to enable JavaScript to run this app.</noscript>
-<div id="root"></div>
+<div id="app"></div>
+<pre style="display: none" id="resourceInfo"></pre>
 </body>
 </html>

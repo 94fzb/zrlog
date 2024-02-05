@@ -157,8 +157,7 @@
         if (type == DIFF_INSERT) {
             editor = dv.edit;
             other = dv.orig;
-        }
-        else {
+        } else {
             editor = dv.orig;
             other = dv.edit;
         }
@@ -679,8 +678,7 @@
                 if (fromLocal > n) {
                     afterE = chunk.editFrom;
                     afterO = chunk.origFrom;
-                }
-                else if (toLocal > n) {
+                } else if (toLocal > n) {
                     afterE = chunk.editTo;
                     afterO = chunk.origTo;
                 }
@@ -688,8 +686,7 @@
             if (toLocal <= n) {
                 beforeE = chunk.editTo;
                 beforeO = chunk.origTo;
-            }
-            else if (fromLocal <= n) {
+            } else if (fromLocal <= n) {
                 beforeE = chunk.editFrom;
                 beforeO = chunk.origFrom;
             }

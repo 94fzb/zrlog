@@ -23,3 +23,5 @@ yarn-debug.log*
 yarn-error.log*
 node
 /node_modules/
+package-lock.json
+tsconfig.tsbuildinfo

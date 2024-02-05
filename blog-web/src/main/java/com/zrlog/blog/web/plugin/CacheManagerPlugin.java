@@ -1,9 +1,8 @@
 package com.zrlog.blog.web.plugin;
 
-import com.jfinal.plugin.IPlugin;
-import com.zrlog.blog.web.interceptor.InitDataInterceptor;
 import com.zrlog.business.cache.CacheService;
 import com.zrlog.common.Constants;
+import com.zrlog.plugin.IPlugin;
 
 import java.util.TimerTask;
 import java.util.concurrent.ScheduledExecutorService;
@@ -44,7 +43,7 @@ public class CacheManagerPlugin implements IPlugin {
 
         @Override
         public void run() {
-            if (System.currentTimeMillis() - InitDataInterceptor.getLastAccessTime() > Constants.getInitDataMaxCacheTimeout()) {
+            if (System.currentTimeMillis() - Constants.getLastAccessTime() > Constants.getInitDataMaxCacheTimeout()) {
                 cacheService.refreshInitDataCache(null, true);
             }
         }

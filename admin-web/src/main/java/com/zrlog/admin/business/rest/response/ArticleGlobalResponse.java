@@ -1,28 +1,35 @@
 package com.zrlog.admin.business.rest.response;
 
-import com.zrlog.model.Tag;
-import com.zrlog.model.Type;
-
 import java.util.List;
+import java.util.Map;
 
 public class ArticleGlobalResponse {
 
-    private List<Tag> tags;
-    private List<Type> types;
+    private List<Map<String, Object>> tags;
+    private List<Map<String, Object>> types;
+    private LoadEditArticleResponse article;
 
-    public List<Tag> getTags() {
+    public LoadEditArticleResponse getArticle() {
+        return article;
+    }
+
+    public void setArticle(LoadEditArticleResponse article) {
+        this.article = article;
+    }
+
+    public List<Map<String, Object>> getTags() {
         return tags;
     }
 
-    public void setTags(List<Tag> tags) {
+    public void setTags(List<Map<String, Object>> tags) {
         this.tags = tags;
     }
 
-    public List<Type> getTypes() {
+    public List<Map<String, Object>> getTypes() {
         return types;
     }
 
-    public void setTypes(List<Type> types) {
+    public void setTypes(List<Map<String, Object>> types) {
         this.types = types;
     }
 }

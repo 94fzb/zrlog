@@ -1,7 +1,5 @@
 package com.zrlog.admin.business.rest.response;
 
-import java.util.Date;
-
 public class ArticleResponseEntry {
 
     private String userName;
@@ -9,8 +7,9 @@ public class ArticleResponseEntry {
     private String title;
     private int click;
     private String keywords;
-    private Date releaseTime;
-    private Date lastUpdateDate;
+    private String releaseTime;
+
+    private String lastUpdateDate;
     private String typeName;
     private boolean rubbish;
     private boolean privacy;
@@ -57,12 +56,20 @@ public class ArticleResponseEntry {
         this.keywords = keywords;
     }
 
-    public Date getReleaseTime() {
+    public String getReleaseTime() {
         return releaseTime;
     }
 
-    public void setReleaseTime(Date releaseTime) {
+    public void setReleaseTime(String releaseTime) {
         this.releaseTime = releaseTime;
+    }
+
+    public String getLastUpdateDate() {
+        return lastUpdateDate;
+    }
+
+    public void setLastUpdateDate(String lastUpdateDate) {
+        this.lastUpdateDate = lastUpdateDate;
     }
 
     public String getTypeName() {
@@ -87,14 +94,6 @@ public class ArticleResponseEntry {
 
     public void setPrivacy(boolean privacy) {
         this.privacy = privacy;
-    }
-
-    public Date getLastUpdateDate() {
-        return lastUpdateDate;
-    }
-
-    public void setLastUpdateDate(Date lastUpdateDate) {
-        this.lastUpdateDate = lastUpdateDate;
     }
 
     public String getUrl() {

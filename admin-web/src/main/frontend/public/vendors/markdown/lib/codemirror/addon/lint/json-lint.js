@@ -27,8 +27,7 @@
         };
         try {
             jsonlint.parse(text);
-        }
-        catch (e) {
+        } catch (e) {
         }
         return found;
     });

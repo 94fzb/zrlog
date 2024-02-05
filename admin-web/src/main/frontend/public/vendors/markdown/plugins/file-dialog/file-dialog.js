@@ -89,8 +89,7 @@
                             }
                             if (link === "" || link === "http://") {
                                 cm.replaceSelection("[" + alt + "](" + url + altAttr + ")");
-                            }
-                            else {
+                            } else {
                                 cm.replaceSelection("[[" + alt + "](" + url + altAttr + ")](" + link + altAttr + ")");
                             }
 
@@ -122,8 +121,7 @@
 
                     if (fileName === "") {
                         alert(fileLang.uploadFileEmpty);
-                    }
-                    else {
+                    } else {
                         if (typeof (dialog.loading) == "function") dialog.loading(true);
 
                         var submitHandler = function () {
@@ -137,8 +135,7 @@
                                 json = (typeof JSON.parse !== "undefined") ? JSON.parse(json) : eval("(" + json + ")");
                                 if (json.error === 0) {
                                     dialog.find("[data-url]").val(json.data.url);
-                                }
-                                else {
+                                } else {
                                     alert(json.message);
                                 }
 
@@ -170,8 +167,7 @@
     // CommonJS/Node.js
     if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
         module.exports = factory;
-    }
-    else if (typeof define === "function")  // AMD/CMD/Sea.js
+    } else if (typeof define === "function")  // AMD/CMD/Sea.js
     {
         if (define.amd) { // for Require.js
 
@@ -185,8 +181,7 @@
                 factory(editormd);
             });
         }
-    }
-    else {
+    } else {
         factory(window.editormd);
     }
 

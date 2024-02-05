@@ -11,11 +11,12 @@ import com.zrlog.model.User;
 import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ZrLogUtil;
 
+import java.sql.SQLException;
 import java.util.Objects;
 
 public class UserService {
 
-    public UpdateRecordResponse updatePassword(int currentUserId, UpdatePasswordRequest updatePasswordRequest) {
+    public UpdateRecordResponse updatePassword(int currentUserId, UpdatePasswordRequest updatePasswordRequest) throws SQLException {
         if (ZrLogUtil.isPreviewMode()) {
             throw new PermissionErrorException();
         }
@@ -36,7 +37,7 @@ public class UserService {
         }
     }
 
-    public void login(LoginRequest loginRequest) {
+    public void login(LoginRequest loginRequest) throws SQLException {
         if (StringUtils.isNotEmpty(loginRequest.getUserName()) && StringUtils.isNotEmpty(loginRequest.getPassword())) {
             String dbPassword = new User().getPasswordByUserName(loginRequest.getUserName().toLowerCase());
             if (dbPassword == null || !Objects.equals(dbPassword.toLowerCase(), loginRequest.getPassword().toLowerCase())) {
@@ -48,11 +49,11 @@ public class UserService {
     }
 
 
-    public Object update(int userId, UpdateAdminRequest updateAdminRequest) {
+    public Object update(int userId, UpdateAdminRequest updateAdminRequest) throws SQLException {
         if (ZrLogUtil.isPreviewMode()) {
             throw new PermissionErrorException();
         }
         new User().updateEmailUserNameHeaderByUserId(updateAdminRequest.getEmail(), updateAdminRequest.getUserName(), updateAdminRequest.getHeader(), userId);
-        return new User().findById(userId);
+        return new User().loadById(userId);
     }
 }

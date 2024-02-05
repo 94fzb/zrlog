@@ -1,15 +1,19 @@
 package com.zrlog.blog.web.controller.page;
 
+import com.google.gson.Gson;
 import com.hibegin.common.util.IOUtil;
-import com.jfinal.core.Controller;
-import com.jfinal.kit.PathKit;
-import com.jfinal.render.HtmlRender;
+import com.hibegin.http.server.api.HttpRequest;
+import com.hibegin.http.server.api.HttpResponse;
+import com.hibegin.http.server.web.Controller;
+import com.zrlog.business.service.CommonService;
+import com.zrlog.common.Constants;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * 与安装向导相关的路由进行控制
@@ -18,21 +22,31 @@ import java.io.FileNotFoundException;
 public class InstallController extends Controller {
 
 
+    public InstallController() {
+    }
+
+    public InstallController(HttpRequest request, HttpResponse response) {
+        super(request, response);
+    }
+
     /**
      * 加载安装向导第一个页面数据
      */
     public void index() throws FileNotFoundException {
-        if (getRequest().getRequestURI().endsWith("/install")) {
-            redirect("/install/");
+        InputStream file = InstallController.class.getResourceAsStream(Constants.INSTALL_HTML_PAGE);
+        if (Objects.isNull(file)) {
+            response.renderCode(404);
             return;
         }
-        File file = new File(PathKit.getWebRootPath() + "/install/index.html");
-        if (!file.exists()) {
-            renderError(404);
-            return;
-        }
-        Document document = Jsoup.parse(IOUtil.getStringInputStream(new FileInputStream(file)));
-        document.selectFirst("base").attr("href", getRequest().getContextPath() + "/");
-        render(new HtmlRender(document.html()));
+        Document document = Jsoup.parse(IOUtil.getStringInputStream(file));
+        //clean history
+        document.body().removeClass("dark");
+        document.body().removeClass("light");
+        document.selectFirst("base").attr("href", "/");
+        Map<String, Object> stringObjectMap = new CommonService().installResourceInfo(getRequest());
+        Objects.requireNonNull(document.getElementById("resourceInfo")).text(new Gson().toJson(stringObjectMap));
+        document.title(String.valueOf(stringObjectMap.get("installWizard")));
+        String html = document.html();
+        response.renderHtmlStr(html);
     }
 }

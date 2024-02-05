@@ -2,9 +2,11 @@ package com.zrlog.business.service;
 
 import com.google.gson.Gson;
 import com.hibegin.common.util.BeanUtil;
+import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.StringUtils;
-import com.jfinal.core.JFinal;
-import com.jfinal.kit.PathKit;
+import com.hibegin.http.server.api.HttpRequest;
+import com.hibegin.http.server.util.PathUtil;
+import com.hibegin.http.server.web.cookie.Cookie;
 import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.business.cache.vo.Archive;
 import com.zrlog.business.cache.vo.BaseDataInitVO;
@@ -13,51 +15,49 @@ import com.zrlog.common.Constants;
 import com.zrlog.common.vo.OutlineVO;
 import com.zrlog.common.vo.TemplateVO;
 import com.zrlog.data.dto.PageData;
-import com.zrlog.model.Log;
-import com.zrlog.model.LogNav;
-import com.zrlog.model.Tag;
-import com.zrlog.model.Type;
 import com.zrlog.util.I18nUtil;
 import com.zrlog.util.OutlineUtil;
 import com.zrlog.util.ParseUtil;
 import com.zrlog.util.ZrLogUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class TemplateHelper {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TemplateHelper.class);
+    private static final Logger LOGGER = LoggerUtil.getLogger(TemplateHelper.class);
 
-    private static void fullInfo(HttpServletRequest request, boolean staticHtml) {
-        boolean staticBlog = ZrLogUtil.isStaticBlogPlugin(request);
-        // 模板地址
-        String suffix = "";
-        if (staticBlog || staticHtml) {
-            suffix = ".html";
+    public static String getSuffix(HttpRequest request){
+        if (ZrLogUtil.isStaticBlogPlugin(request) || Constants.isStaticHtmlStatus()) {
+            return ".html";
         }
-        request.setAttribute("staticBlog", staticBlog);
-        request.setAttribute("suffix", suffix);
+        return "";
+    }
 
-        BaseDataInitVO baseDataInitVO = BeanUtil.cloneObject(request.getAttribute("init"));
-        request.setAttribute("init", baseDataInitVO);
+    private static void fullInfo(HttpRequest request) {
+        boolean staticBlog = ZrLogUtil.isStaticBlogPlugin(request);
+        String suffix = getSuffix(request);
+        request.getAttr().put("staticBlog", staticBlog);
+        request.getAttr().put("suffix", suffix);
+
+        BaseDataInitVO baseDataInitVO = BeanUtil.cloneObject(request.getAttr().get("init"));
+        request.getAttr().put("init", baseDataInitVO);
         Map<String, Object> webSite = baseDataInitVO.getWebSite();
         String baseUrl = setBaseUrl(request, staticBlog, webSite);
         //过期
-        request.setAttribute("webs", webSite);
+        request.getAttr().put("webs", webSite);
         String title = webSite.get("title") + " - " + webSite.get("second_title");
-        if (request.getAttribute("log") != null) {
-            title = ((Log) request.getAttribute("log")).get("title") + " - " + title;
+        if (request.getAttr().get("log") != null) {
+            title = ((Map<String,Object>) request.getAttr().get("log")).get("title") + " - " + title;
         }
-        request.setAttribute("title", title);
+        request.getAttr().put("title", title);
 
         staticHtml(request, suffix, Constants.getBooleanByFromWebSite("article_thumbnail_status"));
-        PagerVO pager = (PagerVO) request.getAttribute("pager");
+        PagerVO pager = (PagerVO) request.getAttr().get("pager");
         if (pager != null && !pager.getPageList().isEmpty()) {
             List<PagerVO.PageEntry> pageList = pager.getPageList();
             for (PagerVO.PageEntry pageMap : pageList) {
@@ -86,60 +86,57 @@ public class TemplateHelper {
         return archives;
     }
 
-    private static void fillTags(String suffix, String baseUrl, List<Tag> tags) {
-        for (Tag tag : tags) {
-            try {
-                String tagUri = baseUrl + Constants.getArticleUri() + "tag/" + URLEncoder.encode(tag.get("text"),
-                        "UTF-8") + suffix;
-                tag.put("url", tagUri);
-            } catch (UnsupportedEncodingException e) {
-                LOGGER.error("", e);
-            }
+    private static void fillTags(String suffix, String baseUrl, List<Map<String, Object>> tags) {
+        for (Map<String, Object> tag : tags) {
+            String tagUri = baseUrl + Constants.getArticleUri() + "tag/" + URLEncoder.encode((String) tag.get("text"), StandardCharsets.UTF_8) + suffix;
+            tag.put("url", tagUri);
         }
     }
 
-    private static void fillType(String suffix, String baseUrl, List<Type> types) {
-        for (Type type : types) {
-            try {
-                String tagUri = baseUrl + Constants.getArticleUri() + "sort/" + URLEncoder.encode(type.get("alias"),
-                        "UTF-8") + suffix;
-                type.put("url", tagUri);
-            } catch (UnsupportedEncodingException e) {
-                LOGGER.error("", e);
-            }
+    private static void fillType(String suffix, String baseUrl, List<Map<String, Object>> types) {
+        for (Map<String, Object> type : types) {
+            String tagUri = baseUrl + Constants.getArticleUri() + "sort/" + URLEncoder.encode((String) type.get("alias"),
+                    StandardCharsets.UTF_8) + suffix;
+            type.put("url", tagUri);
         }
     }
 
-    private static boolean isHomePage(HttpServletRequest request) {
-        String uri = request.getRequestURI().replace(".html", "");
+    private static boolean isHomePage(HttpRequest request) {
+        String uri = request.getUri().replace(".html", "");
         return "".equals(uri) || "/".equals(uri) || "/all-1".equals(uri) || "/all".equals(uri) || ("/" + Constants.getArticleUri() + "all").equals(uri) || ("/" + Constants.getArticleUri() + "all-1").equals(uri);
     }
 
-    private static void fullNavBar(HttpServletRequest request, String suffix, BaseDataInitVO baseDataInitVO) {
-        List<LogNav> logNavList = baseDataInitVO.getLogNavs();
-        for (LogNav logNav : logNavList) {
+    private static void fullNavBar(HttpRequest request, String suffix, BaseDataInitVO baseDataInitVO) {
+        List<Map<String, Object>> logNavList = baseDataInitVO.getLogNavs();
+        for (Map<String, Object> logNav : logNavList) {
             String url = logNav.get("url").toString();
             boolean current;
             if ("/".equals(url) && isHomePage(request)) {
                 current = true;
             } else if (url.startsWith("/")) {
-                if ("/".equals(url)) {
-                    url = WebTools.getHomeUrlWithHost(request);
-                }
-                //文章页
-                else if (url.startsWith("/" + Constants.getArticleUri())) {
-                    url = WebTools.getHomeUrlWithHost(request) + url.substring(1);
-                    if (!url.endsWith(suffix)) {
-                        url = url + suffix;
-                    }
-                }
+                url = getNavUrl(request, suffix, url);
                 logNav.put("url", url);
-                current = ignoreScheme(request.getRequestURL().toString(), suffix).equals(ignoreScheme(url, suffix));
+                current = ignoreScheme(request.getUrl(), suffix).equals(ignoreScheme(url, suffix));
             } else {
-                current = ignoreScheme(request.getRequestURL().toString(), suffix).equals(ignoreScheme(url, suffix));
+                current = ignoreScheme(request.getUrl(), suffix).equals(ignoreScheme(url, suffix));
             }
             logNav.put("current", current);
         }
+    }
+
+    private static String getNavUrl(HttpRequest request, String suffix, String url) {
+        if ("/".equals(url)) {
+            return WebTools.getHomeUrlWithHost(request);
+        }
+        //文章页
+        else if (url.startsWith("/")) {
+            String nUrl = WebTools.getHomeUrlWithHost(request) + url.substring(1);
+            if (!nUrl.endsWith(suffix)) {
+                return nUrl + suffix;
+            }
+            return nUrl;
+        }
+        return url;
     }
 
     private static String ignoreScheme(String url, String suffix) {
@@ -154,35 +151,35 @@ public class TemplateHelper {
         return url;
     }
 
-    public static String setBaseUrl(HttpServletRequest request, boolean staticBlog, Map<String, Object> webSite) {
+    public static String setBaseUrl(HttpRequest request, boolean staticBlog, Map<String, Object> webSite) {
         String templateUrl;
         String baseUrl = WebTools.getHomeUrl(request);
-        String templatePath = request.getAttribute("template").toString();
+        String templatePath = request.getAttr().get("template").toString();
         if (staticBlog) {
-            baseUrl = request.getContextPath() + "/";
-            templateUrl = request.getContextPath() + templatePath;
+            baseUrl = "/";
+            templateUrl = templatePath;
         } else {
             if (isCdnResourceAble(webSite, templatePath)) {
-                templateUrl = "//" + webSite.get("staticResourceHost").toString() + request.getAttribute("template");
-                request.setAttribute("staticResourceBaseUrl",
-                        "//" + webSite.get("staticResourceHost").toString() + request.getContextPath() + "/");
+                templateUrl = "//" + webSite.get("staticResourceHost").toString() + request.getAttr().get("template");
+                request.getAttr().put("staticResourceBaseUrl",
+                        "//" + webSite.get("staticResourceHost").toString() + "/");
             } else {
-                templateUrl = request.getContextPath() + request.getAttribute("template");
+                templateUrl = (String) request.getAttr().get("template");
                 baseUrl = WebTools.getHomeUrl(request);
             }
         }
-        request.setAttribute("url", templateUrl);
-        request.setAttribute("templateUrl", templateUrl);
-        request.setAttribute("rurl", baseUrl);
-        request.setAttribute("baseUrl", baseUrl);
-        request.setAttribute("host", request.getHeader("host"));
-        request.setAttribute("searchUrl", baseUrl + Constants.getArticleUri() + "search");
+        request.getAttr().put("url", templateUrl);
+        request.getAttr().put("templateUrl", templateUrl);
+        request.getAttr().put("rurl", baseUrl);
+        request.getAttr().put("baseUrl", baseUrl);
+        request.getAttr().put("host", request.getHeader("host"));
+        request.getAttr().put("searchUrl", baseUrl + Constants.getArticleUri() + "search");
         return baseUrl;
     }
 
     private static boolean isCdnResourceAble(Map<String, Object> webSite, String templatePath) {
         Properties properties = new Properties();
-        File file = new File(PathKit.getWebRootPath() + templatePath + "/template.properties");
+        File file = new File(PathUtil.getStaticPath() + templatePath + "/template.properties");
         if (file.exists()) {
             try (FileInputStream fileInputStream = new FileInputStream(file)) {
                 properties.load(fileInputStream);
@@ -190,93 +187,90 @@ public class TemplateHelper {
                     return webSite.get("staticResourceHost") != null && !"".equals(webSite.get("staticResourceHost"));
                 }
             } catch (IOException e) {
-                LOGGER.error("load properties error", e);
+                LOGGER.log(Level.SEVERE, "load properties error", e);
             }
         }
         return false;
     }
 
-    private static void staticHtml(HttpServletRequest request, String suffix, boolean thumbnailEnableArticle) {
-        if (request.getAttribute("data") != null) {
-            PageData<Log> map = (PageData) request.getAttribute("data");
-            List<Log> logList = map.getRows();
+    private static void staticHtml(HttpRequest request, String suffix, boolean thumbnailEnableArticle) {
+        if (request.getAttr().get("data") != null) {
+            PageData<Map<String, Object>> map = (PageData) request.getAttr().get("data");
+            List<Map<String, Object>> logList = map.getRows();
             if (logList != null) {
-                for (Log log : logList) {
-                    if (thumbnailEnableArticle && StringUtils.isNotEmpty(log.get("thumbnail"))) {
-                        log.put("thumbnailAlt", ParseUtil.removeHtmlElement(log.get("title")));
+                for (Map<String, Object> log : logList) {
+                    if (thumbnailEnableArticle && StringUtils.isNotEmpty((String) log.get("thumbnail"))) {
+                        log.put("thumbnailAlt", ParseUtil.removeHtmlElement((String) log.get("title")));
                     } else {
                         log.put("thumbnailAlt", null);
                         log.put("thumbnail", null);
                     }
+                    log.put("canComment", Objects.equals(log.get("canComment"), true) && Constants.isAllowComment());
                     log.put("url",
                             WebTools.getHomeUrl(request) + Constants.getArticleUri() + log.get("alias") + suffix);
                     log.put("typeUrl", WebTools.getHomeUrl(request) + Constants.getArticleUri() + "sort/" + log.get(
                             "typeAlias") + suffix);
                 }
             }
-        } else if (request.getAttribute("log") != null) {
-            fillArticleInfo((Log) request.getAttribute("log"), request, suffix);
+        } else if (request.getAttr().get("log") != null) {
+            fillArticleInfo((Map<String, Object>) request.getAttr().get("log"), request, suffix);
         }
     }
 
-    public static void fillArticleInfo(Log data, HttpServletRequest request, String suffix) {
-        data.put("alias", data.get("alias") + suffix);
-        data.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + data.get("alias"));
-        data.put("noSchemeUrl", WebTools.getHomeUrlWithHost(request) + Constants.getArticleUri() + data.get("alias"));
-        data.put("typeUrl",
-                WebTools.getHomeUrl(request) + Constants.getArticleUri() + "sort/" + data.get("typeAlias") + suffix);
-        Log lastLog = data.get("lastLog");
-        Log nextLog = data.get("nextLog");
+    private static void fillArticleInfo(Map<String, Object> log, HttpRequest request, String suffix) {
+        log.put("alias", log.get("alias") + suffix);
+        log.put("canComment", Objects.equals(log.get("canComment"), true) && Constants.isAllowComment());
+        log.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + log.get("alias"));
+        log.put("noSchemeUrl", WebTools.getHomeUrlWithHost(request) + Constants.getArticleUri() + log.get("alias"));
+        log.put("typeUrl",
+                WebTools.getHomeUrl(request) + Constants.getArticleUri() + "sort/" + log.get("typeAlias") + suffix);
+        Map<String, Object> lastLog = (Map<String, Object>) log.get("lastLog");
+        Map<String, Object> nextLog = (Map<String, Object>) log.get("nextLog");
         nextLog.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + nextLog.get("alias") + suffix);
         lastLog.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + lastLog.get("alias") + suffix);
+
         //没有使用md的toc目录的文章才尝试使用系统提取的目录
-        if (data.getStr("markdown") != null && !data.getStr("markdown").toLowerCase().contains("[toc]") && !data.getStr("markdown").toLowerCase().contains("[tocm]")) {
+        if (log.get("markdown") != null && !log.get("markdown").toString().toLowerCase().contains("[toc]") && !log.get("markdown").toString().toLowerCase().contains("[tocm]")) {
             //最基础的实现方式，若需要更强大的实现方式建议使用JavaScript完成（页面输入toc对象）
-            OutlineVO outlineVO = OutlineUtil.extractOutline(data.getStr("content"));
-            if (outlineVO.size() > 0) {
-                data.put("tocHtml", OutlineUtil.buildTocHtml(outlineVO, ""));
+            OutlineVO outlineVO = OutlineUtil.extractOutline((String) log.get("content"));
+            if (!outlineVO.isEmpty()) {
+                log.put("tocHtml", OutlineUtil.buildTocHtml(outlineVO, ""));
             }
-            data.put("toc", outlineVO);
-        }
-        //系统关闭评论
-        if (!Constants.isAllowComment()) {
-            data.set("canComment", false);
+            log.put("toc", outlineVO);
         }
     }
 
     /**
      * 获取主题的相对于程序的路径，当Cookie中有值的情况下，优先使用Cookie里面的数据（仅当主题存在的情况下，否则返回默认的主题），
      */
-    private static String getTemplatePath(HttpServletRequest request) {
+    private static String getTemplatePath(HttpRequest request) {
         String templatePath = Constants.WEB_SITE.get("template").toString();
         templatePath = templatePath == null ? Constants.DEFAULT_TEMPLATE_PATH : templatePath;
         String previewTheme = getTemplatePathByCookie(request.getCookies());
         if (previewTheme != null) {
             templatePath = previewTheme;
         }
-        if (!new File(PathKit.getWebRootPath() + templatePath).exists()) {
+        if (!new File(PathUtil.getStaticPath() + templatePath).exists()) {
             templatePath = Constants.DEFAULT_TEMPLATE_PATH;
         }
         return templatePath;
     }
 
-    public static String fullTemplateInfo(HttpServletRequest request) {
+    public static void fullTemplateInfo(HttpRequest request) {
         String basePath = getTemplatePath(request);
-        request.setAttribute("template", basePath);
-        I18nUtil.addToRequest(PathKit.getWebRootPath() + basePath + "/language/", request,
-                JFinal.me().getConstants().getDevMode());
+        request.getAttr().put("template", basePath);
+        I18nUtil.addToRequest(PathUtil.getStaticPath() + basePath + "/language/", request, false);
         String jsonStr = (String) Constants.WEB_SITE.get(getTemplatePath(request) + Constants.TEMPLATE_CONFIG_SUFFIX);
         if (StringUtils.isNotEmpty(jsonStr)) {
-            Map<String, Object> res = (Map<String, Object>) request.getAttribute("_res");
+            Map<String, Object> res = (Map<String, Object>) request.getAttr().get("_res");
             res.putAll(new Gson().fromJson(jsonStr, Map.class));
         }
-        fullInfo(request, Constants.isStaticHtmlStatus());
-        return basePath;
+        fullInfo(request);
     }
 
     public static String getTemplatePathByCookie(Cookie[] cookies) {
         String previewTemplate = null;
-        if (cookies != null && cookies.length > 0) {
+        if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if ("template".equals(cookie.getName()) && cookie.getValue().startsWith(Constants.TEMPLATE_BASE_PATH)) {
                     previewTemplate = cookie.getValue();
@@ -287,8 +281,8 @@ public class TemplateHelper {
         return previewTemplate;
     }
 
-    public static TemplateVO getTemplateVO(String contextPath, File file) {
-        String templatePath = file.toString().substring(PathKit.getWebRootPath().length()).replace("\\", "/");
+    public static TemplateVO getTemplateVO(File file) {
+        String templatePath = file.toString().substring(PathUtil.getStaticPath().length() - 1).replace("\\", "/");
         TemplateVO templateVO = new TemplateVO();
         File templateInfo = new File(file + "/template.properties");
         if (templateInfo.exists()) {
@@ -306,7 +300,7 @@ public class TemplateHelper {
                     for (int i = 0; i < images.length; i++) {
                         String image = images[i];
                         if (!image.startsWith("https://") && !image.startsWith("http://")) {
-                            images[i] = contextPath + templatePath + "/" + image;
+                            images[i] = templatePath + "/" + image;
                         }
                     }
                     if (images.length > 0) {
@@ -315,7 +309,7 @@ public class TemplateHelper {
                     templateVO.setPreviewImages(Arrays.asList(images));
                 }
             } catch (IOException e) {
-                //LOGGER.error("", e);
+                //LOGGER.log(Level.SEVERE,"", e);
             }
         } else {
             templateVO.setAuthor("");
@@ -331,7 +325,7 @@ public class TemplateHelper {
             templateVO.setDigest(I18nUtil.getBlogStringFromRes("noIntroduction"));
         }
         File settingFile =
-                new File(PathKit.getWebRootPath() + templatePath + "/setting/index" + ZrLogUtil.getViewExt(templateVO.getViewType()));
+                new File(PathUtil.getStaticPath() + templatePath + "/setting/index" + ZrLogUtil.getViewExt(templateVO.getViewType()));
         templateVO.setConfigAble(settingFile.exists());
         templateVO.setTemplate(templatePath);
         return templateVO;

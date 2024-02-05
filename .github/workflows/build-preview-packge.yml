@@ -1,0 +1,25 @@
+name: ZrLog build preview package
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    name: ZrLog package ${{ matrix.os }} ${{ matrix.architecture }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+        architecture: [ amd64 ]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'maven'
+      - name: Build with Maven
+        run: |
+          mkdir -p /tmp/download
+          bash -e bin/build-final-package.sh preview 预览版 /tmp/download
+          bash bin/upload-bin.sh ${{ secrets.SECRET_ID }} ${{ secrets.SECRET_KEY }} ${{ secrets.BUCKET }} /tmp/download preview

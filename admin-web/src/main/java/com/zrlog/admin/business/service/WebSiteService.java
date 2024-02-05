@@ -7,6 +7,8 @@ import com.zrlog.admin.business.rest.base.UpgradeWebSiteRequest;
 import com.zrlog.admin.business.rest.response.WebSiteSettingsResponse;
 import com.zrlog.common.Constants;
 
+import java.util.Objects;
+
 public class WebSiteService {
 
     public WebSiteSettingsResponse loadSettings() {
@@ -23,12 +25,13 @@ public class WebSiteService {
         webSiteSettingsResponse.setOther(other);
         UpgradeWebSiteRequest upgrade = new UpgradeWebSiteRequest();
         upgrade.setUpgradePreview(Constants.getBooleanByFromWebSite("upgradePreview"));
-        upgrade.setAutoUpgradeVersion(Long.parseLong((String) Constants.WEB_SITE.get("autoUpgradeVersion")));
+        upgrade.setAutoUpgradeVersion((long) Double.parseDouble((String) Constants.WEB_SITE.get("autoUpgradeVersion")));
         webSiteSettingsResponse.setUpgrade(upgrade);
         BlogWebSiteRequest blog = new BlogWebSiteRequest();
         blog.setArticle_route((String) Constants.WEB_SITE.get("article_route"));
         blog.setAdmin_darkMode(Constants.getBooleanByFromWebSite("admin_darkMode"));
         blog.setLanguage((String) Constants.WEB_SITE.get("language"));
+        blog.setAdmin_color_primary(Objects.toString(Constants.WEB_SITE.get("admin_color_primary"), "#1677ff"));
         blog.setGenerator_html_status(Constants.getBooleanByFromWebSite("generator_html_status"));
         blog.setDisable_comment_status(Constants.getBooleanByFromWebSite("disable_comment_status"));
         blog.setSession_timeout(Constants.getSessionTimeout() / 60 / 1000);

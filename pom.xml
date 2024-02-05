@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.zrlog</groupId>
     <artifactId>zrlog</artifactId>
-    <version>2.2.1</version>
+    <version>3.0.0</version>
     <modules>
         <module>web</module>
         <module>service</module>
@@ -20,10 +20,8 @@
     <url>https://www.zrlog.com</url>
 
     <properties>
-        <java.version>1.8</java.version>
-        <jfinal.version>4.9.06</jfinal.version>
+        <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <servlet.version>3.1.0</servlet.version>
         <maven.test.skip>true</maven.test.skip>
         <finalName>zrlog</finalName>
     </properties>
@@ -32,7 +30,7 @@
         <developer>
             <name>xiaochun</name>
             <email>xchun90@163.com</email>
-            <url>http://xiaochun.zrlog.com</url>
+            <url>https://xiaochun.zrlog.com</url>
             <roles>
                 <role>owner</role>
             </roles>
@@ -57,31 +55,26 @@
 
     <issueManagement>
         <system>Github Issue</system>
-        <url>http://github.com/94fzb/zrlog</url>
+        <url>https://github.com/94fzb/zrlog</url>
     </issueManagement>
 
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
-            <url>http://apache.org/licenses/LICENSE-2.0.txt</url>
+            <url>https://apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>
 
     <dependencies>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.12</version>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <version>2.3.32</version>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.7.12</version>
-        </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
+            <groupId>com.hibegin</groupId>
+            <artifactId>simplewebserver</artifactId>
+            <version>0.3.73</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -96,37 +89,32 @@
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>common</artifactId>
-                <version>2.2.1</version>
+                <version>3.0.0</version>
             </dependency>
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>data</artifactId>
-                <version>2.2.1</version>
+                <version>3.0.0</version>
             </dependency>
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>admin-token</artifactId>
-                <version>2.2.1</version>
+                <version>3.0.0</version>
             </dependency>
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>blog-web</artifactId>
-                <version>2.2.1</version>
+                <version>3.0.0</version>
             </dependency>
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>service</artifactId>
-                <version>2.2.1</version>
+                <version>3.0.0</version>
             </dependency>
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>admin-web</artifactId>
-                <version>2.2.1</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.servlet</groupId>
-                <artifactId>javax.servlet-api</artifactId>
-                <version>${servlet.version}</version>
+                <version>3.0.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -142,7 +130,7 @@
                     <target>${java.version}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
-                <version>2.3.2</version>
+                <version>3.11.0</version>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -155,7 +143,17 @@
                 <plugin>
                     <groupId>com.github.eirslett</groupId>
                     <artifactId>frontend-maven-plugin</artifactId>
-                    <version>1.11.0</version>
+                    <version>1.15.0</version>
+                    <configuration>
+                        <nodeVersion>v16.15.1</nodeVersion>
+                        <yarnVersion>v1.22.18</yarnVersion>
+                        <npmVersion>8.11.0</npmVersion>
+                        <workingDirectory>src/main/frontend</workingDirectory>
+                        <installDirectory>target</installDirectory>
+                        <nodeDownloadRoot>https://npmmirror.com/mirrors/node/</nodeDownloadRoot>
+                        <yarnDownloadRoot>https://dl.zrlog.com/yarnpkg/yarn/releases/download/</yarnDownloadRoot>
+                        <npmRegistryURL>https://registry.npmmirror.com</npmRegistryURL>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>

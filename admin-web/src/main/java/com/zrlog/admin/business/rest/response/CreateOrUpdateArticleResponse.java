@@ -14,6 +14,16 @@ public class CreateOrUpdateArticleResponse {
 
     private Boolean rubbish;
 
+    private Long lastUpdateDate;
+
+    public Long getLastUpdateDate() {
+        return lastUpdateDate;
+    }
+
+    public void setLastUpdateDate(Long lastUpdateDate) {
+        this.lastUpdateDate = lastUpdateDate;
+    }
+
     public Long getLogId() {
         return logId;
     }

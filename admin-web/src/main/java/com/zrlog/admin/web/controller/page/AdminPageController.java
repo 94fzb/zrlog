@@ -2,51 +2,79 @@ package com.zrlog.admin.web.controller.page;
 
 import com.google.gson.Gson;
 import com.hibegin.common.util.IOUtil;
-import com.jfinal.core.Controller;
-import com.jfinal.kit.PathKit;
-import com.jfinal.render.HtmlRender;
+import com.hibegin.http.annotation.ResponseBody;
+import com.hibegin.http.server.web.Controller;
+import com.hibegin.http.server.web.cookie.Cookie;
+import com.zrlog.admin.business.rest.response.ServerSideDataResponse;
+import com.zrlog.admin.business.rest.response.UserBasicInfoResponse;
+import com.zrlog.admin.web.controller.api.AdminUserController;
 import com.zrlog.admin.web.token.AdminTokenService;
+import com.zrlog.admin.web.token.AdminTokenThreadLocal;
 import com.zrlog.business.service.CommonService;
 import com.zrlog.common.Constants;
+import com.zrlog.common.rest.response.ApiStandardResponse;
+import com.zrlog.util.I18nUtil;
+import com.zrlog.util.ZrLogUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import javax.servlet.http.Cookie;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.lang.reflect.Method;
+import java.util.Date;
+import java.util.Map;
+import java.util.Objects;
 
 public class AdminPageController extends Controller {
 
-    private final AdminTokenService adminTokenService = new AdminTokenService();
-
-    public void index() throws FileNotFoundException {
-        if (getRequest().getRequestURI().endsWith(Constants.ADMIN_URI_BASE_PATH) || getRequest().getRequestURI().endsWith(Constants.ADMIN_URI_BASE_PATH + "/")) {
-            redirect(Constants.ADMIN_URI_BASE_PATH + Constants.INDEX_URI_PATH);
+    public void index() {
+        if (getRequest().getUri().endsWith(Constants.ADMIN_URI_BASE_PATH) || getRequest().getUri().endsWith(Constants.ADMIN_URI_BASE_PATH + "/")) {
+            response.redirect(Constants.ADMIN_URI_BASE_PATH + Constants.INDEX_URI_PATH);
             return;
         }
         renderIndex();
     }
 
-    private void renderIndex() throws FileNotFoundException {
-        File file = new File(PathKit.getWebRootPath() + "/admin/index.html");
-        if (!file.exists()) {
-            renderError(404);
+    private void renderIndex() {
+        InputStream inputStream = AdminPageController.class.getResourceAsStream(Constants.ADMIN_HTML_PAGE);
+        if (Objects.isNull(inputStream)) {
+            response.renderCode(404);
             return;
         }
-        Document document = Jsoup.parse(IOUtil.getStringInputStream(new FileInputStream(file)));
+        Document document = Jsoup.parse(IOUtil.getStringInputStream(inputStream));
         //clean history
         document.body().removeClass("dark");
         document.body().removeClass("light");
-        document.selectFirst("base").attr("href", getRequest().getContextPath() + "/");
+        document.selectFirst("base").attr("href", "/");
         document.body().addClass(Constants.getBooleanByFromWebSite("admin_darkMode") ? "dark" : "light");
-        document.title(Constants.WEB_SITE.get("title") + "");
-        document.getElementById("resourceInfo").text(new Gson().toJson(new CommonService().blogResourceInfo()));
-        render(new HtmlRender(document.html()));
+        document.title(Constants.WEB_SITE.get("title") + " | " + I18nUtil.getBlogStringFromRes("admin.management"));
+        document.getElementById("__SS_DATA__").text(new Gson().toJson(serverSide(request.getUri())));
+        response.renderHtmlStr(document.html());
     }
 
-    public void login() throws FileNotFoundException {
-        renderIndex();
+    /*@ResponseBody
+    public ApiStandardResponse<ServerSideDataResponse> ssJson(){
+        return new ApiStandardResponse<>(serverSide(request.getParaToStr("uri")));
+    }*/
+
+    private ServerSideDataResponse serverSide(String uri){
+        Map<String,Object> resourceInfo = new CommonService().blogResourceInfo();
+        if(Objects.nonNull(AdminTokenThreadLocal.getUser())){
+            UserBasicInfoResponse basicInfoResponse =  new AdminUserController(request,response).index().getData();
+            try{
+                Method method = request.getRequestConfig().getRouter().getMethod("/api" +uri);
+                Controller controller = ZrLogUtil.buildController(method,request,response);
+                ApiStandardResponse<Object> result = (ApiStandardResponse<Object>) method.invoke(controller);
+                if(Objects.nonNull(result)){
+                    return new ServerSideDataResponse(basicInfoResponse,resourceInfo,result.getData());
+                } else{
+                    return new ServerSideDataResponse(basicInfoResponse,resourceInfo,new Object());
+                }
+            } catch (Exception e){
+                throw new RuntimeException(e);
+            }
+        } else{
+            return new ServerSideDataResponse(null,resourceInfo,null);
+        }
     }
 
     public void logout() {
@@ -54,12 +82,12 @@ public class AdminPageController extends Controller {
         for (Cookie cookie : cookies) {
             if (AdminTokenService.ADMIN_TOKEN.equals(cookie.getName())) {
                 cookie.setValue("");
-                cookie.setMaxAge(Constants.getSessionTimeout().intValue());
+                cookie.setExpireDate(new Date(0));
                 cookie.setPath("/");
-                adminTokenService.setCookieDomain(getRequest(), cookie);
+                cookie.setHttpOnly(true);
                 getResponse().addCookie(cookie);
             }
         }
-        redirect(Constants.ADMIN_LOGIN_URI_PATH);
+        response.redirect(Constants.ADMIN_LOGIN_URI_PATH);
     }
 }

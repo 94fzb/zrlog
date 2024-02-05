@@ -2,38 +2,50 @@ package com.zrlog.common;
 
 import com.hibegin.common.util.BooleanUtils;
 import com.hibegin.common.util.StringUtils;
+import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.common.type.AutoUpgradeVersionType;
+import com.zrlog.plugin.Plugins;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 存放全局的静态变量，有多个地方使用一个key时，存放在这里，方便代码的维护。
  */
 public class Constants {
 
+    private static volatile long lastAccessTime = System.currentTimeMillis();
+
+    public static long getLastAccessTime() {
+        return lastAccessTime;
+    }
+
+    public static void setLastAccessTime(long lastAccessTime) {
+        Constants.lastAccessTime = lastAccessTime;
+    }
+
+    public static InstallAction installAction;
+
     public static final String ZRLOG_SQL_VERSION_KEY = "zrlogSqlVersion";
+
+    public static final String INSTALL_HTML_PAGE = "/install/index.html";
+
+    public static final String ADMIN_URI_BASE_PATH = "/admin";
+
+    public static final String ADMIN_HTML_PAGE = ADMIN_URI_BASE_PATH + "/index.html";
 
     public static final String TEMPLATE_BASE_PATH = "/include/templates/";
 
     public static final String DEFAULT_TEMPLATE_PATH = TEMPLATE_BASE_PATH + "default";
 
-    public static final String ERROR_PAGE = "/error/500.html";
+    public static final String ZRLOG_RESOURCE_DOWNLOAD_URL = "https://dl.zrlog.com";
 
-    public static final String FORBIDDEN_PAGE = "/error/403.html";
-
-    public static final String NOT_FOUND_PAGE = "/error/404.html";
-
-    public static final String ZRLOG_RESOURCE_DOWNLOAD_URL = "http://dl.zrlog.com";
+    public static final Set<String> TEMPLATE_REPO_HOSTS = new HashSet<>(Arrays.asList("https://store.zrlog.com", "https://www.zrlog.com"));
 
     public static final String AUTO_UPGRADE_VERSION_KEY = "autoUpgradeVersion";
 
     public static final int DEFAULT_ARTICLE_DIGEST_LENGTH = 200;
 
-    public static final String ADMIN_URI_BASE_PATH = "/admin";
 
     public static final String ADMIN_LOGIN_URI_PATH = ADMIN_URI_BASE_PATH + "/login";
 
@@ -47,11 +59,9 @@ public class Constants {
 
     public static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ssXXX";
 
-    public static final Map<String, Object> WEB_SITE = Collections.synchronizedMap(new HashMap<>());
+    public static final Map<String, Object> WEB_SITE = Collections.synchronizedMap(new LinkedHashMap<>());
 
-    public static final boolean IN_JAR = new File("webapp").exists();
-
-    public static final String ARTICLE_ROUTER_KEY = "article_route";
+    public static final Integer SQL_VERSION = 17;
 
     /**
      * 1天
@@ -91,21 +101,7 @@ public class Constants {
     }
 
     public static String getArticleUri() {
-        String router = getArticleRoute();
-        if (StringUtils.isNotEmpty(router)) {
-            return router + "/";
-        }
         return "";
-    }
-
-    public static String getArticleRoute() {
-        if (WEB_SITE.containsKey(ARTICLE_ROUTER_KEY)) {
-            if (WEB_SITE.get(ARTICLE_ROUTER_KEY) == null) {
-                return "";
-            }
-            return (String) WEB_SITE.get("article_route");
-        }
-        return "post";
     }
 
     public static int getAutoDigestLength() {
@@ -133,7 +129,7 @@ public class Constants {
         long sessionTimeout;
         if (!StringUtils.isEmpty(sessionTimeoutString)) {
             //*60， Cookie过期时间单位为分钟
-            sessionTimeout = Long.parseLong(sessionTimeoutString) * 60 * 1000;
+            sessionTimeout = (long) (Double.parseDouble(sessionTimeoutString) * 60 * 1000);
             if (sessionTimeout <= 0) {
                 sessionTimeout = DEFAULT_SESSION_TIMEOUT;
             }
@@ -144,7 +140,7 @@ public class Constants {
     }
 
     public static List<String> articleRouterList() {
-        return Collections.singletonList("/" + getArticleRoute());
+        return Collections.singletonList("/");
     }
 
     public static boolean isAllowComment() {
@@ -153,5 +149,14 @@ public class Constants {
 
     public static Integer getDefaultRows() {
         return Integer.valueOf(Constants.WEB_SITE.get("rows").toString());
+    }
+
+
+    public static Plugins plugins = new Plugins();
+
+    public static File getDbPropertiesFile() {
+        File file = new File(PathUtil.getConfPath() + "/db.properties");
+        new File(PathUtil.getConfPath()).mkdirs();
+        return file;
     }
 }

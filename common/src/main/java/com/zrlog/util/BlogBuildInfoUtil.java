@@ -1,9 +1,8 @@
 package com.zrlog.util;
 
 
+import com.hibegin.common.util.LoggerUtil;
 import com.zrlog.common.Constants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,6 +12,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * 读取ZrLog构建信息，及build.properties。
@@ -20,7 +21,7 @@ import java.util.Properties;
  */
 public class BlogBuildInfoUtil {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BlogBuildInfoUtil.class);
+    private static final Logger LOGGER = LoggerUtil.getLogger(BlogBuildInfoUtil.class);
 
     /**
      * 目前以git的commitId的前7位标记构建的Id
@@ -49,12 +50,12 @@ public class BlogBuildInfoUtil {
                     runMode = properties.get("runMode").toString();
                 }
             } catch (IOException | ParseException e) {
-                LOGGER.error("doRead stream error", e);
+                LOGGER.log(Level.SEVERE, "doRead stream error", e);
             } finally {
                 try {
                     inputStream.close();
                 } catch (IOException e) {
-                    LOGGER.error("close stream error", e);
+                    LOGGER.log(Level.SEVERE, "close stream error", e);
                 }
             }
         }
@@ -111,7 +112,7 @@ public class BlogBuildInfoUtil {
         try {
             blogProperties.load(BlogBuildInfoUtil.class.getResourceAsStream("/zrlog.properties"));
         } catch (IOException e) {
-            LOGGER.error("load blogProperties error", e);
+            LOGGER.log(Level.SEVERE, "load blogProperties error", e);
         }
         blogProperties.put("version", BlogBuildInfoUtil.getVersion());
         blogProperties.put("buildId", BlogBuildInfoUtil.getBuildId());

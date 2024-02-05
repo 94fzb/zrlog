@@ -2,59 +2,80 @@ package com.zrlog.admin.web.controller.api;
 
 import com.hibegin.common.util.BeanUtil;
 import com.hibegin.common.util.StringUtils;
-import com.jfinal.core.Controller;
+import com.hibegin.http.annotation.ResponseBody;
+import com.hibegin.http.server.api.HttpRequest;
+import com.hibegin.http.server.api.HttpResponse;
+import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.exception.NotFindResourceException;
 import com.zrlog.admin.business.exception.PermissionErrorException;
 import com.zrlog.admin.business.rest.request.CreateArticleRequest;
 import com.zrlog.admin.business.rest.request.UpdateArticleRequest;
-import com.zrlog.admin.business.rest.response.*;
+import com.zrlog.admin.business.rest.response.ArticleGlobalResponse;
+import com.zrlog.admin.business.rest.response.ArticleResponseEntry;
+import com.zrlog.admin.business.rest.response.DeleteLogResponse;
+import com.zrlog.admin.business.rest.response.LoadEditArticleResponse;
 import com.zrlog.admin.business.service.AdminArticleService;
 import com.zrlog.admin.business.util.ControllerUtil;
 import com.zrlog.admin.web.annotation.RefreshCache;
 import com.zrlog.admin.web.token.AdminTokenThreadLocal;
 import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.common.Constants;
+import com.zrlog.common.rest.response.ApiStandardResponse;
 import com.zrlog.data.dto.PageData;
 import com.zrlog.model.Log;
 import com.zrlog.model.Tag;
 import com.zrlog.model.Type;
 import com.zrlog.util.ZrLogUtil;
 
+import java.sql.SQLException;
+import java.util.Map;
+
 public class AdminArticleController extends Controller {
 
     private final AdminArticleService articleService = new AdminArticleService();
 
+    public AdminArticleController() {
+    }
+
+    public AdminArticleController(HttpRequest request, HttpResponse response) {
+        super(request, response);
+    }
+
     @RefreshCache(async = true)
-    public DeleteLogResponse delete() {
+    @ResponseBody
+    public ApiStandardResponse delete() throws SQLException {
         if (ZrLogUtil.isPreviewMode()) {
             throw new PermissionErrorException();
         }
-        String[] ids = getPara("id").split(",");
+        String[] ids = getRequest().getParaToStr("id").split(",");
         for (String id : ids) {
-            articleService.delete(id);
+            articleService.delete(Long.valueOf(id));
         }
         DeleteLogResponse deleteLogResponse = new DeleteLogResponse();
         deleteLogResponse.setDelete(true);
-        return deleteLogResponse;
-    }
-
-    @RefreshCache
-    public CreateOrUpdateArticleResponse create() {
-        return articleService.create(AdminTokenThreadLocal.getUser(), ZrLogUtil.convertRequestBody(getRequest(),
-                CreateArticleRequest.class));
+        return new ApiStandardResponse(deleteLogResponse);
     }
 
     @RefreshCache(async = true)
-    public CreateOrUpdateArticleResponse update() {
-        return articleService.update(AdminTokenThreadLocal.getUser(), ZrLogUtil.convertRequestBody(getRequest(),
-                UpdateArticleRequest.class));
+    @ResponseBody
+    public ApiStandardResponse create() {
+        return new ApiStandardResponse(articleService.create(AdminTokenThreadLocal.getUser(), ZrLogUtil.convertRequestBody(getRequest(),
+                CreateArticleRequest.class)));
     }
 
-    public PageData<ArticleResponseEntry> index() {
+    @RefreshCache(async = true)
+    @ResponseBody
+    public ApiStandardResponse update() {
+        return new ApiStandardResponse(articleService.update(AdminTokenThreadLocal.getUser(), ZrLogUtil.convertRequestBody(getRequest(),
+                UpdateArticleRequest.class)));
+    }
+
+    @ResponseBody
+    public ApiStandardResponse index() throws SQLException {
         PageData<ArticleResponseEntry> key = articleService.adminPage(ControllerUtil.getPageRequest(this),
-                WebTools.convertRequestParam(getPara("key")));
+                WebTools.convertRequestParam(request.getParaToStr("key")));
         key.getRows().forEach(x -> x.setUrl(WebTools.getHomeUrl(getRequest()) + Constants.getArticleUri() + getAccessKey(x)));
-        return key;
+        return new ApiStandardResponse(key);
     }
 
     private String getAccessKey(ArticleResponseEntry articleResponseEntry) {
@@ -64,22 +85,38 @@ public class AdminArticleController extends Controller {
         return articleResponseEntry.getId() + "";
     }
 
-    public ArticleGlobalResponse global() {
+    @ResponseBody
+    public ApiStandardResponse<ArticleGlobalResponse> articleEdit() throws SQLException {
         ArticleGlobalResponse response = new ArticleGlobalResponse();
         response.setTags(new Tag().findAll());
         response.setTypes(new Type().findAll());
-        return response;
+        String id = request.getParaToStr("id");
+        if(StringUtils.isNotEmpty(id)){
+            response.setArticle(detail().getData());
+        } else {
+            response.setArticle(new LoadEditArticleResponse());
+        }
+        return new ApiStandardResponse<>(response);
     }
 
-    public LoadEditArticleResponse detail() {
-        if (getPara("id") == null) {
+    /**
+     * 仅保留，便于测试
+     * @return
+     * @throws SQLException
+     */
+    @ResponseBody
+    public ApiStandardResponse<LoadEditArticleResponse> detail() throws SQLException {
+        if (getRequest().getParaToStr("id") == null) {
             throw new NotFindResourceException();
         }
-        Log log = new Log().adminFindByIdOrAlias(getPara("id"));
+        Map<String, Object> log = new Log().adminFindByIdOrAlias(request.getParaToStr("id"));
         if (log == null) {
             throw new NotFindResourceException();
         }
-        return BeanUtil.convert(log.getAttrs(), LoadEditArticleResponse.class);
+        log.remove("releaseTime");
+        log.remove("last_update_date");
+        log.remove("lastUpdateDate");
+        return new ApiStandardResponse(BeanUtil.convert(log, LoadEditArticleResponse.class));
     }
 
 }

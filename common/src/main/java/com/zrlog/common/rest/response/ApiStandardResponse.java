@@ -1,14 +1,21 @@
 package com.zrlog.common.rest.response;
 
-public class ApiStandardResponse extends StandardResponse {
+public class ApiStandardResponse<T> extends StandardResponse {
 
-    private Object data;
+    public ApiStandardResponse() {
+    }
 
-    public Object getData() {
+    public ApiStandardResponse(T data) {
+        this.data = data;
+    }
+
+    private T data;
+
+    public T getData() {
         return data;
     }
 
-    public void setData(Object data) {
+    public void setData(T data) {
         this.data = data;
     }
 }

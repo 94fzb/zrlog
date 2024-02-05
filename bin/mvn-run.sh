@@ -1,0 +1,1 @@
+./mvnw clean package && sh bin/run.sh

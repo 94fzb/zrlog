@@ -19,8 +19,7 @@
         var found = [];
         try {
             jsyaml.load(text);
-        }
-        catch (e) {
+        } catch (e) {
             var loc = e.mark;
             found.push({
                 from: CodeMirror.Pos(loc.line, loc.column),

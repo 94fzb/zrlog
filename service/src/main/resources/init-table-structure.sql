@@ -112,7 +112,7 @@ CREATE TABLE `log`
     `alias`            varchar(64)  DEFAULT NULL,
     `canComment`       bit(1)       DEFAULT b'1',
     `click`            int(11) DEFAULT '0',
-    `version`         int(11) DEFAULT '0',
+    `version`          int(11) DEFAULT '0',
     `content`          longtext,
     `plain_content`    longtext,
     `markdown`         longtext,

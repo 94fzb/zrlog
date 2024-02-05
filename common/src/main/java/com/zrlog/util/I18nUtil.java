@@ -1,19 +1,20 @@
 package com.zrlog.util;
 
 import com.hibegin.common.util.BeanUtil;
+import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.StringUtils;
+import com.hibegin.http.server.api.HttpRequest;
 import com.zrlog.common.Constants;
 import com.zrlog.common.exception.NotImplementException;
 import com.zrlog.common.vo.I18nVO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * 多语言的工具类
@@ -21,7 +22,7 @@ import java.util.Properties;
 public class I18nUtil {
 
     public static final ThreadLocal<I18nVO> threadLocal = new ThreadLocal<>();
-    private static final Logger LOGGER = LoggerFactory.getLogger(I18nUtil.class);
+    private static final Logger LOGGER = LoggerUtil.getLogger(I18nUtil.class);
     private static final I18nVO i18nVOCache = new I18nVO();
     private static final String I18N_INSTALL_KEY = "install";
     private static final String I18N_BLOG_KEY = "blog";
@@ -63,17 +64,17 @@ public class I18nUtil {
                 map.put(entry.getKey().toString(), entry.getValue());
             }
         } catch (Exception e) {
-            LOGGER.error("load properties error", e);
+            LOGGER.log(Level.SEVERE, "load properties error", e);
         } finally {
             try {
                 inputStream.close();
             } catch (IOException e) {
-                LOGGER.error("", e);
+                LOGGER.log(Level.SEVERE, "", e);
             }
         }
     }
 
-    public static void addToRequest(String path, HttpServletRequest request, boolean devMode) {
+    public static void addToRequest(String path, HttpRequest request, boolean devMode) {
         if (devMode) {
             reloadSystemI18N();
         }
@@ -90,7 +91,7 @@ public class I18nUtil {
             }
         }
         String locale;
-        if (request.getRequestURI().contains(Constants.ADMIN_URI_BASE_PATH + "/") || request.getRequestURI().contains("/api" + Constants.ADMIN_URI_BASE_PATH + "/")) {
+        if (request.getUri().contains(Constants.ADMIN_URI_BASE_PATH + "/") || request.getUri().contains("/api" + Constants.ADMIN_URI_BASE_PATH + "/")) {
             locale = (String) Constants.WEB_SITE.get("language");
         } else {
             String referer = request.getHeader("referer");
@@ -115,18 +116,18 @@ public class I18nUtil {
             }
         }
         blogI18n.put("_locale", locale);
-        request.setAttribute("local", locale);
+        request.getAttr().put("local", locale);
         String lang = locale;
         if (locale.contains("_")) {
             lang = locale.substring(0, locale.indexOf('_'));
         }
-        request.setAttribute("lang", lang);
-        request.setAttribute("_res", blogI18n);
+        request.getAttr().put("lang", lang);
+        request.getAttr().put("_res", blogI18n);
         i18nVO.setLocale(locale);
         threadLocal.set(i18nVO);
     }
 
-    public static String getAcceptLocal(HttpServletRequest request) {
+    public static String getAcceptLocal(HttpRequest request) {
         String lang = request.getHeader("Accept-Language");
         if (Objects.nonNull(lang) && lang.startsWith("en")) {
             return "en_US";

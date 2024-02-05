@@ -1,29 +1,27 @@
 package com.zrlog.business.util;
 
 import com.hibegin.common.util.IOUtil;
+import com.hibegin.common.util.StringUtils;
 import com.hibegin.common.util.http.HttpUtil;
 import com.hibegin.common.util.http.handle.CloseResponseHandle;
+import com.hibegin.http.HttpMethod;
+import com.hibegin.http.server.api.HttpRequest;
+import com.hibegin.http.server.api.HttpResponse;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.AdminTokenVO;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ZrLogUtil;
-import org.apache.http.Header;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.util.*;
 
 public class PluginHelper {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PluginHelper.class);
 
-    public static Map<String, String> genHeaderMapByRequest(HttpServletRequest request, AdminTokenVO adminTokenVO) {
+    public static Map<String, String> genHeaderMapByRequest(HttpRequest request, AdminTokenVO adminTokenVO) {
         Map<String, String> map = new HashMap<>();
         if (adminTokenVO != null) {
             map.put("LoginUserId", adminTokenVO.getUserId() + "");
@@ -34,52 +32,37 @@ public class PluginHelper {
         map.put("Dark-Mode", Constants.getBooleanByFromWebSite("admin_darkMode") + "");
         if (request != null) {
             String fullUrl = ZrLogUtil.getFullUrl(request);
-            if (request.getQueryString() != null) {
-                fullUrl = fullUrl + "?" + request.getQueryString();
+            if (request.getQueryStr() != null) {
+                fullUrl = fullUrl + "?" + request.getQueryStr();
             }
             if (adminTokenVO != null) {
                 fullUrl = adminTokenVO.getProtocol() + ":" + fullUrl;
             }
             map.put("Cookie", request.getHeader("Cookie"));
-            map.put("AccessUrl", "http://127.0.0.1:" + request.getServerPort() + request.getContextPath());
+            map.put("AccessUrl", "http://127.0.0.1:" + request.getServerConfig().getPort());
             if (request.getHeader("Content-Type") != null) {
                 map.put("Content-Type", request.getHeader("Content-Type"));
+            }
+            if (StringUtils.isNotEmpty(request.getHeader("Referer"))) {
+                map.put("Referer", request.getHeader("Referer"));
             }
             map.put("Full-Url", fullUrl);
         }
         return map;
     }
 
-    public static CloseResponseHandle getContext(String uri, String method, HttpServletRequest request, boolean disableRedirect, AdminTokenVO adminTokenVO) throws IOException, InstantiationException {
+    public static CloseResponseHandle getContext(String uri, HttpMethod method, HttpRequest request, AdminTokenVO adminTokenVO) throws IOException, URISyntaxException, InterruptedException {
         String pluginServerHttp = Constants.pluginServer;
-        CloseableHttpResponse httpResponse;
         CloseResponseHandle handle = new CloseResponseHandle();
-        HttpUtil httpUtil = disableRedirect ? HttpUtil.getDisableRedirectInstance() : HttpUtil.getInstance();
         //GET请求不关心request.getInputStream() 的数据
-        if (method.equals(request.getMethod()) && "GET".equalsIgnoreCase(method)) {
-            httpResponse = httpUtil.sendGetRequest(pluginServerHttp + uri, request.getParameterMap(), handle, PluginHelper.genHeaderMapByRequest(request, adminTokenVO)).getT();
+        if (method.equals(request.getMethod()) && "GET".equalsIgnoreCase(method.name())) {
+            HttpUtil.getInstance().sendGetRequest(pluginServerHttp + uri, request.getParamMap(), handle, PluginHelper.genHeaderMapByRequest(request, adminTokenVO));
         } else {
             //如果是表单数据提交不关心请求头，反之将所有请求头都发到插件服务
-            if ("application/x-www-form-urlencoded".equals(request.getContentType())) {
-                httpResponse = httpUtil.sendPostRequest(pluginServerHttp + uri, request.getParameterMap(), handle, PluginHelper.genHeaderMapByRequest(request, adminTokenVO)).getT();
+            if ("application/x-www-form-urlencoded".equals(request.getHeader("Content-Type"))) {
+                HttpUtil.getInstance().sendPostRequest(pluginServerHttp + uri, request.getParamMap(), handle, PluginHelper.genHeaderMapByRequest(request, adminTokenVO));
             } else {
-                httpResponse = httpUtil.sendPostRequest(pluginServerHttp + uri + "?" + request.getQueryString(), IOUtil.getByteByInputStream(request.getInputStream()), handle, PluginHelper.genHeaderMapByRequest(request, adminTokenVO)).getT();
-            }
-        }
-        //添加插件服务的HTTP响应头到调用者响应头里面
-        if (httpResponse != null) {
-            Map<String, String> headerMap = new HashMap<>();
-            Header[] headers = httpResponse.getAllHeaders();
-            for (Header header : headers) {
-                headerMap.put(header.getName(), header.getValue());
-            }
-            if (BlogBuildInfoUtil.isDev()) {
-                LOGGER.info("{} --------------------------------- response", uri);
-            }
-            for (Map.Entry<String, String> t : headerMap.entrySet()) {
-                if (BlogBuildInfoUtil.isDev()) {
-                    LOGGER.info("{} value-> {}", t.getKey(), t.getValue());
-                }
+                HttpUtil.getInstance().sendPostRequest(pluginServerHttp + uri + "?" + request.getQueryStr(), IOUtil.getByteByInputStream(request.getInputStream()), handle, PluginHelper.genHeaderMapByRequest(request, adminTokenVO)).getT();
             }
         }
         return handle;
@@ -95,27 +78,25 @@ public class PluginHelper {
      * @throws IOException
      * @throws InstantiationException
      */
-    public static boolean accessPlugin(String uri, HttpServletRequest request, HttpServletResponse response, AdminTokenVO adminTokenVO) throws IOException, InstantiationException {
-        CloseResponseHandle handle = PluginHelper.getContext(uri, request.getMethod(), request, true, adminTokenVO);
-        try {
-            if (handle.getT() != null && handle.getT().getEntity() != null) {
-                response.setStatus(handle.getT().getStatusLine().getStatusCode());
-                //防止多次被Transfer-Encoding
-                handle.getT().removeHeaders("Transfer-Encoding");
-                for (Header header : handle.getT().getAllHeaders()) {
-                    response.addHeader(header.getName(), header.getValue());
-                }
-                //将插件服务的HTTP的body返回给调用者
-                byte[] bytes = IOUtil.getByteByInputStream(handle.getT().getEntity().getContent());
-                response.addHeader("Content-Length", Integer.toString(bytes.length));
-                response.getOutputStream().write(bytes);
-                response.getOutputStream().close();
-                return true;
-            } else {
-                return false;
-            }
-        } finally {
-            handle.close();
+    public static boolean accessPlugin(String uri, HttpRequest request, HttpResponse response, AdminTokenVO adminTokenVO) throws IOException, URISyntaxException, InterruptedException {
+        CloseResponseHandle handle = PluginHelper.getContext(uri, request.getMethod(), request, adminTokenVO);
+        if (Objects.isNull(handle.getT()) || Objects.isNull(handle.getT().body())) {
+            response.renderCode(404);
+            return true;
         }
+        List<String> ignoreHeaderKeys = Arrays.asList("content-encoding", "transfer-encoding", "content-length", "server", "connection");
+        try (InputStream inputStream = handle.getT().body()) {
+            for (Map.Entry<String, List<String>> header : handle.getT().headers().map().entrySet()) {
+                if (ignoreHeaderKeys.stream().anyMatch(x -> Objects.equals(x, header.getKey()))) {
+                    continue;
+                }
+                response.addHeader(header.getKey(), header.getValue().get(0));
+            }
+            response.addHeader("Connection", "close");
+            //将插件服务的HTTP的body返回给调用者
+            response.write(inputStream, handle.getT().statusCode());
+            return true;
+        }
+
     }
 }

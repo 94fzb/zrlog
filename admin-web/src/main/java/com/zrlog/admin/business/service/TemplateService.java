@@ -6,8 +6,7 @@ import com.hibegin.common.util.FileUtils;
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.common.util.ZipUtil;
-import com.jfinal.core.JFinal;
-import com.jfinal.kit.PathKit;
+import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
 import com.zrlog.admin.business.rest.response.UploadTemplateResponse;
 import com.zrlog.business.service.TemplateHelper;
@@ -20,13 +19,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class TemplateService {
 
-    public UpdateRecordResponse save(String template, Map<String, Object> settingMap) {
+    public UpdateRecordResponse save(String template, Map<String, Object> settingMap) throws SQLException {
         new WebSite().updateByKV(template + Constants.TEMPLATE_CONFIG_SUFFIX,
                 new GsonBuilder().serializeNulls().create().toJson(settingMap));
         UpdateRecordResponse updateRecordResponse = new UpdateRecordResponse();
@@ -35,7 +35,7 @@ public class TemplateService {
     }
 
     public UploadTemplateResponse upload(String templateName, File file) throws IOException {
-        String finalPath = PathKit.getWebRootPath() + Constants.TEMPLATE_BASE_PATH;
+        String finalPath = PathUtil.getStaticPath() + Constants.TEMPLATE_BASE_PATH;
         String finalFile = finalPath + templateName;
         FileUtils.deleteFile(finalFile);
         //start extract template file
@@ -48,13 +48,13 @@ public class TemplateService {
         return response;
     }
 
-    public List<TemplateVO> getAllTemplates(String contextPath, String previewTemplate) {
-        File[] templatesFile = new File(PathKit.getWebRootPath() + Constants.TEMPLATE_BASE_PATH).listFiles();
+    public List<TemplateVO> getAllTemplates(String previewTemplate) {
+        File[] templatesFile = new File(PathUtil.getStaticPath() + Constants.TEMPLATE_BASE_PATH).listFiles();
         List<TemplateVO> templates = new ArrayList<>();
         if (templatesFile != null) {
             for (File file : templatesFile) {
                 if (file.isDirectory() && !file.isHidden()) {
-                    TemplateVO templateVO = TemplateHelper.getTemplateVO(contextPath, file);
+                    TemplateVO templateVO = TemplateHelper.getTemplateVO(file);
                     templates.add(templateVO);
                 }
             }
@@ -88,9 +88,9 @@ public class TemplateService {
     }
 
     public TemplateVO loadTemplateConfig(String templateName) {
-        TemplateVO templateVO = TemplateHelper.getTemplateVO(JFinal.me().getContextPath(),
-                new File(PathKit.getWebRootPath() + templateName));
-        File configFile = new File(PathKit.getWebRootPath() + templateName + "/setting/config-form.json");
+        TemplateVO templateVO = TemplateHelper.getTemplateVO(
+                new File(PathUtil.getStaticPath() + templateName));
+        File configFile = new File(PathUtil.getStaticPath() + templateName + "/setting/config-form.json");
         TemplateVO.TemplateConfigMap config;
         //文件存在才配置
         if (configFile.exists()) {

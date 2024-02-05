@@ -1,24 +1,25 @@
 package com.zrlog.admin.business.service;
 
+import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.http.HttpUtil;
 import com.hibegin.common.util.http.handle.HttpJsonArrayHandle;
+import com.hibegin.http.server.api.HttpRequest;
 import com.zrlog.admin.business.rest.response.UploadFileResponse;
 import com.zrlog.business.util.PluginHelper;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.AdminTokenVO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class UploadService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UploadService.class);
+    private static final Logger LOGGER = LoggerUtil.getLogger(UploadService.class);
 
-    public UploadFileResponse getCloudUrl(String contextPath, String uri, String finalFilePath, HttpServletRequest request, AdminTokenVO adminTokenVO) {
+    public UploadFileResponse getCloudUrl(String contextPath, String uri, String finalFilePath, HttpRequest request, AdminTokenVO adminTokenVO) {
         UploadFileResponse uploadFileResponse = new UploadFileResponse();
         // try push to cloud
         Map<String, String[]> map = new HashMap<>();
@@ -42,7 +43,7 @@ public class UploadService {
             }
         } catch (Exception e) {
             url = contextPath + uri;
-            LOGGER.error("", e);
+            LOGGER.log(Level.SEVERE, "", e);
         }
         uploadFileResponse.setUrl(url);
         return uploadFileResponse;

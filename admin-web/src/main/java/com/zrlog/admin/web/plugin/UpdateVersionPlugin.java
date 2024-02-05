@@ -1,29 +1,32 @@
 package com.zrlog.admin.web.plugin;
 
+import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.common.util.http.HttpUtil;
-import com.jfinal.plugin.IPlugin;
 import com.zrlog.business.service.InstallService;
 import com.zrlog.common.Constants;
 import com.zrlog.common.type.AutoUpgradeVersionType;
 import com.zrlog.common.vo.Version;
 import com.zrlog.model.WebSite;
+import com.zrlog.plugin.IPlugin;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.I18nUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.sql.SQLException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * 基于JFinal插件的实现，使用定时器，定时检查是否有新的版本发布。
+ * 基于插件的实现，使用定时器，定时检查是否有新的版本发布。
  */
 public class UpdateVersionPlugin implements IPlugin {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UpdateVersionPlugin.class);
+    private static final Logger LOGGER = LoggerUtil.getLogger(UpdateVersionPlugin.class);
 
     private ScheduledExecutorService scheduledExecutorService;
 
@@ -41,8 +44,8 @@ public class UpdateVersionPlugin implements IPlugin {
     public boolean start() {
         String value = new WebSite().getStringValueByName(Constants.AUTO_UPGRADE_VERSION_KEY);
         boolean checkPreview = previewAble();
-        if (value != null && !"".equals(value)) {
-            AutoUpgradeVersionType autoUpgradeVersionType = AutoUpgradeVersionType.cycle(Integer.parseInt(value));
+        if (value != null && !value.isEmpty()) {
+            AutoUpgradeVersionType autoUpgradeVersionType = AutoUpgradeVersionType.cycle((int) Double.parseDouble(value));
             if (scheduledExecutorService != null) {
                 scheduledExecutorService.shutdown();
             }
@@ -66,7 +69,11 @@ public class UpdateVersionPlugin implements IPlugin {
     }
 
     private boolean previewAble() {
-        return new WebSite().getBoolValueByName("upgradePreview");
+        try {
+            return new WebSite().getBoolValueByName("upgradePreview");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -84,7 +91,7 @@ public class UpdateVersionPlugin implements IPlugin {
             try {
                 return updateVersionTimerTask.fetchLastVersion(checkPreview);
             } catch (Exception e) {
-                LOGGER.error("", e);
+                LOGGER.log(Level.SEVERE, "", e);
             }
         }
         return updateVersionTimerTask.getVersion();
@@ -99,8 +106,8 @@ public class UpdateVersionPlugin implements IPlugin {
             if (StringUtils.isNotEmpty(changeLog)) {
                 return changeLog;
             }
-        } catch (IOException e) {
-            LOGGER.error("", e);
+        } catch (IOException | InterruptedException | URISyntaxException e) {
+            LOGGER.log(Level.SEVERE, "", e);
         }
         String changeUrl = "https://github.com/94fzb/zrlog/compare/" + BlogBuildInfoUtil.getBuildId() + "..." + buildId;
         return InstallService.renderMd("#### Not find changeLog, Please view git diff \n[" + changeUrl + "](" + changeUrl + ")");

@@ -2,7 +2,10 @@ package com.zrlog.admin.web.controller.api;
 
 import com.hibegin.common.util.BeanUtil;
 import com.hibegin.common.util.StringUtils;
-import com.jfinal.core.Controller;
+import com.hibegin.http.annotation.ResponseBody;
+import com.hibegin.http.server.api.HttpRequest;
+import com.hibegin.http.server.api.HttpResponse;
+import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.rest.request.UpdateAdminRequest;
 import com.zrlog.admin.business.rest.request.UpdatePasswordRequest;
 import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
@@ -10,10 +13,17 @@ import com.zrlog.admin.business.rest.response.UserBasicInfoResponse;
 import com.zrlog.admin.business.service.UpgradeService;
 import com.zrlog.admin.business.service.UserService;
 import com.zrlog.admin.web.annotation.RefreshCache;
+import com.zrlog.admin.web.plugin.UpdateVersionPlugin;
 import com.zrlog.admin.web.token.AdminTokenThreadLocal;
+import com.zrlog.common.Constants;
+import com.zrlog.common.rest.response.ApiStandardResponse;
 import com.zrlog.model.User;
 import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ZrLogUtil;
+
+import java.sql.SQLException;
+import java.util.Map;
+import java.util.Objects;
 
 public class AdminUserController extends Controller {
 
@@ -25,18 +35,27 @@ public class AdminUserController extends Controller {
         this.upgradeService = new UpgradeService();
     }
 
-    public UserBasicInfoResponse basicInfo() {
-        User byId = new User().findById(AdminTokenThreadLocal.getUserId());
-        UserBasicInfoResponse basicInfoResponse = BeanUtil.convert(byId.getAttrs(), UserBasicInfoResponse.class);
+    public AdminUserController(HttpRequest request, HttpResponse response) {
+        super(request, response);
+        this.userService = new UserService();
+        this.upgradeService = new UpgradeService();
+    }
+
+    @ResponseBody
+    public ApiStandardResponse<UserBasicInfoResponse> index() {
+        Map<String, Object> byId = new User().loadById(AdminTokenThreadLocal.getUserId());
+        UserBasicInfoResponse basicInfoResponse = BeanUtil.convert(byId, UserBasicInfoResponse.class);
         if (StringUtils.isEmpty(basicInfoResponse.getHeader())) {
             basicInfoResponse.setHeader("/assets/images/default-portrait.gif");
         }
-        basicInfoResponse.setLastVersion(upgradeService.getCheckVersionResponse(false));
-        return basicInfoResponse;
+        UpdateVersionPlugin plugin = (UpdateVersionPlugin) Constants.plugins.stream().filter(x -> x instanceof UpdateVersionPlugin).findFirst().orElse(null);
+        basicInfoResponse.setLastVersion(upgradeService.getCheckVersionResponse(false, Objects.requireNonNull(plugin)));
+        return new ApiStandardResponse<>(basicInfoResponse);
     }
 
     @RefreshCache
-    public UpdateRecordResponse update() {
+    @ResponseBody
+    public UpdateRecordResponse update() throws SQLException {
         UpdateAdminRequest updateAdminRequest = ZrLogUtil.convertRequestBody(getRequest(), UpdateAdminRequest.class);
         UpdateRecordResponse updateRecordResponse = new UpdateRecordResponse();
         if (updateAdminRequest != null) {
@@ -52,7 +71,8 @@ public class AdminUserController extends Controller {
         return updateRecordResponse;
     }
 
-    public UpdateRecordResponse updatePassword() {
+    @ResponseBody
+    public UpdateRecordResponse updatePassword() throws SQLException {
         return userService.updatePassword(AdminTokenThreadLocal.getUserId(),
                 ZrLogUtil.convertRequestBody(getRequest(), UpdatePasswordRequest.class));
     }
