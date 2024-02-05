@@ -2,19 +2,26 @@ package com.zrlog.admin.web.controller.page;
 
 import com.google.gson.Gson;
 import com.hibegin.common.util.IOUtil;
+import com.hibegin.http.annotation.ResponseBody;
 import com.hibegin.http.server.web.Controller;
 import com.hibegin.http.server.web.cookie.Cookie;
+import com.zrlog.admin.business.rest.response.ServerSideDataResponse;
+import com.zrlog.admin.business.rest.response.UserBasicInfoResponse;
 import com.zrlog.admin.web.controller.api.AdminUserController;
 import com.zrlog.admin.web.token.AdminTokenService;
 import com.zrlog.admin.web.token.AdminTokenThreadLocal;
 import com.zrlog.business.service.CommonService;
 import com.zrlog.common.Constants;
+import com.zrlog.common.rest.response.ApiStandardResponse;
 import com.zrlog.util.I18nUtil;
+import com.zrlog.util.ZrLogUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.util.Date;
+import java.util.Map;
 import java.util.Objects;
 
 public class AdminPageController extends Controller {
@@ -40,12 +47,34 @@ public class AdminPageController extends Controller {
         document.selectFirst("base").attr("href", "/");
         document.body().addClass(Constants.getBooleanByFromWebSite("admin_darkMode") ? "dark" : "light");
         document.title(Constants.WEB_SITE.get("title") + " | " + I18nUtil.getBlogStringFromRes("admin.management"));
-        document.getElementById("resourceInfo").text(new Gson().toJson(new CommonService().blogResourceInfo()));
-        if(Objects.nonNull(AdminTokenThreadLocal.getUser())){
-            document.getElementById("userInfo").text(new Gson().toJson(new AdminUserController(request,response).index()));
-        }
-
+        document.getElementById("__SS_DATA__").text(new Gson().toJson(serverSide(request.getUri())));
         response.renderHtmlStr(document.html());
+    }
+
+    /*@ResponseBody
+    public ApiStandardResponse<ServerSideDataResponse> ssJson(){
+        return new ApiStandardResponse<>(serverSide(request.getParaToStr("uri")));
+    }*/
+
+    private ServerSideDataResponse serverSide(String uri){
+        Map<String,Object> resourceInfo = new CommonService().blogResourceInfo();
+        if(Objects.nonNull(AdminTokenThreadLocal.getUser())){
+            UserBasicInfoResponse basicInfoResponse =  new AdminUserController(request,response).index().getData();
+            try{
+                Method method = request.getRequestConfig().getRouter().getMethod("/api" +uri);
+                Controller controller = ZrLogUtil.buildController(method,request,response);
+                ApiStandardResponse<Object> result = (ApiStandardResponse<Object>) method.invoke(controller);
+                if(Objects.nonNull(result)){
+                    return new ServerSideDataResponse(basicInfoResponse,resourceInfo,result.getData());
+                } else{
+                    return new ServerSideDataResponse(basicInfoResponse,resourceInfo,new Object());
+                }
+            } catch (Exception e){
+                throw new RuntimeException(e);
+            }
+        } else{
+            return new ServerSideDataResponse(null,resourceInfo,null);
+        }
     }
 
     public void logout() {

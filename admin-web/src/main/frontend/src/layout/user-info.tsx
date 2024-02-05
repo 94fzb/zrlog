@@ -6,65 +6,11 @@ import Dropdown from "antd/es/dropdown";
 import Image from "antd/es/image";
 import Constants, { getRes } from "../utils/constants";
 import Divider from "antd/es/divider";
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { BasicUserInfo } from "../type";
 
 const { Text } = Typography;
 
-type BasicInfo = {
-    userName: string;
-    header: string;
-};
-
-export type UserInfoState = {
-    basicInfoLoading: boolean;
-    basicInfo: BasicInfo;
-    upgrade: boolean;
-    newVersion: string;
-    versionType: string;
-};
-
-const UserInfo = () => {
-    const [state, setState] = useState<UserInfoState>({
-        basicInfoLoading: true,
-        basicInfo: {
-            userName: "",
-            header: "",
-        },
-        upgrade: false,
-        newVersion: "",
-        versionType: "",
-    });
-
-    const loadInfo = () => {
-        axios.get("/api/admin/user").then(({ data }) => {
-            if (data.data.lastVersion.version) {
-                setState({
-                    ...state,
-                    basicInfoLoading: false,
-                    basicInfo: data.data,
-                    upgrade: data.data.lastVersion.upgrade,
-                    newVersion: data.data.lastVersion.version.version,
-                    versionType: data.data.lastVersion.version.type,
-                });
-            } else {
-                setState({
-                    ...state,
-                    basicInfoLoading: false,
-                    basicInfo: data.data,
-                });
-            }
-        });
-    };
-
-    useEffect(() => {
-        loadInfo();
-    }, []);
-
-    if (state.basicInfoLoading) {
-        return <></>;
-    }
-
+const UserInfo = ({ data }: { data: BasicUserInfo }) => {
     const adminSettings = (res: Record<string, never>): MenuProps["items"] => {
         let base = [
             {
@@ -101,16 +47,17 @@ const UserInfo = () => {
                 ),
             },
         ];
-        if (state.upgrade) {
+        if (data.lastVersion?.upgrade) {
             base = [
                 {
                     key: "0",
                     label: (
                         <Link to="/upgrade">
-                            <Badge dot={state.upgrade}>
+                            <Badge dot={true}>
                                 <SoundOutlined />
                                 <Text style={{ paddingLeft: "6px" }}>
-                                    {res["newVersion"]} - ({state.newVersion}#{state.versionType})
+                                    {res["newVersion"]} - ({data.lastVersion.version["newVersion"]}#
+                                    {data.lastVersion.version["versionType"]})
                                 </Text>
                             </Badge>
                         </Link>
@@ -134,23 +81,22 @@ const UserInfo = () => {
                     marginRight: 16,
                     float: "right",
                 }}
-                hidden={state.basicInfoLoading}
             >
                 <Image
                     preview={false}
                     fallback={Constants.getFillBackImg()}
                     className={"userAvatarImg"}
-                    src={state.basicInfo.header}
+                    src={data.header}
                     style={{ cursor: "pointer", width: 40, height: 40 }}
                 />
-                <Badge dot={state.upgrade}>
+                <Badge dot={data.lastVersion?.upgrade}>
                     <Text
                         style={{
                             color: "#ffffff",
                             paddingLeft: 8,
                         }}
                     >
-                        {state.basicInfo.userName}
+                        {data.userName}
                     </Text>
                 </Badge>
                 <DownOutlined />

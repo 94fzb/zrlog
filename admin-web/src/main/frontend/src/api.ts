@@ -1,12 +1,14 @@
 import axios from "axios";
+import {ssData} from "./index";
+
+let ssPageData:undefined;
 
 export const getCsrData = async (uri: string) => {
-    const ssrData = document.getElementById("__SSR_DATE__")?.innerText;
-    if(ssrData){
-        document.getElementById("__SSR_DATE__")?.remove();
-        return JSON.parse(ssrData).data;
+    // @ts-ignore
+    if(ssPageData === undefined && ssData && ssData.pageData){
+        ssPageData = ssData.pageData;
+        return ssData.pageData;
     }
-
     const {data} = await axios.get("/api/admin" + uri);
     return data.data;
 }

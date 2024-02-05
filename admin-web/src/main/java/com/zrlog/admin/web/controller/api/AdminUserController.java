@@ -42,7 +42,7 @@ public class AdminUserController extends Controller {
     }
 
     @ResponseBody
-    public ApiStandardResponse index() {
+    public ApiStandardResponse<UserBasicInfoResponse> index() {
         Map<String, Object> byId = new User().loadById(AdminTokenThreadLocal.getUserId());
         UserBasicInfoResponse basicInfoResponse = BeanUtil.convert(byId, UserBasicInfoResponse.class);
         if (StringUtils.isEmpty(basicInfoResponse.getHeader())) {
@@ -50,7 +50,7 @@ public class AdminUserController extends Controller {
         }
         UpdateVersionPlugin plugin = (UpdateVersionPlugin) Constants.plugins.stream().filter(x -> x instanceof UpdateVersionPlugin).findFirst().orElse(null);
         basicInfoResponse.setLastVersion(upgradeService.getCheckVersionResponse(false, Objects.requireNonNull(plugin)));
-        return new ApiStandardResponse(basicInfoResponse);
+        return new ApiStandardResponse<>(basicInfoResponse);
     }
 
     @RefreshCache

@@ -3,6 +3,8 @@ package com.zrlog.admin.web.controller.api;
 import com.hibegin.common.util.BeanUtil;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.annotation.ResponseBody;
+import com.hibegin.http.server.api.HttpRequest;
+import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.rest.base.BasicWebSiteRequest;
 import com.zrlog.admin.business.rest.base.BlogWebSiteRequest;
@@ -26,6 +28,13 @@ import java.util.Map.Entry;
 public class WebSiteController extends Controller {
 
     private final WebSiteService webSiteService = new WebSiteService();
+
+    public WebSiteController() {
+    }
+
+    public WebSiteController(HttpRequest request, HttpResponse response) {
+        super(request, response);
+    }
 
     @ResponseBody
     public ApiStandardResponse<VersionResponse> version() {

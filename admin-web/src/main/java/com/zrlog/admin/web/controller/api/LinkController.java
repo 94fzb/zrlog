@@ -2,6 +2,8 @@ package com.zrlog.admin.web.controller.api;
 
 import com.hibegin.common.util.BeanUtil;
 import com.hibegin.http.annotation.ResponseBody;
+import com.hibegin.http.server.api.HttpRequest;
+import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.rest.base.CreateLinkRequest;
 import com.zrlog.admin.business.rest.base.UpdateLinkRequest;
@@ -15,6 +17,13 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 public class LinkController extends Controller {
+
+    public LinkController() {
+    }
+
+    public LinkController(HttpRequest request, HttpResponse response) {
+        super(request, response);
+    }
 
     @RefreshCache(async = true)
     @ResponseBody

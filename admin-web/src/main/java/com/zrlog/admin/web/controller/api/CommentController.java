@@ -1,6 +1,8 @@
 package com.zrlog.admin.web.controller.api;
 
 import com.hibegin.http.annotation.ResponseBody;
+import com.hibegin.http.server.api.HttpRequest;
+import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.rest.request.ReadCommentRequest;
 import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
@@ -14,6 +16,13 @@ import com.zrlog.util.ZrLogUtil;
 import java.sql.SQLException;
 
 public class CommentController extends Controller {
+
+    public CommentController() {
+    }
+
+    public CommentController(HttpRequest request, HttpResponse response) {
+        super(request, response);
+    }
 
     private final AdminCommentService commentService = new AdminCommentService();
 

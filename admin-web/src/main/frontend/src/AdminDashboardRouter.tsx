@@ -48,8 +48,6 @@ const AdminDashboardRouter = () => {
         });
     }, [location.pathname, location.search]);
 
-    console.info(location);
-
     return (
         <Routes>
             <Route
@@ -57,7 +55,7 @@ const AdminDashboardRouter = () => {
                 element={
                     <AdminManageLayout>
                         {data && (
-                            <Suspense fallback={<MyLoadingComponent />} key={location.pathname}>
+                            <Suspense fallback={<MyLoadingComponent />}>
                                 <AsyncIndex data={data} />
                             </Suspense>
                         )}
@@ -69,7 +67,7 @@ const AdminDashboardRouter = () => {
                 element={
                     <AdminManageLayout>
                         {data && (
-                            <Suspense>
+                            <Suspense fallback={<MyLoadingComponent />}>
                                 <AsyncComment data={data} />
                             </Suspense>
                         )}
@@ -80,7 +78,7 @@ const AdminDashboardRouter = () => {
                 path="plugin"
                 element={
                     <AdminManageLayout>
-                        <Suspense>
+                        <Suspense fallback={<MyLoadingComponent />}>
                             <AsyncPlugin />
                         </Suspense>
                     </AdminManageLayout>
@@ -91,7 +89,7 @@ const AdminDashboardRouter = () => {
                 element={
                     <AdminManageLayout>
                         {data && (
-                            <Suspense>
+                            <Suspense fallback={<MyLoadingComponent />}>
                                 <AsyncWebSite data={data} />
                             </Suspense>
                         )}
@@ -103,7 +101,7 @@ const AdminDashboardRouter = () => {
                 element={
                     <AdminManageLayout>
                         {data && (
-                            <Suspense>
+                            <Suspense fallback={<MyLoadingComponent />}>
                                 <AsyncType data={data} />
                             </Suspense>
                         )}
@@ -115,7 +113,7 @@ const AdminDashboardRouter = () => {
                 element={
                     <AdminManageLayout>
                         {data && (
-                            <Suspense>
+                            <Suspense fallback={<MyLoadingComponent />}>
                                 <AsyncLink data={data} />
                             </Suspense>
                         )}
@@ -127,7 +125,7 @@ const AdminDashboardRouter = () => {
                 element={
                     <AdminManageLayout>
                         {data && (
-                            <Suspense>
+                            <Suspense fallback={<MyLoadingComponent />}>
                                 <AsyncNav data={data} />
                             </Suspense>
                         )}
@@ -139,7 +137,7 @@ const AdminDashboardRouter = () => {
                 element={
                     <AdminManageLayout>
                         {data && (
-                            <Suspense>
+                            <Suspense fallback={<MyLoadingComponent />}>
                                 <AsyncArticle data={data} />
                             </Suspense>
                         )}
@@ -151,7 +149,7 @@ const AdminDashboardRouter = () => {
                 element={
                     <AdminManageLayout>
                         {data && (
-                            <Suspense>
+                            <Suspense fallback={<MyLoadingComponent />}>
                                 <AsyncArticleEdit data={data} />
                             </Suspense>
                         )}
@@ -163,7 +161,7 @@ const AdminDashboardRouter = () => {
                 element={
                     <AdminManageLayout>
                         {data && (
-                            <Suspense>
+                            <Suspense fallback={<MyLoadingComponent />}>
                                 <AsyncUser data={data} />
                             </Suspense>
                         )}
@@ -174,7 +172,7 @@ const AdminDashboardRouter = () => {
                 path="template-center"
                 element={
                     <AdminManageLayout>
-                        <Suspense>
+                        <Suspense fallback={<MyLoadingComponent />}>
                             <AsyncTemplateCenter />
                         </Suspense>
                     </AdminManageLayout>
@@ -184,7 +182,7 @@ const AdminDashboardRouter = () => {
                 path="user-update-password"
                 element={
                     <AdminManageLayout>
-                        <Suspense>
+                        <Suspense fallback={<MyLoadingComponent />}>
                             <AsyncUserUpdatePassword />
                         </Suspense>
                     </AdminManageLayout>
@@ -194,7 +192,7 @@ const AdminDashboardRouter = () => {
                 path="upgrade"
                 element={
                     <AdminManageLayout>
-                        <Suspense>
+                        <Suspense fallback={<MyLoadingComponent />}>
                             <AsyncUpgrade />
                         </Suspense>
                     </AdminManageLayout>
@@ -204,7 +202,7 @@ const AdminDashboardRouter = () => {
                 path="template-config"
                 element={
                     <AdminManageLayout>
-                        <Suspense>
+                        <Suspense fallback={<MyLoadingComponent />}>
                             <AsyncTemplateConfig />
                         </Suspense>
                     </AdminManageLayout>
@@ -214,7 +212,7 @@ const AdminDashboardRouter = () => {
                 path={"*"}
                 element={
                     <AdminManageLayout>
-                        <Suspense>
+                        <Suspense fallback={<MyLoadingComponent />}>
                             <AsyncNotFoundPage />
                         </Suspense>
                     </AdminManageLayout>

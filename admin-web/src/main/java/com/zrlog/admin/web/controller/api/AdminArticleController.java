@@ -3,6 +3,8 @@ package com.zrlog.admin.web.controller.api;
 import com.hibegin.common.util.BeanUtil;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.annotation.ResponseBody;
+import com.hibegin.http.server.api.HttpRequest;
+import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.exception.NotFindResourceException;
 import com.zrlog.admin.business.exception.PermissionErrorException;
@@ -31,6 +33,13 @@ import java.util.Map;
 public class AdminArticleController extends Controller {
 
     private final AdminArticleService articleService = new AdminArticleService();
+
+    public AdminArticleController() {
+    }
+
+    public AdminArticleController(HttpRequest request, HttpResponse response) {
+        super(request, response);
+    }
 
     @RefreshCache(async = true)
     @ResponseBody

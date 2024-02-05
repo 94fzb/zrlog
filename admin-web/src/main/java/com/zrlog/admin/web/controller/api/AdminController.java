@@ -1,6 +1,8 @@
 package com.zrlog.admin.web.controller.api;
 
 import com.hibegin.http.annotation.ResponseBody;
+import com.hibegin.http.server.api.HttpRequest;
+import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.rest.request.LoginRequest;
 import com.zrlog.admin.business.rest.response.IndexResponse;
@@ -30,6 +32,13 @@ public class AdminController extends Controller {
     private final UserService userService = new UserService();
 
     private final AdminTokenService adminTokenService = new AdminTokenService();
+
+    public AdminController() {
+    }
+
+    public AdminController(HttpRequest request, HttpResponse response) {
+        super(request, response);
+    }
 
     @ResponseBody
     public LoginResponse login() throws SQLException {

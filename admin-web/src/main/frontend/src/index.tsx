@@ -10,6 +10,7 @@ import { createRoot } from "react-dom/client";
 import { getColorPrimary, getRes, setRes } from "./utils/constants";
 
 import axios from "axios";
+import { BasicUserInfo } from "./type";
 
 const url = new URL(document.baseURI);
 export const basePath = url.pathname + "admin/";
@@ -23,6 +24,14 @@ type AppState = {
     dark: boolean;
     colorPrimary: string;
 };
+
+type SsDate = {
+    pageData: any;
+    resourceInfo: Record<string, never>;
+    user: BasicUserInfo;
+};
+
+export let ssData: SsDate | undefined;
 
 const Index = () => {
     const [appState, setAppState] = useState<AppState>({
@@ -59,9 +68,8 @@ const Index = () => {
     const initRes = () => {
         const resourceData = getRes();
         if (resourceData === null || Object.keys(resourceData).length === 0) {
-            const jsonStr = document.getElementById("resourceInfo")?.textContent;
-            if (jsonStr && jsonStr !== "") {
-                handleRes(JSON.parse(jsonStr));
+            if (ssData) {
+                handleRes(ssData.resourceInfo);
             } else {
                 loadResourceFromServer();
             }
@@ -71,6 +79,13 @@ const Index = () => {
     };
 
     useEffect(() => {
+        if (ssData === undefined) {
+            const ssDataStr = document.getElementById("__SS_DATA__")?.innerText;
+            // @ts-ignore
+            if (ssDataStr?.length > 0) {
+                ssData = JSON.parse(ssDataStr as string);
+            }
+        }
         initRes();
     }, []);
 

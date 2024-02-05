@@ -2,13 +2,16 @@ import { HomeOutlined } from "@ant-design/icons";
 import { Col, Layout, Row, Typography } from "antd";
 
 import { getRes } from "../utils/constants";
-import { FunctionComponent, PropsWithChildren } from "react";
+import { FunctionComponent, PropsWithChildren, useEffect, useState } from "react";
 import EnvUtils from "../utils/env-utils";
 import UserInfo from "./user-info";
 import styled from "styled-components";
 import { getColorPrimary } from "../utils/constants";
 //import { useLocation } from "react-router";
 import SliderMenu from "./slider";
+import { BasicUserInfo } from "../type";
+import { ssData } from "../index";
+import axios from "axios";
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Text } = Typography;
@@ -216,6 +219,16 @@ const StyledIndexLayout = styled("div")`
 `;
 
 const AdminManageLayout: FunctionComponent<PropsWithChildren> = ({ children }) => {
+    const [userInfo, setUser] = useState<BasicUserInfo | undefined>(ssData?.user);
+
+    useEffect(() => {
+        if (userInfo === undefined) {
+            axios.get("/api/admin/user").then(({ data }) => {
+                setUser(data.data);
+            });
+        }
+    }, []);
+
     // @ts-ignore
     return (
         <StyledIndexLayout>
@@ -233,7 +246,7 @@ const AdminManageLayout: FunctionComponent<PropsWithChildren> = ({ children }) =
                 >
                     <HomeOutlined />
                 </a>
-                <UserInfo />
+                {userInfo && <UserInfo data={userInfo} />}
             </Header>
             <Row>
                 <Col style={{ minHeight: "100vh" }} id="sider">
