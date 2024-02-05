@@ -160,7 +160,7 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
     });
 
     if (articleVersion <= 0) {
-        if (data.article && data.article.version) {
+        if (data.article && data.article.version >= 0) {
             articleVersion = data.article.version;
         } else {
             articleVersion = -1;
