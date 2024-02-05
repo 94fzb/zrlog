@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
 import Form from "antd/es/form";
@@ -22,16 +22,10 @@ type BasicUserInfo = {
     userName: string;
     header: string;
     email: string;
-    _loading: boolean;
 };
 
-const User = () => {
-    const [userInfo, setUserInfo] = useState<BasicUserInfo>({
-        userName: "",
-        header: "",
-        email: "",
-        _loading: true,
-    });
+const User = ({ data }: { data: BasicUserInfo }) => {
+    const [userInfo, setUserInfo] = useState<BasicUserInfo>(data);
 
     const setValue = (changedValues: BasicUserInfo) => {
         setUserInfo({ ...userInfo, ...changedValues });
@@ -55,18 +49,6 @@ const User = () => {
             }
         });
     };
-
-    useEffect(() => {
-        axios.get("/api/admin/user/basicInfo").then(({ data }) => {
-            setUserInfo({ ...userInfo, ...data.data, _loading: false });
-        });
-    }, []);
-
-    if (userInfo._loading) {
-        return <></>;
-    }
-
-    console.info(userInfo);
 
     return (
         <>

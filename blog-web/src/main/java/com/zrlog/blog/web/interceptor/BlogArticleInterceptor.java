@@ -16,6 +16,7 @@ import com.zrlog.business.service.TemplateHelper;
 import com.zrlog.business.util.InstallUtils;
 import com.zrlog.common.Constants;
 import com.zrlog.model.WebSite;
+import com.zrlog.util.ZrLogUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -43,21 +44,6 @@ public class BlogArticleInterceptor implements Interceptor {
         return "/".equals(targetUri) || (targetUri.startsWith("/" + Constants.getArticleUri()) && targetUri.endsWith(".html"));
     }
 
-    private Controller buildController(Method method, HttpRequest request, HttpResponse response) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
-        Constructor[] constructors = method.getDeclaringClass().getConstructors();
-        Controller controller = null;
-        for (Constructor constructor : constructors) {
-            if (constructor.getParameterTypes().length == 2) {
-                if (constructor.getParameterTypes()[0].getName().equals(HttpRequest.class.getName()) && constructor.getParameterTypes()[1].getName().equals(HttpResponse.class.getName())) {
-                    controller = (Controller) constructor.newInstance(request, response);
-                }
-            }
-        }
-        if (controller == null) {
-            throw new RuntimeException(method.getDeclaringClass().getSimpleName() + " not find 2 args " + "constructor");
-        }
-        return controller;
-    }
 
     private void initTemplate(){
         if (!InstallUtils.isInstalled()) {
@@ -112,7 +98,7 @@ public class BlogArticleInterceptor implements Interceptor {
         if (Objects.isNull(method)) {
             return true;
         }
-        Object invoke = method.invoke(buildController(method, request, response));
+        Object invoke = method.invoke(ZrLogUtil.buildController(method, request, response));
         if (Objects.nonNull(invoke)) {
             TemplateHelper.fullTemplateInfo(request);
             initTemplate();

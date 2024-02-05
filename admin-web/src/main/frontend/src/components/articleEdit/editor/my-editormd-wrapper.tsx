@@ -3,7 +3,7 @@ import $ from "jquery";
 import Spin from "antd/es/spin";
 import { message } from "antd";
 import makeAsyncScriptLoader from "react-async-script";
-import { MyLoadingComponent } from "../../my-loading-component";
+import MyLoadingComponent from "../../my-loading-component";
 import EnvUtils from "../../../utils/env-utils";
 import { getRes } from "../../../utils/constants";
 import { dom, library } from "@fortawesome/fontawesome-svg-core";
@@ -2177,6 +2177,7 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({
             taskList: true,
             tocm: false,
             tex: true,
+            height: "1240px",
             flowChart: true,
             sequenceDiagram: true,
             dialogMaskOpacity: 0,

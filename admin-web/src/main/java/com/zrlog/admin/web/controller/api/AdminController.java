@@ -3,6 +3,7 @@ package com.zrlog.admin.web.controller.api;
 import com.hibegin.http.annotation.ResponseBody;
 import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.rest.request.LoginRequest;
+import com.zrlog.admin.business.rest.response.IndexResponse;
 import com.zrlog.admin.business.rest.response.LoginResponse;
 import com.zrlog.admin.business.rest.response.StatisticsInfoResponse;
 import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
@@ -49,21 +50,24 @@ public class AdminController extends Controller {
         return new UpdateRecordResponse();
     }
 
-    @ResponseBody
-    public ApiStandardResponse serverInfo() {
+    private ApiStandardResponse<Map<String, Object>> serverInfo() {
         Map<String, Object> info = new HashMap<>();
         InstallUtils.getSystemProp().forEach((key, value) -> info.put(key.toString(), value));
         BlogBuildInfoUtil.getBlogProp().forEach((key, value) -> info.put("zrlog." + key.toString(), value));
-        return new ApiStandardResponse(info);
+        return new ApiStandardResponse<>(info);
     }
 
-    @ResponseBody
-    public ApiStandardResponse statisticsInfo() throws SQLException {
+    private ApiStandardResponse<StatisticsInfoResponse> statisticsInfo() throws SQLException {
         StatisticsInfoResponse info = new StatisticsInfoResponse();
         info.setCommCount(new Comment().count());
         info.setToDayCommCount(new Comment().countToDayComment());
         info.setClickCount(new Log().sumClick().longValue());
         info.setArticleCount(new Log().adminCount());
-        return new ApiStandardResponse(info);
+        return new ApiStandardResponse<>(info);
+    }
+
+    @ResponseBody
+    public ApiStandardResponse<IndexResponse> index() throws SQLException {
+        return new ApiStandardResponse<>(new IndexResponse(statisticsInfo().getData(),serverInfo().getData()));
     }
 }

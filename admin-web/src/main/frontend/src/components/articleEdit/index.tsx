@@ -29,6 +29,7 @@ export type ArticleEntry = ChangedContent &
     PrivacyChanged &
     CanCommentChanged &
     TypeChanged & {
+        rubbish?: boolean;
         logId?: number;
         lastUpdateDate?: number;
         version: number;
@@ -38,7 +39,6 @@ type ArticleEditState = {
     typeOptions: any[];
     tags: any[];
     rubbish: boolean;
-    globalLoading: boolean;
     fullScreen: boolean;
     editorInitSuccess: boolean;
     article: ArticleEntry;
@@ -127,19 +127,31 @@ type FormValidState = {
     typeError: boolean;
 };
 
-const Index = () => {
+export type ArticleEditProps = {
+    tags: any[];
+    types: any[];
+    article: ArticleEntry;
+};
+
+const Index = ({ data }: { data: ArticleEditProps }) => {
     const [state, setState] = useState<ArticleEditState>({
-        typeOptions: [],
+        typeOptions: data.types
+            ? data.types.map((x) => {
+                  return { value: x.id, label: x.typeName };
+              })
+            : [],
         editorInitSuccess: false,
         fullScreen: false,
-        globalLoading: true,
-        tags: [],
-        rubbish: false,
-        article: {
-            keywords: "",
-            version: -1,
-            title: "",
-        },
+        tags: data.tags ? data.tags : [],
+        rubbish: data.article && data.article.rubbish ? data.article.rubbish : false,
+        article: data.article
+            ? data.article
+            : {
+                  typeId: -1,
+                  version: -1,
+                  title: "",
+                  keywords: "",
+              },
         saving: {
             previewIng: false,
             releaseSaving: false,
@@ -147,54 +159,14 @@ const Index = () => {
         },
     });
 
+    if (articleVersion <= 0) {
+        articleVersion = data.article.version;
+    }
+
     const [content, setContent] = useState<ChangedContent | undefined>(undefined);
     const [formValidState, setFormValidState] = useState<FormValidState>({ titleError: false, typeError: false });
 
     const { message, modal } = App.useApp();
-
-    useEffect(() => {
-        axios.get("/api/admin/article/global").then(({ data }) => {
-            const options: any[] = [];
-            data.data.types.forEach((x: any) => {
-                options.push({ value: x.id, label: x.typeName });
-            });
-            const nDate = data;
-            const query = new URLSearchParams(window.location.search);
-            const id = query.get("id");
-            if (id !== null && id !== "") {
-                axios.get("/api/admin/article/detail?id=" + id).then(({ data }) => {
-                    if (data.error) {
-                        message.error(data.message);
-                        return;
-                    }
-                    setState((prevState) => {
-                        return {
-                            ...prevState,
-                            globalLoading: false,
-                            typeOptions: options,
-                            rubbish: data.data.rubbish,
-                            types: nDate.data.types,
-                            tags: nDate.data.tags,
-                            article: data.data,
-                        };
-                    });
-                    articleVersion = data.data.version;
-                });
-            } else {
-                setState((prevState) => {
-                    return {
-                        ...prevState,
-                        typeOptions: options,
-                        types: nDate.data.types,
-                        tags: nDate.data.tags,
-                        globalLoading: false,
-                        article: { keywords: "", title: "", version: 0, content: "", markdown: "" },
-                    };
-                });
-                articleVersion = 0;
-            }
-        });
-    }, []);
 
     const getVersion = () => {
         return articleVersion;
@@ -470,10 +442,6 @@ const Index = () => {
             </Col>
         );
     };
-
-    if (state.globalLoading || state.article.version < 0) {
-        return <></>;
-    }
 
     return (
         <StyledArticleEdit>

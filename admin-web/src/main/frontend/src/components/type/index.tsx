@@ -1,11 +1,11 @@
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
 import { getRes } from "../../utils/constants";
-import BaseTable from "../../common/BaseTable";
+import BaseTable, { PageDataSource } from "../../common/BaseTable";
 import AddType from "./add_type";
 import EditType from "./edit_type";
 
-const Type = () => {
+const Type = ({ data }: { data: PageDataSource }) => {
     const getColumns = () => {
         return [
             {
@@ -43,6 +43,7 @@ const Type = () => {
                 editBtnRender={(_id, record, editSuccessCall) => (
                     <EditType record={record} editSuccessCall={editSuccessCall} />
                 )}
+                datasource={data}
                 deleteApi={"/api/admin/type/delete"}
                 dataApi={"/api/admin/type"}
             />

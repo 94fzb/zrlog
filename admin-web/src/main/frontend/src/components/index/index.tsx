@@ -15,7 +15,7 @@ type IndexProps = {
 };
 
 const Index: FunctionComponent<IndexProps> = ({ data }) => {
-    if (data === undefined || data === null) {
+    if (data.serverInfo === undefined || data.statisticsInfo === null) {
         return <></>;
     }
     console.info(data);

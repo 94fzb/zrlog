@@ -3,7 +3,7 @@ import Title from "antd/es/typography/Title";
 import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
 import Divider from "antd/es/divider";
-import Index from "../template";
+import Index, { TemplateEntry } from "../template";
 import { getRes } from "../../utils/constants";
 import BlogForm from "./BlogForm";
 import BasicForm from "./BasicForm";
@@ -12,9 +12,46 @@ import UpgradeSettingForm from "./UpgradeSettingForm";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
-const WebSite = () => {
+export interface Data {
+    basic: Basic;
+    blog: Blog;
+    other: Other;
+    upgrade: Upgrade;
+    templates: TemplateEntry[];
+}
+
+export interface Basic {
+    second_title: string;
+    title: string;
+    keywords: string;
+    description: string;
+}
+
+export interface Blog {
+    session_timeout: number;
+    generator_html_status: boolean;
+    disable_comment_status: boolean;
+    article_thumbnail_status: boolean;
+    language: string;
+    article_route: string;
+    admin_darkMode: boolean;
+    admin_color_primary: string;
+}
+
+export interface Other {
+    icp: string;
+    webCm: string;
+}
+
+export interface Upgrade {
+    autoUpgradeVersion: number;
+    upgradePreview: boolean;
+}
+
+const WebSite = ({ data }: { data: Data }) => {
     const navigate = useNavigate();
-    const initActiveKey = window.location.hash !== "" ? window.location.hash.substr(1) : "basic";
+    const tab = new URLSearchParams(window.location.search).get("tab");
+    const initActiveKey = tab ? tab : "basic";
 
     const [activeKey, setActiveKey] = useState<string>(initActiveKey);
 
@@ -23,7 +60,7 @@ const WebSite = () => {
             return (
                 <Row>
                     <Col md={12} xs={24}>
-                        <BasicForm />
+                        <BasicForm data={data.basic} />
                     </Col>
                 </Row>
             );
@@ -31,29 +68,29 @@ const WebSite = () => {
             return (
                 <Row>
                     <Col md={12} xs={24}>
-                        <BlogForm />
+                        <BlogForm data={data.blog} />
                     </Col>
                 </Row>
             );
         } else if (activeKey === "template" && currentActiveKey === "template") {
-            return <Index />;
+            return <Index data={data.templates} />;
         } else if (activeKey === "other" && currentActiveKey === "other") {
             return (
                 <Row>
                     <Col md={12} xs={24}>
-                        <OtherForm />
+                        <OtherForm data={data.other} />
                     </Col>
                 </Row>
             );
         } else if (activeKey === "upgrade" && currentActiveKey === "upgrade") {
-            return <UpgradeSettingForm />;
+            return <UpgradeSettingForm data={data.upgrade} />;
         } else {
             return <></>;
         }
     };
 
     const handleTabClick = (key: string) => {
-        navigate(`/website#${key}`);
+        navigate(`/website?tab=${key}`);
         setActiveKey(key);
     };
 

@@ -40,8 +40,11 @@ public class RouterUtils {
         // api
         router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH, AdminController.class);
         router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/link", LinkController.class);
+        router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/index", AdminController.class,"index");
         router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/comment", CommentController.class);
         router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/type", TypeController.class);
+        router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/article-type", TypeController.class,"index");
+        router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/article-edit", AdminArticleController.class,"articleEdit");
         router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/nav", BlogNavController.class);
         router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/article", AdminArticleController.class);
         router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/website", WebSiteController.class);

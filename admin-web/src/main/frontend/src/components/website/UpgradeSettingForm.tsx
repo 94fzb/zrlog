@@ -8,8 +8,9 @@ import Switch from "antd/es/switch";
 import Divider from "antd/es/divider";
 import { App } from "antd";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Upgrade } from "./index";
 
 const layout = {
     labelCol: { span: 8 },
@@ -21,13 +22,10 @@ type UpgradeFormState = {
     upgradePreview: boolean;
 };
 
-const UpgradeSettingForm = () => {
+const UpgradeSettingForm = ({ data }: { data: Upgrade }) => {
     const [checking, setChecking] = useState<boolean>(false);
     const { modal, message } = App.useApp();
-    const [form, setForm] = useState<UpgradeFormState>({
-        autoUpgradeVersion: -2,
-        upgradePreview: false,
-    });
+    const [form, setForm] = useState<UpgradeFormState>(data);
 
     const navigate = useNavigate();
 
@@ -41,19 +39,6 @@ const UpgradeSettingForm = () => {
             }
         });
     };
-
-    useEffect(() => {
-        axios.get("/api/admin/website/settings").then(({ data }) => {
-            if (data.data.upgrade != null) {
-                setForm(data.data.upgrade);
-                console.info(data.data.upgrade);
-            }
-        });
-    }, []);
-
-    if (form === undefined || form.autoUpgradeVersion === -2) {
-        return <></>;
-    }
 
     const checkNewVersion = async () => {
         if (checking) {

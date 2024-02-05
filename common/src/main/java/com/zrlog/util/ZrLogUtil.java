@@ -5,12 +5,17 @@ import com.hibegin.common.util.*;
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.http.server.api.HttpRequest;
+import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.util.PathUtil;
+import com.hibegin.http.server.web.Controller;
 import com.zrlog.common.Constants;
 import eu.bitwalker.useragentutils.BrowserType;
 import eu.bitwalker.useragentutils.UserAgent;
 
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.sql.*;
@@ -189,5 +194,21 @@ public class ZrLogUtil {
         UserAgent ua = UserAgent.parseUserAgentString(userAgent);
         BrowserType browserType = ua.getBrowser().getBrowserType();
         return browserType == BrowserType.MOBILE_BROWSER || browserType == BrowserType.WEB_BROWSER;
+    }
+
+    public static Controller buildController(Method method, HttpRequest request, HttpResponse response) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+        Constructor[] constructors = method.getDeclaringClass().getConstructors();
+        Controller controller = null;
+        for (Constructor constructor : constructors) {
+            if (constructor.getParameterTypes().length == 2) {
+                if (constructor.getParameterTypes()[0].getName().equals(HttpRequest.class.getName()) && constructor.getParameterTypes()[1].getName().equals(HttpResponse.class.getName())) {
+                    controller = (Controller) constructor.newInstance(request, response);
+                }
+            }
+        }
+        if (controller == null) {
+            throw new RuntimeException(method.getDeclaringClass().getSimpleName() + " not find 2 args " + "constructor");
+        }
+        return controller;
     }
 }

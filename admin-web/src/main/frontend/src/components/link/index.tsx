@@ -1,12 +1,12 @@
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
-import BaseTable from "../../common/BaseTable";
+import BaseTable, { PageDataSource } from "../../common/BaseTable";
 import { getRes } from "../../utils/constants";
 import EditLink from "./edit_link";
 import AddLink from "./add_link";
 import { Tooltip } from "antd";
 
-const BLink = () => {
+const BLink = ({ data }: { data: PageDataSource }) => {
     const getColumns = () => {
         return [
             {
@@ -54,6 +54,7 @@ const BLink = () => {
                 addBtnRender={(addSuccessCall) => {
                     return <AddLink addSuccessCall={addSuccessCall} />;
                 }}
+                datasource={data}
                 editBtnRender={(_id, record, editSuccessCall) => (
                     <EditLink record={record} editSuccessCall={editSuccessCall} />
                 )}

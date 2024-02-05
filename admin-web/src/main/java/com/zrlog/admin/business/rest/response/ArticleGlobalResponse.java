@@ -7,6 +7,15 @@ public class ArticleGlobalResponse {
 
     private List<Map<String, Object>> tags;
     private List<Map<String, Object>> types;
+    private LoadEditArticleResponse article;
+
+    public LoadEditArticleResponse getArticle() {
+        return article;
+    }
+
+    public void setArticle(LoadEditArticleResponse article) {
+        this.article = article;
+    }
 
     public List<Map<String, Object>> getTags() {
         return tags;

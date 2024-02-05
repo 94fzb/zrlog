@@ -1,12 +1,12 @@
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
-import BaseTable from "../../common/BaseTable";
+import BaseTable, { PageDataSource } from "../../common/BaseTable";
 import { getRes } from "../../utils/constants";
 import AddNav from "./add_nav";
 import EditNav from "./edit_nav";
 import { Tooltip } from "antd";
 
-const Nav = () => {
+const Nav = ({ data }: { data: PageDataSource }) => {
     const getColumns = () => {
         return [
             {
@@ -51,6 +51,7 @@ const Nav = () => {
                 editBtnRender={(_id, record, editSuccessCall) => (
                     <EditNav record={record} editSuccessCall={editSuccessCall} />
                 )}
+                datasource={data}
                 deleteApi={"/api/admin/nav/delete"}
                 dataApi={"/api/admin/nav"}
             />

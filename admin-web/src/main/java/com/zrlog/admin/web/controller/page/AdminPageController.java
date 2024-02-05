@@ -4,7 +4,9 @@ import com.google.gson.Gson;
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.http.server.web.Controller;
 import com.hibegin.http.server.web.cookie.Cookie;
+import com.zrlog.admin.web.controller.api.AdminUserController;
 import com.zrlog.admin.web.token.AdminTokenService;
+import com.zrlog.admin.web.token.AdminTokenThreadLocal;
 import com.zrlog.business.service.CommonService;
 import com.zrlog.common.Constants;
 import com.zrlog.util.I18nUtil;
@@ -39,6 +41,10 @@ public class AdminPageController extends Controller {
         document.body().addClass(Constants.getBooleanByFromWebSite("admin_darkMode") ? "dark" : "light");
         document.title(Constants.WEB_SITE.get("title") + " | " + I18nUtil.getBlogStringFromRes("admin.management"));
         document.getElementById("resourceInfo").text(new Gson().toJson(new CommonService().blogResourceInfo()));
+        if(Objects.nonNull(AdminTokenThreadLocal.getUser())){
+            document.getElementById("userInfo").text(new Gson().toJson(new AdminUserController(request,response).index()));
+        }
+
         response.renderHtmlStr(document.html());
     }
 

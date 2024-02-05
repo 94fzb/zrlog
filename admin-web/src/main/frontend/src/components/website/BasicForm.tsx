@@ -5,17 +5,18 @@ import Input from "antd/es/input";
 import TextArea from "antd/es/input/TextArea";
 import Button from "antd/es/button";
 import { getRes, removeRes } from "../../utils/constants";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { App } from "antd";
+import { Basic } from "./index";
 
 const layout = {
     labelCol: { span: 8 },
     wrapperCol: { span: 16 },
 };
 
-const BasicForm = () => {
-    const [form, setForm] = useState<any>(undefined);
+const BasicForm = ({ data }: { data: Basic }) => {
+    const [form, setForm] = useState<any>(data);
 
     const { message } = App.useApp();
     const websiteFormFinish = (changedValues: any) => {
@@ -28,18 +29,6 @@ const BasicForm = () => {
             }
         });
     };
-
-    useEffect(() => {
-        axios.get("/api/admin/website/settings").then(({ data }) => {
-            if (data.data.basic != null) {
-                setForm(data.data.basic);
-            }
-        });
-    }, []);
-
-    if (form === undefined) {
-        return <></>;
-    }
 
     return (
         <>

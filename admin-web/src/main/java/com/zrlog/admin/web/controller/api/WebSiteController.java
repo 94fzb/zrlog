@@ -1,6 +1,7 @@
 package com.zrlog.admin.web.controller.api;
 
 import com.hibegin.common.util.BeanUtil;
+import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.annotation.ResponseBody;
 import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.rest.base.BasicWebSiteRequest;
@@ -8,6 +9,7 @@ import com.zrlog.admin.business.rest.base.BlogWebSiteRequest;
 import com.zrlog.admin.business.rest.base.OtherWebSiteRequest;
 import com.zrlog.admin.business.rest.base.UpgradeWebSiteRequest;
 import com.zrlog.admin.business.rest.response.VersionResponse;
+import com.zrlog.admin.business.rest.response.WebSiteSettingsResponse;
 import com.zrlog.admin.business.service.WebSiteService;
 import com.zrlog.admin.web.annotation.RefreshCache;
 import com.zrlog.admin.web.plugin.UpdateVersionPlugin;
@@ -26,7 +28,7 @@ public class WebSiteController extends Controller {
     private final WebSiteService webSiteService = new WebSiteService();
 
     @ResponseBody
-    public ApiStandardResponse version() {
+    public ApiStandardResponse<VersionResponse> version() {
         VersionResponse versionResponse = new VersionResponse();
         versionResponse.setBuildId(BlogBuildInfoUtil.getBuildId());
         versionResponse.setVersion(BlogBuildInfoUtil.getVersion());
@@ -36,8 +38,10 @@ public class WebSiteController extends Controller {
     }
 
     @ResponseBody
-    public ApiStandardResponse settings() {
-        return new ApiStandardResponse(webSiteService.loadSettings());
+    public ApiStandardResponse index() {
+        WebSiteSettingsResponse webSiteSettingsResponse = webSiteService.loadSettings();
+        webSiteSettingsResponse.setTemplates(new TemplateController(request,response).index().getData());
+        return new ApiStandardResponse(webSiteSettingsResponse);
     }
 
     @RefreshCache

@@ -10,9 +10,15 @@ type BaseTableProps = {
     dataApi: string;
     deleteApi: string;
     columns: any[];
+    datasource?: PageDataSource;
     searchKey?: string;
     addBtnRender?: (addSuccessCall: () => void) => any;
     editBtnRender?: (id: number, record: any, editSuccessCall: () => void) => any;
+};
+
+export type PageDataSource = {
+    rows: [];
+    totalElements: number;
 };
 
 export type TableData = {
@@ -53,14 +59,19 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
     editBtnRender,
     addBtnRender,
     columns,
+    datasource,
     searchKey,
 }) => {
     const [tableDataState, setTableDataState] = useState<TableData>({
         pagination: { page: 1, key: searchKey, size: 10 },
         query: searchKey,
-        tableLoaded: false,
-        rows: [],
+        tableLoaded: true,
+        rows: datasource ? datasource.rows : [],
+        tablePagination: {
+            total: datasource?.totalElements,
+        },
     });
+
     const [messageApi, contextHolder] = message.useMessage();
     const handleDelete = async (
         pagination: MyPagination,
@@ -77,12 +88,6 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
         });
         return fetchData(pagination, dataApiUri);
     };
-
-    useEffect(() => {
-        fetchData(tableDataState.pagination, dataApi).then((r) => {
-            setTableDataState(r);
-        });
-    }, []);
 
     useEffect(() => {
         if (searchKey === undefined || searchKey === null) {
@@ -135,9 +140,7 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
         return c;
     };
 
-    if (!tableDataState.tableLoaded) {
-        return <></>;
-    }
+    console.info(tableDataState);
 
     return (
         <>

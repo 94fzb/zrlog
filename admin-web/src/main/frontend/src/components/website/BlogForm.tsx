@@ -6,9 +6,10 @@ import Switch from "antd/es/switch";
 import { getRes, removeRes } from "../../utils/constants";
 import Select from "antd/es/select";
 import Button from "antd/es/button";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { App, ColorPicker } from "antd";
+import { Blog } from "./index";
 
 const layout = {
     labelCol: { span: 8 },
@@ -17,8 +18,8 @@ const layout = {
 
 const { Option } = Select;
 
-const BlogForm = () => {
-    const [form, setForm] = useState<any>(undefined);
+const BlogForm = ({ data }: { data: Blog }) => {
+    const [form, setForm] = useState<any>(data);
     const { message } = App.useApp();
 
     const websiteFormFinish = (changedValues: any) => {
@@ -31,14 +32,6 @@ const BlogForm = () => {
             }
         });
     };
-
-    useEffect(() => {
-        axios.get("/api/admin/website/settings").then(({ data }) => {
-            if (data.data.basic != null) {
-                setForm(data.data.blog);
-            }
-        });
-    }, []);
 
     if (form === undefined) {
         return <></>;

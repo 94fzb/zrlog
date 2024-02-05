@@ -1,10 +1,10 @@
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
 import { getRes } from "../utils/constants";
-import BaseTable from "../common/BaseTable";
+import BaseTable, { PageDataSource } from "../common/BaseTable";
 import TextArea from "antd/es/input/TextArea";
 
-const Comment = () => {
+const Comment = ({ data }: { data: PageDataSource }) => {
     const getColumns = () => {
         return [
             {
@@ -59,7 +59,12 @@ const Comment = () => {
                 {getRes()["admin.comment.manage"]}
             </Title>
             <Divider />
-            <BaseTable columns={getColumns()} deleteApi={getDeleteApiUri()} dataApi={"/api/admin/comment"} />
+            <BaseTable
+                datasource={data}
+                columns={getColumns()}
+                deleteApi={getDeleteApiUri()}
+                dataApi={"/api/admin/comment"}
+            />
         </>
     );
 };

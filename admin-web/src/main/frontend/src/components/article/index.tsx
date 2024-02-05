@@ -6,10 +6,10 @@ import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
 import { getColorPrimary, getRes } from "../../utils/constants";
 import { useState } from "react";
-import BaseTable from "../../common/BaseTable";
+import BaseTable, { PageDataSource } from "../../common/BaseTable";
 import { Link } from "react-router-dom";
 
-const Index = () => {
+const Index = ({ data }: { data: PageDataSource }) => {
     const dataApi = "/api/admin/article";
 
     const tagForMap = (tag: string) => {
@@ -143,6 +143,7 @@ const Index = () => {
 
             <Divider />
             <BaseTable
+                datasource={data}
                 columns={getColumns()}
                 editBtnRender={(id) => (
                     <Link to={"/article-edit?id=" + id}>

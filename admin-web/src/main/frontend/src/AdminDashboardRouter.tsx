@@ -1,5 +1,8 @@
 import { Route, Routes } from "react-router-dom";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
+import { useLocation } from "react-router";
+import { getCsrData } from "./api";
+import MyLoadingComponent from "./components/my-loading-component";
 
 const AsyncArticleEdit = lazy(() => import("components/articleEdit"));
 
@@ -33,40 +36,31 @@ const AsyncUser = lazy(() => import("components/user"));
 
 const AdminManageLayout = lazy(() => import("layout/index"));
 
-const AdminDashboardRouter = ({ data }: { data: any }) => {
+const AdminDashboardRouter = () => {
+    const location = useLocation();
+
+    const [data, setData] = useState<any>(null);
+
+    useEffect(() => {
+        setData(null);
+        getCsrData(location.pathname + location.search).then((e) => {
+            setData(e);
+        });
+    }, [location.pathname, location.search]);
+
+    console.info(location);
+
     return (
         <Routes>
-            <Route
-                path={""}
-                element={
-                    <AdminManageLayout>
-                        {data && (
-                            <Suspense>
-                                <AsyncIndex data={data} />
-                            </Suspense>
-                        )}
-                    </AdminManageLayout>
-                }
-            />
             <Route
                 path="index"
                 element={
                     <AdminManageLayout>
                         {data && (
-                            <Suspense>
+                            <Suspense fallback={<MyLoadingComponent />} key={location.pathname}>
                                 <AsyncIndex data={data} />
                             </Suspense>
                         )}
-                    </AdminManageLayout>
-                }
-            />
-            <Route
-                path="article-edit"
-                element={
-                    <AdminManageLayout>
-                        <Suspense>
-                            <AsyncArticleEdit />
-                        </Suspense>
                     </AdminManageLayout>
                 }
             />
@@ -74,9 +68,11 @@ const AdminDashboardRouter = ({ data }: { data: any }) => {
                 path="comment"
                 element={
                     <AdminManageLayout>
-                        <Suspense>
-                            <AsyncComment />
-                        </Suspense>
+                        {data && (
+                            <Suspense>
+                                <AsyncComment data={data} />
+                            </Suspense>
+                        )}
                     </AdminManageLayout>
                 }
             />
@@ -94,9 +90,11 @@ const AdminDashboardRouter = ({ data }: { data: any }) => {
                 path="website"
                 element={
                     <AdminManageLayout>
-                        <Suspense>
-                            <AsyncWebSite />
-                        </Suspense>
+                        {data && (
+                            <Suspense>
+                                <AsyncWebSite data={data} />
+                            </Suspense>
+                        )}
                     </AdminManageLayout>
                 }
             />
@@ -104,9 +102,11 @@ const AdminDashboardRouter = ({ data }: { data: any }) => {
                 path="article-type"
                 element={
                     <AdminManageLayout>
-                        <Suspense>
-                            <AsyncType />
-                        </Suspense>
+                        {data && (
+                            <Suspense>
+                                <AsyncType data={data} />
+                            </Suspense>
+                        )}
                     </AdminManageLayout>
                 }
             />
@@ -114,9 +114,11 @@ const AdminDashboardRouter = ({ data }: { data: any }) => {
                 path="link"
                 element={
                     <AdminManageLayout>
-                        <Suspense>
-                            <AsyncLink />
-                        </Suspense>
+                        {data && (
+                            <Suspense>
+                                <AsyncLink data={data} />
+                            </Suspense>
+                        )}
                     </AdminManageLayout>
                 }
             />
@@ -124,9 +126,11 @@ const AdminDashboardRouter = ({ data }: { data: any }) => {
                 path="nav"
                 element={
                     <AdminManageLayout>
-                        <Suspense>
-                            <AsyncNav />
-                        </Suspense>
+                        {data && (
+                            <Suspense>
+                                <AsyncNav data={data} />
+                            </Suspense>
+                        )}
                     </AdminManageLayout>
                 }
             />
@@ -134,9 +138,23 @@ const AdminDashboardRouter = ({ data }: { data: any }) => {
                 path="article"
                 element={
                     <AdminManageLayout>
-                        <Suspense>
-                            <AsyncArticle />
-                        </Suspense>
+                        {data && (
+                            <Suspense>
+                                <AsyncArticle data={data} />
+                            </Suspense>
+                        )}
+                    </AdminManageLayout>
+                }
+            />
+            <Route
+                path="article-edit"
+                element={
+                    <AdminManageLayout>
+                        {data && (
+                            <Suspense>
+                                <AsyncArticleEdit data={data} />
+                            </Suspense>
+                        )}
                     </AdminManageLayout>
                 }
             />
@@ -144,9 +162,11 @@ const AdminDashboardRouter = ({ data }: { data: any }) => {
                 path="user"
                 element={
                     <AdminManageLayout>
-                        <Suspense>
-                            <AsyncUser />
-                        </Suspense>
+                        {data && (
+                            <Suspense>
+                                <AsyncUser data={data} />
+                            </Suspense>
+                        )}
                     </AdminManageLayout>
                 }
             />

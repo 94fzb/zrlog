@@ -37,7 +37,7 @@ const UserInfo = () => {
     });
 
     const loadInfo = () => {
-        axios.get("/api/admin/user/basicInfo").then(({ data }) => {
+        axios.get("/api/admin/user").then(({ data }) => {
             if (data.data.lastVersion.version) {
                 setState({
                     ...state,

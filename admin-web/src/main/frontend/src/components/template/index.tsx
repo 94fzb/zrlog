@@ -6,12 +6,12 @@ import { Badge, Card } from "antd";
 import { CheckOutlined, DeleteOutlined, EyeOutlined, SettingOutlined } from "@ant-design/icons";
 import Meta from "antd/es/card/Meta";
 import Button from "antd/es/button";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { getRes } from "../../utils/constants";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
-type TemplateEntry = {
+export type TemplateEntry = {
     template: string;
     deleteAble: boolean;
     use: boolean;
@@ -21,23 +21,12 @@ type TemplateEntry = {
     digest: string;
 };
 
-type TemplateState = {
-    loading: boolean;
-    templates: TemplateEntry[];
-};
-
-const Template = () => {
-    const [templateState, setTemplateState] = useState<TemplateState>({
-        loading: true,
-        templates: [],
-    });
+const Template = ({ data }: { data: TemplateEntry[] }) => {
+    const [templateState, setTemplateState] = useState<TemplateEntry[]>(data);
 
     const load = () => {
         axios.get("/api/admin/template").then(({ data }) => {
-            setTemplateState({
-                templates: data.data,
-                loading: false,
-            });
+            setTemplateState(data.data);
         });
     };
 
@@ -59,10 +48,6 @@ const Template = () => {
             load();
         });
     };
-
-    useEffect(() => {
-        load();
-    }, []);
 
     const getActions = (template: TemplateEntry) => {
         const links = [];
@@ -92,7 +77,7 @@ const Template = () => {
             <Title level={4}>{getRes()["admin.template.manage"]}</Title>
             <Divider />
             <Row gutter={[16, 16]}>
-                {templateState.templates.map((template) => {
+                {templateState.map((template) => {
                     return (
                         <Col md={6} xxl={4} xs={24}>
                             <Badge.Ribbon

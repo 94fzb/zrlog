@@ -3,6 +3,8 @@ package com.zrlog.admin.web.controller.api;
 import com.hibegin.common.util.FileUtils;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.annotation.ResponseBody;
+import com.hibegin.http.server.api.HttpRequest;
+import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.util.PathUtil;
 import com.hibegin.http.server.web.Controller;
 import com.hibegin.http.server.web.cookie.Cookie;
@@ -18,6 +20,7 @@ import com.zrlog.business.service.TemplateHelper;
 import com.zrlog.common.Constants;
 import com.zrlog.common.rest.response.ApiStandardResponse;
 import com.zrlog.common.rest.response.StandardResponse;
+import com.zrlog.common.vo.TemplateVO;
 import com.zrlog.model.WebSite;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.I18nUtil;
@@ -27,12 +30,20 @@ import com.zrlog.util.ZrLogUtil;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 public class TemplateController extends Controller {
 
     private final TemplateService templateService = new TemplateService();
+
+    public TemplateController() {
+    }
+
+    public TemplateController(HttpRequest request, HttpResponse response) {
+        super(request, response);
+    }
 
     @RefreshCache
     @ResponseBody
@@ -117,7 +128,7 @@ public class TemplateController extends Controller {
     }
 
     @ResponseBody
-    public ApiStandardResponse index() {
+    public ApiStandardResponse<List<TemplateVO>> index() {
         return new ApiStandardResponse(templateService.getAllTemplates(TemplateHelper.getTemplatePathByCookie(getRequest().getCookies())));
     }
 

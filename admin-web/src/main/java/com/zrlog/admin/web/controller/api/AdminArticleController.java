@@ -77,15 +77,26 @@ public class AdminArticleController extends Controller {
     }
 
     @ResponseBody
-    public ApiStandardResponse global() throws SQLException {
+    public ApiStandardResponse<ArticleGlobalResponse> articleEdit() throws SQLException {
         ArticleGlobalResponse response = new ArticleGlobalResponse();
         response.setTags(new Tag().findAll());
         response.setTypes(new Type().findAll());
-        return new ApiStandardResponse(response);
+        String id = request.getParaToStr("id");
+        if(StringUtils.isNotEmpty(id)){
+            response.setArticle(detail().getData());
+        } else {
+            response.setArticle(new LoadEditArticleResponse());
+        }
+        return new ApiStandardResponse<>(response);
     }
 
+    /**
+     * 仅保留，便于测试
+     * @return
+     * @throws SQLException
+     */
     @ResponseBody
-    public ApiStandardResponse detail() throws SQLException {
+    public ApiStandardResponse<LoadEditArticleResponse> detail() throws SQLException {
         if (getRequest().getParaToStr("id") == null) {
             throw new NotFindResourceException();
         }
