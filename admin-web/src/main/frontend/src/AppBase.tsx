@@ -3,6 +3,7 @@ import { lazy } from "react";
 import { Suspense } from "react";
 import { App } from "antd";
 import axios from "axios";
+import MyLoadingComponent from "./components/my-loading-component";
 
 const AsyncLogin = lazy(() => import("components/login"));
 const AsyncAdminDashboardRouter = lazy(() => import("AdminDashboardRouter"));
@@ -58,7 +59,7 @@ const AppBase = () => {
                 <Route
                     path={"login"}
                     element={
-                        <Suspense fallback={<div />}>
+                        <Suspense fallback={<MyLoadingComponent />}>
                             <AsyncLogin />
                         </Suspense>
                     }
@@ -66,7 +67,7 @@ const AppBase = () => {
                 <Route
                     path={"*"}
                     element={
-                        <Suspense fallback={<div />}>
+                        <Suspense fallback={<MyLoadingComponent />}>
                             <AsyncAdminDashboardRouter />
                         </Suspense>
                     }
