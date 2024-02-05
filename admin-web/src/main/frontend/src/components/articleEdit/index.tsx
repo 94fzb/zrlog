@@ -160,7 +160,11 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
     });
 
     if (articleVersion <= 0) {
-        articleVersion = data.article.version;
+        if (data.article && data.article.version) {
+            articleVersion = data.article.version;
+        } else {
+            articleVersion = -1;
+        }
     }
 
     const [content, setContent] = useState<ChangedContent | undefined>(undefined);
@@ -444,6 +448,11 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
             </Col>
         );
     };
+
+    //如果没有返回
+    if (data.article === undefined || data.article === null) {
+        return <></>;
+    }
 
     return (
         <StyledArticleEdit>
