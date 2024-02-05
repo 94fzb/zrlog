@@ -1,9 +1,8 @@
 import { Route, Routes } from "react-router-dom";
 import { lazy } from "react";
 import { Suspense } from "react";
-import { App } from "antd";
+import { App, Spin } from "antd";
 import axios from "axios";
-import MyLoadingComponent from "./components/my-loading-component";
 
 const AsyncLogin = lazy(() => import("components/login"));
 const AsyncAdminDashboardRouter = lazy(() => import("AdminDashboardRouter"));
@@ -59,7 +58,7 @@ const AppBase = () => {
                 <Route
                     path={"login"}
                     element={
-                        <Suspense fallback={<MyLoadingComponent />}>
+                        <Suspense fallback={<Spin spinning={true} fullscreen delay={1000} />}>
                             <AsyncLogin />
                         </Suspense>
                     }
@@ -67,7 +66,7 @@ const AppBase = () => {
                 <Route
                     path={"*"}
                     element={
-                        <Suspense fallback={<MyLoadingComponent />}>
+                        <Suspense fallback={<Spin spinning={true} fullscreen delay={1000} />}>
                             <AsyncAdminDashboardRouter />
                         </Suspense>
                     }
