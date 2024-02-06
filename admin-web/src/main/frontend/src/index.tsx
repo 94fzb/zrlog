@@ -26,13 +26,20 @@ type AppState = {
 };
 
 type SsDate = {
-    pageData: any;
-    resourceInfo: Record<string, never>;
-    user: BasicUserInfo;
+    pageData?: any;
+    resourceInfo?: Record<string, never>;
+    user?: BasicUserInfo;
+    key?: string;
 };
 
 export let ssData: SsDate | undefined;
-
+const ssDataStr = document.getElementById("__SS_DATA__")?.innerText;
+// @ts-ignore
+if (ssDataStr?.length > 0) {
+    ssData = JSON.parse(ssDataStr as string);
+} else {
+    ssData = {};
+}
 const Index = () => {
     const [appState, setAppState] = useState<AppState>({
         resLoaded: false,
@@ -57,7 +64,7 @@ const Index = () => {
     const initRes = () => {
         const resourceData = getRes();
         if (resourceData === null || Object.keys(resourceData).length === 0) {
-            if (ssData) {
+            if (ssData && ssData.resourceInfo) {
                 handleRes(ssData.resourceInfo);
             } else {
                 loadResourceFromServer();
@@ -68,13 +75,6 @@ const Index = () => {
     };
 
     useEffect(() => {
-        if (ssData === undefined) {
-            const ssDataStr = document.getElementById("__SS_DATA__")?.innerText;
-            // @ts-ignore
-            if (ssDataStr?.length > 0) {
-                ssData = JSON.parse(ssDataStr as string);
-            }
-        }
         initRes();
     }, []);
 

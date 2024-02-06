@@ -8,6 +8,7 @@ import { getColorPrimary, getRes } from "../../utils/constants";
 import { useState } from "react";
 import BaseTable, { PageDataSource } from "../../common/BaseTable";
 import { Link } from "react-router-dom";
+import { deleteCacheDataByKey } from "../../cache";
 
 const Index = ({ data }: { data: PageDataSource }) => {
     const dataApi = "/api/admin/article";
@@ -150,6 +151,9 @@ const Index = ({ data }: { data: PageDataSource }) => {
                         <EditOutlined style={{ color: getColorPrimary() }} />
                     </Link>
                 )}
+                deleteSuccessCallback={(id) => {
+                    deleteCacheDataByKey("/article-edit?id=" + id);
+                }}
                 deleteApi={getDeleteApiUri()}
                 searchKey={searchKey}
                 dataApi={dataApi}

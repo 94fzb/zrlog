@@ -4,6 +4,7 @@ import { useLocation } from "react-router";
 import { getCsrData } from "./api";
 import MyLoadingComponent from "./components/my-loading-component";
 import { ssData } from "./index";
+import { getCachedData, putCache } from "./cache";
 
 const AsyncArticleEdit = lazy(() => import("components/articleEdit"));
 
@@ -47,7 +48,10 @@ const AdminDashboardRouter = () => {
 
     const [state, setState] = useState<AdminDashboardRouterState>({
         firstRender: ssData && ssData.pageData,
-        data: ssData && ssData.pageData ? { [location.pathname + location.search]: ssData.pageData } : {},
+        data:
+            ssData && ssData.pageData
+                ? { ...getCachedData(), [location.pathname + location.search]: ssData.pageData }
+                : getCachedData(),
     });
 
     const getDataFromState = () => {
@@ -62,6 +66,7 @@ const AdminDashboardRouter = () => {
             const mergeData = state.data;
             mergeData[uri] = e;
             setState({ firstRender: false, data: mergeData });
+            putCache(mergeData);
         });
     };
 

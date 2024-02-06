@@ -95,7 +95,7 @@ public class AdminTokenService {
         return null;
     }
 
-    public void setAdminToken(Map<String, Object> user, int sessionId, String protocol, HttpRequest request, HttpResponse response) {
+    public void setAdminToken(Map<String, Object> user, String sessionId, String protocol, HttpRequest request, HttpResponse response) {
         AdminTokenVO adminTokenVO = new AdminTokenVO();
         adminTokenVO.setUserId((Integer) user.get("userId"));
         adminTokenVO.setSessionId(sessionId);

@@ -18,6 +18,7 @@
     "@fortawesome/fontawesome-svg-core": "6.4.0",
     "@fortawesome/free-solid-svg-icons": "6.4.0",
     "jquery": "3.7.1",
+    "aes-js": "3.1.2",
     "md5": "2.3.0",
     "rc-tween-one": "3.0.3",
     "react-async-script": "1.2.0",
