@@ -37,40 +37,37 @@ const AsyncUser = lazy(() => import("components/user"));
 
 const AdminManageLayout = lazy(() => import("layout/index"));
 
-let ssRendered: boolean = false;
+type AdminDashboardRouterState = {
+    firstRender: boolean;
+    data: Record<string, any>;
+};
 
 const AdminDashboardRouter = () => {
     const location = useLocation();
 
-    let defaultData = {};
-
-    // 仅客户端渲染时，第一次渲染时生效
-    if (!ssRendered && ssData && ssData.pageData) {
-        ssRendered = true;
-        const uri = location.pathname + location.search;
-        defaultData = { [uri]: ssData.pageData };
-    }
-
-    const [data, setData] = useState<Record<string, any>>(defaultData);
+    const [state, setState] = useState<AdminDashboardRouterState>({
+        firstRender: ssData && ssData.pageData,
+        data: ssData && ssData.pageData ? { [location.pathname + location.search]: ssData.pageData } : {},
+    });
 
     const getDataFromState = () => {
         const uri = location.pathname + location.search;
-        return data[uri] !== undefined && data[uri] !== null ? data[uri] : undefined;
+        return state.data[uri] !== undefined && state.data[uri] !== null ? state.data[uri] : undefined;
     };
 
     useEffect(() => {
         if (getDataFromState()) {
             return;
         }
-        setData({});
+        setState({ firstRender: false, data: {} });
         const uri = location.pathname + location.search;
         getCsrData(uri).then((e) => {
             const newData = { [uri]: e };
-            setData({ ...newData });
+            setState({ firstRender: false, data: newData });
         });
     }, [location.pathname, location.search]);
 
-    //console.info(data);
+    //console.info(location.pathname + "," + JSON.stringify(state));
 
     return (
         <Routes>
