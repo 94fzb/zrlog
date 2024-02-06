@@ -38,7 +38,6 @@ const AsyncUser = lazy(() => import("components/user"));
 const AdminManageLayout = lazy(() => import("layout/index"));
 
 type AdminDashboardRouterState = {
-    firstRender: boolean;
     data: Record<string, any>;
 };
 
@@ -46,7 +45,6 @@ const AdminDashboardRouter = () => {
     const location = useLocation();
 
     const [state, setState] = useState<AdminDashboardRouterState>({
-        firstRender: ssData && ssData.pageData,
         data: ssData && ssData.pageData ? { [location.pathname + location.search]: ssData.pageData } : {},
     });
 
@@ -59,11 +57,11 @@ const AdminDashboardRouter = () => {
         if (getDataFromState()) {
             return;
         }
-        setState({ firstRender: false, data: {} });
+        setState({ data: {} });
         const uri = location.pathname + location.search;
         getCsrData(uri).then((e) => {
             const newData = { [uri]: e };
-            setState({ firstRender: false, data: newData });
+            setState({ data: newData });
         });
     }, [location.pathname, location.search]);
 
