@@ -497,7 +497,7 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
                         <Select
                             style={{ minWidth: 156 }}
                             status={formValidState.typeError ? "error" : ""}
-                            defaultValue={state.article.typeId}
+                            value={state.article.typeId}
                             showSearch={true}
                             optionFilterProp="children"
                             filterOption={(input, option) => (option?.label ?? "").includes(input)}
@@ -534,9 +534,10 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
             <Row gutter={[8, 8]}>
                 <Col md={18} sm={24} xs={24} style={{ zIndex: 10 }}>
                     <MyEditorMdWrapper
+                        key={data.article.version}
                         onfullscreen={onfullscreen}
                         onfullscreenExit={onfullscreenExit}
-                        markdown={state.article.markdown}
+                        markdown={data.article.markdown}
                         onChange={async (v) => {
                             if (
                                 v.markdown === "" &&

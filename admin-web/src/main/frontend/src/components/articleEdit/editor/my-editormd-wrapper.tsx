@@ -2167,7 +2167,7 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({
         }
     }
 
-    const initEditor = () => {
+    const initEditor = (md: string) => {
         // eslint-disable-next-line no-undef,no-unused-vars
         //@ts-ignore
         editor = editormd(state.id, $, {
@@ -2218,7 +2218,7 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({
             imageUploadURL: document.baseURI + "api/admin/upload",
             path: document.baseURI + "admin/vendors/markdown/lib/",
             placeholder: getRes()["editorPlaceholder"],
-            markdown: markdown,
+            markdown: md,
             onload: function () {
                 setTimeout(() => {
                     $("#fileDialog").on("click", function () {
@@ -2307,7 +2307,7 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({
     };
 
     useEffect(() => {
-        initEditor();
+        initEditor(markdown ? markdown : "");
         return () => {
             $(document.getElementById(state.id) as HTMLDivElement).off();
             $(document.body as HTMLBodyElement).off();
