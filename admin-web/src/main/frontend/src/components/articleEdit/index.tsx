@@ -121,7 +121,6 @@ const StyledArticleEdit = styled("div")`
         color: inherit !important;
     }
 `;
-let articleVersion = -1;
 type FormValidState = {
     titleError: boolean;
     typeError: boolean;
@@ -133,8 +132,8 @@ export type ArticleEditProps = {
     article: ArticleEntry;
 };
 
-const Index = ({ data }: { data: ArticleEditProps }) => {
-    const [state, setState] = useState<ArticleEditState>({
+const dataToState = (data: ArticleEditProps) => {
+    const a = {
         typeOptions: data.types
             ? data.types.map((x) => {
                   return { value: x.id, label: x.typeName };
@@ -157,24 +156,19 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
             releaseSaving: false,
             rubbishSaving: false,
         },
-    });
+    };
+    return a;
+};
 
-    if (articleVersion <= 0) {
-        if (data.article && data.article.version >= 0) {
-            articleVersion = data.article.version;
-        } else {
-            articleVersion = -1;
-        }
-    }
+const Index = ({ data }: { data: ArticleEditProps }) => {
+    const defaultState = dataToState(data);
+
+    const [state, setState] = useState<ArticleEditState>(defaultState);
 
     const [content, setContent] = useState<ChangedContent | undefined>(undefined);
     const [formValidState, setFormValidState] = useState<FormValidState>({ titleError: false, typeError: false });
 
     const { message, modal } = App.useApp();
-
-    const getVersion = () => {
-        return articleVersion;
-    };
 
     const onSubmit = async (article: ArticleEntry, release: boolean, preview: boolean, autoSave: boolean) => {
         if (!validForm(article)) {
@@ -212,7 +206,7 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
         exitTips(getRes()["articleEditExitWithOutSaveSuccess"]);
         let newArticle = {
             ...article,
-            version: getVersion(),
+            version: state.article.version,
             rubbish: !release,
         };
         try {
@@ -237,7 +231,6 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
                 window.open(document.baseURI + state.article!.alias, "_blank");
             }
             const respData = data.data;
-            articleVersion = respData.version;
             if (create) {
                 const url = new URL(window.location.href);
                 url.searchParams.set("id", respData.logId);
@@ -377,6 +370,10 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
         }
     }, [content]);
 
+    useEffect(() => {
+        setState(dataToState(data));
+    }, [data]);
+
     const validForm = (changedArticle: ArticleEntry): boolean => {
         const titleError =
             changedArticle.title === undefined || changedArticle.title === null || changedArticle.title === "";
@@ -449,11 +446,6 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
         );
     };
 
-    //如果没有返回
-    if (data.article === undefined || data.article === null) {
-        return <></>;
-    }
-
     return (
         <StyledArticleEdit>
             <Row gutter={[8, 8]} style={{ paddingTop: 20 }}>
@@ -521,7 +513,7 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
                         <BaseInput
                             status={formValidState.titleError ? "error" : ""}
                             placeholder={getRes().inputArticleTitle}
-                            defaultValue={state.article.title ? state.article.title : undefined}
+                            value={state.article.title ? state.article.title : undefined}
                             onChange={async (e) => {
                                 await handleValuesChange({ title: e });
                             }}
@@ -530,7 +522,7 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
                 </Col>
                 <Col md={5} xs={24}>
                     <BaseInput
-                        defaultValue={state.article.alias}
+                        value={state.article.alias}
                         onChange={async (e) => {
                             await handleValuesChange({ alias: e });
                         }}
@@ -584,7 +576,7 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
                                             label={getRes()["commentAble"]}
                                         >
                                             <Switch
-                                                defaultValue={state.article.canComment}
+                                                value={state.article.canComment}
                                                 size="small"
                                                 onChange={async (checked) => {
                                                     await handleValuesChange({ canComment: checked });
@@ -599,7 +591,7 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
                                             label={getRes()["private"]}
                                         >
                                             <Switch
-                                                defaultValue={state.article.privacy}
+                                                value={state.article.privacy}
                                                 size="small"
                                                 onChange={async (checked) => {
                                                     await handleValuesChange({ privacy: checked });
@@ -624,7 +616,7 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
                         <Col span={24}>
                             <Card size="small" title={getRes().digest}>
                                 <BaseTextArea
-                                    defaultValue={state.article.digest}
+                                    value={state.article.digest}
                                     placeholder={getRes().digestTips}
                                     rows={3}
                                     onChange={async (text: string) => {

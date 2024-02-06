@@ -98,6 +98,18 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
         });
     }, [searchKey]);
 
+    useEffect(() => {
+        setTableDataState((prevState) => {
+            return {
+                ...prevState,
+                rows: datasource ? datasource.rows : [],
+                tablePagination: {
+                    total: datasource?.totalElements,
+                },
+            };
+        });
+    }, [datasource]);
+
     const getActionedColumns = () => {
         const c = [];
         c.push({

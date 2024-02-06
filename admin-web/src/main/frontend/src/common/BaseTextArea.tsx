@@ -4,12 +4,12 @@ import TextArea, { TextAreaRef } from "antd/es/input/TextArea";
 
 type BaseTextAreaProps = {
     placeholder?: string;
-    defaultValue?: string;
+    value?: string;
     onChange: (value: string) => Promise<void>;
     required?: boolean;
     rows?: number;
 };
-const BaseInput: FunctionComponent<BaseTextAreaProps> = ({ defaultValue, rows, onChange, required, placeholder }) => {
+const BaseInput: FunctionComponent<BaseTextAreaProps> = ({ value, rows, onChange, required, placeholder }) => {
     const [composing, setComposing] = useState<boolean>(false);
     const inputRef = useRef<TextAreaRef>(null);
 
@@ -17,7 +17,7 @@ const BaseInput: FunctionComponent<BaseTextAreaProps> = ({ defaultValue, rows, o
         <Form.Item style={{ marginBottom: 8, width: "100%" }} rules={[{ required: required, message: "" }]}>
             <TextArea
                 ref={inputRef}
-                defaultValue={defaultValue}
+                value={value}
                 onCompositionStart={() => {
                     setComposing(true);
                 }}
