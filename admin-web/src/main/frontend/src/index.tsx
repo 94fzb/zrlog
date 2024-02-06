@@ -1,6 +1,6 @@
 import * as serviceWorker from "./serviceWorker";
 import zh_CN from "antd/es/locale/zh_CN";
-import { App, ConfigProvider, Modal, Spin, theme } from "antd";
+import { App, ConfigProvider, Spin, theme } from "antd";
 import { BrowserRouter } from "react-router-dom";
 import EnvUtils from "./utils/env-utils";
 import AppBase from "./AppBase";
@@ -42,20 +42,9 @@ const Index = () => {
 
     const loadResourceFromServer = () => {
         const resourceApi = "/api/public/blogResource";
-        axios
-            .get(resourceApi)
-            .then(({ data }: { data: Record<string, any> }) => {
-                handleRes(data.data);
-            })
-            .catch((error: any) => {
-                Modal.error({
-                    title: "加载 " + resourceApi + " 错误",
-                    content: (
-                        <div style={{ paddingTop: 20 }} dangerouslySetInnerHTML={{ __html: error.response.data }} />
-                    ),
-                    okText: "确认",
-                });
-            });
+        axios.get(resourceApi).then(({ data }: { data: Record<string, any> }) => {
+            handleRes(data.data);
+        });
     };
     const handleRes = (data: Record<string, never>) => {
         // @ts-ignore

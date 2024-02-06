@@ -244,12 +244,6 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
                     version: respData.version,
                 };
             }
-        } catch (e: any) {
-            modal.error({
-                title: "保存失败",
-                content: e.toString(),
-                okText: "确认",
-            });
         } finally {
             if (release) {
                 //@ts-ignore

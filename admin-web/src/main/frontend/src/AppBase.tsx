@@ -2,7 +2,7 @@ import { Route, Routes } from "react-router-dom";
 import { lazy } from "react";
 import { Suspense } from "react";
 import { App, Spin } from "antd";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 const AsyncLogin = lazy(() => import("components/login"));
 const AsyncAdminDashboardRouter = lazy(() => import("AdminDashboardRouter"));
@@ -31,9 +31,9 @@ const AppBase = () => {
             },
             (error) => {
                 if (error && error.response) {
-                    if (error.response.status === 502) {
+                    if (error.response.status) {
                         modal.error({
-                            title: "服务未启动",
+                            title: "服务异常[" + error.response.status + "]",
                             content: (
                                 <div
                                     style={{ paddingTop: 20 }}
@@ -43,6 +43,14 @@ const AppBase = () => {
                             okText: "确认",
                         });
                         return Promise.reject(error.response);
+                    }
+                } else {
+                    if ((error as AxiosError) && error.config) {
+                        modal.error({
+                            title: "请求 " + error.config.url + " 错误",
+                            content: error.toString(),
+                            okText: "确认",
+                        });
                     }
                 }
                 return Promise.reject(error);
