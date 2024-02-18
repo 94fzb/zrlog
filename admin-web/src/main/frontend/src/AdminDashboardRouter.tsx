@@ -60,7 +60,6 @@ const AdminDashboardRouter = () => {
     };
 
     const loadData = () => {
-        //setState({firstRender: false, data: {}});
         const uri = location.pathname + location.search;
         getCsrData(uri).then((e) => {
             const mergeData = state.data;
@@ -73,6 +72,12 @@ const AdminDashboardRouter = () => {
     useEffect(() => {
         if (getDataFromState()) {
             if (state.firstRender) {
+                setState((prevState) => {
+                    return {
+                        firstRender: false,
+                        data: prevState.data,
+                    };
+                });
                 return;
             }
         }
