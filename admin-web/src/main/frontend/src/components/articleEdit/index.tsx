@@ -221,7 +221,7 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
             }
             exitNotTips();
             if (release) {
-                message.info(getRes()["releaseSuccess"]);
+                message.success(getRes()["releaseSuccess"]);
             } else {
                 if (!autoSave) {
                     message.info(getRes()["saveSuccess"]);

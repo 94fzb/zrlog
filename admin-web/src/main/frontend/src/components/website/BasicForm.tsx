@@ -22,7 +22,7 @@ const BasicForm = ({ data }: { data: Basic }) => {
     const websiteFormFinish = (changedValues: any) => {
         axios.post("/api/admin/website/basic", changedValues).then(({ data }) => {
             if (!data.error) {
-                message.info(data.message).then(() => {
+                message.success(data.message).then(() => {
                     removeRes();
                     window.location.reload();
                 });

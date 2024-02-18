@@ -51,10 +51,7 @@ const AdminDashboardRouter = () => {
     const [state, setState] = useState<AdminDashboardRouterState>({
         firstRender: ssData && ssData.pageData,
         currentUri: location.pathname + location.search,
-        data:
-            ssData && ssData.pageData
-                ? { ...getCachedData(), [location.pathname + location.search]: ssData.pageData }
-                : getCachedData(),
+        data: { ...getCachedData(), [location.pathname + location.search]: ssData?.pageData },
     });
 
     const getDataFromState = () => {

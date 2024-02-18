@@ -32,7 +32,7 @@ const UpgradeSettingForm = ({ data }: { data: Upgrade }) => {
     const websiteFormFinish = (changedValues: any) => {
         axios.post("/api/admin/website/upgrade", changedValues).then(({ data }) => {
             if (!data.error) {
-                message.info(data.message).then(() => {
+                message.success(data.message).then(() => {
                     removeRes();
                     window.location.reload();
                 });

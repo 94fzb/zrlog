@@ -22,7 +22,7 @@ const OtherForm = ({ data }: { data: Other }) => {
     const websiteFormFinish = (changedValues: any) => {
         axios.post("/api/admin/website/other", changedValues).then(({ data }) => {
             if (!data.error) {
-                message.info(data.message).then(() => {
+                message.success(data.message).then(() => {
                     removeRes();
                     window.location.reload();
                 });

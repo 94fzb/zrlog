@@ -25,7 +25,7 @@ const BlogForm = ({ data }: { data: Blog }) => {
     const websiteFormFinish = (changedValues: any) => {
         axios.post("/api/admin/website/blog", { ...form, ...changedValues }).then(({ data }) => {
             if (!data.error) {
-                message.info(data.message).then(() => {
+                message.success(data.message).then(() => {
                     removeRes();
                     window.location.reload();
                 });

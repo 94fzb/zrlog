@@ -108,7 +108,7 @@ const TemplateConfig = ({ data }: { data: TemplateConfigState }) => {
             if (data.error) {
                 message.error(data.message);
             } else {
-                message.info(data.message);
+                message.success(data.message);
             }
         });
     };
