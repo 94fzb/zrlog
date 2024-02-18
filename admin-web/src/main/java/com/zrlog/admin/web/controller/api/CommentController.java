@@ -11,9 +11,11 @@ import com.zrlog.admin.business.util.ControllerUtil;
 import com.zrlog.admin.web.annotation.RefreshCache;
 import com.zrlog.common.rest.response.ApiStandardResponse;
 import com.zrlog.common.rest.response.StandardResponse;
+import com.zrlog.data.dto.PageData;
 import com.zrlog.util.ZrLogUtil;
 
 import java.sql.SQLException;
+import java.util.Map;
 
 public class CommentController extends Controller {
 
@@ -38,7 +40,7 @@ public class CommentController extends Controller {
     }
 
     @ResponseBody
-    public ApiStandardResponse index() throws SQLException {
-        return new ApiStandardResponse(commentService.page(ControllerUtil.getPageRequest(this)));
+    public ApiStandardResponse<PageData<Map<String,Object>>> index() throws SQLException {
+        return new ApiStandardResponse<>(commentService.page(ControllerUtil.getPageRequest(this)));
     }
 }

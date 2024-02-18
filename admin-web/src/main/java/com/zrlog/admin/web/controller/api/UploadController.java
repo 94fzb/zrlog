@@ -24,13 +24,13 @@ import java.util.Random;
 public class UploadController extends Controller {
 
     @ResponseBody
-    public ApiStandardResponse index() {
+    public ApiStandardResponse<UploadFileResponse> index() {
         String uploadFieldName = "imgFile";
         String uri = generatorUri(uploadFieldName);
         File imgFile = request.getFile(uploadFieldName);
         String finalFilePath = PathUtil.getStaticPath() + uri;
         FileUtils.moveOrCopyFile(imgFile.toString(), finalFilePath, true);
-        return new ApiStandardResponse(new UploadService().getCloudUrl("", uri, finalFilePath, getRequest(),
+        return new ApiStandardResponse<>(new UploadService().getCloudUrl("", uri, finalFilePath, getRequest(),
                 AdminTokenThreadLocal.getUser()));
     }
 
@@ -43,7 +43,7 @@ public class UploadController extends Controller {
     }
 
     @ResponseBody
-    public ApiStandardResponse thumbnail() throws IOException {
+    public ApiStandardResponse<UploadFileResponse> thumbnail() throws IOException {
         String uploadFieldName = "imgFile";
         String uri = generatorUri(uploadFieldName);
         File imgFile = request.getFile(uploadFieldName);
@@ -67,7 +67,7 @@ public class UploadController extends Controller {
                 finalFilePath, getRequest(), AdminTokenThreadLocal.getUser());
         uploadFileResponse.setUrl(uploadFileResponse.getUrl() + "?h=" + height + "&w=" + width);
         imgFile.delete();
-        return new ApiStandardResponse(uploadFileResponse);
+        return new ApiStandardResponse<>(uploadFileResponse);
     }
 
 }

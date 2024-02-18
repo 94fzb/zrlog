@@ -47,10 +47,10 @@ public class TemplateController extends Controller {
 
     @RefreshCache
     @ResponseBody
-    public ApiStandardResponse apply() throws SQLException {
+    public ApiStandardResponse<Void> apply() throws SQLException {
         String template = request.getParaToStr("template");
         new WebSite().updateByKV("template", template);
-        ApiStandardResponse apiStandardResponse = new ApiStandardResponse();
+        ApiStandardResponse<Void> apiStandardResponse = new ApiStandardResponse<>();
         apiStandardResponse.setError(0);
         Cookie cookie = new Cookie();
         cookie.setName("template");
@@ -64,7 +64,7 @@ public class TemplateController extends Controller {
 
     @RefreshCache
     @ResponseBody
-    public ApiStandardResponse preview() {
+    public ApiStandardResponse<Void> preview() {
         String template = request.getParaToStr("template");
         if (StringUtils.isEmpty(template)) {
             throw new TemplatePathNotNullException();
@@ -75,17 +75,17 @@ public class TemplateController extends Controller {
         cookie.setPath("/");
         cookie.setHttpOnly(true);
         getResponse().addCookie(cookie);
-        return new ApiStandardResponse();
+        return new ApiStandardResponse<>();
     }
 
     @ResponseBody
-    public ApiStandardResponse delete() {
+    public ApiStandardResponse<Void> delete() {
         String template = checkByWhiteList(request.getParaToStr("template"));
         File file = new File(PathUtil.getStaticPath() + template);
         if (file.exists()) {
             FileUtils.deleteFile(file.toString());
         }
-        ApiStandardResponse apiStandardResponse = new ApiStandardResponse();
+        ApiStandardResponse<Void> apiStandardResponse = new ApiStandardResponse<>();
         apiStandardResponse.setMessage(I18nUtil.getBlogStringFromRes("updateSuccess"));
         return apiStandardResponse;
     }
@@ -129,7 +129,7 @@ public class TemplateController extends Controller {
 
     @ResponseBody
     public ApiStandardResponse<List<TemplateVO>> index() {
-        return new ApiStandardResponse(templateService.getAllTemplates(TemplateHelper.getTemplatePathByCookie(getRequest().getCookies())));
+        return new ApiStandardResponse<>(templateService.getAllTemplates(TemplateHelper.getTemplatePathByCookie(getRequest().getCookies())));
     }
 
     @ResponseBody

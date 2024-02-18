@@ -10,10 +10,7 @@ import com.zrlog.admin.business.exception.NotFindResourceException;
 import com.zrlog.admin.business.exception.PermissionErrorException;
 import com.zrlog.admin.business.rest.request.CreateArticleRequest;
 import com.zrlog.admin.business.rest.request.UpdateArticleRequest;
-import com.zrlog.admin.business.rest.response.ArticleGlobalResponse;
-import com.zrlog.admin.business.rest.response.ArticleResponseEntry;
-import com.zrlog.admin.business.rest.response.DeleteLogResponse;
-import com.zrlog.admin.business.rest.response.LoadEditArticleResponse;
+import com.zrlog.admin.business.rest.response.*;
 import com.zrlog.admin.business.service.AdminArticleService;
 import com.zrlog.admin.business.util.ControllerUtil;
 import com.zrlog.admin.web.annotation.RefreshCache;
@@ -43,7 +40,7 @@ public class AdminArticleController extends Controller {
 
     @RefreshCache(async = true)
     @ResponseBody
-    public ApiStandardResponse delete() throws SQLException {
+    public ApiStandardResponse<DeleteLogResponse> delete() throws SQLException {
         if (ZrLogUtil.isPreviewMode()) {
             throw new PermissionErrorException();
         }
@@ -53,29 +50,29 @@ public class AdminArticleController extends Controller {
         }
         DeleteLogResponse deleteLogResponse = new DeleteLogResponse();
         deleteLogResponse.setDelete(true);
-        return new ApiStandardResponse(deleteLogResponse);
+        return new ApiStandardResponse<>(deleteLogResponse);
     }
 
     @RefreshCache(async = true)
     @ResponseBody
-    public ApiStandardResponse create() {
-        return new ApiStandardResponse(articleService.create(AdminTokenThreadLocal.getUser(), ZrLogUtil.convertRequestBody(getRequest(),
+    public ApiStandardResponse<CreateOrUpdateArticleResponse> create() {
+        return new ApiStandardResponse<>(articleService.create(AdminTokenThreadLocal.getUser(), ZrLogUtil.convertRequestBody(getRequest(),
                 CreateArticleRequest.class)));
     }
 
     @RefreshCache(async = true)
     @ResponseBody
-    public ApiStandardResponse update() {
-        return new ApiStandardResponse(articleService.update(AdminTokenThreadLocal.getUser(), ZrLogUtil.convertRequestBody(getRequest(),
+    public ApiStandardResponse<CreateOrUpdateArticleResponse> update() {
+        return new ApiStandardResponse<>(articleService.update(AdminTokenThreadLocal.getUser(), ZrLogUtil.convertRequestBody(getRequest(),
                 UpdateArticleRequest.class)));
     }
 
     @ResponseBody
-    public ApiStandardResponse index() throws SQLException {
-        PageData<ArticleResponseEntry> key = articleService.adminPage(ControllerUtil.getPageRequest(this),
+    public ApiStandardResponse<PageData<ArticleResponseEntry>> index() throws SQLException {
+        PageData<ArticleResponseEntry> pageData = articleService.adminPage(ControllerUtil.getPageRequest(this),
                 WebTools.convertRequestParam(request.getParaToStr("key")));
-        key.getRows().forEach(x -> x.setUrl(WebTools.getHomeUrl(getRequest()) + Constants.getArticleUri() + getAccessKey(x)));
-        return new ApiStandardResponse(key);
+        pageData.getRows().forEach(x -> x.setUrl(WebTools.getHomeUrl(getRequest()) + Constants.getArticleUri() + getAccessKey(x)));
+        return new ApiStandardResponse<>(pageData);
     }
 
     private String getAccessKey(ArticleResponseEntry articleResponseEntry) {
@@ -116,7 +113,7 @@ public class AdminArticleController extends Controller {
         log.remove("releaseTime");
         log.remove("last_update_date");
         log.remove("lastUpdateDate");
-        return new ApiStandardResponse(BeanUtil.convert(log, LoadEditArticleResponse.class));
+        return new ApiStandardResponse<>(BeanUtil.convert(log, LoadEditArticleResponse.class));
     }
 
 }

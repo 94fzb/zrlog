@@ -528,7 +528,7 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
             <Row gutter={[8, 8]}>
                 <Col md={18} sm={24} xs={24} style={{ zIndex: 10 }}>
                     <MyEditorMdWrapper
-                        key={data.article.version}
+                        key={data.article.version + "" + data.article.logId}
                         onfullscreen={onfullscreen}
                         onfullscreenExit={onfullscreenExit}
                         markdown={data.article.markdown}
