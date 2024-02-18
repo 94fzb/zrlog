@@ -5,6 +5,7 @@ import { getCsrData } from "./api";
 import MyLoadingComponent from "./components/my-loading-component";
 import { ssData } from "./index";
 import { getCachedData, putCache } from "./cache";
+import { deepEqual } from "./utils/helpers";
 
 const AsyncArticleEdit = lazy(() => import("components/articleEdit"));
 
@@ -40,6 +41,7 @@ const AdminManageLayout = lazy(() => import("layout/index"));
 
 type AdminDashboardRouterState = {
     firstRender: boolean;
+    currentUri: string;
     data: Record<string, any>;
 };
 
@@ -48,6 +50,7 @@ const AdminDashboardRouter = () => {
 
     const [state, setState] = useState<AdminDashboardRouterState>({
         firstRender: ssData && ssData.pageData,
+        currentUri: location.pathname + location.search,
         data:
             ssData && ssData.pageData
                 ? { ...getCachedData(), [location.pathname + location.search]: ssData.pageData }
@@ -59,29 +62,43 @@ const AdminDashboardRouter = () => {
         return state.data[uri] !== undefined && state.data[uri] !== null ? state.data[uri] : undefined;
     };
 
-    const loadData = () => {
-        const uri = location.pathname + location.search;
+    const loadData = (uri: string) => {
         getCsrData(uri).then((e) => {
             const mergeData = state.data;
+            //如果请求回来的和请求回来的一致的情况就跳过 setState
+            if (deepEqual(mergeData[uri], e)) {
+                console.debug(uri + " cache hits");
+                return;
+            }
             mergeData[uri] = e;
-            setState({ firstRender: false, data: mergeData });
+            setState({ firstRender: false, currentUri: uri, data: mergeData });
             putCache(mergeData);
         });
     };
 
     useEffect(() => {
+        const uri = location.pathname + location.search;
         if (getDataFromState()) {
             if (state.firstRender) {
                 setState((prevState) => {
                     return {
+                        currentUri: uri,
                         firstRender: false,
                         data: prevState.data,
                     };
                 });
                 return;
+            } else {
+                setState((prevState) => {
+                    return {
+                        currentUri: uri,
+                        firstRender: false,
+                        data: prevState.data,
+                    };
+                });
             }
         }
-        loadData();
+        loadData(uri);
     }, [location.pathname, location.search]);
 
     //console.info(location.pathname + "," + JSON.stringify(state));
