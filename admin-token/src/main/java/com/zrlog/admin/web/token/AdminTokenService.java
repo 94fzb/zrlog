@@ -111,7 +111,7 @@ public class AdminTokenService {
             Cookie cookie = new Cookie();
             cookie.setName(ADMIN_TOKEN);
             cookie.setValue(finalTokenString);
-            cookie.setExpireDate(new Date(System.currentTimeMillis() + (Constants.getSessionTimeout() * 1000)));
+            cookie.setExpireDate(new Date(System.currentTimeMillis() + Constants.getSessionTimeout()));
             cookie.setHttpOnly(true);
             cookie.setPath("/");
             response.addCookie(cookie);
