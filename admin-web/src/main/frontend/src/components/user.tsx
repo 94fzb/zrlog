@@ -2,11 +2,10 @@ import { useState } from "react";
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
 import Form from "antd/es/form";
-import { Button, Input } from "antd";
+import { Button, Input, App } from "antd";
 import Dragger from "antd/es/upload/Dragger";
 import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
-import { message } from "antd/es";
 import Image from "antd/es/image";
 import Constants, { getRes } from "../utils/constants";
 import axios from "axios";
@@ -26,6 +25,7 @@ type BasicUserInfo = {
 
 const User = ({ data }: { data: BasicUserInfo }) => {
     const [userInfo, setUserInfo] = useState<BasicUserInfo>(data);
+    const { message } = App.useApp();
 
     const setValue = (changedValues: BasicUserInfo) => {
         setUserInfo({ ...userInfo, ...changedValues });

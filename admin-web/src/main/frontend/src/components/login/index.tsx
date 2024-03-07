@@ -7,6 +7,7 @@ import { getColorPrimary, getRes } from "../../utils/constants";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Title from "antd/es/typography/Title";
+import { ssData } from "../../index";
 
 const md5 = require("md5");
 
@@ -57,6 +58,9 @@ const Index = () => {
                         //need reload page, because basename error
                         window.location.href = decodeURIComponent(query.get("redirectFrom") + "");
                     } else {
+                        if (ssData) {
+                            ssData.key = data.data.key;
+                        }
                         navigate("/index", { replace: true });
                     }
                 }

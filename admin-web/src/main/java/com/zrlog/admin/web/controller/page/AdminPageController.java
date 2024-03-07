@@ -65,15 +65,15 @@ public class AdminPageController extends Controller {
                 Controller controller = ZrLogUtil.buildController(method,request,response);
                 ApiStandardResponse<Object> result = (ApiStandardResponse<Object>) method.invoke(controller);
                 if(Objects.nonNull(result)){
-                    return new ServerSideDataResponse(basicInfoResponse,resourceInfo,result.getData());
+                    return new ServerSideDataResponse(basicInfoResponse,resourceInfo,result.getData(),AdminTokenThreadLocal.getUser().getSessionId());
                 } else{
-                    return new ServerSideDataResponse(basicInfoResponse,resourceInfo,new Object());
+                    return new ServerSideDataResponse(basicInfoResponse,resourceInfo,new Object(),AdminTokenThreadLocal.getUser().getSessionId());
                 }
             } catch (Exception e){
                 throw new RuntimeException(e);
             }
         } else{
-            return new ServerSideDataResponse(null,resourceInfo,null);
+            return new ServerSideDataResponse(null,resourceInfo,null,null);
         }
     }
 

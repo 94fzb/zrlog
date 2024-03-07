@@ -43,28 +43,28 @@ public class WebSiteController extends Controller {
         versionResponse.setVersion(BlogBuildInfoUtil.getVersion());
         versionResponse.setChangelog(UpdateVersionPlugin.getChangeLog(BlogBuildInfoUtil.getVersion(),
                 BlogBuildInfoUtil.getBuildId()));
-        return new ApiStandardResponse(versionResponse);
+        return new ApiStandardResponse<>(versionResponse);
     }
 
     @ResponseBody
-    public ApiStandardResponse index() {
+    public ApiStandardResponse<WebSiteSettingsResponse> index() {
         WebSiteSettingsResponse webSiteSettingsResponse = webSiteService.loadSettings();
         webSiteSettingsResponse.setTemplates(new TemplateController(request,response).index().getData());
-        return new ApiStandardResponse(webSiteSettingsResponse);
+        return new ApiStandardResponse<>(webSiteSettingsResponse);
     }
 
     @RefreshCache
     @ResponseBody
-    public ApiStandardResponse basic() throws SQLException {
+    public ApiStandardResponse<Void> basic() throws SQLException {
         return update(BasicWebSiteRequest.class);
     }
 
-    private ApiStandardResponse update(Class<?> t) throws SQLException {
+    private ApiStandardResponse<Void> update(Class<?> t) throws SQLException {
         Map<String, Object> requestMap = BeanUtil.convert(ZrLogUtil.convertRequestBody(getRequest(), t), Map.class);
         for (Entry<String, Object> param : requestMap.entrySet()) {
             new WebSite().updateByKV(param.getKey(), param.getValue());
         }
-        ApiStandardResponse updateResponse = new ApiStandardResponse();
+        ApiStandardResponse<Void> updateResponse = new ApiStandardResponse<>();
         updateResponse.setError(0);
         updateResponse.setMessage(I18nUtil.getBlogStringFromRes("updateSuccess"));
         return updateResponse;
@@ -72,19 +72,19 @@ public class WebSiteController extends Controller {
 
     @RefreshCache
     @ResponseBody
-    public ApiStandardResponse blog() throws SQLException {
+    public ApiStandardResponse<Void> blog() throws SQLException {
         return update(BlogWebSiteRequest.class);
     }
 
     @RefreshCache
     @ResponseBody
-    public ApiStandardResponse other() throws SQLException {
+    public ApiStandardResponse<Void> other() throws SQLException {
         return update(OtherWebSiteRequest.class);
     }
 
     @RefreshCache
     @ResponseBody
-    public ApiStandardResponse upgrade() throws SQLException {
+    public ApiStandardResponse<Void> upgrade() throws SQLException {
         UpgradeWebSiteRequest request = ZrLogUtil.convertRequestBody(getRequest(), UpgradeWebSiteRequest.class);
         Map<String, Object> requestMap = BeanUtil.convert(request, Map.class);
         for (Entry<String, Object> param : requestMap.entrySet()) {
@@ -104,8 +104,9 @@ public class WebSiteController extends Controller {
                 }
             }
         }*/
-        ApiStandardResponse recordResponse = new ApiStandardResponse();
+        ApiStandardResponse<Void> recordResponse = new ApiStandardResponse<>();
         recordResponse.setError(0);
+        recordResponse.setMessage(I18nUtil.getBlogStringFromRes("updateSuccess"));
         return recordResponse;
     }
 }

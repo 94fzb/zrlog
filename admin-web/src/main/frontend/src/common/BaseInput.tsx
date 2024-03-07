@@ -5,13 +5,13 @@ import { InputStatus } from "antd/es/_util/statusUtils";
 type BaseInputProps = {
     addonBefore?: ReactElement | string;
     placeholder?: string;
-    defaultValue?: string;
+    value?: string;
     name?: string;
     status?: InputStatus;
     onChange: (value: string) => Promise<void>;
     required?: boolean;
 };
-const BaseInput: FunctionComponent<BaseInputProps> = ({ defaultValue, onChange, addonBefore, status, placeholder }) => {
+const BaseInput: FunctionComponent<BaseInputProps> = ({ value, onChange, addonBefore, status, placeholder }) => {
     const [composing, setComposing] = useState<boolean>(false);
     const inputRef = useRef<InputRef>(null);
     const [changing, setChanging] = useState<boolean>(false);
@@ -38,7 +38,7 @@ const BaseInput: FunctionComponent<BaseInputProps> = ({ defaultValue, onChange, 
             status={status}
             addonBefore={addonBefore}
             ref={inputRef}
-            defaultValue={defaultValue}
+            value={value}
             onCompositionStart={() => {
                 setComposing(true);
             }}

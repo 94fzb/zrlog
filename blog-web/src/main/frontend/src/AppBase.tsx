@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Spin,App} from "antd";
+import {Spin, App} from "antd";
 import {useEffect, useState} from "react";
 import {getRes, resourceKey} from "./utils/constants";
 import IndexLayout from "./components";
@@ -10,39 +10,33 @@ type AppState = {
     resLoaded: boolean;
 };
 
+const jsonStr = document.getElementById("resourceInfo")?.textContent;
+let _resLoadedBySsr = false;
+
+const setRes = (data: Record<string, unknown>) => {
+    data.copyrightTips =
+        data.copyright + ' <a target="_blank" href="https://blog.zrlog.com/about?footer">ZrLog</a>';
+    //@ts-ignore
+    window[resourceKey] = JSON.stringify(data);
+}
+
+if (jsonStr && jsonStr !== "") {
+    setRes(JSON.parse(jsonStr));
+    _resLoadedBySsr = true;
+}
+
 const AppBase = () => {
-    const [appState, setAppState] = useState<AppState>({resLoaded: false});
+    const [appState, setAppState] = useState<AppState>({resLoaded: _resLoadedBySsr});
 
     const {modal} = App.useApp();
-
-    const handleRes = (data: Record<string, any>) => {
-        data.copyrightTips =
-            data.copyright + ' <a target="_blank" href="https://blog.zrlog.com/about?footer">ZrLog</a>';
-        //@ts-ignore
-        window[resourceKey] = JSON.stringify(data);
-        setAppState({resLoaded: true});
-    };
-
-    const initRes = () => {
-        const resourceData = getRes();
-        if (Object.keys(resourceData).length === 0) {
-            const jsonStr = document.getElementById("resourceInfo")?.textContent;
-            if (jsonStr && jsonStr !== "") {
-                handleRes(JSON.parse(jsonStr));
-            } else {
-                loadResourceFromServer();
-            }
-        } else {
-            handleRes(resourceData);
-        }
-    };
 
     const loadResourceFromServer = () => {
         const resourceApi = "/api/public/installResource";
         axios
             .get(resourceApi)
             .then(({data}: { data: Record<string, any> }) => {
-                handleRes(data.data);
+                setRes(data.data)
+                setAppState({resLoaded: true})
             })
             .catch((error: any) => {
                 modal.error({
@@ -54,6 +48,15 @@ const AppBase = () => {
                 });
             });
     };
+
+    const initRes = () => {
+        const resourceData = getRes();
+        if (Object.keys(resourceData).length !== 0) {
+            return;
+        }
+        loadResourceFromServer();
+    };
+
 
     useEffect(() => {
         initRes();

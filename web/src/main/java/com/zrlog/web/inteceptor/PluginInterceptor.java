@@ -35,7 +35,7 @@ public class PluginInterceptor implements Interceptor {
 
 
     /**
-     * 检查是否登陆，未登陆的请求直接放回403的错误页面
+     * 检查是否登录，未登录的请求直接放回403的错误页面
      *
      * @param target
      * @param request
@@ -53,7 +53,7 @@ public class PluginInterceptor implements Interceptor {
     }
 
     /**
-     * 不检查是否登陆，错误请求直接直接转化为403
+     * 不检查是否登录，错误请求直接直接转化为403
      *
      * @param target
      * @param request

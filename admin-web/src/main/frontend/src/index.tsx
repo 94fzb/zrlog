@@ -1,6 +1,6 @@
 import * as serviceWorker from "./serviceWorker";
 import zh_CN from "antd/es/locale/zh_CN";
-import { App, ConfigProvider, Modal, Spin, theme } from "antd";
+import { App, ConfigProvider, Spin, theme } from "antd";
 import { BrowserRouter } from "react-router-dom";
 import EnvUtils from "./utils/env-utils";
 import AppBase from "./AppBase";
@@ -26,13 +26,20 @@ type AppState = {
 };
 
 type SsDate = {
-    pageData: any;
-    resourceInfo: Record<string, never>;
-    user: BasicUserInfo;
+    pageData?: any;
+    resourceInfo?: Record<string, never>;
+    user?: BasicUserInfo;
+    key?: string;
 };
 
 export let ssData: SsDate | undefined;
-
+const ssDataStr = document.getElementById("__SS_DATA__")?.innerText;
+// @ts-ignore
+if (ssDataStr?.length > 0) {
+    ssData = JSON.parse(ssDataStr as string);
+} else {
+    ssData = {};
+}
 const Index = () => {
     const [appState, setAppState] = useState<AppState>({
         resLoaded: false,
@@ -42,20 +49,9 @@ const Index = () => {
 
     const loadResourceFromServer = () => {
         const resourceApi = "/api/public/blogResource";
-        axios
-            .get(resourceApi)
-            .then(({ data }: { data: Record<string, any> }) => {
-                handleRes(data.data);
-            })
-            .catch((error: any) => {
-                Modal.error({
-                    title: "加载 " + resourceApi + " 错误",
-                    content: (
-                        <div style={{ paddingTop: 20 }} dangerouslySetInnerHTML={{ __html: error.response.data }} />
-                    ),
-                    okText: "确认",
-                });
-            });
+        axios.get(resourceApi).then(({ data }: { data: Record<string, any> }) => {
+            handleRes(data.data);
+        });
     };
     const handleRes = (data: Record<string, never>) => {
         // @ts-ignore
@@ -68,7 +64,7 @@ const Index = () => {
     const initRes = () => {
         const resourceData = getRes();
         if (resourceData === null || Object.keys(resourceData).length === 0) {
-            if (ssData) {
+            if (ssData && ssData.resourceInfo) {
                 handleRes(ssData.resourceInfo);
             } else {
                 loadResourceFromServer();
@@ -79,13 +75,6 @@ const Index = () => {
     };
 
     useEffect(() => {
-        if (ssData === undefined) {
-            const ssDataStr = document.getElementById("__SS_DATA__")?.innerText;
-            // @ts-ignore
-            if (ssDataStr?.length > 0) {
-                ssData = JSON.parse(ssDataStr as string);
-            }
-        }
         initRes();
     }, []);
 

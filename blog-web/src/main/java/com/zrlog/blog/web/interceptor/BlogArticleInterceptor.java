@@ -5,25 +5,17 @@ import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.api.Interceptor;
 import com.hibegin.http.server.util.FreeMarkerUtil;
 import com.hibegin.http.server.util.PathUtil;
-import com.hibegin.http.server.web.Controller;
 import com.hibegin.http.server.web.MethodInterceptor;
-import com.zrlog.blog.web.plugin.RequestInfo;
-import com.zrlog.blog.web.plugin.RequestStatisticsPlugin;
-import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.business.cache.CacheService;
 import com.zrlog.business.exception.InstalledException;
 import com.zrlog.business.service.TemplateHelper;
 import com.zrlog.business.util.InstallUtils;
 import com.zrlog.common.Constants;
-import com.zrlog.model.WebSite;
 import com.zrlog.util.ZrLogUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -45,11 +37,11 @@ public class BlogArticleInterceptor implements Interceptor {
     }
 
 
-    private void initTemplate(){
+    private void initTemplate() {
         if (!InstallUtils.isInstalled()) {
             return;
         }
-        String configTemplate = Constants.WEB_SITE.getOrDefault("template",Constants.DEFAULT_TEMPLATE_PATH).toString();
+        String configTemplate = Constants.WEB_SITE.getOrDefault("template", Constants.DEFAULT_TEMPLATE_PATH).toString();
         File path = new File(PathUtil.getStaticPath() + configTemplate);
         if (!path.exists()) {
             path = new File(PathUtil.getStaticPath() + Constants.DEFAULT_TEMPLATE_PATH);
@@ -72,7 +64,12 @@ public class BlogArticleInterceptor implements Interceptor {
             new MethodInterceptor().doInterceptor(request, response);
             return true;
         }
-        cacheService.refreshInitDataCache(request, false);
+        if (InstallUtils.isInstalled()) {
+            cacheService.refreshInitDataCache(request, false);
+        } else if (!Objects.equals("/install", target)) {
+            response.redirect("/install?ref=" + request.getUri());
+            return true;
+        }
         Method method = request.getServerConfig().getRouter().getRouterMap().get(target);
         if (Objects.isNull(method) && target.endsWith(".html")) {
             method = request.getServerConfig().getRouter().getRouterMap().get(target.substring(0, target.length() - 5));

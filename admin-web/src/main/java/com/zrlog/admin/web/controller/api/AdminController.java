@@ -23,11 +23,10 @@ import com.zrlog.util.ZrLogUtil;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class AdminController extends Controller {
-
-    private static final AtomicInteger sessionAtomicInteger = new AtomicInteger();
 
     private final UserService userService = new UserService();
 
@@ -41,13 +40,14 @@ public class AdminController extends Controller {
     }
 
     @ResponseBody
-    public LoginResponse login() throws SQLException {
+    public ApiStandardResponse<Map<String,Object>> login() throws SQLException {
         LoginRequest loginRequest = ZrLogUtil.convertRequestBody(getRequest(), LoginRequest.class);
         userService.login(loginRequest);
+        String key = UUID.randomUUID().toString();
         adminTokenService.setAdminToken(new User().getUserByUserName(loginRequest.getUserName().toLowerCase()),
-                sessionAtomicInteger.incrementAndGet(), loginRequest.getHttps() ? "https" : "http", getRequest(),
+                key, loginRequest.getHttps() ? "https" : "http", getRequest(),
                 getResponse());
-        return new LoginResponse();
+        return new ApiStandardResponse<>(Map.of("key",key));
     }
 
     /**

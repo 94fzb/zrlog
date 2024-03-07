@@ -4,12 +4,12 @@ import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
 import Divider from "antd/es/divider";
 import Index, { TemplateEntry } from "../template";
-import { getRes } from "../../utils/constants";
+import { getColorPrimary, getRes } from "../../utils/constants";
 import BlogForm from "./BlogForm";
 import BasicForm from "./BasicForm";
 import OtherForm from "./OtherForm";
 import UpgradeSettingForm from "./UpgradeSettingForm";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export interface Data {
     basic: Basic;
@@ -48,46 +48,19 @@ export interface Upgrade {
 }
 
 const WebSite = ({ data }: { data: Data }) => {
-    const navigate = useNavigate();
     const tab = new URLSearchParams(window.location.search).get("tab");
     const activeKey = tab ? tab : "basic";
 
-    const getTabPan = (currentActiveKey: string) => {
-        if (activeKey === "basic" && currentActiveKey === "basic") {
-            return (
-                <Row>
-                    <Col md={12} xs={24}>
-                        <BasicForm data={data.basic} />
-                    </Col>
-                </Row>
-            );
-        } else if (activeKey === "blog" && currentActiveKey === "blog") {
-            return (
-                <Row>
-                    <Col md={12} xs={24}>
-                        <BlogForm data={data.blog} />
-                    </Col>
-                </Row>
-            );
-        } else if (activeKey === "template" && currentActiveKey === "template") {
-            return <Index data={data.templates} />;
-        } else if (activeKey === "other" && currentActiveKey === "other") {
-            return (
-                <Row>
-                    <Col md={12} xs={24}>
-                        <OtherForm data={data.other} />
-                    </Col>
-                </Row>
-            );
-        } else if (activeKey === "upgrade" && currentActiveKey === "upgrade") {
-            return <UpgradeSettingForm data={data.upgrade} />;
-        } else {
-            return <></>;
-        }
-    };
-
-    const handleTabClick = (key: string) => {
-        navigate(`/website?tab=${key}`, { replace: true });
+    const buildLink = (key: string, text: string) => {
+        return (
+            <Link
+                to={"/website?tab=" + key}
+                replace={true}
+                style={{ color: activeKey === key ? getColorPrimary() : "inherit" }}
+            >
+                {text}
+            </Link>
+        );
     };
 
     return (
@@ -101,31 +74,49 @@ const WebSite = ({ data }: { data: Data }) => {
                 items={[
                     {
                         key: "basic",
-                        label: "基本信息",
-                        children: getTabPan("basic"),
+                        label: buildLink("basic", "基本信息"),
+                        children: (
+                            <Row>
+                                <Col md={12} xs={24}>
+                                    <BasicForm data={data.basic} />
+                                </Col>
+                            </Row>
+                        ),
                     },
                     {
                         key: "blog",
-                        label: "博客设置",
-                        children: getTabPan("blog"),
+                        label: buildLink("blog", "博客设置"),
+                        children: (
+                            <Row>
+                                <Col md={12} xs={24}>
+                                    <BlogForm data={data.blog} />
+                                </Col>
+                            </Row>
+                        ),
                     },
                     {
                         key: "template",
-                        label: getRes()["admin.template.manage"],
-                        children: getTabPan("template"),
+                        label: buildLink("template", getRes()["admin.template.manage"]),
+                        children: <Index data={data.templates} />,
                     },
                     {
                         key: "other",
-                        label: "其他设置",
-                        children: getTabPan("other"),
+                        label: buildLink("other", "其他设置"),
+                        children: (
+                            <Row>
+                                <Col md={12} xs={24}>
+                                    <OtherForm data={data.other} />
+                                </Col>
+                            </Row>
+                        ),
                     },
                     {
                         key: "upgrade",
-                        label: getRes()["admin.upgrade.manage"],
-                        children: getTabPan("upgrade"),
+                        label: buildLink("upgrade", getRes()["admin.upgrade.manage"]),
+                        children: <UpgradeSettingForm data={data.upgrade} />,
                     },
                 ]}
-                onChange={(e) => handleTabClick(e)}
+                //onChange={(e) => handleTabClick(e)}
             />
         </>
     );

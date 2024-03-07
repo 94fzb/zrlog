@@ -95,7 +95,7 @@ public class AdminTokenService {
         return null;
     }
 
-    public void setAdminToken(Map<String, Object> user, int sessionId, String protocol, HttpRequest request, HttpResponse response) {
+    public void setAdminToken(Map<String, Object> user, String sessionId, String protocol, HttpRequest request, HttpResponse response) {
         AdminTokenVO adminTokenVO = new AdminTokenVO();
         adminTokenVO.setUserId((Integer) user.get("userId"));
         adminTokenVO.setSessionId(sessionId);
@@ -111,7 +111,7 @@ public class AdminTokenService {
             Cookie cookie = new Cookie();
             cookie.setName(ADMIN_TOKEN);
             cookie.setValue(finalTokenString);
-            cookie.setExpireDate(new Date(System.currentTimeMillis() + (Constants.getSessionTimeout() * 1000)));
+            cookie.setExpireDate(new Date(System.currentTimeMillis() + Constants.getSessionTimeout()));
             cookie.setHttpOnly(true);
             cookie.setPath("/");
             response.addCookie(cookie);

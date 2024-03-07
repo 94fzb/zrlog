@@ -3,6 +3,9 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import { useLocation } from "react-router";
 import { getCsrData } from "./api";
 import MyLoadingComponent from "./components/my-loading-component";
+import { ssData } from "./index";
+import { getCachedData, putCache } from "./cache";
+import { deepEqual } from "./utils/helpers";
 
 const AsyncArticleEdit = lazy(() => import("components/articleEdit"));
 
@@ -36,17 +39,66 @@ const AsyncUser = lazy(() => import("components/user"));
 
 const AdminManageLayout = lazy(() => import("layout/index"));
 
+type AdminDashboardRouterState = {
+    firstRender: boolean;
+    currentUri: string;
+    data: Record<string, any>;
+};
+
 const AdminDashboardRouter = () => {
     const location = useLocation();
 
-    const [data, setData] = useState<any>(null);
+    const [state, setState] = useState<AdminDashboardRouterState>({
+        firstRender: ssData && ssData.pageData,
+        currentUri: location.pathname + location.search,
+        data: { ...getCachedData(), [location.pathname + location.search]: ssData?.pageData },
+    });
+
+    const getDataFromState = () => {
+        const uri = location.pathname + location.search;
+        return state.data[uri] !== undefined && state.data[uri] !== null ? state.data[uri] : undefined;
+    };
+
+    const loadData = (uri: string) => {
+        getCsrData(uri).then((e) => {
+            const mergeData = state.data;
+            //如果请求回来的和请求回来的一致的情况就跳过 setState
+            if (deepEqual(mergeData[uri], e)) {
+                console.debug(uri + " cache hits");
+                return;
+            }
+            mergeData[uri] = e;
+            setState({ firstRender: false, currentUri: uri, data: mergeData });
+            putCache(mergeData);
+        });
+    };
 
     useEffect(() => {
-        setData(null);
-        getCsrData(location.pathname + location.search).then((e) => {
-            setData(e);
-        });
+        const uri = location.pathname + location.search;
+        if (getDataFromState()) {
+            if (state.firstRender) {
+                setState((prevState) => {
+                    return {
+                        currentUri: uri,
+                        firstRender: false,
+                        data: prevState.data,
+                    };
+                });
+                return;
+            } else {
+                setState((prevState) => {
+                    return {
+                        currentUri: uri,
+                        firstRender: false,
+                        data: prevState.data,
+                    };
+                });
+            }
+        }
+        loadData(uri);
     }, [location.pathname, location.search]);
+
+    //console.info(location.pathname + "," + JSON.stringify(state));
 
     return (
         <Routes>
@@ -54,9 +106,9 @@ const AdminDashboardRouter = () => {
                 path="index"
                 element={
                     <AdminManageLayout>
-                        {data && (
+                        {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncIndex data={data} />
+                                <AsyncIndex data={getDataFromState()} />
                             </Suspense>
                         )}
                     </AdminManageLayout>
@@ -66,9 +118,9 @@ const AdminDashboardRouter = () => {
                 path="comment"
                 element={
                     <AdminManageLayout>
-                        {data && (
+                        {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncComment data={data} />
+                                <AsyncComment data={getDataFromState()} />
                             </Suspense>
                         )}
                     </AdminManageLayout>
@@ -88,9 +140,9 @@ const AdminDashboardRouter = () => {
                 path="website"
                 element={
                     <AdminManageLayout>
-                        {data && (
+                        {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncWebSite data={data} />
+                                <AsyncWebSite data={getDataFromState()} />
                             </Suspense>
                         )}
                     </AdminManageLayout>
@@ -100,9 +152,9 @@ const AdminDashboardRouter = () => {
                 path="article-type"
                 element={
                     <AdminManageLayout>
-                        {data && (
+                        {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncType data={data} />
+                                <AsyncType data={getDataFromState()} />
                             </Suspense>
                         )}
                     </AdminManageLayout>
@@ -112,9 +164,9 @@ const AdminDashboardRouter = () => {
                 path="link"
                 element={
                     <AdminManageLayout>
-                        {data && (
+                        {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncLink data={data} />
+                                <AsyncLink data={getDataFromState()} />
                             </Suspense>
                         )}
                     </AdminManageLayout>
@@ -124,9 +176,9 @@ const AdminDashboardRouter = () => {
                 path="nav"
                 element={
                     <AdminManageLayout>
-                        {data && (
+                        {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncNav data={data} />
+                                <AsyncNav data={getDataFromState()} />
                             </Suspense>
                         )}
                     </AdminManageLayout>
@@ -136,9 +188,9 @@ const AdminDashboardRouter = () => {
                 path="article"
                 element={
                     <AdminManageLayout>
-                        {data && (
+                        {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncArticle data={data} />
+                                <AsyncArticle data={getDataFromState()} />
                             </Suspense>
                         )}
                     </AdminManageLayout>
@@ -148,9 +200,9 @@ const AdminDashboardRouter = () => {
                 path="article-edit"
                 element={
                     <AdminManageLayout>
-                        {data && (
+                        {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncArticleEdit data={data} />
+                                <AsyncArticleEdit data={getDataFromState()} />
                             </Suspense>
                         )}
                     </AdminManageLayout>
@@ -160,9 +212,9 @@ const AdminDashboardRouter = () => {
                 path="user"
                 element={
                     <AdminManageLayout>
-                        {data && (
+                        {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncUser data={data} />
+                                <AsyncUser data={getDataFromState()} />
                             </Suspense>
                         )}
                     </AdminManageLayout>
@@ -192,9 +244,9 @@ const AdminDashboardRouter = () => {
                 path="upgrade"
                 element={
                     <AdminManageLayout>
-                        {data && (
+                        {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncUpgrade data={data} />
+                                <AsyncUpgrade data={getDataFromState()} />
                             </Suspense>
                         )}
                     </AdminManageLayout>
@@ -204,9 +256,9 @@ const AdminDashboardRouter = () => {
                 path="template-config"
                 element={
                     <AdminManageLayout>
-                        {data && (
+                        {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncTemplateConfig data={data} />
+                                <AsyncTemplateConfig data={getDataFromState()} />
                             </Suspense>
                         )}
                     </AdminManageLayout>

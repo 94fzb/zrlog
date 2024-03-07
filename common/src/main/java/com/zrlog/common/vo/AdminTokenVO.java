@@ -4,7 +4,7 @@ public class AdminTokenVO {
 
     private long createdDate;
     private int userId;
-    private int sessionId;
+    private String sessionId;
     private String protocol;
 
     public long getCreatedDate() {
@@ -23,11 +23,13 @@ public class AdminTokenVO {
         this.userId = userId;
     }
 
-    public int getSessionId() {
+
+    public String getSessionId() {
+
         return sessionId;
     }
 
-    public void setSessionId(int sessionId) {
+    public void setSessionId(String sessionId) {
         this.sessionId = sessionId;
     }
 

@@ -9,6 +9,7 @@ import { DeleteOutlined } from "@ant-design/icons";
 type BaseTableProps = {
     dataApi: string;
     deleteApi: string;
+    deleteSuccessCallback?: (id: number) => void;
     columns: any[];
     datasource?: PageDataSource;
     searchKey?: string;
@@ -61,6 +62,7 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
     columns,
     datasource,
     searchKey,
+    deleteSuccessCallback,
 }) => {
     const [tableDataState, setTableDataState] = useState<TableData>({
         pagination: { page: 1, key: searchKey, size: 10 },
@@ -98,6 +100,18 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
         });
     }, [searchKey]);
 
+    useEffect(() => {
+        setTableDataState((prevState) => {
+            return {
+                ...prevState,
+                rows: datasource ? datasource.rows : [],
+                tablePagination: {
+                    total: datasource?.totalElements,
+                },
+            };
+        });
+    }, [datasource]);
+
     const getActionedColumns = () => {
         const c = [];
         c.push({
@@ -119,6 +133,9 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
                             onConfirm={() =>
                                 handleDelete(tableDataState.pagination, dataApi, deleteApi, record.id).then((r) => {
                                     setTableDataState(r);
+                                    if (deleteSuccessCallback) {
+                                        deleteSuccessCallback(record.id);
+                                    }
                                 })
                             }
                         >

@@ -11,10 +11,12 @@ import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
 import com.zrlog.admin.business.util.ControllerUtil;
 import com.zrlog.admin.web.annotation.RefreshCache;
 import com.zrlog.common.rest.response.ApiStandardResponse;
+import com.zrlog.data.dto.PageData;
 import com.zrlog.model.LogNav;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Map;
 
 public class BlogNavController extends Controller {
 
@@ -36,8 +38,8 @@ public class BlogNavController extends Controller {
     }
 
     @ResponseBody
-    public ApiStandardResponse index() throws SQLException {
-        return new ApiStandardResponse(new LogNav().find(ControllerUtil.getPageRequest(this)));
+    public ApiStandardResponse<PageData<Map<String,Object>>> index() throws SQLException {
+        return new ApiStandardResponse<>(new LogNav().find(ControllerUtil.getPageRequest(this)));
     }
 
     @RefreshCache(async = true)
