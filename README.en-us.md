@@ -39,7 +39,7 @@ program.
 ### Program installation
 
 - Deployment environment prerequisites
-    - 1.jre version >= 21
+    - 1.jdk version >= 21
     - 2.mysql
 - Data initialization
     - 1.Download [latest zip](https://dl.zrlog.com/release/zrlog.zip) unzip, and run sh bin/run.sh or bin\run.bat (for windows)
@@ -52,8 +52,8 @@ program.
 
 ### Sample Website
 
-* Website [http://demo.zrlog.com](http://demo.zrlog.com)
-* Management address [admin/login](http://demo.zrlog.com/admin/login)
+* Website [http://demo.zrlog.com](https://demo.zrlog.com)
+* Management address [admin/login](https://demo.zrlog.com/admin/login)
 * Username admin
 * Password 123456
 
@@ -62,7 +62,7 @@ program.
 * QQ group 6399942
 * Mail xchun90@163.com
 * Have any questions about the program, welcome
-  feedback [http://blog.zrlog.com/feedback](http://blog.zrlog.com/feedback)
+  feedback [http://blog.zrlog.com/feedback](https://blog.zrlog.com/feedback)
 
 ### FAQ
 
