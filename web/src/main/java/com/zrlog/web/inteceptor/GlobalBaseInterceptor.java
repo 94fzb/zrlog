@@ -48,7 +48,7 @@ public class GlobalBaseInterceptor implements Interceptor {
             response.addHeader("Content-Type", "application/json;charset=UTF-8");
         }
         request.getAttr().put("basePath", WebTools.getHomeUrl(request));
-        request.getAttr().put("baseWithHostPath", WebTools.getHomeUrlWithHostNotProtocol(request));
+        request.getAttr().put("baseWithHostPath", ZrLogUtil.getHomeUrlWithHostNotProtocol(request));
         return true;
     }
 

@@ -1,6 +1,8 @@
 package com.zrlog.admin.business.rest.base;
 
-public class OtherWebSiteRequest {
+import com.zrlog.common.Validator;
+
+public class OtherWebSiteInfo implements Validator {
 
     private String icp;
     private String webCm;
@@ -19,5 +21,10 @@ public class OtherWebSiteRequest {
 
     public void setWebCm(String webCm) {
         this.webCm = webCm;
+    }
+
+    @Override
+    public void doValid() {
+
     }
 }

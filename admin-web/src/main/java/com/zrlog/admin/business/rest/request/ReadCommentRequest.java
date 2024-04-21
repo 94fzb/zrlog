@@ -1,14 +1,21 @@
 package com.zrlog.admin.business.rest.request;
 
-public class ReadCommentRequest {
+import com.zrlog.common.Validator;
 
-    private long id;
+public class ReadCommentRequest implements Validator {
 
-    public long getId() {
+    private Long id;
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
+    }
+
+    @Override
+    public void doValid() {
+
     }
 }

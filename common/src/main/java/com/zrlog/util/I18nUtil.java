@@ -26,6 +26,8 @@ public class I18nUtil {
     private static final I18nVO i18nVOCache = new I18nVO();
     private static final String I18N_INSTALL_KEY = "install";
     private static final String I18N_BLOG_KEY = "blog";
+    private static final String I18N_BACKEND_KEY = "backend";
+    private static final String DEFAULT_LANG = "zh_CN";
 
     static {
         reloadSystemI18N();
@@ -36,6 +38,8 @@ public class I18nUtil {
         loadI18N(I18nUtil.class.getResourceAsStream("/i18n/blog_zh_CN.properties"), "blog_zh_CN.properties", I18N_BLOG_KEY);
         loadI18N(I18nUtil.class.getResourceAsStream("/i18n/install_en_US.properties"), "install_en_US.properties", I18N_INSTALL_KEY);
         loadI18N(I18nUtil.class.getResourceAsStream("/i18n/install_zh_CN.properties"), "install_zh_CN.properties", I18N_INSTALL_KEY);
+        loadI18N(I18nUtil.class.getResourceAsStream("/i18n/backend_en_US.properties"), "backend_en_US.properties", I18N_BACKEND_KEY);
+        loadI18N(I18nUtil.class.getResourceAsStream("/i18n/backend_zh_CN.properties"), "backend_zh_CN.properties", I18N_BACKEND_KEY);
     }
 
     public static void removeI18n() {
@@ -46,14 +50,12 @@ public class I18nUtil {
         if (!name.endsWith(".properties")) {
             return;
         }
-        Map<String, Map<String, Object>> resMap;
-        if (resourceName.equals(I18N_BLOG_KEY)) {
-            resMap = i18nVOCache.getBlog();
-        } else if (resourceName.equals(I18N_INSTALL_KEY)) {
-            resMap = i18nVOCache.getInstall();
-        } else {
-            throw new NotImplementException();
-        }
+        Map<String, Map<String, Object>> resMap = switch (resourceName) {
+            case I18N_BLOG_KEY -> i18nVOCache.getBlog();
+            case I18N_INSTALL_KEY -> i18nVOCache.getInstall();
+            case I18N_BACKEND_KEY -> i18nVOCache.getBackend();
+            default -> throw new NotImplementException();
+        };
         try {
             String key = name.replace(".properties", "").replace("i18n_", "").replace(resourceName + "_", "");
             Map<String, Object> map = resMap.computeIfAbsent(key, k -> new HashMap<>());
@@ -90,25 +92,28 @@ public class I18nUtil {
                 }
             }
         }
-        String locale;
-        if (request.getUri().contains(Constants.ADMIN_URI_BASE_PATH + "/") || request.getUri().contains("/api" + Constants.ADMIN_URI_BASE_PATH + "/")) {
-            locale = (String) Constants.WEB_SITE.get("language");
-        } else {
-            String referer = request.getHeader("referer");
-            if (StringUtils.isNotEmpty(referer) && referer.contains(Constants.ADMIN_URI_BASE_PATH + "/")) {
+        String locale = null;
+        if (Objects.nonNull(request)) {
+            if (request.getUri().contains(Constants.ADMIN_URI_BASE_PATH + "/") || request.getUri().contains("/api" + Constants.ADMIN_URI_BASE_PATH + "/")) {
                 locale = (String) Constants.WEB_SITE.get("language");
             } else {
-                //try get locale info from HTTP header
-                locale = getAcceptLocal(request);
+                String referer = request.getHeader("referer");
+                if (StringUtils.isNotEmpty(referer) && referer.contains(Constants.ADMIN_URI_BASE_PATH + "/")) {
+                    locale = (String) Constants.WEB_SITE.get("language");
+                } else {
+                    //try get locale info from HTTP header
+                    locale = getAcceptLocal(request);
+                }
             }
         }
         if (locale == null) {
             locale = "zh_CN";
         }
+
         I18nVO i18nVO = BeanUtil.convert(i18nVOCache, I18nVO.class);
         Map<String, Object> blogI18n = new HashMap<>(i18nVO.getBlog().get(locale));
         if (StringUtils.isNotEmpty(locale) && !locale.startsWith("zh")) {
-            Map<String, Object> zhI18nMap = i18nVO.getBlog().get("zh_CN");
+            Map<String, Object> zhI18nMap = i18nVO.getBlog().get(DEFAULT_LANG);
             for (Map.Entry<String, Object> entry : zhI18nMap.entrySet()) {
                 if (!blogI18n.containsKey(entry.getKey())) {
                     blogI18n.put(entry.getKey(), entry.getValue());
@@ -116,13 +121,15 @@ public class I18nUtil {
             }
         }
         blogI18n.put("_locale", locale);
-        request.getAttr().put("local", locale);
-        String lang = locale;
-        if (locale.contains("_")) {
-            lang = locale.substring(0, locale.indexOf('_'));
+        if (Objects.nonNull(request)) {
+            request.getAttr().put("local", locale);
+            String lang = locale;
+            if (locale.contains("_")) {
+                lang = locale.substring(0, locale.indexOf('_'));
+            }
+            request.getAttr().put("lang", lang);
+            request.getAttr().put("_res", blogI18n);
         }
-        request.getAttr().put("lang", lang);
-        request.getAttr().put("_res", blogI18n);
         i18nVO.setLocale(locale);
         threadLocal.set(i18nVO);
     }
@@ -132,11 +139,27 @@ public class I18nUtil {
         if (Objects.nonNull(lang) && lang.startsWith("en")) {
             return "en_US";
         }
-        return "zh_CN";
+        return DEFAULT_LANG;
+    }
+
+    public static Map<String, Object> getBlog() {
+        return threadLocal.get().getBlog().get(threadLocal.get().getLocale());
+    }
+
+    public static Map<String, Object> getBackend() {
+        return threadLocal.get().getBackend().get(threadLocal.get().getLocale());
     }
 
     public static String getBlogStringFromRes(String key) {
         Object obj = threadLocal.get().getBlog().get(threadLocal.get().getLocale()).get(key);
+        if (obj != null) {
+            return obj.toString();
+        }
+        return "";
+    }
+
+    public static String getBackendStringFromRes(String key) {
+        Object obj = threadLocal.get().getBackend().get(threadLocal.get().getLocale()).get(key);
         if (obj != null) {
             return obj.toString();
         }
@@ -160,9 +183,9 @@ public class I18nUtil {
                 locale = (String) Constants.WEB_SITE.get("language");
             }
         }
-        if (StringUtils.isEmpty(locale)) {
-            locale = "zh_CN";
+        if (StringUtils.isNotEmpty(locale)) {
+            return locale;
         }
-        return locale;
+        return DEFAULT_LANG;
     }
 }

@@ -31,12 +31,14 @@ const UpgradeSettingForm = ({ data }: { data: Upgrade }) => {
 
     const websiteFormFinish = (changedValues: any) => {
         axios.post("/api/admin/website/upgrade", changedValues).then(({ data }) => {
-            if (!data.error) {
-                message.success(data.message).then(() => {
-                    removeRes();
-                    window.location.reload();
-                });
+            if (data.error) {
+                message.error(data.message).then();
+                return;
             }
+            message.success(data.message).then(() => {
+                removeRes();
+                window.location.reload();
+            });
         });
     };
 
@@ -48,14 +50,7 @@ const UpgradeSettingForm = ({ data }: { data: Upgrade }) => {
         try {
             await axios.get("/api/admin/upgrade").then(async ({ data }) => {
                 if (data.data.upgrade) {
-                    const title =
-                        "V" +
-                        data.data.version.version +
-                        "-" +
-                        data.data.version.buildId +
-                        " (" +
-                        data.data.version.type +
-                        ")";
+                    const title = `${getRes()["newVersion"]} - #${data.data.version.type}`;
                     modal.info({
                         title: title,
                         content: (
@@ -66,7 +61,7 @@ const UpgradeSettingForm = ({ data }: { data: Upgrade }) => {
                             />
                         ),
                         closable: true,
-                        okText: "去更新",
+                        okText: getRes()["doUpgrade"],
                         onOk: function () {
                             navigate("/upgrade");
                         },

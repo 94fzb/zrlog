@@ -8,6 +8,7 @@ import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.util.PathUtil;
 import com.hibegin.http.server.web.Controller;
+import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.common.Constants;
 import eu.bitwalker.useragentutils.BrowserType;
 import eu.bitwalker.useragentutils.UserAgent;
@@ -34,17 +35,6 @@ public class ZrLogUtil {
     private ZrLogUtil() {
     }
 
-    public static <T> T convertRequestBody(HttpRequest request, Class<T> clazz) {
-        try {
-            String jsonStr = IOUtil.getStringInputStream(request.getInputStream());
-            return new Gson().fromJson(jsonStr, clazz);
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "", e);
-            throw new RuntimeException(e);
-        }
-    }
-
-
     public static <T> T convertRequestParam(Map<String, String[]> requestParam, Class<T> clazz) {
         Map<String, Object> tempMap = new HashMap<>();
         for (Map.Entry<String, String[]> entry : requestParam.entrySet()) {
@@ -63,12 +53,28 @@ public class ZrLogUtil {
         return HttpRequest.getHeader("User-Agent") != null && HttpRequest.getHeader("User-Agent").startsWith("Static-Blog-Plugin");
     }
 
+    public static String getHomeUrlWithHost(HttpRequest request) {
+        return "//" + getHomeUrlWithHostNotProtocol(request);
+    }
+
+    public static String getHomeUrlWithHostNotProtocol(HttpRequest request) {
+        return getBlogHost(request) + "/";
+    }
+
+    public static String getBlogHost(HttpRequest request) {
+        String websiteHost = (String) Constants.WEB_SITE.get("host");
+        if (Objects.nonNull(websiteHost) && !websiteHost.trim().isEmpty()) {
+            return websiteHost;
+        }
+        return request.getHeader("Host");
+    }
+
     public static String getFullUrl(HttpRequest request) {
-        return "//" + request.getHeader("Host") + request.getUri();
+        return "//" + getBlogHost(request) + request.getUri();
     }
 
     public static String getDatabaseServerVersion(Properties dbConfig) {
-        try (Connection  connect = DbConnectUtils.getConnection(dbConfig)){
+        try (Connection connect = DbConnectUtils.getConnection(dbConfig)) {
             if (connect != null) {
                 String queryVersionSQL = "select version()";
                 try (PreparedStatement ps = connect.prepareStatement(queryVersionSQL)) {
@@ -86,7 +92,7 @@ public class ZrLogUtil {
     }
 
     public static String getCurrentSqlVersion(Properties dbConfig) {
-        try (Connection connection = DbConnectUtils.getConnection(dbConfig)){
+        try (Connection connection = DbConnectUtils.getConnection(dbConfig)) {
             if (connection != null) {
                 String queryVersionSQL = "select value from website where name = ?";
                 try (PreparedStatement ps = connection.prepareStatement(queryVersionSQL)) {
@@ -211,4 +217,20 @@ public class ZrLogUtil {
         }
         return controller;
     }
+
+    public static Integer getPort(String[] args) {
+        if (Objects.nonNull(args)) {
+            for (String arg : args) {
+                if (arg.startsWith("--port=")) {
+                    return Integer.parseInt(arg.split("=")[1]);
+                }
+            }
+        }
+        String webPort = System.getenv("PORT");
+        if (Objects.nonNull(webPort)) {
+            return Integer.parseInt(webPort);
+        }
+        return 8080;
+    }
+
 }

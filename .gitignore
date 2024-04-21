@@ -54,3 +54,4 @@ node_modules
 *.zip
 temp
 cache
+._.DS_Store

@@ -1,5 +1,6 @@
 package com.zrlog.admin.web.controller.api;
 
+import com.hibegin.common.util.BeanUtil;
 import com.hibegin.http.annotation.ResponseBody;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
@@ -18,13 +19,10 @@ import com.zrlog.model.Comment;
 import com.zrlog.model.Log;
 import com.zrlog.model.User;
 import com.zrlog.util.BlogBuildInfoUtil;
-import com.zrlog.util.ZrLogUtil;
+import com.zrlog.util.I18nUtil;
 
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.*;
 
 public class AdminController extends Controller {
 
@@ -40,14 +38,12 @@ public class AdminController extends Controller {
     }
 
     @ResponseBody
-    public ApiStandardResponse<Map<String,Object>> login() throws SQLException {
-        LoginRequest loginRequest = ZrLogUtil.convertRequestBody(getRequest(), LoginRequest.class);
+    public ApiStandardResponse<LoginResponse> login() throws SQLException {
+        LoginRequest loginRequest = BeanUtil.convertWithValid(getRequest().getInputStream(), LoginRequest.class);
         userService.login(loginRequest);
         String key = UUID.randomUUID().toString();
-        adminTokenService.setAdminToken(new User().getUserByUserName(loginRequest.getUserName().toLowerCase()),
-                key, loginRequest.getHttps() ? "https" : "http", getRequest(),
-                getResponse());
-        return new ApiStandardResponse<>(Map.of("key",key));
+        adminTokenService.setAdminToken(new User().getUserByUserName(loginRequest.getUserName().toLowerCase()), key, Objects.equals(loginRequest.getHttps(), true) ? "https" : "http", getRequest(), getResponse());
+        return new ApiStandardResponse<>(new LoginResponse(key));
     }
 
     /**
@@ -76,12 +72,15 @@ public class AdminController extends Controller {
     }
 
     @ResponseBody
-    public ApiStandardResponse<Map<String,Object>> plugin(){
+    public ApiStandardResponse<Map<String, Object>> plugin() {
         return new ApiStandardResponse<>(new HashMap<>());
     }
 
     @ResponseBody
     public ApiStandardResponse<IndexResponse> index() throws SQLException {
-        return new ApiStandardResponse<>(new IndexResponse(statisticsInfo().getData(),serverInfo().getData()));
+        List<String> tips = new ArrayList<>(Arrays.asList(I18nUtil.getBackendStringFromRes("admin.index.welcomeTips_1"),
+                I18nUtil.getBackendStringFromRes("admin.index.welcomeTips_2"), I18nUtil.getBackendStringFromRes("admin.index.welcomeTips_3")));
+        Collections.shuffle(tips);
+        return new ApiStandardResponse<>(new IndexResponse(statisticsInfo().getData(), serverInfo().getData(), new ArrayList<>(Collections.singletonList(tips.getFirst()))));
     }
 }

@@ -127,7 +127,8 @@ public class Log extends DAO implements Serializable {
         String sql =
                 "select l.*,l.privacy privacy,t.typeName,l.logId as id,l.last_update_date as lastUpdateDate,t" +
                         ".alias as typeAlias,u.userName,(select count(commentId) from " + Comment.TABLE_NAME + " " +
-                        "where " + "logId=l.logId ) commentSize from " + tableName + " l inner join user u inner " + "join type t where u" + ".userId=l.userId" + searchKeywords + " and t.typeid=l.typeid order " + "by " + pageSort + " limit ?,?";
+                        "where " + "logId=l.logId ) commentSize from " + tableName + " l inner join user u inner " + "join type t where u" + ".userId=l.userId" + searchKeywords +
+                        " and t.typeid=l.typeid and l.typeid is not null order " + "by " + pageSort + " limit ?,?";
         data.setRows(findEntry(sql, params.toArray()));
         ModelUtil.fillPageData(this,
                 "from " + tableName + " l inner join user u where u.userId=l.userId " + searchKeywords, data,

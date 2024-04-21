@@ -5,6 +5,7 @@ import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.common.type.AutoUpgradeVersionType;
 import com.zrlog.plugin.Plugins;
+import com.zrlog.util.JarUpdater;
 
 import java.io.File;
 import java.util.*;
@@ -118,23 +119,24 @@ public class Constants {
 
     public static boolean getBooleanByFromWebSite(String key) {
         Object dbSetting = WEB_SITE.get(key);
-        if (dbSetting != null) {
-            return dbSetting instanceof String && ("1".equals(dbSetting) || "on".equals(dbSetting) || BooleanUtils.isTrue((String) dbSetting));
+        if (Objects.isNull(dbSetting)) {
+            return false;
         }
-        return false;
+        if (dbSetting instanceof Boolean) {
+            return (boolean) dbSetting;
+        }
+        return dbSetting instanceof String && ("1".equals(dbSetting) || "on".equals(dbSetting) || BooleanUtils.isTrue((String) dbSetting));
     }
 
     public static Long getSessionTimeout() {
         String sessionTimeoutString = (String) Constants.WEB_SITE.get(SESSION_TIMEOUT_KEY);
-        long sessionTimeout;
-        if (!StringUtils.isEmpty(sessionTimeoutString)) {
-            //*60， Cookie过期时间单位为分钟
-            sessionTimeout = (long) (Double.parseDouble(sessionTimeoutString) * 60 * 1000);
-            if (sessionTimeout <= 0) {
-                sessionTimeout = DEFAULT_SESSION_TIMEOUT;
-            }
-        } else {
-            sessionTimeout = DEFAULT_SESSION_TIMEOUT;
+        if (StringUtils.isEmpty(sessionTimeoutString)) {
+            return DEFAULT_SESSION_TIMEOUT;
+        }
+        //*60， Cookie过期时间单位为分钟
+        long sessionTimeout = (long) (Double.parseDouble(sessionTimeoutString) * 60 * 1000);
+        if (sessionTimeout <= 0) {
+            return DEFAULT_SESSION_TIMEOUT;
         }
         return sessionTimeout;
     }

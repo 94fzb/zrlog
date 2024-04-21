@@ -1,5 +1,5 @@
 <article class="markdown-body ">
-    <h2 class="post-title" style="padding-top: .5rem">${log.title}</h2>
+    <h2>${log.title}</h2>
     <div class="meta" style="display: flex;padding-bottom: .5rem">
         <div style="display:flex;justify-content: flex-start;gap: .4rem">
             <span class="category">

@@ -6,10 +6,9 @@
         </div>
     </#if>
 
-    <form id="searchform" class="widget search search_input" style="margin-bottom: .5rem" action="${searchUrl}"
-          method="post">
+    <form class="widget search search_input" style="margin-bottom: .5rem" action="${searchUrl}" method="post">
         <input type="text" size="15" name="key" placeholder="${_res.searchTip}" value='${key!""}' class="inputtext">
-        <input type="submit" class="btn" value="${_res.search}"></p>
+        <input type="submit" class="btn" value="${_res.search}">
     </form>
 
     <#if init.plugins?has_content>

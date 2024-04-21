@@ -14,9 +14,6 @@ import java.util.*;
  */
 public class ParseUtil {
 
-    public static int getTotalPate(long count, int pageSize) {
-        return (int) Math.ceil(count / (pageSize * 1.0D));
-    }
 
     public static String autoDigest(String str, int size) {
         if (Objects.isNull(str) || str.trim().isEmpty()) {

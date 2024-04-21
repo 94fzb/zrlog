@@ -30,7 +30,7 @@ public class TemplateService {
         new WebSite().updateByKV(template + Constants.TEMPLATE_CONFIG_SUFFIX,
                 new GsonBuilder().serializeNulls().create().toJson(settingMap));
         UpdateRecordResponse updateRecordResponse = new UpdateRecordResponse();
-        updateRecordResponse.setMessage(I18nUtil.getBlogStringFromRes("templateUpdateSuccess"));
+        updateRecordResponse.setMessage(I18nUtil.getBackendStringFromRes("templateUpdateSuccess"));
         return updateRecordResponse;
     }
 
@@ -41,8 +41,8 @@ public class TemplateService {
         //start extract template file
         FileUtils.moveOrCopyFile(file.toString(), finalFile, true);
         UploadTemplateResponse response = new UploadTemplateResponse();
-        response.setMessage(I18nUtil.getBlogStringFromRes("templateUploadSuccess"));
-        String extractFolder = finalPath + templateName.replace(".zip", "") + "/";
+        response.setMessage(I18nUtil.getBackendStringFromRes("templateUploadSuccess"));
+        String extractFolder = finalPath + templateName.replace(".zip", "");
         FileUtils.deleteFile(extractFolder);
         ZipUtil.unZip(finalFile, extractFolder);
         return response;

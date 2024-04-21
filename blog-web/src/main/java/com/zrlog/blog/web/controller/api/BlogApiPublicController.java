@@ -10,12 +10,12 @@ import java.util.Map;
 public class BlogApiPublicController extends Controller {
 
     @ResponseBody
-    public ApiStandardResponse blogResource() {
-        return new ApiStandardResponse(new CommonService().blogResourceInfo());
+    public ApiStandardResponse<Map<String, Object>> blogResource() {
+        return new ApiStandardResponse<>(new CommonService().blogResourceInfo());
     }
 
     @ResponseBody
-    public ApiStandardResponse installResource() {
-        return new ApiStandardResponse(new CommonService().installResourceInfo(getRequest()));
+    public ApiStandardResponse<Map<String, Object>> installResource() {
+        return new ApiStandardResponse<>(new CommonService().installResourceInfo(getRequest()));
     }
 }

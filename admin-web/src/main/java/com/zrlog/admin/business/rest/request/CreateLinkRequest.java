@@ -1,8 +1,12 @@
-package com.zrlog.admin.business.rest.base;
+package com.zrlog.admin.business.rest.request;
 
-public class UpdateLinkRequest {
+import com.zrlog.admin.business.exception.ArgsException;
+import com.zrlog.common.Validator;
 
-    private Long id;
+import java.util.Objects;
+
+public class CreateLinkRequest implements Validator {
+
     private String linkName;
     private String url;
     private String alt;
@@ -32,19 +36,21 @@ public class UpdateLinkRequest {
         this.alt = alt;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public Long getSort() {
         return sort;
     }
 
     public void setSort(Long sort) {
         this.sort = sort;
+    }
+
+    @Override
+    public void doValid() {
+        if (Objects.isNull(url) || url.trim().isEmpty()) {
+            throw new ArgsException("url");
+        }
+        if (Objects.isNull(linkName) || linkName.trim().isEmpty()) {
+            throw new ArgsException("linkName");
+        }
     }
 }

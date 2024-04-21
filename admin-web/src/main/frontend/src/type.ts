@@ -32,5 +32,6 @@ export type UserInfoState = {
 
 export type IndexData = {
     serverInfo: Record<string, any>[],
-    statisticsInfo: StatisticsInfoState
+    statisticsInfo: StatisticsInfoState,
+    tips: string[];
 }

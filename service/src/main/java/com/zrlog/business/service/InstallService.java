@@ -187,9 +187,9 @@ public class InstallService {
             String markdown = IOUtil.getStringInputStream(InstallService.class.getResourceAsStream("/init-blog/" + I18nUtil.getCurrentLocale() + ".md"));
             markdown = markdown.replace("${basePath}", "/");
             String content = renderMd(markdown);
-            ps.setString(2, I18nUtil.getBlogStringFromRes("defaultType"));
+            ps.setString(2, I18nUtil.getInstallStringFromRes("defaultType"));
             ps.setString(3, "hello-world");
-            ps.setString(4, I18nUtil.getBlogStringFromRes("helloWorld"));
+            ps.setString(4, I18nUtil.getInstallStringFromRes("helloWorld"));
             ps.setString(5, content);
             ps.setString(6, VisitorArticleService.getPlainSearchText(content));
             ps.setString(7, markdown);
@@ -203,14 +203,14 @@ public class InstallService {
     }
 
     private void insertType(Connection connect) throws SQLException {
-        String insertLogType = "INSERT INTO `type`(`typeId`, `typeName`, `remark`, `alias`) VALUES (1,'" + I18nUtil.getBlogStringFromRes("defaultType") + "','','note')";
+        String insertLogType = "INSERT INTO `type`(`typeId`, `typeName`, `remark`, `alias`) VALUES (1,'" + I18nUtil.getInstallStringFromRes("defaultType") + "','','note')";
         try (PreparedStatement ps = connect.prepareStatement(insertLogType)) {
             ps.executeUpdate();
         }
     }
 
     private void insertTag(Connection connect) throws SQLException {
-        String insertTag = "INSERT INTO `tag`(`tagId`,`text`,`count`) VALUES (1,'" + I18nUtil.getBlogStringFromRes("defaultType") + "',1)";
+        String insertTag = "INSERT INTO `tag`(`tagId`,`text`,`count`) VALUES (1,'" + I18nUtil.getInstallStringFromRes("defaultType") + "',1)";
         try (PreparedStatement ps = connect.prepareStatement(insertTag)) {
             ps.executeUpdate();
         }
@@ -228,7 +228,7 @@ public class InstallService {
         try (PreparedStatement ps = connect.prepareStatement(insertLogNavSql)) {
             ps.setObject(1, 2);
             ps.setObject(2, Constants.ADMIN_LOGIN_URI_PATH);
-            ps.setObject(3, I18nUtil.getBlogStringFromRes("manage"));
+            ps.setObject(3, I18nUtil.getInstallStringFromRes("manage"));
             ps.setObject(4, 2);
             ps.executeUpdate();
         }
@@ -237,7 +237,7 @@ public class InstallService {
         try (PreparedStatement ps = connect.prepareStatement(insertLogNavSql)) {
             ps.setObject(1, 1);
             ps.setObject(2, "/");
-            ps.setObject(3, I18nUtil.getBlogStringFromRes("home"));
+            ps.setObject(3, I18nUtil.getInstallStringFromRes("home"));
             ps.setObject(4, 1);
             ps.executeUpdate();
         }

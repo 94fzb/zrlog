@@ -1,12 +1,15 @@
 package com.zrlog.admin.business.rest.base;
 
-public class BlogWebSiteRequest {
+import com.zrlog.common.Validator;
+
+public class BlogWebSiteInfo implements Validator {
 
     private Long session_timeout;
     private Boolean generator_html_status;
     private Boolean disable_comment_status;
     private Boolean article_thumbnail_status;
     private String language;
+    private String host;
     private String article_route;
     private Boolean admin_darkMode;
     private String admin_color_primary;
@@ -73,5 +76,18 @@ public class BlogWebSiteRequest {
 
     public void setAdmin_color_primary(String admin_color_primary) {
         this.admin_color_primary = admin_color_primary;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    @Override
+    public void doValid() {
+
     }
 }

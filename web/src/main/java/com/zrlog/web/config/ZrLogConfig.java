@@ -57,6 +57,11 @@ public class ZrLogConfig extends AbstractServerConfig implements InstallAction {
 
     private static final Logger LOGGER = LoggerUtil.getLogger(ZrLogConfig.class);
 
+    private final Integer port;
+
+    public ZrLogConfig(Integer port) {
+        this.port = port;
+    }
 
     /**
      * 配置的常用参数，这里可以看出来推崇使用代码进行配置的，而不是像Spring这样的通过预定配置方式。代码控制的好处在于高度可控制性，
@@ -87,12 +92,7 @@ public class ZrLogConfig extends AbstractServerConfig implements InstallAction {
         RouterUtils.configAdminRoute(serverConfig.getRouter());
         RouterUtils.configBlogRouter(serverConfig.getRouter());
         configInterceptor(serverConfig.getInterceptors());
-        String webPort = System.getenv("PORT");
-        if (Objects.nonNull(webPort)) {
-            serverConfig.setPort(Integer.parseInt(webPort));
-        } else {
-            serverConfig.setPort(8080);
-        }
+        serverConfig.setPort(port);
         installFinish();
         Runtime rt = Runtime.getRuntime();
         rt.addShutdownHook(new Thread(this::onStop));
@@ -146,15 +146,15 @@ public class ZrLogConfig extends AbstractServerConfig implements InstallAction {
 
         try {
             tryInitDbPropertiesFile();
-        } catch (Exception e){
+        } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Init db properties exception ", e);
             System.exit(-1);
         }
         Properties dbProperties = InstallUtils.getDbProp();
-        try (Connection connection=DbConnectUtils.getConnection(Objects.requireNonNull(dbProperties))){
+        try (Connection connection = DbConnectUtils.getConnection(Objects.requireNonNull(dbProperties))) {
             LOGGER.info("Db connect success " + connection.getCatalog());
-        } catch (Exception e){
-            LOGGER.log(Level.SEVERE,"Connect Database error ",e);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Connect Database error ", e);
             System.exit(-1);
         }
         try {
@@ -187,7 +187,7 @@ public class ZrLogConfig extends AbstractServerConfig implements InstallAction {
             IOUtil.writeBytesToFile(ZrLogUtil.getDbInfoByEnv().getBytes(), Constants.getDbPropertiesFile());
         }
         Properties properties = InstallUtils.getDbProp();
-        if(Objects.isNull(properties)){
+        if (Objects.isNull(properties)) {
             return;
         }
         if ("com.mysql.cj.jdbc.Driver".equals(properties.get("driverClass"))) {
@@ -212,7 +212,7 @@ public class ZrLogConfig extends AbstractServerConfig implements InstallAction {
         if (sqlList.isEmpty()) {
             return;
         }
-        try (Connection connection = DbConnectUtils.getConnection(dbProp)){
+        try (Connection connection = DbConnectUtils.getConnection(dbProp)) {
             for (Map.Entry<Integer, List<String>> entry : sqlList) {
 
                 if (Objects.isNull(connection)) {

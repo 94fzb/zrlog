@@ -1,6 +1,11 @@
 package com.zrlog.admin.business.rest.base;
 
-public class BasicWebSiteRequest {
+import com.zrlog.admin.business.exception.ArgsException;
+import com.zrlog.common.Validator;
+
+import java.util.Objects;
+
+public class BasicWebSiteInfo implements Validator {
 
     private String second_title;
     private String title;
@@ -37,5 +42,12 @@ public class BasicWebSiteRequest {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public void doValid() {
+        if (Objects.isNull(title) || title.trim().isEmpty()) {
+            throw new ArgsException("title");
+        }
     }
 }

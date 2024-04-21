@@ -31,7 +31,7 @@ public class TemplateHelper {
 
     private static final Logger LOGGER = LoggerUtil.getLogger(TemplateHelper.class);
 
-    public static String getSuffix(HttpRequest request){
+    public static String getSuffix(HttpRequest request) {
         if (ZrLogUtil.isStaticBlogPlugin(request) || Constants.isStaticHtmlStatus()) {
             return ".html";
         }
@@ -52,7 +52,7 @@ public class TemplateHelper {
         request.getAttr().put("webs", webSite);
         String title = webSite.get("title") + " - " + webSite.get("second_title");
         if (request.getAttr().get("log") != null) {
-            title = ((Map<String,Object>) request.getAttr().get("log")).get("title") + " - " + title;
+            title = ((Map<String, Object>) request.getAttr().get("log")).get("title") + " - " + title;
         }
         request.getAttr().put("title", title);
 
@@ -126,11 +126,11 @@ public class TemplateHelper {
 
     private static String getNavUrl(HttpRequest request, String suffix, String url) {
         if ("/".equals(url)) {
-            return WebTools.getHomeUrlWithHost(request);
+            return ZrLogUtil.getHomeUrlWithHost(request);
         }
         //文章页
         else if (url.startsWith("/")) {
-            String nUrl = WebTools.getHomeUrlWithHost(request) + url.substring(1);
+            String nUrl = ZrLogUtil.getHomeUrlWithHost(request) + url.substring(1);
             if (!nUrl.endsWith(suffix)) {
                 return nUrl + suffix;
             }
@@ -172,7 +172,7 @@ public class TemplateHelper {
         request.getAttr().put("templateUrl", templateUrl);
         request.getAttr().put("rurl", baseUrl);
         request.getAttr().put("baseUrl", baseUrl);
-        request.getAttr().put("host", request.getHeader("host"));
+        request.getAttr().put("host", ZrLogUtil.getBlogHost(request));
         request.getAttr().put("searchUrl", baseUrl + Constants.getArticleUri() + "search");
         return baseUrl;
     }
@@ -221,7 +221,7 @@ public class TemplateHelper {
         log.put("alias", log.get("alias") + suffix);
         log.put("canComment", Objects.equals(log.get("canComment"), true) && Constants.isAllowComment());
         log.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + log.get("alias"));
-        log.put("noSchemeUrl", WebTools.getHomeUrlWithHost(request) + Constants.getArticleUri() + log.get("alias"));
+        log.put("noSchemeUrl", ZrLogUtil.getHomeUrlWithHost(request) + Constants.getArticleUri() + log.get("alias"));
         log.put("typeUrl",
                 WebTools.getHomeUrl(request) + Constants.getArticleUri() + "sort/" + log.get("typeAlias") + suffix);
         Map<String, Object> lastLog = (Map<String, Object>) log.get("lastLog");

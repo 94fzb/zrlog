@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Col, Form, Input, Modal } from "antd";
+import { App, Button, Col, Form, Input, Modal } from "antd";
 import Row from "antd/es/grid/row";
 import TextArea from "antd/es/input/TextArea";
 import axios from "axios";
@@ -12,9 +12,14 @@ const layout = {
 const AddType = ({ addSuccessCall }: { addSuccessCall: () => void }) => {
     const [showModel, setShowModel] = useState<boolean>(false);
     const [form, setForm] = useState<any>();
+    const { message } = App.useApp();
 
     const handleOk = () => {
-        axios.post("/api/admin/type/add", form).then(() => {
+        axios.post("/api/admin/type/add", form).then(async ({ data }) => {
+            if (data.error) {
+                await message.error(data.message);
+                return;
+            }
             setShowModel(false);
             addSuccessCall();
         });

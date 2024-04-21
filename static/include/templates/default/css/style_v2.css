@@ -1,6 +1,6 @@
 /*
   Threme Name: Robinu Threme
-  URI: http://sheshui.me/
+  URI: https://sheshui.me/
   Version: 2.0
   Author: Robin L. info@sheshui.net
   Description: Responsive Web Design
@@ -255,7 +255,6 @@ aside .widget p {
 
 aside .search input[type=text] {
     height: 40px;
-    border: 0 none;
     padding: 6px;
     flex: 1;
 }
@@ -275,7 +274,7 @@ aside .search input.btn {
 
 .search input.btn {
     width: 80px;
-    height: 36px;
+    height: 42px;
     padding: 0;
     border: 0 none;
     vertical-align: middle;
@@ -356,14 +355,14 @@ aside li a:hover {
 /* Comment */
 .comment {
     margin-bottom: 10px;
-    padding: 16px 20px;
+    padding: 10px 10px 20px 10px;
     box-shadow: 0 0 2px rgba(198, 198, 198, 0.5)
 }
 
 .comment h2 {
     font-weight: normal;
     margin-bottom: 10px;
-    font-size: 18px
+    font-size: 20px
 }
 
 .comment label {
@@ -496,10 +495,6 @@ aside li a:hover {
 
     aside .archives {
         height: auto;
-    }
-
-    .gotop {
-        display: none;
     }
 }
 

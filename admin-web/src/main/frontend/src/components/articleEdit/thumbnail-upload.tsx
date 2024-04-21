@@ -6,6 +6,7 @@ import { FunctionComponent } from "react";
 import { UploadChangeParam } from "antd/es/upload";
 import jquery from "jquery";
 import { App } from "antd";
+import { getRes } from "../../utils/constants";
 
 type ThumbnailUploadProps = {
     onChange?: (e: string) => void;
@@ -74,7 +75,7 @@ const ThumbnailUpload: FunctionComponent<ThumbnailUploadProps> = ({ onChange, th
                             margin: 0,
                         }}
                     >
-                        拖拽或点击，上传文章封面
+                        {getRes()["articleCover"]}
                     </p>
                 </>
             )}

@@ -27,7 +27,7 @@ public class UserService {
             if (SecurityUtils.md5(oldPassword).equals(dbPassword)) {
                 new User().updatePassword(currentUserId, SecurityUtils.md5(updatePasswordRequest.getNewPassword()));
                 UpdateRecordResponse updateRecordResponse = new UpdateRecordResponse();
-                updateRecordResponse.setMessage(I18nUtil.getBlogStringFromRes("changePasswordSuccess"));
+                updateRecordResponse.setMessage(I18nUtil.getBackendStringFromRes("changePasswordSuccess"));
                 return updateRecordResponse;
             } else {
                 throw new OldPasswordException();

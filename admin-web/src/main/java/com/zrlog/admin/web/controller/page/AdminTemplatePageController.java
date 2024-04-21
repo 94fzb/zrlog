@@ -33,7 +33,7 @@ public class AdminTemplatePageController extends Controller {
                 new HttpFileHandle(PathUtil.getStaticPath() + Constants.TEMPLATE_BASE_PATH), new HashMap<>());
         String target = fileHandle.getT().getParent() + "/" + fileName;
         FileUtils.moveOrCopyFile(fileHandle.getT().toString(), target, true);
-        ZipUtil.unZip(target, path + "/");
+        ZipUtil.unZip(target, path.toString());
         response.redirect(Constants.ADMIN_URI_BASE_PATH + "/website#template");
     }
 

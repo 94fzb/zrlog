@@ -1,6 +1,8 @@
 package com.zrlog.admin.business.rest.base;
 
-public class UpgradeWebSiteRequest {
+import com.zrlog.common.Validator;
+
+public class UpgradeWebSiteInfo implements Validator {
 
     private Long autoUpgradeVersion;
     private Boolean upgradePreview;
@@ -19,5 +21,10 @@ public class UpgradeWebSiteRequest {
 
     public void setUpgradePreview(Boolean upgradePreview) {
         this.upgradePreview = upgradePreview;
+    }
+
+    @Override
+    public void doValid() {
+
     }
 }

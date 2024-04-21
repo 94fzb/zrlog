@@ -1,5 +1,6 @@
 package com.zrlog.admin.web.controller.api;
 
+import com.hibegin.common.util.BeanUtil;
 import com.hibegin.common.util.FileUtils;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.annotation.ResponseBody;
@@ -15,16 +16,13 @@ import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
 import com.zrlog.admin.business.rest.response.UploadTemplateResponse;
 import com.zrlog.admin.business.service.TemplateService;
 import com.zrlog.admin.web.annotation.RefreshCache;
-import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.business.service.TemplateHelper;
 import com.zrlog.common.Constants;
 import com.zrlog.common.rest.response.ApiStandardResponse;
-import com.zrlog.common.rest.response.StandardResponse;
 import com.zrlog.common.vo.TemplateVO;
 import com.zrlog.model.WebSite;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.I18nUtil;
-import com.zrlog.util.RenderUtils;
 import com.zrlog.util.ZrLogUtil;
 
 import java.io.File;
@@ -58,7 +56,7 @@ public class TemplateController extends Controller {
         cookie.setPath("/");
         cookie.setHttpOnly(true);
         getResponse().addCookie(cookie);
-        apiStandardResponse.setMessage(I18nUtil.getBlogStringFromRes("updateSuccess"));
+        apiStandardResponse.setMessage(I18nUtil.getBackendStringFromRes("updateSuccess"));
         return apiStandardResponse;
     }
 
@@ -86,7 +84,7 @@ public class TemplateController extends Controller {
             FileUtils.deleteFile(file.toString());
         }
         ApiStandardResponse<Void> apiStandardResponse = new ApiStandardResponse<>();
-        apiStandardResponse.setMessage(I18nUtil.getBlogStringFromRes("updateSuccess"));
+        apiStandardResponse.setMessage(I18nUtil.getBackendStringFromRes("updateSuccess"));
         return apiStandardResponse;
     }
 
@@ -113,7 +111,7 @@ public class TemplateController extends Controller {
     @RefreshCache
     @ResponseBody
     public UpdateRecordResponse config() throws SQLException {
-        Map<String, Object> param = ZrLogUtil.convertRequestBody(getRequest(), Map.class);
+        Map<String, Object> param = BeanUtil.convert(getRequest().getInputStream(), Map.class);
         String template = (String) param.get("template");
         if (StringUtils.isNotEmpty(template)) {
             param.remove("template");
@@ -123,8 +121,8 @@ public class TemplateController extends Controller {
     }
 
     @ResponseBody
-    public StandardResponse configParams() {
-        return RenderUtils.tryWrapperToStandardResponse(templateService.loadTemplateConfig(request.getParaToStr("template")));
+    public ApiStandardResponse<TemplateVO> configParams() {
+        return new ApiStandardResponse<>(templateService.loadTemplateConfig(request.getParaToStr("template")));
     }
 
     @ResponseBody
@@ -133,11 +131,11 @@ public class TemplateController extends Controller {
     }
 
     @ResponseBody
-    public StandardResponse downloadUrl() {
+    public ApiStandardResponse<TemplateDownloadResponse> downloadUrl() {
         TemplateDownloadResponse downloadResponse = new TemplateDownloadResponse();
-        downloadResponse.setUrl("https://store.zrlog.com/template/?from=http:" + WebTools.getHomeUrlWithHost(getRequest()) +
+        downloadResponse.setUrl("https://store.zrlog.com/template/?from=http:" + ZrLogUtil.getHomeUrlWithHost(getRequest()) +
                 "admin/template&v=" + BlogBuildInfoUtil.getVersion() +
                 "&id=" + BlogBuildInfoUtil.getBuildId());
-        return RenderUtils.tryWrapperToStandardResponse(downloadResponse);
+        return new ApiStandardResponse<>(downloadResponse);
     }
 }

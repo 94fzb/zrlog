@@ -45,7 +45,7 @@
                             <goal>yarn</goal>
                         </goals>
                         <configuration>
-                            <arguments>install</arguments>
+                            <arguments>install --registry=https://registry.npmmirror.com --frozen-lockfile</arguments>
                         </configuration>
                         <phase>generate-resources</phase>
                     </execution>

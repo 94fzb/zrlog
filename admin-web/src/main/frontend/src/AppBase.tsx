@@ -3,6 +3,7 @@ import { lazy } from "react";
 import { Suspense } from "react";
 import { App, Spin } from "antd";
 import axios, { AxiosError } from "axios";
+import { API_VERSION_PATH } from "./components/upgrade";
 
 const AsyncLogin = lazy(() => import("components/login"));
 const AsyncAdminDashboardRouter = lazy(() => import("AdminDashboardRouter"));
@@ -32,6 +33,9 @@ const AppBase = () => {
             (error) => {
                 if (error && error.response) {
                     if (error.response.status) {
+                        if (error.request.url.includes(API_VERSION_PATH)) {
+                            return Promise.reject(error.response);
+                        }
                         modal.error({
                             title: "服务异常[" + error.response.status + "]",
                             content: (

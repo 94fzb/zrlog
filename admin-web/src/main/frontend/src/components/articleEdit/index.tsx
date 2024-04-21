@@ -502,7 +502,7 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
                                 await handleValuesChange({ typeId: value });
                             }}
                             options={state.typeOptions}
-                            placeholder={"请选择" + getRes()["admin.type.manage"]}
+                            placeholder={getRes()["pleaseChoose"] + getRes()["admin.type.manage"]}
                         />
                         <BaseInput
                             status={formValidState.titleError ? "error" : ""}

@@ -24,7 +24,9 @@ const Index: FunctionComponent<IndexProps> = ({ data }) => {
                 {getRes().dashboard}{" "}
             </Title>
             <Divider />
-            <Alert message={getRes()["admin.index.welcomeTips"]} type="info" showIcon />
+            {data.tips.map((e) => {
+                return <Alert message={e} type="info" showIcon />;
+            })}
             <Row gutter={[8, 8]} style={{ paddingTop: "12px" }}>
                 <Col xs={24} md={14}>
                     <ServerInfo data={data.serverInfo} />

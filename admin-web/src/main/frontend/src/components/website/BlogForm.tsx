@@ -24,12 +24,14 @@ const BlogForm = ({ data }: { data: Blog }) => {
 
     const websiteFormFinish = (changedValues: any) => {
         axios.post("/api/admin/website/blog", { ...form, ...changedValues }).then(({ data }) => {
-            if (!data.error) {
-                message.success(data.message).then(() => {
-                    removeRes();
-                    window.location.reload();
-                });
+            if (data.error) {
+                message.error(data.message).then();
+                return;
             }
+            message.success(data.message).then(() => {
+                removeRes();
+                window.location.reload();
+            });
         });
     };
 
@@ -47,7 +49,10 @@ const BlogForm = ({ data }: { data: Blog }) => {
                 onValuesChange={(_k, v) => setForm({ ...form, v })}
                 onFinish={(v) => websiteFormFinish(v)}
             >
-                <Form.Item name="session_timeout" label="会话过期时间" rules={[{ required: true }]}>
+                <Form.Item name="host" label="博客域名（Host）">
+                    <Input style={{ maxWidth: "300px" }} placeholder="留空，程序将读取接收到的 Host 字段" />
+                </Form.Item>
+                <Form.Item name="session_timeout" label="管理界面会话超时" rules={[{ required: true }]}>
                     <Input
                         suffix="分钟"
                         style={{ maxWidth: "120px" }}

@@ -19,12 +19,12 @@ public class LogNav extends DAO {
     }
 
     public List<Map<String, Object>> findAll() throws SQLException {
-        return queryListWithParams("select l.navId as id,l.navName,l.url,l.sort from " + tableName + " l order by sort");
+        return queryListWithParams("select l.navId as id,l.navName,l.url,l.sort from " + tableName + " l where l.url is not null and l.navName is not null order by sort");
     }
 
     public PageData<Map<String, Object>> find(PageRequest page) throws SQLException {
         PageData<Map<String, Object>> data = new PageData<>();
-        data.setRows(queryListWithParams("select l.navId as id,l.navName,l.url,l.sort from " + tableName + " l order by sort limit ?,?", page.getOffset(), page.getSize()));
+        data.setRows(queryListWithParams("select l.navId as id,l.navName,l.url,l.sort from " + tableName + " l where l.url is not null and l.navName is not null order by sort limit ?,?", page.getOffset(), page.getSize()));
         ModelUtil.fillPageData(this, "from " + tableName, data, new Object[0]);
         return data;
     }

@@ -1,5 +1,5 @@
 <#if log.canComment>
-    <div id="comment-list" class="comment">
+    <div class="comment" id="comment">
         <#if init.webSite.changyan_status == "on">
             <plugin name="changyan" view="widget" param="articleId=${log.logId!''}"></plugin>
         <#else>
@@ -13,7 +13,7 @@
                     </li>
                 </ul>
             </#list>
-            <form action="/addComment" method="post" id="txpCommentInputForm">
+            <form action="/addComment" method="post">
                 <input type="hidden" name="logId" value="${log.logId}">
                 <h2>${_res.comment}</h2>
                 <textarea required class="form-control" rows="15" cols="45" name="userComment"></textarea>
@@ -43,7 +43,7 @@
                         </div>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-outline-primary">${_res.submit}</button>
+                <button type="submit" style="min-width: 80px" class="btn btn-outline-primary">${_res.submit}</button>
             </form>
         </#if>
     </div>

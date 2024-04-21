@@ -1,6 +1,11 @@
-package com.zrlog.admin.business.rest.base;
+package com.zrlog.admin.business.rest.request;
 
-public class CreateTypeRequest {
+import com.zrlog.admin.business.exception.ArgsException;
+import com.zrlog.common.Validator;
+
+import java.util.Objects;
+
+public class CreateTypeRequest implements Validator {
 
     private String typeName;
     private String remark;
@@ -28,5 +33,15 @@ public class CreateTypeRequest {
 
     public void setAlias(String alias) {
         this.alias = alias;
+    }
+
+    @Override
+    public void doValid() {
+        if (Objects.isNull(alias) || alias.trim().isEmpty()) {
+            throw new ArgsException("alias");
+        }
+        if (Objects.isNull(typeName) || typeName.trim().isEmpty()) {
+            throw new ArgsException("typeName");
+        }
     }
 }

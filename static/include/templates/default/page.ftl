@@ -1,9 +1,9 @@
 <#include "header.ftl">
 <#if data?has_content>
     <#if tipsType?has_content>
-        <div class="category-title">
+        <div style="padding-bottom: 12px">
             <h3>${tipsType}目录：${tipsName}</h3>
-            <h3>以下是与${tipsType} “${tipsName}” 相关联的文章</h3>
+            <h4>以下是与${tipsType} “${tipsName}” 相关联的文章</h4>
         </div>
     </#if>
     <#if data?has_content>
@@ -12,7 +12,7 @@
                 <#if log.thumbnail?has_content>
                     <img width="760px" onerror="this.style.display='none'" alt="${log.title}" src="${log.thumbnail}"/>
                 </#if>
-                <h2 class="post-title"><a rel="bookmark" href="${log.url}">${log.title}</a></h2>
+                <h2><a rel="bookmark" href="${log.url}">${log.title}</a></h2>
                 <div class="content"><p>${log.digest!''}</p></div>
                 <div class="meta" style="display: flex;justify-content: space-between">
                     <div style="display:flex;justify-content: flex-start;gap: .4rem">

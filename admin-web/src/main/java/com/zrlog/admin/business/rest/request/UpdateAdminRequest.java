@@ -1,6 +1,11 @@
 package com.zrlog.admin.business.rest.request;
 
-public class UpdateAdminRequest {
+import com.zrlog.admin.business.exception.ArgsException;
+import com.zrlog.common.Validator;
+
+import java.util.Objects;
+
+public class UpdateAdminRequest implements Validator {
 
     private String userName;
     private String email;
@@ -28,5 +33,12 @@ public class UpdateAdminRequest {
 
     public void setHeader(String header) {
         this.header = header;
+    }
+
+    @Override
+    public void doValid() {
+        if (Objects.isNull(userName) || userName.trim().isEmpty()) {
+            throw new ArgsException("userName");
+        }
     }
 }

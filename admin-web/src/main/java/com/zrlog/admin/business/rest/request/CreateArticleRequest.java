@@ -1,6 +1,11 @@
 package com.zrlog.admin.business.rest.request;
 
-public class CreateArticleRequest {
+import com.zrlog.admin.business.exception.ArgsException;
+import com.zrlog.common.Validator;
+
+import java.util.Objects;
+
+public class CreateArticleRequest implements Validator {
 
     private String content;
     private String thumbnail;
@@ -118,5 +123,12 @@ public class CreateArticleRequest {
 
     public void setEditorType(String editorType) {
         this.editorType = editorType;
+    }
+
+    @Override
+    public void doValid() {
+        if (Objects.isNull(typeId) || typeId <= 0) {
+            throw new ArgsException("typeId");
+        }
     }
 }

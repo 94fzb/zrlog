@@ -9,6 +9,7 @@ import com.zrlog.util.ZrLogUtil;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 /**
  * 存放与Web相关的工具代码
@@ -42,13 +43,7 @@ public class WebTools {
         return ip;
     }
 
-    public static String getHomeUrlWithHost(HttpRequest request) {
-        return "//" + request.getHeader("host") + "/";
-    }
 
-    public static String getHomeUrlWithHostNotProtocol(HttpRequest request) {
-        return request.getHeader("host") + "/";
-    }
 
     public static String getHomeUrl(HttpRequest request) {
         return "/";

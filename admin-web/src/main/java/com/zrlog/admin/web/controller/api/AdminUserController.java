@@ -19,7 +19,6 @@ import com.zrlog.common.Constants;
 import com.zrlog.common.rest.response.ApiStandardResponse;
 import com.zrlog.model.User;
 import com.zrlog.util.I18nUtil;
-import com.zrlog.util.ZrLogUtil;
 
 import java.sql.SQLException;
 import java.util.Map;
@@ -56,14 +55,14 @@ public class AdminUserController extends Controller {
     @RefreshCache
     @ResponseBody
     public UpdateRecordResponse update() throws SQLException {
-        UpdateAdminRequest updateAdminRequest = ZrLogUtil.convertRequestBody(getRequest(), UpdateAdminRequest.class);
+        UpdateAdminRequest updateAdminRequest = BeanUtil.convertWithValid(getRequest().getInputStream(), UpdateAdminRequest.class);
         UpdateRecordResponse updateRecordResponse = new UpdateRecordResponse();
         if (updateAdminRequest != null) {
             if (StringUtils.isEmpty(updateAdminRequest.getUserName())) {
                 updateRecordResponse.setError(1);
             } else {
                 userService.update(AdminTokenThreadLocal.getUserId(), updateAdminRequest);
-                updateRecordResponse.setMessage(I18nUtil.getBlogStringFromRes("updatePersonInfoSuccess"));
+                updateRecordResponse.setMessage(I18nUtil.getBackendStringFromRes("updatePersonInfoSuccess"));
             }
         } else {
             updateRecordResponse.setError(1);
@@ -74,6 +73,6 @@ public class AdminUserController extends Controller {
     @ResponseBody
     public UpdateRecordResponse updatePassword() throws SQLException {
         return userService.updatePassword(AdminTokenThreadLocal.getUserId(),
-                ZrLogUtil.convertRequestBody(getRequest(), UpdatePasswordRequest.class));
+                BeanUtil.convertWithValid(getRequest().getInputStream(), UpdatePasswordRequest.class));
     }
 }

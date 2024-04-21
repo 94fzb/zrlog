@@ -32,6 +32,7 @@ export interface Blog {
     disable_comment_status: boolean;
     article_thumbnail_status: boolean;
     language: string;
+    host: string;
     article_route: string;
     admin_darkMode: boolean;
     admin_color_primary: string;

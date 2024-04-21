@@ -13,6 +13,8 @@ import com.zrlog.common.Constants;
 import com.zrlog.common.rest.response.ApiStandardResponse;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.util.Objects;
 
 public class UpgradeController extends Controller {
@@ -30,20 +32,13 @@ public class UpgradeController extends Controller {
     }
 
     @ResponseBody
-    public ApiStandardResponse<DownloadUpdatePackageResponse> download() throws IOException {
-        return new ApiStandardResponse<>(upgradeService.download((UpdateVersionPlugin) Constants.plugins
-                .stream().filter(x -> x instanceof UpdateVersionPlugin).findFirst().orElse(null)));
+    public ApiStandardResponse<DownloadUpdatePackageResponse> download() throws IOException, URISyntaxException, InterruptedException, ParseException {
+        return new ApiStandardResponse<>(upgradeService.download());
     }
 
     @ResponseBody
-    public ApiStandardResponse<CheckVersionResponse> lastVersion() {
-        return new ApiStandardResponse<>(upgradeService.getCheckVersionResponse(false, (UpdateVersionPlugin) Objects.requireNonNull(Constants.plugins
-                .stream().filter(x -> x instanceof UpdateVersionPlugin).findFirst().orElse(null))));
-    }
-
-    @ResponseBody
-    public ApiStandardResponse<CheckVersionResponse> index() {
-        return new ApiStandardResponse<>(upgradeService.getCheckVersionResponse(true, (UpdateVersionPlugin) Objects.requireNonNull(Constants.plugins
+    public ApiStandardResponse<CheckVersionResponse> index() throws ParseException {
+        return new ApiStandardResponse<>(upgradeService.preUpgradeVersion(true, (UpdateVersionPlugin) Objects.requireNonNull(Constants.plugins
                 .stream().filter(x -> x instanceof UpdateVersionPlugin).findFirst().orElse(null))));
     }
 

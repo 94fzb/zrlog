@@ -11,6 +11,6 @@ public class TemplateExistsException extends AbstractBusinessException {
 
     @Override
     public String getMessage() {
-        return I18nUtil.getBlogStringFromRes("templateExists");
+        return I18nUtil.getBackendStringFromRes("templateExists");
     }
 }

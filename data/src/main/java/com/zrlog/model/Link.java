@@ -26,7 +26,7 @@ public class Link extends DAO {
     public PageData<Map<String, Object>> find(PageRequest page) throws SQLException {
         PageData<Map<String, Object>> data = new PageData<>();
         data.setRows(queryListWithParams("select linkName,linkId as id,sort,url,alt from " + tableName + " order by sort limit ?,?", page.getOffset(), page.getSize()));
-        ModelUtil.fillPageData(this, "from link", data, new Object[0]);
+        ModelUtil.fillPageData(this, "from " + tableName, data, new Object[0]);
         return data;
     }
 }

@@ -56,14 +56,14 @@ public class AdminArticleController extends Controller {
     @RefreshCache(async = true)
     @ResponseBody
     public ApiStandardResponse<CreateOrUpdateArticleResponse> create() {
-        return new ApiStandardResponse<>(articleService.create(AdminTokenThreadLocal.getUser(), ZrLogUtil.convertRequestBody(getRequest(),
+        return new ApiStandardResponse<>(articleService.create(AdminTokenThreadLocal.getUser(), BeanUtil.convertWithValid(getRequest().getInputStream(),
                 CreateArticleRequest.class)));
     }
 
     @RefreshCache(async = true)
     @ResponseBody
     public ApiStandardResponse<CreateOrUpdateArticleResponse> update() {
-        return new ApiStandardResponse<>(articleService.update(AdminTokenThreadLocal.getUser(), ZrLogUtil.convertRequestBody(getRequest(),
+        return new ApiStandardResponse<>(articleService.update(AdminTokenThreadLocal.getUser(), BeanUtil.convertWithValid(getRequest().getInputStream(),
                 UpdateArticleRequest.class)));
     }
 

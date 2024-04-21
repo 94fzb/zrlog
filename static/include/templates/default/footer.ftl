@@ -19,6 +19,6 @@
         </div>
     </div>
 </footer>
-<div style="display:none">${webs.webCm!""}</div>
+<#if webs.webCm?has_content><div style="display:none">${webs.webCm!""}</div></#if>
 </body>
 </html>

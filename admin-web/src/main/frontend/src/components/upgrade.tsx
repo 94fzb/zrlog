@@ -6,124 +6,146 @@ import { getRes } from "../utils/constants";
 import axios from "axios";
 
 const { Step } = Steps;
-
-let timer: NodeJS.Timeout;
-let upgradeTimer: NodeJS.Timeout;
-let checkRestartTimer: NodeJS.Timeout;
+export const API_VERSION_PATH = "/api/admin/website/version";
 
 type UpgradeState = {
     current: number;
-    restartSuccess: boolean;
     downloadProcess: number;
-    changeLog: string;
-    newBuildId?: string;
-    finish?: boolean;
-    version?: UpgradeVersion;
     upgradeMessage: string;
+};
+type UpgradeData = {
+    upgrade: boolean;
+    dockerMode: boolean;
+    version: UpgradeVersion;
 };
 
 type UpgradeVersion = {
     changeLog: string;
+    buildId: string;
 };
 
-const Upgrade = ({ data }: { data: UpgradeState }) => {
-    const steps = [
+type StepInfo = {
+    title: string;
+    alias: "changeLog" | "downloadProcess" | "doUpgrade";
+};
+
+const Upgrade = ({ data }: { data: UpgradeData }) => {
+    const steps: StepInfo[] = [
         {
-            title: "变更日志",
+            title: getRes()["changeLog"],
+            alias: "changeLog",
         },
         {
             title: "下载更新",
+            alias: "downloadProcess",
         },
         {
             title: "执行更新",
+            alias: "doUpgrade",
         },
     ];
 
     const [state, setState] = useState<UpgradeState>({
         current: 0,
-        restartSuccess: false,
         downloadProcess: 0,
-        changeLog: data.version ? data.version.changeLog : "",
         upgradeMessage: "",
     });
 
     const { modal } = App.useApp();
 
-    const checkRestartSuccess = () => {
-        if (state.restartSuccess) {
-            clearInterval(checkRestartTimer);
-            modal.info({
-                title: "更新成功，跳转到管理首页？",
-                content: "",
-                okText: "确认",
-                cancelText: "取消",
-                onOk: function () {
-                    window.location.href = "../";
-                },
-            });
-            return;
-        }
+    const checkRestartSuccess = (newBuildId: string) => {
         axios
-            .get("/api/admin/website/version")
+            .get(API_VERSION_PATH + "?buildId=" + newBuildId)
             .then(({ data }) => {
-                setState({
-                    ...state,
-                    restartSuccess: data.data.buildId === state.newBuildId,
-                });
-                checkRestartTimer = setTimeout(checkRestartSuccess, 500);
+                if (newBuildId === data.data.buildId) {
+                    modal.info({
+                        title: "更新成功，跳转到管理首页？",
+                        content: "",
+                        okText: "确认",
+                        cancelText: "取消",
+                        onOk: function () {
+                            window.location.href = "/admin/index?buildId=" + newBuildId;
+                        },
+                    });
+                    return;
+                }
+                setTimeout(() => {
+                    checkRestartSuccess(newBuildId);
+                }, 500);
             })
             .catch(() => {
-                checkRestartTimer = setTimeout(checkRestartSuccess, 500);
+                setTimeout(() => {
+                    checkRestartSuccess(newBuildId);
+                }, 500);
             });
     };
 
     const downloadProcess = async () => {
-        if (state.downloadProcess === 100) {
-            clearInterval(timer);
-            return;
-        }
         const current = 1;
-        setState({ ...state, current: current });
-        await axios.get("/api/admin/upgrade/download").then(({ data }) => {
-            setState({
-                ...state,
-                downloadProcess: data.data.process,
-            });
-            timer = setTimeout(downloadProcess, 500);
+        setState((prevState) => {
+            return {
+                ...prevState,
+                current: current,
+            };
         });
+        const { data } = await axios.get("/api/admin/upgrade/download");
+        setState((prevState) => {
+            return {
+                ...prevState,
+                downloadProcess: data.data.process,
+                current: current,
+            };
+        });
+        if (data.data.process < 100) {
+            setTimeout(downloadProcess, 500);
+        }
     };
 
+    const newBuildId = data.version.buildId;
+
     const upgrade = async () => {
-        if (state.finish) {
-            clearInterval(upgradeTimer);
-            checkRestartSuccess();
+        const current = 2;
+        setState((prevState) => {
+            return {
+                ...prevState,
+                current: current,
+            };
+        });
+        const { data } = await axios.get("/api/admin/upgrade/doUpgrade");
+        setState((prevState) => {
+            return {
+                ...prevState,
+                upgradeMessage: data.data.message,
+                current: current,
+            };
+        });
+        if (data.data.finish) {
+            checkRestartSuccess(newBuildId);
             return;
         }
-        const current = 2;
-        setState({ ...state, current: current });
-        await axios
-            .get("/api/admin/upgrade/doUpgrade")
-            .then(({ data }) => {
-                setState({
-                    ...state,
-                    finish: data.data.finish,
-                    upgradeMessage: data.data.message,
-                    newBuildId: data.data.buildId,
-                });
-                upgradeTimer = setTimeout(upgrade, 500);
-            })
-            .catch(() => {
-                //重启中，可能存在404，可以直接进行下一步了
-                checkRestartSuccess();
-            });
+        setTimeout(upgrade, 500);
     };
 
     const next = async () => {
         if (state.current === 0) {
-            await downloadProcess();
+            if (data.dockerMode) {
+                await upgrade();
+            } else {
+                await downloadProcess();
+            }
         } else if (state.current === 1) {
             await upgrade();
         }
+    };
+
+    const nextDisabled = (): boolean => {
+        if (!data.upgrade) {
+            return true;
+        }
+        if (state.current === 1) {
+            return state.downloadProcess < 100;
+        }
+        return false;
     };
 
     return (
@@ -136,33 +158,42 @@ const Upgrade = ({ data }: { data: UpgradeState }) => {
 
                 <Card>
                     <Steps current={state.current}>
-                        {steps.map((item) => (
-                            <Step key={item.title} title={item.title} />
-                        ))}
+                        {steps.map((item) => {
+                            if (item.alias === "downloadProcess" && data.dockerMode) {
+                                return <></>;
+                            }
+                            return <Step key={item.alias} title={item.title} />;
+                        })}
                     </Steps>
                     <div className="steps-content" style={{ marginTop: "20px" }}>
                         {state.current === 0 && (
                             <>
                                 <Title level={4}>{getRes().changeLog}</Title>
-                                <div dangerouslySetInnerHTML={{ __html: state.changeLog }} />
+                                <div
+                                    style={{ overflowWrap: "break-word" }}
+                                    dangerouslySetInnerHTML={{ __html: data.version ? data.version.changeLog : "" }}
+                                />
                             </>
                         )}
                         {state.current === 1 && (
-                            <div>
+                            <>
                                 <Title level={4}>下载更新包</Title>
-                                <Progress strokeLinecap="square" percent={state.downloadProcess} />
-                            </div>
+                                <Progress strokeLinecap="round" percent={state.downloadProcess} />
+                            </>
                         )}
                         {state.current === 2 && (
-                            <div>
+                            <>
                                 <Title level={4}>正在执行更新...</Title>
-                                <div dangerouslySetInnerHTML={{ __html: state.upgradeMessage }} />
-                            </div>
+                                <div
+                                    style={{ overflowWrap: "break-word" }}
+                                    dangerouslySetInnerHTML={{ __html: state.upgradeMessage }}
+                                />
+                            </>
                         )}
                     </div>
                     <div className="steps-action" style={{ paddingTop: "20px" }}>
                         {state.current < steps.length - 1 && (
-                            <Button type="primary" onClick={() => next()}>
+                            <Button type="primary" disabled={nextDisabled()} onClick={() => next()}>
                                 {getRes().nextStep}
                             </Button>
                         )}

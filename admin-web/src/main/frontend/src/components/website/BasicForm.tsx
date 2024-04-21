@@ -21,12 +21,14 @@ const BasicForm = ({ data }: { data: Basic }) => {
     const { message } = App.useApp();
     const websiteFormFinish = (changedValues: any) => {
         axios.post("/api/admin/website/basic", changedValues).then(({ data }) => {
-            if (!data.error) {
-                message.success(data.message).then(() => {
-                    removeRes();
-                    window.location.reload();
-                });
+            if (data.error) {
+                message.error(data.message).then();
+                return;
             }
+            message.success(data.message).then(() => {
+                removeRes();
+                window.location.reload();
+            });
         });
     };
 

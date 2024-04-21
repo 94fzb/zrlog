@@ -1,9 +1,9 @@
 package com.zrlog.admin.business.rest.response;
 
-import com.zrlog.admin.business.rest.base.BasicWebSiteRequest;
-import com.zrlog.admin.business.rest.base.BlogWebSiteRequest;
-import com.zrlog.admin.business.rest.base.OtherWebSiteRequest;
-import com.zrlog.admin.business.rest.base.UpgradeWebSiteRequest;
+import com.zrlog.admin.business.rest.base.BasicWebSiteInfo;
+import com.zrlog.admin.business.rest.base.BlogWebSiteInfo;
+import com.zrlog.admin.business.rest.base.OtherWebSiteInfo;
+import com.zrlog.admin.business.rest.base.UpgradeWebSiteInfo;
 import com.zrlog.common.vo.TemplateVO;
 
 import java.util.ArrayList;
@@ -11,10 +11,10 @@ import java.util.List;
 
 public class WebSiteSettingsResponse {
 
-    private BasicWebSiteRequest basic;
-    private BlogWebSiteRequest blog;
-    private OtherWebSiteRequest other;
-    private UpgradeWebSiteRequest upgrade;
+    private BasicWebSiteInfo basic;
+    private BlogWebSiteInfo blog;
+    private OtherWebSiteInfo other;
+    private UpgradeWebSiteInfo upgrade;
     private List<TemplateVO> templates = new ArrayList<>();
 
     public List<TemplateVO> getTemplates() {
@@ -26,35 +26,35 @@ public class WebSiteSettingsResponse {
         this.templates = templates;
     }
 
-    public BasicWebSiteRequest getBasic() {
+    public BasicWebSiteInfo getBasic() {
         return basic;
     }
 
-    public void setBasic(BasicWebSiteRequest basic) {
+    public void setBasic(BasicWebSiteInfo basic) {
         this.basic = basic;
     }
 
-    public BlogWebSiteRequest getBlog() {
+    public BlogWebSiteInfo getBlog() {
         return blog;
     }
 
-    public void setBlog(BlogWebSiteRequest blog) {
+    public void setBlog(BlogWebSiteInfo blog) {
         this.blog = blog;
     }
 
-    public OtherWebSiteRequest getOther() {
+    public OtherWebSiteInfo getOther() {
         return other;
     }
 
-    public void setOther(OtherWebSiteRequest other) {
+    public void setOther(OtherWebSiteInfo other) {
         this.other = other;
     }
 
-    public UpgradeWebSiteRequest getUpgrade() {
+    public UpgradeWebSiteInfo getUpgrade() {
         return upgrade;
     }
 
-    public void setUpgrade(UpgradeWebSiteRequest upgrade) {
+    public void setUpgrade(UpgradeWebSiteInfo upgrade) {
         this.upgrade = upgrade;
     }
 

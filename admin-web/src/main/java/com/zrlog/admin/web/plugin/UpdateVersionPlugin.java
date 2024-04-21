@@ -7,14 +7,16 @@ import com.zrlog.business.service.InstallService;
 import com.zrlog.common.Constants;
 import com.zrlog.common.type.AutoUpgradeVersionType;
 import com.zrlog.common.vo.Version;
-import com.zrlog.model.WebSite;
 import com.zrlog.plugin.IPlugin;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.I18nUtil;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -42,8 +44,7 @@ public class UpdateVersionPlugin implements IPlugin {
 
     @Override
     public boolean start() {
-        String value = new WebSite().getStringValueByName(Constants.AUTO_UPGRADE_VERSION_KEY);
-        boolean checkPreview = previewAble();
+        String value = (String) Constants.WEB_SITE.get(Constants.AUTO_UPGRADE_VERSION_KEY);
         if (value != null && !value.isEmpty()) {
             AutoUpgradeVersionType autoUpgradeVersionType = AutoUpgradeVersionType.cycle((int) Double.parseDouble(value));
             if (scheduledExecutorService != null) {
@@ -52,8 +53,8 @@ public class UpdateVersionPlugin implements IPlugin {
             //开启了定时检查，定时器开始工作
             if (autoUpgradeVersionType != AutoUpgradeVersionType.NEVER) {
                 initExecutorService();
-                updateVersionTimerTask = new UpdateVersionTimerTask(checkPreview);
-                scheduledExecutorService.schedule(updateVersionTimerTask, autoUpgradeVersionType.getCycle(), TimeUnit.SECONDS);
+                updateVersionTimerTask = new UpdateVersionTimerTask();
+                scheduledExecutorService.scheduleAtFixedRate(updateVersionTimerTask, 0, autoUpgradeVersionType.getCycle(), TimeUnit.SECONDS);
             }
             LOGGER.info("UpdateVersionPlugin start autoUpgradeVersionType " + autoUpgradeVersionType);
         }
@@ -68,13 +69,6 @@ public class UpdateVersionPlugin implements IPlugin {
         return true;
     }
 
-    private boolean previewAble() {
-        try {
-            return new WebSite().getBoolValueByName("upgradePreview");
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     /**
      * 获取最新的版本信息。
@@ -83,13 +77,12 @@ public class UpdateVersionPlugin implements IPlugin {
      * @return
      */
     public Version getLastVersion(boolean fetch) {
-        boolean checkPreview = previewAble();
         if (updateVersionTimerTask == null) {
-            updateVersionTimerTask = new UpdateVersionTimerTask(checkPreview);
+            updateVersionTimerTask = new UpdateVersionTimerTask();
         }
         if (fetch) {
             try {
-                return updateVersionTimerTask.fetchLastVersion(checkPreview);
+                updateVersionTimerTask.run();
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "", e);
             }
@@ -98,7 +91,7 @@ public class UpdateVersionPlugin implements IPlugin {
     }
 
 
-    public static String getChangeLog(String version, String buildId) {
+    public static String getChangeLog(String version, Date releaseDate, String buildId, Map<String, Object> res) {
         try {
             String changeLog = HttpUtil.getInstance().getSuccessTextByUrl("https://www.zrlog.com/changelog/" +
                     version + "-" + buildId + ".html?lang=" +
@@ -109,7 +102,11 @@ public class UpdateVersionPlugin implements IPlugin {
         } catch (IOException | InterruptedException | URISyntaxException e) {
             LOGGER.log(Level.SEVERE, "", e);
         }
-        String changeUrl = "https://github.com/94fzb/zrlog/compare/" + BlogBuildInfoUtil.getBuildId() + "..." + buildId;
-        return InstallService.renderMd("#### Not find changeLog, Please view git diff \n[" + changeUrl + "](" + changeUrl + ")");
+        if (Objects.equals(BlogBuildInfoUtil.getBuildId(), buildId)) {
+            return InstallService.renderMd((String) res.get("upgradeNoChange"));
+        }
+        String uriPath = "94fzb/zrlog/compare/" + BlogBuildInfoUtil.getBuildId() + "..." + buildId;
+        String changeUrl = "https://github.com/" + uriPath;
+        return InstallService.renderMd("### " + version + " (" + new SimpleDateFormat("yyyy-MM-dd HH:mm").format(releaseDate) + ")\n" + res.get("upgradeNoChangeLog") + "\n[" + uriPath + "](" + changeUrl + ")");
     }
 }

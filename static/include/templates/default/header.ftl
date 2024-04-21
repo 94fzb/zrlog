@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="${lang}">
 <head>
     <meta charset="utf-8"/>
     <#assign webs = init.webSite>

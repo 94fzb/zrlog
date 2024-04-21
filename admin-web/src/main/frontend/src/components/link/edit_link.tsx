@@ -1,5 +1,5 @@
 import { FunctionComponent, useState } from "react";
-import { Col, Form, Input, InputNumber, Modal } from "antd";
+import { App, Col, Form, Input, InputNumber, Modal } from "antd";
 import Row from "antd/es/grid/row";
 import TextArea from "antd/es/input/TextArea";
 import { EditOutlined } from "@ant-design/icons";
@@ -20,9 +20,14 @@ export type EditLinkProps = {
 const EditLink: FunctionComponent<EditLinkProps> = ({ record, editSuccessCall }) => {
     const [showModel, setShowModel] = useState<boolean>(false);
     const [updateForm, setUpdateForm] = useState<any>(record);
+    const { message } = App.useApp();
 
     const handleOk = () => {
-        axios.post("/api/admin/link/update", updateForm).then(() => {
+        axios.post("/api/admin/link/update", updateForm).then(async ({ data }) => {
+            if (data.error) {
+                await message.error(data.message);
+                return;
+            }
             setShowModel(false);
             if (editSuccessCall) {
                 editSuccessCall();

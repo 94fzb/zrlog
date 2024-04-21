@@ -1,6 +1,7 @@
 package com.zrlog.common.vo;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 这个对应了 last.runType.json 里面的字段
@@ -10,7 +11,7 @@ public class Version implements Serializable {
     private String buildId;
     private String releaseDate;
     private String version;
-    private long fileSize;
+    private Date buildDate;
 
     public long getZipFileSize() {
         return zipFileSize;
@@ -70,14 +71,6 @@ public class Version implements Serializable {
         this.version = version;
     }
 
-    public long getFileSize() {
-        return fileSize;
-    }
-
-    public void setFileSize(long fileSize) {
-        this.fileSize = fileSize;
-    }
-
     public String getChangeLog() {
         return changeLog;
     }
@@ -110,5 +103,11 @@ public class Version implements Serializable {
         this.md5sum = md5sum;
     }
 
+    public Date getBuildDate() {
+        return buildDate;
+    }
 
+    public void setBuildDate(Date buildDate) {
+        this.buildDate = buildDate;
+    }
 }

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Col, Form, Input, InputNumber, Modal } from "antd";
+import { App, Button, Col, Form, Input, InputNumber, Modal } from "antd";
 import Row from "antd/es/grid/row";
 import axios from "axios";
 
@@ -11,9 +11,14 @@ const layout = {
 const AddNav = ({ addSuccessCall }: { addSuccessCall: () => void }) => {
     const [showModel, setShowModel] = useState<boolean>(false);
     const [form, setForm] = useState<any>();
+    const { message } = App.useApp();
 
     const handleOk = () => {
-        axios.post("/api/admin/nav/add", form).then(() => {
+        axios.post("/api/admin/nav/add", form).then(async ({ data }) => {
+            if (data.error) {
+                await message.error(data.message);
+                return;
+            }
             setShowModel(false);
             addSuccessCall();
         });

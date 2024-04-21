@@ -1,5 +1,6 @@
 package com.zrlog.admin.web.controller.api;
 
+import com.hibegin.common.util.BeanUtil;
 import com.hibegin.http.annotation.ResponseBody;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
@@ -12,7 +13,6 @@ import com.zrlog.admin.web.annotation.RefreshCache;
 import com.zrlog.common.rest.response.ApiStandardResponse;
 import com.zrlog.common.rest.response.StandardResponse;
 import com.zrlog.data.dto.PageData;
-import com.zrlog.util.ZrLogUtil;
 
 import java.sql.SQLException;
 import java.util.Map;
@@ -36,11 +36,11 @@ public class CommentController extends Controller {
 
     @ResponseBody
     public UpdateRecordResponse read() {
-        return commentService.read(ZrLogUtil.convertRequestBody(getRequest(), ReadCommentRequest.class));
+        return commentService.read(BeanUtil.convertWithValid(getRequest().getInputStream(), ReadCommentRequest.class));
     }
 
     @ResponseBody
-    public ApiStandardResponse<PageData<Map<String,Object>>> index() throws SQLException {
+    public ApiStandardResponse<PageData<Map<String, Object>>> index() throws SQLException {
         return new ApiStandardResponse<>(commentService.page(ControllerUtil.getPageRequest(this)));
     }
 }
