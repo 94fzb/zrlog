@@ -8,13 +8,13 @@
     </#if>
     <#if data?has_content>
         <#list data.rows as log>
-            <article class="entry markdown-body">
+            <article class="markdown-body">
                 <#if log.thumbnail?has_content>
-                    <img width="760px" onerror="this.style.display='none'" alt="${log.title}" src="${log.thumbnail}"/>
+                    <img class="preview-img" onerror="this.style.display='none'" alt="${log.title}" src="${log.thumbnail}"/>
                 </#if>
-                <h2><a rel="bookmark" href="${log.url}">${log.title}</a></h2>
-                <div class="content"><p>${log.digest!''}</p></div>
-                <div class="meta" style="display: flex;justify-content: space-between">
+                <h2 style="margin-bottom: 8px;margin-top: 0"><a rel="bookmark" href="${log.url}">${log.title}</a></h2>
+                <div class="content" style="padding-bottom: 12px">${log.digest!''}</div>
+                <div class="meta">
                     <div style="display:flex;justify-content: flex-start;gap: .4rem">
                         <span class="category">
                             <a href="${log.typeUrl}">${log.typeName}</a>
@@ -22,13 +22,11 @@
                         <span>/</span>
                         <span class="published">${log.releaseTime?split("T")[0]}</span>
                     </div>
-                    <p class="commentlink">
-                        <#if log.canComment>
-                            <a href="${log.url}#comment" class="comments_invite">
-                                ${_res.commentView} [${log.commentSize}]
-                            </a>
-                        </#if>
-                    </p>
+                    <#if log.canComment>
+                        <a href="${log.url}#comment" class="comments_invite">
+                            ${_res.commentView} [${log.commentSize}]
+                        </a>
+                    </#if>
                 </div>
             </article>
         </#list>

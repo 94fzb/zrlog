@@ -11,6 +11,7 @@ import com.zrlog.blog.web.plugin.RequestStatisticsPlugin;
 import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.business.cache.CacheService;
 import com.zrlog.business.util.InstallUtils;
+import com.zrlog.util.ZrLogUtil;
 
 import java.io.File;
 import java.util.Arrays;
@@ -44,7 +45,7 @@ public class StaticResourceInterceptor implements Interceptor {
             }
             if (BlogArticleInterceptor.catGeneratorHtml(actionKey)) {
                 File cacheFile = cacheService.loadCacheFile(request);
-                if (cacheFile.exists()) {
+                if (cacheFile.exists() && !ZrLogUtil.isStaticBlogPlugin(request)) {
                     response.writeFile(cacheFile);
                     return false;
                 }

@@ -2,15 +2,15 @@ package com.zrlog.web;
 
 import com.hibegin.http.server.WebServerBuilder;
 import com.hibegin.http.server.util.PathUtil;
-import com.zrlog.admin.web.plugin.ZipUpdateVersionThread;
+import com.zrlog.admin.web.plugin.ZipUpdateVersionHandle;
 import com.zrlog.common.Constants;
+import com.zrlog.common.ZrLogConfig;
 import com.zrlog.util.JarUpdater;
 import com.zrlog.util.ZrLogUtil;
-import com.zrlog.web.config.ZrLogConfig;
+import com.zrlog.web.config.ZrLogConfigImpl;
 
 import java.io.File;
 import java.net.URISyntaxException;
-import java.util.Objects;
 
 public class Application {
 
@@ -29,12 +29,9 @@ public class Application {
             programDir = jarFile.getParent();
         }
         PathUtil.setRootPath(programDir);
-        ZrLogConfig zrLogConfig = new ZrLogConfig(ZrLogUtil.getPort(args));
-        Constants.installAction = zrLogConfig;
+        ZrLogConfig zrLogConfig = new ZrLogConfigImpl(ZrLogUtil.getPort(args), new JarUpdater(args, starterName));
+        Constants.zrLogConfig = zrLogConfig;
         WebServerBuilder builder = new WebServerBuilder.Builder().config(zrLogConfig).build();
-        if (jarMode) {
-            ZipUpdateVersionThread.jarUpdater = new JarUpdater(args, starterName);
-        }
         builder.addStartErrorHandle(() -> {
             if (jarMode) {
                 Thread.sleep(1000);

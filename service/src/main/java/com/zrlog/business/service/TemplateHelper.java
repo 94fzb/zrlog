@@ -13,14 +13,15 @@ import com.zrlog.business.cache.vo.BaseDataInitVO;
 import com.zrlog.business.util.PagerVO;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.OutlineVO;
-import com.zrlog.common.vo.TemplateVO;
 import com.zrlog.data.dto.PageData;
 import com.zrlog.util.I18nUtil;
 import com.zrlog.util.OutlineUtil;
 import com.zrlog.util.ParseUtil;
 import com.zrlog.util.ZrLogUtil;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -30,6 +31,7 @@ import java.util.logging.Logger;
 public class TemplateHelper {
 
     private static final Logger LOGGER = LoggerUtil.getLogger(TemplateHelper.class);
+
 
     public static String getSuffix(HttpRequest request) {
         if (ZrLogUtil.isStaticBlogPlugin(request) || Constants.isStaticHtmlStatus()) {
@@ -124,17 +126,19 @@ public class TemplateHelper {
         }
     }
 
-    private static String getNavUrl(HttpRequest request, String suffix, String url) {
+    public static String getNavUrl(HttpRequest request, String suffix, String url) {
         if ("/".equals(url)) {
             return ZrLogUtil.getHomeUrlWithHost(request);
         }
         //文章页
-        else if (url.startsWith("/")) {
+        if (url.startsWith("/")) {
             String nUrl = ZrLogUtil.getHomeUrlWithHost(request) + url.substring(1);
             if (!nUrl.endsWith(suffix)) {
+                if (Objects.equals("/admin/login", url)) {
+                    return nUrl;
+                }
                 return nUrl + suffix;
             }
-            return nUrl;
         }
         return url;
     }
@@ -244,14 +248,13 @@ public class TemplateHelper {
      * 获取主题的相对于程序的路径，当Cookie中有值的情况下，优先使用Cookie里面的数据（仅当主题存在的情况下，否则返回默认的主题），
      */
     private static String getTemplatePath(HttpRequest request) {
-        String templatePath = Constants.WEB_SITE.get("template").toString();
-        templatePath = templatePath == null ? Constants.DEFAULT_TEMPLATE_PATH : templatePath;
+        String templatePath = Objects.requireNonNullElse((String) Constants.WEB_SITE.get("template"), Constants.DEFAULT_TEMPLATE_PATH);
         String previewTheme = getTemplatePathByCookie(request.getCookies());
         if (previewTheme != null) {
-            templatePath = previewTheme;
-        }
-        if (!new File(PathUtil.getStaticPath() + templatePath).exists()) {
-            templatePath = Constants.DEFAULT_TEMPLATE_PATH;
+            if (new File(PathUtil.getStaticPath() + templatePath).exists()) {
+                return previewTheme;
+            }
+            return Constants.DEFAULT_TEMPLATE_PATH;
         }
         return templatePath;
     }
@@ -281,53 +284,5 @@ public class TemplateHelper {
         return previewTemplate;
     }
 
-    public static TemplateVO getTemplateVO(File file) {
-        String templatePath = file.toString().substring(PathUtil.getStaticPath().length() - 1).replace("\\", "/");
-        TemplateVO templateVO = new TemplateVO();
-        File templateInfo = new File(file + "/template.properties");
-        if (templateInfo.exists()) {
-            Properties properties = new Properties();
-            try (InputStream in = new FileInputStream(templateInfo)) {
-                properties.load(in);
-                templateVO.setAuthor(properties.getProperty("author"));
-                templateVO.setName(properties.getProperty("name"));
-                templateVO.setDigest(properties.getProperty("digest"));
-                templateVO.setVersion(properties.getProperty("version"));
-                templateVO.setUrl(properties.getProperty("url"));
-                templateVO.setViewType(properties.getProperty("viewType"));
-                if (properties.get("previewImages") != null) {
-                    String[] images = properties.get("previewImages").toString().split(",");
-                    for (int i = 0; i < images.length; i++) {
-                        String image = images[i];
-                        if (!image.startsWith("https://") && !image.startsWith("http://")) {
-                            images[i] = templatePath + "/" + image;
-                        }
-                    }
-                    if (images.length > 0) {
-                        templateVO.setPreviewImage(images[0]);
-                    }
-                    templateVO.setPreviewImages(Arrays.asList(images));
-                }
-            } catch (IOException e) {
-                //LOGGER.log(Level.SEVERE,"", e);
-            }
-        } else {
-            templateVO.setAuthor("");
-            templateVO.setName(templatePath.substring(Constants.TEMPLATE_BASE_PATH.length()));
-            templateVO.setUrl("");
-            templateVO.setViewType("jsp");
-            templateVO.setVersion("");
-        }
-        if (templateVO.getPreviewImages() == null || templateVO.getPreviewImages().isEmpty()) {
-            templateVO.setPreviewImages(Collections.singletonList("assets/images/template-default-preview.jpg"));
-        }
-        if (StringUtils.isEmpty(templateVO.getDigest())) {
-            templateVO.setDigest(I18nUtil.getBlogStringFromRes("noIntroduction"));
-        }
-        File settingFile =
-                new File(PathUtil.getStaticPath() + templatePath + "/setting/index" + ZrLogUtil.getViewExt(templateVO.getViewType()));
-        templateVO.setConfigAble(settingFile.exists());
-        templateVO.setTemplate(templatePath);
-        return templateVO;
-    }
+
 }

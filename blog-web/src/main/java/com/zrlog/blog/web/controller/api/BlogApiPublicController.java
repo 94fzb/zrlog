@@ -11,7 +11,7 @@ public class BlogApiPublicController extends Controller {
 
     @ResponseBody
     public ApiStandardResponse<Map<String, Object>> blogResource() {
-        return new ApiStandardResponse<>(new CommonService().blogResourceInfo());
+        return new ApiStandardResponse<>(new CommonService().blogResourceInfo(request));
     }
 
     @ResponseBody

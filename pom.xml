@@ -74,7 +74,7 @@
         <dependency>
             <groupId>com.hibegin</groupId>
             <artifactId>simplewebserver</artifactId>
-            <version>0.3.98</version>
+            <version>0.3.99</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -145,13 +145,12 @@
                     <artifactId>frontend-maven-plugin</artifactId>
                     <version>1.15.0</version>
                     <configuration>
-                        <nodeVersion>v16.15.1</nodeVersion>
-                        <yarnVersion>v1.22.18</yarnVersion>
-                        <npmVersion>8.11.0</npmVersion>
+                        <nodeVersion>v18.9.0</nodeVersion>
+                        <yarnVersion>v1.22.22</yarnVersion>
                         <workingDirectory>src/main/frontend</workingDirectory>
                         <installDirectory>target</installDirectory>
                         <nodeDownloadRoot>https://npmmirror.com/mirrors/node/</nodeDownloadRoot>
-                        <yarnDownloadRoot>https://dl.zrlog.com/yarnpkg/yarn/releases/download/</yarnDownloadRoot>
+                        <yarnDownloadRoot>https://repo.huaweicloud.com/yarn/</yarnDownloadRoot>
                         <npmRegistryURL>https://registry.npmmirror.com</npmRegistryURL>
                     </configuration>
                 </plugin>

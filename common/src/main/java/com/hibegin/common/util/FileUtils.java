@@ -96,7 +96,7 @@ public class FileUtils {
                 in.close();
                 out.close();
             } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "copy file " + destFile + " to " + targetFile + " error", e);
+                LOGGER.log(Level.SEVERE, "Copy file " + destFile + " to " + targetFile + " error", e);
             }
         }
 

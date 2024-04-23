@@ -8,7 +8,6 @@ import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpRequestListener;
 import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.api.Interceptor;
-import com.hibegin.http.server.config.AbstractServerConfig;
 import com.hibegin.http.server.config.RequestConfig;
 import com.hibegin.http.server.config.ResponseConfig;
 import com.hibegin.http.server.config.ServerConfig;
@@ -21,22 +20,19 @@ import com.zrlog.blog.web.controller.api.ApiInstallController;
 import com.zrlog.blog.web.plugin.CacheManagerPlugin;
 import com.zrlog.blog.web.plugin.RequestStatisticsPlugin;
 import com.zrlog.blog.web.version.UpgradeVersionHandler;
+import com.zrlog.business.plugin.StaticHtmlPlugin;
 import com.zrlog.business.util.InstallUtils;
 import com.zrlog.common.Constants;
-import com.zrlog.common.InstallAction;
+import com.zrlog.common.ZrLogConfig;
 import com.zrlog.model.WebSite;
 import com.zrlog.plugin.IPlugin;
 import com.zrlog.plugin.Plugins;
-import com.zrlog.util.BlogBuildInfoUtil;
-import com.zrlog.util.DbConnectUtils;
-import com.zrlog.util.I18nUtil;
-import com.zrlog.util.ZrLogUtil;
+import com.zrlog.util.*;
 import com.zrlog.web.inteceptor.GlobalBaseInterceptor;
 import com.zrlog.web.inteceptor.MyI18nInterceptor;
 import com.zrlog.web.inteceptor.RouterInterceptor;
 import com.zrlog.web.inteceptor.StaticResourceInterceptor;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.Connection;
@@ -53,14 +49,20 @@ import java.util.logging.Logger;
 /**
  * 核心一些参数的配置。
  */
-public class ZrLogConfig extends AbstractServerConfig implements InstallAction {
+public class ZrLogConfigImpl extends ZrLogConfig {
 
-    private static final Logger LOGGER = LoggerUtil.getLogger(ZrLogConfig.class);
+    private static final Logger LOGGER = LoggerUtil.getLogger(ZrLogConfigImpl.class);
 
     private final Integer port;
+    private ServerConfig serverConfig;
+    private final Plugins plugins;
+    private final JarUpdater jarUpdater;
 
-    public ZrLogConfig(Integer port) {
+
+    public ZrLogConfigImpl(Integer port, JarUpdater jarUpdater) {
         this.port = port;
+        this.plugins = new Plugins();
+        this.jarUpdater = jarUpdater;
     }
 
     /**
@@ -69,7 +71,10 @@ public class ZrLogConfig extends AbstractServerConfig implements InstallAction {
      */
     @Override
     public ServerConfig getServerConfig() {
-        ServerConfig serverConfig = new ServerConfig();
+        if (Objects.nonNull(serverConfig)) {
+            return serverConfig;
+        }
+        serverConfig = new ServerConfig();
         serverConfig.setDisableSession(true);
         serverConfig.addErrorHandle(400, new ZrLogErrorHandle(400));
         serverConfig.addErrorHandle(403, new ZrLogErrorHandle(403));
@@ -88,7 +93,7 @@ public class ZrLogConfig extends AbstractServerConfig implements InstallAction {
 
             }
         });
-        StaticResourceInterceptor.staticResourcePath.forEach(e -> serverConfig.addStaticResourceMapper(e, e, ZrLogConfig.class::getResourceAsStream));
+        StaticResourceInterceptor.staticResourcePath.forEach(e -> serverConfig.addStaticResourceMapper(e, e, ZrLogConfigImpl.class::getResourceAsStream));
         RouterUtils.configAdminRoute(serverConfig.getRouter());
         RouterUtils.configBlogRouter(serverConfig.getRouter());
         configInterceptor(serverConfig.getInterceptors());
@@ -172,6 +177,7 @@ public class ZrLogConfig extends AbstractServerConfig implements InstallAction {
                 plugins.add(new PluginCorePlugin(Constants.getDbPropertiesFile(), pluginJvmArgsObj.toString()));
                 plugins.add(new UpdateVersionPlugin());
                 plugins.add(new CacheManagerPlugin());
+                plugins.add(new StaticHtmlPlugin(this));
             }
             plugins.add(new RequestStatisticsPlugin());
         } catch (Exception e) {
@@ -207,7 +213,10 @@ public class ZrLogConfig extends AbstractServerConfig implements InstallAction {
      * 来达到系统无需手动执行数据库脚本文件。
      */
     private void tryDoUpgrade(Properties dbProp) {
-        String currentVersion = ZrLogUtil.getCurrentSqlVersion(dbProp);
+        Long currentVersion = ZrLogUtil.getCurrentSqlVersion(dbProp);
+        if (Objects.isNull(currentVersion) || currentVersion < 0) {
+            return;
+        }
         List<Map.Entry<Integer, List<String>>> sqlList = ZrLogUtil.getExecSqlList(currentVersion);
         if (sqlList.isEmpty()) {
             return;
@@ -260,16 +269,25 @@ public class ZrLogConfig extends AbstractServerConfig implements InstallAction {
      */
     public void onStop() {
         PluginCoreProcess.getInstance().stopPluginCore();
-        for (IPlugin plugin : Constants.plugins) {
+        for (IPlugin plugin : plugins) {
             plugin.stop();
         }
     }
 
+    @Override
+    public Plugins getPlugins() {
+        return plugins;
+    }
+
+    @Override
+    public JarUpdater getJarUpdater() {
+        return jarUpdater;
+    }
 
     @Override
     public void installFinish() {
-        configPlugin(Constants.plugins);
-        for (IPlugin plugin : Constants.plugins) {
+        configPlugin(plugins);
+        for (IPlugin plugin : plugins) {
             plugin.start();
         }
         if (!InstallUtils.isInstalled()) {

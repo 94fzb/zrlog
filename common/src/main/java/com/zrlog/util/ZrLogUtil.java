@@ -1,6 +1,5 @@
 package com.zrlog.util;
 
-import com.google.gson.Gson;
 import com.hibegin.common.util.*;
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.LoggerUtil;
@@ -8,7 +7,6 @@ import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.util.PathUtil;
 import com.hibegin.http.server.web.Controller;
-import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.common.Constants;
 import eu.bitwalker.useragentutils.BrowserType;
 import eu.bitwalker.useragentutils.UserAgent;
@@ -18,9 +16,12 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
+import java.net.URLEncoder;
 import java.net.UnknownHostException;
-import java.sql.*;
-import java.util.Date;
+import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,6 +32,8 @@ import java.util.logging.Logger;
 public class ZrLogUtil {
 
     private static final Logger LOGGER = LoggerUtil.getLogger(ZrLogUtil.class);
+
+    public static String STATIC_USER_AGENT = "Static-Blog-Plugin/" + UUID.randomUUID().toString().replace("-", "");
 
     private ZrLogUtil() {
     }
@@ -49,8 +52,15 @@ public class ZrLogUtil {
         return BeanUtil.convert(tempMap, clazz);
     }
 
-    public static boolean isStaticBlogPlugin(HttpRequest HttpRequest) {
-        return HttpRequest.getHeader("User-Agent") != null && HttpRequest.getHeader("User-Agent").startsWith("Static-Blog-Plugin");
+    public static boolean isStaticBlogPlugin(HttpRequest request) {
+        if (Objects.isNull(request)) {
+            return false;
+        }
+        String ua = request.getHeader("User-Agent");
+        if (Objects.isNull(ua)) {
+            return false;
+        }
+        return Objects.equals(ua, STATIC_USER_AGENT);
     }
 
     public static String getHomeUrlWithHost(HttpRequest request) {
@@ -62,15 +72,26 @@ public class ZrLogUtil {
     }
 
     public static String getBlogHost(HttpRequest request) {
-        String websiteHost = (String) Constants.WEB_SITE.get("host");
+        String websiteHost = getBlogHostByWebSite();
         if (Objects.nonNull(websiteHost) && !websiteHost.trim().isEmpty()) {
             return websiteHost;
+        }
+        if (Objects.isNull(request)) {
+            return "";
         }
         return request.getHeader("Host");
     }
 
+    public static String getBlogHostByWebSite() {
+        String websiteHost = (String) Constants.WEB_SITE.get("host");
+        if (Objects.nonNull(websiteHost) && !websiteHost.trim().isEmpty()) {
+            return websiteHost;
+        }
+        return "";
+    }
+
     public static String getFullUrl(HttpRequest request) {
-        return "//" + getBlogHost(request) + request.getUri();
+        return "//" + getBlogHost(request) + "/" + URLEncoder.encode(request.getUri().substring(1), StandardCharsets.UTF_8);
     }
 
     public static String getDatabaseServerVersion(Properties dbConfig) {
@@ -91,7 +112,7 @@ public class ZrLogUtil {
         return "Unknown";
     }
 
-    public static String getCurrentSqlVersion(Properties dbConfig) {
+    public static Long getCurrentSqlVersion(Properties dbConfig) {
         try (Connection connection = DbConnectUtils.getConnection(dbConfig)) {
             if (connection != null) {
                 String queryVersionSQL = "select value from website where name = ?";
@@ -99,7 +120,7 @@ public class ZrLogUtil {
                     ps.setString(1, Constants.ZRLOG_SQL_VERSION_KEY);
                     try (ResultSet resultSet = ps.executeQuery()) {
                         if (resultSet.next()) {
-                            return resultSet.getString(1);
+                            return Long.parseLong(resultSet.getString(1));
                         }
                     }
                 }
@@ -107,7 +128,7 @@ public class ZrLogUtil {
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "DB connect error ", e);
         }
-        return "-1";
+        return -1L;
     }
 
 
@@ -123,18 +144,13 @@ public class ZrLogUtil {
         return fileList;
     }
 
-    public static List<Map.Entry<Integer, List<String>>> getExecSqlList(String sqlVersion) {
+    public static List<Map.Entry<Integer, List<String>>> getExecSqlList(Long dbVersion) {
         List<Map.Entry<Integer, List<String>>> sqlList = new ArrayList<>();
-        int version = 0;
-        try {
-            version = Integer.parseInt(sqlVersion);
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "", e);
-        }
+
         for (Map.Entry<Integer, String> f : getSqlFileList().entrySet()) {
             int fileVersion = f.getKey();
-            if (fileVersion > version) {
-                LOGGER.info("need update sql " + f);
+            if (fileVersion > dbVersion) {
+                LOGGER.info("Need update sql " + f);
                 Map.Entry<Integer, List<String>> entry = new AbstractMap.SimpleEntry<>(fileVersion, Arrays.asList(f.getValue().split("\n")));
                 sqlList.add(entry);
             }

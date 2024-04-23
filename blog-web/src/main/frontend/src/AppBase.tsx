@@ -15,7 +15,7 @@ let _resLoadedBySsr = false;
 
 const setRes = (data: Record<string, unknown>) => {
     data.copyrightTips =
-        data.copyright + ' <a target="_blank" href="https://blog.zrlog.com/about?footer">ZrLog</a>';
+        data.copyright + ' <a target="_blank" href="https://blog.zrlog.com/about.html?footer">ZrLog</a>';
     //@ts-ignore
     window[resourceKey] = JSON.stringify(data);
 }

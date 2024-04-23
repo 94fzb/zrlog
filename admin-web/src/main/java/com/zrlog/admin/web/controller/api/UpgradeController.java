@@ -4,8 +4,8 @@ import com.hibegin.http.annotation.ResponseBody;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.web.Controller;
-import com.zrlog.admin.business.rest.response.CheckVersionResponse;
 import com.zrlog.admin.business.rest.response.DownloadUpdatePackageResponse;
+import com.zrlog.admin.business.rest.response.PreCheckVersionResponse;
 import com.zrlog.admin.business.rest.response.UpgradeProcessResponse;
 import com.zrlog.admin.business.service.UpgradeService;
 import com.zrlog.admin.web.plugin.UpdateVersionPlugin;
@@ -33,18 +33,20 @@ public class UpgradeController extends Controller {
 
     @ResponseBody
     public ApiStandardResponse<DownloadUpdatePackageResponse> download() throws IOException, URISyntaxException, InterruptedException, ParseException {
-        return new ApiStandardResponse<>(upgradeService.download());
-    }
-
-    @ResponseBody
-    public ApiStandardResponse<CheckVersionResponse> index() throws ParseException {
-        return new ApiStandardResponse<>(upgradeService.preUpgradeVersion(true, (UpdateVersionPlugin) Objects.requireNonNull(Constants.plugins
+        return new ApiStandardResponse<>(upgradeService.download(request.getParaToStr("preUpgradeKey"), (UpdateVersionPlugin) Objects.requireNonNull(Constants.zrLogConfig.getPlugins()
                 .stream().filter(x -> x instanceof UpdateVersionPlugin).findFirst().orElse(null))));
     }
 
     @ResponseBody
+    public ApiStandardResponse<PreCheckVersionResponse> index() throws ParseException {
+        return new ApiStandardResponse<>(upgradeService.preUpgradeVersion(true, (UpdateVersionPlugin) Objects.requireNonNull(Constants.zrLogConfig.getPlugins()
+                .stream().filter(x -> x instanceof UpdateVersionPlugin).findFirst().orElse(null)),System.currentTimeMillis() + ""));
+    }
+
+
+    @ResponseBody
     public ApiStandardResponse<UpgradeProcessResponse> doUpgrade() {
-        return new ApiStandardResponse<>(upgradeService.doUpgrade());
+        return new ApiStandardResponse<>(upgradeService.doUpgrade(request.getParaToStr("preUpgradeKey")));
     }
 
 }

@@ -33,8 +33,8 @@ const Comment = ({ data }: { data: PageDataSource }) => {
             },
             {
                 title: "IP",
-                key: "ip",
-                dataIndex: "ip",
+                key: "userIp",
+                dataIndex: "userIp",
             },
             {
                 title: "邮箱",

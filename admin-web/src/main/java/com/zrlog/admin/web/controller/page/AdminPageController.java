@@ -57,7 +57,7 @@ public class AdminPageController extends Controller {
     }*/
 
     private ServerSideDataResponse serverSide(String uri){
-        Map<String,Object> resourceInfo = new CommonService().blogResourceInfo();
+        Map<String,Object> resourceInfo = new CommonService().blogResourceInfo(request);
         if(Objects.nonNull(AdminTokenThreadLocal.getUser())){
             UserBasicInfoResponse basicInfoResponse =  new AdminUserController(request,response).index().getData();
             try{

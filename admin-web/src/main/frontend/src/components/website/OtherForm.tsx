@@ -3,7 +3,7 @@ import Divider from "antd/es/divider";
 import Form from "antd/es/form";
 import TextArea from "antd/es/input/TextArea";
 import Button from "antd/es/button";
-import { getRes, removeRes } from "../../utils/constants";
+import { getRes } from "../../utils/constants";
 import { useState } from "react";
 import axios from "axios";
 import { App } from "antd";
@@ -26,8 +26,7 @@ const OtherForm = ({ data }: { data: Other }) => {
                 return;
             }
             message.success(data.message).then(() => {
-                removeRes();
-                window.location.reload();
+                //ignore
             });
         });
     };

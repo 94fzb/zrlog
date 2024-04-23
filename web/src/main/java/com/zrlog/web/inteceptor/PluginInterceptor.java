@@ -24,7 +24,7 @@ import java.util.logging.Logger;
  * 目前插件服务拦截了
  * 1./admin/plugins/* （进行权限检查）
  * 2./plugin/* /p/* （是plugin的短路由，代码逻辑上是不区分的，不检查权限）
- * 如果想了解更多关于插件的实现可以浏览这篇文章 <a href="https://blog.zrlog.com/zrlog-plugin-dev">插件实现</a>
+ * 如果想了解更多关于插件的实现可以浏览这篇文章 <a href="https://blog.zrlog.com/zrlog-plugin-dev.html">插件实现</a>
  */
 public class PluginInterceptor implements Interceptor {
 

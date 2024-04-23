@@ -4,20 +4,14 @@ import com.zrlog.business.service.InstallService;
 
 import java.util.Map;
 
-public class DockerUpdateVersionThread extends Thread implements UpdateVersionHandler {
+public class DockerUpdateVersionHandle implements UpdateVersionHandler {
 
     private String message;
     private boolean finish;
     private final Map<String, Object> blogRes;
 
-    public DockerUpdateVersionThread(Map<String, Object> blogRes) {
+    public DockerUpdateVersionHandle(Map<String, Object> blogRes) {
         this.blogRes = blogRes;
-    }
-
-    @Override
-    public void run() {
-        message = InstallService.renderMd((String) blogRes.get("dockerUpgradeTips"));
-        finish = true;
     }
 
     @Override
@@ -28,5 +22,11 @@ public class DockerUpdateVersionThread extends Thread implements UpdateVersionHa
     @Override
     public boolean isFinish() {
         return finish;
+    }
+
+    @Override
+    public void doHandle() {
+        message = InstallService.renderMd((String) blogRes.get("dockerUpgradeTips"));
+        finish = true;
     }
 }

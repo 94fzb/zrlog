@@ -228,7 +228,7 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
                 }
             }
             if (preview) {
-                window.open(document.baseURI + state.article!.alias, "_blank");
+                window.open(data.data["previewUrl"], "_blank");
             }
             const respData = data.data;
             if (create) {

@@ -10,25 +10,41 @@ const StatisticsInfo = ({ data }: { data: StatisticsInfoState }) => {
         <Card size={"small"} title={getRes()["admin.index.outline"]}>
             <Row gutter={[8, 8]}>
                 <Col xs={24} md={12}>
-                    <Card>
-                        <Statistic title="今天评论" value={data.toDayCommCount} prefix={<CommentOutlined />} />
+                    <Card styles={{ body: { padding: 16 } }}>
+                        <Statistic
+                            title={getRes()["todayComment"]}
+                            value={data.toDayCommCount}
+                            prefix={<CommentOutlined />}
+                        />
                     </Card>
                 </Col>
                 <Col xs={24} md={12}>
-                    <Card>
-                        <Statistic title="评论总数" value={data.commCount} prefix={<CommentOutlined />} />
+                    <Card styles={{ body: { padding: 16 } }}>
+                        <Statistic
+                            title={getRes()["totalComment"]}
+                            value={data.commCount}
+                            prefix={<CommentOutlined />}
+                        />
                     </Card>
                 </Col>
             </Row>
             <Row gutter={[8, 8]} style={{ paddingTop: 8 }}>
                 <Col xs={24} md={12}>
-                    <Card>
-                        <Statistic title="文章总数" value={data.articleCount} prefix={<ContainerOutlined />} />
+                    <Card styles={{ body: { padding: 16 } }}>
+                        <Statistic
+                            title={getRes()["totalArticle"]}
+                            value={data.articleCount}
+                            prefix={<ContainerOutlined />}
+                        />
                     </Card>
                 </Col>
                 <Col xs={24} md={12}>
-                    <Card>
-                        <Statistic title="文章浏览总数" value={data.clickCount} prefix={<ContainerOutlined />} />
+                    <Card styles={{ body: { padding: 16 } }}>
+                        <Statistic
+                            title={getRes()["totalArticleView"]}
+                            value={data.clickCount}
+                            prefix={<ContainerOutlined />}
+                        />
                     </Card>
                 </Col>
             </Row>

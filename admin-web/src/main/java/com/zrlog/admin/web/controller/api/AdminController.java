@@ -15,11 +15,14 @@ import com.zrlog.admin.web.annotation.RefreshCache;
 import com.zrlog.admin.web.token.AdminTokenService;
 import com.zrlog.business.util.InstallUtils;
 import com.zrlog.common.rest.response.ApiStandardResponse;
+import com.zrlog.common.vo.ServerInfo;
 import com.zrlog.model.Comment;
 import com.zrlog.model.Log;
 import com.zrlog.model.User;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.I18nUtil;
+import com.zrlog.util.ServerInfoUtils;
+import com.zrlog.util.ZrLogUtil;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -55,11 +58,11 @@ public class AdminController extends Controller {
         return new UpdateRecordResponse();
     }
 
-    private ApiStandardResponse<Map<String, Object>> serverInfo() {
+    private ApiStandardResponse<List<ServerInfo>> serverInfo() {
         Map<String, Object> info = new HashMap<>();
         InstallUtils.getSystemProp().forEach((key, value) -> info.put(key.toString(), value));
         BlogBuildInfoUtil.getBlogProp().forEach((key, value) -> info.put("zrlog." + key.toString(), value));
-        return new ApiStandardResponse<>(info);
+        return new ApiStandardResponse<>(ServerInfoUtils.convertToServerInfos(info));
     }
 
     private ApiStandardResponse<StatisticsInfoResponse> statisticsInfo() throws SQLException {
@@ -72,6 +75,11 @@ public class AdminController extends Controller {
     }
 
     @ResponseBody
+    public ApiStandardResponse<Map<String, Object>> error() {
+        return new ApiStandardResponse<>(Map.of("message", Objects.requireNonNullElse(request.getParaToStr("message"),"")));
+    }
+
+    @ResponseBody
     public ApiStandardResponse<Map<String, Object>> plugin() {
         return new ApiStandardResponse<>(new HashMap<>());
     }
@@ -81,6 +89,7 @@ public class AdminController extends Controller {
         List<String> tips = new ArrayList<>(Arrays.asList(I18nUtil.getBackendStringFromRes("admin.index.welcomeTips_1"),
                 I18nUtil.getBackendStringFromRes("admin.index.welcomeTips_2"), I18nUtil.getBackendStringFromRes("admin.index.welcomeTips_3")));
         Collections.shuffle(tips);
-        return new ApiStandardResponse<>(new IndexResponse(statisticsInfo().getData(), serverInfo().getData(), new ArrayList<>(Collections.singletonList(tips.getFirst()))));
+        return new ApiStandardResponse<>(new IndexResponse(statisticsInfo().getData(), serverInfo().getData(),
+                new ArrayList<>(Collections.singletonList(tips.getFirst())), ZrLogUtil.isDockerMode()));
     }
 }

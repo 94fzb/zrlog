@@ -6,6 +6,7 @@ import MyLoadingComponent from "./components/my-loading-component";
 import { ssData } from "./index";
 import { getCachedData, putCache } from "./cache";
 import { deepEqual } from "./utils/helpers";
+import { UpgradeData } from "./components/upgrade";
 
 const AsyncArticleEdit = lazy(() => import("components/articleEdit"));
 
@@ -36,6 +37,7 @@ const AsyncUserUpdatePassword = lazy(() => import("components/user-update-passwo
 const AsyncArticle = lazy(() => import("components/article"));
 
 const AsyncUser = lazy(() => import("components/user"));
+const AsyncError = lazy(() => import("components/unknown-error-page"));
 
 const AdminManageLayout = lazy(() => import("layout/index"));
 
@@ -246,7 +248,10 @@ const AdminDashboardRouter = () => {
                     <AdminManageLayout>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncUpgrade data={getDataFromState()} />
+                                <AsyncUpgrade
+                                    key={(getDataFromState() as UpgradeData).preUpgradeKey}
+                                    data={getDataFromState()}
+                                />
                             </Suspense>
                         )}
                     </AdminManageLayout>
@@ -259,6 +264,30 @@ const AdminDashboardRouter = () => {
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
                                 <AsyncTemplateConfig data={getDataFromState()} />
+                            </Suspense>
+                        )}
+                    </AdminManageLayout>
+                }
+            />
+            <Route
+                path="403"
+                element={
+                    <AdminManageLayout>
+                        {getDataFromState() && (
+                            <Suspense fallback={<MyLoadingComponent />}>
+                                <AsyncError data={getDataFromState()} code={403} />
+                            </Suspense>
+                        )}
+                    </AdminManageLayout>
+                }
+            />
+            <Route
+                path="500"
+                element={
+                    <AdminManageLayout>
+                        {getDataFromState() && (
+                            <Suspense fallback={<MyLoadingComponent />}>
+                                <AsyncError data={getDataFromState()} code={500} />
                             </Suspense>
                         )}
                     </AdminManageLayout>

@@ -30,8 +30,14 @@ export type UserInfoState = {
     type: string;
 };
 
+export type ServerInfoEntry = {
+    name:string;
+    value:string;
+}
+
 export type IndexData = {
-    serverInfo: Record<string, any>[],
+    serverInfos: ServerInfoEntry[],
     statisticsInfo: StatisticsInfoState,
+    dockerMode: boolean;
     tips: string[];
 }

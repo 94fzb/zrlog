@@ -1,6 +1,7 @@
 package com.zrlog.admin.web.controller.api;
 
 import com.hibegin.common.util.BeanUtil;
+import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.annotation.ResponseBody;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
@@ -19,13 +20,13 @@ import com.zrlog.common.rest.response.ApiStandardResponse;
 import com.zrlog.common.type.AutoUpgradeVersionType;
 import com.zrlog.model.WebSite;
 import com.zrlog.plugin.IPlugin;
-import com.zrlog.plugin.Plugins;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.I18nUtil;
 
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 public class WebSiteController extends Controller {
 
@@ -43,8 +44,12 @@ public class WebSiteController extends Controller {
         VersionResponse versionResponse = new VersionResponse();
         versionResponse.setBuildId(BlogBuildInfoUtil.getBuildId());
         versionResponse.setVersion(BlogBuildInfoUtil.getVersion());
-        versionResponse.setChangelog(UpdateVersionPlugin.getChangeLog(BlogBuildInfoUtil.getVersion(),BlogBuildInfoUtil.getTime(),
+        versionResponse.setChangelog(UpdateVersionPlugin.getChangeLog(BlogBuildInfoUtil.getVersion(), BlogBuildInfoUtil.getTime(),
                 BlogBuildInfoUtil.getBuildId(), I18nUtil.getBackend()));
+        String requestBuildId = request.getParaToStr("buildId");
+        if (StringUtils.isNotEmpty(requestBuildId) && Objects.equals(versionResponse.getBuildId(), requestBuildId)) {
+            versionResponse.setMessage(I18nUtil.getBackendStringFromRes("upgradeSuccess"));
+        }
         return new ApiStandardResponse<>(versionResponse);
     }
 
@@ -89,13 +94,13 @@ public class WebSiteController extends Controller {
     public ApiStandardResponse<Void> upgrade() throws SQLException {
         UpgradeWebSiteInfo request = BeanUtil.convertWithValid(getRequest().getInputStream(), UpgradeWebSiteInfo.class);
         if (AutoUpgradeVersionType.cycle(request.getAutoUpgradeVersion().intValue()) == AutoUpgradeVersionType.NEVER) {
-            for (IPlugin plugin : Constants.plugins) {
+            for (IPlugin plugin : Constants.zrLogConfig.getPlugins()) {
                 if (plugin instanceof UpdateVersionPlugin) {
                     plugin.stop();
                 }
             }
         } else {
-            for (IPlugin plugin : Constants.plugins) {
+            for (IPlugin plugin : Constants.zrLogConfig.getPlugins()) {
                 if (plugin instanceof UpdateVersionPlugin) {
                     plugin.start();
                 }

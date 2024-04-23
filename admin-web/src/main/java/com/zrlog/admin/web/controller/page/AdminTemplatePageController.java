@@ -8,12 +8,15 @@ import com.hibegin.http.server.util.PathUtil;
 import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.exception.ArgsException;
 import com.zrlog.admin.business.exception.TemplateExistsException;
+import com.zrlog.admin.business.service.TemplateService;
 import com.zrlog.common.Constants;
+import com.zrlog.common.vo.TemplateVO;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class AdminTemplatePageController extends Controller {
 
@@ -35,6 +38,22 @@ public class AdminTemplatePageController extends Controller {
         FileUtils.moveOrCopyFile(fileHandle.getT().toString(), target, true);
         ZipUtil.unZip(target, path.toString());
         response.redirect(Constants.ADMIN_URI_BASE_PATH + "/website#template");
+    }
+
+    public void previewImage() {
+        String templateName = request.getParaToStr("templateName");
+        if (!templateName.startsWith("/include/templates")) {
+            response.renderCode(404);
+        }
+        TemplateVO templateVO = new TemplateService().loadTemplateConfig(templateName);
+        if (Objects.isNull(templateVO)) {
+            response.renderCode(404);
+        }
+        if (templateVO.getPreviewImage().startsWith("/include/templates")) {
+            response.writeFile(PathUtil.getStaticFile(templateVO.getPreviewImage()));
+        } else {
+            response.renderCode(403);
+        }
     }
 
 

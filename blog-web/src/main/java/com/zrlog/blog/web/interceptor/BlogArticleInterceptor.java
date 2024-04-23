@@ -8,6 +8,7 @@ import com.hibegin.http.server.util.PathUtil;
 import com.hibegin.http.server.web.MethodInterceptor;
 import com.zrlog.business.cache.CacheService;
 import com.zrlog.business.exception.InstalledException;
+import com.zrlog.business.plugin.StaticHtmlPlugin;
 import com.zrlog.business.service.TemplateHelper;
 import com.zrlog.business.util.InstallUtils;
 import com.zrlog.common.Constants;
@@ -100,19 +101,24 @@ public class BlogArticleInterceptor implements Interceptor {
             TemplateHelper.fullTemplateInfo(request);
             initTemplate();
             String htmlStr = FreeMarkerUtil.renderToFM(invoke.toString(), request);
-
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            try (ResponseRenderPrintWriter responseRenderPrintWriter = new ResponseRenderPrintWriter(byteArrayOutputStream, "/", request, response, null)) {
-                responseRenderPrintWriter.write(htmlStr);
-                String realHtmlStr = responseRenderPrintWriter.getResponseBody();
-                response.renderHtmlStr(realHtmlStr);
-
-                if (catGeneratorHtml(target)) {
-                    cacheService.saveResponseBodyToHtml(request, realHtmlStr);
-                }
-            }
+            render(htmlStr, target, request, response);
         }
         return true;
+    }
+
+
+    private static void render(String htmlStr, String target, HttpRequest request, HttpResponse response) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        try (ResponseRenderPrintWriter responseRenderPrintWriter = new ResponseRenderPrintWriter(byteArrayOutputStream, "/", request, response, null)) {
+            responseRenderPrintWriter.write(htmlStr);
+            String realHtmlStr = responseRenderPrintWriter.getResponseBody();
+            if (!ZrLogUtil.isStaticBlogPlugin(request)) {
+                response.renderHtmlStr(realHtmlStr);
+            }
+            if (BlogArticleInterceptor.catGeneratorHtml(target)) {
+                request.getAttr().put(StaticHtmlPlugin.HTML_FILE_KEY, new CacheService().saveResponseBodyToHtml(request, realHtmlStr));
+            }
+        }
     }
 
 }

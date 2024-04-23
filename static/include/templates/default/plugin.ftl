@@ -7,8 +7,8 @@
     </#if>
 
     <form class="widget search search_input" style="margin-bottom: .5rem" action="${searchUrl}" method="post">
-        <input type="text" size="15" name="key" placeholder="${_res.searchTip}" value='${key!""}' class="inputtext">
-        <input type="submit" class="btn" value="${_res.search}">
+        <input type="text" size="15" name="key" placeholder="${_res.searchTip}" value='${key!""}' class="inputtext"/>
+        <input type="submit" class="btn" value="${_res.search}"/>
     </form>
 
     <#if init.plugins?has_content>
@@ -54,10 +54,9 @@
                     <#case "tags">
                         <div class="widget">
                             <h3>${_res.tag}</h3>
-                            <div class="taglist" id="tags">
+                            <div class="taglist">
                                 <#list init.tags as tag>
-                                    <a href="${tag.url}" class="size${tag.count % 6}"
-                                       title="${tag.text}上共有(${tag.count})文章">${tag.text}</a>
+                                    <a href="${tag.url}" class="size${tag.keycode % 6}">${tag.text}</a>
                                 </#list>
                             </div>
                         </div>

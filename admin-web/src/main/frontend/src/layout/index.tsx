@@ -238,7 +238,7 @@ const AdminManageLayout: FunctionComponent<PropsWithChildren> = ({ children }) =
                 }}
             >
                 <a
-                    href={document.baseURI}
+                    href={getRes()["homeUrl"] + "?spm=admin&buildId=" + getRes()["buildId"]}
                     id="logo"
                     target="_blank"
                     title={getRes()["websiteTitle"]}

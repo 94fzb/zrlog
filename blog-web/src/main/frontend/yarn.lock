@@ -7504,6 +7504,11 @@ no-case@^3.0.4:
     lower-case "^2.0.2"
     tslib "^2.0.3"
 
+node-bin-darwin-arm64@18.9.0:
+  version "18.9.0"
+  resolved "https://registry.npmmirror.com/node-bin-darwin-arm64/-/node-bin-darwin-arm64-18.9.0.tgz#f277b4e68a6d50acd0e6c8249bc18abb63ccf346"
+  integrity sha512-P132uEt2YabG0/L/xzM4A1UslarOLUxurdiQDaYwlS8lwXfnfwKNVJJA5IOUMrkaSl2OVnDzO+ct3BIIwFfeDg==
+
 node-bin-setup@^1.0.0:
   version "1.1.0"
   resolved "https://registry.npmmirror.com/node-bin-setup/-/node-bin-setup-1.1.0.tgz#9df94c41335a8f41958a639b2736f860582a209c"
@@ -7529,10 +7534,10 @@ node-releases@^2.0.5:
   resolved "https://registry.npmmirror.com/node-releases/-/node-releases-2.0.5.tgz#280ed5bc3eba0d96ce44897d8aee478bfb3d9666"
   integrity sha512-U9h1NLROZTq9uE1SNffn6WuPDg8icmi3ns4rEl/oTfIle4iLjTliCzgTsbaIFMq/Xn078/lfY/BL0GWZ+psK4Q==
 
-node@16.15.1:
-  version "16.15.1"
-  resolved "https://registry.npmmirror.com/node/-/node-16.15.1.tgz#30145953359cb0a59b55fc001c46edb313575f56"
-  integrity sha512-cgcFiK2JxuXZ6v3hqqbI1qLG/NRY2IE9YB+jqgtiuUOQIFu+/vKm9YPY6gpjCOtwaMOBh1uTiJ0ehDM6Gu3Zzw==
+node@18.9.0:
+  version "18.9.0"
+  resolved "https://registry.npmmirror.com/node/-/node-18.9.0.tgz#e2dfeba8e0a04c6397371d5118f3e4ff918e2cd7"
+  integrity sha512-s+JrNt8qOeV2Uci4aYs7jsFSRXgko7jThozysqeZ2bJGp3PGaBKA+kpCCP+TDrg4TRcTLyw3bcHCJx9drxTQtQ==
   dependencies:
     node-bin-setup "^1.0.0"
 

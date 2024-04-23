@@ -9,22 +9,19 @@ import com.hibegin.common.util.ZipUtil;
 import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
 import com.zrlog.admin.business.rest.response.UploadTemplateResponse;
-import com.zrlog.business.service.TemplateHelper;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.TemplateVO;
 import com.zrlog.model.WebSite;
 import com.zrlog.util.I18nUtil;
+import com.zrlog.util.ZrLogUtil;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TemplateService {
+
+    public static final String ADMIN_PREVIEW_IMAGE_URI = Constants.ADMIN_URI_BASE_PATH + "/template/preview-image";
 
     public UpdateRecordResponse save(String template, Map<String, Object> settingMap) throws SQLException {
         new WebSite().updateByKV(template + Constants.TEMPLATE_CONFIG_SUFFIX,
@@ -54,7 +51,7 @@ public class TemplateService {
         if (templatesFile != null) {
             for (File file : templatesFile) {
                 if (file.isDirectory() && !file.isHidden()) {
-                    TemplateVO templateVO = TemplateHelper.getTemplateVO(file);
+                    TemplateVO templateVO = getTemplateVO(file);
                     templates.add(templateVO);
                 }
             }
@@ -87,8 +84,67 @@ public class TemplateService {
         return sortTemplates;
     }
 
+    private static TemplateVO getTemplateVO(File file) {
+        String templatePath = file.toString().substring(PathUtil.getStaticPath().length() - 1).replace("\\", "/");
+        TemplateVO templateVO = new TemplateVO();
+        templateVO.setTemplate(templatePath);
+        File templateInfo = new File(file + "/template.properties");
+        if (templateInfo.exists()) {
+            Properties properties = new Properties();
+            try (InputStream in = new FileInputStream(templateInfo)) {
+                properties.load(in);
+                templateVO.setAuthor(properties.getProperty("author"));
+                templateVO.setName(properties.getProperty("name"));
+                templateVO.setDigest(properties.getProperty("digest"));
+                templateVO.setVersion(properties.getProperty("version"));
+                templateVO.setUrl(properties.getProperty("url"));
+                templateVO.setViewType(properties.getProperty("viewType"));
+                if (properties.get("previewImages") != null) {
+                    String[] images = properties.get("previewImages").toString().split(",");
+                    String adminPreviewImageUrl = "";
+                    for (int i = 0; i < images.length; i++) {
+                        String image = images[i];
+                        if (!image.startsWith("https://") && !image.startsWith("http://")) {
+                            images[i] = templatePath + "/" + image;
+                            if (i == 0) {
+                                adminPreviewImageUrl = ADMIN_PREVIEW_IMAGE_URI + "?templateName=" + templateVO.getTemplate();
+                            }
+                        } else {
+                            if (i == 0) {
+                                adminPreviewImageUrl = images[i];
+                            }
+                        }
+                    }
+                    if (images.length > 0) {
+                        templateVO.setPreviewImage(images[0]);
+                    }
+                    templateVO.setAdminPreviewImage(adminPreviewImageUrl);
+                    templateVO.setPreviewImages(Arrays.asList(images));
+                }
+            } catch (IOException e) {
+                //LOGGER.log(Level.SEVERE,"", e);
+            }
+        } else {
+            templateVO.setAuthor("");
+            templateVO.setName(templatePath.substring(Constants.TEMPLATE_BASE_PATH.length()));
+            templateVO.setUrl("");
+            templateVO.setViewType("jsp");
+            templateVO.setVersion("");
+        }
+        if (templateVO.getPreviewImages() == null || templateVO.getPreviewImages().isEmpty()) {
+            templateVO.setPreviewImages(Collections.singletonList("assets/images/template-default-preview.jpg"));
+        }
+        if (StringUtils.isEmpty(templateVO.getDigest())) {
+            templateVO.setDigest(I18nUtil.getBlogStringFromRes("noIntroduction"));
+        }
+        File settingFile =
+                new File(PathUtil.getStaticPath() + templatePath + "/setting/index" + ZrLogUtil.getViewExt(templateVO.getViewType()));
+        templateVO.setConfigAble(settingFile.exists());
+        return templateVO;
+    }
+
     public TemplateVO loadTemplateConfig(String templateName) {
-        TemplateVO templateVO = TemplateHelper.getTemplateVO(
+        TemplateVO templateVO = getTemplateVO(
                 new File(PathUtil.getStaticPath() + templateName));
         File configFile = new File(PathUtil.getStaticPath() + templateName + "/setting/config-form.json");
         TemplateVO.TemplateConfigMap config;

@@ -71,7 +71,7 @@ public class ApiInstallController extends Controller {
             throw new InstallException(TestConnectDbResult.UNKNOWN);
         }
         //通知启动插件，配置库连接等操作
-        Constants.installAction.installFinish();
+        Constants.zrLogConfig.installFinish();
         return new StandardResponse();
     }
 }

@@ -3,6 +3,7 @@ package com.zrlog.business.service;
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.SecurityUtils;
+import com.hibegin.template.BasicTemplateRender;
 import com.zrlog.business.type.TestConnectDbResult;
 import com.zrlog.common.Constants;
 import com.zrlog.util.DbConnectUtils;
@@ -15,6 +16,7 @@ import org.commonmark.renderer.html.HtmlRenderer;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.*;
 import java.util.*;
 import java.util.logging.Level;
@@ -180,25 +182,29 @@ public class InstallService {
         return false;
     }
 
-    private void insertFirstArticle(Connection connect) throws SQLException {
-        String insetLog = "INSERT INTO `log`(`logId`,`canComment`,`keywords`,`alias`,`typeId`,`userId`,`title`,`content`,`plain_content`,`markdown`,`digest`,`releaseTime`,`last_update_date`,`rubbish`,`privacy`) VALUES (1,?,?,?,1,1,?,?,?,?,?,?,?,?,?)";
+    private void insertFirstArticle(Connection connect) throws Exception {
+        int logId = 1;
+        String insetLog = "INSERT INTO `log`(`logId`,`canComment`,`keywords`,`alias`,`typeId`,`userId`,`title`,`content`,`plain_content`,`markdown`,`digest`,`releaseTime`,`last_update_date`,`rubbish`,`privacy`) VALUES (" + logId + ",?,?,?,1,1,?,?,?,?,?,?,?,?,?)";
         try (PreparedStatement ps = connect.prepareStatement(insetLog)) {
-            ps.setBoolean(1, true);
-            String markdown = IOUtil.getStringInputStream(InstallService.class.getResourceAsStream("/init-blog/" + I18nUtil.getCurrentLocale() + ".md"));
-            markdown = markdown.replace("${basePath}", "/");
-            String content = renderMd(markdown);
-            ps.setString(2, I18nUtil.getInstallStringFromRes("defaultType"));
-            ps.setString(3, "hello-world");
-            ps.setString(4, I18nUtil.getInstallStringFromRes("helloWorld"));
-            ps.setString(5, content);
-            ps.setString(6, VisitorArticleService.getPlainSearchText(content));
-            ps.setString(7, markdown);
-            ps.setString(8, ParseUtil.autoDigest(content, Constants.getAutoDigestLength()));
-            ps.setObject(9, new java.util.Date());
-            ps.setObject(10, new java.util.Date());
-            ps.setBoolean(11, false);
-            ps.setBoolean(12, false);
-            ps.executeUpdate();
+            try (InputStream in = InstallService.class.getResourceAsStream("/init-blog/" + I18nUtil.getCurrentLocale() + ".md")) {
+                Map<String, Object> data = new HashMap<>();
+                data.put("editUrl", "/admin/article-edit?id=" + logId);
+                String markdown = new BasicTemplateRender(data, InstallService.class).render(in);
+                String content = renderMd(markdown);
+                ps.setBoolean(1, true);
+                ps.setString(2, I18nUtil.getInstallStringFromRes("defaultType"));
+                ps.setString(3, "hello-world");
+                ps.setString(4, I18nUtil.getInstallStringFromRes("helloWorld"));
+                ps.setString(5, content);
+                ps.setString(6, VisitorArticleService.getPlainSearchText(content));
+                ps.setString(7, markdown);
+                ps.setString(8, ParseUtil.autoDigest(content, Constants.getAutoDigestLength()));
+                ps.setObject(9, new java.util.Date());
+                ps.setObject(10, new java.util.Date());
+                ps.setBoolean(11, false);
+                ps.setBoolean(12, false);
+                ps.executeUpdate();
+            }
         }
     }
 

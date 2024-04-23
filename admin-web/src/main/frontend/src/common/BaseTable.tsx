@@ -170,7 +170,6 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
                   })
                 : undefined}
             <Table
-                bordered
                 onChange={(pagination) => {
                     fetchData(
                         {

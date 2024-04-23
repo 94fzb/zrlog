@@ -17,6 +17,7 @@ export type TemplateEntry = {
     use: boolean;
     name: string;
     previewImage: string;
+    adminPreviewImage: string;
     preview: boolean;
     digest: string;
 };
@@ -99,7 +100,7 @@ const Template = ({ data }: { data: TemplateEntry[] }) => {
                                             style={{ width: "100%", minHeight: 250 }}
                                             alt={template.name}
                                             title={template.name}
-                                            src={template.previewImage}
+                                            src={template.adminPreviewImage}
                                         />
                                     }
                                     actions={getActions(template)}

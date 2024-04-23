@@ -1,6 +1,10 @@
 package com.zrlog.admin.business.rest.base;
 
+import com.hibegin.common.util.StringUtils;
+import com.zrlog.admin.business.exception.StaticHtmlConfigException;
 import com.zrlog.common.Validator;
+
+import java.util.Objects;
 
 public class BlogWebSiteInfo implements Validator {
 
@@ -88,6 +92,8 @@ public class BlogWebSiteInfo implements Validator {
 
     @Override
     public void doValid() {
-
+        if (Objects.equals(generator_html_status, true) && StringUtils.isEmpty(host)) {
+            throw new StaticHtmlConfigException();
+        }
     }
 }

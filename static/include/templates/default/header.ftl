@@ -13,7 +13,7 @@
     </#if>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
     <link rel="stylesheet" type="text/css" media="screen" href="${url}/css/bootstrap.min.css"/>
-    <link rel="stylesheet" type="text/css" media="screen" href="${url}/css/style_v2.css"/>
+    <link rel="stylesheet" type="text/css" media="screen" href="${url}/css/style_v3.css"/>
     <link rel="stylesheet" type="text/css" media="screen" href="${url}/css/editormd.css"/>
     <script src="${url}/js/jquery-1.10.2.min.js"></script>
     <script src="${url}/js/bootstrap.min.js"></script>

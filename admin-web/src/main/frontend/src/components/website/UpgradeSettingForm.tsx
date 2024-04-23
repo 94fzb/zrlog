@@ -1,7 +1,7 @@
 import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
 import Button from "antd/es/button";
-import { getRes, removeRes } from "../../utils/constants";
+import { getRes } from "../../utils/constants";
 import Form from "antd/es/form";
 import Select from "antd/es/select";
 import Switch from "antd/es/switch";
@@ -36,8 +36,7 @@ const UpgradeSettingForm = ({ data }: { data: Upgrade }) => {
                 return;
             }
             message.success(data.message).then(() => {
-                removeRes();
-                window.location.reload();
+                //ignore
             });
         });
     };
@@ -93,7 +92,7 @@ const UpgradeSettingForm = ({ data }: { data: Upgrade }) => {
                         onFinish={(k) => websiteFormFinish(k)}
                     >
                         <Form.Item name="autoUpgradeVersion" label={getRes()["admin.upgrade.autoCheckCycle"]}>
-                            <Select style={{ maxWidth: "100px" }}>
+                            <Select style={{ maxWidth: "120px" }}>
                                 <Select.Option key="86400" value={86400}>
                                     {getRes()["admin.upgrade.cycle.oneDay"]}
                                 </Select.Option>

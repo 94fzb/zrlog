@@ -4,7 +4,7 @@ import Row from "antd/es/grid/row";
 import { EditOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { getColorPrimary } from "../../utils/constants";
+import { getColorPrimary, getRes } from "../../utils/constants";
 
 const layout = {
     labelCol: { span: 4 },
@@ -46,7 +46,7 @@ const EditNav: FunctionComponent<EditNavProps> = ({ record, editSuccessCall }) =
                     style={{ marginBottom: 8, color: getColorPrimary() }}
                 />
             </Link>
-            <Modal title="编辑" open={showModel} onOk={handleOk} onCancel={() => setShowModel(false)}>
+            <Modal title={getRes()["edit"]} open={showModel} onOk={handleOk} onCancel={() => setShowModel(false)}>
                 <Form initialValues={record} onValuesChange={(_k, v) => setValue(v)} {...layout}>
                     <Form.Item name="id" style={{ display: "none" }}>
                         <Input hidden={true} />
@@ -54,7 +54,7 @@ const EditNav: FunctionComponent<EditNavProps> = ({ record, editSuccessCall }) =
                     <Row>
                         <Col span={24}>
                             <Form.Item
-                                label="链接"
+                                label={getRes()["admin.link.manage"]}
                                 style={{ marginBottom: 8 }}
                                 name="url"
                                 rules={[{ required: true, message: "" }]}

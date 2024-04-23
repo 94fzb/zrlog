@@ -14,7 +14,11 @@ public class CreateOrUpdateArticleResponse {
 
     private Boolean rubbish;
 
+    private Boolean privacy;
+
     private Long lastUpdateDate;
+
+    private String previewUrl;
 
     public Long getLastUpdateDate() {
         return lastUpdateDate;
@@ -70,5 +74,21 @@ public class CreateOrUpdateArticleResponse {
 
     public void setRubbish(Boolean rubbish) {
         this.rubbish = rubbish;
+    }
+
+    public String getPreviewUrl() {
+        return previewUrl;
+    }
+
+    public void setPreviewUrl(String previewUrl) {
+        this.previewUrl = previewUrl;
+    }
+
+    public Boolean getPrivacy() {
+        return privacy;
+    }
+
+    public void setPrivacy(Boolean privacy) {
+        this.privacy = privacy;
     }
 }

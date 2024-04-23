@@ -1,12 +1,12 @@
-import Result from "antd/es/result";
+import Result, { ExceptionStatusType } from "antd/es/result";
 import Button from "antd/es/button";
 
-const UnknownErrorPage = ({ message }: { message: string }) => {
+const UnknownErrorPage = ({ code, data }: { code: ExceptionStatusType; data: Record<string, any> }) => {
     return (
         <Result
-            status="500"
-            title="500"
-            subTitle={message}
+            status={code}
+            title={code}
+            subTitle={data["message"]}
             extra={
                 <Button type="primary" href={window.location.href}>
                     重新加载

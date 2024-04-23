@@ -3,6 +3,7 @@ import { App, Button, Col, Form, Input, InputNumber, Modal } from "antd";
 import Row from "antd/es/grid/row";
 import TextArea from "antd/es/input/TextArea";
 import axios from "axios";
+import { getRes } from "../../utils/constants";
 
 const layout = {
     labelCol: { span: 4 },
@@ -32,14 +33,14 @@ const AddLink = ({ addSuccessCall }: { addSuccessCall: () => void }) => {
     return (
         <>
             <Button type="primary" onClick={() => setShowModel(true)} style={{ marginBottom: 8 }}>
-                添加
+                {getRes()["add"]}
             </Button>
-            <Modal title="添加" open={showModel} onOk={handleOk} onCancel={() => setShowModel(false)}>
+            <Modal title={getRes()["add"]} open={showModel} onOk={handleOk} onCancel={() => setShowModel(false)}>
                 <Form onValuesChange={(_k, v) => setValue(v)} {...layout}>
                     <Row>
                         <Col span={24}>
                             <Form.Item
-                                label="链接"
+                                label={getRes()["admin.link.manage"]}
                                 style={{ marginBottom: 8 }}
                                 name="url"
                                 rules={[{ required: true, message: "" }]}

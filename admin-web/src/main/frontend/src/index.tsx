@@ -56,7 +56,7 @@ const Index = () => {
     const handleRes = (data: Record<string, never>) => {
         // @ts-ignore
         data.copyrightTips =
-            data.copyright + ' <a target="_blank" href="https://blog.zrlog.com/about?footer">ZrLog</a>';
+            data.copyright + ' <a target="_blank" href="https://blog.zrlog.com/about.html?footer">ZrLog</a>';
         setRes(data);
         setAppState({ dark: EnvUtils.isDarkMode(), resLoaded: true, colorPrimary: getColorPrimary() });
     };
@@ -95,6 +95,13 @@ const Index = () => {
             divider={{
                 style: {
                     margin: "16px 0",
+                },
+            }}
+            card={{
+                styles: {
+                    body: {
+                        padding: "8px",
+                    },
                 },
             }}
         >

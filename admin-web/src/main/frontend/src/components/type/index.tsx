@@ -9,10 +9,17 @@ const Type = ({ data }: { data: PageDataSource }) => {
     const getColumns = () => {
         return [
             {
-                title: "分类名称",
+                title: getRes()["admin.type.manage"],
                 dataIndex: "typeName",
                 key: "typeName",
                 width: 240,
+                render: (e: string, r: Record<string, string>) => {
+                    return (
+                        <a rel="noopener noreferrer" target={"_blank"} href={r.url}>
+                            {e}
+                        </a>
+                    );
+                },
             },
             {
                 title: "别名",
@@ -21,10 +28,16 @@ const Type = ({ data }: { data: PageDataSource }) => {
                 width: 120,
             },
             {
-                title: "介绍",
+                title: "简介",
                 key: "remark",
                 dataIndex: "remark",
                 width: 240,
+            },
+            {
+                title: "文章数量",
+                dataIndex: "amount",
+                key: "amount",
+                width: 80,
             },
         ];
     };

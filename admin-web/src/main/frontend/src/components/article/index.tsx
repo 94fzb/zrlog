@@ -36,24 +36,31 @@ const Index = ({ data }: { data: PageDataSource }) => {
                     showTitle: false,
                 },
                 width: 300,
-                render: (text: string, record: any) =>
-                    text ? (
+                render: (text: string, record: any) => {
+                    const t = (
+                        <Tooltip
+                            placement="top"
+                            title={
+                                <div>
+                                    点击查看《<span dangerouslySetInnerHTML={{ __html: text }}></span>》
+                                </div>
+                            }
+                        >
+                            <div
+                                style={{ overflow: "hidden", textOverflow: "ellipsis" }}
+                                dangerouslySetInnerHTML={{ __html: text }}
+                            />
+                        </Tooltip>
+                    );
+                    if (record["url"].includes("previewMode")) {
+                        return <Link to={record["url"]}>{t}</Link>;
+                    }
+                    return (
                         <a rel="noopener noreferrer" target={"_blank"} href={record.url}>
-                            <Tooltip
-                                placement="top"
-                                title={
-                                    <div>
-                                        点击查看《<span dangerouslySetInnerHTML={{ __html: text }}></span>》
-                                    </div>
-                                }
-                            >
-                                <div
-                                    style={{ overflow: "hidden", textOverflow: "ellipsis" }}
-                                    dangerouslySetInnerHTML={{ __html: text }}
-                                />
-                            </Tooltip>
+                            {t}
                         </a>
-                    ) : null,
+                    );
+                },
             },
             {
                 title: "标签",

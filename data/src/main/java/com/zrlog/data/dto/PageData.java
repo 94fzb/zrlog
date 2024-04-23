@@ -4,6 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PageData<T> {
+
+    public PageData() {
+    }
+
+    public PageData(long totalElements, List<T> rows) {
+        this.totalElements = totalElements;
+        this.rows = rows;
+    }
+
     private long totalElements;
     private List<T> rows = new ArrayList<>();
 

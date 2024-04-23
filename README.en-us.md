@@ -19,8 +19,8 @@ program.
 ### Features
 
 1. Provide management of logs, categories, tags, and comments
-2. Support plugin mode [How to write a plugin](https://blog.zrlog.com/zrlog-plugin-dev)
-3. Highly customizable theme features [How to make a set of themes](https://blog.zrlog.com/make-theme-for-zrlog)
+2. Support plugin mode [How to write a plugin](https://blog.zrlog.com/zrlog-plugin-dev.html)
+3. Highly customizable theme features [How to make a set of themes](https://blog.zrlog.com/ake-theme-for-zrlog.html)
 4. Support third party comment plugin
 5. Provide `editormd` mainstream rich text editor, basically meet the editing needs of administrators
 6. Page static, cache public data, faster access
@@ -62,11 +62,11 @@ program.
 * QQ group 6399942
 * Mail xchun90@163.com
 * Have any questions about the program, welcome
-  feedback [http://blog.zrlog.com/feedback](https://blog.zrlog.com/feedback)
+  feedback [http://blog.zrlog.com/feedback.html](https://blog.zrlog.com/feedback.html)
 
 ### FAQ
 
-If you have some problems, you can go here to find [FAQ](https://blog.zrlog.com/faq-collect)
+If you have some problems, you can go here to find [FAQ](https://blog.zrlog.com/faq-collect.html)
 
 ### Thanks
 

@@ -4,21 +4,18 @@ import BaseTable, { PageDataSource } from "../../common/BaseTable";
 import { getRes } from "../../utils/constants";
 import EditLink from "./edit_link";
 import AddLink from "./add_link";
-import { Tooltip } from "antd";
 
 const BLink = ({ data }: { data: PageDataSource }) => {
     const getColumns = () => {
         return [
             {
-                title: "链接",
+                title: getRes()["admin.link.manage"],
                 dataIndex: "url",
                 key: "url",
                 width: 240,
                 render: (url: string) => (
                     <a style={{ display: "inline" }} rel="noopener noreferrer" target={"_blank"} href={url}>
-                        <Tooltip placement="topLeft" title={url}>
-                            <div style={{ display: "inline" }} dangerouslySetInnerHTML={{ __html: url }} />
-                        </Tooltip>
+                        {url}
                     </a>
                 ),
             },

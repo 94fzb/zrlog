@@ -15,7 +15,7 @@ type IndexProps = {
 };
 
 const Index: FunctionComponent<IndexProps> = ({ data }) => {
-    if (data.serverInfo === undefined || data.statisticsInfo === null) {
+    if (data.serverInfos === undefined || data.statisticsInfo === null) {
         return <></>;
     }
     return (
@@ -29,7 +29,7 @@ const Index: FunctionComponent<IndexProps> = ({ data }) => {
             })}
             <Row gutter={[8, 8]} style={{ paddingTop: "12px" }}>
                 <Col xs={24} md={14}>
-                    <ServerInfo data={data.serverInfo} />
+                    <ServerInfo data={data.serverInfos} dockerMode={data.dockerMode} />
                 </Col>
                 <Col xs={24} md={10}>
                     <StatisticsInfo data={data.statisticsInfo} />

@@ -6,19 +6,20 @@ import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.business.cache.vo.BaseDataInitVO;
+import com.zrlog.business.plugin.StaticHtmlPlugin;
 import com.zrlog.common.Constants;
 import com.zrlog.common.rest.request.PageRequest;
 import com.zrlog.model.*;
+import com.zrlog.plugin.IPlugin;
 import com.zrlog.util.I18nUtil;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.sql.Array;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * 对缓存数据的操作
@@ -26,12 +27,13 @@ import java.util.logging.Level;
 public class CacheService {
 
     private static final String CACHE_HTML_PATH = PathUtil.getCachePath();
+    private static final Logger LOGGER = LoggerUtil.getLogger(CacheService.class);
 
     private static final Map<String, String> cacheFileMap = new HashMap<>();
 
-    public boolean isCacheableByRequest(HttpRequest request){
+    public boolean isCacheableByRequest(HttpRequest request) {
         //disable html client cache
-        if(request.getUri().endsWith(".html")){
+        if (request.getUri().endsWith(".html")) {
             return false;
         }
         return cacheFileMap.containsKey(request.getUri().substring(1));
@@ -57,9 +59,9 @@ public class CacheService {
     /**
      * 将一个网页转化对应文件，用于静态化文章页
      */
-    public void saveResponseBodyToHtml(HttpRequest httpRequest, String copy) {
+    public File saveResponseBodyToHtml(HttpRequest httpRequest, String copy) {
         if (copy == null) {
-            return;
+            return null;
         }
         byte[] bytes = copy.getBytes(StandardCharsets.UTF_8);
         FileUtils.tryResizeDiskSpace(CACHE_HTML_PATH, bytes.length,
@@ -69,6 +71,7 @@ public class CacheService {
             htmlFile.getParentFile().mkdirs();
         }
         IOUtil.writeBytesToFile(bytes, htmlFile);
+        return htmlFile;
     }
 
     private Map<String, String> getCacheFileMap() {
@@ -76,13 +79,13 @@ public class CacheService {
         List<File> staticFiles = new ArrayList<>();
         FileUtils.getAllFiles(PathUtil.getStaticPath(), staticFiles);
         Map<String, String> cacheMap = new HashMap<>();
-        List<String> cacheableFileExts = Arrays.asList(".css",".js",".png",".jpg",".png",".webp",".ico");
+        List<String> cacheableFileExts = Arrays.asList(".css", ".js", ".png", ".jpg", ".png", ".webp", ".ico");
         for (File file : staticFiles) {
             String uri = file.toString().substring(PathUtil.getStaticPath().length());
             if (!uri.startsWith("include/") && !Objects.equals("favicon.ico", uri)) {
                 continue;
             }
-            if(cacheableFileExts.stream().noneMatch(e -> uri.toLowerCase().endsWith(e))){
+            if (cacheableFileExts.stream().noneMatch(e -> uri.toLowerCase().endsWith(e))) {
                 continue;
             }
             cacheMap.put(uri, file.lastModified() + "");
@@ -96,35 +99,49 @@ public class CacheService {
         });
     }
 
+    private void refreshWebSite(Map<String, Object> newWebSite) {
+        for (String key : Constants.WEB_SITE.keySet()) {
+            if (!newWebSite.containsKey(key)) {
+                Constants.WEB_SITE.remove(key);
+            }
+        }
+        Constants.WEB_SITE.putAll(newWebSite);
+    }
+
     public void refreshInitDataCache(HttpRequest servletRequest, boolean cleanAble) {
         if (cleanAble || cacheInit == null) {
             long start = System.currentTimeMillis();
             lock.lock();
             try {
                 cacheInit = getCacheInit();
-                FileUtils.deleteFile(CACHE_HTML_PATH);
                 new Tag().refreshTag();
                 //缓存静态资源map
                 Map<String, String> tempMap = getCacheFileMap();
                 cacheFileMap.clear();
                 //重新填充Map
                 cacheFileMap.putAll(tempMap);
+                //静态化插件，重新生成全量的 html
+                Optional<IPlugin> first = Constants.zrLogConfig.getPlugins().stream().filter(e -> e instanceof StaticHtmlPlugin).findFirst();
+                if (first.isPresent()) {
+                    StaticHtmlPlugin staticHtmlPlugin = (StaticHtmlPlugin) first.get();
+                    //restart plugin, for update
+                    staticHtmlPlugin.stop();
+                    staticHtmlPlugin.start();
+                }
+                refreshWebSite(cacheInit.getWebSite());
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             } finally {
                 lock.unlock();
-                LoggerUtil.getLogger(CacheService.class).log(Level.INFO, "refreshInitDataCache used time " + (System.currentTimeMillis() - start) + "ms");
+                LOGGER.info("RefreshInitDataCache used time " + (System.currentTimeMillis() - start) + "ms");
             }
         }
-        if (servletRequest != null) {
-            servletRequest.getAttr().put("init", cacheInit);
-            servletRequest.getAttr().put("website", cacheInit.getWebSite());
-            //存放公共数据到ServletContext
-            servletRequest.getAttr().put("WEB_SITE", Constants.WEB_SITE);
+        if (Objects.isNull(servletRequest)) {
+            return;
         }
-        Constants.WEB_SITE.clear();
-        Constants.WEB_SITE.putAll(cacheInit.getWebSite());
-
+        servletRequest.getAttr().put("init", cacheInit);
+        servletRequest.getAttr().put("website", cacheInit.getWebSite());
+        servletRequest.getAttr().put("WEB_SITE", cacheInit.getWebSite());
     }
 
     private BaseDataInitVO getCacheInit() throws SQLException {
@@ -140,7 +157,11 @@ public class CacheService {
         cacheInit.setLogNavs(new LogNav().findAll());
         cacheInit.setPlugins(new Plugin().findAll());
         cacheInit.setArchives(new Log().getArchives());
-        cacheInit.setTags(new Tag().findAll());
+        List<Map<String, Object>> all = new Tag().findAll();
+        for (Map<String, Object> kv : all) {
+            kv.put("keycode", kv.get("text").hashCode());
+        }
+        cacheInit.setTags(all);
         statistics.setTotalTagSize(cacheInit.getTags().size());
         List<Map<String, Object>> types = cacheInit.getTypes();
         cacheInit.setHotLogs(new Log().visitorFind(new PageRequest(1, 6), "").getRows());

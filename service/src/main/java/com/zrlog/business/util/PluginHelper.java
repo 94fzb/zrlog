@@ -32,7 +32,7 @@ public class PluginHelper {
         map.put("Dark-Mode", Constants.getBooleanByFromWebSite("admin_darkMode") + "");
         if (request != null) {
             String fullUrl = ZrLogUtil.getFullUrl(request);
-            if (request.getQueryStr() != null) {
+            if (StringUtils.isNotEmpty(request.getQueryStr())) {
                 fullUrl = fullUrl + "?" + request.getQueryStr();
             }
             if (adminTokenVO != null) {

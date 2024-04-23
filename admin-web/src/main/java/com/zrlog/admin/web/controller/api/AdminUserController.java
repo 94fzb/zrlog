@@ -47,7 +47,7 @@ public class AdminUserController extends Controller {
         if (StringUtils.isEmpty(basicInfoResponse.getHeader())) {
             basicInfoResponse.setHeader("/assets/images/default-portrait.gif");
         }
-        UpdateVersionPlugin plugin = (UpdateVersionPlugin) Constants.plugins.stream().filter(x -> x instanceof UpdateVersionPlugin).findFirst().orElse(null);
+        UpdateVersionPlugin plugin = (UpdateVersionPlugin) Constants.zrLogConfig.getPlugins().stream().filter(x -> x instanceof UpdateVersionPlugin).findFirst().orElse(null);
         basicInfoResponse.setLastVersion(upgradeService.getCheckVersionResponse(false, Objects.requireNonNull(plugin)));
         return new ApiStandardResponse<>(basicInfoResponse);
     }

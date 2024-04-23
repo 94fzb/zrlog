@@ -4,8 +4,6 @@ import com.hibegin.common.util.BooleanUtils;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.common.type.AutoUpgradeVersionType;
-import com.zrlog.plugin.Plugins;
-import com.zrlog.util.JarUpdater;
 
 import java.io.File;
 import java.util.*;
@@ -25,7 +23,7 @@ public class Constants {
         Constants.lastAccessTime = lastAccessTime;
     }
 
-    public static InstallAction installAction;
+    public static ZrLogConfig zrLogConfig;
 
     public static final String ZRLOG_SQL_VERSION_KEY = "zrlogSqlVersion";
 
@@ -150,11 +148,10 @@ public class Constants {
     }
 
     public static Integer getDefaultRows() {
-        return Integer.valueOf(Constants.WEB_SITE.get("rows").toString());
+        return Integer.valueOf((String) Objects.requireNonNullElse(Constants.WEB_SITE.get("rows"), "10"));
     }
 
 
-    public static Plugins plugins = new Plugins();
 
     public static File getDbPropertiesFile() {
         File file = new File(PathUtil.getConfPath() + "/db.properties");

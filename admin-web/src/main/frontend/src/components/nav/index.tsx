@@ -4,21 +4,18 @@ import BaseTable, { PageDataSource } from "../../common/BaseTable";
 import { getRes } from "../../utils/constants";
 import AddNav from "./add_nav";
 import EditNav from "./edit_nav";
-import { Tooltip } from "antd";
 
 const Nav = ({ data }: { data: PageDataSource }) => {
     const getColumns = () => {
         return [
             {
-                title: "链接",
+                title: getRes()["admin.link.manage"],
                 dataIndex: "url",
                 width: 240,
                 key: "url",
-                render: (url: string) => (
-                    <a style={{ display: "inline" }} rel="noopener noreferrer" target={"_blank"} href={url}>
-                        <Tooltip placement="topLeft" title={url}>
-                            <div style={{ display: "inline" }} dangerouslySetInnerHTML={{ __html: url }} />
-                        </Tooltip>
+                render: (url: string, r: Record<string, any>) => (
+                    <a style={{ display: "inline" }} rel="noopener noreferrer" target={"_blank"} href={r["jumpUrl"]}>
+                        {url}
                     </a>
                 ),
             },

@@ -8,6 +8,7 @@ import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.common.exception.AbstractBusinessException;
 import com.zrlog.common.rest.response.ApiStandardResponse;
+import com.zrlog.util.ZrLogUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -36,14 +37,17 @@ public class ZrLogErrorHandle implements HttpErrorHandle {
     @Override
     public void doHandle(HttpRequest request, HttpResponse response, Throwable e) {
         LOGGER.log(Level.SEVERE, "handle error", e);
+        if (ZrLogUtil.isStaticBlogPlugin(request)) {
+            return;
+        }
         if (request.getUri().startsWith("/api")) {
             if (e instanceof AbstractBusinessException ee) {
-                ApiStandardResponse error = new ApiStandardResponse();
+                ApiStandardResponse<Void> error = new ApiStandardResponse<>();
                 error.setError(ee.getError());
                 error.setMessage(ee.getMessage());
                 response.write(new ByteArrayInputStream(new Gson().toJson(error).getBytes()), 200);
             } else {
-                ApiStandardResponse error = new ApiStandardResponse();
+                ApiStandardResponse<Void> error = new ApiStandardResponse<>();
                 error.setError(9999);
                 error.setMessage(e.getMessage());
                 response.write(new ByteArrayInputStream(new Gson().toJson(error).getBytes()), 200);

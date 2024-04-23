@@ -22,9 +22,8 @@ const AppBase = () => {
             (response) => {
                 if (response.data.error === 9001) {
                     modal.error({
-                        title: "会话过期",
+                        title: response.data.error,
                         content: response.data.message,
-                        okText: "确认",
                     });
                     return Promise.reject(response.data);
                 }
@@ -44,7 +43,6 @@ const AppBase = () => {
                                     dangerouslySetInnerHTML={{ __html: error.response.data }}
                                 />
                             ),
-                            okText: "确认",
                         });
                         return Promise.reject(error.response);
                     }
@@ -53,7 +51,6 @@ const AppBase = () => {
                         modal.error({
                             title: "请求 " + error.config.url + " 错误",
                             content: error.toString(),
-                            okText: "确认",
                         });
                     }
                 }

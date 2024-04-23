@@ -8,17 +8,20 @@ import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.exception.DeleteTypeException;
 import com.zrlog.admin.business.rest.request.CreateTypeRequest;
 import com.zrlog.admin.business.rest.request.UpdateTypeRequest;
+import com.zrlog.admin.business.rest.response.ArticleTypeResponseEntry;
 import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
+import com.zrlog.admin.business.service.ArticleTypeService;
 import com.zrlog.admin.business.util.ControllerUtil;
 import com.zrlog.admin.web.annotation.RefreshCache;
+import com.zrlog.common.Constants;
 import com.zrlog.common.rest.response.ApiStandardResponse;
 import com.zrlog.data.dto.PageData;
 import com.zrlog.model.Log;
 import com.zrlog.model.Type;
+import com.zrlog.util.ZrLogUtil;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Map;
 import java.util.Objects;
 
 public class TypeController extends Controller {
@@ -41,8 +44,8 @@ public class TypeController extends Controller {
     }
 
     @ResponseBody
-    public ApiStandardResponse<PageData<Map<String, Object>>> index() throws SQLException {
-        return new ApiStandardResponse<>(new Type().find(ControllerUtil.getPageRequest(this)));
+    public ApiStandardResponse<PageData<ArticleTypeResponseEntry>> index() throws SQLException {
+        return new ApiStandardResponse<>(new ArticleTypeService().find(ZrLogUtil.getHomeUrlWithHost(request), ControllerUtil.getPageRequest(this), Constants.isStaticHtmlStatus()));
     }
 
     @RefreshCache(async = true)

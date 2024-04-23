@@ -14,10 +14,11 @@ import java.util.Objects;
 
 public class CommonService {
 
-    public Map<String, Object> blogResourceInfo() {
+    public Map<String, Object> blogResourceInfo(HttpRequest request) {
         Map<String, Object> stringObjectMap = I18nUtil.threadLocal.get().getBlog().get(I18nUtil.getCurrentLocale());
         stringObjectMap.put("currentVersion", BlogBuildInfoUtil.getVersion());
         stringObjectMap.put("websiteTitle", Constants.WEB_SITE.get("title"));
+        stringObjectMap.put("homeUrl", ZrLogUtil.getHomeUrlWithHost(request));
         stringObjectMap.put("articleRoute", "");
         stringObjectMap.put("admin_darkMode", Constants.getBooleanByFromWebSite("admin_darkMode"));
         if (ZrLogUtil.isPreviewMode()) {
@@ -26,6 +27,7 @@ public class CommonService {
             defaultLoginInfo.put("password", System.getenv("DEFAULT_PASSWORD"));
             stringObjectMap.put("defaultLoginInfo", defaultLoginInfo);
         }
+        stringObjectMap.put("buildId", BlogBuildInfoUtil.getBuildId());
         stringObjectMap.put("admin_color_primary", Objects.toString(Constants.WEB_SITE.get("admin_color_primary"), "#1677ff"));
         return stringObjectMap;
     }

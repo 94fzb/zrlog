@@ -27,7 +27,7 @@ public record JarUpdater(String[] args, String fileName) {
                 cmdArgs.add("--port=" + ZrLogUtil.getPort(args));
             }
             try {
-                Thread.sleep(1000);
+                Thread.sleep(2000);
                 LOGGER.info("Recall " + Arrays.toString(cmdArgs.toArray()));
                 Runtime.getRuntime().exec(cmdArgs.toArray(new String[0]));
                 System.exit(0);

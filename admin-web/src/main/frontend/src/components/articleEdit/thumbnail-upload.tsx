@@ -1,12 +1,11 @@
 import { apiBasePath } from "../../index";
-import { CameraOutlined } from "@ant-design/icons";
+import { CameraOutlined, DeleteFilled } from "@ant-design/icons";
 import Image from "antd/es/image";
 import Dragger from "antd/es/upload/Dragger";
 import { FunctionComponent } from "react";
 import { UploadChangeParam } from "antd/es/upload";
-import jquery from "jquery";
 import { App } from "antd";
-import { getRes } from "../../utils/constants";
+import { getColorPrimary, getRes } from "../../utils/constants";
 
 type ThumbnailUploadProps = {
     onChange?: (e: string) => void;
@@ -16,28 +15,9 @@ type ThumbnailUploadProps = {
 const ThumbnailUpload: FunctionComponent<ThumbnailUploadProps> = ({ onChange, thumbnail }) => {
     const { message } = App.useApp();
 
-    const gup = (name: string, url: string) => {
-        // eslint-disable-next-line
-        const results = new RegExp("[?&]" + name + "=([^&#]*)").exec(url);
-        if (!results) {
-            return undefined;
-        }
-        return results[1] || undefined;
-    };
-
-    const setThumbnailHeight = (url: string) => {
-        const height = Number.parseInt(gup("h", url) + "");
-        if (height) {
-            const originW = Number.parseInt(jquery("#thumbnail").width() + "");
-            const w = Number.parseInt(gup("w", url) + "");
-            jquery("#thumbnail").width((w / originW) * Math.max(height, 256));
-        }
-    };
-
     const onUploadChange = async (info: UploadChangeParam) => {
         const { status } = info.file;
         if (status === "done") {
-            setThumbnailHeight(info.file.response.data.url);
             if (onChange) {
                 onChange(info.file.response.data.url);
             }
@@ -49,7 +29,7 @@ const ThumbnailUpload: FunctionComponent<ThumbnailUploadProps> = ({ onChange, th
     return (
         <Dragger
             accept={"image/*"}
-            style={{ overflow: "hidden", maxHeight: 256 }}
+            style={{ overflow: "hidden", minHeight: 102, maxHeight: 256 }}
             action={apiBasePath + "upload/thumbnail?dir=thumbnail"}
             name="imgFile"
             onChange={(e) => onUploadChange(e)}
@@ -80,7 +60,35 @@ const ThumbnailUpload: FunctionComponent<ThumbnailUploadProps> = ({ onChange, th
                 </>
             )}
             {thumbnail != null && thumbnail !== "" && (
-                <Image style={{ borderRadius: 8 }} preview={false} id="thumbnail" src={thumbnail} />
+                <div style={{ position: "relative" }}>
+                    <Image
+                        style={{ borderRadius: 8, position: "relative" }}
+                        preview={false}
+                        id="thumbnail"
+                        src={thumbnail}
+                        wrapperStyle={{ position: "relative" }}
+                    />
+                    <div
+                        style={{
+                            position: "absolute",
+                            right: 0,
+                            top: 0,
+                            borderRadius: "0 8px",
+                            padding: 12,
+                            background: getColorPrimary() + "5e",
+                            color: "white",
+                            fontSize: 20,
+                        }}
+                        onClick={(e) => {
+                            if (onChange) {
+                                onChange("");
+                            }
+                            e.stopPropagation();
+                        }}
+                    >
+                        <DeleteFilled />
+                    </div>
+                </div>
             )}
         </Dragger>
     );

@@ -5,7 +5,6 @@ import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.web.Controller;
-import com.zrlog.admin.web.token.AdminTokenService;
 import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.business.cache.CacheService;
 import com.zrlog.business.rest.request.CreateCommentRequest;
@@ -15,7 +14,6 @@ import com.zrlog.business.service.VisitorArticleService;
 import com.zrlog.business.util.PagerUtil;
 import com.zrlog.common.Constants;
 import com.zrlog.common.rest.request.PageRequest;
-import com.zrlog.common.vo.AdminTokenVO;
 import com.zrlog.data.dto.PageData;
 import com.zrlog.model.Comment;
 import com.zrlog.model.Log;
@@ -38,8 +36,6 @@ public class ArticleController extends Controller {
     private final VisitorArticleService visitorArticleService = new VisitorArticleService();
 
     private final CommentService commentService = new CommentService();
-
-    private final AdminTokenService adminTokenService = new AdminTokenService();
 
     public ArticleController() {
     }
@@ -146,13 +142,7 @@ public class ArticleController extends Controller {
     }
 
     private String detail(Object idOrAlias) throws SQLException {
-        AdminTokenVO adminTokenVO = adminTokenService.getAdminTokenVO(getRequest());
-        Map<String, Object> log;
-        if (adminTokenVO == null) {
-            log = new Log().findByIdOrAlias(idOrAlias);
-        } else {
-            log = new Log().adminFindByIdOrAlias(idOrAlias);
-        }
+        Map<String, Object> log = new Log().findByIdOrAlias(idOrAlias);
         if (log != null) {
             Integer logId = (Integer) log.get("logId");
             Map<String,Object> lastLog = Objects.requireNonNullElse(new Log().findLastLog(logId),new HashMap<>(Map.of("title", I18nUtil.getBlogStringFromRes("noLastLog"),"alias",idOrAlias)));

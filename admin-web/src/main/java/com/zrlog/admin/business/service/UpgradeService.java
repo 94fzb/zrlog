@@ -1,19 +1,21 @@
 package com.zrlog.admin.business.service;
 
+import com.hibegin.common.util.BeanUtil;
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.SecurityUtils;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.common.util.http.HttpUtil;
 import com.hibegin.common.util.http.handle.HttpFileHandle;
 import com.hibegin.http.server.util.PathUtil;
+import com.zrlog.admin.business.exception.DownloadUpgradeFileException;
 import com.zrlog.admin.business.rest.response.CheckVersionResponse;
 import com.zrlog.admin.business.rest.response.DownloadUpdatePackageResponse;
+import com.zrlog.admin.business.rest.response.PreCheckVersionResponse;
 import com.zrlog.admin.business.rest.response.UpgradeProcessResponse;
-import com.zrlog.admin.web.plugin.DockerUpdateVersionThread;
+import com.zrlog.admin.web.plugin.DockerUpdateVersionHandle;
 import com.zrlog.admin.web.plugin.UpdateVersionHandler;
 import com.zrlog.admin.web.plugin.UpdateVersionPlugin;
-import com.zrlog.admin.web.plugin.ZipUpdateVersionThread;
-import com.zrlog.admin.web.token.AdminTokenThreadLocal;
+import com.zrlog.admin.web.plugin.ZipUpdateVersionHandle;
 import com.zrlog.common.vo.Version;
 import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ZrLogUtil;
@@ -51,10 +53,12 @@ public class UpgradeService {
         return checkVersionResponse;
     }
 
-    public CheckVersionResponse preUpgradeVersion(boolean fetchAble, UpdateVersionPlugin plugin) {
+    public PreCheckVersionResponse preUpgradeVersion(boolean fetchAble, UpdateVersionPlugin plugin, String preUpgradeKey) {
         CheckVersionResponse checkVersionResponse = getCheckVersionResponse(fetchAble, plugin);
-        versionMap.put(AdminTokenThreadLocal.getUser().getSessionId(), checkVersionResponse.getVersion());
-        return checkVersionResponse;
+        versionMap.put(preUpgradeKey, checkVersionResponse.getVersion());
+        PreCheckVersionResponse preCheckVersionResponse = BeanUtil.convert(checkVersionResponse, PreCheckVersionResponse.class);
+        preCheckVersionResponse.setPreUpgradeKey(preUpgradeKey);
+        return preCheckVersionResponse;
     }
 
     private static boolean isMatch(File file, long length, String md5sum) {
@@ -64,7 +68,7 @@ public class UpgradeService {
                 return false;
             }
             if (StringUtils.isNotEmpty(md5sum)) {
-                return file.exists() && SecurityUtils.md5(new FileInputStream(file)).equals(md5sum);
+                return file.exists() && SecurityUtils.md5ByFile(file).equals(md5sum);
             } else {
                 //如何md5sum没有传的情况，认为文件长度相同就行
                 if (length > 0) {
@@ -83,13 +87,15 @@ public class UpgradeService {
         return new HttpFileHandle(file.getParentFile().toString(), file.getName());
     }
 
-    public DownloadUpdatePackageResponse download() throws IOException, URISyntaxException, InterruptedException, ParseException {
-        Version version = versionMap.get(AdminTokenThreadLocal.getUser().getSessionId());
+    public DownloadUpdatePackageResponse download(String preUpgradeKey, UpdateVersionPlugin plugin) throws IOException, URISyntaxException, InterruptedException, ParseException {
+        Version version = versionMap.computeIfAbsent(preUpgradeKey, k -> {
+            return preUpgradeVersion(true, plugin, preUpgradeKey).getVersion();
+        });
         if (Objects.isNull(version)) {
             LoggerUtil.getLogger(UpgradeService.class).warning("Missing pre check version ");
-            new DownloadUpdatePackageResponse(0);
+            return new DownloadUpdatePackageResponse(0);
         }
-        HttpFileHandle handle = downloadProcessHandleMap.computeIfAbsent(AdminTokenThreadLocal.getUser().getSessionId(), k -> {
+        HttpFileHandle handle = downloadProcessHandleMap.computeIfAbsent(preUpgradeKey, k -> {
             HttpFileHandle fileHandle = createFileHandle();
             CompletableFuture.runAsync(() -> {
                 try {
@@ -101,43 +107,39 @@ public class UpgradeService {
             return fileHandle;
         });
         if (Objects.nonNull(handle.getT())) {
-            return new DownloadUpdatePackageResponse((int) (version.getZipFileSize() * 100 / handle.getT().length()));
+            int process = (int) (handle.getT().length() * 100 / version.getZipFileSize());
+            if (process >= 100) {
+                if (!isMatch(handle.getT(), version.getZipFileSize(), version.getZipMd5sum())) {
+                    throw new DownloadUpgradeFileException();
+                }
+            }
+            return new DownloadUpdatePackageResponse(Math.min(process, 100));
         } else {
             return new DownloadUpdatePackageResponse(0);
         }
     }
 
-    public UpgradeProcessResponse doUpgrade() {
+    public UpgradeProcessResponse doUpgrade(String preUpgradeKey) {
         UpgradeProcessResponse upgradeProcessResponse = new UpgradeProcessResponse();
-        String sessionId = AdminTokenThreadLocal.getUser().getSessionId();
-        UpdateVersionHandler updateVersionHandler = updateVersionThreadMap.get(sessionId);
+        UpdateVersionHandler updateVersionHandler = updateVersionThreadMap.get(preUpgradeKey);
         if (Objects.nonNull(updateVersionHandler)) {
             upgradeProcessResponse.setMessage(updateVersionHandler.getMessage());
             upgradeProcessResponse.setFinish(updateVersionHandler.isFinish());
             return upgradeProcessResponse;
         }
         if (ZrLogUtil.isDockerMode()) {
-            updateVersionHandler = new DockerUpdateVersionThread(I18nUtil.getBackend());
+            updateVersionHandler = new DockerUpdateVersionHandle(I18nUtil.getBackend());
         } else {
-            HttpFileHandle handle = downloadProcessHandleMap.get(sessionId);
+            HttpFileHandle handle = downloadProcessHandleMap.get(preUpgradeKey);
             if (handle == null) {
                 return new UpgradeProcessResponse();
             }
-            File file = handle.getT();
-            Version version = versionMap.get(AdminTokenThreadLocal.getUser().getSessionId());
-            if (isMatch(file, version.getZipFileSize(), version.getMd5sum())) {
-                updateVersionHandler = new ZipUpdateVersionThread(file, I18nUtil.getBackend());
-            } else {
-                upgradeProcessResponse.setMessage(I18nUtil.getBackendStringFromRes("upgradeDownloadFileError"));
-                upgradeProcessResponse.setFinish(false);
-                downloadProcessHandleMap.remove(sessionId);
-                return upgradeProcessResponse;
-            }
+            updateVersionHandler = new ZipUpdateVersionHandle(handle.getT(), I18nUtil.getBackend());
         }
-        updateVersionHandler.start();
+        updateVersionHandler.doHandle();
         upgradeProcessResponse.setMessage(updateVersionHandler.getMessage());
         upgradeProcessResponse.setFinish(updateVersionHandler.isFinish());
-        updateVersionThreadMap.put(sessionId, updateVersionHandler);
+        updateVersionThreadMap.put(preUpgradeKey, updateVersionHandler);
         return upgradeProcessResponse;
 
     }

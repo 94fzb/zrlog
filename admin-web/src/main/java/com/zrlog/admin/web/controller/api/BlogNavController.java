@@ -10,6 +10,7 @@ import com.zrlog.admin.business.rest.request.UpdateNavRequestRequest;
 import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
 import com.zrlog.admin.business.util.ControllerUtil;
 import com.zrlog.admin.web.annotation.RefreshCache;
+import com.zrlog.business.service.TemplateHelper;
 import com.zrlog.common.rest.response.ApiStandardResponse;
 import com.zrlog.data.dto.PageData;
 import com.zrlog.model.LogNav;
@@ -40,7 +41,11 @@ public class BlogNavController extends Controller {
 
     @ResponseBody
     public ApiStandardResponse<PageData<Map<String, Object>>> index() throws SQLException {
-        return new ApiStandardResponse<>(new LogNav().find(ControllerUtil.getPageRequest(this)));
+        PageData<Map<String, Object>> mapPageData = new LogNav().find(ControllerUtil.getPageRequest(this));
+        mapPageData.getRows().forEach(e -> {
+            e.put("jumpUrl", TemplateHelper.getNavUrl(request, TemplateHelper.getSuffix(request), (String) e.get("url")));
+        });
+        return new ApiStandardResponse<>(mapPageData);
     }
 
     @RefreshCache(async = true)
@@ -58,7 +63,7 @@ public class BlogNavController extends Controller {
         return new UpdateRecordResponse(new LogNav()
                 .set("navName", createNavRequest.getNavName())
                 .set("url", createNavRequest.getUrl())
-                .set("sort", Objects.requireNonNullElse(createNavRequest.getSort(),0))
+                .set("sort", Objects.requireNonNullElse(createNavRequest.getSort(), 0))
                 .updateById(createNavRequest.getId()));
     }
 

@@ -19,6 +19,7 @@ public class TemplateVO {
     private TemplateConfigMap config;
     private String viewType;
     private boolean use;
+    private String adminPreviewImage;
 
     public String getViewType() {
         return viewType;
@@ -183,5 +184,13 @@ public class TemplateVO {
         public void setValue(Object value) {
             this.value = value;
         }
+    }
+
+    public String getAdminPreviewImage() {
+        return adminPreviewImage;
+    }
+
+    public void setAdminPreviewImage(String adminPreviewImage) {
+        this.adminPreviewImage = adminPreviewImage;
     }
 }

@@ -5,6 +5,7 @@ public class VersionResponse {
     private String version;
     private String buildId;
     private String changelog;
+    private String message;
 
     public String getVersion() {
         return version;
@@ -28,5 +29,13 @@ public class VersionResponse {
 
     public void setChangelog(String changelog) {
         this.changelog = changelog;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }
