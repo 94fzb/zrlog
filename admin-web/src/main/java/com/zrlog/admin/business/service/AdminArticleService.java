@@ -36,7 +36,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
@@ -199,14 +198,19 @@ public class AdminArticleService {
         } else {
             log.put("thumbnail", createArticleRequest.getThumbnail());
         }
-        // 自动摘要
-        if (StringUtils.isEmpty(createArticleRequest.getDigest())) {
-            log.put("digest", ParseUtil.autoDigest((String) log.get("content"), Constants.getAutoDigestLength()));
-        } else {
-            log.put("digest", createArticleRequest.getDigest());
-        }
         //fix digest xss
-        Jsoup.clean(Objects.requireNonNullElse(log.get("digest"), "").toString(), Safelist.basicWithImages());
+        String parseInputDigest = Jsoup.clean(Objects.requireNonNullElse(createArticleRequest.getDigest(), ""), Safelist.basicWithImages());
+        // 自动摘要
+        if (StringUtils.isEmpty(parseInputDigest) && Objects.equals(createArticleRequest.isRubbish(), false)) {
+            int autoSize = Constants.getAutoDigestLength();
+            if (autoSize <= 0) {
+                log.put("digest", log.get("content"));
+            } else {
+                log.put("digest", ParseUtil.autoDigest((String) log.get("content"), autoSize));
+            }
+        } else {
+            log.put("digest", parseInputDigest);
+        }
         log.put("plain_content", VisitorArticleService.getPlainSearchText((String) log.get("content")));
         log.put("editor_type", createArticleRequest.getEditorType());
         String alias;

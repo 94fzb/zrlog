@@ -2,6 +2,7 @@ package com.zrlog.admin.business.rest.base;
 
 import com.hibegin.common.util.StringUtils;
 import com.zrlog.admin.business.exception.StaticHtmlConfigException;
+import com.zrlog.common.Constants;
 import com.zrlog.common.Validator;
 
 import java.util.Objects;
@@ -17,6 +18,7 @@ public class BlogWebSiteInfo implements Validator {
     private String article_route;
     private Boolean admin_darkMode;
     private String admin_color_primary;
+    private Integer article_auto_digest_length;
 
     public Long getSession_timeout() {
         return session_timeout;
@@ -90,10 +92,21 @@ public class BlogWebSiteInfo implements Validator {
         this.host = host;
     }
 
+    public Integer getArticle_auto_digest_length() {
+        return article_auto_digest_length;
+    }
+
+    public void setArticle_auto_digest_length(Integer article_auto_digest_length) {
+        this.article_auto_digest_length = article_auto_digest_length;
+    }
+
     @Override
     public void doValid() {
         if (Objects.equals(generator_html_status, true) && StringUtils.isEmpty(host)) {
             throw new StaticHtmlConfigException();
+        }
+        if (Objects.isNull(article_auto_digest_length)) {
+            article_auto_digest_length = Constants.DEFAULT_ARTICLE_DIGEST_LENGTH;
         }
     }
 }

@@ -36,7 +36,7 @@ public class ParseUtil {
         }
         String digest = sb.toString();
         Elements elements = Jsoup.parse(str).body().select("video");
-        if (elements != null && !elements.isEmpty()) {
+        if (!elements.isEmpty()) {
             digest = elements.get(0).toString() + "<br/>" + digest;
         }
         return digest.trim();

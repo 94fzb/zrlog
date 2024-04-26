@@ -69,6 +69,7 @@ public class Constants {
 
     private static final String SESSION_TIMEOUT_KEY = "session_timeout";
 
+
     public static String pluginServer;
 
     public static boolean isStaticHtmlStatus() {
@@ -112,7 +113,7 @@ public class Constants {
                 //ignore
             }
         }
-        return 100;
+        return DEFAULT_ARTICLE_DIGEST_LENGTH;
     }
 
     public static boolean getBooleanByFromWebSite(String key) {

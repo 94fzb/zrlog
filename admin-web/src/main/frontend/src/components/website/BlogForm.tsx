@@ -41,14 +41,15 @@ const BlogForm = ({ data }: { data: Blog }) => {
 
     return (
         <>
-            <Title level={4}>博客设置</Title>
-            <Divider />
+
             <Form
                 {...layout}
                 initialValues={form}
                 onValuesChange={(_k, v) => setForm({ ...form, v })}
                 onFinish={(v) => websiteFormFinish(v)}
             >
+                <Title level={4}>博客设置</Title>
+                <Divider />
                 <Form.Item name="host" label="博客域名（Host）">
                     <Input style={{ maxWidth: "300px" }} placeholder="留空，程序将读取接收到的 Host 字段" />
                 </Form.Item>
@@ -65,8 +66,11 @@ const BlogForm = ({ data }: { data: Blog }) => {
                 <Form.Item valuePropName="checked" name="generator_html_status" label="静态化文章页">
                     <Switch size={"small"} />
                 </Form.Item>
-                <Form.Item valuePropName="checked" name="disable_comment_status" label="关闭评论">
-                    <Switch size={"small"} />
+                <Form.Item name="language" label={getRes()["language"]}>
+                    <Select style={{ maxWidth: "100px" }}>
+                        <Option value="zh_CN">{getRes()["languageChinese"]}</Option>
+                        <Option value="en_US">{getRes()["languageEnglish"]}</Option>
+                    </Select>
                 </Form.Item>
                 <Form.Item valuePropName="checked" name="admin_darkMode" label="护眼模式">
                     <Switch size={"small"} />
@@ -82,14 +86,23 @@ const BlogForm = ({ data }: { data: Blog }) => {
                         <span style={{ paddingLeft: 8 }}>{form["admin_color_primary"]}</span>
                     </div>
                 </Form.Item>
+                <Title level={4}>文章/编辑器设置</Title>
+                <Divider />
+                <Form.Item valuePropName="checked" name="disable_comment_status" label="关闭评论">
+                    <Switch size={"small"} />
+                </Form.Item>
                 <Form.Item valuePropName="checked" name="article_thumbnail_status" label="文章封面">
                     <Switch size={"small"} />
                 </Form.Item>
-                <Form.Item name="language" label={getRes()["language"]}>
-                    <Select style={{ maxWidth: "100px" }}>
-                        <Option value="zh_CN">{getRes()["languageChinese"]}</Option>
-                        <Option value="en_US">{getRes()["languageEnglish"]}</Option>
-                    </Select>
+                <Form.Item name="article_auto_digest_length" label="文章自动摘要最大长度" rules={[{ required: true }]}>
+                    <Input
+                        suffix="字"
+                        style={{ maxWidth: "120px" }}
+                        max={99999}
+                        type={"number"}
+                        min={5}
+                        placeholder=""
+                    />
                 </Form.Item>
                 <Divider />
                 <Button type="primary" htmlType="submit">
