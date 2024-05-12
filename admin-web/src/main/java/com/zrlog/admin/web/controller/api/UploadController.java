@@ -65,9 +65,8 @@ public class UploadController extends Controller {
         }
         UploadFileResponse uploadFileResponse = new UploadService().getCloudUrl("", uri,
                 finalFilePath, getRequest(), AdminTokenThreadLocal.getUser());
-        uploadFileResponse.setUrl(uploadFileResponse.getUrl() + "?h=" + height + "&w=" + width);
         imgFile.delete();
-        return new ApiStandardResponse<>(uploadFileResponse);
+        return new ApiStandardResponse<>(new UploadFileResponse(uploadFileResponse.url() + "?h=" + height + "&w=" + width));
     }
 
 }

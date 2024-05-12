@@ -87,9 +87,9 @@ public class HttpUtil {
         requestBuilder.headers("Accept-Encoding", "gzip, deflate");
         requestBuilder.headers("Accept-Language", "zh-cn,zh;q=0.5");
         requestBuilder.headers("User-Agent", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:41.0) Gecko/20100101 Firefox/41.0");
+        //LOGGER.info("headers = " + headers);
         if (Objects.nonNull(headers)) {
             headers.forEach((k, v) -> {
-                //System.out.println("headers = " + headers);
                 if (Objects.nonNull(v)) {
                     requestBuilder.header(k, v);
                 }

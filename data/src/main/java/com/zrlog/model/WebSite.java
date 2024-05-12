@@ -1,18 +1,38 @@
 package com.zrlog.model;
 
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.hibegin.common.util.IOUtil;
+import com.hibegin.common.util.StringUtils;
 import com.hibegin.dao.DAO;
 
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 存放全局的设置，比如网站标题，关键字，插件，主题的配置信息等，当字典表处理即可，对应数据库的website表
  */
 public class WebSite extends DAO {
+
+    private static final String websiteQueryKeys;
+    private static final String TEMPLATE_CONFIG_SUFFIX = "_setting";
+    private static final Map<String, Map<String, Object>> templateConfigCacheMap = new ConcurrentHashMap<>();
+
+
+    static {
+        StringJoiner sj = new StringJoiner("\",\"");
+        String[] list = new Gson().fromJson(IOUtil.getStringInputStream(WebSite.class.getResourceAsStream("/conf/website-key-public.json")), String[].class);
+        for (String key : list) {
+            sj.add(key);
+        }
+        websiteQueryKeys = "(\"" + sj + "\")";
+    }
+
+    public static void main(String[] args) {
+        System.out.println(websiteQueryKeys);
+    }
 
     public WebSite() {
         this.tableName = "website";
@@ -23,7 +43,7 @@ public class WebSite extends DAO {
         Map<String, Object> webSites = new HashMap<>();
         List<Map<String, Object>> lw;
         try {
-            lw = queryList(ALL);
+            lw = queryListWithParams("select name,remark,value from " + tableName + " where name in " + websiteQueryKeys);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -31,8 +51,8 @@ public class WebSite extends DAO {
             webSites.put((String) webSite.get("name"), webSite.get("value"));
             webSites.put(webSite.get("name") + "Remark", webSite.get("remark"));
         }
-        if(Objects.isNull(webSites.get("changyan_status"))){
-            webSites.put("changyan_status","off");
+        if (Objects.isNull(webSites.get("changyan_status"))) {
+            webSites.put("changyan_status", "off");
         }
         return webSites;
     }
@@ -57,6 +77,25 @@ public class WebSite extends DAO {
             //ignore，比如在未安装时，会有该异常但是不影响逻辑
         }
         return "";
+    }
+
+    public static void clearTemplateConfigMap() {
+        templateConfigCacheMap.clear();
+    }
+
+    public Map<String, Object> getTemplateConfigMapWithCache(String templateName) {
+        return templateConfigCacheMap.computeIfAbsent(templateName, (k) -> {
+            String dbJsonStr = new WebSite().getStringValueByName(k + TEMPLATE_CONFIG_SUFFIX);
+            if (StringUtils.isNotEmpty(dbJsonStr)) {
+                return new Gson().fromJson(dbJsonStr, Map.class);
+            }
+            return new HashMap<>();
+        });
+    }
+
+    public Map<String, Object> updateTemplateConfigMap(String templateName, Map<String, Object> settingMap) throws SQLException {
+        new WebSite().updateByKV(templateName + TEMPLATE_CONFIG_SUFFIX, new GsonBuilder().serializeNulls().create().toJson(settingMap));
+        return settingMap;
     }
 
     public boolean getBoolValueByName(String name) throws SQLException {

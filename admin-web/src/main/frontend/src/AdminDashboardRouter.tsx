@@ -272,35 +272,29 @@ const AdminDashboardRouter = () => {
             <Route
                 path="403"
                 element={
-                    <AdminManageLayout>
-                        {getDataFromState() && (
-                            <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncError data={getDataFromState()} code={403} />
-                            </Suspense>
-                        )}
-                    </AdminManageLayout>
+                    getDataFromState() && (
+                        <Suspense fallback={<MyLoadingComponent />}>
+                            <AsyncError data={getDataFromState()} code={403} />
+                        </Suspense>
+                    )
                 }
             />
             <Route
                 path="500"
                 element={
-                    <AdminManageLayout>
-                        {getDataFromState() && (
-                            <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncError data={getDataFromState()} code={500} />
-                            </Suspense>
-                        )}
-                    </AdminManageLayout>
+                    getDataFromState() && (
+                        <Suspense fallback={<MyLoadingComponent />}>
+                            <AsyncError data={getDataFromState()} code={500} />
+                        </Suspense>
+                    )
                 }
             />
             <Route
                 path={"*"}
                 element={
-                    <AdminManageLayout>
-                        <Suspense fallback={<MyLoadingComponent />}>
-                            <AsyncNotFoundPage />
-                        </Suspense>
-                    </AdminManageLayout>
+                    <Suspense fallback={<MyLoadingComponent />}>
+                        <AsyncNotFoundPage />
+                    </Suspense>
                 }
             />
         </Routes>

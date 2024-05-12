@@ -15,6 +15,7 @@ import com.hibegin.http.server.util.PathUtil;
 import com.zaxxer.hikari.util.DriverDataSource;
 import com.zrlog.admin.web.plugin.PluginCorePlugin;
 import com.zrlog.admin.web.plugin.PluginCoreProcess;
+import com.zrlog.business.plugin.TemplateDownloadPlugin;
 import com.zrlog.admin.web.plugin.UpdateVersionPlugin;
 import com.zrlog.blog.web.controller.api.ApiInstallController;
 import com.zrlog.blog.web.plugin.CacheManagerPlugin;
@@ -163,20 +164,21 @@ public class ZrLogConfigImpl extends ZrLogConfig {
             System.exit(-1);
         }
         try {
-
             tryDoUpgrade(dbProperties);
             //启动时候进行数据库连接
             DAO.setDs(new DriverDataSource(dbProperties.getProperty("jdbcUrl"),
                     dbProperties.getProperty("driverClass"), dbProperties, dbProperties.getProperty("user"), dbProperties.getProperty("password")));
-            Object pluginJvmArgsObj = BlogBuildInfoUtil.getBlogProp().get("pluginJvmArgs");
-            if (pluginJvmArgsObj == null) {
-                pluginJvmArgsObj = "";
-            }
             if (!isTest()) {
+                Object pluginJvmArgsObj = BlogBuildInfoUtil.getBlogProp().get("pluginJvmArgs");
+                if (pluginJvmArgsObj == null) {
+                    pluginJvmArgsObj = "";
+                }
                 //这里使用独立的线程进行启动，主要是为了防止插件服务出问题后，影响整体，同时是避免启动过慢的问题。
                 plugins.add(new PluginCorePlugin(Constants.getDbPropertiesFile(), pluginJvmArgsObj.toString()));
                 plugins.add(new UpdateVersionPlugin());
                 plugins.add(new CacheManagerPlugin());
+                //需要缓存加载完毕后执行的插件
+                plugins.add(new TemplateDownloadPlugin());
                 plugins.add(new StaticHtmlPlugin(this));
             }
             plugins.add(new RequestStatisticsPlugin());

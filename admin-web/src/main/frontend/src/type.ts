@@ -4,6 +4,8 @@ export type StatisticsInfoState = {
     commCount: number;
     toDayCommCount: number;
     loading: boolean;
+    usedCacheSpace: number;
+    usedDiskSpace: number;
 };
 
 export type Version= {

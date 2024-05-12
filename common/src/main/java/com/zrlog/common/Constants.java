@@ -19,6 +19,8 @@ public class Constants {
         return lastAccessTime;
     }
 
+    public static boolean DEV_MODE = Objects.equals(System.getenv("DEV_MODE"), "true");
+
     public static void setLastAccessTime(long lastAccessTime) {
         Constants.lastAccessTime = lastAccessTime;
     }
@@ -37,10 +39,6 @@ public class Constants {
 
     public static final String DEFAULT_TEMPLATE_PATH = TEMPLATE_BASE_PATH + "default";
 
-    public static final String ZRLOG_RESOURCE_DOWNLOAD_URL = "https://dl.zrlog.com";
-
-    public static final Set<String> TEMPLATE_REPO_HOSTS = new HashSet<>(Arrays.asList("https://store.zrlog.com", "https://www.zrlog.com"));
-
     public static final String AUTO_UPGRADE_VERSION_KEY = "autoUpgradeVersion";
 
     public static final int DEFAULT_ARTICLE_DIGEST_LENGTH = 200;
@@ -52,7 +50,6 @@ public class Constants {
 
     public static final String ATTACHED_FOLDER = "/attached/";
 
-    public static final String TEMPLATE_CONFIG_SUFFIX = "_setting";
 
     public static final AutoUpgradeVersionType DEFAULT_AUTO_UPGRADE_VERSION_TYPE = AutoUpgradeVersionType.ONE_DAY;
 
@@ -80,7 +77,7 @@ public class Constants {
         Object dbSettingSize = WEB_SITE.get("cache_html_size");
         if (dbSettingSize != null) {
             try {
-                return Integer.parseInt(dbSettingSize.toString());
+                return (int) Double.parseDouble(dbSettingSize.toString());
             } catch (Exception e) {
                 //ignore
             }
@@ -92,7 +89,7 @@ public class Constants {
         Object dbSettingSize = WEB_SITE.get("cache_timeout_minutes");
         if (dbSettingSize != null) {
             try {
-                return Integer.parseInt(dbSettingSize.toString()) * 60 * 1000;
+                return (int) (Double.parseDouble(dbSettingSize.toString()) * 60 * 1000);
             } catch (Exception e) {
                 //ignore
             }
@@ -108,7 +105,7 @@ public class Constants {
         Object dbSettingSize = WEB_SITE.get("article_auto_digest_length");
         if (dbSettingSize != null) {
             try {
-                return Integer.parseInt(dbSettingSize.toString());
+                return (int) Double.parseDouble(dbSettingSize.toString());
             } catch (Exception e) {
                 //ignore
             }
@@ -149,9 +146,8 @@ public class Constants {
     }
 
     public static Integer getDefaultRows() {
-        return Integer.valueOf((String) Objects.requireNonNullElse(Constants.WEB_SITE.get("rows"), "10"));
+        return (int) Double.parseDouble((String) Objects.requireNonNullElse(Constants.WEB_SITE.get("rows"), "10"));
     }
-
 
 
     public static File getDbPropertiesFile() {

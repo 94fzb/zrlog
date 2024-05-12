@@ -2,7 +2,6 @@ package com.zrlog.model;
 
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.StringUtils;
-import com.hibegin.dao.DAO;
 import com.zrlog.common.rest.request.PageRequest;
 import com.zrlog.data.dto.PageData;
 
@@ -14,7 +13,7 @@ import java.util.logging.Logger;
 /**
  * 统计文章中标签出现的次数，方便展示。文章的数据发生变化后，会自动更新记录，无需额外程序控制，对应数据库的tag表
  */
-public class Tag extends DAO {
+public class Tag extends BasePageableDAO {
 
     private static final Logger LOGGER = LoggerUtil.getLogger(Tag.class);
 
@@ -131,9 +130,6 @@ public class Tag extends DAO {
     }
 
     public PageData<Map<String, Object>> find(PageRequest page) throws SQLException {
-        PageData<Map<String, Object>> data = new PageData<>();
-        data.setRows(queryListWithParams("select tagId as id,text,count from " + tableName + " limit ?,?", page.getOffset(), page.getSize()));
-        ModelUtil.fillPageData(this, "from " + tableName, data, new Object[0]);
-        return data;
+        return queryPageData("select tagId as id,text,count from " + tableName, page, new Object[0]);
     }
 }

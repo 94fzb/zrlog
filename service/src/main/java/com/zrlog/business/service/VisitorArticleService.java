@@ -20,21 +20,23 @@ public class VisitorArticleService {
      * 高亮用户检索的关键字
      */
     public static void wrapperSearchKeyword(PageData<Map<String, Object>> data, String keywords) {
-        if (StringUtils.isNotEmpty(keywords)) {
-            List<Map<String, Object>> logs = data.getRows();
-            if (logs != null && !logs.isEmpty()) {
-                for (Map<String, Object> log : logs) {
-                    String title = (String) log.get("title");
-                    String content = (String) log.get("content");
-                    String digest = (String) log.get("digest");
-                    log.put("title", ParseUtil.wrapperKeyword(title, keywords));
-                    String tryWrapperDigest = ParseUtil.wrapperKeyword(digest, keywords);
-                    if (tryWrapperDigest != null && tryWrapperDigest.length() != digest.length()) {
-                        log.put("digest", tryWrapperDigest);
-                    } else {
-                        log.put("digest", ParseUtil.wrapperKeyword(ParseUtil.removeHtmlElement(content), keywords));
-                    }
-                }
+        if (StringUtils.isEmpty(keywords)) {
+            return;
+        }
+        List<Map<String, Object>> logs = data.getRows();
+        if (logs == null || logs.isEmpty()) {
+            return;
+        }
+        for (Map<String, Object> log : logs) {
+            String title = (String) log.get("title");
+            String content = (String) log.get("content");
+            String digest = (String) log.get("digest");
+            log.put("title", ParseUtil.wrapperKeyword(title, keywords));
+            String tryWrapperDigest = ParseUtil.wrapperKeyword(digest, keywords);
+            if (tryWrapperDigest != null && tryWrapperDigest.length() != digest.length()) {
+                log.put("digest", tryWrapperDigest);
+            } else {
+                log.put("digest", ParseUtil.wrapperKeyword(ParseUtil.removeHtmlElement(content), keywords));
             }
         }
 

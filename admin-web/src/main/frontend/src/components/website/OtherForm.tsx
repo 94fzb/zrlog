@@ -20,7 +20,7 @@ const OtherForm = ({ data }: { data: Other }) => {
     const { message } = App.useApp();
 
     const websiteFormFinish = (changedValues: any) => {
-        axios.post("/api/admin/website/other", changedValues).then(({ data }) => {
+        axios.post("/api/admin/website/other", { ...form, ...changedValues }).then(({ data }) => {
             if (data.error) {
                 message.error(data.message).then();
                 return;
@@ -42,7 +42,7 @@ const OtherForm = ({ data }: { data: Other }) => {
             <Form
                 {...layout}
                 initialValues={form}
-                onValuesChange={(_k, v) => setForm(v)}
+                onValuesChange={(_k, v) => setForm({ ...form, ...v })}
                 onFinish={(k) => websiteFormFinish(k)}
             >
                 <Form.Item name="icp" label="ICP备案信息">

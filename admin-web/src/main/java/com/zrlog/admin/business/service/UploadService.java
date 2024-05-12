@@ -20,7 +20,6 @@ public class UploadService {
     private static final Logger LOGGER = LoggerUtil.getLogger(UploadService.class);
 
     public UploadFileResponse getCloudUrl(String contextPath, String uri, String finalFilePath, HttpRequest request, AdminTokenVO adminTokenVO) {
-        UploadFileResponse uploadFileResponse = new UploadFileResponse();
         // try push to cloud
         Map<String, String[]> map = new HashMap<>();
         map.put("fileInfo", new String[]{finalFilePath + "," + uri});
@@ -45,7 +44,6 @@ public class UploadService {
             url = contextPath + uri;
             LOGGER.log(Level.SEVERE, "", e);
         }
-        uploadFileResponse.setUrl(url);
-        return uploadFileResponse;
+        return new UploadFileResponse(url);
     }
 }

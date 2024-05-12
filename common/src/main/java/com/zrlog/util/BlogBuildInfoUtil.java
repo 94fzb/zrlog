@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,44 +27,39 @@ public class BlogBuildInfoUtil {
     /**
      * 目前以git的commitId的前7位标记构建的Id
      */
-    private static String buildId;
-    private static String version;
-    private static Date time;
+    private static String buildId = "0000000";
+    private static String version = "1.0.0-SNAPSHOT";
+    private static Date time = Date.from(LocalDateTime.of(2015, 3, 29, 0, 0, 0)
+            .atZone(ZoneOffset.systemDefault()).toInstant());
     private static String runMode = "RELEASE";
+    private static String resourceDownloadUrl = "https://dl.zrlog.com/";
 
     static {
-        Properties properties = new Properties();
-        InputStream inputStream = BlogBuildInfoUtil.class.getResourceAsStream("/build.properties");
-        if (inputStream != null) {
-            try {
+        try (InputStream inputStream = BlogBuildInfoUtil.class.getResourceAsStream("/build.properties")) {
+            Properties properties = new Properties();
+            if (Objects.nonNull(inputStream)) {
                 properties.load(inputStream);
-                if (properties.get("buildId") != null) {
-                    buildId = properties.get("buildId").toString();
-                }
-                if (properties.get("version") != null && !"".equals(properties.get("version"))) {
-                    version = properties.get("version").toString();
-                }
-                if (properties.get("buildTime") != null && !"".equals(properties.get("buildTime"))) {
-                    time = new SimpleDateFormat(Constants.DATE_FORMAT_PATTERN).parse(properties.get("buildTime").toString());
-                }
-                if (properties.get("runMode") != null && !"".equals(properties.get("runMode"))) {
-                    runMode = properties.get("runMode").toString();
-                }
-            } catch (IOException | ParseException e) {
-                LOGGER.log(Level.SEVERE, "doRead stream error", e);
-            } finally {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    LOGGER.log(Level.SEVERE, "close stream error", e);
-                }
             }
+            if (properties.get("buildId") != null) {
+                buildId = properties.get("buildId").toString();
+            }
+            if (properties.get("version") != null && !"".equals(properties.get("version"))) {
+                version = properties.get("version").toString();
+            }
+            if (properties.get("buildTime") != null && !"".equals(properties.get("buildTime"))) {
+                time = new SimpleDateFormat(Constants.DATE_FORMAT_PATTERN).parse(properties.get("buildTime").toString());
+            }
+            if (properties.get("runMode") != null && !"".equals(properties.get("runMode"))) {
+                runMode = properties.get("runMode").toString();
+            }
+            if (properties.get("mirrorWebSite") != null && !"".equals(properties.get("mirrorWebSite"))) {
+                resourceDownloadUrl = properties.get("mirrorWebSite").toString();
+            }
+        } catch (IOException | ParseException e) {
+            LOGGER.log(Level.SEVERE, "doRead stream error", e);
         }
-        if (buildId == null) {
-            buildId = "0000000";
-        }
-        if (version == null) {
-            version = "1.0.0-SNAPSHOT";
+        if (Objects.nonNull(resourceDownloadUrl) && resourceDownloadUrl.endsWith("/")) {
+            resourceDownloadUrl = resourceDownloadUrl.substring(0, resourceDownloadUrl.length() - 1);
         }
     }
 
@@ -76,16 +72,15 @@ public class BlogBuildInfoUtil {
     }
 
     public static Date getTime() {
-        //仅存在开发环境为空
-        if (time == null) {
-            return Date.from(LocalDateTime.of(2015, 3, 29, 0, 0, 0)
-                    .atZone(ZoneOffset.systemDefault()).toInstant());
-        }
         return time;
     }
 
     public static String getRunMode() {
         return runMode;
+    }
+
+    public static String getResourceDownloadUrl() {
+        return resourceDownloadUrl;
     }
 
     public static boolean isRelease() {
@@ -105,6 +100,7 @@ public class BlogBuildInfoUtil {
         LOGGER.info("version = " + getVersion());
         LOGGER.info("buildId = " + getBuildId());
         LOGGER.info("time = " + getTime());
+        LOGGER.info("resourceDownloadUrl = " + getResourceDownloadUrl());
     }
 
     public static Properties getBlogProp() {

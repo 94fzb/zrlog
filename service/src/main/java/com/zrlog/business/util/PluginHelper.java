@@ -11,7 +11,6 @@ import com.zrlog.common.Constants;
 import com.zrlog.common.vo.AdminTokenVO;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.I18nUtil;
-import com.zrlog.util.ZrLogUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,23 +29,23 @@ public class PluginHelper {
         map.put("Current-Locale", I18nUtil.getCurrentLocale());
         map.put("Blog-Version", BlogBuildInfoUtil.getVersion());
         map.put("Dark-Mode", Constants.getBooleanByFromWebSite("admin_darkMode") + "");
+        map.put("Admin-Color-Primary", Objects.toString(Constants.WEB_SITE.get("admin_color_primary"), "#1677ff"));
         if (request != null) {
-            String fullUrl = ZrLogUtil.getFullUrl(request);
-            if (StringUtils.isNotEmpty(request.getQueryStr())) {
-                fullUrl = fullUrl + "?" + request.getQueryStr();
+            if (Objects.nonNull(request.getHeader("Cookie"))) {
+                map.put("Cookie", request.getHeader("Cookie"));
             }
-            if (adminTokenVO != null) {
-                fullUrl = adminTokenVO.getProtocol() + ":" + fullUrl;
-            }
-            map.put("Cookie", request.getHeader("Cookie"));
             map.put("AccessUrl", "http://127.0.0.1:" + request.getServerConfig().getPort());
-            if (request.getHeader("Content-Type") != null) {
+            if (Objects.nonNull(request.getHeader("Content-Type"))) {
                 map.put("Content-Type", request.getHeader("Content-Type"));
             }
             if (StringUtils.isNotEmpty(request.getHeader("Referer"))) {
                 map.put("Referer", request.getHeader("Referer"));
             }
-            map.put("Full-Url", fullUrl);
+            if (Objects.nonNull(adminTokenVO)) {
+                map.put("Full-Url", request.getFullUrl().replaceAll("http://", adminTokenVO.getProtocol() + "://"));
+            } else {
+                map.put("Full-Url", request.getFullUrl());
+            }
         }
         return map;
     }

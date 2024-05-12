@@ -1,9 +1,6 @@
 package com.zrlog.admin.business.service;
 
-import com.zrlog.admin.business.rest.base.BasicWebSiteInfo;
-import com.zrlog.admin.business.rest.base.BlogWebSiteInfo;
-import com.zrlog.admin.business.rest.base.OtherWebSiteInfo;
-import com.zrlog.admin.business.rest.base.UpgradeWebSiteInfo;
+import com.zrlog.admin.business.rest.base.*;
 import com.zrlog.admin.business.rest.response.WebSiteSettingsResponse;
 import com.zrlog.common.Constants;
 
@@ -28,17 +25,18 @@ public class WebSiteService {
         upgrade.setAutoUpgradeVersion((long) Double.parseDouble((String) Constants.WEB_SITE.get("autoUpgradeVersion")));
         webSiteSettingsResponse.setUpgrade(upgrade);
         BlogWebSiteInfo blog = new BlogWebSiteInfo();
-        blog.setArticle_route((String) Constants.WEB_SITE.get("article_route"));
-        blog.setAdmin_darkMode(Constants.getBooleanByFromWebSite("admin_darkMode"));
-        blog.setLanguage((String) Constants.WEB_SITE.get("language"));
-        blog.setAdmin_color_primary(Objects.toString(Constants.WEB_SITE.get("admin_color_primary"), "#1677ff"));
         blog.setGenerator_html_status(Constants.getBooleanByFromWebSite("generator_html_status"));
-        blog.setDisable_comment_status(Constants.getBooleanByFromWebSite("disable_comment_status"));
-        blog.setSession_timeout(Constants.getSessionTimeout() / 60 / 1000);
-        blog.setArticle_thumbnail_status(Constants.getBooleanByFromWebSite("article_thumbnail_status"));
-        blog.setArticle_auto_digest_length(Constants.getAutoDigestLength());
         blog.setHost(Objects.requireNonNullElse((String) Constants.WEB_SITE.get("host"), ""));
+        blog.setDisable_comment_status(Constants.getBooleanByFromWebSite("disable_comment_status"));
+        blog.setArticle_thumbnail_status(Constants.getBooleanByFromWebSite("article_thumbnail_status"));
         webSiteSettingsResponse.setBlog(blog);
+        AdminWebSiteInfo admin = new AdminWebSiteInfo();
+        admin.setAdmin_darkMode(Constants.getBooleanByFromWebSite("admin_darkMode"));
+        admin.setLanguage((String) Constants.WEB_SITE.get("language"));
+        admin.setAdmin_color_primary(Objects.toString(Constants.WEB_SITE.get("admin_color_primary"), "#1677ff"));
+        admin.setSession_timeout(Constants.getSessionTimeout() / 60 / 1000);
+        admin.setArticle_auto_digest_length(Constants.getAutoDigestLength());
+        webSiteSettingsResponse.setAdmin(admin);
         return webSiteSettingsResponse;
     }
 }

@@ -5,6 +5,7 @@ import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.http.HttpUtil;
 import com.hibegin.common.util.http.handle.HttpFileHandle;
 import com.zrlog.common.Constants;
+import com.zrlog.util.BlogBuildInfoUtil;
 
 import java.io.*;
 import java.net.URISyntaxException;
@@ -21,7 +22,7 @@ public class PluginCoreProcess {
     /**
      * 插件服务的下载地址
      */
-    private static final String PLUGIN_CORE_DOWNLOAD_URL = Constants.ZRLOG_RESOURCE_DOWNLOAD_URL + "/plugin/core/plugin-core.jar";
+    private static final String PLUGIN_CORE_DOWNLOAD_URL = BlogBuildInfoUtil.getResourceDownloadUrl() + "/plugin/core/plugin-core.jar";
 
     private Process pr;
     private boolean canStart = true;

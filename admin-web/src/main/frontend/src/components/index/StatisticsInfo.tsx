@@ -2,7 +2,7 @@ import { Card, Statistic } from "antd";
 import { getRes } from "../../utils/constants";
 import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
-import { CommentOutlined, ContainerOutlined } from "@ant-design/icons";
+import { CommentOutlined, ContainerOutlined, HddOutlined } from "@ant-design/icons";
 import { StatisticsInfoState } from "../../type";
 
 const StatisticsInfo = ({ data }: { data: StatisticsInfoState }) => {
@@ -44,6 +44,24 @@ const StatisticsInfo = ({ data }: { data: StatisticsInfoState }) => {
                             title={getRes()["totalArticleView"]}
                             value={data.clickCount}
                             prefix={<ContainerOutlined />}
+                        />
+                    </Card>
+                </Col>
+                <Col xs={24} md={12}>
+                    <Card styles={{ body: { padding: 16 } }}>
+                        <Statistic
+                            title={getRes()["usedCacheSpace"]}
+                            value={data.usedCacheSpace > 0 ? (data.usedCacheSpace / 1024 / 1024).toFixed(2) + "M" : "-"}
+                            prefix={<HddOutlined />}
+                        />
+                    </Card>
+                </Col>
+                <Col xs={24} md={12}>
+                    <Card styles={{ body: { padding: 16 } }}>
+                        <Statistic
+                            title={getRes()["usedDiskSpace"]}
+                            value={data.usedDiskSpace > 0 ? (data.usedDiskSpace / 1024 / 1024).toFixed(2) + "M" : "-"}
+                            prefix={<HddOutlined />}
                         />
                     </Card>
                 </Col>

@@ -3,7 +3,7 @@ import Divider from "antd/es/divider";
 import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
 import { Badge, Card } from "antd";
-import { CheckOutlined, DeleteOutlined, EyeOutlined, SettingOutlined } from "@ant-design/icons";
+import { CheckOutlined, CloudDownloadOutlined, DeleteOutlined, EyeOutlined, SettingOutlined } from "@ant-design/icons";
 import Meta from "antd/es/card/Meta";
 import Button from "antd/es/button";
 import { useState } from "react";
@@ -65,9 +65,9 @@ const Template = ({ data }: { data: TemplateEntry[] }) => {
         );
         if (template.deleteAble) {
             links.push(
-                <Link to={"#"} onClick={() => deleteTemplate(template.template)}>
+                <div onClick={() => deleteTemplate(template.template)}>
                     <DeleteOutlined key="delete" />
-                </Link>
+                </div>
             );
         }
         return links;
@@ -114,7 +114,9 @@ const Template = ({ data }: { data: TemplateEntry[] }) => {
             </Row>
             <Divider />
             <Link to="/template-center">
-                <Button type={"primary"}>{getRes()["admin.theme.download"]}</Button>
+                <Button icon={<CloudDownloadOutlined />} type={"primary"}>
+                    {getRes()["admin.theme.download"]}
+                </Button>
             </Link>
         </>
     );

@@ -1,6 +1,5 @@
 package com.zrlog.business.service;
 
-import com.google.gson.Gson;
 import com.hibegin.common.util.BeanUtil;
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.StringUtils;
@@ -14,6 +13,7 @@ import com.zrlog.business.util.PagerVO;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.OutlineVO;
 import com.zrlog.data.dto.PageData;
+import com.zrlog.model.WebSite;
 import com.zrlog.util.I18nUtil;
 import com.zrlog.util.OutlineUtil;
 import com.zrlog.util.ParseUtil;
@@ -105,7 +105,7 @@ public class TemplateHelper {
 
     private static boolean isHomePage(HttpRequest request) {
         String uri = request.getUri().replace(".html", "");
-        return "".equals(uri) || "/".equals(uri) || "/all-1".equals(uri) || "/all".equals(uri) || ("/" + Constants.getArticleUri() + "all").equals(uri) || ("/" + Constants.getArticleUri() + "all-1").equals(uri);
+        return uri.isEmpty() || "/".equals(uri) || "/all-1".equals(uri) || "/all".equals(uri) || ("/" + Constants.getArticleUri() + "all").equals(uri) || ("/" + Constants.getArticleUri() + "all-1").equals(uri);
     }
 
     private static void fullNavBar(HttpRequest request, String suffix, BaseDataInitVO baseDataInitVO) {
@@ -133,7 +133,9 @@ public class TemplateHelper {
         //文章页
         if (url.startsWith("/")) {
             String nUrl = ZrLogUtil.getHomeUrlWithHost(request) + url.substring(1);
-            if (!nUrl.endsWith(suffix)) {
+            if (Objects.nonNull(suffix) && !suffix.trim().isEmpty() && nUrl.endsWith(suffix)) {
+                return nUrl;
+            } else {
                 if (Objects.equals("/admin/login", url)) {
                     return nUrl;
                 }
@@ -144,7 +146,7 @@ public class TemplateHelper {
     }
 
     private static String ignoreScheme(String url, String suffix) {
-        if (suffix != null && suffix.length() > 0 && url.endsWith(suffix)) {
+        if (suffix != null && !suffix.isEmpty() && url.endsWith(suffix)) {
             url = url.substring(0, url.length() - suffix.length());
         }
         if (url.startsWith("http://")) {
@@ -214,6 +216,12 @@ public class TemplateHelper {
                             WebTools.getHomeUrl(request) + Constants.getArticleUri() + log.get("alias") + suffix);
                     log.put("typeUrl", WebTools.getHomeUrl(request) + Constants.getArticleUri() + "sort/" + log.get(
                             "typeAlias") + suffix);
+                    if (Objects.isNull(log.get("digest"))) {
+                        log.put("digest", "");
+                    }
+                    if (Objects.isNull(log.get("content"))) {
+                        log.put("content", "");
+                    }
                 }
             }
         } else if (request.getAttr().get("log") != null) {
@@ -242,19 +250,24 @@ public class TemplateHelper {
             }
             log.put("toc", outlineVO);
         }
+        if (Objects.isNull(log.get("content"))) {
+            log.put("content", "");
+        }
     }
 
     /**
      * 获取主题的相对于程序的路径，当Cookie中有值的情况下，优先使用Cookie里面的数据（仅当主题存在的情况下，否则返回默认的主题），
      */
-    private static String getTemplatePath(HttpRequest request) {
+    public static String getTemplatePath(HttpRequest request) {
         String templatePath = Objects.requireNonNullElse((String) Constants.WEB_SITE.get("template"), Constants.DEFAULT_TEMPLATE_PATH);
-        String previewTheme = getTemplatePathByCookie(request.getCookies());
-        if (previewTheme != null) {
-            if (new File(PathUtil.getStaticPath() + templatePath).exists()) {
-                return previewTheme;
+        if (Objects.nonNull(request)) {
+            String previewTheme = getTemplatePathByCookie(request.getCookies());
+            if (previewTheme != null) {
+                if (new File(PathUtil.getStaticPath() + templatePath).exists()) {
+                    return previewTheme;
+                }
+                return Constants.DEFAULT_TEMPLATE_PATH;
             }
-            return Constants.DEFAULT_TEMPLATE_PATH;
         }
         return templatePath;
     }
@@ -263,11 +276,8 @@ public class TemplateHelper {
         String basePath = getTemplatePath(request);
         request.getAttr().put("template", basePath);
         I18nUtil.addToRequest(PathUtil.getStaticPath() + basePath + "/language/", request, false);
-        String jsonStr = (String) Constants.WEB_SITE.get(getTemplatePath(request) + Constants.TEMPLATE_CONFIG_SUFFIX);
-        if (StringUtils.isNotEmpty(jsonStr)) {
-            Map<String, Object> res = (Map<String, Object>) request.getAttr().get("_res");
-            res.putAll(new Gson().fromJson(jsonStr, Map.class));
-        }
+        Map<String, Object> res = (Map<String, Object>) request.getAttr().get("_res");
+        res.putAll(new WebSite().getTemplateConfigMapWithCache(basePath));
         fullInfo(request);
     }
 

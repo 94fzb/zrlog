@@ -203,8 +203,10 @@ public class AdminArticleService {
         // 自动摘要
         if (StringUtils.isEmpty(parseInputDigest) && Objects.equals(createArticleRequest.isRubbish(), false)) {
             int autoSize = Constants.getAutoDigestLength();
-            if (autoSize <= 0) {
+            if (autoSize < 0) {
                 log.put("digest", log.get("content"));
+            } else if (autoSize == 0) {
+                log.put("digest", "");
             } else {
                 log.put("digest", ParseUtil.autoDigest((String) log.get("content"), autoSize));
             }

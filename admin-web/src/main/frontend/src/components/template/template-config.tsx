@@ -73,7 +73,7 @@ const TemplateConfig = ({ data }: { data: TemplateConfigState }) => {
                         name="imgFile"
                         action="/api/admin/upload?dir=image"
                     >
-                        <Image preview={false} width={128} src={state.dataMap[key]} />
+                        <Image style={{ borderRadius: 8 }} preview={false} width={128} src={state.dataMap[key]} />
                     </Dragger>
                 </>
             );

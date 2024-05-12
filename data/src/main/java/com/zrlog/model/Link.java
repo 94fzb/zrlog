@@ -1,6 +1,5 @@
 package com.zrlog.model;
 
-import com.hibegin.dao.DAO;
 import com.zrlog.common.rest.request.PageRequest;
 import com.zrlog.data.dto.PageData;
 
@@ -11,7 +10,7 @@ import java.util.Map;
 /**
  * 存放程序的友情链接，对应数据库link表
  */
-public class Link extends DAO {
+public class Link extends BasePageableDAO {
 
 
     public Link() {
@@ -24,9 +23,6 @@ public class Link extends DAO {
     }
 
     public PageData<Map<String, Object>> find(PageRequest page) throws SQLException {
-        PageData<Map<String, Object>> data = new PageData<>();
-        data.setRows(queryListWithParams("select linkName,linkId as id,sort,url,alt from " + tableName + " order by sort limit ?,?", page.getOffset(), page.getSize()));
-        ModelUtil.fillPageData(this, "from " + tableName, data, new Object[0]);
-        return data;
+        return queryPageData("select linkName,linkId as id,sort,url,alt from " + tableName + " order by sort", page, new Object[0]);
     }
 }

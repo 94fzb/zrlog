@@ -1,6 +1,5 @@
 package com.zrlog.model;
 
-import com.hibegin.dao.DAO;
 import com.zrlog.common.rest.request.PageRequest;
 import com.zrlog.data.dto.PageData;
 
@@ -11,7 +10,7 @@ import java.util.Map;
 /**
  * 存放文章的分类信息，对应数据的type表
  */
-public class Type extends DAO {
+public class Type extends BasePageableDAO {
 
     public Type() {
         this.pk = "typeId";
@@ -24,12 +23,8 @@ public class Type extends DAO {
     }
 
     public PageData<Map<String, Object>> find(PageRequest page) throws SQLException {
-        PageData<Map<String, Object>> response = new PageData<>();
-        response.setRows(queryListWithParams("select t.typeId as id,t.alias,t.typeName,t.remark,(select count(logId) from " + Log.TABLE_NAME +
-                        " where typeid=t.typeid) as typeamount from " + tableName + " t limit ?,?",
-                page.getOffset(), page.getSize()));
-        ModelUtil.fillPageData(this, "from " + tableName, response, new Object[0]);
-        return response;
+        return queryPageData("select t.typeId as id,t.alias,t.typeName,t.remark,(select count(logId) from " + Log.TABLE_NAME +
+                " where typeid=t.typeid) as typeamount from " + tableName + " t", page, new Object[0]);
     }
 
     public Map<String, Object> findByAlias(String alias) throws SQLException {

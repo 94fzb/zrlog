@@ -17,6 +17,7 @@ public class HttpStringHandle extends HttpHandle<String> {
 
     @Override
     public boolean handle(HttpRequest request, HttpResponse<InputStream> response) {
+        statusCode = response.statusCode();
         setT(IOUtil.getStringInputStream(response.body()));
         return false;
     }

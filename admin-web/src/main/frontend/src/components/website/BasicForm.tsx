@@ -20,7 +20,7 @@ const BasicForm = ({ data }: { data: Basic }) => {
 
     const { message } = App.useApp();
     const websiteFormFinish = (changedValues: any) => {
-        axios.post("/api/admin/website/basic", changedValues).then(({ data }) => {
+        axios.post("/api/admin/website/basic", { ...form, ...changedValues }).then(({ data }) => {
             if (data.error) {
                 message.error(data.message).then();
                 return;
@@ -39,7 +39,7 @@ const BasicForm = ({ data }: { data: Basic }) => {
             <Form
                 {...layout}
                 initialValues={form}
-                onValuesChange={(_k, v) => setForm(v)}
+                onValuesChange={(_k, v) => setForm({ ...form, ...v })}
                 onFinish={(k) => websiteFormFinish(k)}
             >
                 <Form.Item name="title" label="网站标题" rules={[{ required: true }]}>

@@ -63,7 +63,7 @@ class UpdateVersionTimerTask extends TimerTask {
     }
 
     private static Version getVersion(boolean preview) throws IOException, URISyntaxException, InterruptedException, ParseException {
-        String versionUrl = Constants.ZRLOG_RESOURCE_DOWNLOAD_URL + "/" + (preview ? "preview" : "release") + "/last.version.json" + "?_" + System.currentTimeMillis() + "&v=" + BlogBuildInfoUtil.getBuildId();
+        String versionUrl = BlogBuildInfoUtil.getResourceDownloadUrl() + "/" + (preview ? "preview" : "release") + "/last.version.json" + "?_" + System.currentTimeMillis() + "&v=" + BlogBuildInfoUtil.getBuildId();
         String txtContent = HttpUtil.getInstance().getTextByUrl(versionUrl).trim();
         Version versionInfo = new Gson().fromJson(txtContent, Version.class);
         Date versionDate = new SimpleDateFormat(Constants.DATE_FORMAT_PATTERN).parse(versionInfo.getReleaseDate());

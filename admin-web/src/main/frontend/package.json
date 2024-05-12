@@ -6,7 +6,7 @@
   "_location": "/vendors",
   "license": "MIT",
   "dependencies": {
-    "@ant-design/icons": "4.7.0",
+    "@ant-design/icons": "5.3.6",
     "@ant-design/cssinjs": "1.11.1",
     "styled-components": "6.0.4",
     "antd": "5.14.0",
@@ -38,7 +38,6 @@
   },
   "devDependencies": {
     "node": "18.9.0",
-    "node-bin-darwin-arm64": "18.9.0",
     "react-scripts": "5.0.1",
     "@types/react": "18.0.17",
     "@types/react-dom": "18.0.6",

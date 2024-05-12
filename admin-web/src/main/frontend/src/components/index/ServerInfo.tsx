@@ -3,6 +3,7 @@ import { getRes } from "../../utils/constants";
 import Table from "antd/es/table";
 import DockerOutlined from "../../icons/DockerOutlined";
 import { ServerInfoEntry } from "../../type";
+import { LinuxOutlined } from "@ant-design/icons";
 
 const ServerInfo = ({ data, dockerMode }: { data: ServerInfoEntry[]; dockerMode: boolean }) => {
     const getFixedColumns = () => {
@@ -24,6 +25,16 @@ const ServerInfo = ({ data, dockerMode }: { data: ServerInfoEntry[]; dockerMode:
                             return (
                                 <>
                                     <DockerOutlined />
+                                    <span style={{ marginLeft: 3 }}>{e}</span>
+                                </>
+                            );
+                        }
+                    }
+                    if (r.name === "操作系统" || r.name === "System Info") {
+                        if (r.value.startsWith("Linux")) {
+                            return (
+                                <>
+                                    <LinuxOutlined />
                                     <span style={{ marginLeft: 3 }}>{e}</span>
                                 </>
                             );

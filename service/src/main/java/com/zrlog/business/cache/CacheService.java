@@ -7,6 +7,7 @@ import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.business.cache.vo.BaseDataInitVO;
 import com.zrlog.business.plugin.StaticHtmlPlugin;
+import com.zrlog.business.plugin.TemplateDownloadPlugin;
 import com.zrlog.common.Constants;
 import com.zrlog.common.rest.request.PageRequest;
 import com.zrlog.model.*;
@@ -120,8 +121,12 @@ public class CacheService {
                 cacheFileMap.clear();
                 //重新填充Map
                 cacheFileMap.putAll(tempMap);
+                //清除模版的缓存数据
+                WebSite.clearTemplateConfigMap();
                 //静态化插件，重新生成全量的 html
                 Optional<IPlugin> first = Constants.zrLogConfig.getPlugins().stream().filter(e -> e instanceof StaticHtmlPlugin).findFirst();
+                Optional<IPlugin> templatePlugin = Constants.zrLogConfig.getPlugins().stream().filter(e -> e instanceof TemplateDownloadPlugin).findFirst();
+                templatePlugin.ifPresent(IPlugin::start);
                 if (first.isPresent()) {
                     StaticHtmlPlugin staticHtmlPlugin = (StaticHtmlPlugin) first.get();
                     //restart plugin, for update
@@ -129,11 +134,14 @@ public class CacheService {
                     staticHtmlPlugin.start();
                 }
                 refreshWebSite(cacheInit.getWebSite());
+
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             } finally {
                 lock.unlock();
-                LOGGER.info("RefreshInitDataCache used time " + (System.currentTimeMillis() - start) + "ms");
+                if (Constants.DEV_MODE) {
+                    LOGGER.info("RefreshInitDataCache used time " + (System.currentTimeMillis() - start) + "ms");
+                }
             }
         }
         if (Objects.isNull(servletRequest)) {
@@ -144,13 +152,18 @@ public class CacheService {
         servletRequest.getAttr().put("WEB_SITE", cacheInit.getWebSite());
     }
 
+    public Map<String, Object> refreshWebSite() {
+        Map<String, Object> website = new WebSite().getWebSite();
+        refreshWebSite(website);
+        return Constants.WEB_SITE;
+    }
+
     private BaseDataInitVO getCacheInit() throws SQLException {
         BaseDataInitVO cacheInit = new BaseDataInitVO();
-        Map<String, Object> website = new WebSite().getWebSite();
         BaseDataInitVO.Statistics statistics = new BaseDataInitVO.Statistics();
         statistics.setTotalArticleSize(new Log().count());
         cacheInit.setStatistics(statistics);
-        cacheInit.setWebSite(website);
+        cacheInit.setWebSite(refreshWebSite());
         cacheInit.setLinks(new Link().findAll());
         cacheInit.setTypes(new Type().findAll());
         statistics.setTotalTypeSize(cacheInit.getTypes().size());

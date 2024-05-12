@@ -249,14 +249,12 @@ const AdminManageLayout: FunctionComponent<PropsWithChildren> = ({ children }) =
                 {userInfo && <UserInfo data={userInfo} />}
             </Header>
             <Row>
-                <Col style={{ minHeight: "100vh" }} id="sider">
-                    <Sider
-                        width={70}
-                        style={{ minHeight: "100vh", backgroundColor: EnvUtils.isDarkMode() ? "#1f1f1f" : "#001529" }}
-                    >
-                        <SliderMenu />
-                    </Sider>
-                </Col>
+                <Sider
+                    width={70}
+                    style={{ minHeight: "100vh", backgroundColor: EnvUtils.isDarkMode() ? "#1f1f1f" : "#001529" }}
+                >
+                    <SliderMenu />
+                </Sider>
                 <Col style={{ flex: 1, width: 100 }}>
                     <Layout style={{ minHeight: "100vh" }}>
                         <Content>{children}</Content>

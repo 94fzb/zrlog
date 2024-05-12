@@ -20,10 +20,10 @@ import org.jsoup.select.Elements;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.util.List;
+import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 public class StaticHtmlPlugin extends BaseLockObject implements IPlugin {
@@ -33,7 +33,6 @@ public class StaticHtmlPlugin extends BaseLockObject implements IPlugin {
     private final Logger LOGGER = LoggerUtil.getLogger(StaticHtmlPlugin.class);
     private final AbstractServerConfig serverConfig;
     private final ApplicationContext applicationContext;
-    private ScheduledExecutorService scheduledExecutorService;
     private final Map<String, HandleState> handleStatusPageMap = new ConcurrentHashMap<>();
 
     public StaticHtmlPlugin(AbstractServerConfig abstractServerConfig) {
@@ -57,10 +56,8 @@ public class StaticHtmlPlugin extends BaseLockObject implements IPlugin {
         return httpRequestDecoder.getRequest();
     }
 
-    private List<CompletableFuture<Void>> getStaticHtmlList() {
-        return handleStatusPageMap.entrySet().stream().filter(e -> {
-            return Objects.equals(e.getValue(), HandleState.NEW);
-        }).map(e -> CompletableFuture.runAsync(() -> {
+    private void doFetch() {
+        handleStatusPageMap.entrySet().stream().filter(e -> Objects.equals(e.getValue(), HandleState.NEW)).forEach((e) -> {
             handleStatusPageMap.put(e.getKey(), HandleState.HANDING);
             try {
                 ResponseConfig responseConfig = serverConfig.getResponseConfig();
@@ -91,7 +88,7 @@ public class StaticHtmlPlugin extends BaseLockObject implements IPlugin {
             } finally {
                 handleStatusPageMap.put(e.getKey(), HandleState.HANDLED);
             }
-        })).toList();
+        });
 
     }
 
@@ -107,20 +104,21 @@ public class StaticHtmlPlugin extends BaseLockObject implements IPlugin {
         handleStatusPageMap.put("/", HandleState.NEW);
         //生成 404 页面，用于配置第三方 cdn，或者云存储的错误页面
         handleStatusPageMap.put("/_404_.html", HandleState.NEW);
-        scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-        scheduledExecutorService.scheduleAtFixedRate(() -> {
-            if (!Constants.isStaticHtmlStatus()) {
-                return;
+        lock.lock();
+        long start = System.currentTimeMillis();
+        try {
+            while (handleStatusPageMap.values().stream().anyMatch(e -> e == HandleState.NEW)) {
+                doFetch();
             }
-            lock.lock();
-            try {
-                CompletableFuture.allOf(getStaticHtmlList().toArray(new CompletableFuture[0])).get();
-            } catch (InterruptedException | ExecutionException e) {
-                throw new RuntimeException(e);
-            } finally {
-                lock.unlock();
+        } finally {
+            lock.unlock();
+            long usedTime = (System.currentTimeMillis() - start);
+            if (Constants.DEV_MODE) {
+                LOGGER.info("Generator " + ZrLogUtil.getBlogHostByWebSite() + " size " + handleStatusPageMap.size() + " finished in " + usedTime + "ms");
+            } else if (usedTime > Duration.ofMinutes(1).toMillis()) {
+                LOGGER.warning("Generator slow size " + handleStatusPageMap.size() + " finish in " + usedTime);
             }
-        }, 0, 5, TimeUnit.SECONDS);
+        }
     }
 
     @Override
@@ -131,9 +129,6 @@ public class StaticHtmlPlugin extends BaseLockObject implements IPlugin {
 
     @Override
     public boolean stop() {
-        if (Objects.nonNull(scheduledExecutorService)) {
-            scheduledExecutorService.shutdown();
-        }
-        return false;
+        return true;
     }
 }

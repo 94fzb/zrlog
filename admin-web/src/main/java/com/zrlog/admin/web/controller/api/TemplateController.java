@@ -16,14 +16,15 @@ import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
 import com.zrlog.admin.business.rest.response.UploadTemplateResponse;
 import com.zrlog.admin.business.service.TemplateService;
 import com.zrlog.admin.web.annotation.RefreshCache;
+import com.zrlog.admin.web.token.AdminTokenThreadLocal;
 import com.zrlog.business.service.TemplateHelper;
 import com.zrlog.common.Constants;
 import com.zrlog.common.rest.response.ApiStandardResponse;
+import com.zrlog.common.vo.AdminTokenVO;
 import com.zrlog.common.vo.TemplateVO;
 import com.zrlog.model.WebSite;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.I18nUtil;
-import com.zrlog.util.ZrLogUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -102,6 +103,8 @@ public class TemplateController extends Controller {
         return filePath;
     }
 
+    @RefreshCache
+    @ResponseBody
     public UploadTemplateResponse upload() throws IOException {
         String uploadFieldName = "file";
         File templateName = request.getFile(uploadFieldName);
@@ -133,9 +136,9 @@ public class TemplateController extends Controller {
     @ResponseBody
     public ApiStandardResponse<TemplateDownloadResponse> downloadUrl() {
         TemplateDownloadResponse downloadResponse = new TemplateDownloadResponse();
-        downloadResponse.setUrl("https://store.zrlog.com/template/?from=http:" + ZrLogUtil.getHomeUrlWithHost(getRequest()) +
-                "admin/template&v=" + BlogBuildInfoUtil.getVersion() +
-                "&id=" + BlogBuildInfoUtil.getBuildId());
+        downloadResponse.setUrl("https://store.zrlog.com/template/index.html?from=" + AdminTokenThreadLocal.getUser().getProtocol() + "://" + getRequest().getHeader("Host") +
+                "/admin/template&v=" + BlogBuildInfoUtil.getVersion() +
+                "&id=" + BlogBuildInfoUtil.getBuildId() + "&upgrade-v3=true");
         return new ApiStandardResponse<>(downloadResponse);
     }
 }

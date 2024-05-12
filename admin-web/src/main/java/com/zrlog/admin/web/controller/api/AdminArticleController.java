@@ -50,9 +50,7 @@ public class AdminArticleController extends Controller {
         for (String id : ids) {
             articleService.delete(Long.valueOf(id));
         }
-        DeleteLogResponse deleteLogResponse = new DeleteLogResponse();
-        deleteLogResponse.setDelete(true);
-        return new ApiStandardResponse<>(deleteLogResponse);
+        return new ApiStandardResponse<>(new DeleteLogResponse(true));
     }
 
     @RefreshCache(async = true)

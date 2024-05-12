@@ -6,15 +6,13 @@ import com.hibegin.http.annotation.ResponseBody;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.web.Controller;
-import com.zrlog.admin.business.rest.base.BasicWebSiteInfo;
-import com.zrlog.admin.business.rest.base.BlogWebSiteInfo;
-import com.zrlog.admin.business.rest.base.OtherWebSiteInfo;
-import com.zrlog.admin.business.rest.base.UpgradeWebSiteInfo;
+import com.zrlog.admin.business.rest.base.*;
 import com.zrlog.admin.business.rest.response.VersionResponse;
 import com.zrlog.admin.business.rest.response.WebSiteSettingsResponse;
 import com.zrlog.admin.business.service.WebSiteService;
 import com.zrlog.admin.web.annotation.RefreshCache;
 import com.zrlog.admin.web.plugin.UpdateVersionPlugin;
+import com.zrlog.business.cache.CacheService;
 import com.zrlog.common.Constants;
 import com.zrlog.common.rest.response.ApiStandardResponse;
 import com.zrlog.common.type.AutoUpgradeVersionType;
@@ -87,6 +85,18 @@ public class WebSiteController extends Controller {
     @ResponseBody
     public ApiStandardResponse<Void> other() throws SQLException {
         return update(BeanUtil.convertWithValid(getRequest().getInputStream(), OtherWebSiteInfo.class));
+    }
+
+    /**
+     * admin 管理的修改，不应该引起博客数据的变化，所以无需更新缓存
+     * @return
+     * @throws SQLException
+     */
+    @ResponseBody
+    public ApiStandardResponse<Void> admin() throws SQLException {
+        ApiStandardResponse<Void> update = update(BeanUtil.convertWithValid(getRequest().getInputStream(), AdminWebSiteInfo.class));
+        new CacheService().refreshWebSite();
+        return update;
     }
 
     @RefreshCache

@@ -30,7 +30,7 @@ const UpgradeSettingForm = ({ data }: { data: Upgrade }) => {
     const navigate = useNavigate();
 
     const websiteFormFinish = (changedValues: any) => {
-        axios.post("/api/admin/website/upgrade", changedValues).then(({ data }) => {
+        axios.post("/api/admin/website/upgrade", { ...form, ...changedValues }).then(({ data }) => {
             if (data.error) {
                 message.error(data.message).then();
                 return;
@@ -88,7 +88,7 @@ const UpgradeSettingForm = ({ data }: { data: Upgrade }) => {
                     <Form
                         {...layout}
                         initialValues={form}
-                        onValuesChange={(_k, v) => setForm(v)}
+                        onValuesChange={(_k, v) => setForm({ ...form, ...v })}
                         onFinish={(k) => websiteFormFinish(k)}
                     >
                         <Form.Item name="autoUpgradeVersion" label={getRes()["admin.upgrade.autoCheckCycle"]}>

@@ -6,6 +6,8 @@ public class StatisticsInfoResponse {
     private Long toDayCommCount;
     private Long clickCount;
     private Long articleCount;
+    private Long usedDiskSpace;
+    private Long usedCacheSpace;
 
     public Long getCommCount() {
         return commCount;
@@ -37,5 +39,21 @@ public class StatisticsInfoResponse {
 
     public void setArticleCount(Long articleCount) {
         this.articleCount = articleCount;
+    }
+
+    public Long getUsedDiskSpace() {
+        return usedDiskSpace;
+    }
+
+    public void setUsedDiskSpace(Long usedDiskSpace) {
+        this.usedDiskSpace = usedDiskSpace;
+    }
+
+    public Long getUsedCacheSpace() {
+        return usedCacheSpace;
+    }
+
+    public void setUsedCacheSpace(Long usedCacheSpace) {
+        this.usedCacheSpace = usedCacheSpace;
     }
 }

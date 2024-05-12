@@ -16,9 +16,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
-import java.net.URLEncoder;
 import java.net.UnknownHostException;
-import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -91,7 +89,7 @@ public class ZrLogUtil {
     }
 
     public static String getFullUrl(HttpRequest request) {
-        return "//" + getBlogHost(request) + "/" + URLEncoder.encode(request.getUri().substring(1), StandardCharsets.UTF_8);
+        return "//" + getBlogHost(request) + request.getUri().substring(1);
     }
 
     public static String getDatabaseServerVersion(Properties dbConfig) {

@@ -23,7 +23,9 @@ const BaseInput: FunctionComponent<BaseInputProps> = ({ value, onChange, addonBe
     const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(e.target.value);
         if (!isComposing) {
-            await onChange(e.target.value);
+            onChange(e.target.value).then(() => {
+                //ignore
+            });
         }
     };
 
@@ -37,7 +39,6 @@ const BaseInput: FunctionComponent<BaseInputProps> = ({ value, onChange, addonBe
             onCompositionUpdate={() => setIsComposing(true)}
             onCompositionEnd={async () => {
                 setIsComposing(false);
-                // 确保在组合文字结束后提交当前值
                 await onChange(inputValue);
             }}
             placeholder={placeholder}

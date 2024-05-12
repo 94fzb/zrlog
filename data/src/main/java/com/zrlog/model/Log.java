@@ -1,7 +1,6 @@
 package com.zrlog.model;
 
 import com.hibegin.common.util.StringUtils;
-import com.hibegin.dao.DAO;
 import com.zrlog.common.rest.request.PageRequest;
 import com.zrlog.data.dto.PageData;
 import com.zrlog.util.ParseUtil;
@@ -18,7 +17,7 @@ import java.util.*;
 /**
  * 存放文章数据，对应数据的log表。
  */
-public class Log extends DAO implements Serializable {
+public class Log extends BasePageableDAO implements Serializable {
 
     public static final String TABLE_NAME = "log";
 
@@ -84,56 +83,38 @@ public class Log extends DAO implements Serializable {
 
     public PageData<Map<String, Object>> visitorFind(PageRequest pageRequest, String keywords) throws SQLException {
         if (StringUtils.isEmpty(keywords)) {
-            PageData<Map<String, Object>> data = new PageData<>();
             String sql =
-                    "select l.*,t.typeName,t.alias as typeAlias,u.userName,(select count(commentId) from " + Comment.TABLE_NAME + " where logId=l.logId) commentSize from " + tableName + " l inner join user u inner join type t where rubbish=? and privacy=? and u.userId=l.userId and t.typeid=l.typeid  order by l.logId desc limit  ?,?";
-
-            data.setRows(queryListWithParams(sql, false, false, pageRequest.getOffset(), pageRequest.getSize()));
-            ModelUtil.fillPageData(this,
-                    "from " + tableName + " l inner join user u where rubbish=? and privacy=? " + "and u.userId=l" + ".userId ", data, new Object[]{false, false});
-            return data;
+                    "select l.*,t.typeName,t.alias as typeAlias,u.userName,(select count(commentId) from " + Comment.TABLE_NAME + " where logId=l.logId) commentSize from " + tableName + " l inner join user u inner join type t where rubbish=? and privacy=? and u.userId=l.userId and t.typeid=l.typeid  order by l.logId desc";
+            return queryPageData(sql, pageRequest, new Object[]{false, false});
         }
-        PageData<Map<String, Object>> data = new PageData<>();
         String sql =
                 "select l.*,t.typeName,t.alias as typeAlias,(select count(commentId) from " + Comment.TABLE_NAME + " "
-                        + "where logId=l.logId) commentSize,u.userName from " + tableName + " l inner join user u," + "type" + " t where rubbish=? and privacy=? and u.userId=l.userId and t.typeId=l.typeId and (l" + ".title " + "like ? or l.plain_content like ?) order by l.logId desc limit ?,?";
-        data.setRows(queryListWithParams(sql, false, false, "%" + keywords + "%", "%" + keywords + "%", pageRequest.getOffset(),
-                pageRequest.getSize()));
-        ModelUtil.fillPageData(this, "from " + tableName + " l inner join user u,type t where rubbish=? and " +
-                        "privacy=? and u.userId=l.userId and t.typeId=l.typeId and (l.title like ? or l.plain_content like ?)"
-                , data, new Object[]{false, false, "%" + keywords + "%", "%" + keywords + "%"});
-        return data;
+                        + "where logId=l.logId) commentSize,u.userName from " + tableName + " l inner join user u," + "type" + " t where rubbish=? and privacy=? and u.userId=l.userId and t.typeId=l.typeId and (l" + ".title " + "like ? or l.plain_content like ?) order by l.logId desc";
+        return queryPageData(sql, pageRequest, new Object[]{false, false, "%" + keywords + "%", "%" + keywords + "%"});
     }
 
     /**
      * 管理员查询文章
      */
     public PageData<Map<String, Object>> adminFind(PageRequest pageRequest, String keywords) throws SQLException {
-        PageData<Map<String, Object>> data = new PageData<>();
         String searchKeywords = "";
         List<Object> searchParam = new ArrayList<>();
-        List<Object> params = new ArrayList<>();
         if (StringUtils.isNotEmpty(keywords)) {
             searchKeywords = " and (l.title like ? or l.plain_content like ? or l.keywords like ? or l.alias like ?)";
             searchParam.add("%" + keywords + "%");
             searchParam.add("%" + keywords + "%");
             searchParam.add("%" + keywords + "%");
             searchParam.add("%" + keywords + "%");
-            params.addAll(searchParam);
         }
         String pageSort = getPageSort(pageRequest);
-        params.add(pageRequest.getOffset());
-        params.add(pageRequest.getSize());
         String sql =
-                "select l.*,l.privacy privacy,t.typeName,l.logId as id,l.last_update_date as lastUpdateDate,t" +
+                "select l.*,t.typeName,l.logId as id,l.last_update_date as lastUpdateDate,t" +
                         ".alias as typeAlias,u.userName,(select count(commentId) from " + Comment.TABLE_NAME + " " +
                         "where " + "logId=l.logId ) commentSize from " + tableName + " l inner join user u inner " + "join type t where u" + ".userId=l.userId" + searchKeywords +
-                        " and t.typeid=l.typeid and l.typeid is not null order " + "by " + pageSort + " limit ?,?";
-        data.setRows(findEntry(sql, params.toArray()));
-        ModelUtil.fillPageData(this,
-                "from " + tableName + " l inner join user u where u.userId=l.userId " + searchKeywords, data,
+                        " and t.typeid=l.typeid and l.typeid is not null order " + "by " + pageSort;
+        return queryPageData(
+                sql, pageRequest,
                 searchParam.toArray());
-        return data;
     }
 
     private static String getPageSort(PageRequest pageRequest) {
@@ -153,17 +134,10 @@ public class Log extends DAO implements Serializable {
     }
 
     public PageData<Map<String, Object>> findByTypeAlias(int page, int pageSize, String typeAlias) throws SQLException {
-        PageData<Map<String, Object>> data = new PageData<>();
-
         String sql =
                 "select l.*,t.typeName,t.alias  as typeAlias,(select count(commentId) from " + Comment.TABLE_NAME +
-                        " where logId=l.logId ) commentSize,u.userName from " + tableName + " l inner join user u," + "type t where rubbish=? and privacy=? and u.userId=l.userId and t.typeId=l.typeId and t" + ".alias=? order by l.logId desc limit ?,?";
-        data.setRows(queryListWithParams(sql, false, false, typeAlias, new PageRequest(page, pageSize).getOffset(), pageSize));
-
-        ModelUtil.fillPageData(this, "from " + tableName + " l inner join user u,type t where u.userId=l.userId and "
-                + "t.typeId=l.typeId and rubbish=? and privacy=? and t.alias=?", data, new Object[]{false, false,
-                typeAlias});
-        return data;
+                        " where logId=l.logId ) commentSize,u.userName from " + tableName + " l inner join user u," + "type t where rubbish=? and privacy=? and u.userId=l.userId and t.typeId=l.typeId and t" + ".alias=? order by l.logId desc";
+        return queryPageData(sql, new PageRequest(page, pageSize), new Object[]{false, false, typeAlias});
     }
 
     public Map<String, Long> getArchives() throws SQLException {
@@ -192,15 +166,10 @@ public class Log extends DAO implements Serializable {
     }
 
     public PageData<Map<String, Object>> findByTag(int page, int pageSize, String tag) throws SQLException {
-        PageData<Map<String, Object>> data = new PageData<>();
         String sql =
                 "select l.*,t.typeName,t.alias  as typeAlias,(select count(commentId) from " + Comment.TABLE_NAME +
-                        " where logId=l.logId) commentSize,u.userName from " + tableName + " l inner join user u," + "type t where rubbish=? and privacy=? and u.userId=l.userId and t.typeId=l.typeId and (l" + ".keywords like ? or l.keywords like ? or l.keywords like ? or l.keywords= ?) order by l" + ".logId desc limit ?,?";
-        data.setRows(queryListWithParams(sql, false, false, tag + ",%", "%," + tag + ",%", "%," + tag, tag,
-                new PageRequest(page, pageSize).getOffset(), pageSize));
-        ModelUtil.fillPageData(this, "from " + tableName + " l inner join user u,type t where rubbish=? and " +
-                "privacy=? and u.userId=l.userId and t.typeId=l.typeId and  (l.keywords like ? or l.keywords like ? " + "or l.keywords like ? or l.keywords= ?)", data, new Object[]{false, false, tag + ",%", "%," + tag + ",%", "%," + tag, tag});
-        return data;
+                        " where logId=l.logId) commentSize,u.userName from " + tableName + " l inner join user u," + "type t where rubbish=? and privacy=? and u.userId=l.userId and t.typeId=l.typeId and (l" + ".keywords like ? or l.keywords like ? or l.keywords like ? or l.keywords= ?) order by l" + ".logId desc";
+        return queryPageData(sql, new PageRequest(page, pageSize), new Object[]{false, false, tag + ",%", "%," + tag + ",%", "%," + tag, tag});
     }
 
     private List<Map<String, Object>> findEntry(String sql, Object[] paras) throws SQLException {
@@ -208,15 +177,11 @@ public class Log extends DAO implements Serializable {
     }
 
     public PageData<Map<String, Object>> findByDate(int page, int pageSize, String date) throws SQLException {
-        PageData<Map<String, Object>> data = new PageData<>();
         String sql =
                 "select l.*,t.typeName,t.alias as typeAlias,(select count(commentId) from " + Comment.TABLE_NAME + " "
-                        + "where logId=l.logId ) commentSize,u.userName from " + tableName + " l inner join user u," + "type t where rubbish=? and privacy=? and u.userId=l.userId and t.typeId=l.typeId and " + "DATE_FORMAT(releaseTime,'%Y_%m')=? order by l.logId desc limit ?,?";
-        data.setRows(queryListWithParams(sql, false, false, date, new PageRequest(page, pageSize).getOffset(), pageSize));
-        ModelUtil.fillPageData(this, "from " + tableName + " l inner join user u,type t where rubbish=? and " +
-                        "privacy=? and u.userId=l.userId and t.typeId=l.typeId and  DATE_FORMAT(releaseTime,'%Y_%m')=?", data
+                        + "where logId=l.logId ) commentSize,u.userName from " + tableName + " l inner join user u," + "type t where rubbish=? and privacy=? and u.userId=l.userId and t.typeId=l.typeId and " + "DATE_FORMAT(releaseTime,'%Y_%m')=? order by l.logId desc";
+        return queryPageData(sql, new PageRequest(page, pageSize)
                 , new Object[]{false, false, date});
-        return data;
     }
 
     /**

@@ -10,12 +10,14 @@ import BasicForm from "./BasicForm";
 import OtherForm from "./OtherForm";
 import UpgradeSettingForm from "./UpgradeSettingForm";
 import { Link } from "react-router-dom";
+import AdminForm from "./AdminForm";
 
 export interface Data {
     basic: Basic;
     blog: Blog;
     other: Other;
     upgrade: Upgrade;
+    admin: Admin;
     templates: TemplateEntry[];
 }
 
@@ -26,16 +28,18 @@ export interface Basic {
     description: string;
 }
 
-export interface Blog {
+export interface Admin {
     session_timeout: number;
-    generator_html_status: boolean;
     disable_comment_status: boolean;
     article_thumbnail_status: boolean;
     language: string;
-    host: string;
-    article_route: string;
     admin_darkMode: boolean;
     admin_color_primary: string;
+}
+
+export interface Blog {
+    host: string;
+    generator_html_status: boolean;
 }
 
 export interface Other {
@@ -91,6 +95,17 @@ const WebSite = ({ data }: { data: Data }) => {
                             <Row>
                                 <Col md={12} xs={24}>
                                     <BlogForm data={data.blog} />
+                                </Col>
+                            </Row>
+                        ),
+                    },
+                    {
+                        key: "admin",
+                        label: buildLink("admin", "管理设置"),
+                        children: (
+                            <Row>
+                                <Col md={12} xs={24}>
+                                    <AdminForm data={data.admin} />
                                 </Col>
                             </Row>
                         ),

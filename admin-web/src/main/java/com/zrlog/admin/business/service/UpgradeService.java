@@ -21,7 +21,6 @@ import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ZrLogUtil;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
@@ -120,27 +119,22 @@ public class UpgradeService {
     }
 
     public UpgradeProcessResponse doUpgrade(String preUpgradeKey) {
-        UpgradeProcessResponse upgradeProcessResponse = new UpgradeProcessResponse();
         UpdateVersionHandler updateVersionHandler = updateVersionThreadMap.get(preUpgradeKey);
         if (Objects.nonNull(updateVersionHandler)) {
-            upgradeProcessResponse.setMessage(updateVersionHandler.getMessage());
-            upgradeProcessResponse.setFinish(updateVersionHandler.isFinish());
-            return upgradeProcessResponse;
+            return new UpgradeProcessResponse(updateVersionHandler.isFinish(), updateVersionHandler.getMessage());
         }
         if (ZrLogUtil.isDockerMode()) {
             updateVersionHandler = new DockerUpdateVersionHandle(I18nUtil.getBackend());
         } else {
             HttpFileHandle handle = downloadProcessHandleMap.get(preUpgradeKey);
             if (handle == null) {
-                return new UpgradeProcessResponse();
+                return new UpgradeProcessResponse(false, "");
             }
             updateVersionHandler = new ZipUpdateVersionHandle(handle.getT(), I18nUtil.getBackend());
         }
         updateVersionHandler.doHandle();
-        upgradeProcessResponse.setMessage(updateVersionHandler.getMessage());
-        upgradeProcessResponse.setFinish(updateVersionHandler.isFinish());
         updateVersionThreadMap.put(preUpgradeKey, updateVersionHandler);
-        return upgradeProcessResponse;
+        return new UpgradeProcessResponse(updateVersionHandler.isFinish(), updateVersionHandler.getMessage());
 
     }
 }

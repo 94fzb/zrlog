@@ -1,9 +1,6 @@
 package com.zrlog.admin.business.rest.response;
 
-import com.zrlog.admin.business.rest.base.BasicWebSiteInfo;
-import com.zrlog.admin.business.rest.base.BlogWebSiteInfo;
-import com.zrlog.admin.business.rest.base.OtherWebSiteInfo;
-import com.zrlog.admin.business.rest.base.UpgradeWebSiteInfo;
+import com.zrlog.admin.business.rest.base.*;
 import com.zrlog.common.vo.TemplateVO;
 
 import java.util.ArrayList;
@@ -14,6 +11,7 @@ public class WebSiteSettingsResponse {
     private BasicWebSiteInfo basic;
     private BlogWebSiteInfo blog;
     private OtherWebSiteInfo other;
+    private AdminWebSiteInfo admin;
     private UpgradeWebSiteInfo upgrade;
     private List<TemplateVO> templates = new ArrayList<>();
 
@@ -58,4 +56,11 @@ public class WebSiteSettingsResponse {
         this.upgrade = upgrade;
     }
 
+    public AdminWebSiteInfo getAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(AdminWebSiteInfo admin) {
+        this.admin = admin;
+    }
 }

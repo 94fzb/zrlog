@@ -22,7 +22,9 @@ public class CacheManagerPlugin implements IPlugin {
 
     @Override
     public boolean start() {
-        scheduledThreadPoolExecutor.scheduleAtFixedRate(new CacheManageTimerTask(), 0, 1, TimeUnit.HOURS);
+        CacheManageTimerTask cacheManageTimerTask = new CacheManageTimerTask();
+        cacheManageTimerTask.run();
+        scheduledThreadPoolExecutor.scheduleAtFixedRate(cacheManageTimerTask, 1, 1, TimeUnit.HOURS);
         return true;
     }
 

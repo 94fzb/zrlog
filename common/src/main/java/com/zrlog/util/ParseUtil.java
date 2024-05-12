@@ -3,57 +3,88 @@ package com.zrlog.util;
 import com.zrlog.common.Constants;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
-import org.jsoup.select.Elements;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 /**
- * 一些常见的转化的工具方法。
+ * 一些常用的转化的工具方法。
  */
 public class ParseUtil {
+
+    public static void main(String[] args) {
+        String s = autoDigest("这是一个测试文本。它包含了一些文字和<span style='color:red;'>红色</span>内容。还有更多内容...", 20);
+        System.out.println(s);
+    }
 
 
     public static String autoDigest(String str, int size) {
         if (Objects.isNull(str) || str.trim().isEmpty()) {
             return str;
         }
+        Document doc = Jsoup.parseBodyFragment(str);
         StringBuilder sb = new StringBuilder();
-        Document document = Jsoup.parseBodyFragment(str);
-        List<Node> allTextNode = new ArrayList<>();
-        getAllTextNode(document.childNodes(), allTextNode);
-        int tLength = 0;
-        for (Node node : allTextNode) {
-            if (node instanceof TextNode) {
-                sb.append(node.parent().outerHtml());
-                tLength += ((TextNode) node).text().length();
-                if (tLength > size) {
-                    sb.append(" ...");
-                    break;
-                }
+        int currentLength = 0;
+        Element body = doc.body();
+
+        for (Node child : body.childNodes()) {
+            currentLength += processNodeWithTags(child, size - currentLength, sb);
+            if (currentLength >= size) {
+                break; // 达到长度限制，退出循环
             }
         }
-        String digest = sb.toString();
-        Elements elements = Jsoup.parse(str).body().select("video");
-        if (!elements.isEmpty()) {
-            digest = elements.get(0).toString() + "<br/>" + digest;
-        }
-        return digest.trim();
+
+        return sb.toString();
     }
 
-    private static void getAllTextNode(List<Node> nodes, List<Node> nodeList) {
-        for (Node node : nodes) {
-            if (!node.childNodes().isEmpty()) {
-                getAllTextNode(node.childNodes(), nodeList);
-            } else {
-                if (node instanceof TextNode) {
-                    if (((TextNode) node).text().trim().length() > 0) {
-                        nodeList.add(node);
-                    }
+    /**
+     * 摘要截断的位置可能仍然不是语义上的完整句子，这取决于文本内容和长度限制。 可以根据需要进行优化，例如寻找最近的标点符号进行截断。
+     * @param node
+     * @param remainingLength
+     * @param sb
+     * @return
+     */
+    private static int processNodeWithTags(Node node, int remainingLength, StringBuilder sb) {
+        if (node instanceof TextNode) {
+            String text = ((TextNode) node).text().trim();
+            if (!text.isEmpty()) {
+                if (text.length() <= remainingLength) {
+                    sb.append(text);
+                    return text.length();
+                } else {
+                    sb.append(text, 0, remainingLength);
+                    sb.append("...");
+                    return remainingLength; // 标记已达到长度限制
                 }
             }
+        } else if (node instanceof Element element) {
+            int usedLength = 0;
+
+            // 添加开始标签 (不计入长度)
+            sb.append("<").append(element.tagName());
+            for (org.jsoup.nodes.Attribute attribute : element.attributes()) {
+                sb.append(" ").append(attribute.getKey()).append("=\"").append(attribute.getValue()).append("\"");
+            }
+            sb.append(">");
+
+            for (Node child : element.childNodes()) {
+                usedLength += processNodeWithTags(child, remainingLength - usedLength, sb);
+                if (usedLength >= remainingLength) {
+                    break; // 子节点已达到长度限制
+                }
+            }
+
+            // 添加结束标签 (不计入长度)
+            sb.append("</").append(element.tagName()).append(">");
+
+            return usedLength; // 只返回文本内容的长度
         }
+        return 0;
     }
 
     public static String removeHtmlElement(String str) {
@@ -80,17 +111,6 @@ public class ParseUtil {
         // TODO　如何过滤垃圾信息
         return false;
     }
-
-    /*private static boolean containsHanScript(String s) {
-        for (int i = 0; i < s.length(); ) {
-            int codepoint = s.codePointAt(i);
-            i += Character.charCount(codepoint);
-            if (Character.UnicodeScript.of(codepoint) == Character.UnicodeScript.HAN) {
-                return true;
-            }
-        }
-        return false;
-    }*/
 
     /**
      * 输入一段纯文本，通过指定关键字提取相关的上下文
@@ -179,9 +199,5 @@ public class ParseUtil {
 
     public static boolean isNumeric(String str) {
         return str.matches("-?\\d+(.\\d+)?");
-    }
-
-    public static void main(String[] args) {
-        System.out.println("check = " + isGarbageComment("what is the best insurance company for auto"));
     }
 }

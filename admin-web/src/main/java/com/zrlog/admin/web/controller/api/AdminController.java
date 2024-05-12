@@ -1,9 +1,12 @@
 package com.zrlog.admin.web.controller.api;
 
 import com.hibegin.common.util.BeanUtil;
+import com.hibegin.common.util.FileUtils;
+import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.http.annotation.ResponseBody;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
+import com.hibegin.http.server.util.PathUtil;
 import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.rest.request.LoginRequest;
 import com.zrlog.admin.business.rest.response.IndexResponse;
@@ -14,6 +17,7 @@ import com.zrlog.admin.business.service.UserService;
 import com.zrlog.admin.web.annotation.RefreshCache;
 import com.zrlog.admin.web.token.AdminTokenService;
 import com.zrlog.business.util.InstallUtils;
+import com.zrlog.common.Constants;
 import com.zrlog.common.rest.response.ApiStandardResponse;
 import com.zrlog.common.vo.ServerInfo;
 import com.zrlog.model.Comment;
@@ -24,6 +28,7 @@ import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ServerInfoUtils;
 import com.zrlog.util.ZrLogUtil;
 
+import java.io.File;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -71,17 +76,41 @@ public class AdminController extends Controller {
         info.setToDayCommCount(new Comment().countToDayComment());
         info.setClickCount(new Log().sumClick().longValue());
         info.setArticleCount(new Log().adminCount());
+        List<File> allFileList = new ArrayList<>();
+        try {
+            List<String> baseFolders = new ArrayList<>(Arrays.asList(PathUtil.getRootPath() + "/bin", PathUtil.getTempPath(),
+                    PathUtil.getLogPath(), PathUtil.getConfPath(), PathUtil.getStaticPath(), PathUtil.getRootPath() + "/lib"));
+            allFileList.add(new File(PathUtil.getRootPath() + "/" + Constants.zrLogConfig.getJarUpdater().fileName()));
+            for (String folder : baseFolders) {
+                FileUtils.getAllFiles(folder, allFileList);
+            }
+            List<File> cacheFileList = new ArrayList<>();
+            FileUtils.getAllFiles(PathUtil.getCachePath(), cacheFileList);
+            allFileList.addAll(cacheFileList);
+            info.setUsedDiskSpace(allFileList.stream().mapToLong(File::length).sum());
+            info.setUsedCacheSpace(cacheFileList.stream().mapToLong(File::length).sum());
+        } catch (Exception e) {
+            LoggerUtil.getLogger(AdminController.class).warning("Load used disk info error " + e.getMessage());
+            info.setUsedCacheSpace(-1L);
+            info.setUsedDiskSpace(-1L);
+        }
         return new ApiStandardResponse<>(info);
     }
 
     @ResponseBody
     public ApiStandardResponse<Map<String, Object>> error() {
-        return new ApiStandardResponse<>(Map.of("message", Objects.requireNonNullElse(request.getParaToStr("message"),"")));
+        return new ApiStandardResponse<>(Map.of("message", Objects.requireNonNullElse(request.getParaToStr("message"), "")));
     }
 
     @ResponseBody
     public ApiStandardResponse<Map<String, Object>> plugin() {
         return new ApiStandardResponse<>(new HashMap<>());
+    }
+
+    @ResponseBody
+    public ApiStandardResponse<Void> dev() {
+        Constants.DEV_MODE = true;
+        return new ApiStandardResponse<>();
     }
 
     @ResponseBody

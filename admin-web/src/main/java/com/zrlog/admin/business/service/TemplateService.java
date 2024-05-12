@@ -1,7 +1,6 @@
 package com.zrlog.admin.business.service;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.hibegin.common.util.FileUtils;
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.StringUtils;
@@ -24,8 +23,7 @@ public class TemplateService {
     public static final String ADMIN_PREVIEW_IMAGE_URI = Constants.ADMIN_URI_BASE_PATH + "/template/preview-image";
 
     public UpdateRecordResponse save(String template, Map<String, Object> settingMap) throws SQLException {
-        new WebSite().updateByKV(template + Constants.TEMPLATE_CONFIG_SUFFIX,
-                new GsonBuilder().serializeNulls().create().toJson(settingMap));
+        new WebSite().updateTemplateConfigMap(template,settingMap);
         UpdateRecordResponse updateRecordResponse = new UpdateRecordResponse();
         updateRecordResponse.setMessage(I18nUtil.getBackendStringFromRes("templateUpdateSuccess"));
         return updateRecordResponse;
@@ -52,6 +50,9 @@ public class TemplateService {
             for (File file : templatesFile) {
                 if (file.isDirectory() && !file.isHidden()) {
                     TemplateVO templateVO = getTemplateVO(file);
+                    if (Objects.isNull(templateVO)) {
+                        continue;
+                    }
                     templates.add(templateVO);
                 }
             }
@@ -89,47 +90,42 @@ public class TemplateService {
         TemplateVO templateVO = new TemplateVO();
         templateVO.setTemplate(templatePath);
         File templateInfo = new File(file + "/template.properties");
-        if (templateInfo.exists()) {
-            Properties properties = new Properties();
-            try (InputStream in = new FileInputStream(templateInfo)) {
-                properties.load(in);
-                templateVO.setAuthor(properties.getProperty("author"));
-                templateVO.setName(properties.getProperty("name"));
-                templateVO.setDigest(properties.getProperty("digest"));
-                templateVO.setVersion(properties.getProperty("version"));
-                templateVO.setUrl(properties.getProperty("url"));
-                templateVO.setViewType(properties.getProperty("viewType"));
-                if (properties.get("previewImages") != null) {
-                    String[] images = properties.get("previewImages").toString().split(",");
-                    String adminPreviewImageUrl = "";
-                    for (int i = 0; i < images.length; i++) {
-                        String image = images[i];
-                        if (!image.startsWith("https://") && !image.startsWith("http://")) {
-                            images[i] = templatePath + "/" + image;
-                            if (i == 0) {
-                                adminPreviewImageUrl = ADMIN_PREVIEW_IMAGE_URI + "?templateName=" + templateVO.getTemplate();
-                            }
-                        } else {
-                            if (i == 0) {
-                                adminPreviewImageUrl = images[i];
-                            }
+        if (!templateInfo.exists()) {
+            return null;
+        }
+        Properties properties = new Properties();
+        try (InputStream in = new FileInputStream(templateInfo)) {
+            properties.load(in);
+            templateVO.setAuthor(properties.getProperty("author"));
+            templateVO.setName(properties.getProperty("name"));
+            templateVO.setDigest(properties.getProperty("digest"));
+            templateVO.setVersion(properties.getProperty("version"));
+            templateVO.setUrl(properties.getProperty("url"));
+            templateVO.setViewType(properties.getProperty("viewType"));
+            if (properties.get("previewImages") != null) {
+                String[] images = properties.get("previewImages").toString().split(",");
+                String adminPreviewImageUrl = "";
+                for (int i = 0; i < images.length; i++) {
+                    String image = images[i];
+                    if (!image.startsWith("https://") && !image.startsWith("http://")) {
+                        images[i] = templatePath + "/" + image;
+                        if (i == 0) {
+                            adminPreviewImageUrl = ADMIN_PREVIEW_IMAGE_URI + "?templateName=" + templateVO.getTemplate();
+                        }
+                    } else {
+                        if (i == 0) {
+                            adminPreviewImageUrl = images[i];
                         }
                     }
-                    if (images.length > 0) {
-                        templateVO.setPreviewImage(images[0]);
-                    }
-                    templateVO.setAdminPreviewImage(adminPreviewImageUrl);
-                    templateVO.setPreviewImages(Arrays.asList(images));
                 }
-            } catch (IOException e) {
-                //LOGGER.log(Level.SEVERE,"", e);
+                if (images.length > 0) {
+                    templateVO.setPreviewImage(images[0]);
+                }
+                templateVO.setAdminPreviewImage(adminPreviewImageUrl);
+                templateVO.setPreviewImages(Arrays.asList(images));
             }
-        } else {
-            templateVO.setAuthor("");
-            templateVO.setName(templatePath.substring(Constants.TEMPLATE_BASE_PATH.length()));
-            templateVO.setUrl("");
-            templateVO.setViewType("jsp");
-            templateVO.setVersion("");
+        } catch (IOException e) {
+            //LOGGER.log(Level.SEVERE,"", e);
         }
         if (templateVO.getPreviewImages() == null || templateVO.getPreviewImages().isEmpty()) {
             templateVO.setPreviewImages(Collections.singletonList("assets/images/template-default-preview.jpg"));
@@ -146,6 +142,9 @@ public class TemplateService {
     public TemplateVO loadTemplateConfig(String templateName) {
         TemplateVO templateVO = getTemplateVO(
                 new File(PathUtil.getStaticPath() + templateName));
+        if (Objects.isNull(templateVO)) {
+            return null;
+        }
         File configFile = new File(PathUtil.getStaticPath() + templateName + "/setting/config-form.json");
         TemplateVO.TemplateConfigMap config;
         //文件存在才配置
@@ -160,11 +159,8 @@ public class TemplateService {
         } else {
             config = new TemplateVO.TemplateConfigMap();
         }
-        String dbJsonStr = new WebSite().getStringValueByName(templateName + Constants.TEMPLATE_CONFIG_SUFFIX);
-        if (StringUtils.isNotEmpty(dbJsonStr)) {
-            Map<String, Object> dbConfig = new Gson().fromJson(dbJsonStr, Map.class);
-            config.forEach((key, value) -> value.setValue(dbConfig.get(key)));
-        }
+        Map<String, Object> dbConfig = new WebSite().getTemplateConfigMapWithCache(templateName);
+        config.forEach((key, value) -> value.setValue(dbConfig.get(key)));
         templateVO.setConfig(config);
         //添加一个隐藏的表单域
         TemplateVO.TemplateConfigVO templateConfigVO = new TemplateVO.TemplateConfigVO();
@@ -174,4 +170,6 @@ public class TemplateService {
         config.put("template", templateConfigVO);
         return templateVO;
     }
+
+
 }

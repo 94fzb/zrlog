@@ -4,19 +4,16 @@ import Form from "antd/es/form";
 import Input from "antd/es/input";
 import Switch from "antd/es/switch";
 import { getRes, removeRes } from "../../utils/constants";
-import Select from "antd/es/select";
 import Button from "antd/es/button";
 import { useState } from "react";
 import axios from "axios";
-import { App, ColorPicker } from "antd";
+import { App } from "antd";
 import { Blog } from "./index";
 
 const layout = {
     labelCol: { span: 8 },
     wrapperCol: { span: 16 },
 };
-
-const { Option } = Select;
 
 const BlogForm = ({ data }: { data: Blog }) => {
     const [form, setForm] = useState<any>(data);
@@ -41,11 +38,10 @@ const BlogForm = ({ data }: { data: Blog }) => {
 
     return (
         <>
-
             <Form
                 {...layout}
                 initialValues={form}
-                onValuesChange={(_k, v) => setForm({ ...form, v })}
+                onValuesChange={(_k, v) => setForm({ ...form, ...v })}
                 onFinish={(v) => websiteFormFinish(v)}
             >
                 <Title level={4}>博客设置</Title>
@@ -53,56 +49,14 @@ const BlogForm = ({ data }: { data: Blog }) => {
                 <Form.Item name="host" label="博客域名（Host）">
                     <Input style={{ maxWidth: "300px" }} placeholder="留空，程序将读取接收到的 Host 字段" />
                 </Form.Item>
-                <Form.Item name="session_timeout" label="管理界面会话超时" rules={[{ required: true }]}>
-                    <Input
-                        suffix="分钟"
-                        style={{ maxWidth: "120px" }}
-                        max={99999}
-                        type={"number"}
-                        min={5}
-                        placeholder=""
-                    />
-                </Form.Item>
                 <Form.Item valuePropName="checked" name="generator_html_status" label="静态化文章页">
                     <Switch size={"small"} />
                 </Form.Item>
-                <Form.Item name="language" label={getRes()["language"]}>
-                    <Select style={{ maxWidth: "100px" }}>
-                        <Option value="zh_CN">{getRes()["languageChinese"]}</Option>
-                        <Option value="en_US">{getRes()["languageEnglish"]}</Option>
-                    </Select>
-                </Form.Item>
-                <Form.Item valuePropName="checked" name="admin_darkMode" label="护眼模式">
-                    <Switch size={"small"} />
-                </Form.Item>
-                <Form.Item label="主题">
-                    <div style={{ display: "flex", justifyContent: "flex-start", alignItems: "center" }}>
-                        <ColorPicker
-                            value={form["admin_color_primary"]}
-                            onChange={(color) => {
-                                setForm({ ...form, admin_color_primary: color.toHexString() });
-                            }}
-                        />
-                        <span style={{ paddingLeft: 8 }}>{form["admin_color_primary"]}</span>
-                    </div>
-                </Form.Item>
-                <Title level={4}>文章/编辑器设置</Title>
-                <Divider />
                 <Form.Item valuePropName="checked" name="disable_comment_status" label="关闭评论">
                     <Switch size={"small"} />
                 </Form.Item>
                 <Form.Item valuePropName="checked" name="article_thumbnail_status" label="文章封面">
                     <Switch size={"small"} />
-                </Form.Item>
-                <Form.Item name="article_auto_digest_length" label="文章自动摘要最大长度" rules={[{ required: true }]}>
-                    <Input
-                        suffix="字"
-                        style={{ maxWidth: "120px" }}
-                        max={99999}
-                        type={"number"}
-                        min={5}
-                        placeholder=""
-                    />
                 </Form.Item>
                 <Divider />
                 <Button type="primary" htmlType="submit">

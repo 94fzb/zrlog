@@ -1,6 +1,5 @@
 package com.zrlog.model;
 
-import com.hibegin.dao.DAO;
 import com.zrlog.common.rest.request.PageRequest;
 import com.zrlog.data.dto.PageData;
 
@@ -15,7 +14,7 @@ import java.util.Map;
 /**
  * 对应数据里面的comment表，用于存放文章对应的评论信息。
  */
-public class Comment extends DAO {
+public class Comment extends BasePageableDAO {
 
     public static final String TABLE_NAME = "comment";
 
@@ -25,10 +24,8 @@ public class Comment extends DAO {
     }
 
     public PageData<Map<String, Object>> find(PageRequest page) throws SQLException {
-        PageData<Map<String, Object>> data = new PageData<>();
-        String sql = "select commentId as id,userComment,header,commTime,userMail,userHome,userIp,userName,hide,logId from " + tableName + " order by commTime desc limit ?,?";
-        data.setRows(queryListWithParams(sql, page.getOffset(), page.getSize()));
-        ModelUtil.fillPageData(this, "from " + tableName, data, new Object[0]);
+        String sql = "select commentId as id,userComment,header,commTime,userMail,userHome,userIp,userName,hide,logId from " + tableName + " order by commTime desc";
+        PageData<Map<String, Object>> data = queryPageData(sql, page, new Object[0]);
         data.getRows().forEach(e -> e.put("commTime", ((LocalDateTime) e.get("commTime")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
         return data;
     }
