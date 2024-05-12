@@ -97,7 +97,7 @@ public class AdminArticleService {
                 IOUtil.writeBytesToFile(bytes, thumbnailFile);
             }
             return new UploadService().getCloudUrl("", path, thumbnailFile.getPath(), null,
-                    adminTokenVO).getUrl() + "?h=" + height + "&w=" + width;
+                    adminTokenVO).url() + "?h=" + height + "&w=" + width;
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "", e);
         }
