@@ -373,8 +373,6 @@ aside li a:hover {
 }
 
 @media screen and (max-width: 1024px) {
-    .main aside { /*display:none;*/
-    }
 
     .main, .top header, .bottom {
         width: auto;
