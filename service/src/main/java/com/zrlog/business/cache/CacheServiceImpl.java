@@ -12,7 +12,6 @@ import com.zrlog.business.plugin.StaticHtmlPlugin;
 import com.zrlog.business.plugin.TemplateDownloadPlugin;
 import com.zrlog.common.CacheService;
 import com.zrlog.common.Constants;
-import com.zrlog.common.rest.request.PageRequest;
 import com.zrlog.common.rest.request.PageRequestImpl;
 import com.zrlog.model.*;
 import com.zrlog.plugin.IPlugin;
@@ -164,6 +163,8 @@ public class CacheServiceImpl implements CacheService {
         }
         servletRequest.getAttr().put("init", cacheInit);
         servletRequest.getAttr().put("website", cacheInit.getWebSite());
+        //website alias
+        servletRequest.getAttr().put("webSite", cacheInit.getWebSite());
         servletRequest.getAttr().put("webs", cacheInit.getWebSite());
         servletRequest.getAttr().put("WEB_SITE", cacheInit.getWebSite());
     }

@@ -2,13 +2,13 @@
 <html lang="${lang}">
 <head>
     <meta charset="utf-8"/>
-    <title><#if log??>${log.title} - </#if>${webs.title} - ${webSite.second_title}</title>
+    <title><#if log??>${log.title} - </#if>${website.title} - ${website.second_title}</title>
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"/>
-    <meta name="description" content="${webSite.description!''}"/>
+    <meta name="description" content="${website.description!''}"/>
     <#if log?? && log.keywords??>
         <meta name="keywords" content="${log.keywords!''}"/>
     <#else>
-        <meta name="keywords" content="${webSite.keywords!''}"/>
+        <meta name="keywords" content="${website.keywords!''}"/>
     </#if>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
     <link rel="stylesheet" type="text/css" media="screen" href="${url}/css/bootstrap.min.css"/>
