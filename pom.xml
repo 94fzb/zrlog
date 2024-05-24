@@ -74,7 +74,7 @@
         <dependency>
             <groupId>com.hibegin</groupId>
             <artifactId>simplewebserver</artifactId>
-            <version>0.3.99</version>
+            <version>0.3.106</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -153,6 +153,11 @@
                         <yarnDownloadRoot>https://repo.huaweicloud.com/yarn/</yarnDownloadRoot>
                         <npmRegistryURL>https://registry.npmmirror.com</npmRegistryURL>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>3.6.1</version>
                 </plugin>
             </plugins>
         </pluginManagement>

@@ -43,6 +43,21 @@ export function deepEqual(obj1: any, obj2: any): boolean {
     return true;
 }
 
+export function removeQueryParam(search: string, key: string) {
+    // 检查是否以 '?' 开头，并处理查询字符串
+    const hasQuestionMark = search.startsWith("?");
+    const params = new URLSearchParams(hasQuestionMark ? search.substring(1) : search);
+
+    // 删除特定的查询参数
+    params.delete(key);
+
+    // 构建新的查询字符串
+    const newSearch = params.toString();
+
+    // 返回结果，根据原始输入决定是否添加 '?'
+    return newSearch ? (hasQuestionMark ? `?${newSearch}` : newSearch) : "";
+}
+
 function isObject(object: any): boolean {
     return object != null && typeof object === "object";
 }

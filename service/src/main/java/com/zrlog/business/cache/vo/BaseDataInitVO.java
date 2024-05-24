@@ -16,9 +16,9 @@ public class BaseDataInitVO implements Serializable {
     private Map<String, Long> archives;
     private List<Archive> archiveList;
     private Map<String, Object> webSite;
-    private List<Map<String, Object>> hotLogs;
+    private List<HotLogBasicInfoVO> hotLogs;
     private List<Map<String, Object>> logNavs;
-    private Map<Map<String, Object>, List<Map<String, Object>>> indexHotLogs;
+    private Map<Map<String, Object>, List<HotLogBasicInfoVO>> indexHotLogs;
     private Statistics statistics;
 
     public List<Map<String, Object>> getTags() {
@@ -77,11 +77,11 @@ public class BaseDataInitVO implements Serializable {
         this.webSite = webSite;
     }
 
-    public List<Map<String, Object>> getHotLogs() {
+    public List<HotLogBasicInfoVO> getHotLogs() {
         return hotLogs;
     }
 
-    public void setHotLogs(List<Map<String, Object>> hotLogs) {
+    public void setHotLogs(List<HotLogBasicInfoVO> hotLogs) {
         this.hotLogs = hotLogs;
     }
 
@@ -93,11 +93,11 @@ public class BaseDataInitVO implements Serializable {
         this.logNavs = logNavs;
     }
 
-    public Map<Map<String, Object>, List<Map<String, Object>>> getIndexHotLogs() {
+    public Map<Map<String, Object>, List<HotLogBasicInfoVO>> getIndexHotLogs() {
         return indexHotLogs;
     }
 
-    public void setIndexHotLogs(Map<Map<String, Object>, List<Map<String, Object>>> indexHotLogs) {
+    public void setIndexHotLogs(Map<Map<String, Object>, List<HotLogBasicInfoVO>> indexHotLogs) {
         this.indexHotLogs = indexHotLogs;
     }
 

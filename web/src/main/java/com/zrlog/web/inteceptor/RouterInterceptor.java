@@ -19,13 +19,10 @@ public class RouterInterceptor implements Interceptor {
 
     @Override
     public boolean doInterceptor(HttpRequest request, HttpResponse response) throws Exception {
-        String actionKey = request.getUri();
-        if (PluginInterceptor.pluginHandlerPaths.stream().anyMatch(actionKey::startsWith)) {
+        if (pluginInterceptor.isHandleAble(request)) {
             pluginInterceptor.doInterceptor(request, response);
             return false;
-        }
-        //这样写一点页不优雅，路径少还好，多了就痛苦了
-        if (actionKey.startsWith("/admin") || actionKey.startsWith("/api/admin")) {
+        } else if (adminInterceptor.isHandleAble(request)) {
             adminInterceptor.doInterceptor(request, response);
         } else {
             blogArticleInterceptor.doInterceptor(request, response);

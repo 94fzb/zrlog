@@ -6,7 +6,8 @@ import com.hibegin.http.annotation.ResponseBody;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.web.Controller;
-import com.zrlog.admin.business.exception.NotFindResourceException;
+import com.zrlog.admin.business.exception.ArgsException;
+import com.zrlog.admin.business.exception.NotFindDbEntryException;
 import com.zrlog.admin.business.exception.PermissionErrorException;
 import com.zrlog.admin.business.rest.request.CreateArticleRequest;
 import com.zrlog.admin.business.rest.request.UpdateArticleRequest;
@@ -73,19 +74,20 @@ public class AdminArticleController extends Controller {
 
     @ResponseBody
     public ApiStandardResponse<PageData<ArticleResponseEntry>> index() throws SQLException {
-        PageData<ArticleResponseEntry> pageData = articleService.adminPage(ControllerUtil.getPageRequest(this),
-                WebTools.convertRequestParam(request.getParaToStr("key")));
+        String key = WebTools.convertRequestParam(request.getParaToStr("key"));
+        PageData<ArticleResponseEntry> pageData = articleService.adminPage(ControllerUtil.getPageRequest(this), key);
         pageData.getRows().forEach(x -> x.setUrl(getAccessUrl(x)));
+        pageData.setKey(key);
         return new ApiStandardResponse<>(pageData);
     }
 
     private String getAccessUrl(ArticleResponseEntry articleResponseEntry) {
+        if (articleResponseEntry.isPrivacy() || articleResponseEntry.isRubbish()) {
+            return "/article-edit?previewMode=true&id=" + articleResponseEntry.getId();
+        }
         String key = articleResponseEntry.getId() + "";
         if (StringUtils.isNotEmpty(articleResponseEntry.getAlias())) {
             key = articleResponseEntry.getAlias();
-        }
-        if (articleResponseEntry.isPrivacy() || articleResponseEntry.isRubbish()) {
-            return "/article-edit?previewMode=true&id=" + key;
         }
         return ZrLogUtil.getHomeUrlWithHost(getRequest()) + Constants.getArticleUri() + key + TemplateHelper.getSuffix(request);
     }
@@ -123,12 +125,13 @@ public class AdminArticleController extends Controller {
      */
     @ResponseBody
     public ApiStandardResponse<LoadEditArticleResponse> detail() throws SQLException {
-        if (getRequest().getParaToStr("id") == null) {
-            throw new NotFindResourceException();
+        String id = getRequest().getParaToStr("id");
+        if (StringUtils.isEmpty(id)) {
+            throw new ArgsException("id");
         }
-        Map<String, Object> log = new Log().adminFindByIdOrAlias(request.getParaToStr("id"));
+        Map<String, Object> log = new Log().adminFindByIdOrAlias(id);
         if (log == null) {
-            throw new NotFindResourceException();
+            throw new NotFindDbEntryException();
         }
         log.remove("releaseTime");
         log.remove("last_update_date");

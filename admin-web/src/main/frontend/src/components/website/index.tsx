@@ -57,12 +57,9 @@ const WebSite = ({ data }: { data: Data }) => {
     const activeKey = tab ? tab : "basic";
 
     const buildLink = (key: string, text: string) => {
+        const toUrl = key === "basic" ? "/website" : "/website?tab=" + key;
         return (
-            <Link
-                to={"/website?tab=" + key}
-                replace={true}
-                style={{ color: activeKey === key ? getColorPrimary() : "inherit" }}
-            >
+            <Link to={toUrl} replace={true} style={{ color: activeKey === key ? getColorPrimary() : "inherit" }}>
                 {text}
             </Link>
         );
@@ -132,7 +129,6 @@ const WebSite = ({ data }: { data: Data }) => {
                         children: <UpgradeSettingForm data={data.upgrade} />,
                     },
                 ]}
-                //onChange={(e) => handleTabClick(e)}
             />
         </>
     );

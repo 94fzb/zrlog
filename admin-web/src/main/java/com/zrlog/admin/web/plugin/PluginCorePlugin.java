@@ -2,6 +2,7 @@ package com.zrlog.admin.web.plugin;
 
 import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.common.Constants;
+import com.zrlog.common.PluginCoreProcess;
 import com.zrlog.plugin.IPlugin;
 import com.zrlog.util.BlogBuildInfoUtil;
 
@@ -16,24 +17,32 @@ public class PluginCorePlugin implements IPlugin {
 
     private final File dbPropertiesPath;
     private final String pluginJvmArgs;
+    private final PluginCoreProcess pluginCoreProcess;
+    private final String token;
 
-    public PluginCorePlugin(File dbPropertiesPath, String pluginJvmArgs) {
+    public PluginCorePlugin(File dbPropertiesPath, String pluginJvmArgs, PluginCoreProcess pluginCoreProcess, String token) {
         this.dbPropertiesPath = dbPropertiesPath;
         this.pluginJvmArgs = pluginJvmArgs;
+        this.pluginCoreProcess = pluginCoreProcess;
+        this.token = token;
     }
 
     @Override
     public boolean start() {
         //加载 ZrLog 提供的插件
-        int port = PluginCoreProcess.getInstance().pluginServerStart(new File(PathUtil.getConfPath() + "/plugins/plugin-core.jar"),
-                dbPropertiesPath.toString(), pluginJvmArgs, PathUtil.getStaticPath(), BlogBuildInfoUtil.getVersion());
+        int port = pluginCoreProcess.pluginServerStart(new File(PathUtil.getConfPath() + "/plugins/plugin-core.jar"),
+                dbPropertiesPath.toString(), pluginJvmArgs, PathUtil.getStaticPath(), BlogBuildInfoUtil.getVersion(),token);
         Constants.pluginServer = "http://127.0.0.1:" + port;
         return true;
     }
 
+    public String getToken() {
+        return token;
+    }
+
     @Override
     public boolean stop() {
-        PluginCoreProcess.getInstance().stopPluginCore();
+        pluginCoreProcess.stopPluginCore();
         return true;
     }
 }

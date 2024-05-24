@@ -8,12 +8,22 @@ public class PageData<T> {
     public PageData() {
     }
 
-    public PageData(long totalElements, List<T> rows) {
+    public PageData(Long totalElements, List<T> rows) {
         this.totalElements = totalElements;
         this.rows = rows;
     }
 
-    private long totalElements;
+    public PageData(Long totalElements, List<T> rows, Long page, Long size) {
+        this.page = page;
+        this.size = size;
+        this.totalElements = totalElements;
+        this.rows = rows;
+    }
+
+    private Long page;
+    private Long size;
+    private Long totalElements;
+    private String key;
     private List<T> rows = new ArrayList<>();
 
     public List<T> getRows() {
@@ -30,5 +40,33 @@ public class PageData<T> {
 
     public void setTotalElements(long totalElements) {
         this.totalElements = totalElements;
+    }
+
+    public Long getPage() {
+        return page;
+    }
+
+    public void setPage(Long page) {
+        this.page = page;
+    }
+
+    public Long getSize() {
+        return size;
+    }
+
+    public void setSize(Long size) {
+        this.size = size;
+    }
+
+    public void setTotalElements(Long totalElements) {
+        this.totalElements = totalElements;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 }

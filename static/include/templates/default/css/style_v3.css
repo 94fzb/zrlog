@@ -198,6 +198,7 @@ aside .search input[type=text] {
     height: 40px;
     padding: 6px;
     flex: 1;
+    background: inherit;
 }
 
 aside .search {
@@ -541,4 +542,10 @@ footer {
 
 li.page-item {
     white-space: nowrap;
+}
+
+.copyright{
+    display: flex;
+    justify-content: center;
+    gap: 8px;
 }

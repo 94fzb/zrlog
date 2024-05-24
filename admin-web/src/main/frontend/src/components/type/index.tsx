@@ -58,7 +58,6 @@ const Type = ({ data }: { data: PageDataSource }) => {
                 )}
                 datasource={data}
                 deleteApi={"/api/admin/type/delete"}
-                dataApi={"/api/admin/type"}
             />
         </>
     );

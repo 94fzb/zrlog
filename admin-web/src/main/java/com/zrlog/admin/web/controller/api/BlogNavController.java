@@ -41,7 +41,7 @@ public class BlogNavController extends Controller {
 
     @ResponseBody
     public ApiStandardResponse<PageData<Map<String, Object>>> index() throws SQLException {
-        PageData<Map<String, Object>> mapPageData = new LogNav().find(ControllerUtil.getPageRequest(this));
+        PageData<Map<String, Object>> mapPageData = new LogNav().find(ControllerUtil.unPageRequest());
         mapPageData.getRows().forEach(e -> {
             e.put("jumpUrl", TemplateHelper.getNavUrl(request, TemplateHelper.getSuffix(request), (String) e.get("url")));
         });

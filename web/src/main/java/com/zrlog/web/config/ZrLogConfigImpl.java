@@ -14,17 +14,18 @@ import com.hibegin.http.server.config.ServerConfig;
 import com.hibegin.http.server.util.PathUtil;
 import com.zaxxer.hikari.util.DriverDataSource;
 import com.zrlog.admin.web.plugin.PluginCorePlugin;
-import com.zrlog.admin.web.plugin.PluginCoreProcess;
-import com.zrlog.business.plugin.TemplateDownloadPlugin;
+import com.zrlog.admin.web.plugin.PluginCoreProcessImpl;
 import com.zrlog.admin.web.plugin.UpdateVersionPlugin;
+import com.zrlog.admin.web.token.AdminTokenService;
 import com.zrlog.blog.web.controller.api.ApiInstallController;
 import com.zrlog.blog.web.plugin.CacheManagerPlugin;
 import com.zrlog.blog.web.plugin.RequestStatisticsPlugin;
 import com.zrlog.blog.web.version.UpgradeVersionHandler;
+import com.zrlog.business.cache.CacheServiceImpl;
 import com.zrlog.business.plugin.StaticHtmlPlugin;
+import com.zrlog.business.plugin.TemplateDownloadPlugin;
 import com.zrlog.business.util.InstallUtils;
-import com.zrlog.common.Constants;
-import com.zrlog.common.ZrLogConfig;
+import com.zrlog.common.*;
 import com.zrlog.model.WebSite;
 import com.zrlog.plugin.IPlugin;
 import com.zrlog.plugin.Plugins;
@@ -39,10 +40,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -58,12 +56,15 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     private ServerConfig serverConfig;
     private final Plugins plugins;
     private final JarUpdater jarUpdater;
-
+    private final CacheService cacheService;
+    private final PluginCoreProcess pluginCoreProcess;
 
     public ZrLogConfigImpl(Integer port, JarUpdater jarUpdater) {
         this.port = port;
         this.plugins = new Plugins();
         this.jarUpdater = jarUpdater;
+        this.cacheService = new CacheServiceImpl();
+        this.pluginCoreProcess = new PluginCoreProcessImpl();
     }
 
     /**
@@ -174,7 +175,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
                     pluginJvmArgsObj = "";
                 }
                 //这里使用独立的线程进行启动，主要是为了防止插件服务出问题后，影响整体，同时是避免启动过慢的问题。
-                plugins.add(new PluginCorePlugin(Constants.getDbPropertiesFile(), pluginJvmArgsObj.toString()));
+                plugins.add(new PluginCorePlugin(Constants.getDbPropertiesFile(), pluginJvmArgsObj.toString(), pluginCoreProcess, UUID.randomUUID().toString().replace("-", "")));
                 plugins.add(new UpdateVersionPlugin());
                 plugins.add(new CacheManagerPlugin());
                 //需要缓存加载完毕后执行的插件
@@ -225,7 +226,6 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         }
         try (Connection connection = DbConnectUtils.getConnection(dbProp)) {
             for (Map.Entry<Integer, List<String>> entry : sqlList) {
-
                 if (Objects.isNull(connection)) {
                     return;
                 }
@@ -250,7 +250,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
                 }
                 //执行需要转换的数据
                 try {
-                    UpgradeVersionHandler upgradeVersionHandler = (UpgradeVersionHandler) Class.forName("com" + ".zrlog.web.version.V" + entry.getKey() + "UpgradeVersionHandler").getDeclaredConstructor().newInstance();
+                    UpgradeVersionHandler upgradeVersionHandler = (UpgradeVersionHandler) Class.forName("com.zrlog.web.version.V" + entry.getKey() + "UpgradeVersionHandler").getDeclaredConstructor().newInstance();
                     try {
                         upgradeVersionHandler.doUpgrade(connection);
                     } catch (Exception e) {
@@ -267,10 +267,10 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     }
 
     /**
-     * 重写了的stop方法，目的是为了，系统正常停止后（如使用sh catalina.sh stop，进行自动更新时）,正常关闭插件，防治内存泄漏。
+     * 系统停止后，关闭插件相关进程服务，防治内存泄漏
      */
-    public void onStop() {
-        PluginCoreProcess.getInstance().stopPluginCore();
+    private void onStop() {
+        pluginCoreProcess.stopPluginCore();
         for (IPlugin plugin : plugins) {
             plugin.stop();
         }
@@ -287,6 +287,16 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     }
 
     @Override
+    public CacheService getCacheService() {
+        return cacheService;
+    }
+
+    @Override
+    public TokenService getTokenService() {
+        return new AdminTokenService();
+    }
+
+    @Override
     public void installFinish() {
         configPlugin(plugins);
         for (IPlugin plugin : plugins) {
@@ -296,12 +306,13 @@ public class ZrLogConfigImpl extends ZrLogConfig {
             return;
         }
         int updatedVersion = Constants.SQL_VERSION;
-        if (updatedVersion > 0) {
-            try {
-                new WebSite().updateByKV(Constants.ZRLOG_SQL_VERSION_KEY, updatedVersion + "");
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+        if (updatedVersion <= 0) {
+            return;
+        }
+        try {
+            new WebSite().updateByKV(Constants.ZRLOG_SQL_VERSION_KEY, updatedVersion + "");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 }

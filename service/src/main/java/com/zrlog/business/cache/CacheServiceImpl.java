@@ -1,15 +1,19 @@
 package com.zrlog.business.cache;
 
+import com.hibegin.common.util.BeanUtil;
 import com.hibegin.common.util.FileUtils;
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.business.cache.vo.BaseDataInitVO;
+import com.zrlog.business.cache.vo.HotLogBasicInfoVO;
 import com.zrlog.business.plugin.StaticHtmlPlugin;
 import com.zrlog.business.plugin.TemplateDownloadPlugin;
+import com.zrlog.common.CacheService;
 import com.zrlog.common.Constants;
 import com.zrlog.common.rest.request.PageRequest;
+import com.zrlog.common.rest.request.PageRequestImpl;
 import com.zrlog.model.*;
 import com.zrlog.plugin.IPlugin;
 import com.zrlog.util.I18nUtil;
@@ -17,21 +21,28 @@ import com.zrlog.util.I18nUtil;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
 
 /**
  * 对缓存数据的操作
  */
-public class CacheService {
+public class CacheServiceImpl implements CacheService {
+    private static final Logger LOGGER = LoggerUtil.getLogger(CacheServiceImpl.class);
+    private final String CACHE_HTML_PATH = PathUtil.getCachePath();
 
-    private static final String CACHE_HTML_PATH = PathUtil.getCachePath();
-    private static final Logger LOGGER = LoggerUtil.getLogger(CacheService.class);
+    private final AtomicLong version = new AtomicLong();
+    private final Map<String, String> cacheFileMap = new ConcurrentHashMap<>();
+    private BaseDataInitVO cacheInit;
+    private final ReentrantLock lock = new ReentrantLock();
 
-    private static final Map<String, String> cacheFileMap = new HashMap<>();
-
+    @Override
     public boolean isCacheableByRequest(HttpRequest request) {
         //disable html client cache
         if (request.getUri().endsWith(".html")) {
@@ -40,14 +51,13 @@ public class CacheService {
         return cacheFileMap.containsKey(request.getUri().substring(1));
     }
 
-    private static final ReentrantLock lock = new ReentrantLock();
 
-    private static BaseDataInitVO cacheInit;
-
-    public static String getFileFlag(String uri) {
+    @Override
+    public String getFileFlag(String uri) {
         return cacheFileMap.get(uri);
     }
 
+    @Override
     public File loadCacheFile(HttpRequest request) {
         String lang = I18nUtil.getAcceptLocal(request);
         String cacheKey = request.getUri();
@@ -60,13 +70,13 @@ public class CacheService {
     /**
      * 将一个网页转化对应文件，用于静态化文章页
      */
+    @Override
     public File saveResponseBodyToHtml(HttpRequest httpRequest, String copy) {
         if (copy == null) {
             return null;
         }
         byte[] bytes = copy.getBytes(StandardCharsets.UTF_8);
-        FileUtils.tryResizeDiskSpace(CACHE_HTML_PATH, bytes.length,
-                Constants.getMaxCacheHtmlSize());
+        FileUtils.tryResizeDiskSpace(CACHE_HTML_PATH, bytes.length, Constants.getMaxCacheHtmlSize());
         File htmlFile = loadCacheFile(httpRequest);
         if (!htmlFile.exists()) {
             htmlFile.getParentFile().mkdirs();
@@ -94,9 +104,11 @@ public class CacheService {
         return cacheMap;
     }
 
-    public void refreshInitDataCacheAsync(HttpRequest servletRequest, boolean cleanAble) {
-        CompletableFuture.runAsync(() -> {
-            refreshInitDataCache(servletRequest, cleanAble);
+    @Override
+    public CompletableFuture<Void> refreshInitDataCacheAsync(HttpRequest servletRequest, boolean cleanAble) {
+        long expectVersion = version.incrementAndGet();
+        return CompletableFuture.runAsync(() -> {
+            refreshInitDataCache(servletRequest, cleanAble, expectVersion);
         });
     }
 
@@ -109,10 +121,13 @@ public class CacheService {
         Constants.WEB_SITE.putAll(newWebSite);
     }
 
-    public void refreshInitDataCache(HttpRequest servletRequest, boolean cleanAble) {
+    private void refreshInitDataCache(HttpRequest servletRequest, boolean cleanAble, long expectVersion) {
         if (cleanAble || cacheInit == null) {
-            long start = System.currentTimeMillis();
             lock.lock();
+            if (!Objects.equals(version.get(), expectVersion)) {
+                return;
+            }
+            long start = System.currentTimeMillis();
             try {
                 cacheInit = getCacheInit();
                 new Tag().refreshTag();
@@ -152,16 +167,23 @@ public class CacheService {
         servletRequest.getAttr().put("WEB_SITE", cacheInit.getWebSite());
     }
 
+    @Override
     public Map<String, Object> refreshWebSite() {
         Map<String, Object> website = new WebSite().getWebSite();
         refreshWebSite(website);
         return Constants.WEB_SITE;
     }
 
+    private HotLogBasicInfoVO convertToBasicVO(Map<String, Object> log) {
+        log.put("releaseTime", ((LocalDateTime) log.get("releaseTime")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        log.put("last_update_date", ((LocalDateTime) log.get("last_update_date")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        return BeanUtil.convert(log, HotLogBasicInfoVO.class);
+    }
+
     private BaseDataInitVO getCacheInit() throws SQLException {
         BaseDataInitVO cacheInit = new BaseDataInitVO();
         BaseDataInitVO.Statistics statistics = new BaseDataInitVO.Statistics();
-        statistics.setTotalArticleSize(new Log().count());
+        statistics.setTotalArticleSize(new Log().getVisitorCount());
         cacheInit.setStatistics(statistics);
         cacheInit.setWebSite(refreshWebSite());
         cacheInit.setLinks(new Link().findAll());
@@ -177,14 +199,17 @@ public class CacheService {
         cacheInit.setTags(all);
         statistics.setTotalTagSize(cacheInit.getTags().size());
         List<Map<String, Object>> types = cacheInit.getTypes();
-        cacheInit.setHotLogs(new Log().visitorFind(new PageRequest(1, 6), "").getRows());
-        Map<Map<String, Object>, List<Map<String, Object>>> indexHotLog = new LinkedHashMap<>();
+        //Last article
+        cacheInit.setHotLogs(new Log().visitorFind(new PageRequestImpl(1L, 6L), "").getRows().stream().map(this::convertToBasicVO).toList());
+        Map<Map<String, Object>, List<HotLogBasicInfoVO>> indexHotLog = new LinkedHashMap<>();
         for (Map<String, Object> type : types) {
             Map<String, Object> typeMap = new TreeMap<>();
             typeMap.put("typeName", type.get("typeName"));
-            typeMap.put("alias", type.get("alias"));
-            indexHotLog.put(typeMap, new Log().findByTypeAlias(1, 6, (String) type.get("alias")).getRows());
+            String alias = (String) type.get("alias");
+            typeMap.put("alias", alias);
+            indexHotLog.put(typeMap, new Log().findByTypeAlias(1, 6, alias).getRows().stream().map(this::convertToBasicVO).toList());
         }
+        //设置分类Hot
         cacheInit.setIndexHotLogs(indexHotLog);
 
         if (cacheInit.getTags() == null || cacheInit.getTags().isEmpty()) {

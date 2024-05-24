@@ -6,14 +6,16 @@ import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.web.Controller;
 import com.zrlog.blog.web.util.WebTools;
-import com.zrlog.business.cache.CacheService;
+import com.zrlog.business.cache.CacheServiceImpl;
 import com.zrlog.business.rest.request.CreateCommentRequest;
 import com.zrlog.business.rest.response.CreateCommentResponse;
 import com.zrlog.business.service.CommentService;
 import com.zrlog.business.service.VisitorArticleService;
 import com.zrlog.business.util.PagerUtil;
 import com.zrlog.common.Constants;
+import com.zrlog.common.ZrLogConfig;
 import com.zrlog.common.rest.request.PageRequest;
+import com.zrlog.common.rest.request.PageRequestImpl;
 import com.zrlog.data.dto.PageData;
 import com.zrlog.model.Comment;
 import com.zrlog.model.Log;
@@ -61,15 +63,15 @@ public class ArticleController extends Controller {
     }
 
     public String index() throws SQLException {
-        int page = getPage();
+        long page = getPage();
 
-        PageRequest pageRequest = new PageRequest(page, Constants.getDefaultRows());
+        PageRequest pageRequest = new PageRequestImpl(page, Constants.getDefaultRows());
         PageData<Map<String, Object>> data = new Log().visitorFind(pageRequest, null);
         setPageDataInfo(Constants.getArticleUri() + "all-", data, pageRequest);
         return "index";
     }
 
-    private int getPage() {
+    private long getPage() {
         int page = 1;
         if (getRequest().getUri().contains("-")) {
             page = ParseUtil.strToInt(getRequest().getUri().split("-")[1].replace(".html", ""), 1);
@@ -94,26 +96,26 @@ public class ArticleController extends Controller {
         if (StringUtils.isEmpty(key)) {
             return index();
         }
-        data = visitorArticleService.pageByKeywords(new PageRequest(1, Constants.getDefaultRows()), key);
+        data = visitorArticleService.pageByKeywords(new PageRequestImpl(1L, Constants.getDefaultRows()), key);
         // 记录回话的Key
         request.getAttr().put("key", WebTools.htmlEncode(key));
 
         request.getAttr().put("tipsType", I18nUtil.getBlogStringFromRes("search"));
         request.getAttr().put("tipsName", WebTools.htmlEncode(key));
 
-        setPageDataInfo(Constants.getArticleUri() + "search/" + key + "-", data, new PageRequest(getPage(),
+        setPageDataInfo(Constants.getArticleUri() + "search/" + key + "-", data, new PageRequestImpl(getPage(),
                 Constants.getDefaultRows()));
         return "page";
     }
 
-    public String record() throws SQLException {
+    public String record() {
         String dateStr = parseArgs(request.getUri(), 2, 0);
 
         request.getAttr().put("tipsType", I18nUtil.getBlogStringFromRes("archive"));
         request.getAttr().put("tipsName", dateStr);
 
         setPageDataInfo(Constants.getArticleUri() + "record/" + dateStr + "-", new Log().findByDate(getPage(), Constants.getDefaultRows(),
-                dateStr), new PageRequest(getPage(),
+                dateStr), new PageRequestImpl(getPage(),
                 Constants.getDefaultRows()));
         return "page";
     }
@@ -123,7 +125,7 @@ public class ArticleController extends Controller {
         String ext = "";
         if (Constants.isStaticHtmlStatus()) {
             ext = ".html";
-            new CacheService().refreshInitDataCache(this.getRequest(), true);
+            Constants.zrLogConfig.getCacheService().refreshInitDataCacheAsync(this.getRequest(), true).join();
         }
         response.redirect("/" + Constants.getArticleUri() + x.getAlias() + ext);
     }
@@ -145,8 +147,8 @@ public class ArticleController extends Controller {
         Map<String, Object> log = new Log().findByIdOrAlias(idOrAlias);
         if (log != null) {
             Integer logId = (Integer) log.get("logId");
-            Map<String,Object> lastLog = Objects.requireNonNullElse(new Log().findLastLog(logId),new HashMap<>(Map.of("title", I18nUtil.getBlogStringFromRes("noLastLog"),"alias",idOrAlias)));
-            Map<String,Object> nextLog = Objects.requireNonNullElse(new Log().findNextLog(logId),new HashMap<>(Map.of("title", I18nUtil.getBlogStringFromRes("noNextLog"),"alias",idOrAlias)));
+            Map<String, Object> lastLog = Objects.requireNonNullElse(new Log().findLastLog(logId), new HashMap<>(Map.of("title", I18nUtil.getBlogStringFromRes("noLastLog"), "alias", idOrAlias)));
+            Map<String, Object> nextLog = Objects.requireNonNullElse(new Log().findNextLog(logId), new HashMap<>(Map.of("title", I18nUtil.getBlogStringFromRes("noNextLog"), "alias", idOrAlias)));
             log.put("lastLog", lastLog);
             log.put("nextLog", nextLog);
             log.put("comments", new Comment().findAllByLogId(logId));
@@ -162,7 +164,7 @@ public class ArticleController extends Controller {
 
     public String sort() throws SQLException {
         String typeStr = parseArgs(request.getUri(), 2, 0);
-        setPageDataInfo(Constants.getArticleUri() + "sort/" + typeStr + "-", new Log().findByTypeAlias(getPage(), Constants.getDefaultRows(), typeStr), new PageRequest(getPage(),
+        setPageDataInfo(Constants.getArticleUri() + "sort/" + typeStr + "-", new Log().findByTypeAlias(getPage(), Constants.getDefaultRows(), typeStr), new PageRequestImpl(getPage(),
                 Constants.getDefaultRows()));
 
         Map<String, Object> type = new Type().findByAlias(typeStr);
@@ -176,7 +178,7 @@ public class ArticleController extends Controller {
 
     public String tag() throws SQLException {
         String tag = WebTools.convertRequestParam(parseArgs(request.getUri(), 2, 0));
-        setPageDataInfo(Constants.getArticleUri() + "tag/" + tag + "-", new Log().findByTag(getPage(), Constants.getDefaultRows(), tag), new PageRequest(getPage(),
+        setPageDataInfo(Constants.getArticleUri() + "tag/" + tag + "-", new Log().findByTag(getPage(), Constants.getDefaultRows(), tag), new PageRequestImpl(getPage(),
                 Constants.getDefaultRows()));
         getRequest().getAttr().put("tipsType", I18nUtil.getBlogStringFromRes("tag"));
         getRequest().getAttr().put("tipsName", tag);

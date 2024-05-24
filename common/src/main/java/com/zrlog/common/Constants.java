@@ -45,6 +45,7 @@ public class Constants {
 
 
     public static final String ADMIN_LOGIN_URI_PATH = ADMIN_URI_BASE_PATH + "/login";
+    public static final String ADMIN_REFRESH_CACHE_API_URI_PATH = "/api" + ADMIN_URI_BASE_PATH + "/refreshCache";
 
     public static final String INDEX_URI_PATH = "/index";
 
@@ -145,8 +146,8 @@ public class Constants {
         return !Constants.getBooleanByFromWebSite("disable_comment_status");
     }
 
-    public static Integer getDefaultRows() {
-        return (int) Double.parseDouble((String) Objects.requireNonNullElse(Constants.WEB_SITE.get("rows"), "10"));
+    public static long getDefaultRows() {
+        return (long) Double.parseDouble((String) Objects.requireNonNullElse(Constants.WEB_SITE.get("rows"), "10"));
     }
 
 

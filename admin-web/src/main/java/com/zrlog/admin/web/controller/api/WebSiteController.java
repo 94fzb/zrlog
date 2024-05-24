@@ -12,8 +12,9 @@ import com.zrlog.admin.business.rest.response.WebSiteSettingsResponse;
 import com.zrlog.admin.business.service.WebSiteService;
 import com.zrlog.admin.web.annotation.RefreshCache;
 import com.zrlog.admin.web.plugin.UpdateVersionPlugin;
-import com.zrlog.business.cache.CacheService;
+import com.zrlog.business.cache.CacheServiceImpl;
 import com.zrlog.common.Constants;
+import com.zrlog.common.ZrLogConfig;
 import com.zrlog.common.rest.response.ApiStandardResponse;
 import com.zrlog.common.type.AutoUpgradeVersionType;
 import com.zrlog.model.WebSite;
@@ -95,7 +96,7 @@ public class WebSiteController extends Controller {
     @ResponseBody
     public ApiStandardResponse<Void> admin() throws SQLException {
         ApiStandardResponse<Void> update = update(BeanUtil.convertWithValid(getRequest().getInputStream(), AdminWebSiteInfo.class));
-        new CacheService().refreshWebSite();
+        Constants.zrLogConfig.getCacheService().refreshWebSite();
         return update;
     }
 

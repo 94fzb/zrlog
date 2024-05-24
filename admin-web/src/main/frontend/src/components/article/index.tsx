@@ -5,14 +5,13 @@ import Search from "antd/es/input/Search";
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
 import { getColorPrimary, getRes } from "../../utils/constants";
-import { useState } from "react";
+import { ReactElement, useState } from "react";
 import BaseTable, { PageDataSource } from "../../common/BaseTable";
 import { Link } from "react-router-dom";
 import { deleteCacheDataByKey } from "../../cache";
+import { LockOutlined } from "@ant-design/icons";
 
 const Index = ({ data }: { data: PageDataSource }) => {
-    const dataApi = "/api/admin/article";
-
     const tagForMap = (tag: string) => {
         const tagElem = (
             <Tag icon={<TagOutlined />} closable={false} color={getColorPrimary()}>
@@ -22,6 +21,16 @@ const Index = ({ data }: { data: PageDataSource }) => {
         return (
             <span key={"all-" + tag} style={{ display: "inline-block" }}>
                 {tagElem}
+            </span>
+        );
+    };
+
+    const wrapperArticleStateInfo = (record: any, children: ReactElement) => {
+        return (
+            <span style={{ display: "flex", gap: 4 }}>
+                {record.privacy && <LockOutlined style={{ color: getColorPrimary() }} />}
+                {record.rubbish && <span>[草稿]</span>}
+                {children}
             </span>
         );
     };
@@ -53,9 +62,10 @@ const Index = ({ data }: { data: PageDataSource }) => {
                         </Tooltip>
                     );
                     if (record["url"].includes("previewMode")) {
-                        return <Link to={record["url"]}>{t}</Link>;
+                        return wrapperArticleStateInfo(record, <Link to={record["url"]}>{t}</Link>);
                     }
-                    return (
+                    return wrapperArticleStateInfo(
+                        record,
                         <a rel="noopener noreferrer" target={"_blank"} href={record.url}>
                             {t}
                         </a>
@@ -74,12 +84,12 @@ const Index = ({ data }: { data: PageDataSource }) => {
                         </Space>
                     ) : null,
             },
-            {
+            /*{
                 title: "作者",
                 key: "userName",
                 dataIndex: "userName",
                 width: 80,
-            },
+            },*/
             {
                 title: "分类",
                 key: "typeName",
@@ -93,17 +103,16 @@ const Index = ({ data }: { data: PageDataSource }) => {
                 width: 80,
             },
             {
-                title: "草稿",
-                key: "rubbish",
-                dataIndex: "rubbish",
+                title: getRes()["commentAble"],
+                key: "canComment",
+                dataIndex: "canComment",
                 render: (v: boolean) => (v ? "是" : "否"),
                 width: 80,
             },
             {
-                title: "公开",
-                key: "privacy",
-                dataIndex: "privacy",
-                render: (v: boolean) => (v ? "否" : "是"),
+                title: "评论量",
+                key: "commentSize",
+                dataIndex: "commentSize",
                 width: 80,
             },
             {
@@ -129,7 +138,7 @@ const Index = ({ data }: { data: PageDataSource }) => {
         return "/api/admin/article/delete";
     };
 
-    const [searchKey, setSearchKey] = useState<string>();
+    const [searchKey, setSearchKey] = useState<string>(data.key ? data.key : "");
 
     return (
         <>
@@ -143,6 +152,7 @@ const Index = ({ data }: { data: PageDataSource }) => {
                     <Search
                         placeholder={getRes().searchTip}
                         onSearch={onSearch}
+                        defaultValue={data.key}
                         enterButton={getRes()["search"]}
                         style={{ maxWidth: "240px", float: "right" }}
                     />
@@ -163,7 +173,6 @@ const Index = ({ data }: { data: PageDataSource }) => {
                 }}
                 deleteApi={getDeleteApiUri()}
                 searchKey={searchKey}
-                dataApi={dataApi}
             />
         </>
     );

@@ -21,6 +21,6 @@ public class ArticleTypeService {
             response.setAmount(response.getTypeamount());
             response.setUrl(homeUrl + "sort/" + URLEncoder.encode(response.getAlias(), StandardCharsets.UTF_8) + (staticHtml ? ".html" : ""));
             return response;
-        }).toList());
+        }).toList(), mapPageData.getPage(), mapPageData.getSize());
     }
 }

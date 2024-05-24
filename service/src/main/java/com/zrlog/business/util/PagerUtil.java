@@ -7,7 +7,7 @@ import java.util.List;
 
 public class PagerUtil {
 
-    public static PagerVO generatorPager(String currentUri, int currentPage, long totalPage) {
+    public static PagerVO generatorPager(String currentUri, long currentPage, long totalPage) {
         PagerVO pager = new PagerVO();
         List<PagerVO.PageEntry> pageList = new ArrayList<>();
         if (currentPage != 1) {
@@ -22,7 +22,7 @@ public class PagerUtil {
                 if (currentPage + 1 == totalPage - 3) {
                     pageList.add(pageEntity(currentUri, currentPage, currentPage - 3));
                 }
-                for (int i = currentPage - 2; i <= currentPage; i++) {
+                for (long i = currentPage - 2; i <= currentPage; i++) {
                     pageList.add(pageEntity(currentUri, currentPage, i));
                 }
                 if (currentPage + 1 != totalPage - 3) {
@@ -48,7 +48,7 @@ public class PagerUtil {
         return pager;
     }
 
-    private static PagerVO.PageEntry pageEntity(String url, int currentPage, String desc, long page) {
+    private static PagerVO.PageEntry pageEntity(String url, long currentPage, String desc, long page) {
         PagerVO.PageEntry map = new PagerVO.PageEntry();
         map.setUrl(url + page);
         map.setDesc(desc);
@@ -56,7 +56,7 @@ public class PagerUtil {
         return map;
     }
 
-    private static PagerVO.PageEntry pageEntity(String url, int currentPage, long page) {
+    private static PagerVO.PageEntry pageEntity(String url, long currentPage, long page) {
         return pageEntity(url, currentPage, page + "", page);
     }
 

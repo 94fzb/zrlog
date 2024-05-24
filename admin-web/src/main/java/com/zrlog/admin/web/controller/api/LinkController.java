@@ -48,7 +48,7 @@ public class LinkController extends Controller {
 
     @ResponseBody
     public ApiStandardResponse<PageData<Map<String, Object>>> index() throws SQLException {
-        return new ApiStandardResponse<>(new Link().find(ControllerUtil.getPageRequest(this)));
+        return new ApiStandardResponse<>(new Link().find(ControllerUtil.unPageRequest()));
     }
 
     @RefreshCache(async = true)

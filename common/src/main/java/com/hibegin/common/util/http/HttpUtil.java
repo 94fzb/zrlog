@@ -3,6 +3,7 @@ package com.hibegin.common.util.http;
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.http.handle.HttpHandle;
 import com.hibegin.common.util.http.handle.HttpStringHandle;
+import com.zrlog.common.Constants;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -87,11 +88,17 @@ public class HttpUtil {
         requestBuilder.headers("Accept-Encoding", "gzip, deflate");
         requestBuilder.headers("Accept-Language", "zh-cn,zh;q=0.5");
         requestBuilder.headers("User-Agent", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:41.0) Gecko/20100101 Firefox/41.0");
-        //LOGGER.info("headers = " + headers);
+        if (Constants.DEV_MODE) {
+            LOGGER.info("headers = " + headers);
+        }
         if (Objects.nonNull(headers)) {
             headers.forEach((k, v) -> {
                 if (Objects.nonNull(v)) {
-                    requestBuilder.header(k, v);
+                    try {
+                        requestBuilder.header(k, v);
+                    } catch (Exception e) {
+                        LOGGER.warning("set header " + k + ", " + v + ", error: " + e.getMessage());
+                    }
                 }
             });
         }

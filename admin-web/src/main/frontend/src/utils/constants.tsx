@@ -30,6 +30,8 @@ export const setRes = (r: Record<string, never>) => {
     window[resourceKey] = JSON.stringify(r);
 };
 
+export const cacheIgnoreReloadKey = "_t";
+
 export const removeRes = () => {
     // @ts-ignore
     window[resourceKey] = undefined;

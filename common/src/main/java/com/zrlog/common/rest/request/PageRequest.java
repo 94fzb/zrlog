@@ -1,56 +1,16 @@
 package com.zrlog.common.rest.request;
 
-public class PageRequest {
+public interface PageRequest {
 
-    private int size;
+    Long getSize();
 
-    private int page;
+    Long getPage();
 
-    private String sort;
+    String getSort();
 
-    private String order;
+    String getOrder();
 
-    public PageRequest(int page, int size) {
-        this.page = page;
-        this.size = size;
-    }
-
-    public PageRequest() {
-    }
-
-    public int getSize() {
-        return size;
-    }
-
-    public void setSize(int size) {
-        this.size = size;
-    }
-
-    public int getPage() {
-        return page;
-    }
-
-    public void setPage(int page) {
-        this.page = page;
-    }
-
-    public String getSort() {
-        return sort;
-    }
-
-    public void setSort(String sort) {
-        this.sort = sort;
-    }
-
-    public String getOrder() {
-        return order;
-    }
-
-    public void setOrder(String order) {
-        this.order = order;
-    }
-
-    public int getOffset() {
-        return (page - 1) * size;
+    default Long getOffset() {
+        return (getPage() - 1) * getSize();
     }
 }

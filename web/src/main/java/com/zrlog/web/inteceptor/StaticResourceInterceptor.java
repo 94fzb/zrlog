@@ -9,8 +9,8 @@ import com.zrlog.blog.web.interceptor.BlogArticleInterceptor;
 import com.zrlog.blog.web.plugin.RequestInfo;
 import com.zrlog.blog.web.plugin.RequestStatisticsPlugin;
 import com.zrlog.blog.web.util.WebTools;
-import com.zrlog.business.cache.CacheService;
 import com.zrlog.business.util.InstallUtils;
+import com.zrlog.common.Constants;
 import com.zrlog.util.ZrLogUtil;
 
 import java.io.File;
@@ -21,7 +21,6 @@ public class StaticResourceInterceptor implements Interceptor {
 
     public static final List<String> staticResourcePath = Arrays.asList("/assets", "/admin/static", "/admin/vendors", "/install/static");
 
-    private final CacheService cacheService = new CacheService();
 
     @Override
     public boolean doInterceptor(HttpRequest request, HttpResponse response) throws Exception {
@@ -37,14 +36,14 @@ public class StaticResourceInterceptor implements Interceptor {
             //静态文件进行拦截
             if (staticFile.isFile() && staticFile.exists()) {
                 //缓存静态资源文件
-                if (cacheService.isCacheableByRequest(request)) {
+                if (Constants.zrLogConfig.getCacheService().isCacheableByRequest(request)) {
                     response.addHeader("Cache-Control", "max-age=31536000, immutable"); // 1 年的秒数
                 }
                 response.writeFile(staticFile);
                 return false;
             }
             if (BlogArticleInterceptor.catGeneratorHtml(actionKey)) {
-                File cacheFile = cacheService.loadCacheFile(request);
+                File cacheFile = Constants.zrLogConfig.getCacheService().loadCacheFile(request);
                 if (cacheFile.exists() && !ZrLogUtil.isStaticBlogPlugin(request)) {
                     response.writeFile(cacheFile);
                     return false;

@@ -225,7 +225,7 @@ public class AdminArticleService {
         return log;
     }
 
-    public PageData<ArticleResponseEntry> adminPage(PageRequest pageRequest, String keywords) throws SQLException {
+    public PageData<ArticleResponseEntry> adminPage(PageRequest pageRequest, String keywords) {
         PageData<Map<String, Object>> data = new Log().adminFind(pageRequest, keywords);
         VisitorArticleService.wrapperSearchKeyword(data, keywords);
         return convertPageable(data);
@@ -245,6 +245,8 @@ public class AdminArticleService {
         PageData<ArticleResponseEntry> pageData = new PageData<>();
         pageData.setTotalElements(object.getTotalElements());
         pageData.setRows(dataList);
+        pageData.setPage(object.getPage());
+        pageData.setSize(object.getSize());
         return pageData;
     }
 

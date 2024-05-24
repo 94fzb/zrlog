@@ -10,7 +10,9 @@
                     ${_res.footerLink!""}
                 </p>
                 <p class="copyright">
-                    ${_res['copyrightCurrentYear']} ${webs.title}
+                    <span>${_res['copyrightCurrentYear']}</span>
+                    <span>${webs.title}</span>
+                    <#if webs.icp?has_content><span>${webs.icp}</span></#if>
                 </p>
             </div>
             <div class="col-lg-12 footer-below">

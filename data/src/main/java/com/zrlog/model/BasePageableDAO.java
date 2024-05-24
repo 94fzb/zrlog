@@ -2,6 +2,8 @@ package com.zrlog.model;
 
 import com.hibegin.dao.DAO;
 import com.zrlog.common.rest.request.PageRequest;
+import com.zrlog.common.rest.request.PageRequestImpl;
+import com.zrlog.common.rest.request.UnPageRequestImpl;
 import com.zrlog.data.dto.PageData;
 
 import java.sql.SQLException;
@@ -21,11 +23,21 @@ class BasePageableDAO extends DAO {
         try (ExecutorService executors = Executors.newVirtualThreadPerTaskExecutor()) {
             List<CompletableFuture<Void>> tasks = new ArrayList<>();
             tasks.add(CompletableFuture.runAsync(() -> {
+                //无需查询具体数据
+                if (pageRequest.getSize() <= 0) {
+                    data.setRows(new ArrayList<>());
+                    return;
+                }
                 try {
                     List<Object> params = new ArrayList<>(Arrays.stream(obj).toList());
-                    params.add(pageRequest.getOffset());
-                    params.add(pageRequest.getSize());
-                    data.setRows(this.queryListWithParams(sql + " limit  ?,?", params.toArray()));
+                    //需要分页对象
+                    if (pageRequest instanceof PageRequestImpl) {
+                        params.add(pageRequest.getOffset());
+                        params.add(pageRequest.getSize());
+                        data.setRows(this.queryListWithParams(sql + " limit  ?,?", params.toArray()));
+                    } else {
+                        data.setRows(this.queryListWithParams(sql, params.toArray()));
+                    }
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
@@ -42,6 +54,12 @@ class BasePageableDAO extends DAO {
             } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
             }
+        }
+        data.setPage(pageRequest.getPage());
+        if (pageRequest instanceof UnPageRequestImpl) {
+            data.setSize(Math.max(data.getRows().size(), 1000000L));
+        } else {
+            data.setSize(pageRequest.getSize());
         }
         return data;
     }

@@ -50,7 +50,6 @@ const Nav = ({ data }: { data: PageDataSource }) => {
                 )}
                 datasource={data}
                 deleteApi={"/api/admin/nav/delete"}
-                dataApi={"/api/admin/nav"}
             />
         </>
     );

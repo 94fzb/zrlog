@@ -63,7 +63,7 @@ public class TemplateHelper {
         if (pager != null && !pager.getPageList().isEmpty()) {
             List<PagerVO.PageEntry> pageList = pager.getPageList();
             for (PagerVO.PageEntry pageMap : pageList) {
-                pageMap.setUrl(baseUrl + pageMap.getUrl() + suffix);
+                pageMap.setUrl(baseUrl + WebTools.encodeUrl(pageMap.getUrl()) + suffix);
             }
 
             pager.setPageStartUrl(baseUrl + pager.getPageStartUrl() + suffix);
@@ -135,12 +135,11 @@ public class TemplateHelper {
             String nUrl = ZrLogUtil.getHomeUrlWithHost(request) + url.substring(1);
             if (Objects.nonNull(suffix) && !suffix.trim().isEmpty() && nUrl.endsWith(suffix)) {
                 return nUrl;
-            } else {
-                if (Objects.equals("/admin/login", url)) {
-                    return nUrl;
-                }
-                return nUrl + suffix;
             }
+            if (Objects.equals("/admin/login", url)) {
+                return nUrl;
+            }
+            return nUrl + suffix;
         }
         return url;
     }
@@ -212,10 +211,8 @@ public class TemplateHelper {
                         log.put("thumbnail", null);
                     }
                     log.put("canComment", Objects.equals(log.get("canComment"), true) && Constants.isAllowComment());
-                    log.put("url",
-                            WebTools.getHomeUrl(request) + Constants.getArticleUri() + log.get("alias") + suffix);
-                    log.put("typeUrl", WebTools.getHomeUrl(request) + Constants.getArticleUri() + "sort/" + log.get(
-                            "typeAlias") + suffix);
+                    log.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + URLEncoder.encode((String) log.get("alias"), StandardCharsets.UTF_8) + suffix);
+                    log.put("typeUrl", WebTools.getHomeUrl(request) + Constants.getArticleUri() + "sort/" + URLEncoder.encode((String) log.get("typeAlias"), StandardCharsets.UTF_8) + suffix);
                     if (Objects.isNull(log.get("digest"))) {
                         log.put("digest", "");
                     }
@@ -230,16 +227,16 @@ public class TemplateHelper {
     }
 
     private static void fillArticleInfo(Map<String, Object> log, HttpRequest request, String suffix) {
-        log.put("alias", log.get("alias") + suffix);
+        String aliasUrl = URLEncoder.encode((String) log.get("alias"), StandardCharsets.UTF_8) + suffix;
+        log.put("alias", aliasUrl);
         log.put("canComment", Objects.equals(log.get("canComment"), true) && Constants.isAllowComment());
-        log.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + log.get("alias"));
-        log.put("noSchemeUrl", ZrLogUtil.getHomeUrlWithHost(request) + Constants.getArticleUri() + log.get("alias"));
-        log.put("typeUrl",
-                WebTools.getHomeUrl(request) + Constants.getArticleUri() + "sort/" + log.get("typeAlias") + suffix);
+        log.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + aliasUrl);
+        log.put("noSchemeUrl", ZrLogUtil.getHomeUrlWithHost(request) + aliasUrl);
+        log.put("typeUrl", WebTools.getHomeUrl(request) + Constants.getArticleUri() + "sort/" + URLEncoder.encode((String) log.get("typeAlias"), StandardCharsets.UTF_8) + suffix);
         Map<String, Object> lastLog = (Map<String, Object>) log.get("lastLog");
         Map<String, Object> nextLog = (Map<String, Object>) log.get("nextLog");
-        nextLog.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + nextLog.get("alias") + suffix);
-        lastLog.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + lastLog.get("alias") + suffix);
+        nextLog.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + URLEncoder.encode((String) nextLog.get("alias"), StandardCharsets.UTF_8) + suffix);
+        lastLog.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + URLEncoder.encode((String) lastLog.get("alias"), StandardCharsets.UTF_8) + suffix);
 
         //没有使用md的toc目录的文章才尝试使用系统提取的目录
         if (log.get("markdown") != null && !log.get("markdown").toString().toLowerCase().contains("[toc]") && !log.get("markdown").toString().toLowerCase().contains("[tocm]")) {

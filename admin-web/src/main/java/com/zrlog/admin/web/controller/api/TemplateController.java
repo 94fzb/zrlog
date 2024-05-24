@@ -134,7 +134,7 @@ public class TemplateController extends Controller {
     }
 
     @ResponseBody
-    public ApiStandardResponse<TemplateDownloadResponse> downloadUrl() {
+    public ApiStandardResponse<TemplateDownloadResponse> templateCenter() {
         TemplateDownloadResponse downloadResponse = new TemplateDownloadResponse();
         downloadResponse.setUrl("https://store.zrlog.com/template/index.html?from=" + AdminTokenThreadLocal.getUser().getProtocol() + "://" + getRequest().getHeader("Host") +
                 "/admin/template&v=" + BlogBuildInfoUtil.getVersion() +

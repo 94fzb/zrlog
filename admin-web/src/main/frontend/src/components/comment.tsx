@@ -59,12 +59,7 @@ const Comment = ({ data }: { data: PageDataSource }) => {
                 {getRes()["admin.comment.manage"]}
             </Title>
             <Divider />
-            <BaseTable
-                datasource={data}
-                columns={getColumns()}
-                deleteApi={getDeleteApiUri()}
-                dataApi={"/api/admin/comment"}
-            />
+            <BaseTable datasource={data} columns={getColumns()} deleteApi={getDeleteApiUri()} />
         </>
     );
 };

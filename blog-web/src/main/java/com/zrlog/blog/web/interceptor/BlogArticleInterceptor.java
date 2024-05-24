@@ -6,12 +6,13 @@ import com.hibegin.http.server.api.Interceptor;
 import com.hibegin.http.server.util.FreeMarkerUtil;
 import com.hibegin.http.server.util.PathUtil;
 import com.hibegin.http.server.web.MethodInterceptor;
-import com.zrlog.business.cache.CacheService;
+import com.zrlog.business.cache.CacheServiceImpl;
 import com.zrlog.business.exception.InstalledException;
 import com.zrlog.business.plugin.StaticHtmlPlugin;
 import com.zrlog.business.service.TemplateHelper;
 import com.zrlog.business.util.InstallUtils;
 import com.zrlog.common.Constants;
+import com.zrlog.common.ZrLogConfig;
 import com.zrlog.util.ZrLogUtil;
 
 import java.io.ByteArrayOutputStream;
@@ -25,7 +26,6 @@ import java.util.Objects;
 public class BlogArticleInterceptor implements Interceptor {
 
 
-    private final CacheService cacheService = new CacheService();
 
     /**
      * 处理静态化文件,仅仅缓存文章页(变化较小)
@@ -66,7 +66,7 @@ public class BlogArticleInterceptor implements Interceptor {
             return true;
         }
         if (InstallUtils.isInstalled()) {
-            cacheService.refreshInitDataCache(request, false);
+            Constants.zrLogConfig.getCacheService().refreshInitDataCacheAsync(request, false).join();
         } else if (!Objects.equals("/install", target)) {
             response.redirect("/install?ref=" + request.getUri());
             return true;
@@ -116,7 +116,7 @@ public class BlogArticleInterceptor implements Interceptor {
                 response.renderHtmlStr(realHtmlStr);
             }
             if (BlogArticleInterceptor.catGeneratorHtml(target)) {
-                request.getAttr().put(StaticHtmlPlugin.HTML_FILE_KEY, new CacheService().saveResponseBodyToHtml(request, realHtmlStr));
+                request.getAttr().put(StaticHtmlPlugin.HTML_FILE_KEY, Constants.zrLogConfig.getCacheService().saveResponseBodyToHtml(request, realHtmlStr));
             }
         }
     }

@@ -45,7 +45,7 @@ public class TypeController extends Controller {
 
     @ResponseBody
     public ApiStandardResponse<PageData<ArticleTypeResponseEntry>> index() throws SQLException {
-        return new ApiStandardResponse<>(new ArticleTypeService().find(ZrLogUtil.getHomeUrlWithHost(request), ControllerUtil.getPageRequest(this), Constants.isStaticHtmlStatus()));
+        return new ApiStandardResponse<>(new ArticleTypeService().find(ZrLogUtil.getHomeUrlWithHost(request), ControllerUtil.unPageRequest(), Constants.isStaticHtmlStatus()));
     }
 
     @RefreshCache(async = true)

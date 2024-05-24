@@ -14,8 +14,6 @@ import com.zrlog.admin.business.rest.response.LoginResponse;
 import com.zrlog.admin.business.rest.response.StatisticsInfoResponse;
 import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
 import com.zrlog.admin.business.service.UserService;
-import com.zrlog.admin.web.annotation.RefreshCache;
-import com.zrlog.admin.web.token.AdminTokenService;
 import com.zrlog.business.util.InstallUtils;
 import com.zrlog.common.Constants;
 import com.zrlog.common.rest.response.ApiStandardResponse;
@@ -36,7 +34,6 @@ public class AdminController extends Controller {
 
     private final UserService userService = new UserService();
 
-    private final AdminTokenService adminTokenService = new AdminTokenService();
 
     public AdminController() {
     }
@@ -50,16 +47,16 @@ public class AdminController extends Controller {
         LoginRequest loginRequest = BeanUtil.convertWithValid(getRequest().getInputStream(), LoginRequest.class);
         userService.login(loginRequest);
         String key = UUID.randomUUID().toString();
-        adminTokenService.setAdminToken(new User().getUserByUserName(loginRequest.getUserName().toLowerCase()), key, Objects.equals(loginRequest.getHttps(), true) ? "https" : "http", getRequest(), getResponse());
+        Constants.zrLogConfig.getTokenService().setAdminToken(new User().getUserByUserName(loginRequest.getUserName().toLowerCase()), key, Objects.equals(loginRequest.getHttps(), true) ? "https" : "http", getRequest(), getResponse());
         return new ApiStandardResponse<>(new LoginResponse(key));
     }
 
     /**
-     * 插件调用这个方法
+     * 触发更新缓存
      */
-    @RefreshCache
     @ResponseBody
     public UpdateRecordResponse refreshCache() {
+        Constants.zrLogConfig.getCacheService().refreshInitDataCacheAsync(request, true);
         return new UpdateRecordResponse();
     }
 
@@ -75,7 +72,7 @@ public class AdminController extends Controller {
         info.setCommCount(new Comment().count());
         info.setToDayCommCount(new Comment().countToDayComment());
         info.setClickCount(new Log().sumClick().longValue());
-        info.setArticleCount(new Log().adminCount());
+        info.setArticleCount(new Log().getAdminCount());
         List<File> allFileList = new ArrayList<>();
         try {
             List<String> baseFolders = new ArrayList<>(Arrays.asList(PathUtil.getRootPath() + "/bin", PathUtil.getTempPath(),

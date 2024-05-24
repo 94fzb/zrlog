@@ -15,4 +15,8 @@ public abstract class ZrLogConfig extends AbstractServerConfig {
     public abstract Plugins getPlugins();
 
     public abstract JarUpdater getJarUpdater();
+
+    public abstract CacheService getCacheService();
+
+    public abstract TokenService getTokenService();
 }

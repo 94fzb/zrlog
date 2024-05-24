@@ -12,6 +12,8 @@ public class ArticleResponseEntry {
     private String lastUpdateDate;
     private String typeName;
     private boolean rubbish;
+    private Boolean canComment;
+    private String commentSize;
     private boolean privacy;
     private String url;
     private String alias;
@@ -110,5 +112,21 @@ public class ArticleResponseEntry {
 
     public void setAlias(String alias) {
         this.alias = alias;
+    }
+
+    public Boolean getCanComment() {
+        return canComment;
+    }
+
+    public void setCanComment(Boolean canComment) {
+        this.canComment = canComment;
+    }
+
+    public String getCommentSize() {
+        return commentSize;
+    }
+
+    public void setCommentSize(String commentSize) {
+        this.commentSize = commentSize;
     }
 }
