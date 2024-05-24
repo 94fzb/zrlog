@@ -164,6 +164,7 @@ public class CacheServiceImpl implements CacheService {
         }
         servletRequest.getAttr().put("init", cacheInit);
         servletRequest.getAttr().put("website", cacheInit.getWebSite());
+        servletRequest.getAttr().put("webs", cacheInit.getWebSite());
         servletRequest.getAttr().put("WEB_SITE", cacheInit.getWebSite());
     }
 

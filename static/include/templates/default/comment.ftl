@@ -1,6 +1,6 @@
 <#if log.canComment>
     <div class="comment" id="comment">
-        <#if init.webSite.changyan_status == "on">
+        <#if webSite.changyan_status == "on">
             <plugin name="changyan" view="widget" param="articleId=${log.logId!''}"></plugin>
         <#else>
             <#if log.comments?has_content>
