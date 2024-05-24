@@ -163,7 +163,7 @@ aside ul {
 article {
     margin-bottom: 20px;
     padding: 10px;
-    box-shadow: 0 0 2px rgba(198, 198, 198, 0.3);
+    box-shadow: 0 0 2px rgb(0 0 0 / 30%);
     -webkit-transition: top 1s ease, left 1s ease;
     -moz-transition: top 1s ease, left 1s ease;
     -o-transition: top 1s ease, left 1s ease;
