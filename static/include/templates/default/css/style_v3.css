@@ -6,6 +6,7 @@
   Description: Responsive Web Design
 */
 
+/* General Styles */
 aside li {
     list-style: none;
 }
@@ -34,7 +35,7 @@ a img {
 
 a:hover span,
 a:hover, a:focus {
-    text-decoration: underline
+    text-decoration: underline;
 }
 
 a:focus, a:active {
@@ -70,11 +71,10 @@ input[type=text], textarea {
     display: none;
 }
 
-
+/* Layout Styles */
 .top, .main, .bottom {
     clear: both;
-    padding-top: 20px
-
+    padding-top: 20px;
 }
 
 .main section {
@@ -87,9 +87,10 @@ input[type=text], textarea {
     width: 290px;
     padding: 14px 0 0;
     margin-bottom: 20px;
-    box-shadow: 0 0 2px rgb(0 0 0 / 20%)
+    box-shadow: 0 0 2px rgb(0 0 0 / 20%);
 }
 
+/* Tag Styles */
 .taglist a {
     padding: 0;
     display: inline-block;
@@ -149,13 +150,14 @@ a.size5:hover {
 a.size6 {
     padding: 2px;
     font-size: 22px;
-    color: #77625E
+    color: #77625E;
 }
 
 a.size6:hover {
     color: #E13728;
 }
 
+/* Aside Styles */
 aside ul {
     margin-bottom: 0;
 }
@@ -171,7 +173,7 @@ article {
 }
 
 aside a:hover {
-    text-decoration: underline
+    text-decoration: underline;
 }
 
 aside h2, aside h3 {
@@ -242,7 +244,7 @@ aside nav a {
 }
 
 aside nav a:hover {
-    text-decoration: underline
+    text-decoration: underline;
 }
 
 aside nav li {
@@ -267,7 +269,7 @@ aside li a .time {
     float: right;
     font-size: .8rem;
     line-height: 1.8rem;
-    color: #999
+    color: #999;
 }
 
 aside li.active {
@@ -291,19 +293,20 @@ aside li.active a {
 }
 
 aside li a:hover {
-    text-decoration: none
+    text-decoration: none;
 }
 
+/* Comment Styles */
 .comment {
     margin-bottom: 10px;
     padding: 10px 10px 20px 10px;
-    box-shadow: 0 0 2px rgb(0 0 0 / 20%)
+    box-shadow: 0 0 2px rgb(0 0 0 / 20%);
 }
 
 .comment h2 {
     font-weight: normal;
     margin-bottom: 10px;
-    font-size: 20px
+    font-size: 20px;
 }
 
 .comment label {
@@ -362,15 +365,7 @@ aside li a:hover {
     box-shadow: 0 0 5px #DDDDDD;
 }
 
-.comment .remrember label {
-    float: none;
-    padding: 0;
-    margin: 0;
-    background-color: #FFFFFF;
-    color: #333333;
-}
-
-
+/* Responsive Styles */
 @media screen and (max-width: 1280px) {
     body {
         overflow: auto;
@@ -386,18 +381,12 @@ aside li a:hover {
     }
 
     .main section {
-        width: 70%
+        width: 70%;
     }
 
     .main aside {
-        width: 29%
+        width: 29%;
     }
-
-    .one-column .main section {
-        width: 100%
-    }
-
-    /*.albums .container{width:100%}*/
 }
 
 @media screen and (max-width: 960px) {
@@ -407,7 +396,7 @@ aside li a:hover {
     }
 
     .top {
-        background-color: transparent
+        background-color: transparent;
     }
 
     header nav.mainnav, header .site-name {
@@ -416,10 +405,6 @@ aside li a:hover {
 
     .gn-menu-main {
         display: block;
-    }
-
-    aside .fixed {
-        top: 73px;
     }
 }
 
@@ -458,9 +443,6 @@ aside li a:hover {
 
     .comment .comment-write, .comments-wrapper .input-group {
         float: none;
-    }
-
-    .comment .comment-write, .comments-wrapper .input-group {
         width: 100%;
     }
 
@@ -489,6 +471,7 @@ aside li a:hover {
     }
 }
 
+/* Bootstrap & Other Styles */
 .nav-item {
     padding-right: 20px;
 }
@@ -524,10 +507,6 @@ a:hover {
     background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
 }
 
-.marquee {
-    color: white;
-}
-
 footer {
     padding: 50px 0;
 }
@@ -549,19 +528,17 @@ li.page-item {
     gap: 8px;
 }
 
-/**
-for dark mode
- */
+/* Dark Mode Styles */
 @media (prefers-color-scheme: dark) {
     .comment {
-        box-shadow: 0 0 2px rgba(198, 198, 198, 0.5)
+        box-shadow: 0 0 2px rgba(198, 198, 198, 0.5);
     }
 
     article {
-        box-shadow: 0 0 2px rgba(198, 198, 198, 0.5)
+        box-shadow: 0 0 2px rgba(198, 198, 198, 0.5);
     }
 
     aside {
-        box-shadow: 0 0 2px rgba(198, 198, 198, 0.5)
+        box-shadow: 0 0 2px rgba(198, 198, 198, 0.5);
     }
 }
