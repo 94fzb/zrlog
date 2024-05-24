@@ -85,7 +85,7 @@ input[type=text], textarea {
 .main aside {
     float: right;
     width: 290px;
-    padding: 20px 0 0;
+    padding: 14px 0 0;
     margin-bottom: 20px;
     box-shadow: 0 0 2px rgba(198, 198, 198, 0.5)
 }
