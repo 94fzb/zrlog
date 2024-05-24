@@ -294,7 +294,6 @@ aside li a:hover {
     text-decoration: none
 }
 
-/* Comment */
 .comment {
     margin-bottom: 10px;
     padding: 10px 10px 20px 10px;
@@ -548,4 +547,21 @@ li.page-item {
     display: flex;
     justify-content: center;
     gap: 8px;
+}
+
+/**
+for dark mode
+ */
+@media (prefers-color-scheme: dark) {
+    .comment {
+        box-shadow: 0 0 2px rgba(198, 198, 198, 0.5)
+    }
+
+    article {
+        box-shadow: 0 0 2px rgba(198, 198, 198, 0.5)
+    }
+
+    aside {
+        box-shadow: 0 0 2px rgba(198, 198, 198, 0.5)
+    }
 }
