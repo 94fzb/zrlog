@@ -14,8 +14,12 @@
     <div class="content">
         ${log.content!''}
     </div>
-    <p style="color:#D4D4D4">${_res.reprint!''}
-        <a title="${log.title}" href="${log.noSchemeUrl}"><span style="color: rgb(51, 102, 255);">${log.noSchemeUrl}</span></a>
+    <hr style="padding-top: 16px;"/>
+    <p>
+        ${_res.reprint!''}
+        <a title="${log.title}" href="${log.noSchemeUrl}" style="padding-left: 4px">
+            ${log.noSchemeUrl}
+        </a>
     </p>
     <div class="pager-nav">
         <a title="${log.nextLog.title}" href="${log.nextLog.url}"><p>${_res.nextArticle}：${log.nextLog.title}</p></a>
