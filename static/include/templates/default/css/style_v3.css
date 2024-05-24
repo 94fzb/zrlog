@@ -82,7 +82,7 @@ input[type=text], textarea {
     width: 800px;
 }
 
-.main aside {
+aside {
     float: right;
     width: 290px;
     padding: 14px 0 0;
