@@ -87,7 +87,7 @@ input[type=text], textarea {
     width: 290px;
     padding: 14px 0 0;
     margin-bottom: 20px;
-    box-shadow: 0 0 2px rgba(198, 198, 198, 0.5)
+    box-shadow: 0 0 2px rgb(0 0 0 / 20%)
 }
 
 .taglist a {
@@ -163,7 +163,7 @@ aside ul {
 article {
     margin-bottom: 20px;
     padding: 10px;
-    box-shadow: 0 0 2px rgb(0 0 0 / 30%);
+    box-shadow: 0 0 2px rgb(0 0 0 / 20%);
     -webkit-transition: top 1s ease, left 1s ease;
     -moz-transition: top 1s ease, left 1s ease;
     -o-transition: top 1s ease, left 1s ease;
@@ -225,7 +225,7 @@ aside .search input.btn {
     border-radius: 0;
 }
 
-aside .search input.btn:hover { /*box-shadow: 0 0 5px #DDDDDD;*/
+aside .search input.btn:hover {
     cursor: pointer;
 }
 
@@ -298,7 +298,7 @@ aside li a:hover {
 .comment {
     margin-bottom: 10px;
     padding: 10px 10px 20px 10px;
-    box-shadow: 0 0 2px rgba(198, 198, 198, 0.5)
+    box-shadow: 0 0 2px rgb(0 0 0 / 20%)
 }
 
 .comment h2 {
@@ -356,7 +356,7 @@ aside li a:hover {
 }
 
 .comment .comment-write textarea {
-    width: 100%; /*box-shadow: 0 0 2px #DDDDDD inset;*/
+    width: 100%;
 }
 
 .comment .comment-write textarea:focus {
@@ -544,7 +544,7 @@ li.page-item {
     white-space: nowrap;
 }
 
-.copyright{
+.copyright {
     display: flex;
     justify-content: center;
     gap: 8px;
