@@ -7504,6 +7504,11 @@ no-case@^3.0.4:
     lower-case "^2.0.2"
     tslib "^2.0.3"
 
+node-bin-darwin-arm64@18.9.0:
+  version "18.9.0"
+  resolved "https://registry.npmmirror.com/node-bin-darwin-arm64/-/node-bin-darwin-arm64-18.9.0.tgz#f277b4e68a6d50acd0e6c8249bc18abb63ccf346"
+  integrity sha512-P132uEt2YabG0/L/xzM4A1UslarOLUxurdiQDaYwlS8lwXfnfwKNVJJA5IOUMrkaSl2OVnDzO+ct3BIIwFfeDg==
+
 node-bin-setup@^1.0.0:
   version "1.1.0"
   resolved "https://registry.npmmirror.com/node-bin-setup/-/node-bin-setup-1.1.0.tgz#9df94c41335a8f41958a639b2736f860582a209c"

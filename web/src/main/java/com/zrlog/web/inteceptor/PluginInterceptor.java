@@ -28,6 +28,9 @@ import java.util.logging.Logger;
  */
 public class PluginInterceptor implements HandleAbleInterceptor {
 
+    public PluginInterceptor() {
+    }
+
     private static final Logger LOGGER = LoggerUtil.getLogger(PluginInterceptor.class);
 
     private static final String notGoodAdminUriPath = Constants.ADMIN_URI_BASE_PATH + "/plugins";

@@ -17,6 +17,9 @@ public class RouterInterceptor implements Interceptor {
 
     private final BlogArticleInterceptor blogArticleInterceptor = new BlogArticleInterceptor();
 
+    public RouterInterceptor() {
+    }
+
     @Override
     public boolean doInterceptor(HttpRequest request, HttpResponse response) throws Exception {
         if (pluginInterceptor.isHandleAble(request)) {

@@ -121,7 +121,7 @@ public class InstallService {
         return getLockFile().exists();
     }
 
-    private File getLockFile() {
+    public File getLockFile() {
         return new File(basePath + "/install.lock");
     }
 

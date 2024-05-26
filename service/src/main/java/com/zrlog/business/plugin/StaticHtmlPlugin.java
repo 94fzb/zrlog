@@ -6,10 +6,12 @@ import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.server.ApplicationContext;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.config.AbstractServerConfig;
+import com.hibegin.http.server.config.RequestConfig;
 import com.hibegin.http.server.config.ResponseConfig;
 import com.hibegin.http.server.handler.HttpRequestHandlerRunnable;
 import com.hibegin.http.server.impl.HttpRequestDecoderImpl;
 import com.hibegin.http.server.impl.SimpleHttpResponse;
+import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.common.Constants;
 import com.zrlog.plugin.IPlugin;
 import com.zrlog.util.ZrLogUtil;
@@ -45,16 +47,7 @@ public class StaticHtmlPlugin extends BaseLockObject implements IPlugin {
         NEW, HANDING, HANDLED
     }
 
-    private HttpRequest buildMockRequest(String uri) throws Exception {
-        String httpHeader = "GET " + uri + " HTTP/1.1\r\n" +
-                "Host: " + ZrLogUtil.getBlogHostByWebSite() + "\r\n" +
-                "X-Real-IP: 127.0.0.1\r\n" +
-                "User-Agent: " + ZrLogUtil.STATIC_USER_AGENT + "\r\n" +
-                "\r\n";
-        HttpRequestDecoderImpl httpRequestDecoder = new HttpRequestDecoderImpl(serverConfig.getRequestConfig(), applicationContext, null);
-        httpRequestDecoder.doDecode(ByteBuffer.wrap(httpHeader.getBytes(Charset.defaultCharset())));
-        return httpRequestDecoder.getRequest();
-    }
+
 
     private void doFetch() {
         handleStatusPageMap.entrySet().stream().filter(e -> Objects.equals(e.getValue(), HandleState.NEW)).forEach((e) -> {
@@ -62,7 +55,7 @@ public class StaticHtmlPlugin extends BaseLockObject implements IPlugin {
             try {
                 ResponseConfig responseConfig = serverConfig.getResponseConfig();
                 responseConfig.setEnableGzip(false);
-                HttpRequest httpRequest = buildMockRequest(e.getKey());
+                HttpRequest httpRequest = WebTools.buildMockRequest("GET", e.getKey(), serverConfig.getRequestConfig(), applicationContext);
                 new HttpRequestHandlerRunnable(httpRequest, new SimpleHttpResponse(httpRequest, serverConfig.getResponseConfig())).run();
                 File file = (File) httpRequest.getAttr().get(HTML_FILE_KEY);
                 if (!file.exists()) {

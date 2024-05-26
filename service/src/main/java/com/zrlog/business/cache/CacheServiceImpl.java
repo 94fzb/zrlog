@@ -117,7 +117,12 @@ public class CacheServiceImpl implements CacheService {
                 Constants.WEB_SITE.remove(key);
             }
         }
-        Constants.WEB_SITE.putAll(newWebSite);
+        newWebSite.forEach((key, value) -> {
+            if (Objects.nonNull(value)) {
+                Constants.WEB_SITE.put(key, value);
+            }
+        });
+
     }
 
     private void refreshInitDataCache(HttpRequest servletRequest, boolean cleanAble, long expectVersion) {
@@ -190,7 +195,7 @@ public class CacheServiceImpl implements CacheService {
         cacheInit.setWebSite(refreshWebSite());
         cacheInit.setLinks(new Link().findAll());
         cacheInit.setTypes(new Type().findAll());
-        statistics.setTotalTypeSize(cacheInit.getTypes().size());
+        statistics.setTotalTypeSize((long) cacheInit.getTypes().size());
         cacheInit.setLogNavs(new LogNav().findAll());
         cacheInit.setPlugins(new Plugin().findAll());
         cacheInit.setArchives(new Log().getArchives());
@@ -199,7 +204,7 @@ public class CacheServiceImpl implements CacheService {
             kv.put("keycode", kv.get("text").hashCode());
         }
         cacheInit.setTags(all);
-        statistics.setTotalTagSize(cacheInit.getTags().size());
+        statistics.setTotalTagSize((long) cacheInit.getTags().size());
         List<Map<String, Object>> types = cacheInit.getTypes();
         //Last article
         cacheInit.setHotLogs(new Log().visitorFind(new PageRequestImpl(1L, 6L), "").getRows().stream().map(this::convertToBasicVO).toList());

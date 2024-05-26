@@ -11,7 +11,6 @@ import com.hibegin.http.server.api.Interceptor;
 import com.hibegin.http.server.config.RequestConfig;
 import com.hibegin.http.server.config.ResponseConfig;
 import com.hibegin.http.server.config.ServerConfig;
-import com.hibegin.http.server.util.PathUtil;
 import com.zaxxer.hikari.util.DriverDataSource;
 import com.zrlog.admin.web.plugin.PluginCorePlugin;
 import com.zrlog.admin.web.plugin.PluginCoreProcessImpl;
@@ -55,14 +54,14 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     private final Integer port;
     private ServerConfig serverConfig;
     private final Plugins plugins;
-    private final JarUpdater jarUpdater;
+    private final Updater updater;
     private final CacheService cacheService;
     private final PluginCoreProcess pluginCoreProcess;
 
-    public ZrLogConfigImpl(Integer port, JarUpdater jarUpdater) {
+    public ZrLogConfigImpl(Integer port, Updater updater) {
         this.port = port;
         this.plugins = new Plugins();
-        this.jarUpdater = jarUpdater;
+        this.updater = updater;
         this.cacheService = new CacheServiceImpl();
         this.pluginCoreProcess = new PluginCoreProcessImpl();
     }
@@ -147,7 +146,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     private void configPlugin(Plugins plugins) {
         // 如果没有安装的情况下不初始化数据
         if (!InstallUtils.isInstalled()) {
-            LOGGER.log(Level.WARNING, "Not found lock file(" + PathUtil.getConfPath() + "/install.lock), Please visit the" + " http://yourHostName:port/install start installation");
+            LOGGER.log(Level.WARNING, "Not found lock file(" + InstallUtils.getLockFile() + "), Please visit the" + " http://yourHostName:port/install start installation");
             return;
         }
 
@@ -282,8 +281,8 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     }
 
     @Override
-    public JarUpdater getJarUpdater() {
-        return jarUpdater;
+    public Updater getUpdater() {
+        return updater;
     }
 
     @Override
@@ -300,7 +299,11 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     public void installFinish() {
         configPlugin(plugins);
         for (IPlugin plugin : plugins) {
-            plugin.start();
+            try {
+                plugin.start();
+            } catch (Exception e) {
+                LOGGER.severe("plugin error, " + e.getMessage());
+            }
         }
         if (!InstallUtils.isInstalled()) {
             return;

@@ -77,7 +77,7 @@ public class AdminController extends Controller {
         try {
             List<String> baseFolders = new ArrayList<>(Arrays.asList(PathUtil.getRootPath() + "/bin", PathUtil.getTempPath(),
                     PathUtil.getLogPath(), PathUtil.getConfPath(), PathUtil.getStaticPath(), PathUtil.getRootPath() + "/lib"));
-            allFileList.add(new File(PathUtil.getRootPath() + "/" + Constants.zrLogConfig.getJarUpdater().fileName()));
+            allFileList.add(new File(PathUtil.getRootPath() + "/" + Constants.zrLogConfig.getUpdater().fileName()));
             for (String folder : baseFolders) {
                 FileUtils.getAllFiles(folder, allFileList);
             }

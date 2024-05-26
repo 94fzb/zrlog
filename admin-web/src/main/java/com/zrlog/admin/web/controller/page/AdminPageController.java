@@ -2,6 +2,8 @@ package com.zrlog.admin.web.controller.page;
 
 import com.google.gson.Gson;
 import com.hibegin.common.util.IOUtil;
+import com.hibegin.http.server.api.HttpRequest;
+import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.rest.response.ServerSideDataResponse;
 import com.zrlog.admin.business.rest.response.UserBasicInfoResponse;
@@ -22,6 +24,13 @@ import java.util.Map;
 import java.util.Objects;
 
 public class AdminPageController extends Controller {
+
+    public AdminPageController() {
+    }
+
+    public AdminPageController(HttpRequest request, HttpResponse response) {
+        super(request, response);
+    }
 
     public void index() throws Throwable {
         if (getRequest().getUri().endsWith(Constants.ADMIN_URI_BASE_PATH) || getRequest().getUri().endsWith(Constants.ADMIN_URI_BASE_PATH + "/")) {

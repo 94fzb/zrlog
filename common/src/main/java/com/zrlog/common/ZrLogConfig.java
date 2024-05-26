@@ -3,6 +3,7 @@ package com.zrlog.common;
 import com.hibegin.http.server.config.AbstractServerConfig;
 import com.zrlog.plugin.Plugins;
 import com.zrlog.util.JarUpdater;
+import com.zrlog.util.Updater;
 
 
 public abstract class ZrLogConfig extends AbstractServerConfig {
@@ -14,7 +15,7 @@ public abstract class ZrLogConfig extends AbstractServerConfig {
 
     public abstract Plugins getPlugins();
 
-    public abstract JarUpdater getJarUpdater();
+    public abstract Updater getUpdater();
 
     public abstract CacheService getCacheService();
 

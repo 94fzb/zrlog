@@ -30,7 +30,7 @@ public class BeanUtil {
         return obj;
     }
 
-    public static <T> T cloneObject(Object obj) {
+    public static <T> T cloneObject(T obj) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream)) {
             objectOutputStream.writeObject(obj);
@@ -39,7 +39,8 @@ public class BeanUtil {
             }
         } catch (IOException | ClassNotFoundException e) {
             LOGGER.log(Level.SEVERE, "", e);
-            throw new RuntimeException(e);
+            //throw new RuntimeException(e);
+            return obj;
         }
     }
 }

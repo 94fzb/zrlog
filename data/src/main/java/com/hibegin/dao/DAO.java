@@ -8,6 +8,7 @@ import org.apache.commons.dbutils.handlers.ScalarHandler;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -375,7 +376,7 @@ public class DAO implements IDAO {
     @Override
     public List<Map<String, Object>> queryListWithParams(String sql,
                                                          Object... params) throws SQLException {
-        return queryRunner.query(sql, new MapListHandler(), params);
+        return new ArrayList<>(queryRunner.query(sql, new MapListHandler(), params));
     }
 
     @Override

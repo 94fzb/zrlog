@@ -3,6 +3,8 @@ package com.zrlog.admin.web.controller.api;
 import com.hibegin.common.util.FileUtils;
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.http.annotation.ResponseBody;
+import com.hibegin.http.server.api.HttpRequest;
+import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.util.PathUtil;
 import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.rest.response.UploadFileResponse;
@@ -22,6 +24,13 @@ import java.util.Date;
 import java.util.Random;
 
 public class UploadController extends Controller {
+
+    public UploadController() {
+    }
+
+    public UploadController(HttpRequest request, HttpResponse response) {
+        super(request, response);
+    }
 
     @ResponseBody
     public ApiStandardResponse<UploadFileResponse> index() {

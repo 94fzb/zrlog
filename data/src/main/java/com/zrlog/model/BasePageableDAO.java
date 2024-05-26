@@ -52,7 +52,7 @@ class BasePageableDAO extends DAO {
             try {
                 CompletableFuture.allOf(tasks.toArray(new CompletableFuture[0])).get();
             } catch (InterruptedException | ExecutionException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException(e.getCause());
             }
         }
         data.setPage(pageRequest.getPage());

@@ -21,6 +21,8 @@ public class StaticResourceInterceptor implements Interceptor {
 
     public static final List<String> staticResourcePath = Arrays.asList("/assets", "/admin/static", "/admin/vendors", "/install/static");
 
+    public StaticResourceInterceptor() {
+    }
 
     @Override
     public boolean doInterceptor(HttpRequest request, HttpResponse response) throws Exception {

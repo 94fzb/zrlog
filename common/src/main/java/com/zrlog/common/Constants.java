@@ -7,6 +7,7 @@ import com.zrlog.common.type.AutoUpgradeVersionType;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
  * 存放全局的静态变量，有多个地方使用一个key时，存放在这里，方便代码的维护。
@@ -56,7 +57,7 @@ public class Constants {
 
     public static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ssXXX";
 
-    public static final Map<String, Object> WEB_SITE = Collections.synchronizedMap(new LinkedHashMap<>());
+    public static final Map<String, Object> WEB_SITE = new ConcurrentSkipListMap<>();
 
     public static final Integer SQL_VERSION = 17;
 

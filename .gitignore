@@ -63,3 +63,5 @@ static/include/templates/README.md
 static/include/templates/bin/
 static/include/templates/generate-preview.sh
 static/include/templates/zip/
+zrlog.bgv
+zrlog

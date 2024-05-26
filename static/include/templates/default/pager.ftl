@@ -1,7 +1,7 @@
-<#if pager?has_content>
+<#if pager?has_content && pager.pageList?has_content>
     <nav>
         <ul class="pagination">
-            <#if !pager.startPage>
+            <#if pager.startPage??>
                 <li class="page-item"><a title="${_res.pageStart}" class="page-link"
                                          href="${pager.pageStartUrl}">${_res.pageStart}</a></li>
             </#if>
@@ -9,7 +9,7 @@
                 <li class="page-item<#if page.current> active</#if>"><a class="page-link"
                                                                         href="${page.url}">${page.desc}</a></li>
             </#list>
-            <#if !pager.endPage>
+            <#if pager.endPage??>
                 <li class="page-item"><a title="${_res.pageEnd}" class="page-link"
                                          href="${pager.pageEndUrl}">${_res.pageEnd}</a></li>
             </#if>

@@ -46,7 +46,7 @@ public class TemplateHelper {
         request.getAttr().put("staticBlog", staticBlog);
         request.getAttr().put("suffix", suffix);
 
-        BaseDataInitVO baseDataInitVO = BeanUtil.cloneObject(request.getAttr().get("init"));
+        BaseDataInitVO baseDataInitVO = BeanUtil.cloneObject((BaseDataInitVO)request.getAttr().get("init"));
         request.getAttr().put("init", baseDataInitVO);
         Map<String, Object> webSite = baseDataInitVO.getWebSite();
         String baseUrl = setBaseUrl(request, staticBlog, webSite);

@@ -1,6 +1,7 @@
 package com.zrlog.business.cache.vo;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -9,15 +10,18 @@ import java.util.Map;
  */
 public class BaseDataInitVO implements Serializable {
 
-    private List<Map<String, Object>> tags;
-    private List<Map<String, Object>> types;
-    private List<Map<String, Object>> links;
-    private List<Map<String, Object>> plugins;
+    public BaseDataInitVO() {
+    }
+
+    private List<Map<String, Object>> tags = new ArrayList<>();
+    private List<Map<String, Object>> types = new ArrayList<>();
+    private List<Map<String, Object>> links = new ArrayList<>();
+    private List<Map<String, Object>> plugins = new ArrayList<>();
     private Map<String, Long> archives;
     private List<Archive> archiveList;
     private Map<String, Object> webSite;
-    private List<HotLogBasicInfoVO> hotLogs;
-    private List<Map<String, Object>> logNavs;
+    private List<HotLogBasicInfoVO> hotLogs = new ArrayList<>();
+    private List<Map<String, Object>> logNavs = new ArrayList<>();
     private Map<Map<String, Object>, List<HotLogBasicInfoVO>> indexHotLogs;
     private Statistics statistics;
 
@@ -111,31 +115,34 @@ public class BaseDataInitVO implements Serializable {
 
     public static class Statistics implements Serializable {
 
-        private long totalArticleSize;
-        private long totalTagSize;
-        private long totalTypeSize;
+        public Statistics() {
+        }
 
-        public long getTotalArticleSize() {
+        private Long totalArticleSize;
+        private Long totalTagSize;
+        private Long totalTypeSize;
+
+        public Long getTotalArticleSize() {
             return totalArticleSize;
         }
 
-        public void setTotalArticleSize(long totalArticleSize) {
+        public void setTotalArticleSize(Long totalArticleSize) {
             this.totalArticleSize = totalArticleSize;
         }
 
-        public long getTotalTagSize() {
+        public Long getTotalTagSize() {
             return totalTagSize;
         }
 
-        public void setTotalTagSize(long totalTagSize) {
+        public void setTotalTagSize(Long totalTagSize) {
             this.totalTagSize = totalTagSize;
         }
 
-        public long getTotalTypeSize() {
+        public Long getTotalTypeSize() {
             return totalTypeSize;
         }
 
-        public void setTotalTypeSize(long totalTypeSize) {
+        public void setTotalTypeSize(Long totalTypeSize) {
             this.totalTypeSize = totalTypeSize;
         }
     }

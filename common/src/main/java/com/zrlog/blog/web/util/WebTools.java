@@ -1,14 +1,19 @@
 package com.zrlog.blog.web.util;
 
 import com.hibegin.common.util.StringUtils;
+import com.hibegin.http.server.ApplicationContext;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
+import com.hibegin.http.server.config.RequestConfig;
+import com.hibegin.http.server.impl.HttpRequestDecoderImpl;
 import com.zrlog.common.Constants;
 import com.zrlog.common.exception.AdminAuthException;
 import com.zrlog.util.ZrLogUtil;
 
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -153,6 +158,17 @@ public class WebTools {
     private static boolean isReservedCharacter(char c) {
         // 保留字符和子分隔符
         return ":/?#[]@!$&'()*+,;=".indexOf(c) != -1;
+    }
+
+    public static HttpRequest buildMockRequest(String method, String uri, RequestConfig requestConfig, ApplicationContext applicationContext) throws Exception {
+        String httpHeader = method + " " + uri + " HTTP/1.1\r\n" +
+                "Host: " + ZrLogUtil.getBlogHostByWebSite() + "\r\n" +
+                "X-Real-IP: 127.0.0.1\r\n" +
+                "User-Agent: " + ZrLogUtil.STATIC_USER_AGENT + "\r\n" +
+                "\r\n";
+        HttpRequestDecoderImpl httpRequestDecoder = new HttpRequestDecoderImpl(requestConfig, applicationContext, null);
+        httpRequestDecoder.doDecode(ByteBuffer.wrap(httpHeader.getBytes(Charset.defaultCharset())));
+        return httpRequestDecoder.getRequest();
     }
 
 }

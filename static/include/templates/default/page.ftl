@@ -6,7 +6,7 @@
             <h4>以下是与${tipsType} “${tipsName}” 相关联的文章</h4>
         </div>
     </#if>
-    <#if data?has_content>
+    <#if data?has_content && data.rows?has_content>
         <#list data.rows as log>
             <article class="markdown-body">
                 <#if log.thumbnail?has_content>

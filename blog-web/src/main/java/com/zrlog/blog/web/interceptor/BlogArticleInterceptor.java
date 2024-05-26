@@ -1,5 +1,6 @@
 package com.zrlog.blog.web.interceptor;
 
+import com.google.gson.Gson;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.api.Interceptor;
@@ -100,6 +101,7 @@ public class BlogArticleInterceptor implements Interceptor {
         if (Objects.nonNull(invoke)) {
             TemplateHelper.fullTemplateInfo(request);
             initTemplate();
+            System.out.println("request.getAttr() = " + new Gson().toJson(request.getAttr()));
             String htmlStr = FreeMarkerUtil.renderToFM(invoke.toString(), request);
             render(htmlStr, target, request, response);
         }

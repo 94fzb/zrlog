@@ -1,5 +1,7 @@
 package com.zrlog.admin.web.controller.page;
 
+import com.hibegin.http.server.api.HttpRequest;
+import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.util.PathUtil;
 import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.service.TemplateService;
@@ -13,6 +15,13 @@ import java.net.URISyntaxException;
 import java.util.Objects;
 
 public class AdminTemplatePageController extends Controller {
+
+    public AdminTemplatePageController() {
+    }
+
+    public AdminTemplatePageController(HttpRequest request, HttpResponse response) {
+        super(request, response);
+    }
 
     @RefreshCache
     public void download() throws IOException, URISyntaxException, InterruptedException {

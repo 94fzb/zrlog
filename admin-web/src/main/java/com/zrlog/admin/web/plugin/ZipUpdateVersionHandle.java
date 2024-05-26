@@ -4,6 +4,7 @@ import com.hibegin.common.util.ZipUtil;
 import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.common.Constants;
 import com.zrlog.util.JarUpdater;
+import com.zrlog.util.Updater;
 
 import java.io.File;
 import java.io.Serializable;
@@ -80,8 +81,8 @@ public class ZipUpdateVersionHandle implements Serializable, UpdateVersionHandle
             if (finish) {
                 return;
             }
-            JarUpdater jarUpdater = Constants.zrLogConfig.getJarUpdater();
-            jarUpdater.restartJarAsync();
+            Updater updater = Constants.zrLogConfig.getUpdater();
+            updater.restartJarAsync();
             finish = true;
         } catch (Exception e) {
             sb.append(backendRes.get("upgradeError")).append(" ").append(e.getMessage());

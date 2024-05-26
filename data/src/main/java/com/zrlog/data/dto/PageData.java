@@ -6,11 +6,11 @@ import java.util.List;
 public class PageData<T> {
 
     public PageData() {
+        this(0L, new ArrayList<>());
     }
 
     public PageData(Long totalElements, List<T> rows) {
-        this.totalElements = totalElements;
-        this.rows = rows;
+        this(totalElements, rows, 0L, 0L);
     }
 
     public PageData(Long totalElements, List<T> rows, Long page, Long size) {
@@ -24,7 +24,7 @@ public class PageData<T> {
     private Long size;
     private Long totalElements;
     private String key;
-    private List<T> rows = new ArrayList<>();
+    private List<T> rows;
 
     public List<T> getRows() {
         return rows;

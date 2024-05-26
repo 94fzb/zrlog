@@ -10,11 +10,7 @@ import com.zrlog.util.BlogBuildInfoUtil;
 
 import java.io.*;
 import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -62,9 +58,10 @@ public class PluginCoreProcessImpl implements PluginCoreProcess {
                 Thread.currentThread().setName("plugin-core-thread");
                 while (true) {
                     tryDownloadPluginCoreFile(pluginCoreFile);
-                    String javaHome = System.getProperty("java.home").replace("\\", "/");
-                    String java = javaHome + "/bin/java";
-                    if (java.contains(" ")) {
+                    String java = System.getProperty("java.home");
+                    if (Objects.nonNull(java)) {
+                        java = java.replace("\\", "/") + "/bin/java";
+                    } else {
                         java = "java";
                     }
                     List<String> args = new ArrayList<>();

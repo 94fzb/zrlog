@@ -10,6 +10,9 @@ import com.zrlog.util.I18nUtil;
  */
 public class MyI18nInterceptor implements Interceptor {
 
+    public MyI18nInterceptor() {
+    }
+
     @Override
     public boolean doInterceptor(HttpRequest request, HttpResponse response) {
         I18nUtil.addToRequest(null, request, false);

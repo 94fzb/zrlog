@@ -1,5 +1,6 @@
 package com.zrlog.blog.web.controller.page;
 
+import com.google.gson.Gson;
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.server.api.HttpRequest;
@@ -55,6 +56,7 @@ public class ArticleController extends Controller {
                 BigDecimal.valueOf(Math.ceil(data.getTotalElements() * 1.0 / pageRequest.getSize())).longValue();
         if (totalPage > 0) {
             getRequest().getAttr().put("data", data);
+            System.out.println("new Gson().toJson(data) = " + new Gson().toJson(data));
             //大于1页
             if (totalPage > 1) {
                 getRequest().getAttr().put("pager", PagerUtil.generatorPager(currentUri, pageRequest.getPage(), totalPage));
