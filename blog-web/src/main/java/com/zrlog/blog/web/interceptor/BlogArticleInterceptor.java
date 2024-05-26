@@ -1,19 +1,16 @@
 package com.zrlog.blog.web.interceptor;
 
-import com.google.gson.Gson;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.api.Interceptor;
 import com.hibegin.http.server.util.FreeMarkerUtil;
 import com.hibegin.http.server.util.PathUtil;
 import com.hibegin.http.server.web.MethodInterceptor;
-import com.zrlog.business.cache.CacheServiceImpl;
 import com.zrlog.business.exception.InstalledException;
 import com.zrlog.business.plugin.StaticHtmlPlugin;
 import com.zrlog.business.service.TemplateHelper;
 import com.zrlog.business.util.InstallUtils;
 import com.zrlog.common.Constants;
-import com.zrlog.common.ZrLogConfig;
 import com.zrlog.util.ZrLogUtil;
 
 import java.io.ByteArrayOutputStream;
@@ -25,7 +22,6 @@ import java.util.Objects;
  * 静态化文章页，加快文章页的响应，压缩html文本，提供自定义插件标签的解析，静态资源文件的浏览器缓存问题
  */
 public class BlogArticleInterceptor implements Interceptor {
-
 
 
     /**
@@ -101,7 +97,6 @@ public class BlogArticleInterceptor implements Interceptor {
         if (Objects.nonNull(invoke)) {
             TemplateHelper.fullTemplateInfo(request);
             initTemplate();
-            System.out.println("request.getAttr() = " + new Gson().toJson(request.getAttr()));
             String htmlStr = FreeMarkerUtil.renderToFM(invoke.toString(), request);
             render(htmlStr, target, request, response);
         }

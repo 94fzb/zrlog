@@ -1,20 +1,17 @@
 package com.zrlog.blog.web.controller.page;
 
-import com.google.gson.Gson;
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.web.Controller;
 import com.zrlog.blog.web.util.WebTools;
-import com.zrlog.business.cache.CacheServiceImpl;
 import com.zrlog.business.rest.request.CreateCommentRequest;
 import com.zrlog.business.rest.response.CreateCommentResponse;
 import com.zrlog.business.service.CommentService;
 import com.zrlog.business.service.VisitorArticleService;
 import com.zrlog.business.util.PagerUtil;
 import com.zrlog.common.Constants;
-import com.zrlog.common.ZrLogConfig;
 import com.zrlog.common.rest.request.PageRequest;
 import com.zrlog.common.rest.request.PageRequestImpl;
 import com.zrlog.data.dto.PageData;
@@ -56,7 +53,6 @@ public class ArticleController extends Controller {
                 BigDecimal.valueOf(Math.ceil(data.getTotalElements() * 1.0 / pageRequest.getSize())).longValue();
         if (totalPage > 0) {
             getRequest().getAttr().put("data", data);
-            System.out.println("new Gson().toJson(data) = " + new Gson().toJson(data));
             //大于1页
             if (totalPage > 1) {
                 getRequest().getAttr().put("pager", PagerUtil.generatorPager(currentUri, pageRequest.getPage(), totalPage));
