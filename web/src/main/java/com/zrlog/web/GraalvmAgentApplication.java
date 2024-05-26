@@ -6,6 +6,7 @@ import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.http.server.WebServerBuilder;
 import com.hibegin.http.server.util.FreeMarkerUtil;
 import com.hibegin.http.server.util.PathUtil;
+import com.zrlog.admin.business.rest.base.*;
 import com.zrlog.admin.business.rest.request.CreateArticleRequest;
 import com.zrlog.admin.business.rest.request.CreateLinkRequest;
 import com.zrlog.admin.business.rest.request.LoginRequest;
@@ -16,6 +17,7 @@ import com.zrlog.business.cache.vo.BaseDataInitVO;
 import com.zrlog.business.cache.vo.HotLogBasicInfoVO;
 import com.zrlog.business.util.PagerVO;
 import com.zrlog.common.Constants;
+import com.zrlog.common.rest.response.ApiStandardResponse;
 import com.zrlog.common.vo.*;
 import com.zrlog.data.dto.PageData;
 import com.zrlog.util.DbConnectUtils;
@@ -55,14 +57,26 @@ public class GraalvmAgentApplication {
         }
     }
 
-    private static void adminJson(){
+    private static void adminJson() {
         new Gson().toJson(new ArticleResponseEntry());
+        new Gson().toJson(new PreCheckVersionResponse());
+        new Gson().toJson(new WebSiteSettingsResponse());
+        new Gson().toJson(new BlogWebSiteInfo());
+        new Gson().toJson(new OtherWebSiteInfo());
+        new Gson().toJson(new AdminWebSiteInfo());
+        new Gson().toJson(new UpgradeWebSiteInfo());
+        new Gson().toJson(new TemplateVO());
+        new Gson().toJson(new BasicWebSiteInfo());
+        new Gson().toJson(new ArticleGlobalResponse());
+        new Gson().toJson(new ApiStandardResponse<PageData<ArticleResponseEntry>>());
+        new Gson().toJson(new ApiStandardResponse<ArticleGlobalResponse>());
+        new Gson().toJson(new ArticleTypeResponseEntry());
         new Gson().toJson(new UploadFileResponse(""));
         new Gson().toJson(new LoginRequest());
         new Gson().toJson(new LoginResponse(""));
         new Gson().toJson(new CreateArticleRequest());
         new Gson().toJson(new CreateLinkRequest());
-        new Gson().toJson(new IndexResponse(new StatisticsInfoResponse(),new ArrayList<>(),new ArrayList<>(),false));
+        new Gson().toJson(new IndexResponse(new StatisticsInfoResponse(), new ArrayList<>(), new ArrayList<>(), false));
         new Gson().toJson(new StatisticsInfoResponse());
         new Gson().toJson(new ServerSideDataResponse(new UserBasicInfoResponse(), new HashMap<>(), new Object(), "/"));
         new Gson().toJson(new AdminTokenVO());
