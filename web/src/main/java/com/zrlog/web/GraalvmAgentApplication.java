@@ -15,6 +15,7 @@ import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.business.cache.vo.Archive;
 import com.zrlog.business.cache.vo.BaseDataInitVO;
 import com.zrlog.business.cache.vo.HotLogBasicInfoVO;
+import com.zrlog.business.util.PagerUtil;
 import com.zrlog.business.util.PagerVO;
 import com.zrlog.common.Constants;
 import com.zrlog.common.rest.response.ApiStandardResponse;
@@ -88,13 +89,17 @@ public class GraalvmAgentApplication {
         new Gson().toJson(new UserBasicInfoResponse());
         new Gson().toJson(new BaseDataInitVO());
         new Gson().toJson(new PageData<>());
-        new Gson().toJson(new PageData<>(0L, new ArrayList<>()));
+        new Gson().toJson(new PageData<>());
+        new Gson().toJson(MyBasicRowProcessor.createMap());
+        ArrayList<Object> objects = new ArrayList<>();
+        objects.add(MyBasicRowProcessor.createMap());
+        new Gson().toJson(new PageData<>(0L, objects));
         new Gson().toJson(new PageData<>(0L, new ArrayList<>(), 0L, 0L));
         new Gson().toJson(new BaseDataInitVO.Statistics());
         new Gson().toJson(new I18nVO());
         new Gson().toJson(new Outline());
         new Gson().toJson(new Version());
-        new Gson().toJson(new PagerVO());
+        new Gson().toJson(PagerUtil.generatorPager("/all", 1, 20));
         new Gson().toJson(new PagerVO.PageEntry());
         new Gson().toJson(new Archive());
 
@@ -107,7 +112,11 @@ public class GraalvmAgentApplication {
     }
 
     private static void cloneObj() {
+        BeanUtil.cloneObject(PagerUtil.generatorPager("/all", 1, 20));
+        ArrayList<Object> objects = new ArrayList<>();
+        objects.add(MyBasicRowProcessor.createMap());
         BeanUtil.cloneObject(new BaseDataInitVO());
+        BeanUtil.cloneObject(new PageData<>(1L, objects));
         BeanUtil.cloneObject(new Archive());
         BeanUtil.cloneObject(new BaseDataInitVO.Statistics());
         BeanUtil.cloneObject(new HotLogBasicInfoVO());

@@ -151,6 +151,9 @@ public class I18nUtil {
     }
 
     public static String getBlogStringFromRes(String key) {
+        if (Objects.isNull(threadLocal.get())) {
+            return "";
+        }
         Object obj = threadLocal.get().getBlog().get(threadLocal.get().getLocale()).get(key);
         if (obj != null) {
             return obj.toString();

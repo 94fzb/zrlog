@@ -25,6 +25,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
@@ -134,7 +136,6 @@ public class CacheServiceImpl implements CacheService {
             long start = System.currentTimeMillis();
             try {
                 cacheInit = getCacheInit();
-                new Tag().refreshTag();
                 //缓存静态资源map
                 Map<String, String> tempMap = getCacheFileMap();
                 cacheFileMap.clear();
@@ -153,14 +154,9 @@ public class CacheServiceImpl implements CacheService {
                     staticHtmlPlugin.start();
                 }
                 refreshWebSite(cacheInit.getWebSite());
-
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
             } finally {
                 lock.unlock();
-                if (Constants.DEV_MODE) {
-                    LOGGER.info("RefreshInitDataCache used time " + (System.currentTimeMillis() - start) + "ms");
-                }
+                LOGGER.info("RefreshInitDataCache used time " + (System.currentTimeMillis() - start) + "ms");
             }
         }
         if (Objects.isNull(servletRequest)) {
@@ -187,61 +183,112 @@ public class CacheServiceImpl implements CacheService {
         return BeanUtil.convert(log, HotLogBasicInfoVO.class);
     }
 
-    private BaseDataInitVO getCacheInit() throws SQLException {
+    private BaseDataInitVO getCacheInit() {
         BaseDataInitVO cacheInit = new BaseDataInitVO();
-        BaseDataInitVO.Statistics statistics = new BaseDataInitVO.Statistics();
-        statistics.setTotalArticleSize(new Log().getVisitorCount());
-        cacheInit.setStatistics(statistics);
-        cacheInit.setWebSite(refreshWebSite());
-        cacheInit.setLinks(new Link().findAll());
-        cacheInit.setTypes(new Type().findAll());
-        statistics.setTotalTypeSize((long) cacheInit.getTypes().size());
-        cacheInit.setLogNavs(new LogNav().findAll());
-        cacheInit.setPlugins(new Plugin().findAll());
-        cacheInit.setArchives(new Log().getArchives());
-        List<Map<String, Object>> all = new Tag().findAll();
-        for (Map<String, Object> kv : all) {
-            kv.put("keycode", kv.get("text").hashCode());
+        List<CompletableFuture<Void>> futures = new ArrayList<>();
+        try (ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor()) {
+            BaseDataInitVO.Statistics statistics = new BaseDataInitVO.Statistics();
+            futures.add(CompletableFuture.runAsync(() -> {
+                statistics.setTotalArticleSize(new Log().getVisitorCount());
+                cacheInit.setStatistics(statistics);
+            }, executorService));
+            futures.add(CompletableFuture.runAsync(() -> {
+                cacheInit.setWebSite(refreshWebSite());
+            }, executorService));
+            futures.add(CompletableFuture.runAsync(() -> {
+                try {
+                    cacheInit.setLinks(new Link().findAll());
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }, executorService));
+            futures.add(CompletableFuture.runAsync(() -> {
+                try {
+                    cacheInit.setTypes(new Type().findAll());
+                    statistics.setTotalTypeSize((long) cacheInit.getTypes().size());
+                    List<Map<String, Object>> types = cacheInit.getTypes();
+                    //Last article
+                    cacheInit.setHotLogs(new Log().visitorFind(new PageRequestImpl(1L, 6L), "").getRows().stream().map(this::convertToBasicVO).toList());
+                    Map<Map<String, Object>, List<HotLogBasicInfoVO>> indexHotLog = new LinkedHashMap<>();
+                    cacheInit.setIndexHotLogs(indexHotLog);
+                    //设置分类Hot
+                    for (Map<String, Object> type : types) {
+                        futures.add(CompletableFuture.runAsync(() -> {
+                            Map<String, Object> typeMap = new TreeMap<>();
+                            typeMap.put("typeName", type.get("typeName"));
+                            String alias = (String) type.get("alias");
+                            typeMap.put("alias", alias);
+                            indexHotLog.put(typeMap, new Log().findByTypeAlias(1, 6, alias).getRows().stream().map(this::convertToBasicVO).toList());
+                        }, executorService));
+                    }
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }, executorService));
+            futures.add(CompletableFuture.runAsync(() -> {
+                try {
+                    cacheInit.setLogNavs(new LogNav().findAll());
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }, executorService));
+            futures.add(CompletableFuture.runAsync(() -> {
+                try {
+                    cacheInit.setPlugins(new Plugin().findAll());
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }, executorService));
+            futures.add(CompletableFuture.runAsync(() -> {
+                try {
+                    cacheInit.setArchives(new Log().getArchives());
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }, executorService));
+            futures.add(CompletableFuture.runAsync(() -> {
+                List<Map<String, Object>> all;
+                try {
+                    new Tag().refreshTag();
+                    all = new Tag().findAll();
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+                for (Map<String, Object> kv : all) {
+                    kv.put("keycode", kv.get("text").hashCode());
+                }
+                cacheInit.setTags(all);
+                statistics.setTotalTagSize((long) cacheInit.getTags().size());
+            }, executorService));
+            try {
+                CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+            } catch (Exception e) {
+                LOGGER.warning("Load data error " + e.getMessage());
+            }
+            if (cacheInit.getTags() == null || cacheInit.getTags().isEmpty()) {
+                cacheInit.getPlugins().stream().filter(e -> Objects.equals(e.get("pluginName"), "tags")).findFirst().ifPresent(e -> {
+                    cacheInit.getPlugins().remove(e);
+                });
+            }
+            if (cacheInit.getArchives() == null || cacheInit.getArchives().isEmpty()) {
+                cacheInit.getPlugins().stream().filter(e -> Objects.equals(e.get("pluginName"), "archives")).findFirst().ifPresent(e -> {
+                    cacheInit.getPlugins().remove(e);
+                });
+            }
+            if (cacheInit.getTypes() == null || cacheInit.getTypes().isEmpty()) {
+                cacheInit.getPlugins().stream().filter(e -> Objects.equals(e.get("pluginName"), "types")).findFirst().ifPresent(e -> {
+                    cacheInit.getPlugins().remove(e);
+                });
+            }
+            if (cacheInit.getLinks() == null || cacheInit.getLinks().isEmpty()) {
+                cacheInit.getPlugins().stream().filter(e -> Objects.equals(e.get("pluginName"), "links")).findFirst().ifPresent(e -> {
+                    cacheInit.getPlugins().remove(e);
+                });
+            }
+            //默认开启文章封面
+            cacheInit.getWebSite().putIfAbsent("article_thumbnail_status", "1");
+            return cacheInit;
         }
-        cacheInit.setTags(all);
-        statistics.setTotalTagSize((long) cacheInit.getTags().size());
-        List<Map<String, Object>> types = cacheInit.getTypes();
-        //Last article
-        cacheInit.setHotLogs(new Log().visitorFind(new PageRequestImpl(1L, 6L), "").getRows().stream().map(this::convertToBasicVO).toList());
-        Map<Map<String, Object>, List<HotLogBasicInfoVO>> indexHotLog = new LinkedHashMap<>();
-        for (Map<String, Object> type : types) {
-            Map<String, Object> typeMap = new TreeMap<>();
-            typeMap.put("typeName", type.get("typeName"));
-            String alias = (String) type.get("alias");
-            typeMap.put("alias", alias);
-            indexHotLog.put(typeMap, new Log().findByTypeAlias(1, 6, alias).getRows().stream().map(this::convertToBasicVO).toList());
-        }
-        //设置分类Hot
-        cacheInit.setIndexHotLogs(indexHotLog);
-
-        if (cacheInit.getTags() == null || cacheInit.getTags().isEmpty()) {
-            cacheInit.getPlugins().stream().filter(e -> Objects.equals(e.get("pluginName"), "tags")).findFirst().ifPresent(e -> {
-                cacheInit.getPlugins().remove(e);
-            });
-        }
-        if (cacheInit.getArchives() == null || cacheInit.getArchives().isEmpty()) {
-            cacheInit.getPlugins().stream().filter(e -> Objects.equals(e.get("pluginName"), "archives")).findFirst().ifPresent(e -> {
-                cacheInit.getPlugins().remove(e);
-            });
-        }
-        if (cacheInit.getTypes() == null || cacheInit.getTypes().isEmpty()) {
-            cacheInit.getPlugins().stream().filter(e -> Objects.equals(e.get("pluginName"), "types")).findFirst().ifPresent(e -> {
-                cacheInit.getPlugins().remove(e);
-            });
-        }
-        if (cacheInit.getLinks() == null || cacheInit.getLinks().isEmpty()) {
-            cacheInit.getPlugins().stream().filter(e -> Objects.equals(e.get("pluginName"), "links")).findFirst().ifPresent(e -> {
-                cacheInit.getPlugins().remove(e);
-            });
-        }
-        //默认开启文章封面
-        cacheInit.getWebSite().putIfAbsent("article_thumbnail_status", "1");
-        return cacheInit;
     }
 
 }

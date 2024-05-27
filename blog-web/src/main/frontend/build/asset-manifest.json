@@ -1,0 +1,9 @@
+{
+  "files": {
+    "main.js": "./install/static/js/main.cc118cfa.js",
+    "index.html": "./install/index.html"
+  },
+  "entrypoints": [
+    "static/js/main.cc118cfa.js"
+  ]
+}

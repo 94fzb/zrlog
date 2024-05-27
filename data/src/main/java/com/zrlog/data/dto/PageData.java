@@ -1,9 +1,10 @@
 package com.zrlog.data.dto;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PageData<T> {
+public class PageData<T> implements Serializable {
 
     public PageData() {
         this(0L, new ArrayList<>());

@@ -103,7 +103,11 @@
                             <fallback>false</fallback>
                             <buildArgs>
                                 <arg>
+                                    -Ob
+                                    --enable-sbom
+                                    -H:+BuildReport
                                     -H:+AddAllCharsets
+                                    -H:+UnlockExperimentalVMOptions
                                     --initialize-at-build-time=sun.security.krb5.SCDynamicStoreConfig
                                     --initialize-at-build-time=java.util.ImmutableCollections$ListN
                                     --trace-class-initialization=sun.security.krb5.SCDynamicStoreConfig
@@ -182,6 +186,7 @@
                         </executions>
                         <configuration>
                             <finalName>${finalName}</finalName>
+                            <classifier>starter</classifier>
                             <archive>
                                 <manifest>
                                     <addClasspath>true</addClasspath>
