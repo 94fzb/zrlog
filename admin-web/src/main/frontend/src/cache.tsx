@@ -11,9 +11,10 @@ function aesEncrypt(text: string, key: string): string {
     // 使用 AES-CTR 模式进行加密
     const aesCtr = new ModeOfOperation.ctr(keyBytes);
     const encryptedBytes = aesCtr.encrypt(textBytes);
+    const textDecoder = new TextDecoder("utf-8");
+    const decodedString = textDecoder.decode(encryptedBytes);
     // 将加密后的字节数组转换为 Base64 编码的字符串
-    const encryptedBase64 = btoa(String.fromCharCode.apply(null, encryptedBytes));
-    return encryptedBase64;
+    return btoa(decodedString);
 }
 
 // AES解密函数
@@ -30,8 +31,7 @@ function aesDecrypt(encryptedBase64: string, key: string): string {
     const aesCtr = new ModeOfOperation.ctr(keyBytes);
     const decryptedBytes = aesCtr.decrypt(encryptedBytes);
     // 将解密后的字节数组转换为 UTF-8 编码的字符串
-    const decryptedText = new TextDecoder().decode(decryptedBytes);
-    return decryptedText;
+    return new TextDecoder().decode(decryptedBytes);
 }
 
 const getKey = () => {
