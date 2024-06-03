@@ -198,6 +198,9 @@ public class ParseUtil {
     }
 
     public static boolean isNumeric(String str) {
-        return str.matches("-?\\d+(.\\d+)?");
+        if (str == null || str.isEmpty()) {
+            return false;
+        }
+        return str.matches("-?([1-9]\\d*|0)(\\.\\d+)?");
     }
 }

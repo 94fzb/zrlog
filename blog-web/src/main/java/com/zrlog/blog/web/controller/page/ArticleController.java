@@ -25,10 +25,11 @@ import org.jsoup.safety.Safelist;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ArticleController extends Controller {
 
+    private static final Logger LOGGER = LoggerUtil.getLogger(ArticleController.class);
     private final VisitorArticleService visitorArticleService = new VisitorArticleService();
 
     private final CommentService commentService = new CommentService();
@@ -50,25 +51,16 @@ public class ArticleController extends Controller {
     }
 
     public String index() throws SQLException {
-        long page = getPage();
-
-        PageRequest pageRequest = new PageRequestImpl(page, Constants.getDefaultRows());
+        PageRequest pageRequest = new PageRequestImpl(parseUriInfo(request.getUri()).page(), Constants.getDefaultRows());
         PageData<Map<String, Object>> data = new Log().visitorFind(pageRequest, null);
         setPageDataInfo(Constants.getArticleUri() + "all-", data, pageRequest);
         return "index";
     }
 
-    private long getPage() {
-        int page = 1;
-        if (getRequest().getUri().contains("-")) {
-            String[] split = getRequest().getUri().split("-");
-            page = ParseUtil.strToInt(split[split.length - 1].replace(".html", ""), 1);
-        }
-        return page;
-    }
 
     public String search() throws SQLException {
         String key = request.getParaToStr("key");
+        ArticleUriInfoVO uriInfoVO = parseUriInfo(request.getUri());
         PageData<Map<String, Object>> data;
         if (StringUtils.isNotEmpty(key)) {
             if ("GET".equals(getRequest().getMethod().name())) {
@@ -76,9 +68,9 @@ public class ArticleController extends Controller {
             }
         } else {
             try {
-                key = parseArgs(request.getUri(), 2);
+                key = uriInfoVO.key();
             } catch (Exception e) {
-                LoggerUtil.getLogger(ArticleController.class).log(Level.WARNING, "Parse " + request.getUri() + " error " + e.getMessage());
+                LOGGER.warning("Parse " + request.getUri() + " error " + e.getMessage());
             }
         }
         if (StringUtils.isEmpty(key)) {
@@ -91,19 +83,17 @@ public class ArticleController extends Controller {
         request.getAttr().put("tipsType", I18nUtil.getBlogStringFromRes("search"));
         request.getAttr().put("tipsName", WebTools.htmlEncode(key));
 
-        setPageDataInfo(Constants.getArticleUri() + "search/" + key + "-", data, new PageRequestImpl(getPage(),
-                Constants.getDefaultRows()));
+        setPageDataInfo(Constants.getArticleUri() + "search/" + key + "-", data, new PageRequestImpl(uriInfoVO.page(), Constants.getDefaultRows()));
         return "page";
     }
 
     public String record() {
-        String dateStr = parseArgs(request.getUri(), 2);
-
+        ArticleUriInfoVO uriInfoVO = parseUriInfo(request.getUri());
         request.getAttr().put("tipsType", I18nUtil.getBlogStringFromRes("archive"));
-        request.getAttr().put("tipsName", dateStr);
+        request.getAttr().put("tipsName", uriInfoVO.key());
 
-        setPageDataInfo(Constants.getArticleUri() + "record/" + dateStr + "-", new Log().findByDate(getPage(), Constants.getDefaultRows(),
-                dateStr), new PageRequestImpl(getPage(),
+        setPageDataInfo(Constants.getArticleUri() + "record/" + uriInfoVO.key() + "-", new Log().findByDate(uriInfoVO.page(), Constants.getDefaultRows(),
+                uriInfoVO.key()), new PageRequestImpl(uriInfoVO.page(),
                 Constants.getDefaultRows()));
         return "page";
     }
@@ -146,11 +136,18 @@ public class ArticleController extends Controller {
         return "index";
     }
 
-    private static String parseArgs(String uri, Integer idx) {
-        List<String> list = Arrays.asList(uri.split("/")[idx].split("-"));
+    private static ArticleUriInfoVO parseUriInfo(String uri) {
+        String rawUrl = uri;
+        if (rawUrl.endsWith(".html")) {
+            rawUrl = rawUrl.substring(0, rawUrl.length() - ".html".length());
+        }
+        String rawArgs = rawUrl.substring(rawUrl.lastIndexOf("/") + 1);
+        List<String> list = Arrays.asList(rawArgs.split("-"));
         boolean numeric = ParseUtil.isNumeric(list.getLast());
         StringJoiner sj = new StringJoiner("-");
+        int page = 1;
         if (numeric) {
+            page = ParseUtil.strToInt(list.getLast(), 1);
             for (int i = 0; i < list.size() - 1; i++) {
                 sj.add(list.get(i));
             }
@@ -160,15 +157,21 @@ public class ArticleController extends Controller {
             }
         }
         String key = sj.toString();
-        return WebTools.convertRequestParam(key).replace(".html", "");
+        return new ArticleUriInfoVO(WebTools.convertRequestParam(key), page);
+    }
+
+    public static void main(String[] args) {
+        ArticleUriInfoVO uriInfoVO = parseUriInfo("/record/2015-06.html");
+        System.out.println(uriInfoVO);
     }
 
     public String sort() throws SQLException {
-        String typeStr = parseArgs(request.getUri(), 2);
-        setPageDataInfo(Constants.getArticleUri() + "sort/" + typeStr + "-", new Log().findByTypeAlias(getPage(), Constants.getDefaultRows(), typeStr), new PageRequestImpl(getPage(),
+        ArticleUriInfoVO uriInfoVO = parseUriInfo(request.getUri());
+        setPageDataInfo(Constants.getArticleUri() + "sort/" + uriInfoVO.key() + "-", new Log().findByTypeAlias(uriInfoVO.page(), Constants.getDefaultRows(),
+                uriInfoVO.key()), new PageRequestImpl(uriInfoVO.page(),
                 Constants.getDefaultRows()));
 
-        Map<String, Object> type = new Type().findByAlias(typeStr);
+        Map<String, Object> type = new Type().findByAlias(uriInfoVO.key());
         request.getAttr().put("type", type);
         request.getAttr().put("tipsType", I18nUtil.getBlogStringFromRes("category"));
         if (type != null) {
@@ -178,9 +181,12 @@ public class ArticleController extends Controller {
     }
 
     public String tag() throws SQLException {
-        String tag = WebTools.convertRequestParam(parseArgs(request.getUri(), 2));
-        setPageDataInfo(Constants.getArticleUri() + "tag/" + tag + "-", new Log().findByTag(getPage(), Constants.getDefaultRows(), tag), new PageRequestImpl(getPage(),
-                Constants.getDefaultRows()));
+        ArticleUriInfoVO uriInfoVO = parseUriInfo(request.getUri());
+
+        String tag = WebTools.convertRequestParam(uriInfoVO.key());
+        setPageDataInfo(Constants.getArticleUri() + "tag/" + tag + "-", new Log().findByTag(uriInfoVO.page(), Constants.getDefaultRows(), tag),
+                new PageRequestImpl(uriInfoVO.page(),
+                        Constants.getDefaultRows()));
         getRequest().getAttr().put("tipsType", I18nUtil.getBlogStringFromRes("tag"));
         getRequest().getAttr().put("tipsName", tag);
         return "page";
