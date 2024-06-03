@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { App, Button, Col, Progress, Row, Steps } from "antd";
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
@@ -30,9 +30,10 @@ type StepInfo = {
     alias: "changeLog" | "downloadProcess" | "doUpgrade";
 };
 
+let upgradeTimer: NodeJS.Timeout;
+
 const Upgrade = ({ data }: { data: UpgradeData }) => {
     const preUpgradeKey = data.preUpgradeKey;
-
     const steps: StepInfo[] = [
         {
             title: getRes()["changeLog"],
@@ -61,7 +62,7 @@ const Upgrade = ({ data }: { data: UpgradeData }) => {
             .get(API_VERSION_PATH + "?buildId=" + newBuildId)
             .then(({ data }) => {
                 if (newBuildId === data.data.buildId) {
-                    modal.info({
+                    modal.success({
                         title: data.data.message,
                         content: "",
                         onOk: function () {
@@ -70,12 +71,12 @@ const Upgrade = ({ data }: { data: UpgradeData }) => {
                     });
                     return;
                 }
-                setTimeout(() => {
+                upgradeTimer = setTimeout(() => {
                     checkRestartSuccess(newBuildId);
                 }, 500);
             })
             .catch(() => {
-                setTimeout(() => {
+                upgradeTimer = setTimeout(() => {
                     checkRestartSuccess(newBuildId);
                 }, 500);
             });
@@ -99,7 +100,7 @@ const Upgrade = ({ data }: { data: UpgradeData }) => {
                 };
             });
             if (data.data.process < 100) {
-                setTimeout(downloadProcess, 500);
+                upgradeTimer = setTimeout(downloadProcess, 500);
             }
         } catch (e) {
             if (e instanceof AxiosError) {
@@ -132,7 +133,7 @@ const Upgrade = ({ data }: { data: UpgradeData }) => {
             checkRestartSuccess(newBuildId);
             return;
         }
-        setTimeout(upgrade, 500);
+        upgradeTimer = setTimeout(upgrade, 500);
     };
 
     const next = async () => {
@@ -157,9 +158,17 @@ const Upgrade = ({ data }: { data: UpgradeData }) => {
         return false;
     };
 
+    useEffect(() => {
+        return () => {
+            if (upgradeTimer) {
+                clearTimeout(upgradeTimer);
+            }
+        };
+    }, []);
+
     return (
         <Row>
-            <Col md={18} xs={24}>
+            <Col style={{ maxWidth: 600 }} xs={24}>
                 <Title className="page-header" level={3}>
                     {getRes()["upgradeWizard"]}
                 </Title>

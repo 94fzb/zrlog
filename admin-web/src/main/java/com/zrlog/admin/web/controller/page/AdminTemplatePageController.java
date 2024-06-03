@@ -1,5 +1,9 @@
 package com.zrlog.admin.web.controller.page;
 
+import com.hibegin.common.util.FileUtils;
+import com.hibegin.http.server.api.HttpRequest;
+import com.hibegin.http.server.api.HttpResponse;
+import com.hibegin.http.server.util.MimeTypeUtil;
 import com.hibegin.http.server.util.PathUtil;
 import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.service.TemplateService;
@@ -13,6 +17,7 @@ import java.net.URISyntaxException;
 import java.util.Objects;
 
 public class AdminTemplatePageController extends Controller {
+
 
     @RefreshCache
     public void download() throws IOException, URISyntaxException, InterruptedException {
@@ -31,7 +36,12 @@ public class AdminTemplatePageController extends Controller {
             response.renderCode(404);
         }
         if (templateVO.getPreviewImage().startsWith("/include/templates")) {
-            response.writeFile(PathUtil.getStaticFile(templateVO.getPreviewImage()));
+            if (Objects.equals(templateVO.getTemplate(), Constants.DEFAULT_TEMPLATE_PATH)) {
+                response.getHeader().put("Content-Type", MimeTypeUtil.getMimeStrByExt(FileUtils.getFileExt(templateVO.getPreviewImage())));
+                response.write(AdminTemplatePageController.class.getResourceAsStream(templateVO.getPreviewImage()));
+            } else {
+                response.writeFile(PathUtil.getStaticFile(templateVO.getPreviewImage()));
+            }
         } else {
             response.renderCode(403);
         }

@@ -116,4 +116,12 @@ public class BlogBuildInfoUtil {
         blogProperties.put("runMode", BlogBuildInfoUtil.getRunMode());
         return blogProperties;
     }
+
+    public static String getVersionInfo() {
+        return BlogBuildInfoUtil.getVersion() + " - " + BlogBuildInfoUtil.getBuildId() + " (" + new SimpleDateFormat("yyyy-MM-dd").format(BlogBuildInfoUtil.getTime()) + ")";
+    }
+
+    public static String getVersionInfoFull() {
+        return BlogBuildInfoUtil.getVersion() + " - " + BlogBuildInfoUtil.getBuildId() + " (" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(BlogBuildInfoUtil.getTime()) + ")";
+    }
 }

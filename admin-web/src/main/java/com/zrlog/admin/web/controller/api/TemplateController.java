@@ -9,6 +9,7 @@ import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.util.PathUtil;
 import com.hibegin.http.server.web.Controller;
 import com.hibegin.http.server.web.cookie.Cookie;
+import com.zrlog.admin.business.exception.ArgsException;
 import com.zrlog.admin.business.exception.BadTemplatePathException;
 import com.zrlog.admin.business.exception.TemplatePathNotNullException;
 import com.zrlog.admin.business.rest.response.TemplateDownloadResponse;
@@ -20,7 +21,6 @@ import com.zrlog.admin.web.token.AdminTokenThreadLocal;
 import com.zrlog.business.service.TemplateHelper;
 import com.zrlog.common.Constants;
 import com.zrlog.common.rest.response.ApiStandardResponse;
-import com.zrlog.common.vo.AdminTokenVO;
 import com.zrlog.common.vo.TemplateVO;
 import com.zrlog.model.WebSite;
 import com.zrlog.util.BlogBuildInfoUtil;
@@ -108,6 +108,9 @@ public class TemplateController extends Controller {
     public UploadTemplateResponse upload() throws IOException {
         String uploadFieldName = "file";
         File templateName = request.getFile(uploadFieldName);
+        if (Objects.isNull(templateName)) {
+            throw new ArgsException("file");
+        }
         return templateService.upload("", templateName);
     }
 
@@ -115,6 +118,9 @@ public class TemplateController extends Controller {
     @ResponseBody
     public UpdateRecordResponse config() throws SQLException {
         Map<String, Object> param = BeanUtil.convert(getRequest().getInputStream(), Map.class);
+        if (Objects.isNull(param)) {
+            return new UpdateRecordResponse(false);
+        }
         String template = (String) param.get("template");
         if (StringUtils.isNotEmpty(template)) {
             param.remove("template");
@@ -125,7 +131,11 @@ public class TemplateController extends Controller {
 
     @ResponseBody
     public ApiStandardResponse<TemplateVO> configParams() {
-        return new ApiStandardResponse<>(templateService.loadTemplateConfig(request.getParaToStr("template")));
+        String template = request.getParaToStr("template");
+        if (StringUtils.isEmpty(template)) {
+            return new ApiStandardResponse<>();
+        }
+        return new ApiStandardResponse<>(templateService.loadTemplateConfig(template));
     }
 
     @ResponseBody
@@ -134,11 +144,8 @@ public class TemplateController extends Controller {
     }
 
     @ResponseBody
-    public ApiStandardResponse<TemplateDownloadResponse> downloadUrl() {
-        TemplateDownloadResponse downloadResponse = new TemplateDownloadResponse();
-        downloadResponse.setUrl("https://store.zrlog.com/template/index.html?from=" + AdminTokenThreadLocal.getUser().getProtocol() + "://" + getRequest().getHeader("Host") +
-                "/admin/template&v=" + BlogBuildInfoUtil.getVersion() +
-                "&id=" + BlogBuildInfoUtil.getBuildId() + "&upgrade-v3=true");
+    public ApiStandardResponse<TemplateDownloadResponse> templateCenter() {
+        TemplateDownloadResponse downloadResponse = new TemplateDownloadResponse("https://store.zrlog.com/template/index.html?from=" + AdminTokenThreadLocal.getUserProtocol() + "://" + getRequest().getHeader("Host") + "/admin/template&v=" + BlogBuildInfoUtil.getVersion() + "&id=" + BlogBuildInfoUtil.getBuildId() + "&upgrade-v3=true");
         return new ApiStandardResponse<>(downloadResponse);
     }
 }

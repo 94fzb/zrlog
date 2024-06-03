@@ -22,12 +22,12 @@ const StyledIndexLayout = styled("div")`
     }
 
     #logo {
-        height: 51px;
+        height: 64px;
         padding-left: 23px;
         padding-right: 23px;
         overflow: hidden;
         font-size: 25px;
-        line-height: 65px;
+        display: inline-flex;
         color: #ffffff;
     }
 

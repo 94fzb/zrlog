@@ -8,10 +8,10 @@ import com.zrlog.blog.web.controller.api.ApiInstallController;
 import com.zrlog.blog.web.controller.api.BlogApiPublicController;
 import com.zrlog.blog.web.controller.page.ArticleController;
 import com.zrlog.blog.web.controller.page.InstallController;
+import com.zrlog.business.service.TemplateInfoHelper;
 import com.zrlog.business.util.InstallUtils;
 import com.zrlog.common.Constants;
 
-import static com.zrlog.admin.business.service.TemplateService.ADMIN_PREVIEW_IMAGE_URI;
 
 public class RouterUtils {
     /**
@@ -30,6 +30,7 @@ public class RouterUtils {
         router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/404", AdminPageController.class, "index");
         router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/upgrade", AdminPageController.class, "index");
         router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/article-edit", AdminPageController.class, "index");
+        router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/offline", AdminPageController.class, "index");
         router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/article", AdminPageController.class, "index");
         router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/type", AdminPageController.class, "index");
         router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/link", AdminPageController.class, "index");
@@ -43,12 +44,13 @@ public class RouterUtils {
         router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/template", AdminPageController.class, "index");
         //template download
         router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/template/download", AdminTemplatePageController.class, "download");
-        router.addMapper(ADMIN_PREVIEW_IMAGE_URI, AdminTemplatePageController.class, "previewImage");
+        router.addMapper(TemplateInfoHelper.ADMIN_PREVIEW_IMAGE_URI, AdminTemplatePageController.class, "previewImage");
         // api
         router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH, AdminController.class);
         router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/403", AdminController.class, "error");
         router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/404", AdminController.class, "error");
         router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/500", AdminController.class, "error");
+        router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/offline", AdminController.class, "error");
         router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/link", LinkController.class);
         router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/plugin", AdminController.class, "plugin");
         router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/index", AdminController.class, "index");
@@ -61,6 +63,7 @@ public class RouterUtils {
         router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/website", WebSiteController.class);
         router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/template", TemplateController.class);
         router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/template-config", TemplateController.class, "configParams");
+        router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/template-center", TemplateController.class, "templateCenter");
         router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/upload", UploadController.class);
         router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/upgrade", UpgradeController.class);
         router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/user", AdminUserController.class);

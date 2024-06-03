@@ -2,31 +2,32 @@ package com.zrlog.admin.web.controller.page;
 
 import com.google.gson.Gson;
 import com.hibegin.common.util.IOUtil;
-import com.hibegin.http.annotation.ResponseBody;
+import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.server.web.Controller;
-import com.hibegin.http.server.web.cookie.Cookie;
 import com.zrlog.admin.business.rest.response.ServerSideDataResponse;
 import com.zrlog.admin.business.rest.response.UserBasicInfoResponse;
 import com.zrlog.admin.web.controller.api.AdminUserController;
-import com.zrlog.admin.web.token.AdminTokenService;
 import com.zrlog.admin.web.token.AdminTokenThreadLocal;
+import com.zrlog.business.rest.response.PublicInfoVO;
 import com.zrlog.business.service.CommonService;
 import com.zrlog.common.Constants;
 import com.zrlog.common.rest.response.ApiStandardResponse;
 import com.zrlog.util.I18nUtil;
-import com.zrlog.util.ZrLogUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
+import java.util.StringJoiner;
 
 public class AdminPageController extends Controller {
 
-    public void index() {
+    public void index() throws Throwable {
         if (getRequest().getUri().endsWith(Constants.ADMIN_URI_BASE_PATH) || getRequest().getUri().endsWith(Constants.ADMIN_URI_BASE_PATH + "/")) {
             response.redirect(Constants.ADMIN_URI_BASE_PATH + Constants.INDEX_URI_PATH);
             return;
@@ -34,7 +35,8 @@ public class AdminPageController extends Controller {
         renderIndex();
     }
 
-    private void renderIndex() {
+
+    private void renderIndex() throws Throwable {
         InputStream inputStream = AdminPageController.class.getResourceAsStream(Constants.ADMIN_HTML_PAGE);
         if (Objects.isNull(inputStream)) {
             response.renderCode(404);
@@ -46,9 +48,27 @@ public class AdminPageController extends Controller {
         document.body().removeClass("light");
         document.selectFirst("base").attr("href", "/");
         document.body().addClass(Constants.getBooleanByFromWebSite("admin_darkMode") ? "dark" : "light");
-        document.title(Constants.WEB_SITE.get("title") + " | " + I18nUtil.getBlogStringFromRes("admin.management"));
+        document.title(getAdminTitle());
+        Elements select = document.head().select("meta[name=theme-color]");
+        if (!select.isEmpty()) {
+            Element first = select.first();
+            if (Objects.nonNull(first)) {
+                PublicInfoVO publicInfo = new CommonService().getPublicInfo(request);
+                first.attr("content", publicInfo.pwaThemeColor());
+            }
+        }
         document.getElementById("__SS_DATA__").text(new Gson().toJson(serverSide(request.getUri())));
         response.renderHtmlStr(document.html());
+    }
+
+    public static String getAdminTitle() {
+        String title = (String) Constants.WEB_SITE.get("title");
+        StringJoiner sj = new StringJoiner(" | ");
+        if (StringUtils.isNotEmpty(title)) {
+            sj.add(title);
+        }
+        sj.add(I18nUtil.getBlogStringFromRes("admin.management"));
+        return sj.toString();
     }
 
     /*@ResponseBody
@@ -56,38 +76,28 @@ public class AdminPageController extends Controller {
         return new ApiStandardResponse<>(serverSide(request.getParaToStr("uri")));
     }*/
 
-    private ServerSideDataResponse serverSide(String uri){
-        Map<String,Object> resourceInfo = new CommonService().blogResourceInfo(request);
-        if(Objects.nonNull(AdminTokenThreadLocal.getUser())){
-            UserBasicInfoResponse basicInfoResponse =  new AdminUserController(request,response).index().getData();
-            try{
-                Method method = request.getRequestConfig().getRouter().getMethod("/api" +uri);
-                Controller controller = ZrLogUtil.buildController(method,request,response);
+    private ServerSideDataResponse serverSide(String uri) throws Throwable {
+        Map<String, Object> resourceInfo = new CommonService().blogResourceInfo(request);
+        if (Objects.nonNull(AdminTokenThreadLocal.getUser())) {
+            UserBasicInfoResponse basicInfoResponse = new AdminUserController(request, response).index().getData();
+            Method method = request.getRequestConfig().getRouter().getMethod("/api" + uri);
+            try {
+                Controller controller = Controller.buildController(method, request, response);
                 ApiStandardResponse<Object> result = (ApiStandardResponse<Object>) method.invoke(controller);
-                if(Objects.nonNull(result)){
-                    return new ServerSideDataResponse(basicInfoResponse,resourceInfo,result.getData(),AdminTokenThreadLocal.getUser().getSessionId());
-                } else{
-                    return new ServerSideDataResponse(basicInfoResponse,resourceInfo,new Object(),AdminTokenThreadLocal.getUser().getSessionId());
+                if (Objects.nonNull(result)) {
+                    return new ServerSideDataResponse(basicInfoResponse, resourceInfo, result.getData(), AdminTokenThreadLocal.getUser().getSessionId());
+                } else {
+                    return new ServerSideDataResponse(basicInfoResponse, resourceInfo, new Object(), AdminTokenThreadLocal.getUser().getSessionId());
                 }
-            } catch (Exception e){
-                throw new RuntimeException(e);
+            } catch (InvocationTargetException e) {
+                throw e.getTargetException();
             }
-        } else{
-            return new ServerSideDataResponse(null,resourceInfo,null,null);
+        } else {
+            return new ServerSideDataResponse(null, resourceInfo, null, null);
         }
     }
 
     public void logout() {
-        Cookie[] cookies = getRequest().getCookies();
-        for (Cookie cookie : cookies) {
-            if (AdminTokenService.ADMIN_TOKEN.equals(cookie.getName())) {
-                cookie.setValue("");
-                cookie.setExpireDate(new Date(0));
-                cookie.setPath("/");
-                cookie.setHttpOnly(true);
-                getResponse().addCookie(cookie);
-            }
-        }
-        response.redirect(Constants.ADMIN_LOGIN_URI_PATH);
+        Constants.zrLogConfig.getTokenService().removeAdminToken(request, response);
     }
 }

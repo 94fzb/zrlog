@@ -56,7 +56,6 @@ const BLink = ({ data }: { data: PageDataSource }) => {
                     <EditLink record={record} editSuccessCall={editSuccessCall} />
                 )}
                 deleteApi={"/api/admin/link/delete"}
-                dataApi={"/api/admin/link"}
             />
         </>
     );

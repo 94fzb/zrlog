@@ -22,17 +22,10 @@ import java.util.Objects;
 
 public class BlogNavController extends Controller {
 
-    public BlogNavController() {
-    }
-
-    public BlogNavController(HttpRequest request, HttpResponse response) {
-        super(request, response);
-    }
-
     @RefreshCache(async = true)
     @ResponseBody
     public UpdateRecordResponse delete() throws SQLException {
-        String[] ids = request.getParaToStr("id").split(",");
+        String[] ids = Objects.requireNonNullElse(request.getParaToStr("id"),"").split(",");
         for (String id : ids) {
             new LogNav().deleteById(Integer.parseInt(id));
         }
@@ -41,7 +34,7 @@ public class BlogNavController extends Controller {
 
     @ResponseBody
     public ApiStandardResponse<PageData<Map<String, Object>>> index() throws SQLException {
-        PageData<Map<String, Object>> mapPageData = new LogNav().find(ControllerUtil.getPageRequest(this));
+        PageData<Map<String, Object>> mapPageData = new LogNav().find(ControllerUtil.unPageRequest());
         mapPageData.getRows().forEach(e -> {
             e.put("jumpUrl", TemplateHelper.getNavUrl(request, TemplateHelper.getSuffix(request), (String) e.get("url")));
         });

@@ -1,5 +1,6 @@
 package com.zrlog.common.vo;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class TemplateVO {
     private String viewType;
     private boolean use;
     private String adminPreviewImage;
+    private List<String> staticResources = new ArrayList<>();
 
     public String getViewType() {
         return viewType;
@@ -192,5 +194,13 @@ public class TemplateVO {
 
     public void setAdminPreviewImage(String adminPreviewImage) {
         this.adminPreviewImage = adminPreviewImage;
+    }
+
+    public List<String> getStaticResources() {
+        return staticResources;
+    }
+
+    public void setStaticResources(List<String> staticResources) {
+        this.staticResources = staticResources;
     }
 }

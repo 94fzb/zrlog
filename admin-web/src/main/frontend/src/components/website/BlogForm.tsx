@@ -5,7 +5,7 @@ import Input from "antd/es/input";
 import Switch from "antd/es/switch";
 import { getRes, removeRes } from "../../utils/constants";
 import Button from "antd/es/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { App } from "antd";
 import { Blog } from "./index";
@@ -32,9 +32,9 @@ const BlogForm = ({ data }: { data: Blog }) => {
         });
     };
 
-    if (form === undefined) {
-        return <></>;
-    }
+    useEffect(() => {
+        setForm(data);
+    }, [data]);
 
     return (
         <>

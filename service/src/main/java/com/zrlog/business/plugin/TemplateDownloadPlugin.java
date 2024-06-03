@@ -2,6 +2,7 @@ package com.zrlog.business.plugin;
 
 import com.hibegin.common.BaseLockObject;
 import com.hibegin.common.util.LoggerUtil;
+import com.hibegin.common.util.StringUtils;
 import com.hibegin.common.util.ZipUtil;
 import com.hibegin.common.util.http.HttpUtil;
 import com.hibegin.common.util.http.handle.HttpFileHandle;
@@ -16,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 public class TemplateDownloadPlugin extends BaseLockObject implements IPlugin {
@@ -26,13 +28,17 @@ public class TemplateDownloadPlugin extends BaseLockObject implements IPlugin {
     public boolean start() {
         lock.lock();
         try {
-            File file = PathUtil.getStaticFile(TemplateHelper.getTemplatePath(null));
+            String templatePath = TemplateHelper.getTemplatePath(null);
+            if (Objects.equals(templatePath, Constants.DEFAULT_TEMPLATE_PATH)) {
+                return true;
+            }
+            File file = PathUtil.getStaticFile(templatePath);
             if (file.exists()) {
                 return true;
             }
             try {
                 installByUrl(BlogBuildInfoUtil.getResourceDownloadUrl() + "/attachment/template/" + file.getName() + ".zip");
-                LOGGER.info("Download lost " + file.getName() + " template success");
+                LOGGER.info("Download lost template [" + file.getName() + "] success");
             } catch (IOException | URISyntaxException | InterruptedException e) {
                 LOGGER.warning("Reinstall template error -> " + e.getMessage());
             }
@@ -48,14 +54,19 @@ public class TemplateDownloadPlugin extends BaseLockObject implements IPlugin {
     }
 
     public static void installByUrl(String downloadUrl) throws IOException, URISyntaxException, InterruptedException {
+        if (StringUtils.isEmpty(downloadUrl)) {
+            return;
+        }
         String templateName = downloadUrl.substring(downloadUrl.lastIndexOf("/") + 1).replace(".zip", "");
         File path = new File(PathUtil.getStaticPath() + Constants.TEMPLATE_BASE_PATH + templateName);
         if (path.exists()) {
             throw new TemplateExistsException();
         }
         HttpFileHandle fileHandle = (HttpFileHandle) HttpUtil.getInstance().sendGetRequest(downloadUrl, new HttpFileHandle(PathUtil.getStaticPath() + Constants.TEMPLATE_BASE_PATH), new HashMap<>());
-        ZipUtil.unZip(fileHandle.getT().toString(), path.toString());
-        //delete zip file
-        fileHandle.getT().delete();
+        if (fileHandle.getT().exists()) {
+            ZipUtil.unZip(fileHandle.getT().toString(), path.toString());
+            //delete zip file
+            fileHandle.getT().delete();
+        }
     }
 }

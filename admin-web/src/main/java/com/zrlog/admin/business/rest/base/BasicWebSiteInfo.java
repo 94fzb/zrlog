@@ -11,6 +11,7 @@ public class BasicWebSiteInfo implements Validator {
     private String title;
     private String keywords;
     private String description;
+    private String favicon_ico_base64;
 
     public String getSecond_title() {
         return second_title;
@@ -49,5 +50,13 @@ public class BasicWebSiteInfo implements Validator {
         if (Objects.isNull(title) || title.trim().isEmpty()) {
             throw new ArgsException("title");
         }
+    }
+
+    public String getFavicon_ico_base64() {
+        return favicon_ico_base64;
+    }
+
+    public void setFavicon_ico_base64(String favicon_ico_base64) {
+        this.favicon_ico_base64 = favicon_ico_base64;
     }
 }

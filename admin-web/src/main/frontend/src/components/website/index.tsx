@@ -26,6 +26,7 @@ export interface Basic {
     title: string;
     keywords: string;
     description: string;
+    favicon_ico_base64: string;
 }
 
 export interface Admin {
@@ -35,6 +36,8 @@ export interface Admin {
     language: string;
     admin_darkMode: boolean;
     admin_color_primary: string;
+    favicon_png_pwa_192_base64: string;
+    favicon_png_pwa_512_base64: string;
 }
 
 export interface Blog {
@@ -57,12 +60,9 @@ const WebSite = ({ data }: { data: Data }) => {
     const activeKey = tab ? tab : "basic";
 
     const buildLink = (key: string, text: string) => {
+        const toUrl = key === "basic" ? "/website" : "/website?tab=" + key;
         return (
-            <Link
-                to={"/website?tab=" + key}
-                replace={true}
-                style={{ color: activeKey === key ? getColorPrimary() : "inherit" }}
-            >
+            <Link to={toUrl} replace={true} style={{ color: activeKey === key ? getColorPrimary() : "inherit" }}>
                 {text}
             </Link>
         );
@@ -82,7 +82,7 @@ const WebSite = ({ data }: { data: Data }) => {
                         label: buildLink("basic", "基本信息"),
                         children: (
                             <Row>
-                                <Col md={12} xs={24}>
+                                <Col xs={24} style={{ maxWidth: 600 }}>
                                     <BasicForm data={data.basic} />
                                 </Col>
                             </Row>
@@ -93,7 +93,7 @@ const WebSite = ({ data }: { data: Data }) => {
                         label: buildLink("blog", "博客设置"),
                         children: (
                             <Row>
-                                <Col md={12} xs={24}>
+                                <Col xs={24} style={{ maxWidth: 600 }}>
                                     <BlogForm data={data.blog} />
                                 </Col>
                             </Row>
@@ -104,7 +104,7 @@ const WebSite = ({ data }: { data: Data }) => {
                         label: buildLink("admin", "管理设置"),
                         children: (
                             <Row>
-                                <Col md={12} xs={24}>
+                                <Col xs={24} style={{ maxWidth: 600 }}>
                                     <AdminForm data={data.admin} />
                                 </Col>
                             </Row>
@@ -120,7 +120,7 @@ const WebSite = ({ data }: { data: Data }) => {
                         label: buildLink("other", "其他设置"),
                         children: (
                             <Row>
-                                <Col md={12} xs={24}>
+                                <Col xs={24} style={{ maxWidth: 600 }}>
                                     <OtherForm data={data.other} />
                                 </Col>
                             </Row>
@@ -132,7 +132,6 @@ const WebSite = ({ data }: { data: Data }) => {
                         children: <UpgradeSettingForm data={data.upgrade} />,
                     },
                 ]}
-                //onChange={(e) => handleTabClick(e)}
             />
         </>
     );

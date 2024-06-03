@@ -41,11 +41,15 @@ const EditType: FunctionComponent<EditTypeProps> = ({ record, editSuccessCall })
 
     return (
         <>
-            <Link to={"#"}>
-                <EditOutlined
-                    onClick={() => setShowModel(true)}
-                    style={{ marginBottom: 8, color: getColorPrimary() }}
-                />
+            <Link
+                to={"#edit-" + record.id}
+                onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setShowModel(true);
+                }}
+            >
+                <EditOutlined style={{ marginBottom: 8, color: getColorPrimary() }} />
             </Link>
             <Modal title={getRes()["edit"]} open={showModel} onOk={handleOk} onCancel={() => setShowModel(false)}>
                 <Form initialValues={record} onValuesChange={(_k, v) => setValue(v)} {...layout}>

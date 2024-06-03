@@ -6,6 +6,7 @@ import com.google.gson.GsonBuilder;
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.dao.DAO;
+import com.zrlog.data.dto.FaviconBase64DTO;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -102,5 +103,13 @@ public class WebSite extends DAO {
         Map<String, Object> webSite = queryFirstWithParams("select value from website where name=?", name);
         //数据库varchar导致这里使用1进行比较
         return webSite != null && webSite.get("value") instanceof String && "1".equals(webSite.get("value"));
+    }
+
+    public FaviconBase64DTO faviconBase64DTO() {
+        FaviconBase64DTO faviconBase64DTO = new FaviconBase64DTO();
+        faviconBase64DTO.setFavicon_ico_base64(getStringValueByName("favicon_ico_base64"));
+        faviconBase64DTO.setFavicon_png_pwa_192_base64(getStringValueByName("favicon_png_pwa_192_base64"));
+        faviconBase64DTO.setFavicon_png_pwa_512_base64(getStringValueByName("favicon_png_pwa_512_base64"));
+        return faviconBase64DTO;
     }
 }

@@ -5,10 +5,12 @@ import { getCsrData } from "./api";
 import MyLoadingComponent from "./components/my-loading-component";
 import { ssData } from "./index";
 import { getCachedData, putCache } from "./cache";
-import { deepEqual } from "./utils/helpers";
+import { deepEqual, removeQueryParam } from "./utils/helpers";
 import { UpgradeData } from "./components/upgrade";
+import { cacheIgnoreReloadKey } from "./utils/constants";
 
 const AsyncArticleEdit = lazy(() => import("components/articleEdit"));
+const AsyncOffline = lazy(() => import("common/Offline"));
 
 const AsyncComment = lazy(() => import("components/comment"));
 
@@ -57,7 +59,7 @@ const AdminDashboardRouter = () => {
     });
 
     const getDataFromState = () => {
-        const uri = location.pathname + location.search;
+        const uri = location.pathname + removeQueryParam(location.search, cacheIgnoreReloadKey);
         return state.data[uri] !== undefined && state.data[uri] !== null ? state.data[uri] : undefined;
     };
 
@@ -76,7 +78,7 @@ const AdminDashboardRouter = () => {
     };
 
     useEffect(() => {
-        const uri = location.pathname + location.search;
+        const uri = location.pathname + removeQueryParam(location.search, cacheIgnoreReloadKey);
         if (getDataFromState()) {
             if (state.firstRender) {
                 setState((prevState) => {
@@ -226,9 +228,11 @@ const AdminDashboardRouter = () => {
                 path="template-center"
                 element={
                     <AdminManageLayout>
-                        <Suspense fallback={<MyLoadingComponent />}>
-                            <AsyncTemplateCenter />
-                        </Suspense>
+                        {getDataFromState() && (
+                            <Suspense fallback={<MyLoadingComponent />}>
+                                <AsyncTemplateCenter data={getDataFromState()} />
+                            </Suspense>
+                        )}
                     </AdminManageLayout>
                 }
             />
@@ -287,6 +291,14 @@ const AdminDashboardRouter = () => {
                             <AsyncError data={getDataFromState()} code={500} />
                         </Suspense>
                     )
+                }
+            />
+            <Route
+                path={"offline"}
+                element={
+                    <Suspense fallback={<MyLoadingComponent />}>
+                        <AsyncOffline />
+                    </Suspense>
                 }
             />
             <Route

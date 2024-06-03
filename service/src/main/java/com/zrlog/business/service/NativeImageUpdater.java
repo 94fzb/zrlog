@@ -1,0 +1,113 @@
+package com.zrlog.business.service;
+
+import com.hibegin.common.util.IOUtil;
+import com.hibegin.common.util.LoggerUtil;
+import com.hibegin.common.util.StringUtils;
+import com.hibegin.http.server.util.PathUtil;
+import com.zrlog.common.Constants;
+import com.zrlog.common.Updater;
+import com.zrlog.common.vo.Version;
+import com.zrlog.util.ZrLogUtil;
+
+import java.io.File;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Objects;
+import java.util.StringJoiner;
+import java.util.concurrent.CompletableFuture;
+import java.util.logging.Logger;
+
+public record NativeImageUpdater(String[] args, String fileName) implements Updater {
+
+    private static final Logger LOGGER = LoggerUtil.getLogger(NativeImageUpdater.class);
+
+    private String buildExec() {
+        StringJoiner shells = new StringJoiner("\n");
+        shells.add("sleep 1");
+        String zipBinName = "zrlog";
+        shells.add("chmod a+x " + getUploadTempPath() + "/" + zipBinName);
+        shells.add("mv " + getUploadTempPath() + "/*" + " " + PathUtil.getRootPath());
+        File newBinFile = new File(PathUtil.getRootPath() + "/" + zipBinName);
+        //try update exec name
+        if (!Objects.equals(newBinFile.toString(), new File(fileName).toString())) {
+            shells.add("mv " + newBinFile + " " + fileName);
+        }
+        //shells.add("mv " + getUploadTempPath() + "/*" + " " + PathUtil.getRootPath());
+        StringJoiner cmdArgs = new StringJoiner(" ");
+        for (String arg : args) {
+            if (arg.startsWith("--port=")) {
+                continue;
+            }
+            cmdArgs.add(arg);
+        }
+        cmdArgs.add("--port=" + ZrLogUtil.getPort(args));
+        shells.add(fileName + " " + cmdArgs);
+        return shells.toString();
+    }
+
+    private String buildWindowsBatExec() {
+        StringJoiner shells = new StringJoiner("\n");
+        String zipBinName = "zrlog.exe";
+        shells.add("timeout /t 1 /nobreak > nul");
+        shells.add("move " + getUploadTempPath() + "\\*" + " " + PathUtil.getRootPath());
+        File newBinFile = new File(PathUtil.getRootPath() + "\\" + zipBinName);
+        //try update exec name
+        if (!Objects.equals(newBinFile.toString(), new File(fileName).toString())) {
+            shells.add("move " + newBinFile + " " + fileName);
+        }
+        StringJoiner cmdArgs = new StringJoiner(" ");
+        for (String arg : args) {
+            if (arg.startsWith("--port=")) {
+                continue;
+            }
+            cmdArgs.add(arg);
+        }
+        cmdArgs.add("--port=" + ZrLogUtil.getPort(args));
+        shells.add(fileName + " " + cmdArgs);
+        return shells.toString();
+    }
+
+    private String buildUpgradeCmd(Version upgradeVersion) {
+        StringJoiner stringJoiner = new StringJoiner("-");
+        stringJoiner.add("upgrade");
+        if (Objects.nonNull(upgradeVersion) && StringUtils.isNotEmpty(upgradeVersion.getVersion())) {
+            stringJoiner.add(upgradeVersion.getVersion());
+        }
+        if (Objects.nonNull(upgradeVersion) && StringUtils.isNotEmpty(upgradeVersion.getBuildId())) {
+            stringJoiner.add(upgradeVersion.getBuildId());
+        }
+        stringJoiner.add(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
+        String fileName = stringJoiner.toString();
+        if (Constants.getRealFileArch().startsWith("Windows")) {
+            File tempUpgradeFile = new File(PathUtil.getTempPath() + "/" + fileName + ".bat");
+            IOUtil.writeStrToFile(buildWindowsBatExec(), tempUpgradeFile);
+            return "cmd /c start " + tempUpgradeFile;
+        }
+        File tempUpgradeFile = new File(PathUtil.getTempPath() + "/" + fileName + ".sh");
+        IOUtil.writeStrToFile(buildExec(), tempUpgradeFile);
+        return "sh " + tempUpgradeFile + " &";
+
+    }
+
+    @Override
+    public CompletableFuture<Void> restartProcessAsync(Version upgradeVersion) {
+        return CompletableFuture.runAsync(() -> {
+            try {
+                String cmd = buildUpgradeCmd(upgradeVersion);
+                // 构造完整的命令启动
+                LOGGER.info("ZrLog file updated. exec shell\n" + cmd);
+                Thread.sleep(2000);
+                Runtime.getRuntime().exec(cmd);
+                Thread.sleep(100);
+                System.exit(0);
+            } catch (Exception e) {
+                LOGGER.warning("Restart error " + e.getMessage());
+            }
+        });
+    }
+
+    @Override
+    public String getUnzipPath() {
+        return getUploadTempPath().getPath();
+    }
+}

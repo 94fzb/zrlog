@@ -1,1 +1,1 @@
-./mvnw clean package && sh bin/run.sh
+./mvnw -Pjar clean package && sh bin/run.sh

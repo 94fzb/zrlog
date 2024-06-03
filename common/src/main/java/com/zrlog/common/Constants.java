@@ -4,9 +4,14 @@ import com.hibegin.common.util.BooleanUtils;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.common.type.AutoUpgradeVersionType;
+import com.zrlog.common.type.RunMode;
 
 import java.io.File;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
  * 存放全局的静态变量，有多个地方使用一个key时，存放在这里，方便代码的维护。
@@ -19,7 +24,25 @@ public class Constants {
         return lastAccessTime;
     }
 
-    public static boolean DEV_MODE = Objects.equals(System.getenv("DEV_MODE"), "true");
+    public static RunMode runMode = RunMode.DEV;
+
+    public static Boolean devEnabled = Boolean.FALSE;
+
+    public static boolean debugLoggerPrintAble() {
+        return runMode == RunMode.DEV || devEnabled;
+    }
+
+    public static String getRealFileArch() {
+        String os = System.getProperty("os.name");
+        if (os.startsWith("Windows")) {
+            os = "Windows";
+        } else {
+            os = os.replace("Mac OS X", "Darwin");
+        }
+        return os + "-" + System.getProperty("os.arch")
+                .replace("aarch64", "arm64")
+                .replace("amd64", "x86_64");
+    }
 
     public static void setLastAccessTime(long lastAccessTime) {
         Constants.lastAccessTime = lastAccessTime;
@@ -43,8 +66,15 @@ public class Constants {
 
     public static final int DEFAULT_ARTICLE_DIGEST_LENGTH = 200;
 
+    public static final String FAVICON_ICO_URI_PATH = "/favicon.ico";
+    public static final String FAVICON_PNG_PWA_192_URI_PATH = "/pwa/icon/favicon-192.png";
+    public static final String FAVICON_PNG_PWA_512_URI_PATH = "/pwa/icon/favicon-512.png";
+
 
     public static final String ADMIN_LOGIN_URI_PATH = ADMIN_URI_BASE_PATH + "/login";
+    public static final String ADMIN_PWA_MANIFEST_JSON = ADMIN_URI_BASE_PATH + "/manifest.json";
+    public static final String ADMIN_PWA_MANIFEST_API_URI_PATH = "/api" + ADMIN_URI_BASE_PATH + "/manifest";
+    public static final String ADMIN_REFRESH_CACHE_API_URI_PATH = "/api" + ADMIN_URI_BASE_PATH + "/refreshCache";
 
     public static final String INDEX_URI_PATH = "/index";
 
@@ -55,7 +85,7 @@ public class Constants {
 
     public static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ssXXX";
 
-    public static final Map<String, Object> WEB_SITE = Collections.synchronizedMap(new LinkedHashMap<>());
+    public static final Map<String, Object> WEB_SITE = new ConcurrentSkipListMap<>();
 
     public static final Integer SQL_VERSION = 17;
 
@@ -145,8 +175,8 @@ public class Constants {
         return !Constants.getBooleanByFromWebSite("disable_comment_status");
     }
 
-    public static Integer getDefaultRows() {
-        return (int) Double.parseDouble((String) Objects.requireNonNullElse(Constants.WEB_SITE.get("rows"), "10"));
+    public static long getDefaultRows() {
+        return (long) Double.parseDouble((String) Objects.requireNonNullElse(Constants.WEB_SITE.get("rows"), "10"));
     }
 
 

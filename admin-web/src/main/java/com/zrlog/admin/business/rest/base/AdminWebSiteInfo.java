@@ -12,6 +12,8 @@ public class AdminWebSiteInfo implements Validator {
     private String admin_color_primary;
     private Integer article_auto_digest_length;
     private Boolean admin_darkMode;
+    private String favicon_png_pwa_192_base64;
+    private String favicon_png_pwa_512_base64;
 
     public Long getSession_timeout() {
         return session_timeout;
@@ -59,5 +61,21 @@ public class AdminWebSiteInfo implements Validator {
         if (Objects.isNull(article_auto_digest_length)) {
             article_auto_digest_length = Constants.DEFAULT_ARTICLE_DIGEST_LENGTH;
         }
+    }
+
+    public String getFavicon_png_pwa_192_base64() {
+        return favicon_png_pwa_192_base64;
+    }
+
+    public void setFavicon_png_pwa_192_base64(String favicon_png_pwa_192_base64) {
+        this.favicon_png_pwa_192_base64 = favicon_png_pwa_192_base64;
+    }
+
+    public String getFavicon_png_pwa_512_base64() {
+        return favicon_png_pwa_512_base64;
+    }
+
+    public void setFavicon_png_pwa_512_base64(String favicon_png_pwa_512_base64) {
+        this.favicon_png_pwa_512_base64 = favicon_png_pwa_512_base64;
     }
 }

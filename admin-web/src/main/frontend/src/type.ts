@@ -41,5 +41,6 @@ export type IndexData = {
     serverInfos: ServerInfoEntry[],
     statisticsInfo: StatisticsInfoState,
     dockerMode: boolean;
+    nativeImageMode: boolean;
     tips: string[];
 }

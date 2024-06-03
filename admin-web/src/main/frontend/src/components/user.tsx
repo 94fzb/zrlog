@@ -45,7 +45,7 @@ const User = ({ data }: { data: BasicUserInfo }) => {
             if (data.error) {
                 message.error(data.message);
             } else {
-                message.info(data.message);
+                message.success(data.message);
             }
         });
     };
@@ -57,7 +57,7 @@ const User = ({ data }: { data: BasicUserInfo }) => {
             </Title>
             <Divider />
             <Row>
-                <Col md={12} xs={24}>
+                <Col style={{ maxWidth: 600 }} xs={24}>
                     <Form
                         onFinish={() => onFinish()}
                         initialValues={userInfo}

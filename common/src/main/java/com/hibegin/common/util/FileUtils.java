@@ -155,7 +155,16 @@ public class FileUtils {
         }
     }
 
+    public static String getFileExt(String fileName) {
+        String name = new File(fileName).getName();
+        if (!name.contains(".")) {
+            return "";
+        }
+        return name.substring(name.lastIndexOf(".") + 1);
+    }
+
     public static void main(String[] args) {
-        moveOrCopyFolder("/home/xiaochun/0.jpg", "/home/Public/", true);
+        String fileExt = getFileExt("1.png");
+        System.out.println("fileExt = " + fileExt);
     }
 }

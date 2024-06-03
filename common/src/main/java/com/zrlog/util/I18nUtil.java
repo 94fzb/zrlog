@@ -4,6 +4,7 @@ import com.hibegin.common.util.BeanUtil;
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.server.api.HttpRequest;
+import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.common.Constants;
 import com.zrlog.common.exception.NotImplementException;
 import com.zrlog.common.vo.I18nVO;
@@ -42,11 +43,18 @@ public class I18nUtil {
         loadI18N(I18nUtil.class.getResourceAsStream("/i18n/backend_zh_CN.properties"), "backend_zh_CN.properties", I18N_BACKEND_KEY);
     }
 
+    public static I18nVO getI18nVOCache() {
+        return i18nVOCache;
+    }
+
     public static void removeI18n() {
         threadLocal.remove();
     }
 
     private static void loadI18N(InputStream inputStream, String name, String resourceName) {
+        if (Objects.isNull(inputStream)) {
+            return;
+        }
         if (!name.endsWith(".properties")) {
             return;
         }
@@ -76,18 +84,26 @@ public class I18nUtil {
         }
     }
 
-    public static void addToRequest(String path, HttpRequest request, boolean devMode) {
-        if (devMode) {
+    public static void addToRequest(String templatePath, HttpRequest request) {
+        if (Constants.devEnabled) {
             reloadSystemI18N();
         }
-        if (path != null) {
-            File[] propertiesFiles = new File(path).listFiles();
-            if (propertiesFiles != null) {
-                for (File propertiesFile : propertiesFiles) {
-                    try {
-                        loadI18N(new FileInputStream(propertiesFile), propertiesFile.getName(), I18N_BLOG_KEY);
-                    } catch (FileNotFoundException e) {
-                        //ignore
+        if (templatePath != null) {
+            if (Objects.equals(templatePath, Constants.DEFAULT_TEMPLATE_PATH)) {
+                File enUSPropertiesFile = new File(templatePath + "/language/i18n_en_US.properties");
+                File zhCNPropertiesFile = new File(templatePath + "/language/i18n_zh_CN.properties");
+                loadI18N(I18nUtil.class.getResourceAsStream(enUSPropertiesFile.toString().replace("\\","/")), enUSPropertiesFile.getName(), I18N_BLOG_KEY);
+                loadI18N(I18nUtil.class.getResourceAsStream(zhCNPropertiesFile.toString().replace("\\","/")), zhCNPropertiesFile.getName(), I18N_BLOG_KEY);
+            } else {
+                String filePath = PathUtil.getStaticPath() + templatePath + "/language/";
+                File[] propertiesFiles = new File(filePath).listFiles();
+                if (propertiesFiles != null) {
+                    for (File propertiesFile : propertiesFiles) {
+                        try {
+                            loadI18N(new FileInputStream(propertiesFile), propertiesFile.getName(), I18N_BLOG_KEY);
+                        } catch (FileNotFoundException e) {
+                            //ignore
+                        }
                     }
                 }
             }
@@ -142,15 +158,14 @@ public class I18nUtil {
         return DEFAULT_LANG;
     }
 
-    public static Map<String, Object> getBlog() {
-        return threadLocal.get().getBlog().get(threadLocal.get().getLocale());
-    }
-
     public static Map<String, Object> getBackend() {
         return threadLocal.get().getBackend().get(threadLocal.get().getLocale());
     }
 
     public static String getBlogStringFromRes(String key) {
+        if (Objects.isNull(threadLocal.get())) {
+            return "";
+        }
         Object obj = threadLocal.get().getBlog().get(threadLocal.get().getLocale()).get(key);
         if (obj != null) {
             return obj.toString();
@@ -159,6 +174,9 @@ public class I18nUtil {
     }
 
     public static String getBackendStringFromRes(String key) {
+        if (Objects.isNull(threadLocal.get())) {
+            return "";
+        }
         Object obj = threadLocal.get().getBackend().get(threadLocal.get().getLocale()).get(key);
         if (obj != null) {
             return obj.toString();
@@ -166,7 +184,32 @@ public class I18nUtil {
         return "";
     }
 
+    public static Map<String, Map<String, Object>> getInstall() {
+        if (Objects.isNull(threadLocal.get())) {
+            return new HashMap<>();
+        }
+        Map<String, Map<String, Object>> install = threadLocal.get().getInstall();
+        if (Objects.isNull(install)) {
+            return new HashMap<>();
+        }
+        return install;
+    }
+
+    public static Map<String, Map<String, Object>> getBlog() {
+        if (Objects.isNull(threadLocal.get())) {
+            return new HashMap<>();
+        }
+        Map<String, Map<String, Object>> install = threadLocal.get().getBlog();
+        if (Objects.isNull(install)) {
+            return new HashMap<>();
+        }
+        return install;
+    }
+
     public static String getInstallStringFromRes(String key) {
+        if (Objects.isNull(threadLocal.get())) {
+            return "";
+        }
         Object obj = threadLocal.get().getInstall().get(threadLocal.get().getLocale()).get(key);
         if (obj != null) {
             return obj.toString();

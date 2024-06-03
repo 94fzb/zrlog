@@ -26,13 +26,6 @@ import java.util.Objects;
 
 public class TypeController extends Controller {
 
-    public TypeController() {
-    }
-
-    public TypeController(HttpRequest request, HttpResponse response) {
-        super(request, response);
-    }
-
     @RefreshCache(async = true)
     @ResponseBody
     public UpdateRecordResponse delete() throws SQLException {
@@ -45,7 +38,7 @@ public class TypeController extends Controller {
 
     @ResponseBody
     public ApiStandardResponse<PageData<ArticleTypeResponseEntry>> index() throws SQLException {
-        return new ApiStandardResponse<>(new ArticleTypeService().find(ZrLogUtil.getHomeUrlWithHost(request), ControllerUtil.getPageRequest(this), Constants.isStaticHtmlStatus()));
+        return new ApiStandardResponse<>(new ArticleTypeService().find(ZrLogUtil.getHomeUrlWithHost(request), ControllerUtil.unPageRequest(), Constants.isStaticHtmlStatus()));
     }
 
     @RefreshCache(async = true)

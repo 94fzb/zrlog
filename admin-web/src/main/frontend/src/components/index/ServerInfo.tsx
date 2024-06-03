@@ -1,11 +1,20 @@
-import { Card } from "antd";
+import { Card, Col, Row } from "antd";
 import { getRes } from "../../utils/constants";
 import Table from "antd/es/table";
 import DockerOutlined from "../../icons/DockerOutlined";
 import { ServerInfoEntry } from "../../type";
 import { LinuxOutlined } from "@ant-design/icons";
+import GraalVmOutlined from "../../icons/GraalVMOutlined";
 
-const ServerInfo = ({ data, dockerMode }: { data: ServerInfoEntry[]; dockerMode: boolean }) => {
+const ServerInfo = ({
+    data,
+    dockerMode,
+    nativeImageMode,
+}: {
+    data: ServerInfoEntry[];
+    dockerMode: boolean;
+    nativeImageMode: boolean;
+}) => {
     const getFixedColumns = () => {
         return [
             {
@@ -21,12 +30,17 @@ const ServerInfo = ({ data, dockerMode }: { data: ServerInfoEntry[]; dockerMode:
                 dataIndex: "value",
                 render: (e: string, r: ServerInfoEntry) => {
                     if (r.name === "运行环境" || r.name == "Runtime") {
-                        if (dockerMode) {
+                        if (dockerMode || nativeImageMode) {
                             return (
-                                <>
-                                    <DockerOutlined />
-                                    <span style={{ marginLeft: 3 }}>{e}</span>
-                                </>
+                                <Row style={{ display: "flex", gap: 3, flexFlow: "row", alignItems: "center" }}>
+                                    {dockerMode && <DockerOutlined />}
+                                    {nativeImageMode && (
+                                        <Col xs={0} md={12} style={{ maxWidth: 92, height: 30 }}>
+                                            <GraalVmOutlined />
+                                        </Col>
+                                    )}
+                                    <span>{e}</span>
+                                </Row>
                             );
                         }
                     }

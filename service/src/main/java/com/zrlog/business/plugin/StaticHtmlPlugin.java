@@ -3,14 +3,20 @@ package com.zrlog.business.plugin;
 import com.hibegin.common.BaseLockObject;
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.StringUtils;
+import com.hibegin.http.HttpMethod;
 import com.hibegin.http.server.ApplicationContext;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.config.AbstractServerConfig;
 import com.hibegin.http.server.config.ResponseConfig;
 import com.hibegin.http.server.handler.HttpRequestHandlerRunnable;
-import com.hibegin.http.server.impl.HttpRequestDecoderImpl;
 import com.hibegin.http.server.impl.SimpleHttpResponse;
+import com.hibegin.http.server.util.PathUtil;
+import com.zrlog.blog.web.util.WebTools;
+import com.zrlog.business.service.TemplateHelper;
+import com.zrlog.business.service.TemplateInfoHelper;
 import com.zrlog.common.Constants;
+import com.zrlog.common.type.RunMode;
+import com.zrlog.common.vo.TemplateVO;
 import com.zrlog.plugin.IPlugin;
 import com.zrlog.util.ZrLogUtil;
 import org.jsoup.Jsoup;
@@ -18,8 +24,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import java.io.File;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
+import java.io.InputStream;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
@@ -30,7 +35,7 @@ public class StaticHtmlPlugin extends BaseLockObject implements IPlugin {
     public static final String HTML_FILE_KEY = "_htmlFile";
 
 
-    private final Logger LOGGER = LoggerUtil.getLogger(StaticHtmlPlugin.class);
+    private static final Logger LOGGER = LoggerUtil.getLogger(StaticHtmlPlugin.class);
     private final AbstractServerConfig serverConfig;
     private final ApplicationContext applicationContext;
     private final Map<String, HandleState> handleStatusPageMap = new ConcurrentHashMap<>();
@@ -45,16 +50,6 @@ public class StaticHtmlPlugin extends BaseLockObject implements IPlugin {
         NEW, HANDING, HANDLED
     }
 
-    private HttpRequest buildMockRequest(String uri) throws Exception {
-        String httpHeader = "GET " + uri + " HTTP/1.1\r\n" +
-                "Host: " + ZrLogUtil.getBlogHostByWebSite() + "\r\n" +
-                "X-Real-IP: 127.0.0.1\r\n" +
-                "User-Agent: " + ZrLogUtil.STATIC_USER_AGENT + "\r\n" +
-                "\r\n";
-        HttpRequestDecoderImpl httpRequestDecoder = new HttpRequestDecoderImpl(serverConfig.getRequestConfig(), applicationContext, null);
-        httpRequestDecoder.doDecode(ByteBuffer.wrap(httpHeader.getBytes(Charset.defaultCharset())));
-        return httpRequestDecoder.getRequest();
-    }
 
     private void doFetch() {
         handleStatusPageMap.entrySet().stream().filter(e -> Objects.equals(e.getValue(), HandleState.NEW)).forEach((e) -> {
@@ -62,10 +57,10 @@ public class StaticHtmlPlugin extends BaseLockObject implements IPlugin {
             try {
                 ResponseConfig responseConfig = serverConfig.getResponseConfig();
                 responseConfig.setEnableGzip(false);
-                HttpRequest httpRequest = buildMockRequest(e.getKey());
+                HttpRequest httpRequest = WebTools.buildMockRequest(HttpMethod.GET, e.getKey(), serverConfig.getRequestConfig(), applicationContext);
                 new HttpRequestHandlerRunnable(httpRequest, new SimpleHttpResponse(httpRequest, serverConfig.getResponseConfig())).run();
                 File file = (File) httpRequest.getAttr().get(HTML_FILE_KEY);
-                if (!file.exists()) {
+                if (Objects.isNull(file) || !file.exists()) {
                     return;
                 }
                 Document document = Jsoup.parse(file);
@@ -99,6 +94,8 @@ public class StaticHtmlPlugin extends BaseLockObject implements IPlugin {
         if (StringUtils.isEmpty(ZrLogUtil.getBlogHostByWebSite())) {
             return;
         }
+        copyCommonAssert();
+        copyDefaultTemplateAssets();
         handleStatusPageMap.clear();
         //从首页开始查找
         handleStatusPageMap.put("/", HandleState.NEW);
@@ -113,12 +110,49 @@ public class StaticHtmlPlugin extends BaseLockObject implements IPlugin {
         } finally {
             lock.unlock();
             long usedTime = (System.currentTimeMillis() - start);
-            if (Constants.DEV_MODE) {
+            if (Constants.debugLoggerPrintAble()) {
                 LOGGER.info("Generator " + ZrLogUtil.getBlogHostByWebSite() + " size " + handleStatusPageMap.size() + " finished in " + usedTime + "ms");
             } else if (usedTime > Duration.ofMinutes(1).toMillis()) {
                 LOGGER.warning("Generator slow size " + handleStatusPageMap.size() + " finish in " + usedTime);
             }
         }
+    }
+
+    private static void copyCommonAssert() {
+        //video.js
+        copyResourceToCacheFolder("/assets/css/font/vjs.eot");
+        copyResourceToCacheFolder("/assets/css/font/vjs.svg");
+        copyResourceToCacheFolder("/assets/css/font/vjs.ttf");
+        copyResourceToCacheFolder("/assets/css/font/vjs.woff");
+        copyResourceToCacheFolder("/assets/css/video-js.css");
+        copyResourceToCacheFolder("/assets/js/video.js");
+        //default avatar url
+        copyResourceToCacheFolder("/assets/images/default-portrait.gif");
+        if (!new File(PathUtil.getStaticPath() + "/favicon.ico").exists()) {
+            //favicon
+            copyResourceToCacheFolder("/favicon.ico");
+        }
+    }
+
+    private static void copyResourceToCacheFolder(String resourceName) {
+        InputStream inputStream = StaticHtmlPlugin.class.getResourceAsStream(resourceName);
+        if (Objects.isNull(inputStream)) {
+            LOGGER.warning("Missing resource " + resourceName);
+            return;
+        }
+        Constants.zrLogConfig.getCacheService().saveToCacheFolder(inputStream, resourceName);
+    }
+
+    private static void copyDefaultTemplateAssets() {
+        String templatePath = TemplateHelper.getTemplatePath(null);
+        if (!Objects.equals(templatePath, Constants.DEFAULT_TEMPLATE_PATH)) {
+            return;
+        }
+        TemplateVO templateVO = TemplateInfoHelper.getDefaultTemplateVO();
+        templateVO.getStaticResources().forEach(e -> {
+            String resourceUri = Constants.DEFAULT_TEMPLATE_PATH + "/" + e;
+            copyResourceToCacheFolder(resourceUri);
+        });
     }
 
     @Override

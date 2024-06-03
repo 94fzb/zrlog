@@ -1,8 +1,6 @@
 package com.zrlog.admin.web.controller.api;
 
 import com.hibegin.http.annotation.ResponseBody;
-import com.hibegin.http.server.api.HttpRequest;
-import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.rest.response.DownloadUpdatePackageResponse;
 import com.zrlog.admin.business.rest.response.PreCheckVersionResponse;
@@ -19,34 +17,24 @@ import java.util.Objects;
 
 public class UpgradeController extends Controller {
 
-    private final UpgradeService upgradeService;
-
-    public UpgradeController() {
-        this.upgradeService = new UpgradeService();
-    }
-
-
-    public UpgradeController(HttpRequest request, HttpResponse response) {
-        super(request, response);
-        this.upgradeService = new UpgradeService();
-    }
+    private final UpgradeService upgradeService = new UpgradeService();
 
     @ResponseBody
     public ApiStandardResponse<DownloadUpdatePackageResponse> download() throws IOException, URISyntaxException, InterruptedException, ParseException {
-        return new ApiStandardResponse<>(upgradeService.download(request.getParaToStr("preUpgradeKey"), (UpdateVersionPlugin) Objects.requireNonNull(Constants.zrLogConfig.getPlugins()
-                .stream().filter(x -> x instanceof UpdateVersionPlugin).findFirst().orElse(null))));
+        return new ApiStandardResponse<>(upgradeService.download(Objects.requireNonNullElse(request.getParaToStr("preUpgradeKey"),""), (UpdateVersionPlugin) Constants.zrLogConfig.getPlugins()
+                .stream().filter(x -> x instanceof UpdateVersionPlugin).findFirst().orElse(null)));
     }
 
     @ResponseBody
     public ApiStandardResponse<PreCheckVersionResponse> index() throws ParseException {
-        return new ApiStandardResponse<>(upgradeService.preUpgradeVersion(true, (UpdateVersionPlugin) Objects.requireNonNull(Constants.zrLogConfig.getPlugins()
-                .stream().filter(x -> x instanceof UpdateVersionPlugin).findFirst().orElse(null)),System.currentTimeMillis() + ""));
+        return new ApiStandardResponse<>(upgradeService.preUpgradeVersion(true, (UpdateVersionPlugin) Constants.zrLogConfig.getPlugins()
+                .stream().filter(x -> x instanceof UpdateVersionPlugin).findFirst().orElse(null), System.currentTimeMillis() + ""));
     }
 
 
     @ResponseBody
     public ApiStandardResponse<UpgradeProcessResponse> doUpgrade() {
-        return new ApiStandardResponse<>(upgradeService.doUpgrade(request.getParaToStr("preUpgradeKey")));
+        return new ApiStandardResponse<>(upgradeService.doUpgrade(Objects.requireNonNullElse(request.getParaToStr("preUpgradeKey"), "")));
     }
 
 }

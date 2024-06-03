@@ -3,8 +3,6 @@ package com.zrlog.admin.web.controller.api;
 import com.hibegin.common.util.BeanUtil;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.annotation.ResponseBody;
-import com.hibegin.http.server.api.HttpRequest;
-import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.rest.base.*;
 import com.zrlog.admin.business.rest.response.VersionResponse;
@@ -12,7 +10,6 @@ import com.zrlog.admin.business.rest.response.WebSiteSettingsResponse;
 import com.zrlog.admin.business.service.WebSiteService;
 import com.zrlog.admin.web.annotation.RefreshCache;
 import com.zrlog.admin.web.plugin.UpdateVersionPlugin;
-import com.zrlog.business.cache.CacheService;
 import com.zrlog.common.Constants;
 import com.zrlog.common.rest.response.ApiStandardResponse;
 import com.zrlog.common.type.AutoUpgradeVersionType;
@@ -29,13 +26,6 @@ import java.util.Objects;
 public class WebSiteController extends Controller {
 
     private final WebSiteService webSiteService = new WebSiteService();
-
-    public WebSiteController() {
-    }
-
-    public WebSiteController(HttpRequest request, HttpResponse response) {
-        super(request, response);
-    }
 
     @ResponseBody
     public ApiStandardResponse<VersionResponse> version() {
@@ -66,8 +56,10 @@ public class WebSiteController extends Controller {
 
     private ApiStandardResponse<Void> update(Object t) throws SQLException {
         Map<String, Object> requestMap = BeanUtil.convert(t, Map.class);
-        for (Entry<String, Object> param : requestMap.entrySet()) {
-            new WebSite().updateByKV(param.getKey(), param.getValue());
+        if (Objects.nonNull(requestMap)) {
+            for (Entry<String, Object> param : requestMap.entrySet()) {
+                new WebSite().updateByKV(param.getKey(), param.getValue());
+            }
         }
         ApiStandardResponse<Void> updateResponse = new ApiStandardResponse<>();
         updateResponse.setError(0);
@@ -89,13 +81,15 @@ public class WebSiteController extends Controller {
 
     /**
      * admin 管理的修改，不应该引起博客数据的变化，所以无需更新缓存
+     *
      * @return
      * @throws SQLException
      */
+    @RefreshCache
     @ResponseBody
     public ApiStandardResponse<Void> admin() throws SQLException {
         ApiStandardResponse<Void> update = update(BeanUtil.convertWithValid(getRequest().getInputStream(), AdminWebSiteInfo.class));
-        new CacheService().refreshWebSite();
+        Constants.zrLogConfig.getCacheService().refreshWebSite();
         return update;
     }
 

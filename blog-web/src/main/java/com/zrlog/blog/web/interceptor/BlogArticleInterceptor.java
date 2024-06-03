@@ -1,12 +1,14 @@
 package com.zrlog.blog.web.interceptor;
 
+import com.hibegin.common.util.FileUtils;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.api.Interceptor;
 import com.hibegin.http.server.util.FreeMarkerUtil;
+import com.hibegin.http.server.util.MimeTypeUtil;
 import com.hibegin.http.server.util.PathUtil;
+import com.hibegin.http.server.web.Controller;
 import com.hibegin.http.server.web.MethodInterceptor;
-import com.zrlog.business.cache.CacheService;
 import com.zrlog.business.exception.InstalledException;
 import com.zrlog.business.plugin.StaticHtmlPlugin;
 import com.zrlog.business.service.TemplateHelper;
@@ -16,6 +18,8 @@ import com.zrlog.util.ZrLogUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.Objects;
 
@@ -24,8 +28,6 @@ import java.util.Objects;
  */
 public class BlogArticleInterceptor implements Interceptor {
 
-
-    private final CacheService cacheService = new CacheService();
 
     /**
      * 处理静态化文件,仅仅缓存文章页(变化较小)
@@ -44,19 +46,35 @@ public class BlogArticleInterceptor implements Interceptor {
         }
         String configTemplate = Constants.WEB_SITE.getOrDefault("template", Constants.DEFAULT_TEMPLATE_PATH).toString();
         File path = new File(PathUtil.getStaticPath() + configTemplate);
-        if (!path.exists()) {
-            path = new File(PathUtil.getStaticPath() + Constants.DEFAULT_TEMPLATE_PATH);
-        }
-        try {
-            FreeMarkerUtil.init(path.getPath());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        if (path.exists() && !Objects.equals(configTemplate, Constants.DEFAULT_TEMPLATE_PATH)) {
+            try {
+                FreeMarkerUtil.init(path.getPath());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            try {
+                FreeMarkerUtil.initClassTemplate(Constants.DEFAULT_TEMPLATE_PATH);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
 
     }
 
     @Override
     public boolean doInterceptor(HttpRequest request, HttpResponse response) throws Exception {
+        if (request.getUri().startsWith(Constants.DEFAULT_TEMPLATE_PATH)) {
+            try (InputStream resourceAsStream = BlogArticleInterceptor.class.getResourceAsStream(request.getUri())) {
+                if (Objects.nonNull(resourceAsStream)) {
+                    response.getHeader().put("Content-Type", MimeTypeUtil.getMimeStrByExt(FileUtils.getFileExt(request.getUri())));
+                    response.write(resourceAsStream, 200);
+                    return true;
+                }
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
         String target = request.getUri();
         if (target.startsWith("/api/install") && InstallUtils.isInstalled()) {
             throw new InstalledException();
@@ -66,7 +84,7 @@ public class BlogArticleInterceptor implements Interceptor {
             return true;
         }
         if (InstallUtils.isInstalled()) {
-            cacheService.refreshInitDataCache(request, false);
+            Constants.zrLogConfig.getCacheService().refreshInitDataCacheAsync(request, false).join();
         } else if (!Objects.equals("/install", target)) {
             response.redirect("/install?ref=" + request.getUri());
             return true;
@@ -96,7 +114,7 @@ public class BlogArticleInterceptor implements Interceptor {
         if (Objects.isNull(method)) {
             return true;
         }
-        Object invoke = method.invoke(ZrLogUtil.buildController(method, request, response));
+        Object invoke = method.invoke(Controller.buildController(method, request, response));
         if (Objects.nonNull(invoke)) {
             TemplateHelper.fullTemplateInfo(request);
             initTemplate();
@@ -116,7 +134,7 @@ public class BlogArticleInterceptor implements Interceptor {
                 response.renderHtmlStr(realHtmlStr);
             }
             if (BlogArticleInterceptor.catGeneratorHtml(target)) {
-                request.getAttr().put(StaticHtmlPlugin.HTML_FILE_KEY, new CacheService().saveResponseBodyToHtml(request, realHtmlStr));
+                request.getAttr().put(StaticHtmlPlugin.HTML_FILE_KEY, Constants.zrLogConfig.getCacheService().saveResponseBodyToHtml(request, realHtmlStr));
             }
         }
     }

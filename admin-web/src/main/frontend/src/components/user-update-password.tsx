@@ -36,7 +36,7 @@ const UserUpdatePassword = () => {
             </Title>
             <Divider />
             <Row>
-                <Col md={12} xs={24}>
+                <Col style={{ maxWidth: 600 }} xs={24}>
                     <Form {...layout} onFinish={(value) => onFinish(value)}>
                         <Form.Item
                             name="oldPassword"

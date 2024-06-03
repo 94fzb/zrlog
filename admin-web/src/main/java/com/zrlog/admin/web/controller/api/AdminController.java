@@ -1,24 +1,24 @@
 package com.zrlog.admin.web.controller.api;
 
-import com.hibegin.common.util.BeanUtil;
-import com.hibegin.common.util.FileUtils;
-import com.hibegin.common.util.LoggerUtil;
+import com.google.gson.Gson;
+import com.hibegin.common.util.*;
 import com.hibegin.http.annotation.ResponseBody;
-import com.hibegin.http.server.api.HttpRequest;
-import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.util.PathUtil;
 import com.hibegin.http.server.web.Controller;
+import com.zrlog.admin.business.exception.MissingInstallException;
 import com.zrlog.admin.business.rest.request.LoginRequest;
 import com.zrlog.admin.business.rest.response.IndexResponse;
 import com.zrlog.admin.business.rest.response.LoginResponse;
 import com.zrlog.admin.business.rest.response.StatisticsInfoResponse;
 import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
 import com.zrlog.admin.business.service.UserService;
-import com.zrlog.admin.web.annotation.RefreshCache;
-import com.zrlog.admin.web.token.AdminTokenService;
+import com.zrlog.admin.web.controller.page.AdminPageController;
+import com.zrlog.business.rest.response.PublicInfoVO;
+import com.zrlog.business.service.CommonService;
 import com.zrlog.business.util.InstallUtils;
 import com.zrlog.common.Constants;
 import com.zrlog.common.rest.response.ApiStandardResponse;
+import com.zrlog.common.type.RunMode;
 import com.zrlog.common.vo.ServerInfo;
 import com.zrlog.model.Comment;
 import com.zrlog.model.Log;
@@ -29,6 +29,8 @@ import com.zrlog.util.ServerInfoUtils;
 import com.zrlog.util.ZrLogUtil;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -36,30 +38,42 @@ public class AdminController extends Controller {
 
     private final UserService userService = new UserService();
 
-    private final AdminTokenService adminTokenService = new AdminTokenService();
-
-    public AdminController() {
-    }
-
-    public AdminController(HttpRequest request, HttpResponse response) {
-        super(request, response);
-    }
-
     @ResponseBody
     public ApiStandardResponse<LoginResponse> login() throws SQLException {
+        if (!InstallUtils.isInstalled()) {
+            throw new MissingInstallException();
+        }
         LoginRequest loginRequest = BeanUtil.convertWithValid(getRequest().getInputStream(), LoginRequest.class);
         userService.login(loginRequest);
         String key = UUID.randomUUID().toString();
-        adminTokenService.setAdminToken(new User().getUserByUserName(loginRequest.getUserName().toLowerCase()), key, Objects.equals(loginRequest.getHttps(), true) ? "https" : "http", getRequest(), getResponse());
+        Constants.zrLogConfig.getTokenService().setAdminToken(new User().getUserByUserName(loginRequest.getUserName().toLowerCase()), key, Objects.equals(loginRequest.getHttps(), true) ? "https" : "http", getRequest(), getResponse());
         return new ApiStandardResponse<>(new LoginResponse(key));
     }
 
+    @ResponseBody
+    public Map<String, Object> manifest() throws IOException {
+        try (InputStream inputStream = AdminPageController.class.getResourceAsStream("/admin/manifest.json")) {
+            if (inputStream == null) {
+                return new HashMap<>();
+            }
+            Map map = new Gson().fromJson(IOUtil.getStringInputStream(inputStream), Map.class);
+            PublicInfoVO publicInfoVO = new CommonService().getPublicInfo(request);
+            if (StringUtils.isNotEmpty(publicInfoVO.websiteTitle())) {
+                map.put("short_name", publicInfoVO.websiteTitle());
+            }
+            map.put("name", AdminPageController.getAdminTitle());
+            map.put("theme_color", publicInfoVO.pwaThemeColor());
+            map.put("background_color", publicInfoVO.admin_darkMode() ? "#000000" : "#FFFFFF");
+            return map;
+        }
+    }
+
     /**
-     * 插件调用这个方法
+     * 触发更新缓存
      */
-    @RefreshCache
     @ResponseBody
     public UpdateRecordResponse refreshCache() {
+        Constants.zrLogConfig.getCacheService().refreshInitDataCacheAsync(request, true);
         return new UpdateRecordResponse();
     }
 
@@ -75,12 +89,14 @@ public class AdminController extends Controller {
         info.setCommCount(new Comment().count());
         info.setToDayCommCount(new Comment().countToDayComment());
         info.setClickCount(new Log().sumClick().longValue());
-        info.setArticleCount(new Log().adminCount());
+        info.setArticleCount(new Log().getAdminCount());
         List<File> allFileList = new ArrayList<>();
         try {
             List<String> baseFolders = new ArrayList<>(Arrays.asList(PathUtil.getRootPath() + "/bin", PathUtil.getTempPath(),
                     PathUtil.getLogPath(), PathUtil.getConfPath(), PathUtil.getStaticPath(), PathUtil.getRootPath() + "/lib"));
-            allFileList.add(new File(PathUtil.getRootPath() + "/" + Constants.zrLogConfig.getJarUpdater().fileName()));
+            if (Objects.nonNull(Constants.zrLogConfig.getUpdater())) {
+                allFileList.add(new File(PathUtil.getRootPath() + "/" + Constants.zrLogConfig.getUpdater().fileName()));
+            }
             for (String folder : baseFolders) {
                 FileUtils.getAllFiles(folder, allFileList);
             }
@@ -109,7 +125,7 @@ public class AdminController extends Controller {
 
     @ResponseBody
     public ApiStandardResponse<Void> dev() {
-        Constants.DEV_MODE = true;
+        Constants.devEnabled = true;
         return new ApiStandardResponse<>();
     }
 
@@ -119,6 +135,6 @@ public class AdminController extends Controller {
                 I18nUtil.getBackendStringFromRes("admin.index.welcomeTips_2"), I18nUtil.getBackendStringFromRes("admin.index.welcomeTips_3")));
         Collections.shuffle(tips);
         return new ApiStandardResponse<>(new IndexResponse(statisticsInfo().getData(), serverInfo().getData(),
-                new ArrayList<>(Collections.singletonList(tips.getFirst())), ZrLogUtil.isDockerMode()));
+                new ArrayList<>(Collections.singletonList(tips.getFirst())), ZrLogUtil.isDockerMode(), Objects.equals(Constants.runMode, RunMode.NATIVE)));
     }
 }

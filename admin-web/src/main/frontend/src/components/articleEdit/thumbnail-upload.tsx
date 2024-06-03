@@ -18,6 +18,10 @@ const ThumbnailUpload: FunctionComponent<ThumbnailUploadProps> = ({ onChange, th
     const onUploadChange = async (info: UploadChangeParam) => {
         const { status } = info.file;
         if (status === "done") {
+            if (info.file.response.error && info.file.response.error > 0) {
+                message.error(`${info.file.name} file upload failed.` + `${info.file.response.message}`);
+                return;
+            }
             if (onChange) {
                 onChange(info.file.response.data.url);
             }

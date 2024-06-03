@@ -20,6 +20,9 @@ public class UserService {
         if (ZrLogUtil.isPreviewMode()) {
             throw new PermissionErrorException();
         }
+        if (Objects.isNull(updatePasswordRequest)) {
+            return new UpdateRecordResponse(false);
+        }
         if (StringUtils.isNotEmpty(updatePasswordRequest.getOldPassword()) && StringUtils.isNotEmpty(updatePasswordRequest.getNewPassword())) {
             String dbPassword = new User().getPasswordByUserId(currentUserId);
             String oldPassword = updatePasswordRequest.getOldPassword();

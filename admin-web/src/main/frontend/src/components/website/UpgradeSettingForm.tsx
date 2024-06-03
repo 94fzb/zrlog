@@ -8,7 +8,7 @@ import Switch from "antd/es/switch";
 import Divider from "antd/es/divider";
 import { App } from "antd";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Upgrade } from "./index";
 
@@ -74,17 +74,21 @@ const UpgradeSettingForm = ({ data }: { data: Upgrade }) => {
         }
     };
 
+    useEffect(() => {
+        setForm(data);
+    }, [data]);
+
     return (
-        <>
+        <div style={{ maxWidth: 600 }}>
             <Row>
-                <Col md={12} xs={24}>
+                <Col xs={24}>
                     <Button type="dashed" loading={checking} onClick={checkNewVersion} style={{ float: "right" }}>
                         {getRes().checkUpgrade}
                     </Button>
                 </Col>
             </Row>
             <Row>
-                <Col md={12} xs={24}>
+                <Col xs={24}>
                     <Form
                         {...layout}
                         initialValues={form}
@@ -121,7 +125,7 @@ const UpgradeSettingForm = ({ data }: { data: Upgrade }) => {
                     </Form>
                 </Col>
             </Row>
-        </>
+        </div>
     );
 };
 

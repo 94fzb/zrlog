@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
-public class DbConnectUtils{
+public class DbConnectUtils {
     public static Connection getConnection(Properties dbConn) throws ClassNotFoundException, SQLException {
         Class.forName(dbConn.getProperty("driverClass"));
         DriverManager.setLoginTimeout(20);

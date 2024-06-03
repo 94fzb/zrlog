@@ -25,11 +25,7 @@ public class RequestStatisticsPlugin implements IPlugin {
     private static final long REMOVE_TIME = 2 * 1000 * 60L;
     private static final List<RequestInfo> requestInfoList = Collections.synchronizedList(new ArrayList<>());
     private static final ReentrantLock saveLock = new ReentrantLock();
-    private final ScheduledExecutorService clickSchedule = new ScheduledThreadPoolExecutor(1, r -> {
-        Thread thread = new Thread(r);
-        thread.setName("request-statistics-click-thread");
-        return thread;
-    });
+    private final ScheduledExecutorService clickSchedule = new ScheduledThreadPoolExecutor(1, Thread.ofVirtual().factory());
 
     public static void record(RequestInfo requestInfo) {
         saveLock.lock();

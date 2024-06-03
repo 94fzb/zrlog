@@ -29,7 +29,11 @@ const Index: FunctionComponent<IndexProps> = ({ data }) => {
             })}
             <Row gutter={[8, 8]} style={{ paddingTop: "12px" }}>
                 <Col xs={24} md={14}>
-                    <ServerInfo data={data.serverInfos} dockerMode={data.dockerMode} />
+                    <ServerInfo
+                        data={data.serverInfos}
+                        nativeImageMode={data.nativeImageMode}
+                        dockerMode={data.dockerMode}
+                    />
                 </Col>
                 <Col xs={24} md={10}>
                     <StatisticsInfo data={data.statisticsInfo} />

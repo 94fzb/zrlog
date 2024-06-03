@@ -21,14 +21,6 @@ import java.util.Objects;
  */
 public class InstallController extends Controller {
 
-
-    public InstallController() {
-    }
-
-    public InstallController(HttpRequest request, HttpResponse response) {
-        super(request, response);
-    }
-
     /**
      * 加载安装向导第一个页面数据
      */

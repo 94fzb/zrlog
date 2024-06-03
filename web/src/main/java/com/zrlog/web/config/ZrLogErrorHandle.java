@@ -5,7 +5,9 @@ import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.http.server.api.HttpErrorHandle;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
+import com.hibegin.http.server.execption.NotFindResourceException;
 import com.hibegin.http.server.util.PathUtil;
+import com.zrlog.admin.business.exception.NotFindDbEntryException;
 import com.zrlog.common.Constants;
 import com.zrlog.common.exception.AbstractBusinessException;
 import com.zrlog.common.rest.response.ApiStandardResponse;
@@ -56,11 +58,14 @@ public class ZrLogErrorHandle implements HttpErrorHandle {
             return;
         }
         if (request.getUri().startsWith(Constants.ADMIN_URI_BASE_PATH)) {
+            if (e instanceof NotFindResourceException || e instanceof NotFindDbEntryException) {
+                response.redirect(Constants.ADMIN_URI_BASE_PATH + "/404?message=" + e.getMessage());
+            }
             response.redirect(Constants.ADMIN_URI_BASE_PATH + "/500?message=" + e.getMessage());
             return;
         }
-        if (Constants.DEV_MODE) {
-            response.renderHtmlStr("<pre style='color:red'>" +  LoggerUtil.recordStackTraceMsg((Exception) e) + "</pre>");
+        if (Constants.debugLoggerPrintAble()) {
+            response.renderHtmlStr("<pre style='color:red'>" + LoggerUtil.recordStackTraceMsg(e) + "</pre>");
             return;
         }
         InputStream inputStream = PathUtil.getConfInputStream("/error/" + httpStatueCode + ".html");

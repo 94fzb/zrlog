@@ -19,13 +19,6 @@ import java.util.Map;
 
 public class CommentController extends Controller {
 
-    public CommentController() {
-    }
-
-    public CommentController(HttpRequest request, HttpResponse response) {
-        super(request, response);
-    }
-
     private final AdminCommentService commentService = new AdminCommentService();
 
     @RefreshCache

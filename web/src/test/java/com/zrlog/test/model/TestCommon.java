@@ -1,6 +1,7 @@
 package com.zrlog.test.model;
 
 import com.zrlog.admin.web.plugin.UpdateVersionPlugin;
+import com.zrlog.common.Constants;
 import com.zrlog.common.vo.Version;
 import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ZrLogUtil;
@@ -21,7 +22,7 @@ public class TestCommon {
 
     @Test
     public void testI18n() {
-        I18nUtil.addToRequest("/", null, true);
+        I18nUtil.addToRequest(Constants.DEFAULT_TEMPLATE_PATH, null);
         Map<String, Object> backend = I18nUtil.getBackend();
         System.out.println("backend = " + backend);
         assert Objects.nonNull(backend);

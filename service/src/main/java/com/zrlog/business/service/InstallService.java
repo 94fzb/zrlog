@@ -6,6 +6,7 @@ import com.hibegin.common.util.SecurityUtils;
 import com.hibegin.template.BasicTemplateRender;
 import com.zrlog.business.type.TestConnectDbResult;
 import com.zrlog.common.Constants;
+import com.zrlog.common.type.RunMode;
 import com.zrlog.util.DbConnectUtils;
 import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ParseUtil;
@@ -109,7 +110,10 @@ public class InstallService {
      * @return false 表示安装没有正常执行，true 表示初始化数据库成功。
      */
     public boolean install() {
-        return !getLockFile().exists() && startInstall(dbConn, configMsg);
+        if (getLockFile().exists()) {
+            return false;
+        }
+        return startInstall(dbConn, configMsg);
     }
 
     /**
@@ -118,10 +122,10 @@ public class InstallService {
      * @return
      */
     public boolean checkInstall() {
-        return getLockFile().exists();
+        return getLockFile().exists() && !Objects.equals(Constants.runMode, RunMode.NATIVE_AGENT);
     }
 
-    private File getLockFile() {
+    public File getLockFile() {
         return new File(basePath + "/install.lock");
     }
 
@@ -198,7 +202,7 @@ public class InstallService {
                 ps.setString(5, content);
                 ps.setString(6, VisitorArticleService.getPlainSearchText(content));
                 ps.setString(7, markdown);
-                ps.setString(8, ParseUtil.autoDigest(content, Constants.getAutoDigestLength()));
+                ps.setString(8, content);
                 ps.setObject(9, new java.util.Date());
                 ps.setObject(10, new java.util.Date());
                 ps.setBoolean(11, false);

@@ -2,6 +2,7 @@ package com.zrlog.admin.web.controller.api;
 
 import com.hibegin.common.util.FileUtils;
 import com.hibegin.common.util.IOUtil;
+import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.http.annotation.ResponseBody;
 import com.hibegin.http.server.util.PathUtil;
 import com.hibegin.http.server.web.Controller;
@@ -19,9 +20,14 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class UploadController extends Controller {
+
+    private static final Logger LOGGER = LoggerUtil.getLogger(UploadController.class);
 
     @ResponseBody
     public ApiStandardResponse<UploadFileResponse> index() {
@@ -35,8 +41,12 @@ public class UploadController extends Controller {
     }
 
     private String generatorUri(String uploadFieldName) {
+        File file = request.getFile(uploadFieldName);
+        if (Objects.isNull(file)) {
+            return "";
+        }
         String fileExt =
-                request.getFile(uploadFieldName).getName().substring(request.getFile(uploadFieldName).getName().lastIndexOf(".") + 1).toLowerCase();
+                request.getFile(uploadFieldName).getName().substring(file.getName().lastIndexOf(".") + 1).toLowerCase();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
         return Constants.ATTACHED_FOLDER + getRequest().getParaToStr("dir") + "/" + sdf.format(new Date()) + "/" + df.format(new Date()) + "_" + new Random().nextInt(1000) + "." + fileExt;
@@ -56,10 +66,15 @@ public class UploadController extends Controller {
         int height = -1;
         int width = -1;
         if (!".gif".endsWith(uri)) {
-            IOUtil.writeBytesToFile(ThumbnailUtil.jpeg(bytes, 1f), thumbnailFile);
-            BufferedImage bimg = ImageIO.read(thumbnailFile);
-            height = bimg.getHeight();
-            width = bimg.getWidth();
+            try {
+                IOUtil.writeBytesToFile(ThumbnailUtil.jpeg(bytes, 1f), thumbnailFile);
+                BufferedImage bimg = ImageIO.read(thumbnailFile);
+                height = bimg.getHeight();
+                width = bimg.getWidth();
+            } catch (Throwable e) {
+                LOGGER.log(Level.SEVERE, "generation jpeg thumbnail error ", e);
+                IOUtil.writeBytesToFile(bytes, thumbnailFile);
+            }
         } else {
             IOUtil.writeBytesToFile(bytes, thumbnailFile);
         }

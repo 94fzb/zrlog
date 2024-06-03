@@ -3,6 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.zrlog</groupId>
     <artifactId>zrlog</artifactId>
+    <packaging>pom</packaging>
     <version>3.0.2-SNAPSHOT</version>
     <modules>
         <module>web</module>
@@ -12,8 +13,8 @@
         <module>blog-web</module>
         <module>admin-web</module>
         <module>admin-token</module>
+        <module>package-web</module>
     </modules>
-    <packaging>pom</packaging>
     <name>zrlog</name>
     <description>ZrLog是使用Java开发的博客/CMS程序，具有简约，易用，组件化，内存占用低等特点。自带Markdown编辑器，让更多的精力放在写作上，而不是花费大量时间在学习程序的使用上。
     </description>
@@ -24,6 +25,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.test.skip>true</maven.test.skip>
         <finalName>zrlog</finalName>
+        <disableNodePackage>false</disableNodePackage>
     </properties>
 
     <developers>
@@ -74,7 +76,7 @@
         <dependency>
             <groupId>com.hibegin</groupId>
             <artifactId>simplewebserver</artifactId>
-            <version>0.3.99</version>
+            <version>0.3.121</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -116,6 +118,11 @@
                 <artifactId>admin-web</artifactId>
                 <version>3.0.2-SNAPSHOT</version>
             </dependency>
+            <dependency>
+                <groupId>com.zrlog</groupId>
+                <artifactId>web</artifactId>
+                <version>3.0.2-SNAPSHOT</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -145,7 +152,7 @@
                     <artifactId>frontend-maven-plugin</artifactId>
                     <version>1.15.0</version>
                     <configuration>
-                        <nodeVersion>v18.9.0</nodeVersion>
+                        <nodeVersion>v18.20.3</nodeVersion>
                         <yarnVersion>v1.22.22</yarnVersion>
                         <workingDirectory>src/main/frontend</workingDirectory>
                         <installDirectory>target</installDirectory>
@@ -153,6 +160,11 @@
                         <yarnDownloadRoot>https://repo.huaweicloud.com/yarn/</yarnDownloadRoot>
                         <npmRegistryURL>https://registry.npmmirror.com</npmRegistryURL>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>3.6.1</version>
                 </plugin>
             </plugins>
         </pluginManagement>

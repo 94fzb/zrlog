@@ -7,6 +7,7 @@ import com.hibegin.common.util.http.handle.CloseResponseHandle;
 import com.hibegin.http.HttpMethod;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
+import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.AdminTokenVO;
 import com.zrlog.util.BlogBuildInfoUtil;
@@ -41,11 +42,13 @@ public class PluginHelper {
             if (StringUtils.isNotEmpty(request.getHeader("Referer"))) {
                 map.put("Referer", request.getHeader("Referer"));
             }
+            String fullUrl;
             if (Objects.nonNull(adminTokenVO)) {
-                map.put("Full-Url", request.getFullUrl().replaceAll("http://", adminTokenVO.getProtocol() + "://"));
+                fullUrl = request.getFullUrl().replaceAll("http://", adminTokenVO.getProtocol() + "://");
             } else {
-                map.put("Full-Url", request.getFullUrl());
+                fullUrl = request.getFullUrl();
             }
+            map.put("Full-Url", WebTools.encodeUrl(fullUrl));
         }
         return map;
     }
@@ -61,11 +64,13 @@ public class PluginHelper {
             if ("application/x-www-form-urlencoded".equals(request.getHeader("Content-Type"))) {
                 HttpUtil.getInstance().sendPostRequest(pluginServerHttp + uri, request.getParamMap(), handle, PluginHelper.genHeaderMapByRequest(request, adminTokenVO));
             } else {
-                HttpUtil.getInstance().sendPostRequest(pluginServerHttp + uri + "?" + request.getQueryStr(), IOUtil.getByteByInputStream(request.getInputStream()), handle, PluginHelper.genHeaderMapByRequest(request, adminTokenVO)).getT();
+                String appendQueryStr = StringUtils.isEmpty(request.getQueryStr()) ? "?" + request.getQueryStr() : "";
+                HttpUtil.getInstance().sendPostRequest(pluginServerHttp + uri + appendQueryStr, IOUtil.getByteByInputStream(request.getInputStream()), handle, PluginHelper.genHeaderMapByRequest(request, adminTokenVO)).getT();
             }
         }
         return handle;
     }
+
 
     /**
      * 代理中转HTTP请求，目前仅支持，GET，POST 请求方式的中转。

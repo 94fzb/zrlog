@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { App, Spin } from "antd";
 import axios, { AxiosError } from "axios";
 import { API_VERSION_PATH } from "./components/upgrade";
+import ErrorBoundary from "./common/ErrorBoundary";
 
 const AsyncLogin = lazy(() => import("components/login"));
 const AsyncAdminDashboardRouter = lazy(() => import("AdminDashboardRouter"));
@@ -30,11 +31,14 @@ const AppBase = () => {
                 return response;
             },
             (error) => {
+                //ignore upgrade api error
+                if ((error as AxiosError) && error.config && error.config.url) {
+                    if (error.config.url.includes(API_VERSION_PATH)) {
+                        return Promise.reject(error.message);
+                    }
+                }
                 if (error && error.response) {
                     if (error.response.status) {
-                        if (error.request.url.includes(API_VERSION_PATH)) {
-                            return Promise.reject(error.response);
-                        }
                         modal.error({
                             title: "服务异常[" + error.response.status + "]",
                             content: (
@@ -67,17 +71,21 @@ const AppBase = () => {
                 <Route
                     path={"login"}
                     element={
-                        <Suspense fallback={<Spin spinning={true} fullscreen delay={1000} />}>
-                            <AsyncLogin />
-                        </Suspense>
+                        <ErrorBoundary>
+                            <Suspense fallback={<Spin spinning={true} fullscreen delay={1000} />}>
+                                <AsyncLogin />
+                            </Suspense>
+                        </ErrorBoundary>
                     }
                 />
                 <Route
                     path={"*"}
                     element={
-                        <Suspense fallback={<Spin spinning={true} fullscreen delay={1000} />}>
-                            <AsyncAdminDashboardRouter />
-                        </Suspense>
+                        <ErrorBoundary>
+                            <Suspense fallback={<Spin spinning={true} fullscreen delay={1000} />}>
+                                <AsyncAdminDashboardRouter />
+                            </Suspense>
+                        </ErrorBoundary>
                     }
                 />
             </Routes>

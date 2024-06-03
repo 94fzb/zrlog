@@ -16,6 +16,9 @@ import java.util.Set;
  */
 public class GlobalBaseInterceptor implements Interceptor {
 
+    public GlobalBaseInterceptor() {
+    }
+
     /**
      * 不希望部分技术人走后门，拦截一些不合法的请求
      */

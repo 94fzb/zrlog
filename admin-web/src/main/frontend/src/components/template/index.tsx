@@ -10,6 +10,7 @@ import { useState } from "react";
 import { getRes } from "../../utils/constants";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import Popconfirm from "antd/es/popconfirm";
 
 export type TemplateEntry = {
     template: string;
@@ -65,9 +66,14 @@ const Template = ({ data }: { data: TemplateEntry[] }) => {
         );
         if (template.deleteAble) {
             links.push(
-                <div onClick={() => deleteTemplate(template.template)}>
+                <Popconfirm
+                    title={getRes()["deleteTips"]}
+                    onConfirm={() => {
+                        deleteTemplate(template.template);
+                    }}
+                >
                     <DeleteOutlined key="delete" />
-                </div>
+                </Popconfirm>
             );
         }
         return links;

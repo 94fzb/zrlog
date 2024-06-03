@@ -13,11 +13,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Objects;
-import java.util.Random;
 import java.util.logging.Logger;
 
 public class HttpFileHandle extends HttpHandle<File> {
@@ -60,7 +57,14 @@ public class HttpFileHandle extends HttpHandle<File> {
             setT(new File(filePath + "/" + getFileName(request.uri().getPath())));
         }
         try {
-            Files.copy(response.body(), Paths.get(getT().toString()), StandardCopyOption.REPLACE_EXISTING);
+            if (!getT().getParentFile().exists()) {
+                getT().getParentFile().mkdirs();
+            }
+            if (response.statusCode() == 200) {
+                Files.copy(response.body(), Paths.get(getT().toString()), StandardCopyOption.REPLACE_EXISTING);
+            } else {
+                LOGGER.warning("FileHandle " + request.uri() + " status error " + response.statusCode());
+            }
         } catch (IOException e) {
             LOGGER.warning("FileHandle error " + e.getMessage());
         }

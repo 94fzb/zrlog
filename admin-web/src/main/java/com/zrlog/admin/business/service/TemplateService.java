@@ -1,29 +1,25 @@
 package com.zrlog.admin.business.service;
 
 import com.google.gson.Gson;
-import com.hibegin.common.util.FileUtils;
-import com.hibegin.common.util.IOUtil;
-import com.hibegin.common.util.StringUtils;
-import com.hibegin.common.util.ZipUtil;
+import com.hibegin.common.util.*;
 import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
 import com.zrlog.admin.business.rest.response.UploadTemplateResponse;
+import com.zrlog.business.service.TemplateInfoHelper;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.TemplateVO;
 import com.zrlog.model.WebSite;
 import com.zrlog.util.I18nUtil;
-import com.zrlog.util.ZrLogUtil;
 
 import java.io.*;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.logging.Level;
 
 public class TemplateService {
 
-    public static final String ADMIN_PREVIEW_IMAGE_URI = Constants.ADMIN_URI_BASE_PATH + "/template/preview-image";
-
     public UpdateRecordResponse save(String template, Map<String, Object> settingMap) throws SQLException {
-        new WebSite().updateTemplateConfigMap(template,settingMap);
+        new WebSite().updateTemplateConfigMap(template, settingMap);
         UpdateRecordResponse updateRecordResponse = new UpdateRecordResponse();
         updateRecordResponse.setMessage(I18nUtil.getBackendStringFromRes("templateUpdateSuccess"));
         return updateRecordResponse;
@@ -44,8 +40,14 @@ public class TemplateService {
     }
 
     public List<TemplateVO> getAllTemplates(String previewTemplate) {
-        File[] templatesFile = new File(PathUtil.getStaticPath() + Constants.TEMPLATE_BASE_PATH).listFiles();
         List<TemplateVO> templates = new ArrayList<>();
+        TemplateVO defaultTemplateInfo = TemplateInfoHelper.getDefaultTemplateVO();
+        if (Objects.nonNull(defaultTemplateInfo)) {
+            defaultTemplateInfo.setDeleteAble(false);
+            defaultTemplateInfo.setConfigAble(true);
+            templates.add(defaultTemplateInfo);
+        }
+        File[] templatesFile = new File(PathUtil.getStaticPath() + Constants.TEMPLATE_BASE_PATH).listFiles();
         if (templatesFile != null) {
             for (File file : templatesFile) {
                 if (file.isDirectory() && !file.isHidden()) {
@@ -53,20 +55,14 @@ public class TemplateService {
                     if (Objects.isNull(templateVO)) {
                         continue;
                     }
+                    templateVO.setDeleteAble(true);
+                    File settingFile = new File(PathUtil.getStaticPath() + templateVO.getTemplate() + "/setting/config-form.json");
+                    templateVO.setConfigAble(settingFile.exists());
                     templates.add(templateVO);
                 }
             }
         }
-
-        List<TemplateVO> sortTemplates = new ArrayList<>();
         for (TemplateVO templateVO : templates) {
-            if (templateVO.getTemplate().startsWith(Constants.DEFAULT_TEMPLATE_PATH)) {
-                templateVO.setDeleteAble(false);
-                sortTemplates.add(templateVO);
-            } else {
-                templateVO.setDeleteAble(true);
-            }
-
             //同时存在以使用为主
             if (templateVO.getTemplate().equals(Constants.WEB_SITE.get("template"))) {
                 templateVO.setUse(true);
@@ -77,76 +73,33 @@ public class TemplateService {
                 templateVO.setPreview(true);
             }
         }
-        for (TemplateVO templateVO : templates) {
-            if (!templateVO.getTemplate().startsWith(Constants.DEFAULT_TEMPLATE_PATH)) {
-                sortTemplates.add(templateVO);
-            }
-        }
-        return sortTemplates;
+        return templates;
     }
+
+
 
     private static TemplateVO getTemplateVO(File file) {
         String templatePath = file.toString().substring(PathUtil.getStaticPath().length() - 1).replace("\\", "/");
-        TemplateVO templateVO = new TemplateVO();
-        templateVO.setTemplate(templatePath);
+        if (!file.exists() || !file.isDirectory()) {
+            return null;
+        }
         File templateInfo = new File(file + "/template.properties");
         if (!templateInfo.exists()) {
             return null;
         }
-        Properties properties = new Properties();
-        try (InputStream in = new FileInputStream(templateInfo)) {
-            properties.load(in);
-            templateVO.setAuthor(properties.getProperty("author"));
-            templateVO.setName(properties.getProperty("name"));
-            templateVO.setDigest(properties.getProperty("digest"));
-            templateVO.setVersion(properties.getProperty("version"));
-            templateVO.setUrl(properties.getProperty("url"));
-            templateVO.setViewType(properties.getProperty("viewType"));
-            if (properties.get("previewImages") != null) {
-                String[] images = properties.get("previewImages").toString().split(",");
-                String adminPreviewImageUrl = "";
-                for (int i = 0; i < images.length; i++) {
-                    String image = images[i];
-                    if (!image.startsWith("https://") && !image.startsWith("http://")) {
-                        images[i] = templatePath + "/" + image;
-                        if (i == 0) {
-                            adminPreviewImageUrl = ADMIN_PREVIEW_IMAGE_URI + "?templateName=" + templateVO.getTemplate();
-                        }
-                    } else {
-                        if (i == 0) {
-                            adminPreviewImageUrl = images[i];
-                        }
-                    }
-                }
-                if (images.length > 0) {
-                    templateVO.setPreviewImage(images[0]);
-                }
-                templateVO.setAdminPreviewImage(adminPreviewImageUrl);
-                templateVO.setPreviewImages(Arrays.asList(images));
-            }
-        } catch (IOException e) {
-            //LOGGER.log(Level.SEVERE,"", e);
+        try {
+            return TemplateInfoHelper.getTemplateVOByInputStream(templatePath, new FileInputStream(templateInfo));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
         }
-        if (templateVO.getPreviewImages() == null || templateVO.getPreviewImages().isEmpty()) {
-            templateVO.setPreviewImages(Collections.singletonList("assets/images/template-default-preview.jpg"));
-        }
-        if (StringUtils.isEmpty(templateVO.getDigest())) {
-            templateVO.setDigest(I18nUtil.getBlogStringFromRes("noIntroduction"));
-        }
-        File settingFile =
-                new File(PathUtil.getStaticPath() + templatePath + "/setting/index" + ZrLogUtil.getViewExt(templateVO.getViewType()));
-        templateVO.setConfigAble(settingFile.exists());
-        return templateVO;
     }
 
-    public TemplateVO loadTemplateConfig(String templateName) {
-        TemplateVO templateVO = getTemplateVO(
-                new File(PathUtil.getStaticPath() + templateName));
-        if (Objects.isNull(templateVO)) {
-            return null;
+    private TemplateVO.TemplateConfigMap getConfigMap(String templateName) {
+        if (Objects.equals(templateName, Constants.DEFAULT_TEMPLATE_PATH)) {
+            String jsonStr = IOUtil.getStringInputStream(TemplateService.class.getResourceAsStream(Constants.DEFAULT_TEMPLATE_PATH + "/setting/config-form.json"));
+            return new Gson().fromJson(jsonStr, TemplateVO.TemplateConfigMap.class);
         }
         File configFile = new File(PathUtil.getStaticPath() + templateName + "/setting/config-form.json");
-        TemplateVO.TemplateConfigMap config;
         //文件存在才配置
         if (configFile.exists()) {
             String jsonStr;
@@ -155,10 +108,18 @@ public class TemplateService {
             } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
-            config = new Gson().fromJson(jsonStr, TemplateVO.TemplateConfigMap.class);
-        } else {
-            config = new TemplateVO.TemplateConfigMap();
+            return new Gson().fromJson(jsonStr, TemplateVO.TemplateConfigMap.class);
         }
+        return new TemplateVO.TemplateConfigMap();
+    }
+
+    public TemplateVO loadTemplateConfig(String templateName) {
+        TemplateVO templateVO = Objects.equals(templateName, Constants.DEFAULT_TEMPLATE_PATH) ? TemplateInfoHelper.getDefaultTemplateVO() : getTemplateVO(
+                new File(PathUtil.getStaticPath() + templateName));
+        if (Objects.isNull(templateVO)) {
+            return null;
+        }
+        TemplateVO.TemplateConfigMap config = getConfigMap(templateName);
         Map<String, Object> dbConfig = new WebSite().getTemplateConfigMapWithCache(templateName);
         config.forEach((key, value) -> value.setValue(dbConfig.get(key)));
         templateVO.setConfig(config);

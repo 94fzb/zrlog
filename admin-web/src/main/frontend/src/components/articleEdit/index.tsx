@@ -48,6 +48,7 @@ type ArticleEditState = {
 type ArticleSavingState = {
     rubbishSaving: boolean;
     previewIng: boolean;
+    autoSaving: boolean;
     releaseSaving: boolean;
 };
 
@@ -132,8 +133,8 @@ export type ArticleEditProps = {
     article: ArticleEntry;
 };
 
-const dataToState = (data: ArticleEditProps) => {
-    const a = {
+const dataToState = (data: ArticleEditProps): ArticleEditState => {
+    return {
         typeOptions: data.types
             ? data.types.map((x) => {
                   return { value: x.id, label: x.typeName };
@@ -155,9 +156,9 @@ const dataToState = (data: ArticleEditProps) => {
             previewIng: false,
             releaseSaving: false,
             rubbishSaving: false,
+            autoSaving: false,
         },
     };
-    return a;
 };
 
 const Index = ({ data }: { data: ArticleEditProps }) => {
@@ -188,6 +189,7 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
                     saving: {
                         ...prevState.saving,
                         releaseSaving: true,
+                        autoSaving: autoSave,
                     },
                 };
             });
@@ -199,6 +201,7 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
                         ...prevState.saving,
                         rubbishSaving: true,
                         previewIng: preview,
+                        autoSaving: autoSave,
                     },
                 };
             });
@@ -257,6 +260,7 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
                             releaseSaving: false,
                             rubbishSaving: false,
                             previewIng: false,
+                            autoSaving: false,
                         },
                     };
                 });
@@ -271,6 +275,7 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
                             ...prevState.saving,
                             rubbishSaving: false,
                             previewIng: false,
+                            autoSaving: false,
                         },
                     };
                 });
@@ -368,6 +373,12 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
         setState(dataToState(data));
     }, [data]);
 
+    useEffect(() => {
+        return () => {
+            exitNotTips();
+        };
+    }, []);
+
     const validForm = (changedArticle: ArticleEntry): boolean => {
         const titleError =
             changedArticle.title === undefined || changedArticle.title === null || changedArticle.title === "";
@@ -453,7 +464,8 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
                     <Button
                         type={state.fullScreen ? "default" : "dashed"}
                         style={{ width: "100%" }}
-                        onClick={() => onSubmit(state.article, false, false, false)}
+                        disabled={state.saving.rubbishSaving && !state.saving.autoSaving}
+                        onClick={async () => await onSubmit(state.article, false, false, false)}
                     >
                         <SaveOutlined hidden={state.saving.rubbishSaving} />
                         {state.saving.rubbishSaving ? getRes().saving : getRes().saveAsDraft}
@@ -462,9 +474,9 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
                 <Col xxl={2} md={3} sm={4}>
                     <Button
                         type="dashed"
-                        loading={state.saving.rubbishSaving && state.saving.previewIng}
+                        disabled={state.saving.previewIng && !state.saving.autoSaving}
                         style={{ width: "100%" }}
-                        onClick={() => onSubmit(state.article, !state.rubbish, true, false)}
+                        onClick={async () => await onSubmit(state.article, !state.rubbish, true, false)}
                     >
                         <EyeOutlined />
                         {getRes().preview}

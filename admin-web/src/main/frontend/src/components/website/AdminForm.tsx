@@ -6,10 +6,11 @@ import Switch from "antd/es/switch";
 import { getRes, removeRes } from "../../utils/constants";
 import Select from "antd/es/select";
 import Button from "antd/es/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { App, ColorPicker } from "antd";
 import { Admin } from "./index";
+import FaviconUpload from "./FaviconUpload";
 
 const layout = {
     labelCol: { span: 8 },
@@ -19,10 +20,10 @@ const layout = {
 const { Option } = Select;
 
 const BlogForm = ({ data }: { data: Admin }) => {
-    const [form, setForm] = useState<any>(data);
+    const [form, setForm] = useState<Admin>(data);
     const { message } = App.useApp();
 
-    const websiteFormFinish = (changedValues: any) => {
+    const websiteFormFinish = (changedValues: Admin) => {
         axios.post("/api/admin/website/admin", { ...form, ...changedValues }).then(({ data }) => {
             if (data.error) {
                 message.error(data.message).then();
@@ -35,9 +36,9 @@ const BlogForm = ({ data }: { data: Admin }) => {
         });
     };
 
-    if (form === undefined) {
-        return <></>;
-    }
+    useEffect(() => {
+        setForm(data);
+    }, [data]);
 
     return (
         <>
@@ -78,6 +79,22 @@ const BlogForm = ({ data }: { data: Admin }) => {
                         />
                         <span style={{ paddingLeft: 8 }}>{form["admin_color_primary"]}</span>
                     </div>
+                </Form.Item>
+                <Form.Item name="favicon_png_pwa_192_base64" label="Favicon (192 * 192)">
+                    <FaviconUpload
+                        url={form.favicon_png_pwa_192_base64}
+                        onChange={(e) => {
+                            setForm({ ...form, favicon_png_pwa_192_base64: e ? e : "" });
+                        }}
+                    />
+                </Form.Item>
+                <Form.Item name="favicon_png_pwa_512_base64" label="Favicon (512 * 512)">
+                    <FaviconUpload
+                        url={form.favicon_png_pwa_512_base64}
+                        onChange={(e) => {
+                            setForm({ ...form, favicon_png_pwa_512_base64: e ? e : "" });
+                        }}
+                    />
                 </Form.Item>
                 <Title level={4}>文章/编辑器设置</Title>
                 <Divider />

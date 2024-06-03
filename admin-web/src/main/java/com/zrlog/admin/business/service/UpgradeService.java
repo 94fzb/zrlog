@@ -6,7 +6,6 @@ import com.hibegin.common.util.SecurityUtils;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.common.util.http.HttpUtil;
 import com.hibegin.common.util.http.handle.HttpFileHandle;
-import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.admin.business.exception.DownloadUpgradeFileException;
 import com.zrlog.admin.business.rest.response.CheckVersionResponse;
 import com.zrlog.admin.business.rest.response.DownloadUpdatePackageResponse;
@@ -16,6 +15,7 @@ import com.zrlog.admin.web.plugin.DockerUpdateVersionHandle;
 import com.zrlog.admin.web.plugin.UpdateVersionHandler;
 import com.zrlog.admin.web.plugin.UpdateVersionPlugin;
 import com.zrlog.admin.web.plugin.ZipUpdateVersionHandle;
+import com.zrlog.common.Constants;
 import com.zrlog.common.vo.Version;
 import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ZrLogUtil;
@@ -39,6 +39,10 @@ public class UpgradeService {
 
     public CheckVersionResponse getCheckVersionResponse(boolean fetchAble, UpdateVersionPlugin plugin) {
         CheckVersionResponse checkVersionResponse = new CheckVersionResponse();
+        if (Objects.isNull(plugin)) {
+            checkVersionResponse.setUpgrade(false);
+            return checkVersionResponse;
+        }
         Version version = plugin.getLastVersion(fetchAble);
         if (Objects.isNull(version)) {
             checkVersionResponse.setUpgrade(false);
@@ -54,7 +58,9 @@ public class UpgradeService {
 
     public PreCheckVersionResponse preUpgradeVersion(boolean fetchAble, UpdateVersionPlugin plugin, String preUpgradeKey) {
         CheckVersionResponse checkVersionResponse = getCheckVersionResponse(fetchAble, plugin);
-        versionMap.put(preUpgradeKey, checkVersionResponse.getVersion());
+        if (Objects.nonNull(checkVersionResponse.getVersion())) {
+            versionMap.put(preUpgradeKey, checkVersionResponse.getVersion());
+        }
         PreCheckVersionResponse preCheckVersionResponse = BeanUtil.convert(checkVersionResponse, PreCheckVersionResponse.class);
         preCheckVersionResponse.setPreUpgradeKey(preUpgradeKey);
         return preCheckVersionResponse;
@@ -81,7 +87,7 @@ public class UpgradeService {
     }
 
     public HttpFileHandle createFileHandle() {
-        File file = PathUtil.getConfFile("/update-temp/zrlog.zip");
+        File file = new File(Constants.zrLogConfig.getUpdater().getUploadTempPath() + "/zrlog.zip");
         file.getParentFile().mkdir();
         return new HttpFileHandle(file.getParentFile().toString(), file.getName());
     }
@@ -130,7 +136,7 @@ public class UpgradeService {
             if (handle == null) {
                 return new UpgradeProcessResponse(false, "");
             }
-            updateVersionHandler = new ZipUpdateVersionHandle(handle.getT(), I18nUtil.getBackend());
+            updateVersionHandler = new ZipUpdateVersionHandle(handle.getT(), I18nUtil.getBackend(), versionMap.get(preUpgradeKey));
         }
         updateVersionHandler.doHandle();
         updateVersionThreadMap.put(preUpgradeKey, updateVersionHandler);

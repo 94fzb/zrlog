@@ -1,10 +1,10 @@
 package com.zrlog.blog.web.plugin;
 
-import com.zrlog.business.cache.CacheService;
 import com.zrlog.common.Constants;
 import com.zrlog.plugin.IPlugin;
 
 import java.util.TimerTask;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -14,11 +14,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class CacheManagerPlugin implements IPlugin {
 
-    private final ScheduledExecutorService scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1, r -> {
-        Thread thread = new Thread(r);
-        thread.setName("cache-clean-plugin-thread");
-        return thread;
-    });
+    private final ScheduledExecutorService scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1, Thread.ofVirtual().factory());
 
     @Override
     public boolean start() {
@@ -36,17 +32,19 @@ public class CacheManagerPlugin implements IPlugin {
 
     private static class CacheManageTimerTask extends TimerTask {
 
-        private final CacheService cacheService;
 
         public CacheManageTimerTask() {
-            this.cacheService = new CacheService();
-            cacheService.refreshInitDataCache(null, true);
+            try {
+                Constants.zrLogConfig.getCacheService().refreshInitDataCacheAsync(null, true).get();
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         @Override
         public void run() {
             if (System.currentTimeMillis() - Constants.getLastAccessTime() > Constants.getInitDataMaxCacheTimeout()) {
-                cacheService.refreshInitDataCache(null, true);
+                Constants.zrLogConfig.getCacheService().refreshInitDataCacheAsync(null, true).join();
             }
         }
     }

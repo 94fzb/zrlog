@@ -2,6 +2,7 @@ package com.zrlog.model;
 
 import com.hibegin.common.util.StringUtils;
 import com.zrlog.common.rest.request.PageRequest;
+import com.zrlog.common.rest.request.PageRequestImpl;
 import com.zrlog.data.dto.PageData;
 import com.zrlog.util.ParseUtil;
 
@@ -81,7 +82,7 @@ public class Log extends BasePageableDAO implements Serializable {
 
     }
 
-    public PageData<Map<String, Object>> visitorFind(PageRequest pageRequest, String keywords) throws SQLException {
+    public PageData<Map<String, Object>> visitorFind(PageRequest pageRequest, String keywords) {
         if (StringUtils.isEmpty(keywords)) {
             String sql =
                     "select l.*,t.typeName,t.alias as typeAlias,u.userName,(select count(commentId) from " + Comment.TABLE_NAME + " where logId=l.logId) commentSize from " + tableName + " l inner join user u inner join type t where rubbish=? and privacy=? and u.userId=l.userId and t.typeid=l.typeid  order by l.logId desc";
@@ -96,7 +97,7 @@ public class Log extends BasePageableDAO implements Serializable {
     /**
      * 管理员查询文章
      */
-    public PageData<Map<String, Object>> adminFind(PageRequest pageRequest, String keywords) throws SQLException {
+    public PageData<Map<String, Object>> adminFind(PageRequest pageRequest, String keywords) {
         String searchKeywords = "";
         List<Object> searchParam = new ArrayList<>();
         if (StringUtils.isNotEmpty(keywords)) {
@@ -133,11 +134,11 @@ public class Log extends BasePageableDAO implements Serializable {
         return pageSort;
     }
 
-    public PageData<Map<String, Object>> findByTypeAlias(int page, int pageSize, String typeAlias) throws SQLException {
+    public PageData<Map<String, Object>> findByTypeAlias(long page, long pageSize, String typeAlias) {
         String sql =
                 "select l.*,t.typeName,t.alias  as typeAlias,(select count(commentId) from " + Comment.TABLE_NAME +
                         " where logId=l.logId ) commentSize,u.userName from " + tableName + " l inner join user u," + "type t where rubbish=? and privacy=? and u.userId=l.userId and t.typeId=l.typeId and t" + ".alias=? order by l.logId desc";
-        return queryPageData(sql, new PageRequest(page, pageSize), new Object[]{false, false, typeAlias});
+        return queryPageData(sql, new PageRequestImpl(page, pageSize), new Object[]{false, false, typeAlias});
     }
 
     public Map<String, Long> getArchives() throws SQLException {
@@ -165,22 +166,22 @@ public class Log extends BasePageableDAO implements Serializable {
         return archives;
     }
 
-    public PageData<Map<String, Object>> findByTag(int page, int pageSize, String tag) throws SQLException {
+    public PageData<Map<String, Object>> findByTag(long page, long pageSize, String tag) {
         String sql =
                 "select l.*,t.typeName,t.alias  as typeAlias,(select count(commentId) from " + Comment.TABLE_NAME +
                         " where logId=l.logId) commentSize,u.userName from " + tableName + " l inner join user u," + "type t where rubbish=? and privacy=? and u.userId=l.userId and t.typeId=l.typeId and (l" + ".keywords like ? or l.keywords like ? or l.keywords like ? or l.keywords= ?) order by l" + ".logId desc";
-        return queryPageData(sql, new PageRequest(page, pageSize), new Object[]{false, false, tag + ",%", "%," + tag + ",%", "%," + tag, tag});
+        return queryPageData(sql, new PageRequestImpl(page, pageSize), new Object[]{false, false, tag + ",%", "%," + tag + ",%", "%," + tag, tag});
     }
 
     private List<Map<String, Object>> findEntry(String sql, Object[] paras) throws SQLException {
         return queryListWithParams(sql, paras);
     }
 
-    public PageData<Map<String, Object>> findByDate(int page, int pageSize, String date) throws SQLException {
+    public PageData<Map<String, Object>> findByDate(long page, long pageSize, String date) {
         String sql =
                 "select l.*,t.typeName,t.alias as typeAlias,(select count(commentId) from " + Comment.TABLE_NAME + " "
                         + "where logId=l.logId ) commentSize,u.userName from " + tableName + " l inner join user u," + "type t where rubbish=? and privacy=? and u.userId=l.userId and t.typeId=l.typeId and " + "DATE_FORMAT(releaseTime,'%Y_%m')=? order by l.logId desc";
-        return queryPageData(sql, new PageRequest(page, pageSize)
+        return queryPageData(sql, new PageRequestImpl(page, pageSize)
                 , new Object[]{false, false, date});
     }
 
@@ -200,13 +201,8 @@ public class Log extends BasePageableDAO implements Serializable {
         return sum == null ? new BigDecimal(0) : sum;
     }
 
-    public long count() {
-        try {
-            return (long) queryFirstObj("select count(1) as count from " + tableName + " where rubbish=? and privacy=?", false,
-                    false);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+    public long getVisitorCount() {
+        return visitorFind(new PageRequestImpl(1L, 0L), null).getTotalElements();
     }
 
     public long countByTypeId(Integer typeId) {
@@ -217,11 +213,7 @@ public class Log extends BasePageableDAO implements Serializable {
         }
     }
 
-    public long adminCount() {
-        try {
-            return (long) queryFirstObj("select count(1) as count from " + tableName);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+    public long getAdminCount() {
+        return adminFind(new PageRequestImpl(1L, 0L), null).getTotalElements();
     }
 }

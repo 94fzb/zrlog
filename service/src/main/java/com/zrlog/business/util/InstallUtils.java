@@ -7,6 +7,7 @@ import com.zrlog.business.service.InstallService;
 import com.zrlog.common.Constants;
 import com.zrlog.util.ZrLogUtil;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Objects;
@@ -21,6 +22,10 @@ public class InstallUtils {
      */
     public static boolean isInstalled() {
         return new InstallService(PathUtil.getConfPath()).checkInstall() || StringUtils.isNotEmpty(ZrLogUtil.getDbInfoByEnv());
+    }
+
+    public static File getLockFile() {
+        return new InstallService(PathUtil.getConfPath()).getLockFile();
     }
 
     public static Properties getDbProp() {

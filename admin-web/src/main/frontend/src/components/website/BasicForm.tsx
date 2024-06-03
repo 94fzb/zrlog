@@ -5,10 +5,11 @@ import Input from "antd/es/input";
 import TextArea from "antd/es/input/TextArea";
 import Button from "antd/es/button";
 import { getRes, removeRes } from "../../utils/constants";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { App } from "antd";
 import { Basic } from "./index";
+import FaviconUpload from "./FaviconUpload";
 
 const layout = {
     labelCol: { span: 8 },
@@ -16,10 +17,10 @@ const layout = {
 };
 
 const BasicForm = ({ data }: { data: Basic }) => {
-    const [form, setForm] = useState<any>(data);
+    const [form, setForm] = useState<Basic>(data);
 
     const { message } = App.useApp();
-    const websiteFormFinish = (changedValues: any) => {
+    const websiteFormFinish = (changedValues: Basic) => {
         axios.post("/api/admin/website/basic", { ...form, ...changedValues }).then(({ data }) => {
             if (data.error) {
                 message.error(data.message).then();
@@ -31,6 +32,10 @@ const BasicForm = ({ data }: { data: Basic }) => {
             });
         });
     };
+
+    useEffect(() => {
+        setForm(data);
+    }, [data]);
 
     return (
         <>
@@ -53,6 +58,14 @@ const BasicForm = ({ data }: { data: Basic }) => {
                 </Form.Item>
                 <Form.Item name="description" label="网站描述">
                     <TextArea rows={5} />
+                </Form.Item>
+                <Form.Item name="favicon_ico_base64" label="Favicon">
+                    <FaviconUpload
+                        url={form.favicon_ico_base64}
+                        onChange={(e) => {
+                            setForm({ ...form, favicon_ico_base64: e ? e : "" });
+                        }}
+                    />
                 </Form.Item>
                 <Divider />
                 <Button type="primary" htmlType="submit">

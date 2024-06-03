@@ -6,7 +6,7 @@ import com.zrlog.util.I18nUtil;
 public class StaticHtmlConfigException extends AbstractBusinessException {
     @Override
     public int getError() {
-        return 9027;
+        return 9028;
     }
 
     @Override

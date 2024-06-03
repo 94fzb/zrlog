@@ -120,7 +120,7 @@ const TemplateConfig = ({ data }: { data: TemplateConfigState }) => {
             </Title>
             <Divider />
             <Row>
-                <Col md={12} xs={24}>
+                <Col xs={24} style={{ maxWidth: 600 }}>
                     <Form
                         onFinish={() => onFinish()}
                         initialValues={state.dataMap}

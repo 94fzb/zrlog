@@ -4,7 +4,7 @@ import Form from "antd/es/form";
 import TextArea from "antd/es/input/TextArea";
 import Button from "antd/es/button";
 import { getRes } from "../../utils/constants";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { App } from "antd";
 
@@ -31,9 +31,9 @@ const OtherForm = ({ data }: { data: Other }) => {
         });
     };
 
-    if (form === undefined) {
-        return <></>;
-    }
+    useEffect(() => {
+        setForm(data);
+    }, [data]);
 
     return (
         <>
