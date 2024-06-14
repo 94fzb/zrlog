@@ -32,7 +32,7 @@ const PWAHandler: React.FC<PropsWithChildren> = ({ children }) => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const defaultLoaded = sessionStorage.getItem("loaded") === "true";
+    const defaultLoaded = sessionStorage.getItem("loaded") === "true" || !isPWA();
     const [loaded, setLoaded] = useState(defaultLoaded);
 
     // Effect for initial load to redirect to last opened page
@@ -52,8 +52,9 @@ const PWAHandler: React.FC<PropsWithChildren> = ({ children }) => {
 
     // Effect to save the current page on location change
     useEffect(() => {
-        const fullPath = getFullPath(location);
         if (isPWA()) {
+            const fullPath = getFullPath(location);
+            //console.log("This page is running as a PWA.");
             if (
                 fullPath.startsWith("/500") ||
                 fullPath.startsWith("/404") ||
@@ -62,7 +63,6 @@ const PWAHandler: React.FC<PropsWithChildren> = ({ children }) => {
             ) {
                 return;
             }
-            console.log("This page is running as a PWA.");
             saveLastOpenedPage(fullPath);
         }
     }, [location]); // Run on location change
@@ -71,7 +71,7 @@ const PWAHandler: React.FC<PropsWithChildren> = ({ children }) => {
         return <></>;
     }
 
-    return <>{children}</>; // This component does not render anything
+    return <>{children}</>;
 };
 
 export default PWAHandler;
