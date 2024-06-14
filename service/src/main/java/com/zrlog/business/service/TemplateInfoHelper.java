@@ -43,7 +43,7 @@ public class TemplateInfoHelper {
                     if (!image.startsWith("https://") && !image.startsWith("http://")) {
                         images[i] = templatePath + "/" + image;
                         if (i == 0) {
-                            adminPreviewImageUrl = ADMIN_PREVIEW_IMAGE_URI + "?templateName=" + templateVO.getTemplate();
+                            adminPreviewImageUrl = ADMIN_PREVIEW_IMAGE_URI + "?templateName=" + templateVO.getTemplate() + "&t=" + Constants.zrLogConfig.getCacheService().getFileFlagFirstByCache(images[i]);
                         }
                     } else {
                         if (i == 0) {

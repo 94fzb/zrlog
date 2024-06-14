@@ -46,6 +46,7 @@ const AdminManageLayout = lazy(() => import("layout/index"));
 type AdminDashboardRouterState = {
     firstRender: boolean;
     currentUri: string;
+    axiosRequesting: boolean;
     data: Record<string, any>;
 };
 
@@ -55,6 +56,7 @@ const AdminDashboardRouter = () => {
     const [state, setState] = useState<AdminDashboardRouterState>({
         firstRender: ssData && ssData.pageData,
         currentUri: location.pathname + location.search,
+        axiosRequesting: false,
         data: { ...getCachedData(), [location.pathname + location.search]: ssData?.pageData },
     });
 
@@ -64,17 +66,28 @@ const AdminDashboardRouter = () => {
     };
 
     const loadData = (uri: string) => {
-        getCsrData(uri).then((e) => {
-            const mergeData = state.data;
-            //如果请求回来的和请求回来的一致的情况就跳过 setState
-            if (deepEqual(mergeData[uri], e)) {
-                console.debug(uri + " cache hits");
-                return;
-            }
-            mergeData[uri] = e;
-            setState({ firstRender: false, currentUri: uri, data: mergeData });
-            putCache(mergeData);
-        });
+        getCsrData(uri)
+            .then((e) => {
+                const mergeData = state.data;
+                //如果请求回来的和请求回来的一致的情况就跳过 setState
+                if (deepEqual(mergeData[uri], e)) {
+                    console.debug(uri + " cache hits");
+                    return;
+                }
+                mergeData[uri] = e;
+                setState({ firstRender: false, axiosRequesting: false, currentUri: uri, data: mergeData });
+                putCache(mergeData);
+            })
+            .finally(() => {
+                setState((prevState) => {
+                    return {
+                        currentUri: uri,
+                        firstRender: false,
+                        axiosRequesting: false,
+                        data: prevState.data,
+                    };
+                });
+            });
     };
 
     useEffect(() => {
@@ -85,6 +98,7 @@ const AdminDashboardRouter = () => {
                     return {
                         currentUri: uri,
                         firstRender: false,
+                        axiosRequesting: false,
                         data: prevState.data,
                     };
                 });
@@ -93,6 +107,7 @@ const AdminDashboardRouter = () => {
                 setState((prevState) => {
                     return {
                         currentUri: uri,
+                        axiosRequesting: true,
                         firstRender: false,
                         data: prevState.data,
                     };
@@ -109,7 +124,7 @@ const AdminDashboardRouter = () => {
             <Route
                 path="index"
                 element={
-                    <AdminManageLayout>
+                    <AdminManageLayout loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
                                 <AsyncIndex data={getDataFromState()} />
@@ -121,7 +136,7 @@ const AdminDashboardRouter = () => {
             <Route
                 path="comment"
                 element={
-                    <AdminManageLayout>
+                    <AdminManageLayout loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
                                 <AsyncComment data={getDataFromState()} />
@@ -133,7 +148,7 @@ const AdminDashboardRouter = () => {
             <Route
                 path="plugin"
                 element={
-                    <AdminManageLayout>
+                    <AdminManageLayout loading={state.axiosRequesting}>
                         <Suspense fallback={<MyLoadingComponent />}>
                             <AsyncPlugin />
                         </Suspense>
@@ -141,9 +156,69 @@ const AdminDashboardRouter = () => {
                 }
             />
             <Route
-                path="website"
+                path={"website"}
                 element={
-                    <AdminManageLayout>
+                    <AdminManageLayout loading={state.axiosRequesting}>
+                        {getDataFromState() && (
+                            <Suspense fallback={<MyLoadingComponent />}>
+                                <AsyncWebSite data={getDataFromState()} />
+                            </Suspense>
+                        )}
+                    </AdminManageLayout>
+                }
+            />
+            <Route
+                path={"website/admin"}
+                element={
+                    <AdminManageLayout loading={state.axiosRequesting}>
+                        {getDataFromState() && (
+                            <Suspense fallback={<MyLoadingComponent />}>
+                                <AsyncWebSite data={getDataFromState()} />
+                            </Suspense>
+                        )}
+                    </AdminManageLayout>
+                }
+            />
+            <Route
+                path={"website/template"}
+                element={
+                    <AdminManageLayout loading={state.axiosRequesting}>
+                        {getDataFromState() && (
+                            <Suspense fallback={<MyLoadingComponent />}>
+                                <AsyncWebSite data={getDataFromState()} />
+                            </Suspense>
+                        )}
+                    </AdminManageLayout>
+                }
+            />
+            <Route
+                path={"website/other"}
+                element={
+                    <AdminManageLayout loading={state.axiosRequesting}>
+                        {getDataFromState() && (
+                            <Suspense fallback={<MyLoadingComponent />}>
+                                <AsyncWebSite data={getDataFromState()} />
+                            </Suspense>
+                        )}
+                    </AdminManageLayout>
+                }
+            />
+            <Route
+                path={"website/blog"}
+                element={
+                    <AdminManageLayout loading={state.axiosRequesting}>
+                        {getDataFromState() && (
+                            <Suspense fallback={<MyLoadingComponent />}>
+                                <AsyncWebSite data={getDataFromState()} />
+                            </Suspense>
+                        )}
+                    </AdminManageLayout>
+                }
+            />
+            <Route
+                path={"website/upgrade"}
+                element={
+                    <AdminManageLayout loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
                                 <AsyncWebSite data={getDataFromState()} />
@@ -155,7 +230,7 @@ const AdminDashboardRouter = () => {
             <Route
                 path="article-type"
                 element={
-                    <AdminManageLayout>
+                    <AdminManageLayout loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
                                 <AsyncType data={getDataFromState()} />
@@ -167,7 +242,7 @@ const AdminDashboardRouter = () => {
             <Route
                 path="link"
                 element={
-                    <AdminManageLayout>
+                    <AdminManageLayout loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
                                 <AsyncLink data={getDataFromState()} />
@@ -179,7 +254,7 @@ const AdminDashboardRouter = () => {
             <Route
                 path="nav"
                 element={
-                    <AdminManageLayout>
+                    <AdminManageLayout loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
                                 <AsyncNav data={getDataFromState()} />
@@ -191,7 +266,7 @@ const AdminDashboardRouter = () => {
             <Route
                 path="article"
                 element={
-                    <AdminManageLayout>
+                    <AdminManageLayout loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
                                 <AsyncArticle data={getDataFromState()} />
@@ -203,7 +278,7 @@ const AdminDashboardRouter = () => {
             <Route
                 path="article-edit"
                 element={
-                    <AdminManageLayout>
+                    <AdminManageLayout loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
                                 <AsyncArticleEdit data={getDataFromState()} />
@@ -215,7 +290,7 @@ const AdminDashboardRouter = () => {
             <Route
                 path="user"
                 element={
-                    <AdminManageLayout>
+                    <AdminManageLayout loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
                                 <AsyncUser data={getDataFromState()} />
@@ -227,7 +302,7 @@ const AdminDashboardRouter = () => {
             <Route
                 path="template-center"
                 element={
-                    <AdminManageLayout>
+                    <AdminManageLayout loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
                                 <AsyncTemplateCenter data={getDataFromState()} />
@@ -239,7 +314,7 @@ const AdminDashboardRouter = () => {
             <Route
                 path="user-update-password"
                 element={
-                    <AdminManageLayout>
+                    <AdminManageLayout loading={state.axiosRequesting}>
                         <Suspense fallback={<MyLoadingComponent />}>
                             <AsyncUserUpdatePassword />
                         </Suspense>
@@ -249,7 +324,7 @@ const AdminDashboardRouter = () => {
             <Route
                 path="upgrade"
                 element={
-                    <AdminManageLayout>
+                    <AdminManageLayout loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
                                 <AsyncUpgrade
@@ -264,7 +339,7 @@ const AdminDashboardRouter = () => {
             <Route
                 path="template-config"
                 element={
-                    <AdminManageLayout>
+                    <AdminManageLayout loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
                                 <AsyncTemplateConfig data={getDataFromState()} />

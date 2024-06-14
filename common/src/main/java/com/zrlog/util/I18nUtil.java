@@ -27,6 +27,7 @@ public class I18nUtil {
     private static final I18nVO i18nVOCache = new I18nVO();
     private static final String I18N_INSTALL_KEY = "install";
     private static final String I18N_BLOG_KEY = "blog";
+    private static final String I18N_ADMIN_KEY = "admin";
     private static final String I18N_BACKEND_KEY = "backend";
     private static final String DEFAULT_LANG = "zh_CN";
 
@@ -35,6 +36,8 @@ public class I18nUtil {
     }
 
     private static void reloadSystemI18N() {
+        loadI18N(I18nUtil.class.getResourceAsStream("/i18n/admin_en_US.properties"), "admin_en_US.properties", I18N_ADMIN_KEY);
+        loadI18N(I18nUtil.class.getResourceAsStream("/i18n/admin_zh_CN.properties"), "admin_zh_CN.properties", I18N_ADMIN_KEY);
         loadI18N(I18nUtil.class.getResourceAsStream("/i18n/blog_en_US.properties"), "blog_en_US.properties", I18N_BLOG_KEY);
         loadI18N(I18nUtil.class.getResourceAsStream("/i18n/blog_zh_CN.properties"), "blog_zh_CN.properties", I18N_BLOG_KEY);
         loadI18N(I18nUtil.class.getResourceAsStream("/i18n/install_en_US.properties"), "install_en_US.properties", I18N_INSTALL_KEY);
@@ -60,6 +63,7 @@ public class I18nUtil {
         }
         Map<String, Map<String, Object>> resMap = switch (resourceName) {
             case I18N_BLOG_KEY -> i18nVOCache.getBlog();
+            case I18N_ADMIN_KEY -> i18nVOCache.getAdmin();
             case I18N_INSTALL_KEY -> i18nVOCache.getInstall();
             case I18N_BACKEND_KEY -> i18nVOCache.getBackend();
             default -> throw new NotImplementException();
@@ -92,8 +96,8 @@ public class I18nUtil {
             if (Objects.equals(templatePath, Constants.DEFAULT_TEMPLATE_PATH)) {
                 File enUSPropertiesFile = new File(templatePath + "/language/i18n_en_US.properties");
                 File zhCNPropertiesFile = new File(templatePath + "/language/i18n_zh_CN.properties");
-                loadI18N(I18nUtil.class.getResourceAsStream(enUSPropertiesFile.toString().replace("\\","/")), enUSPropertiesFile.getName(), I18N_BLOG_KEY);
-                loadI18N(I18nUtil.class.getResourceAsStream(zhCNPropertiesFile.toString().replace("\\","/")), zhCNPropertiesFile.getName(), I18N_BLOG_KEY);
+                loadI18N(I18nUtil.class.getResourceAsStream(enUSPropertiesFile.toString().replace("\\", "/")), enUSPropertiesFile.getName(), I18N_BLOG_KEY);
+                loadI18N(I18nUtil.class.getResourceAsStream(zhCNPropertiesFile.toString().replace("\\", "/")), zhCNPropertiesFile.getName(), I18N_BLOG_KEY);
             } else {
                 String filePath = PathUtil.getStaticPath() + templatePath + "/language/";
                 File[] propertiesFiles = new File(filePath).listFiles();
@@ -162,6 +166,17 @@ public class I18nUtil {
         return threadLocal.get().getBackend().get(threadLocal.get().getLocale());
     }
 
+    public static Map<String, Map<String, Object>> getAdmin() {
+        if (Objects.isNull(threadLocal.get())) {
+            return new HashMap<>();
+        }
+        Map<String, Map<String, Object>> admin = threadLocal.get().getAdmin();
+        if (Objects.isNull(admin)) {
+            return new HashMap<>();
+        }
+        return admin;
+    }
+
     public static String getBlogStringFromRes(String key) {
         if (Objects.isNull(threadLocal.get())) {
             return "";
@@ -171,6 +186,10 @@ public class I18nUtil {
             return obj.toString();
         }
         return "";
+    }
+
+    public static String getAdminStringFromRes(String key) {
+        return Objects.requireNonNullElse(getAdmin().get(threadLocal.get().getLocale()).get(key), "").toString();
     }
 
     public static String getBackendStringFromRes(String key) {

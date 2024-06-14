@@ -39,7 +39,11 @@ public class ZrLogErrorHandle implements HttpErrorHandle {
      */
     @Override
     public void doHandle(HttpRequest request, HttpResponse response, Throwable e) {
-        LOGGER.log(Level.SEVERE, "handle error", e);
+        if (Constants.debugLoggerPrintAble()) {
+            LOGGER.log(Level.SEVERE, "handle " + request.getUri() + " error", e);
+        } else {
+            LOGGER.log(Level.WARNING, "handle " + request.getUri() + " error " + e.getMessage());
+        }
         if (ZrLogUtil.isStaticBlogPlugin(request)) {
             return;
         }

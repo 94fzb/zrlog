@@ -14,7 +14,7 @@ import { LockOutlined } from "@ant-design/icons";
 const Index = ({ data }: { data: PageDataSource }) => {
     const tagForMap = (tag: string) => {
         const tagElem = (
-            <Tag icon={<TagOutlined />} closable={false} color={getColorPrimary()}>
+            <Tag icon={<TagOutlined />} closable={false} color={getColorPrimary()} style={{ userSelect: "none" }}>
                 {tag}
             </Tag>
         );
@@ -29,7 +29,7 @@ const Index = ({ data }: { data: PageDataSource }) => {
         return (
             <span style={{ display: "flex", gap: 4 }}>
                 {record.privacy && <LockOutlined style={{ color: getColorPrimary() }} />}
-                {record.rubbish && <span>[草稿]</span>}
+                {record.rubbish && <span>[{getRes()["rubbish"]}]</span>}
                 {children}
             </span>
         );
@@ -38,7 +38,7 @@ const Index = ({ data }: { data: PageDataSource }) => {
     const getColumns = () => {
         return [
             {
-                title: "标题",
+                title: getRes()["title"],
                 dataIndex: "title",
                 key: "title",
                 ellipsis: {
@@ -73,7 +73,7 @@ const Index = ({ data }: { data: PageDataSource }) => {
                 },
             },
             {
-                title: "标签",
+                title: getRes().tag,
                 dataIndex: "keywords",
                 key: "keywords",
                 width: 150,
@@ -91,7 +91,7 @@ const Index = ({ data }: { data: PageDataSource }) => {
                 width: 80,
             },*/
             {
-                title: "分类",
+                title: getRes()["type"],
                 key: "typeName",
                 dataIndex: "typeName",
                 width: 100,
@@ -116,13 +116,13 @@ const Index = ({ data }: { data: PageDataSource }) => {
                 width: 80,
             },
             {
-                title: "创建时间",
+                title: getRes()["createTime"],
                 key: "releaseTime",
                 dataIndex: "releaseTime",
                 width: 120,
             },
             {
-                title: "最后更新时间",
+                title: getRes()["lastUpdateDate"],
                 key: "lastUpdateDate",
                 dataIndex: "lastUpdateDate",
                 width: 120,

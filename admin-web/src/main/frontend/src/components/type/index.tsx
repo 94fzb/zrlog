@@ -22,7 +22,7 @@ const Type = ({ data }: { data: PageDataSource }) => {
                 },
             },
             {
-                title: "别名",
+                title: getRes()["alias"],
                 dataIndex: "alias",
                 key: "alias",
                 width: 120,
@@ -49,6 +49,7 @@ const Type = ({ data }: { data: PageDataSource }) => {
             </Title>
             <Divider />
             <BaseTable
+                hideId={true}
                 columns={getColumns()}
                 addBtnRender={(addSuccessCall) => {
                     return <AddType addSuccessCall={addSuccessCall} />;

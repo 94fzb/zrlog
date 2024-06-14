@@ -9,7 +9,7 @@ const Nav = ({ data }: { data: PageDataSource }) => {
     const getColumns = () => {
         return [
             {
-                title: getRes()["admin.link.manage"],
+                title: getRes()["admin.nav.manage"],
                 dataIndex: "url",
                 width: 240,
                 key: "url",
@@ -26,7 +26,7 @@ const Nav = ({ data }: { data: PageDataSource }) => {
                 width: 240,
             },
             {
-                title: "排序",
+                title: getRes()["order"],
                 key: "sort",
                 dataIndex: "sort",
                 width: 60,
@@ -41,6 +41,7 @@ const Nav = ({ data }: { data: PageDataSource }) => {
             </Title>
             <Divider />
             <BaseTable
+                hideId={true}
                 columns={getColumns()}
                 addBtnRender={(addSuccessCall) => {
                     return <AddNav addSuccessCall={addSuccessCall} />;

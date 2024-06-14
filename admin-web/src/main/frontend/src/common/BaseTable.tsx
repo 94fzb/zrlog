@@ -14,6 +14,7 @@ type BaseTableProps = {
     columns: any[];
     datasource?: PageDataSource;
     searchKey?: string;
+    hideId?: boolean;
     addBtnRender?: (addSuccessCall: () => void) => any;
     editBtnRender?: (id: number, record: any, editSuccessCall: () => void) => any;
 };
@@ -48,6 +49,7 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
     datasource,
     searchKey,
     deleteSuccessCallback,
+    hideId,
 }) => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -144,32 +146,44 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
 
     const getActionedColumns = () => {
         const c = [];
-        c.push({
-            title: "ID",
-            dataIndex: "id",
-            key: "id",
-            width: 80,
-        });
+        if (hideId === null || hideId === undefined || !hideId) {
+            c.push({
+                title: "ID",
+                dataIndex: "id",
+                key: "id",
+                fixed: true,
+                width: 80,
+            });
+        }
         c.push({
             title: "",
             dataIndex: "id",
             key: "action",
-            width: 100,
+            fixed: true,
+            width: 80,
             render: (text: any, record: any) =>
                 text ? (
                     <Space size={16}>
-                        <Popconfirm
-                            title={getRes()["deleteTips"]}
-                            onConfirm={() =>
-                                handleDelete(tableDataState.pagination, deleteApi, record.id).then(() => {
-                                    if (deleteSuccessCallback) {
-                                        deleteSuccessCallback(record.id);
-                                    }
-                                })
-                            }
+                        <Link
+                            to={"#delete-" + record.id}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }}
                         >
-                            <DeleteOutlined style={{ color: "red" }} />
-                        </Popconfirm>
+                            <Popconfirm
+                                title={getRes()["deleteTips"]}
+                                onConfirm={() =>
+                                    handleDelete(tableDataState.pagination, deleteApi, record.id).then(() => {
+                                        if (deleteSuccessCallback) {
+                                            deleteSuccessCallback(record.id);
+                                        }
+                                    })
+                                }
+                            >
+                                <DeleteOutlined style={{ color: "red" }} />
+                            </Popconfirm>
+                        </Link>
                         {editBtnRender
                             ? editBtnRender(text, record, () => {
                                   fetchDataWithReload(

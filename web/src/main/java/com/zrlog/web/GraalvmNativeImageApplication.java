@@ -1,5 +1,6 @@
 package com.zrlog.web;
 
+import com.hibegin.common.util.ParseArgsUtil;
 import com.hibegin.common.util.Pid;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.server.WebServerBuilder;
@@ -19,29 +20,6 @@ import java.io.InputStreamReader;
  */
 public class GraalvmNativeImageApplication {
 
-    public static boolean justTips(String[] args, String processName, String version) {
-        if (args.length > 0) {
-            switch (args[0]) {
-                case "-v", "--version" -> {
-                    System.out.println(processName + " version: " + version);
-                    return true;
-                }
-                case "--properties" -> {
-                    System.getProperties().forEach((key, value) -> System.out.format("%s=%s%n",
-                            key,
-                            value));
-                    return true;
-                }
-                case "--env" -> {
-                    System.getenv().forEach((key, value) -> System.out.format("%s=%s%n",
-                            key,
-                            value));
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 
     private static String getWindowsExecutablePath() {
         try {
@@ -66,15 +44,16 @@ public class GraalvmNativeImageApplication {
             binFile = getWindowsExecutablePath();
         }
         String exeFile = binFile.replace("./", "");
-        if (justTips(args, new File(exeFile).getName(), BlogBuildInfoUtil.getVersionInfoFull())) {
-            return;
-        }
         Constants.runMode = RunMode.NATIVE;
         String runtimeRoot = System.getProperty("user.dir");
+        PathUtil.setRootPath(runtimeRoot);
         if (!exeFile.startsWith(runtimeRoot)) {
             exeFile = new File(PathUtil.getRootPath() + "/" + exeFile).toString();
         }
-        PathUtil.setRootPath(runtimeRoot);
+        //parse args
+        if (ParseArgsUtil.justTips(args, new File(exeFile).getName(), BlogBuildInfoUtil.getVersionInfoFull())) {
+            return;
+        }
         int port = ZrLogUtil.getPort(args);
         WebServerBuilder webServerBuilder = Application.webServerBuilder(port, new NativeImageUpdater(args, exeFile));
         webServerBuilder.start();

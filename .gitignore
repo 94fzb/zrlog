@@ -14,16 +14,9 @@ logs
 .settings
 target
 hs_err*.log
-static/post
-static/temp
-static/_cache
-static/attached
+static/
 conf/classes
 conf/plugins/*
-
-static/include/templates/README.md
-static/include/templates/*.sh
-static/include/templates/.gitignore
 web/log
 web/logs
 rebel.xml
@@ -36,11 +29,8 @@ sim.pid
 .DS_Store
 .vscode
 pom.xml.versionsBackup
-static/include/
 web/src/main/zrlog
 web/src/main/lib
-static/install
-static/admin
 conf/update-temp/zrlog.zip
 /blog-web/src/main/frontend/node_modules/
 /admin-web/src/main/frontend/node_modules/
@@ -55,5 +45,3 @@ zrlog.bgv
 /zrlog
 /conf/update-temp/
 1
-static/favicon.ico
-static/pwa/icon

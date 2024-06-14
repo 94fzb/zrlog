@@ -6,16 +6,17 @@ import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.common.util.http.HttpUtil;
 import com.hibegin.common.util.http.handle.HttpFileHandle;
+import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.admin.business.exception.ArticleMissingTitleException;
 import com.zrlog.admin.business.exception.ArticleMissingTypeException;
 import com.zrlog.admin.business.exception.UpdateArticleExpireException;
 import com.zrlog.admin.business.rest.request.CreateArticleRequest;
 import com.zrlog.admin.business.rest.request.UpdateArticleRequest;
-import com.zrlog.admin.business.rest.response.ArticleResponseEntry;
 import com.zrlog.admin.business.rest.response.CreateOrUpdateArticleResponse;
 import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
 import com.zrlog.admin.business.util.ThumbnailUtil;
+import com.zrlog.business.rest.response.ArticleResponseEntry;
 import com.zrlog.business.service.VisitorArticleService;
 import com.zrlog.common.Constants;
 import com.zrlog.common.rest.request.PageRequest;
@@ -35,9 +36,10 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -225,29 +227,11 @@ public class AdminArticleService {
         return log;
     }
 
-    public PageData<ArticleResponseEntry> adminPage(PageRequest pageRequest, String keywords) {
+    public PageData<ArticleResponseEntry> adminPage(PageRequest pageRequest, String keywords, HttpRequest request) {
         PageData<Map<String, Object>> data = new Log().adminFind(pageRequest, keywords);
         VisitorArticleService.wrapperSearchKeyword(data, keywords);
-        return convertPageable(data);
+        return VisitorArticleService.convertPageable(data, request);
     }
 
-    /**
-     * 将输入的分页过后的对象，转化PageableResponse的对象
-     */
-    private PageData<ArticleResponseEntry> convertPageable(PageData<Map<String, Object>> object) {
-        List<ArticleResponseEntry> dataList = new ArrayList<>();
-        for (Map<String, Object> obj : object.getRows()) {
-            obj.put("releaseTime", ((LocalDateTime) obj.get("releaseTime")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-            obj.put("lastUpdateDate", ((LocalDateTime) obj.get("lastUpdateDate")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-            obj.remove("last_update_date");
-            dataList.add(BeanUtil.convert(obj, ArticleResponseEntry.class));
-        }
-        PageData<ArticleResponseEntry> pageData = new PageData<>();
-        pageData.setTotalElements(object.getTotalElements());
-        pageData.setRows(dataList);
-        pageData.setPage(object.getPage());
-        pageData.setSize(object.getSize());
-        return pageData;
-    }
 
 }

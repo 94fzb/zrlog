@@ -51,6 +51,9 @@ const OtherForm = ({ data }: { data: Other }) => {
                 <Form.Item name="webCm" label="网站统计">
                     <TextArea rows={7} />
                 </Form.Item>
+                <Form.Item name="robotRuleContent" label="robots.txt">
+                    <TextArea rows={7} placeholder={"User-agent: *\n" + "Disallow: "} />
+                </Form.Item>
                 <Divider />
                 <Button type="primary" htmlType="submit">
                     {getRes().submit}

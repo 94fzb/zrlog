@@ -51,7 +51,10 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
 
 
     @Override
-    public String getFileFlag(String uri) {
+    public String getFileFlagFirstByCache(String uri) {
+        if (uri.startsWith("/")) {
+            uri = uri.substring(1);
+        }
         String s = cacheFileMap.get(uri);
         if (Objects.nonNull(s)) {
             return s;
@@ -64,6 +67,20 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
             String flag = getStreamTag(inputStream);
             cacheFileMap.put(uri, flag);
             return flag;
+        }
+        File staticFile = PathUtil.getStaticFile("/" + uri);
+        if (!staticFile.exists()) {
+            return null;
+        }
+        if (staticFile.isDirectory()) {
+            return null;
+        }
+        try (FileInputStream fileInputStream = new FileInputStream(staticFile)) {
+            String streamTag = getStreamTag(fileInputStream);
+            cacheFileMap.put(uri, streamTag);
+            return streamTag;
+        } catch (IOException e) {
+            LOGGER.warning("Get " + uri + " stream tag error " + e.getMessage());
         }
         return null;
     }
@@ -134,18 +151,10 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
                 continue;
             }
             String uri = file.toString().substring(PathUtil.getStaticPath().length());
-            if (!uri.startsWith("include/templates/") && !uri.startsWith("assets/") && !Objects.equals("favicon.ico", uri)) {
-                continue;
-            }
             if (cacheableFileExts.stream().noneMatch(e -> uri.toLowerCase().endsWith(e))) {
                 continue;
             }
-            try (FileInputStream fileInputStream = new FileInputStream(file)) {
-                cacheMap.put(uri, getStreamTag(fileInputStream));
-            } catch (Exception e) {
-                LOGGER.warning("Get stream tag error " + e.getMessage());
-
-            }
+            getFileFlagFirstByCache(uri);
         }
         return cacheMap;
     }
@@ -219,6 +228,14 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
     public Map<String, Object> refreshWebSite() {
         Map<String, Object> website = new WebSite().getWebSite();
         refreshWebSite(website);
+        String robotTxt = (String) Constants.WEB_SITE.get("robotRuleContent");
+        if (StringUtils.isNotEmpty(robotTxt)) {
+            File robotFile = PathUtil.getStaticFile("robots.txt");
+            if (!robotFile.getParentFile().exists()) {
+                robotFile.getParentFile().mkdirs();
+            }
+            IOUtil.writeStrToFile(robotTxt, robotFile);
+        }
         return Constants.WEB_SITE;
     }
 

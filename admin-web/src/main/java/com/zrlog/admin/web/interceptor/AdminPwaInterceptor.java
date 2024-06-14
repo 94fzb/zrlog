@@ -4,11 +4,11 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.StringUtils;
+import com.hibegin.http.server.api.HandleAbleInterceptor;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.util.MimeTypeUtil;
 import com.hibegin.http.server.web.Controller;
-import com.zrlog.blog.web.interceptor.HandleAbleInterceptor;
 import com.zrlog.common.Constants;
 
 import java.io.ByteArrayInputStream;

@@ -18,4 +18,6 @@ public @interface RefreshCache {
      * async call update cache
      */
     boolean async() default false;
+
+    boolean onlyOnPostMethod() default false;
 }

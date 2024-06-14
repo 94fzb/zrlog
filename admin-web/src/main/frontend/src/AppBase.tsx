@@ -10,7 +10,7 @@ const AsyncLogin = lazy(() => import("components/login"));
 const AsyncAdminDashboardRouter = lazy(() => import("AdminDashboardRouter"));
 
 const AppBase = () => {
-    const { modal } = App.useApp();
+    const { modal, message } = App.useApp();
 
     const initAxios = () => {
         //@ts-ignore
@@ -52,10 +52,14 @@ const AppBase = () => {
                     }
                 } else {
                     if ((error as AxiosError) && error.config) {
-                        modal.error({
-                            title: "请求 " + error.config.url + " 错误",
-                            content: error.toString(),
-                        });
+                        if (navigator.onLine) {
+                            modal.error({
+                                title: "请求 " + error.config.url + " 错误",
+                                content: error.toString(),
+                            });
+                        } else {
+                            message.error("请求 " + error.config.url + " " + error.toString() + " network offline");
+                        }
                     }
                 }
                 return Promise.reject(error);

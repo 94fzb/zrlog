@@ -3,20 +3,22 @@ package com.zrlog.admin.web.controller.api;
 import com.hibegin.common.util.BeanUtil;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.annotation.ResponseBody;
-import com.hibegin.http.server.api.HttpRequest;
-import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.exception.ArgsException;
 import com.zrlog.admin.business.exception.NotFindDbEntryException;
 import com.zrlog.admin.business.exception.PermissionErrorException;
 import com.zrlog.admin.business.rest.request.CreateArticleRequest;
 import com.zrlog.admin.business.rest.request.UpdateArticleRequest;
-import com.zrlog.admin.business.rest.response.*;
+import com.zrlog.admin.business.rest.response.ArticleGlobalResponse;
+import com.zrlog.admin.business.rest.response.CreateOrUpdateArticleResponse;
+import com.zrlog.admin.business.rest.response.DeleteLogResponse;
+import com.zrlog.admin.business.rest.response.LoadEditArticleResponse;
 import com.zrlog.admin.business.service.AdminArticleService;
-import com.zrlog.admin.business.util.ControllerUtil;
 import com.zrlog.admin.web.annotation.RefreshCache;
 import com.zrlog.admin.web.token.AdminTokenThreadLocal;
+import com.zrlog.blog.web.util.ControllerUtil;
 import com.zrlog.blog.web.util.WebTools;
+import com.zrlog.business.rest.response.ArticleResponseEntry;
 import com.zrlog.business.service.TemplateHelper;
 import com.zrlog.common.Constants;
 import com.zrlog.common.rest.response.ApiStandardResponse;
@@ -68,22 +70,11 @@ public class AdminArticleController extends Controller {
     @ResponseBody
     public ApiStandardResponse<PageData<ArticleResponseEntry>> index() throws SQLException {
         String key = WebTools.convertRequestParam(request.getParaToStr("key"));
-        PageData<ArticleResponseEntry> pageData = articleService.adminPage(ControllerUtil.getPageRequest(this), key);
-        pageData.getRows().forEach(x -> x.setUrl(getAccessUrl(x)));
+        PageData<ArticleResponseEntry> pageData = articleService.adminPage(ControllerUtil.getPageRequest(this), key, request);
         pageData.setKey(key);
         return new ApiStandardResponse<>(pageData);
     }
 
-    private String getAccessUrl(ArticleResponseEntry articleResponseEntry) {
-        if (articleResponseEntry.isPrivacy() || articleResponseEntry.isRubbish()) {
-            return "/article-edit?previewMode=true&id=" + articleResponseEntry.getId();
-        }
-        String key = articleResponseEntry.getId() + "";
-        if (StringUtils.isNotEmpty(articleResponseEntry.getAlias())) {
-            key = articleResponseEntry.getAlias();
-        }
-        return ZrLogUtil.getHomeUrlWithHost(getRequest()) + Constants.getArticleUri() + key + TemplateHelper.getSuffix(request);
-    }
 
     private String getPreviewUrl(CreateOrUpdateArticleResponse articleResponseEntry) {
         String key = articleResponseEntry.getLogId() + "";

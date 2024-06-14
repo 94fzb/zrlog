@@ -24,6 +24,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.time.Duration;
 import java.util.Map;
@@ -94,6 +96,9 @@ public class StaticHtmlPlugin extends BaseLockObject implements IPlugin {
         if (StringUtils.isEmpty(ZrLogUtil.getBlogHostByWebSite())) {
             return;
         }
+        if (Constants.runMode == RunMode.DEV) {
+            return;
+        }
         copyCommonAssert();
         copyDefaultTemplateAssets();
         handleStatusPageMap.clear();
@@ -131,6 +136,14 @@ public class StaticHtmlPlugin extends BaseLockObject implements IPlugin {
         if (!new File(PathUtil.getStaticPath() + "/favicon.ico").exists()) {
             //favicon
             copyResourceToCacheFolder("/favicon.ico");
+        }
+        File robots = PathUtil.getStaticFile( "/robots.txt");
+        if (robots.exists()) {
+            try {
+                Constants.zrLogConfig.getCacheService().saveToCacheFolder(new FileInputStream(robots), "/robots.txt");
+            } catch (FileNotFoundException e) {
+                LOGGER.warning("Missing resource " + robots);
+            }
         }
     }
 

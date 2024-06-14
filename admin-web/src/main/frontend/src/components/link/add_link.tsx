@@ -76,7 +76,7 @@ const AddLink = ({ addSuccessCall }: { addSuccessCall: () => void }) => {
                     <Row>
                         <Col span={24}>
                             <Form.Item
-                                label="排序"
+                                label={getRes()["order"]}
                                 style={{ marginBottom: 8 }}
                                 name="sort"
                                 rules={[{ required: true, message: "" }]}

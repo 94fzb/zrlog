@@ -188,7 +188,7 @@ class ResponseRenderPrintWriter extends PrintWriter {
             if (uriPath.contains("?")) {
                 uriPath = uriPath.substring(0, uriPath.lastIndexOf("?"));
             }
-            String flag = Constants.zrLogConfig.getCacheService().getFileFlag(uriPath);
+            String flag = Constants.zrLogConfig.getCacheService().getFileFlagFirstByCache(uriPath);
             if (flag != null) {
                 if (href.contains("?")) {
                     href = href + "&t=" + flag;

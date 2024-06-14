@@ -6,7 +6,7 @@ import { Badge, Card } from "antd";
 import { CheckOutlined, CloudDownloadOutlined, DeleteOutlined, EyeOutlined, SettingOutlined } from "@ant-design/icons";
 import Meta from "antd/es/card/Meta";
 import Button from "antd/es/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getRes } from "../../utils/constants";
 import axios from "axios";
 import { Link } from "react-router-dom";
@@ -50,6 +50,10 @@ const Template = ({ data }: { data: TemplateEntry[] }) => {
             load();
         });
     };
+
+    useEffect(() => {
+        setTemplateState(data);
+    }, [data]);
 
     const getActions = (template: TemplateEntry) => {
         const links = [];
@@ -119,7 +123,7 @@ const Template = ({ data }: { data: TemplateEntry[] }) => {
                 })}
             </Row>
             <Divider />
-            <Link to="/template-center">
+            <Link to={`/template-center?host=${window.location.host}`}>
                 <Button icon={<CloudDownloadOutlined />} type={"primary"}>
                     {getRes()["admin.theme.download"]}
                 </Button>

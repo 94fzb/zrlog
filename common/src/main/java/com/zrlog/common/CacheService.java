@@ -19,7 +19,7 @@ public interface CacheService {
 
     CompletableFuture<Void> refreshInitDataCacheAsync(HttpRequest servletRequest, boolean cleanAble);
 
-    String getFileFlag(String uriPath);
+    String getFileFlagFirstByCache(String uriPath);
 
     boolean isCacheableByRequest(HttpRequest request);
 

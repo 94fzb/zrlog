@@ -1,4 +1,4 @@
-package com.zrlog.admin.business.rest.response;
+package com.zrlog.business.rest.response;
 
 public class ArticleResponseEntry {
 

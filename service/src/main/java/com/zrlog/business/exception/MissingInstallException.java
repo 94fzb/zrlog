@@ -1,4 +1,4 @@
-package com.zrlog.admin.business.exception;
+package com.zrlog.business.exception;
 
 import com.zrlog.common.exception.AbstractBusinessException;
 import com.zrlog.util.I18nUtil;

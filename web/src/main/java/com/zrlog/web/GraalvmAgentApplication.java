@@ -15,6 +15,7 @@ import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.business.cache.vo.Archive;
 import com.zrlog.business.cache.vo.BaseDataInitVO;
 import com.zrlog.business.cache.vo.HotLogBasicInfoVO;
+import com.zrlog.business.rest.response.ArticleResponseEntry;
 import com.zrlog.business.util.PagerUtil;
 import com.zrlog.business.util.PagerVO;
 import com.zrlog.common.Constants;
@@ -64,7 +65,6 @@ public class GraalvmAgentApplication {
         new Gson().toJson(new DownloadUpdatePackageResponse(0));
         new Gson().toJson(new UpgradeProcessResponse(false, ""));
         new Gson().toJson(new PreCheckVersionResponse());
-        new Gson().toJson(new WebSiteSettingsResponse());
         new Gson().toJson(new BlogWebSiteInfo());
         new Gson().toJson(new OtherWebSiteInfo());
         new Gson().toJson(new AdminWebSiteInfo());

@@ -5,7 +5,7 @@ import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.api.Interceptor;
 import com.hibegin.http.server.util.PathUtil;
 import com.hibegin.http.server.web.MethodInterceptor;
-import com.zrlog.blog.web.interceptor.BlogArticleInterceptor;
+import com.zrlog.blog.web.interceptor.BlogPageInterceptor;
 import com.zrlog.blog.web.plugin.RequestInfo;
 import com.zrlog.blog.web.plugin.RequestStatisticsPlugin;
 import com.zrlog.blog.web.util.WebTools;
@@ -44,7 +44,7 @@ public class StaticResourceInterceptor implements Interceptor {
                 response.writeFile(staticFile);
                 return false;
             }
-            if (BlogArticleInterceptor.catGeneratorHtml(actionKey)) {
+            if (BlogPageInterceptor.catGeneratorHtml(actionKey)) {
                 File cacheFile = Constants.zrLogConfig.getCacheService().loadCacheFile(request);
                 if (cacheFile.exists() && !ZrLogUtil.isStaticBlogPlugin(request)) {
                     response.writeFile(cacheFile);

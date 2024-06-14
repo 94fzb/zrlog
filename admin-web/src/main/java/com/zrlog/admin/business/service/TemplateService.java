@@ -1,7 +1,9 @@
 package com.zrlog.admin.business.service;
 
 import com.google.gson.Gson;
-import com.hibegin.common.util.*;
+import com.hibegin.common.util.FileUtils;
+import com.hibegin.common.util.IOUtil;
+import com.hibegin.common.util.ZipUtil;
 import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
 import com.zrlog.admin.business.rest.response.UploadTemplateResponse;
@@ -11,10 +13,15 @@ import com.zrlog.common.vo.TemplateVO;
 import com.zrlog.model.WebSite;
 import com.zrlog.util.I18nUtil;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.SQLException;
-import java.util.*;
-import java.util.logging.Level;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class TemplateService {
 
@@ -55,6 +62,10 @@ public class TemplateService {
                     if (Objects.isNull(templateVO)) {
                         continue;
                     }
+                    //跳过默认主题
+                    if (Objects.equals(templateVO.getTemplate(), Constants.DEFAULT_TEMPLATE_PATH)) {
+                        continue;
+                    }
                     templateVO.setDeleteAble(true);
                     File settingFile = new File(PathUtil.getStaticPath() + templateVO.getTemplate() + "/setting/config-form.json");
                     templateVO.setConfigAble(settingFile.exists());
@@ -75,7 +86,6 @@ public class TemplateService {
         }
         return templates;
     }
-
 
 
     private static TemplateVO getTemplateVO(File file) {

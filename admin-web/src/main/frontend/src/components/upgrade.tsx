@@ -122,14 +122,20 @@ const Upgrade = ({ data }: { data: UpgradeData }) => {
             };
         });
         const { data } = await axios.get("/api/admin/upgrade/doUpgrade?preUpgradeKey=" + preUpgradeKey);
-        setState((prevState) => {
-            return {
-                ...prevState,
-                upgradeMessage: data.data.message,
-                current: current,
-            };
-        });
-        if (data.data.finish) {
+        if (data.data) {
+            setState((prevState) => {
+                return {
+                    ...prevState,
+                    upgradeMessage: data.data.message,
+                    current: current,
+                };
+            });
+            if (data.data.finish) {
+                checkRestartSuccess(newBuildId);
+                return;
+            }
+        } else {
+            //没有 data 也认为在重启中了
             checkRestartSuccess(newBuildId);
             return;
         }

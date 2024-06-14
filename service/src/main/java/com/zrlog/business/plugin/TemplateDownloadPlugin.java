@@ -7,7 +7,6 @@ import com.hibegin.common.util.ZipUtil;
 import com.hibegin.common.util.http.HttpUtil;
 import com.hibegin.common.util.http.handle.HttpFileHandle;
 import com.hibegin.http.server.util.PathUtil;
-import com.zrlog.business.exception.TemplateExistsException;
 import com.zrlog.business.service.TemplateHelper;
 import com.zrlog.common.Constants;
 import com.zrlog.plugin.IPlugin;
@@ -59,14 +58,12 @@ public class TemplateDownloadPlugin extends BaseLockObject implements IPlugin {
         }
         String templateName = downloadUrl.substring(downloadUrl.lastIndexOf("/") + 1).replace(".zip", "");
         File path = new File(PathUtil.getStaticPath() + Constants.TEMPLATE_BASE_PATH + templateName);
-        if (path.exists()) {
-            throw new TemplateExistsException();
-        }
         HttpFileHandle fileHandle = (HttpFileHandle) HttpUtil.getInstance().sendGetRequest(downloadUrl, new HttpFileHandle(PathUtil.getStaticPath() + Constants.TEMPLATE_BASE_PATH), new HashMap<>());
-        if (fileHandle.getT().exists()) {
-            ZipUtil.unZip(fileHandle.getT().toString(), path.toString());
-            //delete zip file
-            fileHandle.getT().delete();
+        if (!fileHandle.getT().exists()) {
+            return;
         }
+        ZipUtil.unZip(fileHandle.getT().toString(), path.toString());
+        //delete zip file
+        fileHandle.getT().delete();
     }
 }

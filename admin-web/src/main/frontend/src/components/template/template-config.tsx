@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { App, Form, Input, Row } from "antd";
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
@@ -28,13 +28,17 @@ export type ConfigParam = {
     placeholder: string;
 };
 
-const TemplateConfig = ({ data }: { data: TemplateConfigState }) => {
+const convertToDataMap = (data: TemplateConfigState) => {
     const dataMap = {};
     for (const [key, value] of Object.entries(data.config)) {
         //@ts-ignore
         dataMap[key] = value.value;
     }
+    return dataMap;
+};
 
+const TemplateConfig = ({ data }: { data: TemplateConfigState }) => {
+    const dataMap = convertToDataMap(data);
     const [state, setState] = useState<TemplateConfigState>({
         config: data.config,
         dataMap: dataMap,
@@ -67,13 +71,19 @@ const TemplateConfig = ({ data }: { data: TemplateConfigState }) => {
             return (
                 <>
                     <Dragger
-                        style={{ width: "128px" }}
+                        style={{ width: "128px", height: "128px" }}
                         multiple={false}
                         onChange={(e) => onUploadChange(e, key)}
                         name="imgFile"
                         action="/api/admin/upload?dir=image"
                     >
-                        <Image style={{ borderRadius: 8 }} preview={false} width={128} src={state.dataMap[key]} />
+                        <Image
+                            style={{ borderRadius: 8 }}
+                            preview={false}
+                            height={128}
+                            width={128}
+                            src={state.dataMap[key]}
+                        />
                     </Dragger>
                 </>
             );
@@ -112,6 +122,13 @@ const TemplateConfig = ({ data }: { data: TemplateConfigState }) => {
             }
         });
     };
+
+    useEffect(() => {
+        setState({
+            config: data.config,
+            dataMap: convertToDataMap(data),
+        });
+    }, [data]);
 
     return (
         <>

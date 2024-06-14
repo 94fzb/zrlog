@@ -1,6 +1,7 @@
 package com.zrlog.blog.web.interceptor;
 
 import com.hibegin.common.util.FileUtils;
+import com.hibegin.http.server.api.HandleAbleInterceptor;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.util.MimeTypeUtil;
@@ -22,7 +23,7 @@ public class PwaInterceptor implements HandleAbleInterceptor {
 
     @Override
     public boolean doInterceptor(HttpRequest request, HttpResponse response) {
-        try (InputStream resourceAsStream = BlogArticleInterceptor.class.getResourceAsStream(request.getUri())) {
+        try (InputStream resourceAsStream = BlogPageInterceptor.class.getResourceAsStream(request.getUri())) {
             if (Objects.nonNull(resourceAsStream)) {
                 response.getHeader().put("Content-Type", MimeTypeUtil.getMimeStrByExt(FileUtils.getFileExt(request.getUri())));
                 File file = PathUtil.getStaticFile(request.getUri());

@@ -1,6 +1,8 @@
 package com.zrlog.admin.web.interceptor;
 
 import com.hibegin.common.util.StringUtils;
+import com.hibegin.http.HttpMethod;
+import com.hibegin.http.server.api.HandleAbleInterceptor;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.web.MethodInterceptor;
@@ -8,7 +10,6 @@ import com.zrlog.admin.business.exception.ArgsException;
 import com.zrlog.admin.web.annotation.RefreshCache;
 import com.zrlog.admin.web.plugin.PluginCorePlugin;
 import com.zrlog.admin.web.token.AdminTokenThreadLocal;
-import com.zrlog.blog.web.interceptor.HandleAbleInterceptor;
 import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.AdminTokenVO;
@@ -79,6 +80,10 @@ public class AdminInterceptor implements HandleAbleInterceptor {
             if (Objects.nonNull(method)) {
                 RefreshCache annotation = method.getAnnotation(RefreshCache.class);
                 if (Objects.nonNull(annotation)) {
+                    //跳过更新
+                    if (annotation.onlyOnPostMethod() && request.getMethod() != HttpMethod.POST) {
+                        return false;
+                    }
                     if (annotation.async()) {
                         Constants.zrLogConfig.getCacheService().refreshInitDataCacheAsync(request, true);
                     } else {
@@ -94,6 +99,9 @@ public class AdminInterceptor implements HandleAbleInterceptor {
 
     @Override
     public boolean isHandleAble(HttpRequest request) {
-        return request.getUri().startsWith("/admin") || request.getUri().startsWith("/api/admin");
+        if (Objects.equals(request.getUri(), "/admin") || Objects.equals(request.getUri(), "/api/admin")) {
+            return true;
+        }
+        return request.getUri().startsWith("/admin/") || request.getUri().startsWith("/api/admin/");
     }
 }

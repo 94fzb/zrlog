@@ -6,6 +6,7 @@ public class OtherWebSiteInfo implements Validator {
 
     private String icp;
     private String webCm;
+    private String robotRuleContent;
 
     public String getIcp() {
         return icp;
@@ -26,5 +27,13 @@ public class OtherWebSiteInfo implements Validator {
     @Override
     public void doValid() {
 
+    }
+
+    public String getRobotRuleContent() {
+        return robotRuleContent;
+    }
+
+    public void setRobotRuleContent(String robotRuleContent) {
+        this.robotRuleContent = robotRuleContent;
     }
 }

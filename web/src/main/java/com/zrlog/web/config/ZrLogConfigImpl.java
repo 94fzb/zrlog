@@ -12,11 +12,17 @@ import com.hibegin.http.server.config.RequestConfig;
 import com.hibegin.http.server.config.ResponseConfig;
 import com.hibegin.http.server.config.ServerConfig;
 import com.zaxxer.hikari.util.DriverDataSource;
+import com.zrlog.admin.web.interceptor.AdminInterceptor;
+import com.zrlog.admin.web.interceptor.AdminPwaInterceptor;
 import com.zrlog.admin.web.plugin.PluginCorePlugin;
 import com.zrlog.admin.web.plugin.PluginCoreProcessImpl;
 import com.zrlog.admin.web.plugin.UpdateVersionPlugin;
 import com.zrlog.admin.web.token.AdminTokenService;
 import com.zrlog.blog.web.controller.api.ApiInstallController;
+import com.zrlog.blog.web.interceptor.BlogApiInterceptor;
+import com.zrlog.blog.web.interceptor.BlogInstallInterceptor;
+import com.zrlog.blog.web.interceptor.BlogPageInterceptor;
+import com.zrlog.blog.web.interceptor.PwaInterceptor;
 import com.zrlog.blog.web.plugin.CacheManagerPlugin;
 import com.zrlog.blog.web.plugin.RequestStatisticsPlugin;
 import com.zrlog.blog.web.version.UpgradeVersionHandler;
@@ -29,10 +35,13 @@ import com.zrlog.common.type.RunMode;
 import com.zrlog.model.WebSite;
 import com.zrlog.plugin.IPlugin;
 import com.zrlog.plugin.Plugins;
-import com.zrlog.util.*;
+import com.zrlog.util.BlogBuildInfoUtil;
+import com.zrlog.util.DbConnectUtils;
+import com.zrlog.util.I18nUtil;
+import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.inteceptor.GlobalBaseInterceptor;
 import com.zrlog.web.inteceptor.MyI18nInterceptor;
-import com.zrlog.web.inteceptor.RouterInterceptor;
+import com.zrlog.web.inteceptor.PluginInterceptor;
 import com.zrlog.web.inteceptor.StaticResourceInterceptor;
 
 import java.io.FileOutputStream;
@@ -131,15 +140,23 @@ public class ZrLogConfigImpl extends ZrLogConfig {
 
 
     /**
-     * 的拦截器，这里配置时需要区分先后顺序的。由于提供拦截器并没有类似Spring的拦截器可以对请求路径的配置，这里并不是很优雅。
-     * 及需要在对应Interception中自行通过路由进行拦截。详细可以看 RouterInterceptor 这拦截器的代码,
-     * 的Handler和其Interception有点类似，使用上需要主要一点（IHandler可以用于拦截处理静态资源文件，而Interception不会处理静态资源请求）
+     * 配置过滤器，这里配置时需要区分先后顺序的。由于提供拦截器并没有类似 Spring 的过滤器可以对请求路径的配置，这里并不是很优雅。
+     * 及需要在对应 Interceptor 中自行通过路由进行拦截
      */
     public void configInterceptor(List<Class<? extends Interceptor>> interceptors) {
+        //all
         interceptors.add(GlobalBaseInterceptor.class);
         interceptors.add(StaticResourceInterceptor.class);
         interceptors.add(MyI18nInterceptor.class);
-        interceptors.add(RouterInterceptor.class);
+        interceptors.add(PluginInterceptor.class);
+        //admin
+        interceptors.add(AdminPwaInterceptor.class);
+        interceptors.add(AdminInterceptor.class);
+        //blog
+        interceptors.add(PwaInterceptor.class);
+        interceptors.add(BlogInstallInterceptor.class);
+        interceptors.add(BlogApiInterceptor.class);
+        interceptors.add(BlogPageInterceptor.class);
     }
 
     /***

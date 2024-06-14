@@ -32,7 +32,7 @@ const BLink = ({ data }: { data: PageDataSource }) => {
                 width: 240,
             },
             {
-                title: "排序",
+                title: getRes()["order"],
                 key: "sort",
                 dataIndex: "sort",
                 width: 60,
@@ -47,6 +47,7 @@ const BLink = ({ data }: { data: PageDataSource }) => {
             </Title>
             <Divider />
             <BaseTable
+                hideId={true}
                 columns={getColumns()}
                 addBtnRender={(addSuccessCall) => {
                     return <AddLink addSuccessCall={addSuccessCall} />;

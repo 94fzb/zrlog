@@ -1,5 +1,6 @@
 import * as serviceWorker from "./serviceWorker";
 import zh_CN from "antd/es/locale/zh_CN";
+import en_US from "antd/es/locale/en_US";
 import { App, ConfigProvider, Spin, theme } from "antd";
 import { BrowserRouter } from "react-router-dom";
 import EnvUtils from "./utils/env-utils";
@@ -78,9 +79,11 @@ const Index = () => {
         initRes();
     }, []);
 
+    const htmlLang = document.documentElement.lang;
+
     return (
         <ConfigProvider
-            locale={zh_CN}
+            locale={htmlLang.startsWith("zh") ? zh_CN : en_US}
             theme={{
                 algorithm: appState.dark ? darkAlgorithm : defaultAlgorithm,
                 token: {

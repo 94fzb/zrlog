@@ -1,15 +1,14 @@
 package com.zrlog.blog.web.interceptor;
 
 import com.hibegin.common.util.FileUtils;
+import com.hibegin.http.server.api.HandleAbleInterceptor;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
-import com.hibegin.http.server.api.Interceptor;
 import com.hibegin.http.server.util.FreeMarkerUtil;
 import com.hibegin.http.server.util.MimeTypeUtil;
 import com.hibegin.http.server.util.PathUtil;
 import com.hibegin.http.server.web.Controller;
-import com.hibegin.http.server.web.MethodInterceptor;
-import com.zrlog.business.exception.InstalledException;
+import com.zrlog.business.exception.MissingInstallException;
 import com.zrlog.business.plugin.StaticHtmlPlugin;
 import com.zrlog.business.service.TemplateHelper;
 import com.zrlog.business.util.InstallUtils;
@@ -26,7 +25,7 @@ import java.util.Objects;
 /**
  * 静态化文章页，加快文章页的响应，压缩html文本，提供自定义插件标签的解析，静态资源文件的浏览器缓存问题
  */
-public class BlogArticleInterceptor implements Interceptor {
+public class BlogPageInterceptor implements HandleAbleInterceptor {
 
 
     /**
@@ -65,29 +64,22 @@ public class BlogArticleInterceptor implements Interceptor {
     @Override
     public boolean doInterceptor(HttpRequest request, HttpResponse response) throws Exception {
         if (request.getUri().startsWith(Constants.DEFAULT_TEMPLATE_PATH)) {
-            try (InputStream resourceAsStream = BlogArticleInterceptor.class.getResourceAsStream(request.getUri())) {
+            try (InputStream resourceAsStream = BlogPageInterceptor.class.getResourceAsStream(request.getUri())) {
                 if (Objects.nonNull(resourceAsStream)) {
                     response.getHeader().put("Content-Type", MimeTypeUtil.getMimeStrByExt(FileUtils.getFileExt(request.getUri())));
                     response.write(resourceAsStream, 200);
-                    return true;
+                    return false;
                 }
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
         }
         String target = request.getUri();
-        if (target.startsWith("/api/install") && InstallUtils.isInstalled()) {
-            throw new InstalledException();
-        }
-        if (target.startsWith("/api")) {
-            new MethodInterceptor().doInterceptor(request, response);
-            return true;
-        }
         if (InstallUtils.isInstalled()) {
             Constants.zrLogConfig.getCacheService().refreshInitDataCacheAsync(request, false).join();
-        } else if (!Objects.equals("/install", target)) {
+        } else {
             response.redirect("/install?ref=" + request.getUri());
-            return true;
+            return false;
         }
         Method method = request.getServerConfig().getRouter().getRouterMap().get(target);
         if (Objects.isNull(method) && target.endsWith(".html")) {
@@ -121,7 +113,7 @@ public class BlogArticleInterceptor implements Interceptor {
             String htmlStr = FreeMarkerUtil.renderToFM(invoke.toString(), request);
             render(htmlStr, target, request, response);
         }
-        return true;
+        return false;
     }
 
 
@@ -133,10 +125,14 @@ public class BlogArticleInterceptor implements Interceptor {
             if (!ZrLogUtil.isStaticBlogPlugin(request)) {
                 response.renderHtmlStr(realHtmlStr);
             }
-            if (BlogArticleInterceptor.catGeneratorHtml(target)) {
+            if (BlogPageInterceptor.catGeneratorHtml(target)) {
                 request.getAttr().put(StaticHtmlPlugin.HTML_FILE_KEY, Constants.zrLogConfig.getCacheService().saveResponseBodyToHtml(request, realHtmlStr));
             }
         }
     }
 
+    @Override
+    public boolean isHandleAble(HttpRequest request) {
+        return true;
+    }
 }

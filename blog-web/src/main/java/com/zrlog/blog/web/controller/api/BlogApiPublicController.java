@@ -17,6 +17,11 @@ public class BlogApiPublicController extends Controller {
     }
 
     @ResponseBody
+    public ApiStandardResponse<Map<String, Object>> adminResource() {
+        return new ApiStandardResponse<>(new CommonService().blogResourceInfo(request));
+    }
+
+    @ResponseBody
     public ApiStandardResponse<Map<String, Object>> installResource() {
         return new ApiStandardResponse<>(new CommonService().installResourceInfo(getRequest()));
     }

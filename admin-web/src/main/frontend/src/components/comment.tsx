@@ -8,7 +8,7 @@ const Comment = ({ data }: { data: PageDataSource }) => {
     const getColumns = () => {
         return [
             {
-                title: "内容",
+                title: getRes()["content"],
                 dataIndex: "userComment",
                 key: "userComment",
                 width: 600,
@@ -22,7 +22,7 @@ const Comment = ({ data }: { data: PageDataSource }) => {
                 ),
             },
             {
-                title: "昵称",
+                title: getRes()["nickName"],
                 dataIndex: "userName",
                 key: "userName",
             },
@@ -37,7 +37,7 @@ const Comment = ({ data }: { data: PageDataSource }) => {
                 dataIndex: "userIp",
             },
             {
-                title: "邮箱",
+                title: getRes()["email"],
                 key: "userMail",
                 dataIndex: "userMail",
             },

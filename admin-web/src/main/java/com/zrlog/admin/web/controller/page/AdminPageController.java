@@ -28,7 +28,7 @@ import java.util.StringJoiner;
 public class AdminPageController extends Controller {
 
     public void index() throws Throwable {
-        if (getRequest().getUri().endsWith(Constants.ADMIN_URI_BASE_PATH) || getRequest().getUri().endsWith(Constants.ADMIN_URI_BASE_PATH + "/")) {
+        if (Objects.equals(request.getUri(), Constants.ADMIN_URI_BASE_PATH) || Objects.equals(request.getUri(), Constants.ADMIN_URI_BASE_PATH + "/")) {
             response.redirect(Constants.ADMIN_URI_BASE_PATH + Constants.INDEX_URI_PATH);
             return;
         }
@@ -46,9 +46,13 @@ public class AdminPageController extends Controller {
         //clean history
         document.body().removeClass("dark");
         document.body().removeClass("light");
-        document.selectFirst("base").attr("href", "/");
+        Objects.requireNonNull(document.selectFirst("base")).attr("href", "/");
         document.body().addClass(Constants.getBooleanByFromWebSite("admin_darkMode") ? "dark" : "light");
         document.title(getAdminTitle());
+        Element htmlElement = document.selectFirst("html");
+        if (Objects.nonNull(htmlElement)) {
+            htmlElement.attr("lang", I18nUtil.getCurrentLocale().split("_")[0]);
+        }
         Elements select = document.head().select("meta[name=theme-color]");
         if (!select.isEmpty()) {
             Element first = select.first();
@@ -67,7 +71,7 @@ public class AdminPageController extends Controller {
         if (StringUtils.isNotEmpty(title)) {
             sj.add(title);
         }
-        sj.add(I18nUtil.getBlogStringFromRes("admin.management"));
+        sj.add(I18nUtil.getAdminStringFromRes("admin.management"));
         return sj.toString();
     }
 
@@ -77,7 +81,7 @@ public class AdminPageController extends Controller {
     }*/
 
     private ServerSideDataResponse serverSide(String uri) throws Throwable {
-        Map<String, Object> resourceInfo = new CommonService().blogResourceInfo(request);
+        Map<String, Object> resourceInfo = new CommonService().adminResourceInfo(request);
         if (Objects.nonNull(AdminTokenThreadLocal.getUser())) {
             UserBasicInfoResponse basicInfoResponse = new AdminUserController(request, response).index().getData();
             Method method = request.getRequestConfig().getRouter().getMethod("/api" + uri);

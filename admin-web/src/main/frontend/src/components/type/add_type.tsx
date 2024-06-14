@@ -51,7 +51,7 @@ const AddType = ({ addSuccessCall }: { addSuccessCall: () => void }) => {
                     <Row>
                         <Col span={24}>
                             <Form.Item
-                                label="别名"
+                                label={getRes()["alias"]}
                                 style={{ marginBottom: 8 }}
                                 name="alias"
                                 rules={[{ required: true, message: "" }]}

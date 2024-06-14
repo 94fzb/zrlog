@@ -69,7 +69,7 @@ const BlogForm = ({ data }: { data: Admin }) => {
                 <Form.Item valuePropName="checked" name="admin_darkMode" label="护眼模式">
                     <Switch size={"small"} />
                 </Form.Item>
-                <Form.Item label="主题">
+                <Form.Item label={getRes()["admin.theme.manage"]}>
                     <div style={{ display: "flex", justifyContent: "flex-start", alignItems: "center" }}>
                         <ColorPicker
                             value={form["admin_color_primary"]}
@@ -80,7 +80,7 @@ const BlogForm = ({ data }: { data: Admin }) => {
                         <span style={{ paddingLeft: 8 }}>{form["admin_color_primary"]}</span>
                     </div>
                 </Form.Item>
-                <Form.Item name="favicon_png_pwa_192_base64" label="Favicon (192 * 192)">
+                <Form.Item name="favicon_png_pwa_192_base64" label={`${getRes()["favicon"]} PWA (192px)`}>
                     <FaviconUpload
                         url={form.favicon_png_pwa_192_base64}
                         onChange={(e) => {
@@ -88,7 +88,7 @@ const BlogForm = ({ data }: { data: Admin }) => {
                         }}
                     />
                 </Form.Item>
-                <Form.Item name="favicon_png_pwa_512_base64" label="Favicon (512 * 512)">
+                <Form.Item name="favicon_png_pwa_512_base64" label={`${getRes()["favicon"]} PWA (512px)`}>
                     <FaviconUpload
                         url={form.favicon_png_pwa_512_base64}
                         onChange={(e) => {

@@ -6,32 +6,58 @@ import { ssData } from "./index";
 function aesEncrypt(text: string, key: string): string {
     // 将输入的字符串转换为 UTF-8 编码的字节数组
     const textBytes = new TextEncoder().encode(text);
-    // 将密钥转换为 UTF-8 编码的字节数组
+    // 将密钥转换为 UTF-8 编码的字节数组，并确保长度为 16、24 或 32 字节
     const keyBytes = new TextEncoder().encode(key);
+    const paddedKey = new Uint8Array(32);
+    paddedKey.set(keyBytes.subarray(0, 32));
+
     // 使用 AES-CTR 模式进行加密
-    const aesCtr = new ModeOfOperation.ctr(keyBytes);
+    const aesCtr = new ModeOfOperation.ctr(paddedKey);
     const encryptedBytes = aesCtr.encrypt(textBytes);
-    const textDecoder = new TextDecoder("utf-8");
-    const decodedString = textDecoder.decode(encryptedBytes);
+
     // 将加密后的字节数组转换为 Base64 编码的字符串
-    return btoa(decodedString);
+    return uint8ArrayToBase64(encryptedBytes);
+}
+
+// 将 Uint8Array 转换为 Base64 编码的字符串
+function uint8ArrayToBase64(uint8Array: Uint8Array): string {
+    let binary = "";
+    const chunkSize = 8192; // 分块大小
+    for (let i = 0; i < uint8Array.length; i += chunkSize) {
+        const chunk = uint8Array.subarray(i, i + chunkSize);
+        // @ts-ignore
+        binary += String.fromCharCode.apply(null, chunk);
+    }
+    return btoa(binary);
 }
 
 // AES解密函数
 function aesDecrypt(encryptedBase64: string, key: string): string {
-    // 将密文的 Base64 编码的字符串转换为字节数组
-    const encryptedBytes = new Uint8Array(
-        atob(encryptedBase64)
-            .split("")
-            .map((char) => char.charCodeAt(0))
-    );
-    // 将密钥转换为 UTF-8 编码的字节数组
+    // 将密钥转换为 UTF-8 编码的字节数组，并确保长度为 16、24 或 32 字节
     const keyBytes = new TextEncoder().encode(key);
+    const paddedKey = new Uint8Array(32);
+    paddedKey.set(keyBytes.subarray(0, 32));
+
+    // 将 Base64 编码的字符串转换为加密后的字节数组
+    const encryptedBytes = base64ToUint8Array(encryptedBase64);
+
     // 使用 AES-CTR 模式进行解密
-    const aesCtr = new ModeOfOperation.ctr(keyBytes);
+    const aesCtr = new ModeOfOperation.ctr(paddedKey);
     const decryptedBytes = aesCtr.decrypt(encryptedBytes);
+
     // 将解密后的字节数组转换为 UTF-8 编码的字符串
     return new TextDecoder().decode(decryptedBytes);
+}
+
+// 将 Base64 编码的字符串转换为 Uint8Array
+function base64ToUint8Array(base64: string): Uint8Array {
+    const binaryString = atob(base64);
+    const len = binaryString.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+    }
+    return bytes;
 }
 
 const getKey = () => {

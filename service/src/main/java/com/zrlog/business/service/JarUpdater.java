@@ -31,7 +31,7 @@ public record JarUpdater(String[] args, String fileName) implements Updater {
                 cmdArgs.add("--port=" + ZrLogUtil.getPort(args));
             }
             try {
-                LOGGER.info("ZrLog file updated. exec cmd\n" + Arrays.toString(cmdArgs.toArray()));
+                LOGGER.info("ZrLog file updated. exec cmd\n" + String.join(" ", cmdArgs));
                 Thread.sleep(2000);
                 Runtime.getRuntime().exec(cmdArgs.toArray(new String[0]));
                 System.exit(0);

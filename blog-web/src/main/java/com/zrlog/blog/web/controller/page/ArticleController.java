@@ -6,6 +6,7 @@ import com.hibegin.http.server.web.Controller;
 import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.business.rest.request.CreateCommentRequest;
 import com.zrlog.business.rest.response.CreateCommentResponse;
+import com.zrlog.business.service.ArticleService;
 import com.zrlog.business.service.CommentService;
 import com.zrlog.business.service.VisitorArticleService;
 import com.zrlog.business.util.PagerUtil;
@@ -13,7 +14,6 @@ import com.zrlog.common.Constants;
 import com.zrlog.common.rest.request.PageRequest;
 import com.zrlog.common.rest.request.PageRequestImpl;
 import com.zrlog.data.dto.PageData;
-import com.zrlog.model.Comment;
 import com.zrlog.model.Log;
 import com.zrlog.model.Type;
 import com.zrlog.util.I18nUtil;
@@ -33,6 +33,7 @@ public class ArticleController extends Controller {
     private final VisitorArticleService visitorArticleService = new VisitorArticleService();
 
     private final CommentService commentService = new CommentService();
+    private final ArticleService articleService = new ArticleService();
 
     /**
      * add page info for template more easy
@@ -118,23 +119,13 @@ public class ArticleController extends Controller {
 
     public String detail() throws SQLException {
         String uri = getRequest().getUri();
-        return detail(uri.replace("/", "").replace(".html", ""));
+        Map<String, Object> detail = articleService.detail(uri.replace("/", "").replace(".html", ""));
+        if (Objects.nonNull(detail)) {
+            request.getAttr().put("log", detail);
+        }
+        return "detail";
     }
 
-    private String detail(Object idOrAlias) throws SQLException {
-        Map<String, Object> log = new Log().findByIdOrAlias(idOrAlias);
-        if (log != null) {
-            Integer logId = (Integer) log.get("logId");
-            Map<String, Object> lastLog = Objects.requireNonNullElse(new Log().findLastLog(logId), new HashMap<>(Map.of("title", I18nUtil.getBlogStringFromRes("noLastLog"), "alias", idOrAlias)));
-            Map<String, Object> nextLog = Objects.requireNonNullElse(new Log().findNextLog(logId), new HashMap<>(Map.of("title", I18nUtil.getBlogStringFromRes("noNextLog"), "alias", idOrAlias)));
-            log.put("lastLog", lastLog);
-            log.put("nextLog", nextLog);
-            log.put("comments", new Comment().findAllByLogId(logId));
-            getRequest().getAttr().put("log", log);
-            return "detail";
-        }
-        return "index";
-    }
 
     private static ArticleUriInfoVO parseUriInfo(String uri) {
         String rawUrl = uri;

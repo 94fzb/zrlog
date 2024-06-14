@@ -3,7 +3,7 @@
     <#if tipsType?has_content>
         <div style="padding-bottom: 12px">
             <h3>${tipsType}目录：${tipsName}</h3>
-            <h4>以下是与${tipsType} “${tipsName}” 相关联的文章</h4>
+            <p style="font-size: 18px">以下是与${tipsType} “${tipsName}” 相关联的文章</p>
         </div>
     </#if>
     <#if data?has_content && data.rows?has_content>

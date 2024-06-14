@@ -1,4 +1,4 @@
-const CACHE_NAME = 'my-cache-v2';
+const CACHE_NAME = 'my-cache-v3';
 const urlsToCache = [
     '/admin/index',
     '/admin/article-edit',
@@ -6,10 +6,10 @@ const urlsToCache = [
     '/admin/offline',
     '/admin/website',
     '/admin/website',
-    '/admin/website?tab=admin',
-    '/admin/website?tab=template',
-    '/admin/website?tab=other',
-    '/admin/website?tab=upgrade',
+    '/admin/website/admin',
+    '/admin/website/template',
+    '/admin/website/other',
+    '/admin/website/upgrade',
     '/admin/template-config?template=/include/templates/default',
     '/admin/type',
     '/admin/link',

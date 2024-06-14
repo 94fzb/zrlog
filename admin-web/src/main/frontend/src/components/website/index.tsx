@@ -12,15 +12,6 @@ import UpgradeSettingForm from "./UpgradeSettingForm";
 import { Link } from "react-router-dom";
 import AdminForm from "./AdminForm";
 
-export interface Data {
-    basic: Basic;
-    blog: Blog;
-    other: Other;
-    upgrade: Upgrade;
-    admin: Admin;
-    templates: TemplateEntry[];
-}
-
 export interface Basic {
     second_title: string;
     title: string;
@@ -48,6 +39,7 @@ export interface Blog {
 export interface Other {
     icp: string;
     webCm: string;
+    robotRuleContent: string;
 }
 
 export interface Upgrade {
@@ -55,17 +47,59 @@ export interface Upgrade {
     upgradePreview: boolean;
 }
 
-const WebSite = ({ data }: { data: Data }) => {
-    const tab = new URLSearchParams(window.location.search).get("tab");
-    const activeKey = tab ? tab : "basic";
-
+const WebSite = ({ data }: { data: Basic | Admin | Upgrade | Other | Blog | TemplateEntry[] }) => {
+    let activeKey = window.location.pathname.replace("/admin/website", "").replace("/", "");
+    if (activeKey === "") {
+        activeKey = "basic";
+    }
     const buildLink = (key: string, text: string) => {
-        const toUrl = key === "basic" ? "/website" : "/website?tab=" + key;
+        const toUrl = key === "basic" ? "/website" : "/website/" + key;
         return (
             <Link to={toUrl} replace={true} style={{ color: activeKey === key ? getColorPrimary() : "inherit" }}>
                 {text}
             </Link>
         );
+    };
+
+    const getItemBody = () => {
+        if (activeKey === "basic") {
+            return (
+                <Row>
+                    <Col xs={24} style={{ maxWidth: 600 }}>
+                        <BasicForm data={data as Basic} />
+                    </Col>
+                </Row>
+            );
+        } else if (activeKey === "blog") {
+            return (
+                <Row>
+                    <Col xs={24} style={{ maxWidth: 600 }}>
+                        <BlogForm data={data as Blog} />
+                    </Col>
+                </Row>
+            );
+        } else if (activeKey === "admin") {
+            return (
+                <Row>
+                    <Col xs={24} style={{ maxWidth: 600 }}>
+                        <AdminForm data={data as Admin} />
+                    </Col>
+                </Row>
+            );
+        } else if (activeKey === "template") {
+            return <Index data={data as TemplateEntry[]} />;
+        } else if (activeKey === "other") {
+            return (
+                <Row>
+                    <Col xs={24} style={{ maxWidth: 600 }}>
+                        <OtherForm data={data as Other} />
+                    </Col>
+                </Row>
+            );
+        } else if (activeKey === "upgrade") {
+            return <UpgradeSettingForm data={data as Upgrade} />;
+        }
+        return <></>;
     };
 
     return (
@@ -80,56 +114,32 @@ const WebSite = ({ data }: { data: Data }) => {
                     {
                         key: "basic",
                         label: buildLink("basic", "基本信息"),
-                        children: (
-                            <Row>
-                                <Col xs={24} style={{ maxWidth: 600 }}>
-                                    <BasicForm data={data.basic} />
-                                </Col>
-                            </Row>
-                        ),
+                        children: getItemBody(),
                     },
                     {
                         key: "blog",
                         label: buildLink("blog", "博客设置"),
-                        children: (
-                            <Row>
-                                <Col xs={24} style={{ maxWidth: 600 }}>
-                                    <BlogForm data={data.blog} />
-                                </Col>
-                            </Row>
-                        ),
+                        children: getItemBody(),
                     },
                     {
                         key: "admin",
                         label: buildLink("admin", "管理设置"),
-                        children: (
-                            <Row>
-                                <Col xs={24} style={{ maxWidth: 600 }}>
-                                    <AdminForm data={data.admin} />
-                                </Col>
-                            </Row>
-                        ),
+                        children: getItemBody(),
                     },
                     {
                         key: "template",
                         label: buildLink("template", getRes()["admin.template.manage"]),
-                        children: <Index data={data.templates} />,
+                        children: getItemBody(),
                     },
                     {
                         key: "other",
                         label: buildLink("other", "其他设置"),
-                        children: (
-                            <Row>
-                                <Col xs={24} style={{ maxWidth: 600 }}>
-                                    <OtherForm data={data.other} />
-                                </Col>
-                            </Row>
-                        ),
+                        children: getItemBody(),
                     },
                     {
                         key: "upgrade",
                         label: buildLink("upgrade", getRes()["admin.upgrade.manage"]),
-                        children: <UpgradeSettingForm data={data.upgrade} />,
+                        children: getItemBody(),
                     },
                 ]}
             />

@@ -1,10 +1,10 @@
 package com.zrlog.web.inteceptor;
 
 import com.hibegin.common.util.LoggerUtil;
+import com.hibegin.http.server.api.HandleAbleInterceptor;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
 import com.zrlog.admin.web.token.AdminTokenThreadLocal;
-import com.zrlog.blog.web.interceptor.HandleAbleInterceptor;
 import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.business.util.PluginHelper;
 import com.zrlog.common.Constants;
@@ -84,7 +84,7 @@ public class PluginInterceptor implements HandleAbleInterceptor {
         String target = request.getUri();
         if (Objects.equals(notGoodAdminUriPath, target)) {
             response.redirect(adminPluginUriPath);
-            return true;
+            return false;
         }
         AdminTokenVO entry = null;
         try {
@@ -107,6 +107,6 @@ public class PluginInterceptor implements HandleAbleInterceptor {
                 AdminTokenThreadLocal.remove();
             }
         }
-        return true;
+        return false;
     }
 }

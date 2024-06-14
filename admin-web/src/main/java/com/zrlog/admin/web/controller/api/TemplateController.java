@@ -28,6 +28,7 @@ import com.zrlog.util.I18nUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -145,7 +146,16 @@ public class TemplateController extends Controller {
 
     @ResponseBody
     public ApiStandardResponse<TemplateDownloadResponse> templateCenter() {
-        TemplateDownloadResponse downloadResponse = new TemplateDownloadResponse("https://store.zrlog.com/template/index.html?from=" + AdminTokenThreadLocal.getUserProtocol() + "://" + getRequest().getHeader("Host") + "/admin/template&v=" + BlogBuildInfoUtil.getVersion() + "&id=" + BlogBuildInfoUtil.getBuildId() + "&upgrade-v3=true");
+        String host = request.getParaToStr("host");
+        if (StringUtils.isEmpty(host)) {
+            String referer = request.getHeader("referer");
+            if (StringUtils.isNotEmpty(referer)) {
+                host = URI.create(referer).getAuthority();
+            } else {
+                host = getRequest().getHeader("Host");
+            }
+        }
+        TemplateDownloadResponse downloadResponse = new TemplateDownloadResponse("https://store.zrlog.com/template/index.html?from=" + AdminTokenThreadLocal.getUserProtocol() + "://" + host + "/admin/template&v=" + BlogBuildInfoUtil.getVersion() + "&id=" + BlogBuildInfoUtil.getBuildId() + "&upgrade-v3=true");
         return new ApiStandardResponse<>(downloadResponse);
     }
 }

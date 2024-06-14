@@ -59,7 +59,7 @@ const BasicForm = ({ data }: { data: Basic }) => {
                 <Form.Item name="description" label="网站描述">
                     <TextArea rows={5} />
                 </Form.Item>
-                <Form.Item name="favicon_ico_base64" label="Favicon">
+                <Form.Item name="favicon_ico_base64" label={`${getRes()["favicon"]}`}>
                     <FaviconUpload
                         url={form.favicon_ico_base64}
                         onChange={(e) => {

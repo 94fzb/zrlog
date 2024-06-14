@@ -1,0 +1,32 @@
+name: build on macos amd64 release native
+on:
+  push:
+    branches:
+      - release
+jobs:
+  build:
+    name: ZrLog on ${{ matrix.os }} ${{ matrix.architecture }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ macos-13 ]
+        architecture: [ x86_64 ]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '21'
+          distribution: 'graalvm' # See 'Options' for all available distributions
+          cache: 'maven'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          native-image-job-reports: 'true'
+
+      - name: Build and upload binary
+        run: |
+          brew install coreutils
+          mkdir -p /tmp/download
+          bash -e bin/build-final-native.sh release 正式版本 /tmp/download unix
+          bash -e bin/upload-bin.sh ${{ secrets.SECRET_ID }} ${{ secrets.SECRET_KEY }} ${{ secrets.BUCKET }} /tmp/download release

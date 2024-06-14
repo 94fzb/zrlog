@@ -5,6 +5,8 @@ import com.zrlog.admin.web.controller.api.*;
 import com.zrlog.admin.web.controller.page.AdminPageController;
 import com.zrlog.admin.web.controller.page.AdminTemplatePageController;
 import com.zrlog.blog.web.controller.api.ApiInstallController;
+import com.zrlog.blog.web.controller.api.BlogApiArticleController;
+import com.zrlog.blog.web.controller.api.BlogApiCacheController;
 import com.zrlog.blog.web.controller.api.BlogApiPublicController;
 import com.zrlog.blog.web.controller.page.ArticleController;
 import com.zrlog.blog.web.controller.page.InstallController;
@@ -37,6 +39,11 @@ public class RouterUtils {
         router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/comment", AdminPageController.class, "index");
         router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/plugin", AdminPageController.class, "index");
         router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/website", AdminPageController.class, "index");
+        router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/website/blog", AdminPageController.class, "index");
+        router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/website/other", AdminPageController.class, "index");
+        router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/website/admin", AdminPageController.class, "index");
+        router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/website/template", AdminPageController.class, "index");
+        router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/website/upgrade", AdminPageController.class, "index");
         router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/nav", AdminPageController.class, "index");
         router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/template-config", AdminPageController.class, "index");
         router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/user", AdminPageController.class, "index");
@@ -61,6 +68,7 @@ public class RouterUtils {
         router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/nav", BlogNavController.class);
         router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/article", AdminArticleController.class);
         router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/website", WebSiteController.class);
+        router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/website/template", TemplateController.class, "index");
         router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/template", TemplateController.class);
         router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/template-config", TemplateController.class, "configParams");
         router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/template-center", TemplateController.class, "templateCenter");
@@ -79,6 +87,8 @@ public class RouterUtils {
         router.addMapper("/api/public", BlogApiPublicController.class);
         router.addMapper(InstallUtils.INSTALL_ROUTER_PATH, InstallController.class);
         router.addMapper("/", ArticleController.class);
+        router.addMapper("/api/article", BlogApiArticleController.class);
+        router.addMapper("/api/cache", BlogApiCacheController.class);
         router.addMapper("/api" + InstallUtils.INSTALL_ROUTER_PATH, ApiInstallController.class);
     }
 }

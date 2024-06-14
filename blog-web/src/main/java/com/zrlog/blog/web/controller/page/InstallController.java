@@ -2,8 +2,6 @@ package com.zrlog.blog.web.controller.page;
 
 import com.google.gson.Gson;
 import com.hibegin.common.util.IOUtil;
-import com.hibegin.http.server.api.HttpRequest;
-import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.web.Controller;
 import com.zrlog.business.service.CommonService;
 import com.zrlog.common.Constants;
@@ -34,7 +32,7 @@ public class InstallController extends Controller {
         //clean history
         document.body().removeClass("dark");
         document.body().removeClass("light");
-        document.selectFirst("base").attr("href", "/");
+        Objects.requireNonNull(document.selectFirst("base")).attr("href", "/");
         Map<String, Object> stringObjectMap = new CommonService().installResourceInfo(getRequest());
         Objects.requireNonNull(document.getElementById("resourceInfo")).text(new Gson().toJson(stringObjectMap));
         document.title(String.valueOf(stringObjectMap.get("installWizard")));

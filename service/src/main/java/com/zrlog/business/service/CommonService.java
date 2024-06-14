@@ -21,6 +21,20 @@ public class CommonService {
         }
         Map<String, Object> stringObjectMap = Objects.requireNonNullElse(I18nUtil.getBlog().get(I18nUtil.getCurrentLocale()), new HashMap<>());
         PublicInfoVO publicInfoVO = getPublicInfo(request);
+        stringObjectMap.put("websiteTitle", publicInfoVO.websiteTitle());
+        stringObjectMap.put("homeUrl", publicInfoVO.homeUrl());
+        stringObjectMap.put("articleRoute", "");
+        stringObjectMap.put("admin_darkMode", publicInfoVO.admin_darkMode());
+        stringObjectMap.put("buildId", BlogBuildInfoUtil.getBuildId());
+        return stringObjectMap;
+    }
+
+    public Map<String, Object> adminResourceInfo(HttpRequest request) {
+        if (Objects.isNull(I18nUtil.threadLocal.get())) {
+            return new HashMap<>();
+        }
+        Map<String, Object> stringObjectMap = Objects.requireNonNullElse(I18nUtil.getAdmin().get(I18nUtil.getCurrentLocale()), new HashMap<>());
+        PublicInfoVO publicInfoVO = getPublicInfo(request);
         stringObjectMap.put("currentVersion", publicInfoVO.currentVersion());
         stringObjectMap.put("websiteTitle", publicInfoVO.websiteTitle());
         stringObjectMap.put("homeUrl", publicInfoVO.homeUrl());

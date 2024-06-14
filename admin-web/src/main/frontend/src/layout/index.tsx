@@ -12,6 +12,8 @@ import SliderMenu from "./slider";
 import { BasicUserInfo } from "../type";
 import { ssData } from "../index";
 import axios from "axios";
+import MyLoadingComponent from "../components/my-loading-component";
+import PWAHandler from "../PWAHandler";
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Text } = Typography;
@@ -218,7 +220,11 @@ const StyledIndexLayout = styled("div")`
     }
 `;
 
-const AdminManageLayout: FunctionComponent<PropsWithChildren> = ({ children }) => {
+type AdminManageLayoutProps = PropsWithChildren & {
+    loading: boolean;
+};
+
+const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ children, loading }) => {
     const [userInfo, setUser] = useState<BasicUserInfo | undefined>(ssData?.user);
 
     useEffect(() => {
@@ -231,52 +237,57 @@ const AdminManageLayout: FunctionComponent<PropsWithChildren> = ({ children }) =
 
     // @ts-ignore
     return (
-        <StyledIndexLayout>
-            <Header
-                style={{
-                    backgroundColor: EnvUtils.isDarkMode() ? "#1f1f1f" : "#011529",
-                }}
-            >
-                <a
-                    href={getRes()["homeUrl"] + "?spm=admin&buildId=" + getRes()["buildId"]}
-                    id="logo"
-                    target="_blank"
-                    title={getRes()["websiteTitle"]}
-                    rel="noopener noreferrer"
+        <PWAHandler>
+            <StyledIndexLayout>
+                <Header
+                    style={{
+                        backgroundColor: EnvUtils.isDarkMode() ? "#1f1f1f" : "#011529",
+                    }}
                 >
-                    <HomeOutlined />
-                </a>
-                {userInfo && <UserInfo data={userInfo} />}
-            </Header>
-            <Row>
-                <Sider
-                    width={70}
-                    style={{ minHeight: "100vh", backgroundColor: EnvUtils.isDarkMode() ? "#1f1f1f" : "#001529" }}
-                >
-                    <SliderMenu />
-                </Sider>
-                <Col style={{ flex: 1, width: 100 }}>
-                    <Layout style={{ minHeight: "100vh" }}>
-                        <Content>{children}</Content>
-                        <Footer>
-                            <Row>
-                                <Col xs={24} md={12}>
-                                    <div
-                                        className="ant-layout-footer-copyright"
-                                        dangerouslySetInnerHTML={{
-                                            __html: getRes().copyrightTips + ". All Rights Reserved.",
-                                        }}
-                                    />
-                                </Col>
-                                <Col xs={0} md={12}>
-                                    <Text style={{ float: "right" }}>Version {getRes().currentVersion}</Text>
-                                </Col>
-                            </Row>
-                        </Footer>
-                    </Layout>
-                </Col>
-            </Row>
-        </StyledIndexLayout>
+                    <a
+                        href={getRes()["homeUrl"] + "?spm=admin&buildId=" + getRes()["buildId"]}
+                        id="logo"
+                        target="_blank"
+                        title={getRes()["websiteTitle"]}
+                        rel="noopener noreferrer"
+                    >
+                        <HomeOutlined />
+                    </a>
+                    {userInfo && <UserInfo data={userInfo} />}
+                </Header>
+                <Row>
+                    <Sider
+                        width={70}
+                        style={{ minHeight: "100vh", backgroundColor: EnvUtils.isDarkMode() ? "#1f1f1f" : "#001529" }}
+                    >
+                        <SliderMenu />
+                    </Sider>
+                    <Col style={{ flex: 1, width: 100 }}>
+                        <Layout style={{ minHeight: "100vh" }}>
+                            <Content>
+                                {loading && <MyLoadingComponent />}
+                                {children}
+                            </Content>
+                            <Footer>
+                                <Row>
+                                    <Col xs={24} md={12}>
+                                        <div
+                                            className="ant-layout-footer-copyright"
+                                            dangerouslySetInnerHTML={{
+                                                __html: getRes().copyrightTips + ". All Rights Reserved.",
+                                            }}
+                                        />
+                                    </Col>
+                                    <Col xs={0} md={12}>
+                                        <Text style={{ float: "right" }}>Version {getRes().currentVersion}</Text>
+                                    </Col>
+                                </Row>
+                            </Footer>
+                        </Layout>
+                    </Col>
+                </Row>
+            </StyledIndexLayout>
+        </PWAHandler>
     );
 };
 

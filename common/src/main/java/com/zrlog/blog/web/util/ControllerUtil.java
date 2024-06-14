@@ -1,4 +1,4 @@
-package com.zrlog.admin.business.util;
+package com.zrlog.blog.web.util;
 
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.server.web.Controller;

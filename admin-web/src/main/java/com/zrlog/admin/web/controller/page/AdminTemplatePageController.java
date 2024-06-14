@@ -23,7 +23,7 @@ public class AdminTemplatePageController extends Controller {
     public void download() throws IOException, URISyntaxException, InterruptedException {
         String downloadUrl = request.getParaToStr("downloadUrl");
         TemplateDownloadPlugin.installByUrl(downloadUrl);
-        response.redirect(Constants.ADMIN_URI_BASE_PATH + "/website?tab=template");
+        response.redirect(Constants.ADMIN_URI_BASE_PATH + "/website/template");
     }
 
     public void previewImage() {
@@ -36,8 +36,9 @@ public class AdminTemplatePageController extends Controller {
             response.renderCode(404);
         }
         if (templateVO.getPreviewImage().startsWith("/include/templates")) {
+            response.addHeader("Cache-Control", "max-age=31536000, immutable"); // 1 年的秒数
+            response.getHeader().put("Content-Type", MimeTypeUtil.getMimeStrByExt(FileUtils.getFileExt(templateVO.getPreviewImage())));
             if (Objects.equals(templateVO.getTemplate(), Constants.DEFAULT_TEMPLATE_PATH)) {
-                response.getHeader().put("Content-Type", MimeTypeUtil.getMimeStrByExt(FileUtils.getFileExt(templateVO.getPreviewImage())));
                 response.write(AdminTemplatePageController.class.getResourceAsStream(templateVO.getPreviewImage()));
             } else {
                 response.writeFile(PathUtil.getStaticFile(templateVO.getPreviewImage()));

@@ -20,5 +20,6 @@
   "cache_html_size",
   "rows",
   "staticResourceHost",
-  "template"
+  "template",
+  "robotRuleContent"
 ]
