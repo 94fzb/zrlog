@@ -23,7 +23,7 @@ public class AdminPwaInterceptor implements HandleAbleInterceptor {
 
     private final List<String> resourceUris = new ArrayList<>();
     private final String adminServiceWorkerJs = "/admin/service-worker.js";
-    private final Set<String> files = new LinkedHashSet<>();
+    private final Set<String> cacheUris = new LinkedHashSet<>();
 
     public static void main(String[] args) {
         System.out.println("js = " + IOUtil.getStringInputStream(new AdminPwaInterceptor().renderServiceWorker()));
@@ -40,12 +40,12 @@ public class AdminPwaInterceptor implements HandleAbleInterceptor {
                 });
                 Map<String, Object> staticFiles = (Map<String, Object>) map.get("files");
                 if (Objects.nonNull(staticFiles)) {
-                    files.addAll(staticFiles.values().stream().filter(e -> ((String) e).endsWith(".js")).map(e -> ((String) e).replace("./", "/")).toList());
+                    cacheUris.addAll(staticFiles.values().stream().filter(e -> ((String) e).endsWith(".js")).map(e -> ((String) e).replace("./", "/")).toList());
                 }
             }
             if (StringUtils.isNotEmpty(strVendors)) {
                 for (String file : strVendors.split("\n")) {
-                    files.add("/admin/" + file);
+                    cacheUris.add("/admin/" + file);
                 }
             }
         }
@@ -64,7 +64,7 @@ public class AdminPwaInterceptor implements HandleAbleInterceptor {
 
     private ByteArrayInputStream renderServiceWorker() {
         StringJoiner sb = new StringJoiner(",\n    ");
-        files.forEach(e -> {
+        cacheUris.forEach(e -> {
             sb.add("'" + e + "'");
         });
         return new ByteArrayInputStream(IOUtil.getStringInputStream(AdminPwaInterceptor.class.getResourceAsStream(adminServiceWorkerJs)).replace("'___FILES___'", sb.toString()).getBytes());

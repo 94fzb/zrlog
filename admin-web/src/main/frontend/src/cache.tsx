@@ -100,10 +100,21 @@ export const putCache = (cache: Record<string, any>) => {
     }
 };
 
+export const addToCache = (key: string, obj: any) => {
+    const record = getCachedData();
+    record[key] = obj;
+    putCache(record);
+};
+
+export const getCacheByKey = (key: string) => {
+    const record = getCachedData();
+    return record[key];
+};
+
 export const deleteCacheDataByKey = (key: string) => {
     const data: Record<string, any> = getCachedData();
+    console.info("deleted -> " + key + "==" + data[key]);
     delete data[key];
-    console.info(data);
     putCache(data);
 };
 

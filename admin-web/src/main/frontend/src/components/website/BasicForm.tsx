@@ -16,7 +16,7 @@ const layout = {
     wrapperCol: { span: 16 },
 };
 
-const BasicForm = ({ data }: { data: Basic }) => {
+const BasicForm = ({ data, offline }: { data: Basic; offline: boolean }) => {
     const [form, setForm] = useState<Basic>(data);
 
     const { message } = App.useApp();
@@ -68,7 +68,7 @@ const BasicForm = ({ data }: { data: Basic }) => {
                     />
                 </Form.Item>
                 <Divider />
-                <Button type="primary" htmlType="submit">
+                <Button disabled={offline} type="primary" htmlType="submit">
                     {getRes().submit}
                 </Button>
             </Form>

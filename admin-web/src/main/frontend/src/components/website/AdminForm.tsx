@@ -19,7 +19,7 @@ const layout = {
 
 const { Option } = Select;
 
-const BlogForm = ({ data }: { data: Admin }) => {
+const BlogForm = ({ data, offline }: { data: Admin; offline: boolean }) => {
     const [form, setForm] = useState<Admin>(data);
     const { message } = App.useApp();
 
@@ -110,7 +110,7 @@ const BlogForm = ({ data }: { data: Admin }) => {
                     />
                 </Form.Item>
                 <Divider />
-                <Button type="primary" htmlType="submit">
+                <Button disabled={offline} type="primary" htmlType="submit">
                     {getRes().submit}
                 </Button>
             </Form>

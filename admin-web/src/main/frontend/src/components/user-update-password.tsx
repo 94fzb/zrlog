@@ -12,7 +12,7 @@ const layout = {
     wrapperCol: { span: 16 },
 };
 
-const UserUpdatePassword = () => {
+const UserUpdatePassword = ({ offline }: { offline: boolean }) => {
     const { message } = App.useApp();
 
     const onFinish = (allValues: Record<string, any>) => {
@@ -53,7 +53,7 @@ const UserUpdatePassword = () => {
                             <Input.Password />
                         </Form.Item>
                         <Divider />
-                        <Button type="primary" htmlType="submit">
+                        <Button disabled={offline} type="primary" htmlType="submit">
                             {getRes().submit}
                         </Button>
                     </Form>

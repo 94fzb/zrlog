@@ -47,7 +47,13 @@ export interface Upgrade {
     upgradePreview: boolean;
 }
 
-const WebSite = ({ data }: { data: Basic | Admin | Upgrade | Other | Blog | TemplateEntry[] }) => {
+const WebSite = ({
+    data,
+    offline,
+}: {
+    data: Basic | Admin | Upgrade | Other | Blog | TemplateEntry[];
+    offline: boolean;
+}) => {
     let activeKey = window.location.pathname.replace("/admin/website", "").replace("/", "");
     if (activeKey === "") {
         activeKey = "basic";
@@ -66,7 +72,7 @@ const WebSite = ({ data }: { data: Basic | Admin | Upgrade | Other | Blog | Temp
             return (
                 <Row>
                     <Col xs={24} style={{ maxWidth: 600 }}>
-                        <BasicForm data={data as Basic} />
+                        <BasicForm offline={offline} data={data as Basic} />
                     </Col>
                 </Row>
             );
@@ -74,7 +80,7 @@ const WebSite = ({ data }: { data: Basic | Admin | Upgrade | Other | Blog | Temp
             return (
                 <Row>
                     <Col xs={24} style={{ maxWidth: 600 }}>
-                        <BlogForm data={data as Blog} />
+                        <BlogForm offline={offline} data={data as Blog} />
                     </Col>
                 </Row>
             );
@@ -82,7 +88,7 @@ const WebSite = ({ data }: { data: Basic | Admin | Upgrade | Other | Blog | Temp
             return (
                 <Row>
                     <Col xs={24} style={{ maxWidth: 600 }}>
-                        <AdminForm data={data as Admin} />
+                        <AdminForm offline={offline} data={data as Admin} />
                     </Col>
                 </Row>
             );
@@ -92,12 +98,12 @@ const WebSite = ({ data }: { data: Basic | Admin | Upgrade | Other | Blog | Temp
             return (
                 <Row>
                     <Col xs={24} style={{ maxWidth: 600 }}>
-                        <OtherForm data={data as Other} />
+                        <OtherForm offline={offline} data={data as Other} />
                     </Col>
                 </Row>
             );
         } else if (activeKey === "upgrade") {
-            return <UpgradeSettingForm data={data as Upgrade} />;
+            return <UpgradeSettingForm offline={offline} data={data as Upgrade} />;
         }
         return <></>;
     };

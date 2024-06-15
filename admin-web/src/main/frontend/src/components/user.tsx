@@ -23,7 +23,7 @@ type BasicUserInfo = {
     email: string;
 };
 
-const User = ({ data }: { data: BasicUserInfo }) => {
+const User = ({ data, offline }: { data: BasicUserInfo; offline: boolean }) => {
     const [userInfo, setUserInfo] = useState<BasicUserInfo>(data);
     const { message } = App.useApp();
 
@@ -92,7 +92,7 @@ const User = ({ data }: { data: BasicUserInfo }) => {
                         </Form.Item>
                         <Divider />
                         <Form.Item>
-                            <Button type="primary" htmlType="submit">
+                            <Button disabled={offline} type="primary" htmlType="submit">
                                 {getRes().submit}
                             </Button>
                         </Form.Item>

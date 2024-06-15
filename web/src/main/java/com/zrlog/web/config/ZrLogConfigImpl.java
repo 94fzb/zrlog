@@ -12,12 +12,14 @@ import com.hibegin.http.server.config.RequestConfig;
 import com.hibegin.http.server.config.ResponseConfig;
 import com.hibegin.http.server.config.ServerConfig;
 import com.zaxxer.hikari.util.DriverDataSource;
+import com.zrlog.admin.web.config.AdminRouters;
 import com.zrlog.admin.web.interceptor.AdminInterceptor;
 import com.zrlog.admin.web.interceptor.AdminPwaInterceptor;
 import com.zrlog.admin.web.plugin.PluginCorePlugin;
 import com.zrlog.admin.web.plugin.PluginCoreProcessImpl;
 import com.zrlog.admin.web.plugin.UpdateVersionPlugin;
 import com.zrlog.admin.web.token.AdminTokenService;
+import com.zrlog.blog.web.config.BlogRouters;
 import com.zrlog.blog.web.controller.api.ApiInstallController;
 import com.zrlog.blog.web.interceptor.BlogApiInterceptor;
 import com.zrlog.blog.web.interceptor.BlogInstallInterceptor;
@@ -106,8 +108,8 @@ public class ZrLogConfigImpl extends ZrLogConfig {
             }
         });
         StaticResourceInterceptor.staticResourcePath.forEach(e -> serverConfig.addStaticResourceMapper(e, e, ZrLogConfigImpl.class::getResourceAsStream));
-        RouterUtils.configAdminRoute(serverConfig.getRouter());
-        RouterUtils.configBlogRouter(serverConfig.getRouter());
+        AdminRouters.configAdminRoute(serverConfig.getRouter());
+        BlogRouters.configBlogRouter(serverConfig.getRouter());
         configInterceptor(serverConfig.getInterceptors());
         serverConfig.setPort(port);
         installFinish();

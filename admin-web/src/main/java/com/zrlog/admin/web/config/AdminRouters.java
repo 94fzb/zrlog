@@ -1,21 +1,14 @@
-package com.zrlog.web.config;
+package com.zrlog.admin.web.config;
 
 import com.hibegin.http.server.web.Router;
 import com.zrlog.admin.web.controller.api.*;
 import com.zrlog.admin.web.controller.page.AdminPageController;
 import com.zrlog.admin.web.controller.page.AdminTemplatePageController;
-import com.zrlog.blog.web.controller.api.ApiInstallController;
-import com.zrlog.blog.web.controller.api.BlogApiArticleController;
-import com.zrlog.blog.web.controller.api.BlogApiCacheController;
-import com.zrlog.blog.web.controller.api.BlogApiPublicController;
-import com.zrlog.blog.web.controller.page.ArticleController;
-import com.zrlog.blog.web.controller.page.InstallController;
 import com.zrlog.business.service.TemplateInfoHelper;
-import com.zrlog.business.util.InstallUtils;
 import com.zrlog.common.Constants;
 
+public class AdminRouters {
 
-public class RouterUtils {
     /**
      * 后台管理者路由，这里目前分为2中情况，及服务端响应模板页面和用户对数据的操作
      * 约定
@@ -76,19 +69,5 @@ public class RouterUtils {
         router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/upgrade", UpgradeController.class);
         router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/user", AdminUserController.class);
 
-    }
-
-    /**
-     * 添加浏览者能访问Control 路由
-     *
-     * @param router
-     */
-    public static void configBlogRouter(Router router) {
-        router.addMapper("/api/public", BlogApiPublicController.class);
-        router.addMapper(InstallUtils.INSTALL_ROUTER_PATH, InstallController.class);
-        router.addMapper("/", ArticleController.class);
-        router.addMapper("/api/article", BlogApiArticleController.class);
-        router.addMapper("/api/cache", BlogApiCacheController.class);
-        router.addMapper("/api" + InstallUtils.INSTALL_ROUTER_PATH, ApiInstallController.class);
     }
 }

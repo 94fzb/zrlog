@@ -93,7 +93,7 @@ public class AdminPageController extends Controller {
                 throw e.getTargetException();
             }
         } else {
-            return new ServerSideDataResponse(null, resourceInfo, null, null, Constants.getAdminTitle("login"));
+            return new ServerSideDataResponse(null, resourceInfo, null, null, Constants.getAdminTitle(I18nUtil.getAdminStringFromRes("login")));
         }
     }
 

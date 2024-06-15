@@ -7,11 +7,11 @@
     <meta name="description" content="${description!''}"/>
     <meta name="keywords" content="${keywords!''}"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
-    <link rel="stylesheet" type="text/css" media="screen" href="${url}/css/bootstrap.min.css"/>
-    <link rel="stylesheet" type="text/css" media="screen" href="${url}/css/style_v3.css"/>
-    <link rel="stylesheet" type="text/css" media="screen" href="${url}/css/editormd.css"/>
-    <script src="${url}/js/jquery-1.10.2.min.js"></script>
-    <script src="${url}/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="${url}/css/bootstrap.min.css"/>
+    <link rel="stylesheet" type="text/css" href="${url}/css/editormd.css"/>
+    <link rel="stylesheet" type="text/css" href="${url}/css/style_v3.css"/>
+
+    <script src="${url}/js/bootstrap.bundle.min.js"></script>
     <script src="${url}/js/auto-theme.js"></script>
 </head>
 <body>
@@ -21,13 +21,12 @@
            href="${rurl}"><#if _res.navBarBrand?has_content>
                 <b>${_res.navBarBrand}</b>
             </#if></a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
+            <ul class="navbar-nav me-auto">
                 <#list init.logNavs as lognav>
                     <li class="nav-item<#if lognav.current> active</#if>">
                         <a class="nav-link" href="${lognav.url}">${lognav.navName}</a>

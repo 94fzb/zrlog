@@ -223,9 +223,10 @@ const StyledIndexLayout = styled("div")`
 type AdminManageLayoutProps = PropsWithChildren & {
     loading: boolean;
     fullScreen?: boolean;
+    offline: boolean;
 };
 
-const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ children, loading, fullScreen }) => {
+const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ offline, children, loading, fullScreen }) => {
     const [userInfo, setUser] = useState<BasicUserInfo | undefined>(ssData?.user);
 
     useEffect(() => {
@@ -253,8 +254,22 @@ const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ children
                         rel="noopener noreferrer"
                     >
                         <HomeOutlined />
+                        {offline && (
+                            <span
+                                style={{
+                                    display: "inline-block",
+                                    textAlign: "center",
+                                    fontSize: 20,
+                                    paddingLeft: 24,
+                                    userSelect: "none",
+                                    color: getColorPrimary(),
+                                }}
+                            >
+                                {getRes()["admin.offline.desc"]}
+                            </span>
+                        )}
                     </a>
-                    {userInfo && <UserInfo data={userInfo} />}
+                    {userInfo && <UserInfo offline={offline} data={userInfo} />}
                 </Header>
                 <Row>
                     <Sider

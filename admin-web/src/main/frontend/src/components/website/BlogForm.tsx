@@ -15,7 +15,7 @@ const layout = {
     wrapperCol: { span: 16 },
 };
 
-const BlogForm = ({ data }: { data: Blog }) => {
+const BlogForm = ({ data, offline }: { data: Blog; offline?: boolean }) => {
     const [form, setForm] = useState<any>(data);
     const { message } = App.useApp();
 
@@ -59,7 +59,7 @@ const BlogForm = ({ data }: { data: Blog }) => {
                     <Switch size={"small"} />
                 </Form.Item>
                 <Divider />
-                <Button type="primary" htmlType="submit">
+                <Button type="primary" disabled={offline} htmlType="submit">
                     {getRes().submit}
                 </Button>
             </Form>

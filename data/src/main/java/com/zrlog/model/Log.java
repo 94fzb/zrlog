@@ -78,7 +78,7 @@ public class Log extends BasePageableDAO implements Serializable {
     }
 
     public long findMaxId() throws SQLException {
-        return Objects.requireNonNullElse((Long) queryFirstObj("select max(logId) max from " + tableName), 0L);
+        return Objects.requireNonNullElse((Number) queryFirstObj("select max(logId) max from " + tableName), 0).longValue();
 
     }
 

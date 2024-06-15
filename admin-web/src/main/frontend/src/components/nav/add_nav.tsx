@@ -9,7 +9,7 @@ const layout = {
     wrapperCol: { span: 20 },
 };
 
-const AddNav = ({ addSuccessCall }: { addSuccessCall: () => void }) => {
+const AddNav = ({ addSuccessCall, offline }: { offline: boolean; addSuccessCall: () => void }) => {
     const [showModel, setShowModel] = useState<boolean>(false);
     const [form, setForm] = useState<any>();
     const { message } = App.useApp();
@@ -31,7 +31,7 @@ const AddNav = ({ addSuccessCall }: { addSuccessCall: () => void }) => {
 
     return (
         <>
-            <Button type="primary" onClick={() => setShowModel(true)} style={{ marginBottom: 8 }}>
+            <Button type="primary" disabled={offline} onClick={() => setShowModel(true)} style={{ marginBottom: 8 }}>
                 {getRes()["add"]}
             </Button>
             <Modal title={getRes()["add"]} open={showModel} onOk={handleOk} onCancel={() => setShowModel(false)}>

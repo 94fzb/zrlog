@@ -19,7 +19,7 @@ import ThumbnailUpload from "./thumbnail-upload";
 import BaseInput from "../../common/BaseInput";
 import BaseTextArea from "../../common/BaseTextArea";
 import Form from "antd/es/form";
-import { getPageFullState } from "../../cache";
+import { addToCache, deleteCacheDataByKey, getCacheByKey, getPageFullState } from "../../cache";
 import { getFullPath } from "../../utils/helpers";
 import { useLocation } from "react-router";
 
@@ -46,6 +46,7 @@ type ArticleEditState = {
     editorInitSuccess: boolean;
     article: ArticleEntry;
     saving: ArticleSavingState;
+    offline: boolean;
 };
 
 type ArticleSavingState = {
@@ -140,10 +141,32 @@ export type ArticleEditProps = {
     data: ArticleEditInfo;
     onExitFullScreen: () => void;
     onFullScreen: () => void;
+    offline: boolean;
 };
 
-const dataToState = (data: ArticleEditInfo, fullScreen: boolean): ArticleEditState => {
+const buildCacheKey = (newArticle: ArticleEntry) => {
+    return "local-article-info-" + (newArticle && newArticle.logId && newArticle.logId > 0 ? newArticle.logId : -1);
+};
+
+const dataToState = (data: ArticleEditInfo, fullScreen: boolean, offline: boolean): ArticleEditState => {
+    const article: ArticleEntry =
+        data.article.logId && data.article.logId > 0
+            ? data.article
+            : {
+                  version: -1,
+                  title: "",
+                  keywords: "",
+              };
+    const cachedArticle = getCacheByKey(buildCacheKey(article)) as ArticleEntry;
+    const realArticle = {
+        ...article,
+        ...cachedArticle,
+        //use input version
+        version: data.article.version,
+    };
+    //console.info("debug => " + JSON.stringify(realArticle));
     return {
+        offline: offline,
         typeOptions: data.types
             ? data.types.map((x) => {
                   return { value: x.id, label: x.typeName };
@@ -153,14 +176,7 @@ const dataToState = (data: ArticleEditInfo, fullScreen: boolean): ArticleEditSta
         fullScreen: fullScreen,
         tags: data.tags ? data.tags : [],
         rubbish: data.article && data.article.rubbish ? data.article.rubbish : false,
-        article: data.article
-            ? data.article
-            : {
-                  typeId: -1,
-                  version: -1,
-                  title: "",
-                  keywords: "",
-              },
+        article: realArticle,
         saving: {
             previewIng: false,
             releaseSaving: false,
@@ -170,9 +186,13 @@ const dataToState = (data: ArticleEditInfo, fullScreen: boolean): ArticleEditSta
     };
 };
 
-const Index: FunctionComponent<ArticleEditProps> = ({ data, onExitFullScreen, onFullScreen }) => {
+const saveToCache = (article: ArticleEntry) => {
+    addToCache(buildCacheKey(article), article);
+};
+
+const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullScreen, onFullScreen }) => {
     const location = useLocation();
-    const defaultState = dataToState(data, getPageFullState(getFullPath(location)));
+    const defaultState = dataToState(data, getPageFullState(getFullPath(location)), offline);
 
     const [state, setState] = useState<ArticleEditState>(defaultState);
 
@@ -216,12 +236,30 @@ const Index: FunctionComponent<ArticleEditProps> = ({ data, onExitFullScreen, on
                 };
             });
         }
-        exitTips(getRes()["articleEditExitWithOutSaveSuccess"]);
         let newArticle = {
             ...article,
             version: state.article.version,
             rubbish: !release,
         };
+        const ck = buildCacheKey(newArticle);
+        if (offline) {
+            saveToCache(newArticle);
+            setState((prevState) => {
+                return {
+                    ...prevState,
+                    article: newArticle,
+                    saving: {
+                        ...prevState.saving,
+                        releaseSaving: false,
+                        rubbishSaving: false,
+                        previewIng: false,
+                        autoSaving: false,
+                    },
+                };
+            });
+            return;
+        }
+        exitTips(getRes()["articleEditExitWithOutSaveSuccess"]);
         try {
             const { data } = await axios.post(uri, newArticle);
             if (data.error) {
@@ -257,6 +295,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({ data, onExitFullScreen, on
                     version: respData.version,
                 };
             }
+            deleteCacheDataByKey(ck);
         } finally {
             if (release) {
                 setState((prevState) => {
@@ -386,8 +425,31 @@ const Index: FunctionComponent<ArticleEditProps> = ({ data, onExitFullScreen, on
     }, [content]);
 
     useEffect(() => {
-        setState(dataToState(data, getPageFullState(getFullPath(location))));
-    }, [data]);
+        const lastOffline = state.offline;
+        //离线，保存到本地编辑
+        if (!lastOffline && offline) {
+            saveToCache(state.article);
+            setState((prevState) => {
+                return {
+                    ...prevState,
+                    offline: true,
+                };
+            });
+            return;
+        }
+        const newSate = dataToState(data, getPageFullState(getFullPath(location)), offline);
+        setState(newSate);
+        //如果网络恢复，自动保存一次
+        if (lastOffline && !offline) {
+            handleValuesChange(newSate.article)
+                .then(() => {
+                    //ignore
+                })
+                .catch((e) => {
+                    message.error(e);
+                });
+        }
+    }, [data, offline]);
 
     useEffect(() => {
         return () => {
@@ -433,19 +495,24 @@ const Index: FunctionComponent<ArticleEditProps> = ({ data, onExitFullScreen, on
     };
 
     const getRubbishText = () => {
-        if (!state.rubbish) {
-            return <Col xxl={3} md={3} sm={4} style={{ padding: 0 }} />;
-        }
         let tips;
-        if (state.article.lastUpdateDate && state.article.lastUpdateDate > 0) {
-            tips = (
-                <>
-                    <TimeAgo timestamp={state.article.lastUpdateDate} />
-                    更新
-                </>
-            );
+        if (state.offline) {
+            tips = getRes()["admin.offline.article-editing"];
         } else {
-            tips = "当前为草稿";
+            if (!state.rubbish) {
+                return <Col xxl={3} md={3} sm={4} style={{ padding: 0 }} />;
+            }
+
+            if (state.article.lastUpdateDate && state.article.lastUpdateDate > 0) {
+                tips = (
+                    <>
+                        <TimeAgo timestamp={state.article.lastUpdateDate} />
+                        更新
+                    </>
+                );
+            } else {
+                tips = "当前为草稿";
+            }
         }
         return (
             <Col xxl={3} md={3} sm={4} className={state.fullScreen ? "save-text-full-screen" : ""}>
@@ -485,7 +552,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({ data, onExitFullScreen, on
                     <Button
                         type={state.fullScreen ? "default" : "dashed"}
                         style={{ width: "100%" }}
-                        disabled={state.saving.rubbishSaving && !state.saving.autoSaving}
+                        disabled={state.offline || (state.saving.rubbishSaving && !state.saving.autoSaving)}
                         onClick={async () => await onSubmit(state.article, false, false, false)}
                     >
                         <SaveOutlined hidden={state.saving.rubbishSaving} />
@@ -496,7 +563,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({ data, onExitFullScreen, on
                     <Col xxl={2} md={3} sm={4}>
                         <Button
                             type="dashed"
-                            disabled={state.saving.previewIng && !state.saving.autoSaving}
+                            disabled={state.offline || (state.saving.previewIng && !state.saving.autoSaving)}
                             style={{ width: "100%" }}
                             onClick={async () => await onSubmit(state.article, !state.rubbish, true, false)}
                         >
@@ -508,6 +575,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({ data, onExitFullScreen, on
                 <Col xxl={2} md={3} sm={4} className={state.fullScreen ? "save-btn-full-screen" : ""}>
                     <Button
                         type="primary"
+                        disabled={state.offline}
                         loading={state.saving.releaseSaving}
                         style={{ width: "100%" }}
                         onClick={async () => {
@@ -570,10 +638,10 @@ const Index: FunctionComponent<ArticleEditProps> = ({ data, onExitFullScreen, on
                     style={{ zIndex: 10, minHeight: state.fullScreen ? 0 : 1 }}
                 >
                     <MyEditorMdWrapper
-                        key={data.article.version + "" + data.article.logId}
+                        key={data.article.version + "" + data.article.logId + "_offline:" + state.offline}
                         onfullscreen={onfullscreen}
                         onfullscreenExit={onfullscreenExit}
-                        markdown={data.article.markdown}
+                        markdown={state.article.markdown}
                         onChange={async (v) => {
                             if (
                                 v.markdown === "" &&

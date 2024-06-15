@@ -15,7 +15,7 @@ const layout = {
     wrapperCol: { span: 16 },
 };
 
-const OtherForm = ({ data }: { data: Other }) => {
+const OtherForm = ({ data, offline }: { data: Other; offline: boolean }) => {
     const [form, setForm] = useState<any>(data);
     const { message } = App.useApp();
 
@@ -55,7 +55,7 @@ const OtherForm = ({ data }: { data: Other }) => {
                     <TextArea rows={7} placeholder={"User-agent: *\n" + "Disallow: "} />
                 </Form.Item>
                 <Divider />
-                <Button type="primary" htmlType="submit">
+                <Button disabled={offline} type="primary" htmlType="submit">
                     {getRes().submit}
                 </Button>
             </Form>

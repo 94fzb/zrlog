@@ -5,7 +5,7 @@ import { getRes } from "../../utils/constants";
 import AddNav from "./add_nav";
 import EditNav from "./edit_nav";
 
-const Nav = ({ data }: { data: PageDataSource }) => {
+const Nav = ({ data, offline }: { data: PageDataSource; offline: boolean }) => {
     const getColumns = () => {
         return [
             {
@@ -44,7 +44,7 @@ const Nav = ({ data }: { data: PageDataSource }) => {
                 hideId={true}
                 columns={getColumns()}
                 addBtnRender={(addSuccessCall) => {
-                    return <AddNav addSuccessCall={addSuccessCall} />;
+                    return <AddNav offline={offline} addSuccessCall={addSuccessCall} />;
                 }}
                 editBtnRender={(_id, record, editSuccessCall) => (
                     <EditNav record={record} editSuccessCall={editSuccessCall} />

@@ -539,4 +539,18 @@ li.page-item {
     aside {
         box-shadow: 0 0 2px rgba(198, 198, 198, 0.5);
     }
+
+    .markdown-body table th,
+    .markdown-body table td {
+        border: 1px solid rgba(198, 198, 198, 0.5);
+    }
+
+    .markdown-body table tr {
+        background-color: #212529 !important;
+        border-top: 1px solid rgba(198, 198, 198, 0.5);
+    }
+
+    .markdown-body table tr:nth-child(2n) {
+        background-color: #212529 !important;
+    }
 }

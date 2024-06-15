@@ -14,7 +14,7 @@ logs
 .settings
 target
 hs_err*.log
-static/
+/static/
 conf/classes
 conf/plugins/*
 web/log

@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom";
-import { lazy, Suspense, useEffect, useState } from "react";
+import { FunctionComponent, lazy, Suspense, useEffect, useState } from "react";
 import { useLocation } from "react-router";
 import { getCsrData } from "./api";
 import MyLoadingComponent from "./components/my-loading-component";
@@ -50,6 +50,7 @@ type AdminDashboardRouterState = {
     currentUri: string;
     axiosRequesting: boolean;
     fullScreen: boolean;
+    offline: boolean;
     data: Record<string, any>;
 };
 
@@ -66,7 +67,11 @@ const updateDocumentTitle = (newDocumentTitle: string) => {
     }
 };
 
-const AdminDashboardRouter = () => {
+type AdminDashboardRouterProps = {
+    offline: boolean;
+};
+
+const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({ offline }) => {
     const location = useLocation();
     const pwaLastOpenedPage = isPWA() ? getLastOpenedPage() : null;
     const defaultFullScreen = getPageFullState(pwaLastOpenedPage ? pwaLastOpenedPage : getFullPath(location));
@@ -76,6 +81,7 @@ const AdminDashboardRouter = () => {
         firstRender: ssData && ssData.pageData,
         currentUri: location.pathname + location.search,
         axiosRequesting: false,
+        offline: offline,
         fullScreen: defaultFullScreen,
         data: { ...getCachedData(), [location.pathname + location.search]: ssData?.pageData },
     });
@@ -97,18 +103,22 @@ const AdminDashboardRouter = () => {
                     return;
                 }
                 mergeData[uri] = data;
-                setState({
-                    firstRender: false,
-                    axiosRequesting: false,
-                    currentUri: uri,
-                    data: mergeData,
-                    fullScreen: getPageFullState(getFullPath(location)),
+                setState((prevState) => {
+                    return {
+                        offline: prevState.offline,
+                        firstRender: false,
+                        axiosRequesting: false,
+                        currentUri: uri,
+                        data: mergeData,
+                        fullScreen: getPageFullState(getFullPath(location)),
+                    };
                 });
                 putCache(mergeData);
             })
             .finally(() => {
                 setState((prevState) => {
                     return {
+                        offline: prevState.offline,
                         currentUri: uri,
                         firstRender: false,
                         axiosRequesting: false,
@@ -129,6 +139,7 @@ const AdminDashboardRouter = () => {
                         fullScreen: getPageFullState(getFullPath(location)),
                         firstRender: false,
                         axiosRequesting: false,
+                        offline: prevState.offline,
                         data: prevState.data,
                     };
                 });
@@ -141,12 +152,22 @@ const AdminDashboardRouter = () => {
                         firstRender: false,
                         fullScreen: getPageFullState(getFullPath(location)),
                         data: prevState.data,
+                        offline: prevState.offline,
                     };
                 });
             }
         }
         loadData(uri, location);
     }, [location.pathname, location.search]);
+
+    useEffect(() => {
+        setState((prevState) => {
+            return {
+                ...prevState,
+                offline: offline,
+            };
+        });
+    }, [offline]);
 
     //console.info(location.pathname + "," + JSON.stringify(state));
 
@@ -155,7 +176,19 @@ const AdminDashboardRouter = () => {
             <Route
                 path="index"
                 element={
-                    <AdminManageLayout loading={state.axiosRequesting}>
+                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
+                        {getDataFromState() && (
+                            <Suspense fallback={<MyLoadingComponent />}>
+                                <AsyncIndex data={getDataFromState()} />
+                            </Suspense>
+                        )}
+                    </AdminManageLayout>
+                }
+            />
+            <Route
+                path=""
+                element={
+                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
                                 <AsyncIndex data={getDataFromState()} />
@@ -167,7 +200,7 @@ const AdminDashboardRouter = () => {
             <Route
                 path="comment"
                 element={
-                    <AdminManageLayout loading={state.axiosRequesting}>
+                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
                                 <AsyncComment data={getDataFromState()} />
@@ -179,7 +212,7 @@ const AdminDashboardRouter = () => {
             <Route
                 path="plugin"
                 element={
-                    <AdminManageLayout loading={state.axiosRequesting}>
+                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
                         <Suspense fallback={<MyLoadingComponent />}>
                             <AsyncPlugin />
                         </Suspense>
@@ -189,10 +222,10 @@ const AdminDashboardRouter = () => {
             <Route
                 path={"website"}
                 element={
-                    <AdminManageLayout loading={state.axiosRequesting}>
+                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncWebSite data={getDataFromState()} />
+                                <AsyncWebSite offline={state.offline} data={getDataFromState()} />
                             </Suspense>
                         )}
                     </AdminManageLayout>
@@ -201,10 +234,10 @@ const AdminDashboardRouter = () => {
             <Route
                 path={"website/admin"}
                 element={
-                    <AdminManageLayout loading={state.axiosRequesting}>
+                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncWebSite data={getDataFromState()} />
+                                <AsyncWebSite offline={state.offline} data={getDataFromState()} />
                             </Suspense>
                         )}
                     </AdminManageLayout>
@@ -213,10 +246,10 @@ const AdminDashboardRouter = () => {
             <Route
                 path={"website/template"}
                 element={
-                    <AdminManageLayout loading={state.axiosRequesting}>
+                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncWebSite data={getDataFromState()} />
+                                <AsyncWebSite offline={state.offline} data={getDataFromState()} />
                             </Suspense>
                         )}
                     </AdminManageLayout>
@@ -225,10 +258,10 @@ const AdminDashboardRouter = () => {
             <Route
                 path={"website/other"}
                 element={
-                    <AdminManageLayout loading={state.axiosRequesting}>
+                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncWebSite data={getDataFromState()} />
+                                <AsyncWebSite offline={state.offline} data={getDataFromState()} />
                             </Suspense>
                         )}
                     </AdminManageLayout>
@@ -237,10 +270,10 @@ const AdminDashboardRouter = () => {
             <Route
                 path={"website/blog"}
                 element={
-                    <AdminManageLayout loading={state.axiosRequesting}>
+                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncWebSite data={getDataFromState()} />
+                                <AsyncWebSite offline={state.offline} data={getDataFromState()} />
                             </Suspense>
                         )}
                     </AdminManageLayout>
@@ -249,10 +282,10 @@ const AdminDashboardRouter = () => {
             <Route
                 path={"website/upgrade"}
                 element={
-                    <AdminManageLayout loading={state.axiosRequesting}>
+                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncWebSite data={getDataFromState()} />
+                                <AsyncWebSite offline={state.offline} data={getDataFromState()} />
                             </Suspense>
                         )}
                     </AdminManageLayout>
@@ -261,10 +294,10 @@ const AdminDashboardRouter = () => {
             <Route
                 path="article-type"
                 element={
-                    <AdminManageLayout loading={state.axiosRequesting}>
+                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncType data={getDataFromState()} />
+                                <AsyncType offline={state.offline} data={getDataFromState()} />
                             </Suspense>
                         )}
                     </AdminManageLayout>
@@ -273,10 +306,10 @@ const AdminDashboardRouter = () => {
             <Route
                 path="link"
                 element={
-                    <AdminManageLayout loading={state.axiosRequesting}>
+                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncLink data={getDataFromState()} />
+                                <AsyncLink offline={state.offline} data={getDataFromState()} />
                             </Suspense>
                         )}
                     </AdminManageLayout>
@@ -285,10 +318,10 @@ const AdminDashboardRouter = () => {
             <Route
                 path="nav"
                 element={
-                    <AdminManageLayout loading={state.axiosRequesting}>
+                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncNav data={getDataFromState()} />
+                                <AsyncNav offline={state.offline} data={getDataFromState()} />
                             </Suspense>
                         )}
                     </AdminManageLayout>
@@ -297,7 +330,7 @@ const AdminDashboardRouter = () => {
             <Route
                 path="article"
                 element={
-                    <AdminManageLayout loading={state.axiosRequesting}>
+                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
                                 <AsyncArticle data={getDataFromState()} />
@@ -309,10 +342,15 @@ const AdminDashboardRouter = () => {
             <Route
                 path="article-edit"
                 element={
-                    <AdminManageLayout loading={state.axiosRequesting} fullScreen={state.fullScreen}>
+                    <AdminManageLayout
+                        offline={state.offline}
+                        loading={state.axiosRequesting}
+                        fullScreen={state.fullScreen}
+                    >
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
                                 <AsyncArticleEdit
+                                    offline={state.offline}
                                     onFullScreen={() => {
                                         setState((prevState) => {
                                             return {
@@ -339,10 +377,10 @@ const AdminDashboardRouter = () => {
             <Route
                 path="user"
                 element={
-                    <AdminManageLayout loading={state.axiosRequesting}>
+                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncUser data={getDataFromState()} />
+                                <AsyncUser offline={state.offline} data={getDataFromState()} />
                             </Suspense>
                         )}
                     </AdminManageLayout>
@@ -351,7 +389,7 @@ const AdminDashboardRouter = () => {
             <Route
                 path="template-center"
                 element={
-                    <AdminManageLayout loading={state.axiosRequesting}>
+                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
                                 <AsyncTemplateCenter data={getDataFromState()} />
@@ -363,9 +401,9 @@ const AdminDashboardRouter = () => {
             <Route
                 path="user-update-password"
                 element={
-                    <AdminManageLayout loading={state.axiosRequesting}>
+                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
                         <Suspense fallback={<MyLoadingComponent />}>
-                            <AsyncUserUpdatePassword />
+                            <AsyncUserUpdatePassword offline={state.offline} />
                         </Suspense>
                     </AdminManageLayout>
                 }
@@ -373,7 +411,7 @@ const AdminDashboardRouter = () => {
             <Route
                 path="upgrade"
                 element={
-                    <AdminManageLayout loading={state.axiosRequesting}>
+                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
                                 <AsyncUpgrade
@@ -388,7 +426,7 @@ const AdminDashboardRouter = () => {
             <Route
                 path="template-config"
                 element={
-                    <AdminManageLayout loading={state.axiosRequesting}>
+                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
                                 <AsyncTemplateConfig data={getDataFromState()} />

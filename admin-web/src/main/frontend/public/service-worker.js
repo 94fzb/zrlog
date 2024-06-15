@@ -1,24 +1,45 @@
-const CACHE_NAME = 'my-cache-v3';
+const CACHE_NAME = 'my-cache-v4';
 const urlsToCache = [
     '/admin/index',
+    '/api/admin/index',
     '/admin/article-edit',
+    '/api/admin/article-edit',
     '/admin/article',
+    '/admin/article-type',
+    '/api/admin/article-type',
+    '/api/admin/article',
     '/admin/offline',
+    '/api/admin/offline',
     '/admin/website',
-    '/admin/website',
+    '/api/admin/website',
+    '/admin/website/blog',
+    '/api/admin/website/blog',
     '/admin/website/admin',
+    '/api/admin/website/admin',
     '/admin/website/template',
+    '/api/admin/website/template',
     '/admin/website/other',
+    '/api/admin/website/other',
     '/admin/website/upgrade',
+    '/api/admin/website/upgrade',
     '/admin/template-config?template=/include/templates/default',
+    '/api/admin/template-config?template=/include/templates/default',
     '/admin/type',
+    '/api/admin/type',
     '/admin/link',
+    '/api/admin/link',
     '/admin/nav',
+    '/api/admin/nav',
     '/admin/comment',
+    '/api/admin/comment',
     '/admin/user',
+    '/api/admin/user',
     '/admin/user-update-password',
+    '/api/admin/user-update-password',
     '/admin/plugin',
+    '/api/admin/plugin',
     '/admin/upgrade',
+    '/api/admin/upgrade',
     '___FILES___'
     // 其他需要缓存的静态资源路径
 ];
@@ -31,7 +52,9 @@ self.addEventListener('install', event => {
 
 self.addEventListener('fetch', event => {
     const request = event.request;
-
+    if (request.protocol === 'chrome-extension:') {
+        return;
+    }
     event.respondWith(
         fetch(request)
             .then(response => {

@@ -5,7 +5,7 @@ import { getRes } from "../../utils/constants";
 import EditLink from "./edit_link";
 import AddLink from "./add_link";
 
-const BLink = ({ data }: { data: PageDataSource }) => {
+const BLink = ({ data, offline }: { data: PageDataSource; offline: boolean }) => {
     const getColumns = () => {
         return [
             {
@@ -50,7 +50,7 @@ const BLink = ({ data }: { data: PageDataSource }) => {
                 hideId={true}
                 columns={getColumns()}
                 addBtnRender={(addSuccessCall) => {
-                    return <AddLink addSuccessCall={addSuccessCall} />;
+                    return <AddLink offline={offline} addSuccessCall={addSuccessCall} />;
                 }}
                 datasource={data}
                 editBtnRender={(_id, record, editSuccessCall) => (

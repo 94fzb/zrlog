@@ -9,7 +9,7 @@ import ErrorBoundary from "./common/ErrorBoundary";
 const AsyncLogin = lazy(() => import("components/login"));
 const AsyncAdminDashboardRouter = lazy(() => import("AdminDashboardRouter"));
 
-const AppBase = () => {
+const AppBase = ({ offline }: { offline: boolean }) => {
     const { modal, message } = App.useApp();
 
     const initAxios = () => {
@@ -83,11 +83,21 @@ const AppBase = () => {
                     }
                 />
                 <Route
+                    path={"logout"}
+                    element={
+                        <ErrorBoundary>
+                            <Suspense fallback={<Spin spinning={true} fullscreen delay={1000} />}>
+                                <AsyncLogin />
+                            </Suspense>
+                        </ErrorBoundary>
+                    }
+                />
+                <Route
                     path={"*"}
                     element={
                         <ErrorBoundary>
                             <Suspense fallback={<Spin spinning={true} fullscreen delay={1000} />}>
-                                <AsyncAdminDashboardRouter />
+                                <AsyncAdminDashboardRouter offline={offline} />
                             </Suspense>
                         </ErrorBoundary>
                     }

@@ -22,7 +22,7 @@ type UpgradeFormState = {
     upgradePreview: boolean;
 };
 
-const UpgradeSettingForm = ({ data }: { data: Upgrade }) => {
+const UpgradeSettingForm = ({ data, offline }: { data: Upgrade; offline: boolean }) => {
     const [checking, setChecking] = useState<boolean>(false);
     const { modal, message } = App.useApp();
     const [form, setForm] = useState<UpgradeFormState>(data);
@@ -119,7 +119,7 @@ const UpgradeSettingForm = ({ data }: { data: Upgrade }) => {
                             <Switch size={"small"} />
                         </Form.Item>
                         <Divider />
-                        <Button type="primary" htmlType="submit">
+                        <Button disabled={offline} type="primary" htmlType="submit">
                             {getRes().submit}
                         </Button>
                     </Form>

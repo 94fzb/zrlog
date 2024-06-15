@@ -25,6 +25,7 @@ type AppState = {
     resLoaded: boolean;
     resLoadErrorMsg: string;
     dark: boolean;
+    offline: boolean;
     lang: string;
     colorPrimary: string;
 };
@@ -44,11 +45,17 @@ if (ssDataStr?.length > 0) {
 } else {
     ssData = {};
 }
+
+const isOffline = () => {
+    return !navigator.onLine;
+};
+
 const Index = () => {
     const [appState, setAppState] = useState<AppState>({
         resLoaded: false,
         resLoadErrorMsg: "",
         lang: "zh_CN",
+        offline: isOffline(),
         dark: EnvUtils.isDarkMode(),
         colorPrimary: getColorPrimary(),
     });
@@ -61,12 +68,15 @@ const Index = () => {
                 handleRes(data.data);
             })
             .catch((e) => {
-                setAppState({
-                    dark: document.body.className.includes("dark"),
-                    resLoadErrorMsg: "Request " + resourceApi + " error -> " + e.message,
-                    resLoaded: false,
-                    lang: "zh_CN",
-                    colorPrimary: getColorPrimary(),
+                setAppState((prevState) => {
+                    return {
+                        dark: document.body.className.includes("dark"),
+                        resLoadErrorMsg: "Request " + resourceApi + " error -> " + e.message,
+                        resLoaded: false,
+                        lang: "zh_CN",
+                        offline: prevState.offline,
+                        colorPrimary: getColorPrimary(),
+                    };
                 });
             });
     };
@@ -75,12 +85,15 @@ const Index = () => {
         data.copyrightTips =
             data.copyright + ' <a target="_blank" href="https://blog.zrlog.com/about.html?footer">ZrLog</a>';
         setRes(data);
-        setAppState({
-            lang: data.lang,
-            dark: EnvUtils.isDarkMode(),
-            resLoadErrorMsg: "",
-            resLoaded: true,
-            colorPrimary: getColorPrimary(),
+        setAppState((prevState) => {
+            return {
+                lang: data.lang,
+                offline: prevState.offline,
+                dark: EnvUtils.isDarkMode(),
+                resLoadErrorMsg: "",
+                resLoaded: true,
+                colorPrimary: getColorPrimary(),
+            };
         });
     };
 
@@ -97,8 +110,24 @@ const Index = () => {
         }
     };
 
+    const updateOnlineStatus = () => {
+        setAppState((prevState) => {
+            return {
+                ...prevState,
+                offline: isOffline(),
+            };
+        });
+    };
+
     useEffect(() => {
+        window.addEventListener("online", updateOnlineStatus);
+        window.addEventListener("offline", updateOnlineStatus);
         initRes();
+        // Cleanup event listeners on component unmount
+        return () => {
+            window.removeEventListener("online", updateOnlineStatus);
+            window.removeEventListener("offline", updateOnlineStatus);
+        };
     }, []);
 
     return (
@@ -132,7 +161,7 @@ const Index = () => {
                 <StyleProvider transformers={[legacyLogicalPropertiesTransformer]}>
                     <BrowserRouter basename={basePath}>
                         {appState.resLoaded ? (
-                            <AppBase />
+                            <AppBase offline={appState.offline} />
                         ) : appState.resLoadErrorMsg.length === 0 ? (
                             <Spin delay={1000} style={{ maxHeight: "100vh" }}>
                                 <div style={{ width: "100vw", height: "100vh" }}></div>

@@ -5,7 +5,7 @@ import BaseTable, { PageDataSource } from "../../common/BaseTable";
 import AddType from "./add_type";
 import EditType from "./edit_type";
 
-const Type = ({ data }: { data: PageDataSource }) => {
+const Type = ({ data, offline }: { data: PageDataSource; offline: boolean }) => {
     const getColumns = () => {
         return [
             {
@@ -52,7 +52,7 @@ const Type = ({ data }: { data: PageDataSource }) => {
                 hideId={true}
                 columns={getColumns()}
                 addBtnRender={(addSuccessCall) => {
-                    return <AddType addSuccessCall={addSuccessCall} />;
+                    return <AddType offline={offline} addSuccessCall={addSuccessCall} />;
                 }}
                 editBtnRender={(_id, record, editSuccessCall) => (
                     <EditType record={record} editSuccessCall={editSuccessCall} />
