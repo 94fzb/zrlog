@@ -446,7 +446,7 @@ export const StyledEditor = styled("div")`
     }
 
     .editormd-grid-table-row a {
-        font-size: 1.4em;
+        font-size: 1.4rem;
         width: 5%;
         height: 36px;
         color: #999;
@@ -576,7 +576,7 @@ export const StyledEditor = styled("div")`
     }
 
     .editormd-form .fa-btns .fa {
-        font-size: 1.3em;
+        font-size: 1.3rem;
     }
 
     .editormd-form .fa-btns label {
@@ -828,7 +828,7 @@ export const StyledEditor = styled("div")`
 
     .markdown-body h1,
     .markdown-body h2 {
-        padding-bottom: 0.3em;
+        padding-bottom: 0.3rem;
         border-bottom: 1px solid #eee;
     }
 
@@ -895,7 +895,7 @@ export const StyledEditor = styled("div")`
     .markdown-body h5,
     .markdown-body h6 {
         position: relative;
-        margin-top: 1em;
+        margin-top: 1rem;
         margin-bottom: 16px;
         font-weight: 700;
         line-height: 1.4;
@@ -933,7 +933,7 @@ export const StyledEditor = styled("div")`
     }
 
     .markdown-body h1 {
-        font-size: 2.25em;
+        font-size: 2.25rem;
         line-height: 1.2;
     }
 
@@ -942,7 +942,7 @@ export const StyledEditor = styled("div")`
     }
 
     .markdown-body h2 {
-        font-size: 1.75em;
+        font-size: 1.75rem;
         line-height: 1.225;
     }
 
@@ -951,7 +951,7 @@ export const StyledEditor = styled("div")`
     }
 
     .markdown-body h3 {
-        font-size: 1.5em;
+        font-size: 1.5rem;
         line-height: 1.43;
     }
 
@@ -961,7 +961,7 @@ export const StyledEditor = styled("div")`
     }
 
     .markdown-body h4 {
-        font-size: 1.25em;
+        font-size: 1.25rem;
     }
 
     .markdown-body h5 .anchor,
@@ -970,11 +970,11 @@ export const StyledEditor = styled("div")`
     }
 
     .markdown-body h5 {
-        font-size: 1em;
+        font-size: 1rem;
     }
 
     .markdown-body h6 {
-        font-size: 1em;
+        font-size: 1rem;
         color: #777;
     }
 
@@ -991,7 +991,7 @@ export const StyledEditor = styled("div")`
 
     .markdown-body ol,
     .markdown-body ul {
-        padding-left: 2em;
+        padding-left: 2rem;
     }
 
     .markdown-body ol ol,
@@ -1013,7 +1013,7 @@ export const StyledEditor = styled("div")`
     .markdown-body dl dt {
         padding: 0;
         margin-top: 16px;
-        font-size: 1em;
+        font-size: 1rem;
         font-style: italic;
         font-weight: 700;
     }
@@ -1082,7 +1082,7 @@ export const StyledEditor = styled("div")`
 
     .markdown-body code:after,
     .markdown-body code:before {
-        letter-spacing: -0.2em;
+        letter-spacing: -0.2rem;
         content: "\\00a0";
     }
 
@@ -1263,7 +1263,7 @@ export const StyledEditor = styled("div")`
 
     .markdown-body .task-list-item input {
         float: left;
-        margin: 0.3em 0 0.25em -1.6em;
+        margin: 0.3em 0 0.25em -1.6rem;
         vertical-align: middle;
     }
 
@@ -1362,7 +1362,7 @@ export const StyledEditor = styled("div")`
 
     .editormd-html-preview .katex,
     .editormd-preview-container .katex {
-        font-size: 1.4em;
+        font-size: 1.4rem;
     }
 
     .editormd-html-preview .flowchart,
@@ -1518,7 +1518,7 @@ export const StyledEditor = styled("div")`
     .editormd-html-preview ol.linenums,
     .editormd-preview-container ol.linenums {
         color: #999;
-        padding-left: 2.5em;
+        padding-left: 2.5rem;
     }
 
     .editormd-html-preview ol.linenums li,
@@ -1549,7 +1549,7 @@ export const StyledEditor = styled("div")`
         border-radius: 4px;
         border: 1px solid #ddd;
         display: inline-block;
-        font-size: 1em;
+        font-size: 1rem;
     }
 
     .editormd-html-preview .editormd-toc-menu > .markdown-toc > ul,
@@ -1697,7 +1697,7 @@ export const StyledEditor = styled("div")`
     .editormd-preview-container .editormd-toc-menu .toc-menu-btn .fa {
         float: right;
         padding: 3px 0 0 10px;
-        font-size: 1.3em;
+        font-size: 1.3rem;
     }
 
     .markdown-body .editormd-toc-menu ul {
@@ -1774,7 +1774,7 @@ export const StyledEditor = styled("div")`
 
     .editormd-preview-theme-dark .editormd-preview-container blockquote {
         color: #555;
-        padding: 0.5em;
+        padding: 0.5rem;
         background: #222;
         border-color: #333;
     }

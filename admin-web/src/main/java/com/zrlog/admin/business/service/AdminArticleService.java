@@ -33,8 +33,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
@@ -63,7 +63,7 @@ public class AdminArticleService {
             String path = url;
             byte[] bytes;
             if (url.startsWith("https://") || url.startsWith("http://")) {
-                path = new URL(url).getPath();
+                path = URI.create(url).getPath();
                 if (!path.startsWith(Constants.ATTACHED_FOLDER)) {
                     path = (Constants.ATTACHED_FOLDER + path).replace("//", "/");
                 } else {
@@ -168,7 +168,7 @@ public class AdminArticleService {
 
     private Map<String, Object> getLog(AdminTokenVO adminTokenVO, CreateArticleRequest createArticleRequest) throws SQLException {
         Map<String, Object> log;
-        int articleId;
+        long articleId;
         if (createArticleRequest instanceof UpdateArticleRequest) {
             log = new Log().loadById(((UpdateArticleRequest) createArticleRequest).getLogId());
             articleId = Objects.requireNonNull(((UpdateArticleRequest) createArticleRequest).getLogId());
@@ -219,7 +219,7 @@ public class AdminArticleService {
         log.put("editor_type", createArticleRequest.getEditorType());
         String alias;
         if (StringUtils.isEmpty(createArticleRequest.getAlias())) {
-            alias = Integer.toString(articleId);
+            alias = Long.toString(articleId);
         } else {
             alias = createArticleRequest.getAlias();
         }

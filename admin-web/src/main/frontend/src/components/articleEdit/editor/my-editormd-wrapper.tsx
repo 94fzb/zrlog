@@ -4,7 +4,7 @@ import Spin from "antd/es/spin";
 import { message } from "antd";
 import makeAsyncScriptLoader from "react-async-script";
 import MyLoadingComponent from "../../my-loading-component";
-import EnvUtils from "../../../utils/env-utils";
+import EnvUtils, { isPWA } from "../../../utils/env-utils";
 import { getRes } from "../../../utils/constants";
 import { dom, library } from "@fortawesome/fontawesome-svg-core";
 import {
@@ -39,6 +39,9 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { StyledEditor } from "./styled-editor";
 import axios from "axios";
+import { useLocation } from "react-router";
+import { getPageFullState, savePageFullState } from "../../../cache";
+import { getFullPath } from "../../../utils/helpers";
 // Add the icons to the library so you can use it in your page
 const icons = [
     faBold,
@@ -109,6 +112,7 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({
         id: "editor-" + new Date().getTime(),
     });
     const [messageApi, contextHolder] = message.useMessage();
+    const location = useLocation();
 
     function setDarkMode(editor: any, dark: boolean) {
         editor.setTheme(dark ? "dark" : "default");
@@ -127,6 +131,11 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({
         }
     }
 
+    const doFullScreen = (editor: any) => {
+        onfullscreen(editor);
+        editor.width("100%");
+    };
+
     const initEditor = (md: string) => {
         // eslint-disable-next-line no-undef,no-unused-vars
         //@ts-ignore
@@ -137,7 +146,7 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({
             taskList: true,
             tocm: false,
             tex: true,
-            height: "1240px",
+            height: getPageFullState(getFullPath(location)) && isPWA() ? "calc(100vh - 2px)" : "1240px",
             flowChart: true,
             sequenceDiagram: true,
             dialogMaskOpacity: 0,
@@ -235,6 +244,9 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({
                     });
                 }
                 setDarkMode(editor, EnvUtils.isDarkMode());
+                if (getPageFullState(getFullPath(location)) && isPWA()) {
+                    $(".svg-inline--fa[name=fullscreen]").click();
+                }
                 setTimeout(initSuccess, 100);
             },
 
@@ -246,12 +258,17 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({
                 await onChange(changed);
             },
             onfullscreen: function () {
-                onfullscreen(editor);
-                editor.width("100%");
+                if (isPWA()) {
+                    savePageFullState(getFullPath(location), true);
+                }
+                doFullScreen(editor);
             },
 
             onfullscreenExit: function () {
                 onfullscreenExit();
+                if (isPWA()) {
+                    savePageFullState(getFullPath(location), false);
+                }
                 editor.width("100%");
             },
         });

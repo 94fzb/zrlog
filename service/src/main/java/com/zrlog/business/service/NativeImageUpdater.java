@@ -17,23 +17,33 @@ import java.util.StringJoiner;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
-public record NativeImageUpdater(String[] args, String fileName) implements Updater {
+public record NativeImageUpdater(String[] args, File execFile) implements Updater {
 
     private static final Logger LOGGER = LoggerUtil.getLogger(NativeImageUpdater.class);
 
     private String buildExec() {
         StringJoiner shells = new StringJoiner("\n");
+        shells.add("#!/bin/sh");
+        shells.add("set -e");
         shells.add("sleep 1");
         String zipBinName = "zrlog";
-        shells.add("chmod a+x " + getUploadTempPath() + "/" + zipBinName);
-        shells.add("mv " + getUploadTempPath() + "/*" + " " + PathUtil.getRootPath());
+        shells.add("chmod a+x " + getUpdateTempPath() + "/" + zipBinName);
+        shells.add("# upgrade " + zipBinName);
+        shells.add("cp -r " + getUpdateTempPath() + "/*" + " " + PathUtil.getRootPath());
         File newBinFile = new File(PathUtil.getRootPath() + "/" + zipBinName);
         //try update exec name
-        if (!Objects.equals(newBinFile.toString(), new File(fileName).toString())) {
-            shells.add("mv " + newBinFile + " " + fileName);
+        if (!Objects.equals(newBinFile.toString(), execFile.toString())) {
+            shells.add("mv " + newBinFile + " " + execFile);
         }
-        //shells.add("mv " + getUploadTempPath() + "/*" + " " + PathUtil.getRootPath());
+        shells.add("rm -rf " + getUpdateTempPath());
+        shells.add("# start " + zipBinName);
+        shells.add(buildStartExec());
+        return shells.toString();
+    }
+
+    private String buildStartExec() {
         StringJoiner cmdArgs = new StringJoiner(" ");
+        cmdArgs.add(execFile.toString());
         for (String arg : args) {
             if (arg.startsWith("--port=")) {
                 continue;
@@ -41,29 +51,20 @@ public record NativeImageUpdater(String[] args, String fileName) implements Upda
             cmdArgs.add(arg);
         }
         cmdArgs.add("--port=" + ZrLogUtil.getPort(args));
-        shells.add(fileName + " " + cmdArgs);
-        return shells.toString();
+        return cmdArgs.toString();
     }
 
     private String buildWindowsBatExec() {
         StringJoiner shells = new StringJoiner("\n");
         String zipBinName = "zrlog.exe";
         shells.add("timeout /t 1 /nobreak > nul");
-        shells.add("move " + getUploadTempPath() + "\\*" + " " + PathUtil.getRootPath());
+        shells.add("move " + getUpdateTempPath() + "\\*" + " " + PathUtil.getRootPath());
         File newBinFile = new File(PathUtil.getRootPath() + "\\" + zipBinName);
         //try update exec name
-        if (!Objects.equals(newBinFile.toString(), new File(fileName).toString())) {
-            shells.add("move " + newBinFile + " " + fileName);
+        if (!Objects.equals(newBinFile.toString(), execFile.toString())) {
+            shells.add("move " + newBinFile + " " + execFile);
         }
-        StringJoiner cmdArgs = new StringJoiner(" ");
-        for (String arg : args) {
-            if (arg.startsWith("--port=")) {
-                continue;
-            }
-            cmdArgs.add(arg);
-        }
-        cmdArgs.add("--port=" + ZrLogUtil.getPort(args));
-        shells.add(fileName + " " + cmdArgs);
+        shells.add(buildStartExec());
         return shells.toString();
     }
 
@@ -108,6 +109,6 @@ public record NativeImageUpdater(String[] args, String fileName) implements Upda
 
     @Override
     public String getUnzipPath() {
-        return getUploadTempPath().getPath();
+        return getUpdateTempPath().getPath();
     }
 }

@@ -39,23 +39,23 @@ public class GraalvmNativeImageApplication {
     }
 
     public static void main(String[] args) {
-        String binFile = System.getenv("_");
-        if (StringUtils.isEmpty(binFile)) {
-            binFile = getWindowsExecutablePath();
+        String envBinFile = System.getenv("_");
+        if (StringUtils.isEmpty(envBinFile)) {
+            envBinFile = getWindowsExecutablePath();
         }
-        String exeFile = binFile.replace("./", "");
+        String execFile = envBinFile.replace("./", "");
         Constants.runMode = RunMode.NATIVE;
         String runtimeRoot = System.getProperty("user.dir");
         PathUtil.setRootPath(runtimeRoot);
-        if (!exeFile.startsWith(runtimeRoot)) {
-            exeFile = new File(PathUtil.getRootPath() + "/" + exeFile).toString();
+        if (!execFile.startsWith(runtimeRoot)) {
+            execFile = new File(PathUtil.getRootPath() + "/" + execFile).toString();
         }
         //parse args
-        if (ParseArgsUtil.justTips(args, new File(exeFile).getName(), BlogBuildInfoUtil.getVersionInfoFull())) {
+        if (ParseArgsUtil.justTips(args, new File(execFile).getName(), BlogBuildInfoUtil.getVersionInfoFull())) {
             return;
         }
         int port = ZrLogUtil.getPort(args);
-        WebServerBuilder webServerBuilder = Application.webServerBuilder(port, new NativeImageUpdater(args, exeFile));
+        WebServerBuilder webServerBuilder = Application.webServerBuilder(port, new NativeImageUpdater(args, new File(execFile)));
         webServerBuilder.start();
     }
 }

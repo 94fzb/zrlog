@@ -222,9 +222,10 @@ const StyledIndexLayout = styled("div")`
 
 type AdminManageLayoutProps = PropsWithChildren & {
     loading: boolean;
+    fullScreen?: boolean;
 };
 
-const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ children, loading }) => {
+const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ children, loading, fullScreen }) => {
     const [userInfo, setUser] = useState<BasicUserInfo | undefined>(ssData?.user);
 
     useEffect(() => {
@@ -235,11 +236,11 @@ const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ children
         }
     }, []);
 
-    // @ts-ignore
     return (
         <PWAHandler>
             <StyledIndexLayout>
                 <Header
+                    hidden={fullScreen}
                     style={{
                         backgroundColor: EnvUtils.isDarkMode() ? "#1f1f1f" : "#011529",
                     }}
@@ -257,18 +258,19 @@ const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ children
                 </Header>
                 <Row>
                     <Sider
+                        hidden={fullScreen}
                         width={70}
                         style={{ minHeight: "100vh", backgroundColor: EnvUtils.isDarkMode() ? "#1f1f1f" : "#001529" }}
                     >
                         <SliderMenu />
                     </Sider>
-                    <Col style={{ flex: 1, width: 100 }}>
-                        <Layout style={{ minHeight: "100vh" }}>
-                            <Content>
+                    <Col style={{ flex: 1, width: 100, minHeight: fullScreen ? 0 : 1 }}>
+                        <Layout style={{ minHeight: "100vh", overflow: fullScreen ? "hidden" : "auto" }}>
+                            <Content style={{ paddingRight: fullScreen ? 0 : 12, paddingLeft: fullScreen ? 0 : 12 }}>
                                 {loading && <MyLoadingComponent />}
                                 {children}
                             </Content>
-                            <Footer>
+                            <Footer hidden={fullScreen}>
                                 <Row>
                                     <Col xs={24} md={12}>
                                         <div

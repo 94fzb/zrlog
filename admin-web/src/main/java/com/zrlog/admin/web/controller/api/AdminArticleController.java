@@ -9,12 +9,10 @@ import com.zrlog.admin.business.exception.NotFindDbEntryException;
 import com.zrlog.admin.business.exception.PermissionErrorException;
 import com.zrlog.admin.business.rest.request.CreateArticleRequest;
 import com.zrlog.admin.business.rest.request.UpdateArticleRequest;
-import com.zrlog.admin.business.rest.response.ArticleGlobalResponse;
-import com.zrlog.admin.business.rest.response.CreateOrUpdateArticleResponse;
-import com.zrlog.admin.business.rest.response.DeleteLogResponse;
-import com.zrlog.admin.business.rest.response.LoadEditArticleResponse;
+import com.zrlog.admin.business.rest.response.*;
 import com.zrlog.admin.business.service.AdminArticleService;
 import com.zrlog.admin.web.annotation.RefreshCache;
+import com.zrlog.admin.web.controller.page.AdminPageController;
 import com.zrlog.admin.web.token.AdminTokenThreadLocal;
 import com.zrlog.blog.web.util.ControllerUtil;
 import com.zrlog.blog.web.util.WebTools;
@@ -31,6 +29,8 @@ import com.zrlog.util.ZrLogUtil;
 
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.Objects;
+import java.util.StringJoiner;
 
 public class AdminArticleController extends Controller {
 
@@ -68,11 +68,13 @@ public class AdminArticleController extends Controller {
     }
 
     @ResponseBody
-    public ApiStandardResponse<PageData<ArticleResponseEntry>> index() throws SQLException {
+    public AdminApiPageDataStrandardResponse<PageData<ArticleResponseEntry>> index() throws SQLException {
         String key = WebTools.convertRequestParam(request.getParaToStr("key"));
         PageData<ArticleResponseEntry> pageData = articleService.adminPage(ControllerUtil.getPageRequest(this), key, request);
         pageData.setKey(key);
-        return new ApiStandardResponse<>(pageData);
+        AdminApiPageDataStrandardResponse<PageData<ArticleResponseEntry>> strandardResponse = new AdminApiPageDataStrandardResponse<>(pageData);
+        strandardResponse.setDocumentTitle(Constants.getAdminTitle(I18nUtil.getAdminStringFromRes("blogManage")));
+        return strandardResponse;
     }
 
 
@@ -88,7 +90,7 @@ public class AdminArticleController extends Controller {
     }
 
     @ResponseBody
-    public ApiStandardResponse<ArticleGlobalResponse> articleEdit() throws SQLException {
+    public AdminApiPageDataStrandardResponse<ArticleGlobalResponse> articleEdit() throws SQLException {
         ArticleGlobalResponse response = new ArticleGlobalResponse();
         response.setTags(new Tag().findAll());
         response.setTypes(new Type().findAll());
@@ -98,7 +100,14 @@ public class AdminArticleController extends Controller {
         } else {
             response.setArticle(new LoadEditArticleResponse());
         }
-        return new ApiStandardResponse<>(response);
+        AdminApiPageDataStrandardResponse<ArticleGlobalResponse> strandardResponse = new AdminApiPageDataStrandardResponse<>(response);
+        StringJoiner sj = new StringJoiner(Constants.ADMIN_TITLE_CHAR);
+        if (Objects.nonNull(response.getArticle().getTitle())) {
+            sj.add(response.getArticle().getTitle());
+        }
+        sj.add(I18nUtil.getAdminStringFromRes("admin.log.edit"));
+        strandardResponse.setDocumentTitle(Constants.getAdminTitle(sj.toString()));
+        return strandardResponse;
     }
 
     /**

@@ -5,12 +5,10 @@ import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.common.type.AutoUpgradeVersionType;
 import com.zrlog.common.type.RunMode;
+import com.zrlog.util.I18nUtil;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
@@ -184,5 +182,20 @@ public class Constants {
         File file = new File(PathUtil.getConfPath() + "/db.properties");
         new File(PathUtil.getConfPath()).mkdirs();
         return file;
+    }
+
+    public static final String ADMIN_TITLE_CHAR = " - ";
+
+    public static String getAdminTitle(String startTitle) {
+        String title = (String) Constants.WEB_SITE.get("title");
+        StringJoiner sj = new StringJoiner(ADMIN_TITLE_CHAR);
+        if (StringUtils.isNotEmpty(startTitle) && startTitle.trim().length() > 0) {
+            sj.add(startTitle);
+        }
+        if (StringUtils.isNotEmpty(title)) {
+            sj.add(title);
+        }
+        sj.add(I18nUtil.getAdminStringFromRes("admin.management"));
+        return sj.toString();
     }
 }

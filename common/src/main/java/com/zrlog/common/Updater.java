@@ -10,9 +10,9 @@ public interface Updater {
 
     CompletableFuture<Void> restartProcessAsync(Version upgradeVersion);
 
-    String fileName();
+    File execFile();
 
-    default File getUploadTempPath() {
+    default File getUpdateTempPath() {
         return PathUtil.getConfFile("/update-temp");
     }
 

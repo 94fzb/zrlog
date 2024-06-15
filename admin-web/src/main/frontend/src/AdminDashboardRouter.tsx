@@ -4,10 +4,12 @@ import { useLocation } from "react-router";
 import { getCsrData } from "./api";
 import MyLoadingComponent from "./components/my-loading-component";
 import { ssData } from "./index";
-import { getCachedData, putCache } from "./cache";
-import { deepEqual, removeQueryParam } from "./utils/helpers";
+import { getCachedData, getLastOpenedPage, getPageFullState, putCache } from "./cache";
+import { deepEqual, getFullPath, removeQueryParam } from "./utils/helpers";
 import { UpgradeData } from "./components/upgrade";
-import { cacheIgnoreReloadKey } from "./utils/constants";
+import { cacheIgnoreReloadKey, getRes } from "./utils/constants";
+import { isPWA } from "./utils/env-utils";
+import * as H from "history";
 
 const AsyncArticleEdit = lazy(() => import("components/articleEdit"));
 const AsyncOffline = lazy(() => import("common/Offline"));
@@ -47,16 +49,34 @@ type AdminDashboardRouterState = {
     firstRender: boolean;
     currentUri: string;
     axiosRequesting: boolean;
+    fullScreen: boolean;
     data: Record<string, any>;
+};
+
+const updateDocumentTitle = (newDocumentTitle: string) => {
+    const baseTitle = getRes()["websiteTitle"] + " - " + getRes()["admin.management"];
+    if (newDocumentTitle) {
+        if (isPWA()) {
+            window.document.title = newDocumentTitle.replace(" - " + baseTitle, "");
+        } else {
+            window.document.title = newDocumentTitle;
+        }
+    } else {
+        window.document.title = baseTitle;
+    }
 };
 
 const AdminDashboardRouter = () => {
     const location = useLocation();
+    const pwaLastOpenedPage = isPWA() ? getLastOpenedPage() : null;
+    const defaultFullScreen = getPageFullState(pwaLastOpenedPage ? pwaLastOpenedPage : getFullPath(location));
+    //console.info(pwaLastOpenedPage + " => full screen " + defaultFullScreen);
 
     const [state, setState] = useState<AdminDashboardRouterState>({
         firstRender: ssData && ssData.pageData,
         currentUri: location.pathname + location.search,
         axiosRequesting: false,
+        fullScreen: defaultFullScreen,
         data: { ...getCachedData(), [location.pathname + location.search]: ssData?.pageData },
     });
 
@@ -65,17 +85,25 @@ const AdminDashboardRouter = () => {
         return state.data[uri] !== undefined && state.data[uri] !== null ? state.data[uri] : undefined;
     };
 
-    const loadData = (uri: string) => {
+    const loadData = (uri: string, location: H.Location) => {
         getCsrData(uri)
             .then((e) => {
+                const { data, documentTitle } = e;
                 const mergeData = state.data;
+                updateDocumentTitle(documentTitle);
                 //如果请求回来的和请求回来的一致的情况就跳过 setState
-                if (deepEqual(mergeData[uri], e)) {
+                if (deepEqual(mergeData[uri], data)) {
                     console.debug(uri + " cache hits");
                     return;
                 }
-                mergeData[uri] = e;
-                setState({ firstRender: false, axiosRequesting: false, currentUri: uri, data: mergeData });
+                mergeData[uri] = data;
+                setState({
+                    firstRender: false,
+                    axiosRequesting: false,
+                    currentUri: uri,
+                    data: mergeData,
+                    fullScreen: getPageFullState(getFullPath(location)),
+                });
                 putCache(mergeData);
             })
             .finally(() => {
@@ -85,6 +113,7 @@ const AdminDashboardRouter = () => {
                         firstRender: false,
                         axiosRequesting: false,
                         data: prevState.data,
+                        fullScreen: getPageFullState(getFullPath(location)),
                     };
                 });
             });
@@ -97,6 +126,7 @@ const AdminDashboardRouter = () => {
                 setState((prevState) => {
                     return {
                         currentUri: uri,
+                        fullScreen: getPageFullState(getFullPath(location)),
                         firstRender: false,
                         axiosRequesting: false,
                         data: prevState.data,
@@ -109,12 +139,13 @@ const AdminDashboardRouter = () => {
                         currentUri: uri,
                         axiosRequesting: true,
                         firstRender: false,
+                        fullScreen: getPageFullState(getFullPath(location)),
                         data: prevState.data,
                     };
                 });
             }
         }
-        loadData(uri);
+        loadData(uri, location);
     }, [location.pathname, location.search]);
 
     //console.info(location.pathname + "," + JSON.stringify(state));
@@ -278,10 +309,28 @@ const AdminDashboardRouter = () => {
             <Route
                 path="article-edit"
                 element={
-                    <AdminManageLayout loading={state.axiosRequesting}>
+                    <AdminManageLayout loading={state.axiosRequesting} fullScreen={state.fullScreen}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncArticleEdit data={getDataFromState()} />
+                                <AsyncArticleEdit
+                                    onFullScreen={() => {
+                                        setState((prevState) => {
+                                            return {
+                                                ...prevState,
+                                                fullScreen: true,
+                                            };
+                                        });
+                                    }}
+                                    data={getDataFromState()}
+                                    onExitFullScreen={() =>
+                                        setState((prevState) => {
+                                            return {
+                                                ...prevState,
+                                                fullScreen: false,
+                                            };
+                                        })
+                                    }
+                                />
                             </Suspense>
                         )}
                     </AdminManageLayout>

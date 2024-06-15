@@ -38,7 +38,7 @@ public class Application {
     private static Updater getUpdater(String[] args) {
         if (Constants.runMode == RunMode.JAR) {
             File jarFile = new File(System.getProperty("java.class.path"));
-            return new JarUpdater(args, jarFile.getName());
+            return new JarUpdater(args, jarFile);
         }
         return null;
     }

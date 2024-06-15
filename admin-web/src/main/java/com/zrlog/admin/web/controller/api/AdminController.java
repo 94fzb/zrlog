@@ -61,7 +61,7 @@ public class AdminController extends Controller {
             if (StringUtils.isNotEmpty(publicInfoVO.websiteTitle())) {
                 map.put("short_name", publicInfoVO.websiteTitle());
             }
-            map.put("name", AdminPageController.getAdminTitle());
+            map.put("name", Constants.getAdminTitle(""));
             map.put("theme_color", publicInfoVO.pwaThemeColor());
             map.put("background_color", publicInfoVO.admin_darkMode() ? "#000000" : "#FFFFFF");
             return map;
@@ -92,10 +92,17 @@ public class AdminController extends Controller {
         info.setArticleCount(new Log().getAdminCount());
         List<File> allFileList = new ArrayList<>();
         try {
-            List<String> baseFolders = new ArrayList<>(Arrays.asList(PathUtil.getRootPath() + "/bin", PathUtil.getTempPath(),
-                    PathUtil.getLogPath(), PathUtil.getConfPath(), PathUtil.getStaticPath(), PathUtil.getRootPath() + "/lib"));
+            List<String> baseFolders = new ArrayList<>(Arrays.asList(PathUtil.getTempPath(),
+                    PathUtil.getLogPath(), PathUtil.getConfPath(), PathUtil.getStaticPath(),
+                    PathUtil.getRootPath() + "/doc",
+                    PathUtil.getRootPath() + "/LICENSE",
+                    PathUtil.getRootPath() + "/README.en-us.md",
+                    PathUtil.getRootPath() + "/README.md",
+                    PathUtil.getRootPath() + "/bin",
+                    PathUtil.getRootPath() + "/lib"
+            ));
             if (Objects.nonNull(Constants.zrLogConfig.getUpdater())) {
-                allFileList.add(new File(PathUtil.getRootPath() + "/" + Constants.zrLogConfig.getUpdater().fileName()));
+                allFileList.add(Constants.zrLogConfig.getUpdater().execFile());
             }
             for (String folder : baseFolders) {
                 FileUtils.getAllFiles(folder, allFileList);

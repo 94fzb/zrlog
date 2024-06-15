@@ -1,3 +1,5 @@
+import * as H from "history";
+
 export const mapToQueryString = (map: Record<string, string | boolean | number | undefined>): string => {
     return Object.keys(map)
         .reduce(function (a, k) {
@@ -61,3 +63,10 @@ export function removeQueryParam(search: string, key: string) {
 function isObject(object: any): boolean {
     return object != null && typeof object === "object";
 }
+
+export const getFullPath = (location: H.Location) => {
+    if (location.search.length <= 0) {
+        return location.pathname;
+    }
+    return location.pathname + location.search;
+};

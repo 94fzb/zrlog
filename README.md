@@ -1,4 +1,4 @@
-## ZrLog ![build-preview](https://github.com/94fzb/zrlog/actions/workflows/build-preview-packge.yml/badge.svg) ![build-release](https://github.com/94fzb/zrlog/actions/workflows/build-release-packge.yml/badge.svg) [![Apache License](http://img.shields.io/badge/license-apache2-orange.svg?style=flat)](http://www.apache.org/licenses/LICENSE-2.0)
+## ZrLog ![build-preview](https://github.com/94fzb/zrlog/actions/workflows/build-preview-package-jar.yml/badge.svg) ![build-release](https://github.com/94fzb/zrlog/actions/workflows/build-release-package-jar.yml/badge.svg) [![Apache License](http://img.shields.io/badge/license-apache2-orange.svg?style=flat)](http://www.apache.org/licenses/LICENSE-2.0)
 
 [中文](README.md) | [English](README.en-us.md)
 

@@ -48,6 +48,7 @@ public class CommonService {
         }
         stringObjectMap.put("buildId", BlogBuildInfoUtil.getBuildId());
         stringObjectMap.put("admin_color_primary", publicInfoVO.admin_color_primary());
+        stringObjectMap.put("lang", I18nUtil.getCurrentLocale());
         return stringObjectMap;
     }
 

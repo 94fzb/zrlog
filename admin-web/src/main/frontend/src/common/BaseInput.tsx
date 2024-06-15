@@ -10,8 +10,16 @@ type BaseInputProps = {
     status?: InputStatus;
     onChange: (value: string) => Promise<void>;
     required?: boolean;
+    hidden?: boolean;
 };
-const BaseInput: FunctionComponent<BaseInputProps> = ({ value, onChange, addonBefore, status, placeholder }) => {
+const BaseInput: FunctionComponent<BaseInputProps> = ({
+    hidden,
+    value,
+    onChange,
+    addonBefore,
+    status,
+    placeholder,
+}) => {
     const [inputValue, setInputValue] = useState<string>(value || "");
     const [isComposing, setIsComposing] = useState<boolean>(false);
 
@@ -31,6 +39,9 @@ const BaseInput: FunctionComponent<BaseInputProps> = ({ value, onChange, addonBe
 
     return (
         <Input
+            style={{
+                display: hidden ? "none" : "flex",
+            }}
             status={status}
             addonBefore={addonBefore}
             value={inputValue}

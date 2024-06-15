@@ -87,7 +87,7 @@ public class UpgradeService {
     }
 
     public HttpFileHandle createFileHandle() {
-        File file = new File(Constants.zrLogConfig.getUpdater().getUploadTempPath() + "/zrlog.zip");
+        File file = new File(Constants.zrLogConfig.getUpdater().getUpdateTempPath() + "/zrlog.zip");
         file.getParentFile().mkdir();
         return new HttpFileHandle(file.getParentFile().toString(), file.getName());
     }

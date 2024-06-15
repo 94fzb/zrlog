@@ -1,32 +1,8 @@
 import React, { PropsWithChildren, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import * as H from "history";
-
-// Function to check if the page is running as a PWA
-const isPWA = (): boolean => {
-    //@ts-ignore
-    if (window.navigator.standalone) {
-        return true;
-    }
-    return window.matchMedia("(display-mode: standalone)").matches;
-};
-
-// Function to save the last opened page to sessionStorage and localStorage
-const saveLastOpenedPage = (url: string): void => {
-    localStorage.setItem("lastOpenedPage", url);
-};
-
-// Function to get the last opened page from sessionStorage or localStorage
-const getLastOpenedPage = (): string | null => {
-    return localStorage.getItem("lastOpenedPage");
-};
-
-const getFullPath = (location: H.Location) => {
-    if (location.search.length <= 0) {
-        return location.pathname;
-    }
-    return location.pathname + location.search;
-};
+import { getLastOpenedPage, saveLastOpenedPage } from "./cache";
+import { getFullPath } from "./utils/helpers";
+import { isPWA } from "./utils/env-utils";
 
 const PWAHandler: React.FC<PropsWithChildren> = ({ children }) => {
     const location = useLocation();
@@ -41,30 +17,42 @@ const PWAHandler: React.FC<PropsWithChildren> = ({ children }) => {
             return;
         }
         const lastOpenedPage = getLastOpenedPage();
+        sessionStorage.setItem("loaded", "true");
         if (lastOpenedPage && lastOpenedPage !== getFullPath(location)) {
-            console.log("Redirecting to last opened page:", lastOpenedPage);
-            saveLastOpenedPage(lastOpenedPage);
+            console.log(getFullPath(location) + " redirecting to last opened page:", lastOpenedPage);
             navigate(lastOpenedPage);
-            sessionStorage.setItem("loaded", "true");
+            return;
         }
-        setLoaded(true);
     }, []); // Empty dependency array to run only on mount
 
     // Effect to save the current page on location change
     useEffect(() => {
-        if (isPWA()) {
-            const fullPath = getFullPath(location);
-            //console.log("This page is running as a PWA.");
-            if (
-                fullPath.startsWith("/500") ||
-                fullPath.startsWith("/404") ||
-                fullPath.startsWith("/403") ||
-                fullPath.startsWith("/offline")
-            ) {
-                return;
-            }
-            saveLastOpenedPage(fullPath);
+        if (!isPWA()) {
+            return;
         }
+        const fullPath = getFullPath(location);
+        if (!loaded) {
+            const lastOpenedPage = getLastOpenedPage();
+            if (lastOpenedPage === undefined || lastOpenedPage === null) {
+                setLoaded(true);
+            } else if (lastOpenedPage === fullPath) {
+                setLoaded(true);
+            }
+            return;
+        }
+        if (sessionStorage.getItem("loaded") !== "true") {
+            return;
+        }
+        //console.log("This page is running as a PWA.");
+        if (
+            fullPath.startsWith("/500") ||
+            fullPath.startsWith("/404") ||
+            fullPath.startsWith("/403") ||
+            fullPath.startsWith("/offline")
+        ) {
+            return;
+        }
+        saveLastOpenedPage(fullPath);
     }, [location]); // Run on location change
 
     if (!loaded) {

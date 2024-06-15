@@ -1,6 +1,7 @@
 // @ts-ignore
 import { ModeOfOperation } from "aes-js";
 import { ssData } from "./index";
+import { isPWA } from "./utils/env-utils";
 
 // AES加密函数
 function aesEncrypt(text: string, key: string): string {
@@ -104,4 +105,34 @@ export const deleteCacheDataByKey = (key: string) => {
     delete data[key];
     console.info(data);
     putCache(data);
+};
+
+const buildPageFullStateKey = (key: string) => {
+    if (isPWA()) {
+        return key + "_page_fullState_pwa";
+    }
+    return key + "_page_fullState";
+};
+
+export const savePageFullState = (key: string, full: boolean) => {
+    const record = getCachedData();
+    record[buildPageFullStateKey(key)] = full;
+    putCache(record);
+};
+
+export const getPageFullState = (key: string): boolean => {
+    const record = getCachedData();
+    return record[buildPageFullStateKey(key)] === true;
+};
+
+// Function to save the last opened page to cache
+export const saveLastOpenedPage = (url: string): void => {
+    const record = getCachedData();
+    record["lastOpenedPage"] = url;
+    putCache(record);
+};
+
+// Function to get the last opened page from cache
+export const getLastOpenedPage = (): string | null => {
+    return getCachedData()["lastOpenedPage"];
 };

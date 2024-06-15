@@ -113,17 +113,17 @@ const WebSite = ({ data }: { data: Basic | Admin | Upgrade | Other | Blog | Temp
                 items={[
                     {
                         key: "basic",
-                        label: buildLink("basic", "基本信息"),
+                        label: buildLink("basic", getRes()["admin.basic.manage"]),
                         children: getItemBody(),
                     },
                     {
                         key: "blog",
-                        label: buildLink("blog", "博客设置"),
+                        label: buildLink("blog", getRes()["admin.blog.manage"]),
                         children: getItemBody(),
                     },
                     {
                         key: "admin",
-                        label: buildLink("admin", "管理设置"),
+                        label: buildLink("admin", getRes()["admin.admin.manage"]),
                         children: getItemBody(),
                     },
                     {
@@ -133,7 +133,7 @@ const WebSite = ({ data }: { data: Basic | Admin | Upgrade | Other | Blog | Temp
                     },
                     {
                         key: "other",
-                        label: buildLink("other", "其他设置"),
+                        label: buildLink("other", getRes()["admin.other.manage"]),
                         children: getItemBody(),
                     },
                     {

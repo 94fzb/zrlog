@@ -12,6 +12,7 @@ import { getColorPrimary, getRes, setRes } from "./utils/constants";
 
 import axios from "axios";
 import { BasicUserInfo } from "./type";
+import UnknownErrorPage from "./components/unknown-error-page";
 
 const url = new URL(document.baseURI);
 export const basePath = url.pathname + "admin/";
@@ -22,7 +23,9 @@ const { darkAlgorithm, defaultAlgorithm } = theme;
 
 type AppState = {
     resLoaded: boolean;
+    resLoadErrorMsg: string;
     dark: boolean;
+    lang: string;
     colorPrimary: string;
 };
 
@@ -44,22 +47,41 @@ if (ssDataStr?.length > 0) {
 const Index = () => {
     const [appState, setAppState] = useState<AppState>({
         resLoaded: false,
+        resLoadErrorMsg: "",
+        lang: "zh_CN",
         dark: EnvUtils.isDarkMode(),
         colorPrimary: getColorPrimary(),
     });
 
     const loadResourceFromServer = () => {
-        const resourceApi = "/api/public/blogResource";
-        axios.get(resourceApi).then(({ data }: { data: Record<string, any> }) => {
-            handleRes(data.data);
-        });
+        const resourceApi = "/api/public/adminResource";
+        axios
+            .get(resourceApi)
+            .then(({ data }: { data: Record<string, any> }) => {
+                handleRes(data.data);
+            })
+            .catch((e) => {
+                setAppState({
+                    dark: document.body.className.includes("dark"),
+                    resLoadErrorMsg: "Request " + resourceApi + " error -> " + e.message,
+                    resLoaded: false,
+                    lang: "zh_CN",
+                    colorPrimary: getColorPrimary(),
+                });
+            });
     };
     const handleRes = (data: Record<string, never>) => {
         // @ts-ignore
         data.copyrightTips =
             data.copyright + ' <a target="_blank" href="https://blog.zrlog.com/about.html?footer">ZrLog</a>';
         setRes(data);
-        setAppState({ dark: EnvUtils.isDarkMode(), resLoaded: true, colorPrimary: getColorPrimary() });
+        setAppState({
+            lang: data.lang,
+            dark: EnvUtils.isDarkMode(),
+            resLoadErrorMsg: "",
+            resLoaded: true,
+            colorPrimary: getColorPrimary(),
+        });
     };
 
     const initRes = () => {
@@ -79,11 +101,9 @@ const Index = () => {
         initRes();
     }, []);
 
-    const htmlLang = document.documentElement.lang;
-
     return (
         <ConfigProvider
-            locale={htmlLang.startsWith("zh") ? zh_CN : en_US}
+            locale={appState.lang.startsWith("zh") ? zh_CN : en_US}
             theme={{
                 algorithm: appState.dark ? darkAlgorithm : defaultAlgorithm,
                 token: {
@@ -113,10 +133,16 @@ const Index = () => {
                     <BrowserRouter basename={basePath}>
                         {appState.resLoaded ? (
                             <AppBase />
-                        ) : (
+                        ) : appState.resLoadErrorMsg.length === 0 ? (
                             <Spin delay={1000} style={{ maxHeight: "100vh" }}>
-                                <div style={{ height: "100vh", width: "100vw" }}></div>
+                                <div style={{ width: "100vw", height: "100vh" }}></div>
                             </Spin>
+                        ) : (
+                            <UnknownErrorPage
+                                code={500}
+                                data={{ message: appState.resLoadErrorMsg }}
+                                style={{ width: "100vw", height: "100vh" }}
+                            />
                         )}
                     </BrowserRouter>
                 </StyleProvider>

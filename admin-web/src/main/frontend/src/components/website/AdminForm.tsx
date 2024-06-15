@@ -66,10 +66,10 @@ const BlogForm = ({ data }: { data: Admin }) => {
                         <Option value="en_US">{getRes()["languageEnglish"]}</Option>
                     </Select>
                 </Form.Item>
-                <Form.Item valuePropName="checked" name="admin_darkMode" label="护眼模式">
+                <Form.Item valuePropName="checked" name="admin_darkMode" label={getRes()["admin.dark.mode"]}>
                     <Switch size={"small"} />
                 </Form.Item>
-                <Form.Item label={getRes()["admin.theme.manage"]}>
+                <Form.Item label={getRes()["admin.color.primary"]}>
                     <div style={{ display: "flex", justifyContent: "flex-start", alignItems: "center" }}>
                         <ColorPicker
                             value={form["admin_color_primary"]}

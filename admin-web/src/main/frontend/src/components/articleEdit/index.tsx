@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { FunctionComponent, useEffect, useState } from "react";
 import { EyeOutlined, SaveOutlined, SendOutlined } from "@ant-design/icons";
 import { App, Button, Space } from "antd";
 import Row from "antd/es/grid/row";
@@ -19,6 +19,9 @@ import ThumbnailUpload from "./thumbnail-upload";
 import BaseInput from "../../common/BaseInput";
 import BaseTextArea from "../../common/BaseTextArea";
 import Form from "antd/es/form";
+import { getPageFullState } from "../../cache";
+import { getFullPath } from "../../utils/helpers";
+import { useLocation } from "react-router";
 
 export type ArticleEntry = ChangedContent &
     ThumbnailChanged &
@@ -127,13 +130,19 @@ type FormValidState = {
     typeError: boolean;
 };
 
-export type ArticleEditProps = {
+type ArticleEditInfo = {
     tags: any[];
     types: any[];
     article: ArticleEntry;
 };
 
-const dataToState = (data: ArticleEditProps): ArticleEditState => {
+export type ArticleEditProps = {
+    data: ArticleEditInfo;
+    onExitFullScreen: () => void;
+    onFullScreen: () => void;
+};
+
+const dataToState = (data: ArticleEditInfo, fullScreen: boolean): ArticleEditState => {
     return {
         typeOptions: data.types
             ? data.types.map((x) => {
@@ -141,7 +150,7 @@ const dataToState = (data: ArticleEditProps): ArticleEditState => {
               })
             : [],
         editorInitSuccess: false,
-        fullScreen: false,
+        fullScreen: fullScreen,
         tags: data.tags ? data.tags : [],
         rubbish: data.article && data.article.rubbish ? data.article.rubbish : false,
         article: data.article
@@ -161,8 +170,9 @@ const dataToState = (data: ArticleEditProps): ArticleEditState => {
     };
 };
 
-const Index = ({ data }: { data: ArticleEditProps }) => {
-    const defaultState = dataToState(data);
+const Index: FunctionComponent<ArticleEditProps> = ({ data, onExitFullScreen, onFullScreen }) => {
+    const location = useLocation();
+    const defaultState = dataToState(data, getPageFullState(getFullPath(location)));
 
     const [state, setState] = useState<ArticleEditState>(defaultState);
 
@@ -249,7 +259,6 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
             }
         } finally {
             if (release) {
-                //@ts-ignore
                 setState((prevState) => {
                     return {
                         ...prevState,
@@ -265,7 +274,6 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
                     };
                 });
             } else {
-                //@ts-ignore
                 setState((prevState) => {
                     return {
                         ...prevState,
@@ -290,29 +298,36 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
         return getRes()["articleRoute"];
     };
 
+    const doFullState = () => {
+        setState((prevState) => {
+            return {
+                ...prevState,
+                fullScreen: true,
+            };
+        });
+    };
+
     const onfullscreen = (editor: any) => {
-        if (screenfull.isEnabled) {
-            screenfull.request().then(() => {
-                setState((prevState) => {
-                    return {
-                        ...prevState,
-                        fullScreen: true,
-                    };
+        try {
+            if (screenfull.isEnabled) {
+                screenfull.request().then(() => {
+                    doFullState();
                 });
-            });
-            screenfull.on("change", () => {
-                //@ts-ignore
-                if (!screenfull.isFullscreen) {
-                    editor.fullscreenExit();
-                }
-            });
-        } else {
-            setState((prevState) => {
-                return {
-                    ...prevState,
-                    fullScreen: true,
-                };
-            });
+                screenfull.on("change", () => {
+                    //@ts-ignore
+                    if (!screenfull.isFullscreen) {
+                        editor.fullscreenExit();
+                        onExitFullScreen();
+                    }
+                });
+            } else {
+                doFullState();
+            }
+        } catch (e) {
+            console.error(e);
+            doFullState();
+        } finally {
+            onFullScreen();
         }
     };
 
@@ -325,6 +340,7 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
         });
         //@ts-ignore
         screenfull.exit();
+        onExitFullScreen();
     };
 
     const exitTips = (tips: string) => {
@@ -370,7 +386,7 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
     }, [content]);
 
     useEffect(() => {
-        setState(dataToState(data));
+        setState(dataToState(data, getPageFullState(getFullPath(location))));
     }, [data]);
 
     useEffect(() => {
@@ -453,9 +469,14 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
 
     return (
         <StyledArticleEdit>
-            <Row gutter={[8, 8]} style={{ paddingTop: 20 }}>
+            <Row gutter={[8, 8]} style={{ paddingTop: state.fullScreen ? 0 : 20 }}>
                 <Col md={12} xxl={15} sm={6} span={24}>
-                    <Title className="page-header" style={{ marginTop: 0, marginBottom: 0 }} level={3}>
+                    <Title
+                        className="page-header"
+                        style={{ marginTop: 0, marginBottom: 0 }}
+                        level={3}
+                        hidden={state.fullScreen}
+                    >
                         {getRes()["admin.log.edit"]}
                     </Title>
                 </Col>
@@ -471,17 +492,19 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
                         {state.saving.rubbishSaving ? getRes().saving : getRes().saveAsDraft}
                     </Button>
                 </Col>
-                <Col xxl={2} md={3} sm={4}>
-                    <Button
-                        type="dashed"
-                        disabled={state.saving.previewIng && !state.saving.autoSaving}
-                        style={{ width: "100%" }}
-                        onClick={async () => await onSubmit(state.article, !state.rubbish, true, false)}
-                    >
-                        <EyeOutlined />
-                        {getRes().preview}
-                    </Button>
-                </Col>
+                {!state.fullScreen && (
+                    <Col xxl={2} md={3} sm={4}>
+                        <Button
+                            type="dashed"
+                            disabled={state.saving.previewIng && !state.saving.autoSaving}
+                            style={{ width: "100%" }}
+                            onClick={async () => await onSubmit(state.article, !state.rubbish, true, false)}
+                        >
+                            <EyeOutlined />
+                            {getRes().preview}
+                        </Button>
+                    </Col>
+                )}
                 <Col xxl={2} md={3} sm={4} className={state.fullScreen ? "save-btn-full-screen" : ""}>
                     <Button
                         type="primary"
@@ -496,12 +519,12 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
                     </Button>
                 </Col>
             </Row>
-            <Divider />
-            <Row gutter={[8, 8]} style={{ paddingBottom: 8 }}>
+            {!state.fullScreen && <Divider />}
+            <Row gutter={[8, 8]} style={{ paddingBottom: state.fullScreen ? 0 : 8 }}>
                 <Col md={13} xs={24}>
-                    <Space.Compact style={{ display: "flex" }}>
+                    <Space.Compact style={{ display: "flex" }} hidden={state.fullScreen}>
                         <Select
-                            style={{ minWidth: 156 }}
+                            style={{ minWidth: 156, display: state.fullScreen ? "none" : "flex" }}
                             status={formValidState.typeError ? "error" : ""}
                             value={state.article.typeId}
                             showSearch={true}
@@ -517,6 +540,7 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
                             placeholder={getRes()["pleaseChoose"] + getRes()["admin.type.manage"]}
                         />
                         <BaseInput
+                            hidden={state.fullScreen}
                             status={formValidState.titleError ? "error" : ""}
                             placeholder={getRes().inputArticleTitle}
                             value={state.article.title ? state.article.title : undefined}
@@ -528,6 +552,7 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
                 </Col>
                 <Col md={5} xs={24}>
                     <BaseInput
+                        hidden={state.fullScreen}
                         value={state.article.alias}
                         onChange={async (e) => {
                             await handleValuesChange({ alias: e });
@@ -537,8 +562,13 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
                     />
                 </Col>
             </Row>
-            <Row gutter={[8, 8]}>
-                <Col md={18} sm={24} xs={24} style={{ zIndex: 10 }}>
+            <Row gutter={[state.fullScreen ? 0 : 8, state.fullScreen ? 0 : 8]}>
+                <Col
+                    md={state.fullScreen ? 24 : 18}
+                    sm={24}
+                    xs={24}
+                    style={{ zIndex: 10, minHeight: state.fullScreen ? 0 : 1 }}
+                >
                     <MyEditorMdWrapper
                         key={data.article.version + "" + data.article.logId}
                         onfullscreen={onfullscreen}
@@ -561,7 +591,12 @@ const Index = ({ data }: { data: ArticleEditProps }) => {
                         }}
                     />
                 </Col>
-                <Col md={6} sm={24} xs={24} style={{ cursor: isSaving() ? "none" : "inherit" }}>
+                <Col
+                    md={state.fullScreen ? 0 : 6}
+                    sm={state.fullScreen ? 0 : 24}
+                    xs={state.fullScreen ? 0 : 24}
+                    style={{ cursor: isSaving() ? "none" : "inherit" }}
+                >
                     <Row gutter={[8, 8]}>
                         <Col span={24}>
                             <Card size="small" style={{ textAlign: "center" }}>

@@ -12,6 +12,7 @@ import com.hibegin.http.server.web.Controller;
 import com.zrlog.common.Constants;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -21,35 +22,35 @@ import java.util.*;
 public class AdminPwaInterceptor implements HandleAbleInterceptor {
 
     private final List<String> resourceUris = new ArrayList<>();
-    private static final String ADMIN_SERVICE_WORKER_JS = "/admin/service-worker.js";
-    private static final String ADMIN_ASSET_MANIFEST_JSON = "/admin/asset-manifest.json";
-    private static final Set<String> files = new LinkedHashSet<>();
-
-    static {
-        String str = IOUtil.getStringInputStream(AdminPwaInterceptor.class.getResourceAsStream(ADMIN_ASSET_MANIFEST_JSON));
-        String strVendors = IOUtil.getStringInputStream(AdminPwaInterceptor.class.getResourceAsStream("/admin/vendors-resource.txt"));
-        if (StringUtils.isNotEmpty(str)) {
-            Map<String, Object> map = new Gson().fromJson(str, new TypeToken<>() {
-            });
-            Map<String, Object> staticFiles = (Map<String, Object>) map.get("files");
-            if (Objects.nonNull(staticFiles)) {
-                files.addAll(staticFiles.values().stream().filter(e -> ((String) e).endsWith(".js")).map(e -> ((String) e).replace("./", "/")).toList());
-            }
-        }
-        if (StringUtils.isNotEmpty(strVendors)) {
-            for (String file : strVendors.split("\n")) {
-                files.add("/admin/" + file);
-            }
-        }
-    }
+    private final String adminServiceWorkerJs = "/admin/service-worker.js";
+    private final Set<String> files = new LinkedHashSet<>();
 
     public static void main(String[] args) {
-        System.out.println("js = " + IOUtil.getStringInputStream(renderServiceWorker()));
+        System.out.println("js = " + IOUtil.getStringInputStream(new AdminPwaInterceptor().renderServiceWorker()));
     }
 
     public AdminPwaInterceptor() {
-        resourceUris.add(ADMIN_SERVICE_WORKER_JS);
-        resourceUris.add(ADMIN_ASSET_MANIFEST_JSON);
+        String jsonPath = "/admin/asset-manifest.json";
+        InputStream resourceAsStream = AdminPwaInterceptor.class.getResourceAsStream(jsonPath);
+        if (Objects.nonNull(resourceAsStream)) {
+            String str = IOUtil.getStringInputStream(resourceAsStream);
+            String strVendors = IOUtil.getStringInputStream(AdminPwaInterceptor.class.getResourceAsStream("/admin/vendors-resource.txt"));
+            if (StringUtils.isNotEmpty(str)) {
+                Map<String, Object> map = new Gson().fromJson(str, new TypeToken<>() {
+                });
+                Map<String, Object> staticFiles = (Map<String, Object>) map.get("files");
+                if (Objects.nonNull(staticFiles)) {
+                    files.addAll(staticFiles.values().stream().filter(e -> ((String) e).endsWith(".js")).map(e -> ((String) e).replace("./", "/")).toList());
+                }
+            }
+            if (StringUtils.isNotEmpty(strVendors)) {
+                for (String file : strVendors.split("\n")) {
+                    files.add("/admin/" + file);
+                }
+            }
+        }
+        resourceUris.add(jsonPath);
+        resourceUris.add(adminServiceWorkerJs);
     }
 
     @Override
@@ -61,17 +62,17 @@ public class AdminPwaInterceptor implements HandleAbleInterceptor {
         return Constants.ADMIN_PWA_MANIFEST_JSON.equals(request.getUri()) || Constants.ADMIN_PWA_MANIFEST_API_URI_PATH.equals(request.getUri());
     }
 
-    private static ByteArrayInputStream renderServiceWorker() {
+    private ByteArrayInputStream renderServiceWorker() {
         StringJoiner sb = new StringJoiner(",\n    ");
         files.forEach(e -> {
             sb.add("'" + e + "'");
         });
-        return new ByteArrayInputStream(IOUtil.getStringInputStream(AdminPwaInterceptor.class.getResourceAsStream(ADMIN_SERVICE_WORKER_JS)).replace("'___FILES___'", sb.toString()).getBytes());
+        return new ByteArrayInputStream(IOUtil.getStringInputStream(AdminPwaInterceptor.class.getResourceAsStream(adminServiceWorkerJs)).replace("'___FILES___'", sb.toString()).getBytes());
     }
 
     @Override
     public boolean doInterceptor(HttpRequest request, HttpResponse response) throws Exception {
-        if (Objects.equals(ADMIN_SERVICE_WORKER_JS, request.getUri())) {
+        if (Objects.equals(adminServiceWorkerJs, request.getUri())) {
             response.addHeader("Content-Type", MimeTypeUtil.getMimeStrByExt(request.getUri().substring(request.getUri().lastIndexOf(".") + 1)));
             response.write(renderServiceWorker());
             return false;

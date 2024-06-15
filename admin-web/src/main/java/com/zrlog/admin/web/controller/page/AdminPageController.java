@@ -2,8 +2,8 @@ package com.zrlog.admin.web.controller.page;
 
 import com.google.gson.Gson;
 import com.hibegin.common.util.IOUtil;
-import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.server.web.Controller;
+import com.zrlog.admin.business.rest.response.AdminApiPageDataStrandardResponse;
 import com.zrlog.admin.business.rest.response.ServerSideDataResponse;
 import com.zrlog.admin.business.rest.response.UserBasicInfoResponse;
 import com.zrlog.admin.web.controller.api.AdminUserController;
@@ -23,9 +23,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Objects;
-import java.util.StringJoiner;
 
 public class AdminPageController extends Controller {
+
 
     public void index() throws Throwable {
         if (Objects.equals(request.getUri(), Constants.ADMIN_URI_BASE_PATH) || Objects.equals(request.getUri(), Constants.ADMIN_URI_BASE_PATH + "/")) {
@@ -48,7 +48,6 @@ public class AdminPageController extends Controller {
         document.body().removeClass("light");
         Objects.requireNonNull(document.selectFirst("base")).attr("href", "/");
         document.body().addClass(Constants.getBooleanByFromWebSite("admin_darkMode") ? "dark" : "light");
-        document.title(getAdminTitle());
         Element htmlElement = document.selectFirst("html");
         if (Objects.nonNull(htmlElement)) {
             htmlElement.attr("lang", I18nUtil.getCurrentLocale().split("_")[0]);
@@ -61,19 +60,13 @@ public class AdminPageController extends Controller {
                 first.attr("content", publicInfo.pwaThemeColor());
             }
         }
-        document.getElementById("__SS_DATA__").text(new Gson().toJson(serverSide(request.getUri())));
+        ServerSideDataResponse serverSideDataResponse = serverSide(request.getUri());
+        document.getElementById("__SS_DATA__").text(new Gson().toJson(serverSideDataResponse));
+        document.title(serverSideDataResponse.documentTitle());
         response.renderHtmlStr(document.html());
     }
 
-    public static String getAdminTitle() {
-        String title = (String) Constants.WEB_SITE.get("title");
-        StringJoiner sj = new StringJoiner(" | ");
-        if (StringUtils.isNotEmpty(title)) {
-            sj.add(title);
-        }
-        sj.add(I18nUtil.getAdminStringFromRes("admin.management"));
-        return sj.toString();
-    }
+
 
     /*@ResponseBody
     public ApiStandardResponse<ServerSideDataResponse> ssJson(){
@@ -89,15 +82,18 @@ public class AdminPageController extends Controller {
                 Controller controller = Controller.buildController(method, request, response);
                 ApiStandardResponse<Object> result = (ApiStandardResponse<Object>) method.invoke(controller);
                 if (Objects.nonNull(result)) {
-                    return new ServerSideDataResponse(basicInfoResponse, resourceInfo, result.getData(), AdminTokenThreadLocal.getUser().getSessionId());
+                    if (result instanceof AdminApiPageDataStrandardResponse<?> data) {
+                        return new ServerSideDataResponse(basicInfoResponse, resourceInfo, result.getData(), AdminTokenThreadLocal.getUser().getSessionId(), data.getDocumentTitle());
+                    }
+                    return new ServerSideDataResponse(basicInfoResponse, resourceInfo, result.getData(), AdminTokenThreadLocal.getUser().getSessionId(), Constants.getAdminTitle(""));
                 } else {
-                    return new ServerSideDataResponse(basicInfoResponse, resourceInfo, new Object(), AdminTokenThreadLocal.getUser().getSessionId());
+                    return new ServerSideDataResponse(basicInfoResponse, resourceInfo, new Object(), AdminTokenThreadLocal.getUser().getSessionId(), Constants.getAdminTitle(""));
                 }
             } catch (InvocationTargetException e) {
                 throw e.getTargetException();
             }
         } else {
-            return new ServerSideDataResponse(null, resourceInfo, null, null);
+            return new ServerSideDataResponse(null, resourceInfo, null, null, Constants.getAdminTitle("login"));
         }
     }
 
