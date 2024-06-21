@@ -43,6 +43,7 @@ type ArticleEditState = {
     tags: any[];
     rubbish: boolean;
     fullScreen: boolean;
+    editorVersion: number;
     editorInitSuccess: boolean;
     article: ArticleEntry;
     saving: ArticleSavingState;
@@ -173,6 +174,7 @@ const dataToState = (data: ArticleEditInfo, fullScreen: boolean, offline: boolea
               })
             : [],
         editorInitSuccess: false,
+        editorVersion: realArticle.version,
         fullScreen: fullScreen,
         tags: data.tags ? data.tags : [],
         rubbish: data.article && data.article.rubbish ? data.article.rubbish : false,
@@ -638,7 +640,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
                     style={{ zIndex: 10, minHeight: state.fullScreen ? 0 : 1 }}
                 >
                     <MyEditorMdWrapper
-                        key={data.article.version + "" + data.article.logId + "_offline:" + state.offline}
+                        key={data.article.logId + "_" + state.editorVersion + "_offline:" + state.offline}
                         onfullscreen={onfullscreen}
                         onfullscreenExit={onfullscreenExit}
                         markdown={state.article.markdown}
