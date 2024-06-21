@@ -9,6 +9,7 @@ import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.util.MimeTypeUtil;
 import com.hibegin.http.server.web.Controller;
+import com.zrlog.business.service.TemplateInfoHelper;
 import com.zrlog.common.Constants;
 
 import java.io.ByteArrayInputStream;
@@ -50,6 +51,7 @@ public class AdminPwaInterceptor implements HandleAbleInterceptor {
             }
         }
         resourceUris.add(jsonPath);
+        resourceUris.add(TemplateInfoHelper.getDefaultTemplateVO().getAdminPreviewImage());
         resourceUris.add(adminServiceWorkerJs);
     }
 
