@@ -82,7 +82,13 @@ const UpgradeSettingForm = ({ data, offline }: { data: Upgrade; offline: boolean
         <div style={{ maxWidth: 600 }}>
             <Row>
                 <Col xs={24}>
-                    <Button type="dashed" loading={checking} onClick={checkNewVersion} style={{ float: "right" }}>
+                    <Button
+                        type="dashed"
+                        disabled={offline}
+                        loading={checking}
+                        onClick={checkNewVersion}
+                        style={{ float: "right" }}
+                    >
                         {getRes().checkUpgrade}
                     </Button>
                 </Col>

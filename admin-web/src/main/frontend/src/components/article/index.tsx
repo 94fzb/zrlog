@@ -11,7 +11,7 @@ import { Link } from "react-router-dom";
 import { deleteCacheDataByKey } from "../../cache";
 import { LockOutlined } from "@ant-design/icons";
 
-const Index = ({ data }: { data: PageDataSource }) => {
+const Index = ({ data, offline }: { data: PageDataSource; offline: boolean }) => {
     const tagForMap = (tag: string) => {
         const tagElem = (
             <Tag icon={<TagOutlined />} closable={false} color={getColorPrimary()} style={{ userSelect: "none" }}>
@@ -150,6 +150,7 @@ const Index = ({ data }: { data: PageDataSource }) => {
                 </Col>
                 <Col md={10} xxl={6} sm={18}>
                     <Search
+                        disabled={offline}
                         placeholder={getRes().searchTip}
                         onSearch={onSearch}
                         defaultValue={data.key}
@@ -161,6 +162,7 @@ const Index = ({ data }: { data: PageDataSource }) => {
 
             <Divider />
             <BaseTable
+                offline={offline}
                 datasource={data}
                 columns={getColumns()}
                 editBtnRender={(id) => (

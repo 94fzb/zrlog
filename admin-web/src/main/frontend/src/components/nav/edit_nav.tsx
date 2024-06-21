@@ -13,10 +13,11 @@ const layout = {
 
 export type EditNavProps = {
     record: any;
+    offline: boolean;
     editSuccessCall: () => void;
 };
 
-const EditNav: FunctionComponent<EditNavProps> = ({ record, editSuccessCall }) => {
+const EditNav: FunctionComponent<EditNavProps> = ({ record, editSuccessCall, offline }) => {
     const [showModel, setShowModel] = useState<boolean>(false);
     const [updateForm, setUpdateForm] = useState<any>(record);
     const { message } = App.useApp();
@@ -45,6 +46,9 @@ const EditNav: FunctionComponent<EditNavProps> = ({ record, editSuccessCall }) =
                 onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
+                    if (offline) {
+                        return;
+                    }
                     setShowModel(true);
                 }}
             >

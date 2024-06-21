@@ -15,9 +15,10 @@ const layout = {
 export type EditTypeProps = {
     record: any;
     editSuccessCall: () => void;
+    offline: boolean;
 };
 
-const EditType: FunctionComponent<EditTypeProps> = ({ record, editSuccessCall }) => {
+const EditType: FunctionComponent<EditTypeProps> = ({ record, editSuccessCall, offline }) => {
     const [showModel, setShowModel] = useState<boolean>(false);
     const [updateForm, setUpdateForm] = useState<any>(record);
     const { message } = App.useApp();
@@ -46,6 +47,9 @@ const EditType: FunctionComponent<EditTypeProps> = ({ record, editSuccessCall })
                 onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
+                    if (offline) {
+                        return;
+                    }
                     setShowModel(true);
                 }}
             >

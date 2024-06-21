@@ -47,6 +47,7 @@ const BLink = ({ data, offline }: { data: PageDataSource; offline: boolean }) =>
             </Title>
             <Divider />
             <BaseTable
+                offline={offline}
                 hideId={true}
                 columns={getColumns()}
                 addBtnRender={(addSuccessCall) => {
@@ -54,7 +55,7 @@ const BLink = ({ data, offline }: { data: PageDataSource; offline: boolean }) =>
                 }}
                 datasource={data}
                 editBtnRender={(_id, record, editSuccessCall) => (
-                    <EditLink record={record} editSuccessCall={editSuccessCall} />
+                    <EditLink offline={offline} record={record} editSuccessCall={editSuccessCall} />
                 )}
                 deleteApi={"/api/admin/link/delete"}
             />

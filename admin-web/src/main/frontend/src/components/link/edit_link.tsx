@@ -15,9 +15,10 @@ const layout = {
 export type EditLinkProps = {
     record: any;
     editSuccessCall: () => void;
+    offline: boolean;
 };
 
-const EditLink: FunctionComponent<EditLinkProps> = ({ record, editSuccessCall }) => {
+const EditLink: FunctionComponent<EditLinkProps> = ({ record, editSuccessCall, offline }) => {
     const [showModel, setShowModel] = useState<boolean>(false);
     const [updateForm, setUpdateForm] = useState<any>(record);
     const { message } = App.useApp();
@@ -46,10 +47,12 @@ const EditLink: FunctionComponent<EditLinkProps> = ({ record, editSuccessCall })
                 onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
+                    if (offline) {
+                        return;
+                    }
                     setShowModel(true);
                 }}
             >
-                {" "}
                 <EditOutlined style={{ marginBottom: 8, color: getColorPrimary() }} />
             </Link>
             <Modal title={getRes()["edit"]} open={showModel} onOk={handleOk} onCancel={() => setShowModel(false)}>

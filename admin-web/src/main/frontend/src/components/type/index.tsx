@@ -49,13 +49,14 @@ const Type = ({ data, offline }: { data: PageDataSource; offline: boolean }) => 
             </Title>
             <Divider />
             <BaseTable
+                offline={offline}
                 hideId={true}
                 columns={getColumns()}
                 addBtnRender={(addSuccessCall) => {
                     return <AddType offline={offline} addSuccessCall={addSuccessCall} />;
                 }}
                 editBtnRender={(_id, record, editSuccessCall) => (
-                    <EditType record={record} editSuccessCall={editSuccessCall} />
+                    <EditType offline={offline} record={record} editSuccessCall={editSuccessCall} />
                 )}
                 datasource={data}
                 deleteApi={"/api/admin/type/delete"}

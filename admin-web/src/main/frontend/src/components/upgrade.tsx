@@ -32,7 +32,7 @@ type StepInfo = {
 
 let upgradeTimer: NodeJS.Timeout;
 
-const Upgrade = ({ data }: { data: UpgradeData }) => {
+const Upgrade = ({ data, offline }: { data: UpgradeData; offline: boolean }) => {
     const preUpgradeKey = data.preUpgradeKey;
     const steps: StepInfo[] = [
         {
@@ -155,6 +155,9 @@ const Upgrade = ({ data }: { data: UpgradeData }) => {
     };
 
     const nextDisabled = (): boolean => {
+        if (offline) {
+            return true;
+        }
         if (!data.upgrade) {
             return true;
         }

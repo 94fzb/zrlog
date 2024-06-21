@@ -15,6 +15,7 @@ type BaseTableProps = {
     datasource?: PageDataSource;
     searchKey?: string;
     hideId?: boolean;
+    offline: boolean;
     addBtnRender?: (addSuccessCall: () => void) => any;
     editBtnRender?: (id: number, record: any, editSuccessCall: () => void) => any;
 };
@@ -50,6 +51,7 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
     searchKey,
     deleteSuccessCallback,
     hideId,
+    offline,
 }) => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -172,6 +174,7 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
                             }}
                         >
                             <Popconfirm
+                                disabled={offline}
                                 title={getRes()["deleteTips"]}
                                 onConfirm={() =>
                                     handleDelete(tableDataState.pagination, deleteApi, record.id).then(() => {

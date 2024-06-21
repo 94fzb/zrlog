@@ -24,7 +24,7 @@ type LoginState = {
     password: string;
 };
 
-const Index = () => {
+const Index = ({ offline }: { offline: boolean }) => {
     const [logging, setLogging] = useState<boolean>(false);
     const [loginState, setLoginState] = useState<LoginState>({
         userName: "",
@@ -137,7 +137,7 @@ const Index = () => {
 
                             <Row style={{ alignItems: "center", display: "flex" }}>
                                 <Col xxl={24} xs={24}>
-                                    <Button loading={logging} type="primary" htmlType="submit">
+                                    <Button disabled={offline} loading={logging} type="primary" htmlType="submit">
                                         <LoginOutlined /> {getRes().login}
                                     </Button>
                                 </Col>

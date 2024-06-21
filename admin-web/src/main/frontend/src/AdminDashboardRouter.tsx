@@ -203,7 +203,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({ of
                     <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncComment data={getDataFromState()} />
+                                <AsyncComment offline={offline} data={getDataFromState()} />
                             </Suspense>
                         )}
                     </AdminManageLayout>
@@ -333,7 +333,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({ of
                     <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncArticle data={getDataFromState()} />
+                                <AsyncArticle offline={state.offline} data={getDataFromState()} />
                             </Suspense>
                         )}
                     </AdminManageLayout>
@@ -415,6 +415,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({ of
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
                                 <AsyncUpgrade
+                                    offline={state.offline}
                                     key={(getDataFromState() as UpgradeData).preUpgradeKey}
                                     data={getDataFromState()}
                                 />
@@ -429,7 +430,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({ of
                     <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncTemplateConfig data={getDataFromState()} />
+                                <AsyncTemplateConfig offline={state.offline} data={getDataFromState()} />
                             </Suspense>
                         )}
                     </AdminManageLayout>

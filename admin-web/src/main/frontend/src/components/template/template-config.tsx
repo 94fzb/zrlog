@@ -37,7 +37,7 @@ const convertToDataMap = (data: TemplateConfigState) => {
     return dataMap;
 };
 
-const TemplateConfig = ({ data }: { data: TemplateConfigState }) => {
+const TemplateConfig = ({ data, offline }: { data: TemplateConfigState; offline: boolean }) => {
     const dataMap = convertToDataMap(data);
     const [state, setState] = useState<TemplateConfigState>({
         config: data.config,
@@ -146,7 +146,7 @@ const TemplateConfig = ({ data }: { data: TemplateConfigState }) => {
                     >
                         {getFormItems()}
                         <Divider />
-                        <Button type="primary" htmlType="submit">
+                        <Button disabled={offline} type="primary" htmlType="submit">
                             {getRes()["submit"]}
                         </Button>
                     </Form>

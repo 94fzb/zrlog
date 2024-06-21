@@ -4,7 +4,7 @@ import { getRes } from "../utils/constants";
 import BaseTable, { PageDataSource } from "../common/BaseTable";
 import TextArea from "antd/es/input/TextArea";
 
-const Comment = ({ data }: { data: PageDataSource }) => {
+const Comment = ({ data, offline }: { data: PageDataSource; offline: boolean }) => {
     const getColumns = () => {
         return [
             {
@@ -59,7 +59,7 @@ const Comment = ({ data }: { data: PageDataSource }) => {
                 {getRes()["admin.comment.manage"]}
             </Title>
             <Divider />
-            <BaseTable datasource={data} columns={getColumns()} deleteApi={getDeleteApiUri()} />
+            <BaseTable offline={offline} datasource={data} columns={getColumns()} deleteApi={getDeleteApiUri()} />
         </>
     );
 };

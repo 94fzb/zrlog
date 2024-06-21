@@ -77,7 +77,7 @@ const AppBase = ({ offline }: { offline: boolean }) => {
                     element={
                         <ErrorBoundary>
                             <Suspense fallback={<Spin spinning={true} fullscreen delay={1000} />}>
-                                <AsyncLogin />
+                                <AsyncLogin offline={offline} />
                             </Suspense>
                         </ErrorBoundary>
                     }
@@ -87,7 +87,7 @@ const AppBase = ({ offline }: { offline: boolean }) => {
                     element={
                         <ErrorBoundary>
                             <Suspense fallback={<Spin spinning={true} fullscreen delay={1000} />}>
-                                <AsyncLogin />
+                                <AsyncLogin offline={offline} />
                             </Suspense>
                         </ErrorBoundary>
                     }

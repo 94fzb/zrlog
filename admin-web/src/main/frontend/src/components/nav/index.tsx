@@ -41,13 +41,14 @@ const Nav = ({ data, offline }: { data: PageDataSource; offline: boolean }) => {
             </Title>
             <Divider />
             <BaseTable
+                offline={offline}
                 hideId={true}
                 columns={getColumns()}
                 addBtnRender={(addSuccessCall) => {
                     return <AddNav offline={offline} addSuccessCall={addSuccessCall} />;
                 }}
                 editBtnRender={(_id, record, editSuccessCall) => (
-                    <EditNav record={record} editSuccessCall={editSuccessCall} />
+                    <EditNav offline={offline} record={record} editSuccessCall={editSuccessCall} />
                 )}
                 datasource={data}
                 deleteApi={"/api/admin/nav/delete"}
