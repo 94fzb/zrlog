@@ -154,7 +154,10 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
                 dataIndex: "id",
                 key: "id",
                 fixed: true,
-                width: 80,
+                width: 64,
+                render: (text: string) => {
+                    return <span style={{ maxWidth: 64 }}>{text}</span>;
+                },
             });
         }
         c.push({
