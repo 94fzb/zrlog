@@ -7,9 +7,7 @@ mirrorWebSite=https://dl.zrlog.com/
 runMode=${1}
 runModeDesc=${2}
 Date=$(date --rfc-3339="seconds")
-length=7
-commitId=$(git log --format="%H" -n 1)
-buildId=$(expr substr ${commitId} 1 ${length})
+buildId=$(git rev-parse --short HEAD)
 mkdir -p data/src/main/resources
 echo -e "version=${version}\nrunMode=${runMode}\nbuildId=${buildId}\nbuildTime=${Date}\nmirrorWebSite=${mirrorWebSite}" > data/src/main/resources/build.properties
 bash -e bin/package-zip.sh

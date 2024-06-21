@@ -7,7 +7,6 @@ mirrorWebSite=https://dl.zrlog.com/
 runMode=${1}
 runModeDesc=${2}
 Date=$(date +"%Y-%m-%d %H:%M:%S%z" | sed "s/\([+-]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1\2:\3/")
-length=7
 buildId=$(git rev-parse --short HEAD)
 mkdir -p data/src/main/resources
 # 判断操作系统类型
