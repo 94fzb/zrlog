@@ -1,5 +1,7 @@
 package com.zrlog.web.config;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.StringUtils;
@@ -8,9 +10,7 @@ import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpRequestListener;
 import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.api.Interceptor;
-import com.hibegin.http.server.config.RequestConfig;
-import com.hibegin.http.server.config.ResponseConfig;
-import com.hibegin.http.server.config.ServerConfig;
+import com.hibegin.http.server.config.*;
 import com.zaxxer.hikari.util.DriverDataSource;
 import com.zrlog.admin.web.config.AdminRouters;
 import com.zrlog.admin.web.interceptor.AdminInterceptor;
@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
@@ -90,6 +91,20 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         serverConfig = new ServerConfig().setApplicationName("zrlog").setDisablePrintWebServerInfo(true);
         serverConfig.setNativeImageAgent(Constants.runMode == RunMode.NATIVE_AGENT);
         serverConfig.setDisableSession(true);
+        serverConfig.setHttpJsonMessageConverter(new GsonHttpJsonMessageConverter() {
+            @Override
+            public String toJson(Object obj) throws Exception {
+                GsonBuilder gsonBuilder = new GsonBuilder();
+                gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter());
+                Gson gson = gsonBuilder.create();
+                return gson.toJson(obj);
+            }
+
+            @Override
+            public Object fromJson(String jsonStr) throws Exception {
+                return super.fromJson(jsonStr);
+            }
+        });
         serverConfig.addErrorHandle(400, new ZrLogErrorHandle(400));
         serverConfig.addErrorHandle(403, new ZrLogErrorHandle(403));
         serverConfig.addErrorHandle(404, new ZrLogErrorHandle(404));
