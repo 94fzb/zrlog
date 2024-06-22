@@ -20,9 +20,6 @@ public class BlogApiArticleController extends Controller {
     @ResponseBody
     public ApiStandardResponse<Map<String, Object>> detail() throws SQLException {
         Map<String, Object> log = articleService.detail(request.getParaToStr("id"));
-        log.remove("releaseTime");
-        log.remove("last_update_date");
-        log.remove("lastUpdateDate");
         return new ApiStandardResponse<>(log);
     }
 
