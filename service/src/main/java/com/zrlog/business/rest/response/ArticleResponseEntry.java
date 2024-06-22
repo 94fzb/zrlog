@@ -18,6 +18,7 @@ public class ArticleResponseEntry {
     private String url;
     private String alias;
     private String arrange_plugin;
+    private String typeAlias;
 
     public int getClick() {
         return click;
@@ -137,5 +138,13 @@ public class ArticleResponseEntry {
 
     public void setArrange_plugin(String arrange_plugin) {
         this.arrange_plugin = arrange_plugin;
+    }
+
+    public String getTypeAlias() {
+        return typeAlias;
+    }
+
+    public void setTypeAlias(String typeAlias) {
+        this.typeAlias = typeAlias;
     }
 }
