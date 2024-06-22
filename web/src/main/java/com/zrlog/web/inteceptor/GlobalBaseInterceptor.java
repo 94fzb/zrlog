@@ -9,6 +9,7 @@ import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.ZrLogUtil;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -39,8 +40,8 @@ public class GlobalBaseInterceptor implements Interceptor {
     public boolean doInterceptor(HttpRequest request, HttpResponse response) {
         String target = request.getUri();
         request.getAttr().put("requrl", ZrLogUtil.getFullUrl(request));
-        request.getAttr().put("reqUriPath", request.getUri());
-        request.getAttr().put("reqQueryString", request.getQueryStr());
+        request.getAttr().put("reqUriPath", Objects.requireNonNullElse(request.getUri(),"/"));
+        request.getAttr().put("reqQueryString", Objects.requireNonNullElse(request.getQueryStr(),""));
         Constants.setLastAccessTime(System.currentTimeMillis());
         //便于Wappalyzer读取
         response.addHeader("X-ZrLog", BlogBuildInfoUtil.getVersion());
