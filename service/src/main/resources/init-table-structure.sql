@@ -78,6 +78,7 @@ CREATE TABLE `type`
     `remark`   varchar(2000) DEFAULT NULL,
     `typeName` varchar(128)  DEFAULT NULL,
     `pid`      int(11) DEFAULT NULL,
+    `arrange_plugin`  varchar(64)  DEFAULT null COMMENT '文章分类统筹重排插件名称'
     PRIMARY KEY (`typeId`),
     KEY        `pid` (`pid`),
     CONSTRAINT `type_ibfk_1` FOREIGN KEY (`pid`) REFERENCES `type` (`typeId`)
@@ -129,6 +130,7 @@ CREATE TABLE `log`
     `rubbish`          bit(1)       DEFAULT NULL,
     `privacy`          bit(1)       DEFAULT NULL,
     `editor_type`      varchar(256) DEFAULT NULL,
+    `arrange_plugin`  varchar(64)  DEFAULT null COMMENT '文章统筹重排插件名称'
     PRIMARY KEY (`logId`),
     KEY                `typeId` (`typeId`),
     KEY                `userId` (`userId`),

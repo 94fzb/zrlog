@@ -10,6 +10,7 @@ import com.zrlog.common.type.RunMode;
 import com.zrlog.util.DbConnectUtils;
 import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ParseUtil;
+import com.zrlog.util.ZrLogUtil;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
@@ -153,21 +154,10 @@ public class InstallService {
         Properties properties = new Properties();
         properties.putAll(dbConn);
         try (Connection connect = DbConnectUtils.getConnection(properties)) {
-            String s = IOUtil.getStringInputStream(InstallService.class.getResourceAsStream("/init-table-structure.sql"));
-            String[] sql = s.split("\n");
-            StringBuilder tempSqlStr = new StringBuilder();
-            for (String sqlSt : sql) {
-                if (sqlSt.startsWith("#") || sqlSt.startsWith("/*")) {
-                    continue;
-                }
-                tempSqlStr.append(sqlSt);
-            }
-            sql = tempSqlStr.toString().split(";");
-            for (String sqlSt : sql) {
-                if (!"".equals(sqlSt)) {
-                    try (Statement st = connect.createStatement()) {
-                        st.execute(sqlSt);
-                    }
+            String sql = IOUtil.getStringInputStream(InstallService.class.getResourceAsStream("/init-table-structure.sql"));
+            for(String sqlSt: ZrLogUtil.extractExecutableSql(sql)) {
+                try (Statement st = connect.createStatement()) {
+                    st.execute(sqlSt);
                 }
             }
             //初始数据

@@ -253,6 +253,9 @@ public class ZrLogConfigImpl extends ZrLogConfig {
                 Statement statement = connection.createStatement();
                 try {
                     for (String sql : entry.getValue()) {
+                        if(StringUtils.isEmpty(sql.trim())){
+                            continue;
+                        }
                         statement.execute(sql);
                     }
                 } catch (Exception e) {
@@ -278,7 +281,9 @@ public class ZrLogConfigImpl extends ZrLogConfig {
                         return;
                     }
                 } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
-                    LOGGER.log(Level.WARNING, "Try exec upgrade method error, " + e.getMessage());
+                    if(Constants.debugLoggerPrintAble()) {
+                        LOGGER.log(Level.WARNING, "Try exec upgrade method error, " + e.getMessage());
+                    }
                 }
             }
         } catch (Exception e) {

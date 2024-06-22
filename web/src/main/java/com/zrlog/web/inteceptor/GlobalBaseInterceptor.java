@@ -39,6 +39,8 @@ public class GlobalBaseInterceptor implements Interceptor {
     public boolean doInterceptor(HttpRequest request, HttpResponse response) {
         String target = request.getUri();
         request.getAttr().put("requrl", ZrLogUtil.getFullUrl(request));
+        request.getAttr().put("reqUriPath", request.getUri());
+        request.getAttr().put("reqQueryString", request.getQueryStr());
         Constants.setLastAccessTime(System.currentTimeMillis());
         //便于Wappalyzer读取
         response.addHeader("X-ZrLog", BlogBuildInfoUtil.getVersion());

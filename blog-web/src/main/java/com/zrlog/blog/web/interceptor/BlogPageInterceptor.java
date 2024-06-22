@@ -11,6 +11,7 @@ import com.hibegin.http.server.web.Controller;
 import com.zrlog.business.exception.MissingInstallException;
 import com.zrlog.business.plugin.StaticHtmlPlugin;
 import com.zrlog.business.service.TemplateHelper;
+import com.zrlog.business.service.TemplateInfoHelper;
 import com.zrlog.business.util.InstallUtils;
 import com.zrlog.common.Constants;
 import com.zrlog.util.ZrLogUtil;
@@ -36,29 +37,6 @@ public class BlogPageInterceptor implements HandleAbleInterceptor {
             return false;
         }
         return "/".equals(targetUri) || (targetUri.startsWith("/" + Constants.getArticleUri()) && targetUri.endsWith(".html"));
-    }
-
-
-    private void initTemplate() {
-        if (!InstallUtils.isInstalled()) {
-            return;
-        }
-        String configTemplate = Constants.WEB_SITE.getOrDefault("template", Constants.DEFAULT_TEMPLATE_PATH).toString();
-        File path = new File(PathUtil.getStaticPath() + configTemplate);
-        if (path.exists() && !Objects.equals(configTemplate, Constants.DEFAULT_TEMPLATE_PATH)) {
-            try {
-                FreeMarkerUtil.init(path.getPath());
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            try {
-                FreeMarkerUtil.initClassTemplate(Constants.DEFAULT_TEMPLATE_PATH);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-
     }
 
     @Override
@@ -109,7 +87,10 @@ public class BlogPageInterceptor implements HandleAbleInterceptor {
         Object invoke = method.invoke(Controller.buildController(method, request, response));
         if (Objects.nonNull(invoke)) {
             TemplateHelper.fullTemplateInfo(request);
-            initTemplate();
+            TemplateUtils.initTemplate();
+            if(TemplateHelper.isArrangeable(request) && TemplateUtils.existsByTemplateName("arrange")){
+                invoke = "arrange";
+            }
             String htmlStr = FreeMarkerUtil.renderToFM(invoke.toString(), request);
             render(htmlStr, target, request, response);
         }

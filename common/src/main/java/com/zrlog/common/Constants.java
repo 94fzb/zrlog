@@ -85,7 +85,7 @@ public class Constants {
 
     public static final Map<String, Object> WEB_SITE = new ConcurrentSkipListMap<>();
 
-    public static final Integer SQL_VERSION = 17;
+    public static final Integer SQL_VERSION = 18;
 
     /**
      * 1天

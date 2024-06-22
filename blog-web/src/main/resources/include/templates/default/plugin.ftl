@@ -1,4 +1,3 @@
-</section>
 <aside>
     <#if _res.widgetAd?has_content>
         <div class="widget" style="padding-bottom: 15px">

@@ -38,4 +38,3 @@
 </nav>
 <div class="main clearfloat">
     <div class="container">
-        <section>

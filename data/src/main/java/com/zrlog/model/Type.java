@@ -18,12 +18,12 @@ public class Type extends BasePageableDAO {
     }
 
     public List<Map<String, Object>> findAll() throws SQLException {
-        return queryListWithParams("select t.typeId as id,t.alias,t.typeName,t.remark,(select count(logId) from " + Log.TABLE_NAME +
+        return queryListWithParams("select t.typeId as id,t.alias,t.typeName,t.remark,t.arrange_plugin,(select count(logId) from " + Log.TABLE_NAME +
                 " where rubbish=? and privacy=? and typeid=t.typeid) as typeamount from " + tableName + " t", false, false);
     }
 
     public PageData<Map<String, Object>> find(PageRequest page) throws SQLException {
-        return queryPageData("select t.typeId as id,t.alias,t.typeName,t.remark,(select count(logId) from " + Log.TABLE_NAME +
+        return queryPageData("select t.typeId as id,t.alias,t.typeName,t.remark,t.arrange_plugin,(select count(logId) from " + Log.TABLE_NAME +
                 " where typeid=t.typeid) as typeamount from " + tableName + " t", page, new Object[0]);
     }
 

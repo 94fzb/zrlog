@@ -141,8 +141,8 @@ public class ZrLogUtil {
         for (Map.Entry<Integer, String> f : getSqlFileList().entrySet()) {
             int fileVersion = f.getKey();
             if (fileVersion > dbVersion) {
-                LOGGER.info("Need update sql " + f);
-                Map.Entry<Integer, List<String>> entry = new AbstractMap.SimpleEntry<>(fileVersion, Arrays.asList(f.getValue().split("\n")));
+                Map.Entry<Integer, List<String>> entry = new AbstractMap.SimpleEntry<>(fileVersion, extractExecutableSql(f.getValue()));
+                LOGGER.info("Need update sql "+ fileVersion+".sql \n" + String.join(";\n",entry.getValue()) + ";");
                 sqlList.add(entry);
             }
         }
@@ -222,6 +222,26 @@ public class ZrLogUtil {
             return Integer.parseInt(webPort);
         }
         return 8080;
+    }
+
+    public static List<String> extractExecutableSql(String sql){
+        String[] sqlArr = sql.split("\n");
+        StringBuilder tempSqlStr = new StringBuilder();
+        List<String> sqlList = new ArrayList<>();
+        for (String sqlSt : sqlArr) {
+            if (sqlSt.startsWith("#") || sqlSt.startsWith("/*")) {
+                continue;
+            }
+            tempSqlStr.append(sqlSt);
+        }
+        String[] cleanSql = tempSqlStr.toString().split(";");
+        for (String sqlSt : cleanSql) {
+            if (StringUtils.isEmpty(sqlSt) || sqlSt.trim().isEmpty()) {
+                continue;
+            }
+            sqlList.add(sqlSt);
+        }
+        return sqlList;
     }
 
 }

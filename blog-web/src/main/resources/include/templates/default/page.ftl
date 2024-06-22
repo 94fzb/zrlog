@@ -1,4 +1,5 @@
 <#include "header.ftl">
+    <section>
 <#if data?has_content>
     <#if tipsType?has_content>
         <div style="padding-bottom: 12px">
@@ -37,5 +38,6 @@
 </#if>
 
 <#include "pager.ftl">
+    </section>
 <#include "plugin.ftl">
 <#include "footer.ftl">

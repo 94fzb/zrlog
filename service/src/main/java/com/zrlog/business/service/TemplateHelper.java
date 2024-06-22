@@ -11,7 +11,6 @@ import com.zrlog.business.cache.vo.Archive;
 import com.zrlog.business.cache.vo.BaseDataInitVO;
 import com.zrlog.business.util.PagerVO;
 import com.zrlog.common.Constants;
-import com.zrlog.common.type.RunMode;
 import com.zrlog.common.vo.OutlineVO;
 import com.zrlog.data.dto.PageData;
 import com.zrlog.model.WebSite;
@@ -71,7 +70,7 @@ public class TemplateHelper {
             pager.setPageEndUrl(baseUrl + pager.getPageEndUrl() + suffix);
         }
         fillTags(suffix, baseUrl, baseDataInitVO.getTags());
-        fillType(suffix, baseUrl, baseDataInitVO.getTypes());
+        fillType(suffix, baseUrl, baseDataInitVO.getTypes(),request);
         fullNavBar(request, suffix, baseDataInitVO);
         baseDataInitVO.setArchiveList(getConvertedArchives(suffix, baseUrl, baseDataInitVO.getArchives()));
     }
@@ -96,11 +95,13 @@ public class TemplateHelper {
         }
     }
 
-    private static void fillType(String suffix, String baseUrl, List<Map<String, Object>> types) {
+    private static void fillType(String suffix, String baseUrl, List<Map<String, Object>> types,HttpRequest request) {
         for (Map<String, Object> type : types) {
-            String tagUri = baseUrl + Constants.getArticleUri() + "sort/" + URLEncoder.encode((String) type.get("alias"),
-                    StandardCharsets.UTF_8) + suffix;
-            type.put("url", tagUri);
+            String typeUri = baseUrl + Constants.getArticleUri() + "sort/" +  type.get("alias");
+            if(request.getUri().startsWith(typeUri)){
+                tryEnableArrangePlugin((String) type.get("arrange_plugin"),request);
+            }
+            type.put("url", WebTools.encodeUrl(typeUri) + suffix);
         }
     }
 
@@ -271,9 +272,20 @@ public class TemplateHelper {
             }
             log.put("toc", outlineVO);
         }
+        tryEnableArrangePlugin((String) log.get("arrange_plugin"),request);
         if (Objects.isNull(log.get("content"))) {
             log.put("content", "");
         }
+    }
+
+    private static void tryEnableArrangePlugin(String pluginName,HttpRequest request){
+        if(Objects.nonNull(pluginName) && StringUtils.isNotEmpty(pluginName)) {
+            request.getAttr().put("arrangePlugin", pluginName);
+        }
+    }
+
+    public static boolean isArrangeable(HttpRequest request){
+        return Objects.nonNull(request.getAttr().get("arrangePlugin"));
     }
 
     /**
