@@ -17,6 +17,7 @@ public class ArticleResponseEntry {
     private boolean privacy;
     private String url;
     private String alias;
+    private String arrange_plugin;
 
     public int getClick() {
         return click;
@@ -128,5 +129,13 @@ public class ArticleResponseEntry {
 
     public void setCommentSize(String commentSize) {
         this.commentSize = commentSize;
+    }
+
+    public String getArrange_plugin() {
+        return arrange_plugin;
+    }
+
+    public void setArrange_plugin(String arrange_plugin) {
+        this.arrange_plugin = arrange_plugin;
     }
 }
