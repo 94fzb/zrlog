@@ -126,7 +126,7 @@ class ResponseRenderPrintWriter extends PrintWriter {
         }
         String html = document.html();
         for (Map.Entry<String, String> entry : replaceMap.entrySet()) {
-            html = html.replaceAll(entry.getKey(), entry.getValue());
+            html = html.replace(entry.getKey(), entry.getValue());
         }
         String versionInfo = SecurityUtils.md5(html);
         if (ZrLogUtil.isStaticBlogPlugin(request)) {
