@@ -38,13 +38,6 @@ public class TemplateController extends Controller {
 
     private final TemplateService templateService = new TemplateService();
 
-    public TemplateController() {
-    }
-
-    public TemplateController(HttpRequest request, HttpResponse response) {
-        super(request, response);
-    }
-
     @RefreshCache
     @ResponseBody
     public ApiStandardResponse<Void> apply() throws SQLException {
@@ -65,7 +58,7 @@ public class TemplateController extends Controller {
     @RefreshCache
     @ResponseBody
     public ApiStandardResponse<Void> preview() {
-        String template = request.getParaToStr("template");
+        String template = Constants.TEMPLATE_BASE_PATH + request.getParaToStr("shortTemplate");
         if (StringUtils.isEmpty(template)) {
             throw new TemplatePathNotNullException();
         }
@@ -132,7 +125,7 @@ public class TemplateController extends Controller {
 
     @ResponseBody
     public ApiStandardResponse<TemplateVO> configParams() {
-        String template = request.getParaToStr("template");
+        String template = Constants.TEMPLATE_BASE_PATH + request.getParaToStr("shortTemplate");
         if (StringUtils.isEmpty(template)) {
             return new ApiStandardResponse<>();
         }

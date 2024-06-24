@@ -17,6 +17,7 @@ export type TemplateEntry = {
     deleteAble: boolean;
     use: boolean;
     name: string;
+    shortTemplate: string;
     previewImage: string;
     adminPreviewImage: string;
     preview: boolean;
@@ -61,7 +62,7 @@ const Template = ({ data }: { data: TemplateEntry[] }) => {
             <div onClick={() => preview(template.template)}>
                 <EyeOutlined key="preview" />
             </div>,
-            <Link to={"/template-config?template=" + template.template}>
+            <Link to={"/template-config?shortTemplate=" + template.shortTemplate}>
                 <SettingOutlined key="setting" />
             </Link>,
             <div onClick={() => apply(template.template)}>

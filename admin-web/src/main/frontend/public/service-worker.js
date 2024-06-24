@@ -1,4 +1,4 @@
-const CACHE_NAME = 'my-cache-v4';
+const CACHE_NAME = 'my-cache-v5';
 const urlsToCache = [
     '/admin/index',
     '/api/admin/index',
@@ -22,8 +22,8 @@ const urlsToCache = [
     '/api/admin/website/other',
     '/admin/website/upgrade',
     '/api/admin/website/upgrade',
-    '/admin/template-config?template=/include/templates/default',
-    '/api/admin/template-config?template=/include/templates/default',
+    '/admin/template-config?shortTemplate=default',
+    '/api/admin/template-config?shortTemplate=default',
     '/admin/type',
     '/api/admin/type',
     '/admin/link',

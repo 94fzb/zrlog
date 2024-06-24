@@ -7,6 +7,7 @@ import com.zrlog.common.vo.TemplateVO;
 import com.zrlog.util.I18nUtil;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
@@ -27,6 +28,7 @@ public class TemplateInfoHelper {
         try (InputStream in = new BufferedInputStream(inputStream)) {
             TemplateVO templateVO = new TemplateVO();
             templateVO.setTemplate(templatePath);
+            templateVO.setShortTemplate(new File(templatePath).getName());
             Properties properties = new Properties();
             properties.load(in);
             templateVO.setAuthor(properties.getProperty("author"));
@@ -43,7 +45,7 @@ public class TemplateInfoHelper {
                     if (!image.startsWith("https://") && !image.startsWith("http://")) {
                         images[i] = templatePath + "/" + image;
                         if (i == 0) {
-                            adminPreviewImageUrl = ADMIN_PREVIEW_IMAGE_URI + "?templateName=" + templateVO.getTemplate() + "&t=" + Constants.zrLogConfig.getCacheService().getFileFlagFirstByCache(images[i]);
+                            adminPreviewImageUrl = ADMIN_PREVIEW_IMAGE_URI + "?shortTemplate=" + templateVO.getShortTemplate() + "&t=" + Constants.zrLogConfig.getCacheService().getFileFlagFirstByCache(images[i]);
                         }
                     } else {
                         if (i == 0) {

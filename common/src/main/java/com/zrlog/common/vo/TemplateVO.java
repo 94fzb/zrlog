@@ -7,6 +7,7 @@ import java.util.List;
 public class TemplateVO {
 
     private String template;
+    private String shortTemplate;
     private String url;
     private String version;
     private String name;
@@ -133,6 +134,14 @@ public class TemplateVO {
 
     public void setConfig(TemplateConfigMap config) {
         this.config = config;
+    }
+
+    public String getShortTemplate() {
+        return shortTemplate;
+    }
+
+    public void setShortTemplate(String shortTemplate) {
+        this.shortTemplate = shortTemplate;
     }
 
     public static class TemplateConfigMap extends LinkedHashMap<String, TemplateConfigVO> {
