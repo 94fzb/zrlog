@@ -41,7 +41,7 @@ public class TemplateController extends Controller {
     @RefreshCache
     @ResponseBody
     public ApiStandardResponse<Void> apply() throws SQLException {
-        String template = request.getParaToStr("template");
+        String template = Constants.TEMPLATE_BASE_PATH + request.getParaToStr("shortTemplate");
         new WebSite().updateByKV("template", template);
         ApiStandardResponse<Void> apiStandardResponse = new ApiStandardResponse<>();
         apiStandardResponse.setError(0);
@@ -73,7 +73,7 @@ public class TemplateController extends Controller {
 
     @ResponseBody
     public ApiStandardResponse<Void> delete() {
-        String template = checkByWhiteList(request.getParaToStr("template"));
+        String template = checkByWhiteList(Constants.TEMPLATE_BASE_PATH + request.getParaToStr("shortTemplate"));
         File file = new File(PathUtil.getStaticPath() + template);
         if (file.exists()) {
             FileUtils.deleteFile(file.toString());

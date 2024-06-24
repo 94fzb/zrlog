@@ -27,7 +27,7 @@ public class AdminTemplatePageController extends Controller {
     }
 
     public void previewImage() {
-        String templateName = Constants.DEFAULT_TEMPLATE_PATH + request.getParaToStr("shortTemplate");
+        String templateName = Constants.TEMPLATE_BASE_PATH + request.getParaToStr("shortTemplate");
         TemplateVO templateVO = new TemplateService().loadTemplateConfig(templateName);
         if (Objects.isNull(templateVO)) {
             response.renderCode(404);

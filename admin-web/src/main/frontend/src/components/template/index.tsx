@@ -33,21 +33,21 @@ const Template = ({ data }: { data: TemplateEntry[] }) => {
         });
     };
 
-    const preview = (template: string) => {
-        axios.post("/api/admin/template/preview?template=" + template).then(() => {
+    const preview = (shortTemplate: string) => {
+        axios.post("/api/admin/template/preview?shortTemplate=" + shortTemplate).then(() => {
             window.open(document.baseURI, "_blank");
             load();
         });
     };
 
-    const apply = (template: string) => {
-        axios.post("/api/admin/template/apply?template=" + template).then(() => {
+    const apply = (shortTemplate: string) => {
+        axios.post("/api/admin/template/apply?shortTemplate=" + shortTemplate).then(() => {
             load();
         });
     };
 
-    const deleteTemplate = (template: string) => {
-        axios.post("/api/admin/template/delete?template=" + template).then(() => {
+    const deleteTemplate = (shortTemplate: string) => {
+        axios.post("/api/admin/template/delete?shortTemplate=" + shortTemplate).then(() => {
             load();
         });
     };
@@ -59,13 +59,13 @@ const Template = ({ data }: { data: TemplateEntry[] }) => {
     const getActions = (template: TemplateEntry) => {
         const links = [];
         links.push(
-            <div onClick={() => preview(template.template)}>
+            <div onClick={() => preview(template.shortTemplate)}>
                 <EyeOutlined key="preview" />
             </div>,
             <Link to={"/template-config?shortTemplate=" + template.shortTemplate}>
                 <SettingOutlined key="setting" />
             </Link>,
-            <div onClick={() => apply(template.template)}>
+            <div onClick={() => apply(template.shortTemplate)}>
                 <CheckOutlined />
             </div>
         );
@@ -74,7 +74,7 @@ const Template = ({ data }: { data: TemplateEntry[] }) => {
                 <Popconfirm
                     title={getRes()["deleteTips"]}
                     onConfirm={() => {
-                        deleteTemplate(template.template);
+                        deleteTemplate(template.shortTemplate);
                     }}
                 >
                     <DeleteOutlined key="delete" />
