@@ -243,6 +243,8 @@ const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ offline,
                 <Header
                     hidden={fullScreen}
                     style={{
+                        display: "flex",
+                        justifyContent: "space-between",
                         backgroundColor: EnvUtils.isDarkMode() ? "#1f1f1f" : "#011529",
                     }}
                 >
