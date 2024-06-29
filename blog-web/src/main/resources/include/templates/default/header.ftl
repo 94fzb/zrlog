@@ -31,7 +31,7 @@
     ${_res.globalStyle!''}
 </head>
 <body>
-<nav class="navbar navbar-expand-lg <#if _res.navStickyTop>sticky-top</#if> navbar-custom">
+<nav class="navbar navbar-expand-lg <#if _res.navStickyTop?? && _res.navStickyTop>sticky-top</#if> navbar-custom">
     <div class="container">
         <a <#if _res.navBarBrand?has_content>class='navbar-brand'</#if>
            href="${rurl}"><#if _res.navBarBrand?has_content>
