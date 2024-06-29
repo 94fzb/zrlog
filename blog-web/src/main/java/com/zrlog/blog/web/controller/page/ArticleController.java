@@ -127,6 +127,9 @@ public class ArticleController extends Controller {
             List<Map<String,Object>> tags = new ArrayList<>();
             String keywords = Objects.requireNonNullElse(detail.get("keywords"),"").toString();
             for (String tag : keywords.split(",")) {
+                if(StringUtils.isEmpty(tag.trim())){
+                    continue;
+                }
                 String tagUrl = WebTools.getHomeUrl(request) + Constants.getArticleUri() + "tag/" + URLEncoder.encode( tag, StandardCharsets.UTF_8) + TemplateHelper.getSuffix(request);;
                 tags.add(Map.of("name",tag,"url",tagUrl));
             }
