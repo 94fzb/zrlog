@@ -554,3 +554,17 @@ li.page-item {
         background-color: #212529 !important;
     }
 }
+
+@media (prefers-color-scheme: light) {
+    .navbar-custom {
+        background: linear-gradient(to right, #0d6efd, #1365bc);
+    }
+
+    .navbar-custom .navbar-brand {
+        color: #ffffff; /* 白色字体 */
+    }
+
+    .navbar-custom .nav-link {
+        color: #ffffff; /* 白色字体 */
+    }
+}

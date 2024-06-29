@@ -15,7 +15,7 @@
     <script src="${url}/js/auto-theme.js"></script>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg sticky-top">
+<nav class="navbar navbar-expand-lg sticky-top navbar-custom">
     <div class="container">
         <a <#if _res.navBarBrand?has_content>class='navbar-brand'</#if>
            href="${rurl}"><#if _res.navBarBrand?has_content>
