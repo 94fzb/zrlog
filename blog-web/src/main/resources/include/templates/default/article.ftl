@@ -15,6 +15,13 @@
         ${log.content!''}
     </div>
     <hr style="padding-top: 16px;"/>
+    <#if log.tags?has_content>
+    <div style="display: flex;gap: 8px;height: 60px;align-items: center">
+        <#list log.tags as tag>
+            <a href="${tag.url}"><span class="badge text-bg-primary" style="font-size: 14px">#${tag.name}</span></a>
+        </#list>
+    </div>
+    </#if>
     <p>
         ${_res.reprint!''}
         <a title="${log.title}" href="${log.noSchemeUrl}" style="padding-left: 4px">

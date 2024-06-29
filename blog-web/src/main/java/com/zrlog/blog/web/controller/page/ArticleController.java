@@ -8,6 +8,7 @@ import com.zrlog.business.rest.request.CreateCommentRequest;
 import com.zrlog.business.rest.response.CreateCommentResponse;
 import com.zrlog.business.service.ArticleService;
 import com.zrlog.business.service.CommentService;
+import com.zrlog.business.service.TemplateHelper;
 import com.zrlog.business.service.VisitorArticleService;
 import com.zrlog.business.util.PagerUtil;
 import com.zrlog.common.Constants;
@@ -23,6 +24,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
 
 import java.math.BigDecimal;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.logging.Logger;
@@ -121,6 +124,13 @@ public class ArticleController extends Controller {
         String uri = getRequest().getUri();
         Map<String, Object> detail = articleService.detail(uri.replace("/", "").replace(".html", ""));
         if (Objects.nonNull(detail)) {
+            List<Map<String,Object>> tags = new ArrayList<>();
+            String keywords = Objects.requireNonNullElse(detail.get("keywords"),"").toString();
+            for (String tag : keywords.split(",")) {
+                String tagUrl = WebTools.getHomeUrl(request) + Constants.getArticleUri() + "tag/" + URLEncoder.encode( tag, StandardCharsets.UTF_8) + TemplateHelper.getSuffix(request);;
+                tags.add(Map.of("name",tag,"url",tagUrl));
+            }
+            detail.put("tags", tags);
             request.getAttr().put("log", detail);
         }
         return "detail";
