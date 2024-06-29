@@ -9,7 +9,7 @@ type BaseTextAreaProps = {
     required?: boolean;
     rows?: number;
 };
-const BaseInput: FunctionComponent<BaseTextAreaProps> = ({ value, rows, onChange, required, placeholder }) => {
+const BaseTextArea: FunctionComponent<BaseTextAreaProps> = ({ value, rows, onChange, required, placeholder }) => {
     const [isComposing, setIsComposing] = useState<boolean>(false);
     const [inputValue, setInputValue] = useState<string>(value || "");
     // 更新 inputValue 以匹配外部传入的 value，处理受控组件的需求
@@ -29,7 +29,7 @@ const BaseInput: FunctionComponent<BaseTextAreaProps> = ({ value, rows, onChange
     return (
         <Form.Item style={{ marginBottom: 8, width: "100%" }} rules={[{ required: required, message: "" }]}>
             <TextArea
-                value={value}
+                value={inputValue}
                 onChange={handleInputChange}
                 onCompositionStart={() => setIsComposing(true)}
                 onCompositionUpdate={() => setIsComposing(true)}
@@ -43,4 +43,4 @@ const BaseInput: FunctionComponent<BaseTextAreaProps> = ({ value, rows, onChange
         </Form.Item>
     );
 };
-export default BaseInput;
+export default BaseTextArea;
