@@ -13,9 +13,25 @@
 
     <script src="${url}/js/bootstrap.bundle.min.js"></script>
     <script src="${url}/js/auto-theme.js"></script>
+    <style>
+        @media (prefers-color-scheme: light) {
+            .navbar-custom {
+                background: ${_res.navBg!'linear-gradient(to right, #0d6efd, #1365bc)'};
+            }
+
+            .navbar-custom .navbar-brand {
+                color: #ffffff; /* 白色字体 */
+            }
+
+            .navbar-custom .nav-link {
+                color: #ffffff; /* 白色字体 */
+            }
+        }
+    </style>
+    ${_res.globalStyle!''}
 </head>
 <body>
-<nav class="navbar navbar-expand-lg sticky-top navbar-custom">
+<nav class="navbar navbar-expand-lg <#if _res.navStickyTop>sticky-top</#if> navbar-custom">
     <div class="container">
         <a <#if _res.navBarBrand?has_content>class='navbar-brand'</#if>
            href="${rurl}"><#if _res.navBarBrand?has_content>

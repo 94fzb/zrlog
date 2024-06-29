@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { App, Form, Input, Row } from "antd";
+import { App, ColorPicker, Form, Input, Row } from "antd";
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
 import Button from "antd/es/button";
@@ -10,6 +10,7 @@ import Col from "antd/es/grid/col";
 import axios from "axios";
 import { getRes } from "../../utils/constants";
 import { UploadChangeParam } from "antd/es/upload";
+import Switch from "antd/es/switch";
 
 const layout = {
     labelCol: { span: 8 },
@@ -87,10 +88,30 @@ const TemplateConfig = ({ data, offline }: { data: TemplateConfigState; offline:
                     </Dragger>
                 </>
             );
-        } else if (value.htmlElementType === "textarea") {
-            return <TextArea rows={5} placeholder={value.placeholder} />;
+        } else if (value.htmlElementType === "switch") {
+            return <Switch size={"small"} />;
+        } else if (value.htmlElementType === "textarea" || value.htmlElementType === "large-textarea") {
+            return (
+                <TextArea rows={value.htmlElementType === "large-textarea" ? 20 : 5} placeholder={value.placeholder} />
+            );
         } else if (value.type === "hidden") {
             return <Input hidden={true} />;
+        } else if (value.htmlElementType === "colorPicker") {
+            return (
+                <div style={{ display: "flex", justifyContent: "flex-start", alignItems: "center" }}>
+                    <ColorPicker
+                        value={state.dataMap[key]}
+                        onChange={(color) => {
+                            state.dataMap[key] = color.toHexString();
+                            setState({
+                                ...state,
+                                dataMap: state.dataMap,
+                            });
+                        }}
+                    />
+                    <span style={{ paddingLeft: 8 }}>{state.dataMap[key]}</span>
+                </div>
+            );
         }
         return <Input type={value.type} placeholder={value.placeholder} />;
     };
