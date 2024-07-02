@@ -4,8 +4,8 @@ import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.http.handle.HttpHandle;
 import com.hibegin.common.util.http.handle.HttpStringHandle;
 import com.zrlog.common.Constants;
-import com.zrlog.common.type.RunMode;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -69,7 +69,7 @@ public class HttpUtil {
             throws IOException, InterruptedException {
         HttpRequest.Builder builder = HttpRequest.newBuilder()
                 .uri(URI.create(urlPath))
-                .POST(HttpRequest.BodyPublishers.ofByteArray(bodyBytes));
+                .POST(HttpRequest.BodyPublishers.ofInputStream(() -> new ByteArrayInputStream(bodyBytes)));
         setHttpHeaders(builder, reqHeaders);
         HttpRequest request = builder.build();
         HttpResponse<InputStream> response = httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
