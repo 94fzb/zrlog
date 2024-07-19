@@ -71,6 +71,7 @@ const ArticleEditTag: FunctionComponent<ArticleEditTagProps> = ({ allTags, keywo
                     e.preventDefault();
                     handleClose(tag);
                 }}
+                style={{ userSelect: "none" }}
             >
                 {tag}
             </Tag>
@@ -101,6 +102,7 @@ const ArticleEditTag: FunctionComponent<ArticleEditTagProps> = ({ allTags, keywo
                 icon={<TagOutlined />}
                 onClick={(e) => allTagsOnClick(e)}
                 closable={false}
+                style={{ userSelect: "none", cursor: "pointer" }}
                 color={getColorPrimary()}
             >
                 {tag}
@@ -155,7 +157,7 @@ const ArticleEditTag: FunctionComponent<ArticleEditTagProps> = ({ allTags, keywo
             {!inputVisible && (
                 <>
                     <Space size={[0, 8]} wrap>
-                        <Tag color={getColorPrimary()} onClick={showInput}>
+                        <Tag color={getColorPrimary()} onClick={showInput} style={{ userSelect: "none" }}>
                             <PlusOutlined /> {getRes()["tagTips"]}
                         </Tag>
                     </Space>

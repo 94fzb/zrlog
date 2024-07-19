@@ -9,6 +9,12 @@ public class ApiStandardResponse<T> extends StandardResponse {
         this.data = data;
     }
 
+
+    public ApiStandardResponse(T data, String message) {
+        this.data = data;
+        super.setMessage(message);
+    }
+
     private T data;
 
     public T getData() {

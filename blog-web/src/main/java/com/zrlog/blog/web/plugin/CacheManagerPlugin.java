@@ -1,10 +1,9 @@
 package com.zrlog.blog.web.plugin;
 
-import com.zrlog.business.cache.CacheService;
 import com.zrlog.common.Constants;
 import com.zrlog.plugin.IPlugin;
 
-import java.util.TimerTask;
+import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -14,37 +13,42 @@ import java.util.concurrent.TimeUnit;
  */
 public class CacheManagerPlugin implements IPlugin {
 
-    private final ScheduledExecutorService scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1, r -> {
-        Thread thread = new Thread(r);
-        thread.setName("cache-clean-plugin-thread");
-        return thread;
-    });
+    private ScheduledExecutorService scheduledThreadPoolExecutor;
+
+    private boolean started = false;
 
     @Override
     public boolean start() {
-        scheduledThreadPoolExecutor.scheduleAtFixedRate(new CacheManageTimerTask(), 0, 1, TimeUnit.HOURS);
+        if (started) {
+            return true;
+        }
+        scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1, Thread.ofVirtual().factory());
+        scheduledThreadPoolExecutor.scheduleAtFixedRate(new CacheManageRunnable(), 1, 1, TimeUnit.HOURS);
+        this.started = true;
         return true;
+    }
+
+    @Override
+    public boolean isStarted() {
+        return started;
     }
 
     @Override
     public boolean stop() {
-        scheduledThreadPoolExecutor.shutdown();
+        if (Objects.nonNull(scheduledThreadPoolExecutor)) {
+            scheduledThreadPoolExecutor.shutdown();
+            scheduledThreadPoolExecutor = null;
+        }
+        started = false;
         return true;
     }
 
-    private static class CacheManageTimerTask extends TimerTask {
-
-        private final CacheService cacheService;
-
-        public CacheManageTimerTask() {
-            this.cacheService = new CacheService();
-            cacheService.refreshInitDataCache(null, true);
-        }
+    private static class CacheManageRunnable implements Runnable {
 
         @Override
         public void run() {
             if (System.currentTimeMillis() - Constants.getLastAccessTime() > Constants.getInitDataMaxCacheTimeout()) {
-                cacheService.refreshInitDataCache(null, true);
+                Constants.zrLogConfig.getCacheService().refreshInitDataCacheAsync(null, true).join();
             }
         }
     }

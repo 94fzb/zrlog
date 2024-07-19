@@ -5,5 +5,5 @@ ZrLog is a blog/CMS program developed using Java. It is characterized by simplic
 low memory usage. Comes with the Markdown editor, allowing more focus on writing, rather than spending a lot of time
 learning the use of the program
 
-Now you can edit or delete this article by visiting [admin](${basePath}/admin/article-edit?id=1) and start writing
+Now you can edit or delete this article by visiting [admin](${editUrl}) and start writing
 happily.

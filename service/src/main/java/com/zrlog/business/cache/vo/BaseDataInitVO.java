@@ -1,6 +1,8 @@
 package com.zrlog.business.cache.vo;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -9,17 +11,20 @@ import java.util.Map;
  */
 public class BaseDataInitVO implements Serializable {
 
-    private List<Map<String, Object>> tags;
-    private List<Map<String, Object>> types;
-    private List<Map<String, Object>> links;
-    private List<Map<String, Object>> plugins;
-    private Map<String, Long> archives;
-    private List<Archive> archiveList;
-    private Map<String, Object> webSite;
-    private List<Map<String, Object>> hotLogs;
-    private List<Map<String, Object>> logNavs;
-    private Map<Map<String, Object>, List<Map<String, Object>>> indexHotLogs;
-    private Statistics statistics;
+    public BaseDataInitVO() {
+    }
+
+    private List<Map<String, Object>> tags = new ArrayList<>();
+    private List<Map<String, Object>> types = new ArrayList<>();
+    private List<Map<String, Object>> links = new ArrayList<>();
+    private List<Map<String, Object>> plugins = new ArrayList<>();
+    private Map<String, Long> archives = new HashMap<>();
+    private List<Archive> archiveList = new ArrayList<>();
+    private Map<String, Object> webSite = new HashMap<>();
+    private List<HotLogBasicInfoVO> hotLogs = new ArrayList<>();
+    private List<Map<String, Object>> logNavs = new ArrayList<>();
+    private Map<Map<String, Object>, List<HotLogBasicInfoVO>> indexHotLogs;
+    private Statistics statistics = new Statistics();
 
     public List<Map<String, Object>> getTags() {
         return tags;
@@ -77,11 +82,11 @@ public class BaseDataInitVO implements Serializable {
         this.webSite = webSite;
     }
 
-    public List<Map<String, Object>> getHotLogs() {
+    public List<HotLogBasicInfoVO> getHotLogs() {
         return hotLogs;
     }
 
-    public void setHotLogs(List<Map<String, Object>> hotLogs) {
+    public void setHotLogs(List<HotLogBasicInfoVO> hotLogs) {
         this.hotLogs = hotLogs;
     }
 
@@ -93,11 +98,11 @@ public class BaseDataInitVO implements Serializable {
         this.logNavs = logNavs;
     }
 
-    public Map<Map<String, Object>, List<Map<String, Object>>> getIndexHotLogs() {
+    public Map<Map<String, Object>, List<HotLogBasicInfoVO>> getIndexHotLogs() {
         return indexHotLogs;
     }
 
-    public void setIndexHotLogs(Map<Map<String, Object>, List<Map<String, Object>>> indexHotLogs) {
+    public void setIndexHotLogs(Map<Map<String, Object>, List<HotLogBasicInfoVO>> indexHotLogs) {
         this.indexHotLogs = indexHotLogs;
     }
 
@@ -111,31 +116,34 @@ public class BaseDataInitVO implements Serializable {
 
     public static class Statistics implements Serializable {
 
-        private long totalArticleSize;
-        private long totalTagSize;
-        private long totalTypeSize;
+        public Statistics() {
+        }
 
-        public long getTotalArticleSize() {
+        private Long totalArticleSize;
+        private Long totalTagSize;
+        private Long totalTypeSize;
+
+        public Long getTotalArticleSize() {
             return totalArticleSize;
         }
 
-        public void setTotalArticleSize(long totalArticleSize) {
+        public void setTotalArticleSize(Long totalArticleSize) {
             this.totalArticleSize = totalArticleSize;
         }
 
-        public long getTotalTagSize() {
+        public Long getTotalTagSize() {
             return totalTagSize;
         }
 
-        public void setTotalTagSize(long totalTagSize) {
+        public void setTotalTagSize(Long totalTagSize) {
             this.totalTagSize = totalTagSize;
         }
 
-        public long getTotalTypeSize() {
+        public Long getTotalTypeSize() {
             return totalTypeSize;
         }
 
-        public void setTotalTypeSize(long totalTypeSize) {
+        public void setTotalTypeSize(Long totalTypeSize) {
             this.totalTypeSize = totalTypeSize;
         }
     }

@@ -1,8 +1,9 @@
 package com.zrlog.business.util;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class PagerVO {
+public class PagerVO implements Serializable {
 
     private List<PageEntry> pageList;
     private String pageStartUrl;
@@ -50,7 +51,7 @@ public class PagerVO {
         this.endPage = endPage;
     }
 
-    public static class PageEntry {
+    public static class PageEntry implements Serializable {
         private String url;
         private Boolean current;
         private String desc;

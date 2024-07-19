@@ -5,26 +5,39 @@ import BaseTable, { PageDataSource } from "../../common/BaseTable";
 import AddType from "./add_type";
 import EditType from "./edit_type";
 
-const Type = ({ data }: { data: PageDataSource }) => {
+const Type = ({ data, offline }: { data: PageDataSource; offline: boolean }) => {
     const getColumns = () => {
         return [
             {
-                title: "分类名称",
+                title: getRes()["admin.type.manage"],
                 dataIndex: "typeName",
                 key: "typeName",
                 width: 240,
+                render: (e: string, r: Record<string, string>) => {
+                    return (
+                        <a rel="noopener noreferrer" target={"_blank"} href={r.url}>
+                            {e}
+                        </a>
+                    );
+                },
             },
             {
-                title: "别名",
+                title: getRes()["alias"],
                 dataIndex: "alias",
                 key: "alias",
                 width: 120,
             },
             {
-                title: "介绍",
+                title: "简介",
                 key: "remark",
                 dataIndex: "remark",
                 width: 240,
+            },
+            {
+                title: "文章数量",
+                dataIndex: "amount",
+                key: "amount",
+                width: 80,
             },
         ];
     };
@@ -36,16 +49,17 @@ const Type = ({ data }: { data: PageDataSource }) => {
             </Title>
             <Divider />
             <BaseTable
+                offline={offline}
+                hideId={true}
                 columns={getColumns()}
                 addBtnRender={(addSuccessCall) => {
-                    return <AddType addSuccessCall={addSuccessCall} />;
+                    return <AddType offline={offline} addSuccessCall={addSuccessCall} />;
                 }}
                 editBtnRender={(_id, record, editSuccessCall) => (
-                    <EditType record={record} editSuccessCall={editSuccessCall} />
+                    <EditType offline={offline} record={record} editSuccessCall={editSuccessCall} />
                 )}
                 datasource={data}
                 deleteApi={"/api/admin/type/delete"}
-                dataApi={"/api/admin/type"}
             />
         </>
     );

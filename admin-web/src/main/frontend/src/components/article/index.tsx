@@ -5,16 +5,16 @@ import Search from "antd/es/input/Search";
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
 import { getColorPrimary, getRes } from "../../utils/constants";
-import { useState } from "react";
+import { ReactElement, useState } from "react";
 import BaseTable, { PageDataSource } from "../../common/BaseTable";
 import { Link } from "react-router-dom";
+import { deleteCacheDataByKey } from "../../cache";
+import { LockOutlined } from "@ant-design/icons";
 
-const Index = ({ data }: { data: PageDataSource }) => {
-    const dataApi = "/api/admin/article";
-
+const Index = ({ data, offline }: { data: PageDataSource; offline: boolean }) => {
     const tagForMap = (tag: string) => {
         const tagElem = (
-            <Tag icon={<TagOutlined />} closable={false} color={getColorPrimary()}>
+            <Tag icon={<TagOutlined />} closable={false} color={getColorPrimary()} style={{ userSelect: "none" }}>
                 {tag}
             </Tag>
         );
@@ -25,37 +25,55 @@ const Index = ({ data }: { data: PageDataSource }) => {
         );
     };
 
+    const wrapperArticleStateInfo = (record: any, children: ReactElement) => {
+        return (
+            <span style={{ display: "flex", gap: 4, whiteSpace: "normal" }}>
+                {record.privacy && <LockOutlined style={{ color: getColorPrimary() }} />}
+                {record.rubbish && <span>[{getRes()["rubbish"]}]</span>}
+                {children}
+            </span>
+        );
+    };
+
     const getColumns = () => {
         return [
             {
-                title: "标题",
+                title: getRes()["title"],
                 dataIndex: "title",
                 key: "title",
                 ellipsis: {
                     showTitle: false,
                 },
                 width: 300,
-                render: (text: string, record: any) =>
-                    text ? (
+                render: (text: string, record: any) => {
+                    const t = (
+                        <Tooltip
+                            placement="top"
+                            title={
+                                <div>
+                                    点击查看《<span dangerouslySetInnerHTML={{ __html: text }}></span>》
+                                </div>
+                            }
+                        >
+                            <div
+                                style={{ overflow: "hidden", textOverflow: "ellipsis" }}
+                                dangerouslySetInnerHTML={{ __html: text }}
+                            />
+                        </Tooltip>
+                    );
+                    if (record["url"].includes("previewMode")) {
+                        return wrapperArticleStateInfo(record, <Link to={record["url"]}>{t}</Link>);
+                    }
+                    return wrapperArticleStateInfo(
+                        record,
                         <a rel="noopener noreferrer" target={"_blank"} href={record.url}>
-                            <Tooltip
-                                placement="top"
-                                title={
-                                    <div>
-                                        点击查看《<span dangerouslySetInnerHTML={{ __html: text }}></span>》
-                                    </div>
-                                }
-                            >
-                                <div
-                                    style={{ overflow: "hidden", textOverflow: "ellipsis" }}
-                                    dangerouslySetInnerHTML={{ __html: text }}
-                                />
-                            </Tooltip>
+                            {t}
                         </a>
-                    ) : null,
+                    );
+                },
             },
             {
-                title: "标签",
+                title: getRes().tag,
                 dataIndex: "keywords",
                 key: "keywords",
                 width: 150,
@@ -66,14 +84,14 @@ const Index = ({ data }: { data: PageDataSource }) => {
                         </Space>
                     ) : null,
             },
-            {
+            /*{
                 title: "作者",
                 key: "userName",
                 dataIndex: "userName",
                 width: 80,
-            },
+            },*/
             {
-                title: "分类",
+                title: getRes()["type"],
                 key: "typeName",
                 dataIndex: "typeName",
                 width: 100,
@@ -85,27 +103,26 @@ const Index = ({ data }: { data: PageDataSource }) => {
                 width: 80,
             },
             {
-                title: "草稿",
-                key: "rubbish",
-                dataIndex: "rubbish",
+                title: getRes()["commentAble"],
+                key: "canComment",
+                dataIndex: "canComment",
                 render: (v: boolean) => (v ? "是" : "否"),
                 width: 80,
             },
             {
-                title: "公开",
-                key: "privacy",
-                dataIndex: "privacy",
-                render: (v: boolean) => (v ? "否" : "是"),
+                title: "评论量",
+                key: "commentSize",
+                dataIndex: "commentSize",
                 width: 80,
             },
             {
-                title: "创建时间",
+                title: getRes()["createTime"],
                 key: "releaseTime",
                 dataIndex: "releaseTime",
                 width: 120,
             },
             {
-                title: "最后更新时间",
+                title: getRes()["lastUpdateDate"],
                 key: "lastUpdateDate",
                 dataIndex: "lastUpdateDate",
                 width: 120,
@@ -121,7 +138,7 @@ const Index = ({ data }: { data: PageDataSource }) => {
         return "/api/admin/article/delete";
     };
 
-    const [searchKey, setSearchKey] = useState<string>();
+    const [searchKey, setSearchKey] = useState<string>(data.key ? data.key : "");
 
     return (
         <>
@@ -133,8 +150,10 @@ const Index = ({ data }: { data: PageDataSource }) => {
                 </Col>
                 <Col md={10} xxl={6} sm={18}>
                     <Search
+                        disabled={offline}
                         placeholder={getRes().searchTip}
                         onSearch={onSearch}
+                        defaultValue={data.key}
                         enterButton={getRes()["search"]}
                         style={{ maxWidth: "240px", float: "right" }}
                     />
@@ -143,6 +162,7 @@ const Index = ({ data }: { data: PageDataSource }) => {
 
             <Divider />
             <BaseTable
+                offline={offline}
                 datasource={data}
                 columns={getColumns()}
                 editBtnRender={(id) => (
@@ -150,9 +170,11 @@ const Index = ({ data }: { data: PageDataSource }) => {
                         <EditOutlined style={{ color: getColorPrimary() }} />
                     </Link>
                 )}
+                deleteSuccessCallback={(id) => {
+                    deleteCacheDataByKey("/article-edit?id=" + id);
+                }}
                 deleteApi={getDeleteApiUri()}
                 searchKey={searchKey}
-                dataApi={dataApi}
             />
         </>
     );

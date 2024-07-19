@@ -5,30 +5,37 @@ import Input from "antd/es/input";
 import TextArea from "antd/es/input/TextArea";
 import Button from "antd/es/button";
 import { getRes, removeRes } from "../../utils/constants";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { App } from "antd";
 import { Basic } from "./index";
+import FaviconUpload from "./FaviconUpload";
 
 const layout = {
     labelCol: { span: 8 },
     wrapperCol: { span: 16 },
 };
 
-const BasicForm = ({ data }: { data: Basic }) => {
-    const [form, setForm] = useState<any>(data);
+const BasicForm = ({ data, offline }: { data: Basic; offline: boolean }) => {
+    const [form, setForm] = useState<Basic>(data);
 
     const { message } = App.useApp();
-    const websiteFormFinish = (changedValues: any) => {
-        axios.post("/api/admin/website/basic", changedValues).then(({ data }) => {
-            if (!data.error) {
-                message.info(data.message).then(() => {
-                    removeRes();
-                    window.location.reload();
-                });
+    const websiteFormFinish = (changedValues: Basic) => {
+        axios.post("/api/admin/website/basic", { ...form, ...changedValues }).then(({ data }) => {
+            if (data.error) {
+                message.error(data.message).then();
+                return;
             }
+            message.success(data.message).then(() => {
+                removeRes();
+                window.location.reload();
+            });
         });
     };
+
+    useEffect(() => {
+        setForm(data);
+    }, [data]);
 
     return (
         <>
@@ -37,7 +44,7 @@ const BasicForm = ({ data }: { data: Basic }) => {
             <Form
                 {...layout}
                 initialValues={form}
-                onValuesChange={(_k, v) => setForm(v)}
+                onValuesChange={(_k, v) => setForm({ ...form, ...v })}
                 onFinish={(k) => websiteFormFinish(k)}
             >
                 <Form.Item name="title" label="网站标题" rules={[{ required: true }]}>
@@ -52,8 +59,16 @@ const BasicForm = ({ data }: { data: Basic }) => {
                 <Form.Item name="description" label="网站描述">
                     <TextArea rows={5} />
                 </Form.Item>
+                <Form.Item name="favicon_ico_base64" label={`${getRes()["favicon"]}`}>
+                    <FaviconUpload
+                        url={form.favicon_ico_base64}
+                        onChange={(e) => {
+                            setForm({ ...form, favicon_ico_base64: e ? e : "" });
+                        }}
+                    />
+                </Form.Item>
                 <Divider />
-                <Button type="primary" htmlType="submit">
+                <Button disabled={offline} type="primary" htmlType="submit">
                     {getRes().submit}
                 </Button>
             </Form>

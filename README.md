@@ -1,4 +1,4 @@
-## ZrLog ![build-preview](https://github.com/94fzb/zrlog/actions/workflows/build-preview-packge.yml/badge.svg) ![build-release](https://github.com/94fzb/zrlog/actions/workflows/build-release-packge.yml/badge.svg) [![Apache License](http://img.shields.io/badge/license-apache2-orange.svg?style=flat)](http://www.apache.org/licenses/LICENSE-2.0)
+## ZrLog ![build-preview](https://github.com/94fzb/zrlog/actions/workflows/build-preview-package-jar.yml/badge.svg) ![build-release](https://github.com/94fzb/zrlog/actions/workflows/build-release-package-jar.yml/badge.svg) [![Apache License](http://img.shields.io/badge/license-apache2-orange.svg?style=flat)](http://www.apache.org/licenses/LICENSE-2.0)
 
 [中文](README.md) | [English](README.en-us.md)
 
@@ -20,8 +20,8 @@ ZrLog是使用 Java 开发的博客/CMS程序，具有简约，易用，组件�
 ### 特性
 
 1. 提供日志，分类，标签，评论的管理
-2. 支持插件模式 [如何编写一个插件](https://blog.zrlog.com/zrlog-plugin-dev)
-3. 高度可定制的主题功能 [如何制作一套主题](https://blog.zrlog.com/make-theme-for-zrlog)
+2. 支持插件模式 [如何编写一个插件](https://blog.zrlog.com/zrlog-plugin-dev.html)
+3. 高度可定制的主题功能 [如何制作一套主题](https://blog.zrlog.com/make-theme-for-zrlog.html)
 4. 支持第三方评论插件
 5. 提供 `editormd` 主流的富文本编辑器，基本上满足了管理员的编辑需求
 6. 页面静态化，缓存公共数据，访问速度更快
@@ -40,13 +40,13 @@ ZrLog是使用 Java 开发的博客/CMS程序，具有简约，易用，组件�
 ### 程序安装
 
 * 部署环境前提
-    * 1.jre 版本 >= 21
-    * 2.mysql
+    * JDK 版本 >= 21（若选择 GraalVM Native Image 包，可以不安装 JDK）
+    * MySQL >= 5.7
 
 * 数据初始化
-    * 1.下载 [最新 zip](https://dl.zrlog.com/release/zrlog.zip) 解压，运行 bin/start.sh 或者是 bin/start.bat
-    * 2.访问 http://host:port/install
-    * 3.填写数据库，管理员信息，完成安装
+    * 下载 [最新 zip](https://dl.zrlog.com/release/zrlog.zip) 解压，运行 bin/start.sh 或者是 bin/start.bat
+    * 访问 http://host:port/install
+    * 填写数据库，管理员信息，完成安装
 
 ### 变更日志
 
@@ -63,21 +63,21 @@ ZrLog是使用 Java 开发的博客/CMS程序，具有简约，易用，组件�
 
 * 微信号 hibegin
 * 邮件 xchun90@163.com
-* 对程序有任何问题，欢迎反馈 [https://blog.zrlog.com/feedback](https://blog.zrlog.com/feedback)
+* 对程序有任何问题，欢迎反馈 [https://blog.zrlog.com/feedback.html](https://blog.zrlog.com/feedback.html)
 
 ### 常见问题
 
 #### 开发工具打开后没有 webapp 里面没有 admin 目录，或访问 admin 提示页面没有找到
 
-[解决办法](https://blog.zrlog.com/faq-collect#%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7%E6%89%93%E5%BC%80%E5%90%8E%E6%B2%A1%E6%9C%89%20web/src/main/webapp%20%E9%87%8C%E9%9D%A2%E6%B2%A1%E6%9C%89%20admin%20%E7%9B%AE%E5%BD%95%EF%BC%8C%E6%88%96%E8%AE%BF%E9%97%AE%20admin%20%E6%8F%90%E7%A4%BA%E9%A1%B5%E9%9D%A2%E6%B2%A1%E6%9C%89%E6%89%BE%E5%88%B0)
+[解决办法](https://blog.zrlog.com/faq-collect.html#%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7%E6%89%93%E5%BC%80%E5%90%8E%E6%B2%A1%E6%9C%89%20web/src/main/webapp%20%E9%87%8C%E9%9D%A2%E6%B2%A1%E6%9C%89%20admin%20%E7%9B%AE%E5%BD%95%EF%BC%8C%E6%88%96%E8%AE%BF%E9%97%AE%20admin%20%E6%8F%90%E7%A4%BA%E9%A1%B5%E9%9D%A2%E6%B2%A1%E6%9C%89%E6%89%BE%E5%88%B0)
 
 ### docker模式下，输入正确的数据库信息，仍无法完成安装
 
-- https://blog.zrlog.com/faq-collect
+- https://blog.zrlog.com/faq-collect.html
 
 #### 其它问题
 
-如何你遇到了一些问题，可以先去这里找下 [常见问题](https://blog.zrlog.com/faq-collect)
+如何你遇到了一些问题，可以先去这里找下 [常见问题](https://blog.zrlog.com/faq-collect.html)
 
 ### 感谢
 
@@ -88,6 +88,7 @@ ZrLog是使用 Java 开发的博客/CMS程序，具有简约，易用，组件�
 * [AntD](https://ant.design)
 * [Jetbrains](https://www.jetbrains.com/)
 * [e-lionel](http://www.e-lionel.com)
+* [Cloudflare](https://www.cloudflare.com)
 
 ### 协议
 

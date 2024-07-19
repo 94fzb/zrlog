@@ -11,6 +11,6 @@ public class PermissionErrorException extends AbstractBusinessException {
 
     @Override
     public String getMessage() {
-        return I18nUtil.getBlogStringFromRes("permissionError");
+        return I18nUtil.getBackendStringFromRes("permissionError");
     }
 }

@@ -12,6 +12,8 @@ import SliderMenu from "./slider";
 import { BasicUserInfo } from "../type";
 import { ssData } from "../index";
 import axios from "axios";
+import MyLoadingComponent from "../components/my-loading-component";
+import PWAHandler from "../PWAHandler";
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Text } = Typography;
@@ -22,12 +24,12 @@ const StyledIndexLayout = styled("div")`
     }
 
     #logo {
-        height: 51px;
+        height: 64px;
         padding-left: 23px;
         padding-right: 23px;
         overflow: hidden;
         font-size: 25px;
-        line-height: 65px;
+        display: inline-flex;
         color: #ffffff;
     }
 
@@ -218,7 +220,13 @@ const StyledIndexLayout = styled("div")`
     }
 `;
 
-const AdminManageLayout: FunctionComponent<PropsWithChildren> = ({ children }) => {
+type AdminManageLayoutProps = PropsWithChildren & {
+    loading: boolean;
+    fullScreen?: boolean;
+    offline: boolean;
+};
+
+const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ offline, children, loading, fullScreen }) => {
     const [userInfo, setUser] = useState<BasicUserInfo | undefined>(ssData?.user);
 
     useEffect(() => {
@@ -229,56 +237,76 @@ const AdminManageLayout: FunctionComponent<PropsWithChildren> = ({ children }) =
         }
     }, []);
 
-    // @ts-ignore
     return (
-        <StyledIndexLayout>
-            <Header
-                style={{
-                    backgroundColor: EnvUtils.isDarkMode() ? "#1f1f1f" : "#011529",
-                }}
-            >
-                <a
-                    href={document.baseURI}
-                    id="logo"
-                    target="_blank"
-                    title={getRes()["websiteTitle"]}
-                    rel="noopener noreferrer"
+        <PWAHandler>
+            <StyledIndexLayout>
+                <Header
+                    hidden={fullScreen}
+                    style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        backgroundColor: EnvUtils.isDarkMode() ? "#1f1f1f" : "#011529",
+                    }}
                 >
-                    <HomeOutlined />
-                </a>
-                {userInfo && <UserInfo data={userInfo} />}
-            </Header>
-            <Row>
-                <Col style={{ minHeight: "100vh" }} id="sider">
+                    <a
+                        href={getRes()["homeUrl"] + "?spm=admin&buildId=" + getRes()["buildId"]}
+                        id="logo"
+                        target="_blank"
+                        title={getRes()["websiteTitle"]}
+                        rel="noopener noreferrer"
+                    >
+                        <HomeOutlined />
+                        {offline && (
+                            <span
+                                style={{
+                                    display: "inline-block",
+                                    textAlign: "center",
+                                    fontSize: 20,
+                                    paddingLeft: 24,
+                                    userSelect: "none",
+                                    color: getColorPrimary(),
+                                }}
+                            >
+                                {getRes()["admin.offline.desc"]}
+                            </span>
+                        )}
+                    </a>
+                    {userInfo && <UserInfo offline={offline} data={userInfo} />}
+                </Header>
+                <Row>
                     <Sider
+                        hidden={fullScreen}
                         width={70}
                         style={{ minHeight: "100vh", backgroundColor: EnvUtils.isDarkMode() ? "#1f1f1f" : "#001529" }}
                     >
                         <SliderMenu />
                     </Sider>
-                </Col>
-                <Col style={{ flex: 1, width: 100 }}>
-                    <Layout style={{ minHeight: "100vh" }}>
-                        <Content>{children}</Content>
-                        <Footer>
-                            <Row>
-                                <Col xs={24} md={12}>
-                                    <div
-                                        className="ant-layout-footer-copyright"
-                                        dangerouslySetInnerHTML={{
-                                            __html: getRes().copyrightTips + ". All Rights Reserved.",
-                                        }}
-                                    />
-                                </Col>
-                                <Col xs={0} md={12}>
-                                    <Text style={{ float: "right" }}>Version {getRes().currentVersion}</Text>
-                                </Col>
-                            </Row>
-                        </Footer>
-                    </Layout>
-                </Col>
-            </Row>
-        </StyledIndexLayout>
+                    <Col style={{ flex: 1, width: 100, minHeight: fullScreen ? 0 : 1 }}>
+                        <Layout style={{ minHeight: "100vh", overflow: fullScreen ? "hidden" : "auto" }}>
+                            <Content style={{ paddingRight: fullScreen ? 0 : 12, paddingLeft: fullScreen ? 0 : 12 }}>
+                                {loading && <MyLoadingComponent />}
+                                {children}
+                            </Content>
+                            <Footer hidden={fullScreen}>
+                                <Row>
+                                    <Col xs={24} md={12}>
+                                        <div
+                                            className="ant-layout-footer-copyright"
+                                            dangerouslySetInnerHTML={{
+                                                __html: getRes().copyrightTips + ". All Rights Reserved.",
+                                            }}
+                                        />
+                                    </Col>
+                                    <Col xs={0} md={12}>
+                                        <Text style={{ float: "right" }}>Version {getRes().currentVersion}</Text>
+                                    </Col>
+                                </Row>
+                            </Footer>
+                        </Layout>
+                    </Col>
+                </Row>
+            </StyledIndexLayout>
+        </PWAHandler>
     );
 };
 

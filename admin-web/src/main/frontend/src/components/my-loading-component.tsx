@@ -1,7 +1,8 @@
 import { LoadingOutlined } from "@ant-design/icons";
 import { Spin } from "antd";
+import { FunctionComponent } from "react";
 
-const MyLoadingComponent = () => {
+const MyLoadingComponent: FunctionComponent = () => {
     return (
         <Spin
             delay={200}

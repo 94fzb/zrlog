@@ -60,7 +60,7 @@ public class ApiInstallController extends Controller {
      * 数据库检查通过后，根据填写信息，执行数据表，表数据的初始化
      */
     @ResponseBody
-    public StandardResponse startInstall() {
+    public StandardResponse startInstall() throws Exception {
         Map<String, String> configMsg = new HashMap<>();
         configMsg.put("title", getRequest().getParaToStr("title"));
         configMsg.put("second_title", getRequest().getParaToStr("second_title"));
@@ -70,8 +70,8 @@ public class ApiInstallController extends Controller {
         if (!new InstallService(PathUtil.getConfPath(), getDbConn(), configMsg).install()) {
             throw new InstallException(TestConnectDbResult.UNKNOWN);
         }
-        //通知启动插件，配置库连接等操作
-        Constants.installAction.installFinish();
+        Constants.zrLogConfig.configDatabase();
+        Constants.zrLogConfig.startPluginsAsync();
         return new StandardResponse();
     }
 }

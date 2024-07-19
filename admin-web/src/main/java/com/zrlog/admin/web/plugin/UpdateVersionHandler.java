@@ -6,5 +6,5 @@ public interface UpdateVersionHandler {
 
     boolean isFinish();
 
-    void start();
+    void doHandle();
 }

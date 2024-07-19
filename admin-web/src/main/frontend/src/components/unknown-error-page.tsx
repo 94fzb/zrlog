@@ -1,19 +1,16 @@
-import Result from "antd/es/result";
-import Button from "antd/es/button";
+import Result, { ExceptionStatusType } from "antd/es/result";
+import { CSSProperties } from "react";
 
-const UnknownErrorPage = ({ message }: { message: string }) => {
-    return (
-        <Result
-            status="500"
-            title="500"
-            subTitle={message}
-            extra={
-                <Button type="primary" href={window.location.href}>
-                    重新加载
-                </Button>
-            }
-        />
-    );
+const UnknownErrorPage = ({
+    code,
+    data,
+    style,
+}: {
+    code: ExceptionStatusType;
+    data: Record<string, any>;
+    style?: CSSProperties;
+}) => {
+    return <Result status={code} title={code} subTitle={data["message"]} style={style} />;
 };
 
 export default UnknownErrorPage;

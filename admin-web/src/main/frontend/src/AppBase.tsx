@@ -1,14 +1,16 @@
 import { Route, Routes } from "react-router-dom";
 import { lazy } from "react";
 import { Suspense } from "react";
-import { App } from "antd";
-import axios from "axios";
+import { App, Spin } from "antd";
+import axios, { AxiosError } from "axios";
+import { API_VERSION_PATH } from "./components/upgrade";
+import ErrorBoundary from "./common/ErrorBoundary";
 
 const AsyncLogin = lazy(() => import("components/login"));
 const AsyncAdminDashboardRouter = lazy(() => import("AdminDashboardRouter"));
 
-const AppBase = () => {
-    const { modal } = App.useApp();
+const AppBase = ({ offline }: { offline: boolean }) => {
+    const { modal, message } = App.useApp();
 
     const initAxios = () => {
         //@ts-ignore
@@ -21,28 +23,43 @@ const AppBase = () => {
             (response) => {
                 if (response.data.error === 9001) {
                     modal.error({
-                        title: "会话过期",
+                        title: response.data.error,
                         content: response.data.message,
-                        okText: "确认",
                     });
                     return Promise.reject(response.data);
                 }
                 return response;
             },
             (error) => {
+                //ignore upgrade api error
+                if ((error as AxiosError) && error.config && error.config.url) {
+                    if (error.config.url.includes(API_VERSION_PATH)) {
+                        return Promise.reject(error.message);
+                    }
+                }
                 if (error && error.response) {
-                    if (error.response.status === 502) {
+                    if (error.response.status) {
                         modal.error({
-                            title: "服务未启动",
+                            title: "服务异常[" + error.response.status + "]",
                             content: (
                                 <div
                                     style={{ paddingTop: 20 }}
                                     dangerouslySetInnerHTML={{ __html: error.response.data }}
                                 />
                             ),
-                            okText: "确认",
                         });
                         return Promise.reject(error.response);
+                    }
+                } else {
+                    if ((error as AxiosError) && error.config) {
+                        if (navigator.onLine) {
+                            modal.error({
+                                title: "请求 " + error.config.url + " 错误",
+                                content: error.toString(),
+                            });
+                        } else {
+                            message.error("请求 " + error.config.url + " " + error.toString() + " network offline");
+                        }
                     }
                 }
                 return Promise.reject(error);
@@ -58,17 +75,31 @@ const AppBase = () => {
                 <Route
                     path={"login"}
                     element={
-                        <Suspense fallback={<div />}>
-                            <AsyncLogin />
-                        </Suspense>
+                        <ErrorBoundary>
+                            <Suspense fallback={<Spin spinning={true} fullscreen delay={1000} />}>
+                                <AsyncLogin offline={offline} />
+                            </Suspense>
+                        </ErrorBoundary>
+                    }
+                />
+                <Route
+                    path={"logout"}
+                    element={
+                        <ErrorBoundary>
+                            <Suspense fallback={<Spin spinning={true} fullscreen delay={1000} />}>
+                                <AsyncLogin offline={offline} />
+                            </Suspense>
+                        </ErrorBoundary>
                     }
                 />
                 <Route
                     path={"*"}
                     element={
-                        <Suspense fallback={<div />}>
-                            <AsyncAdminDashboardRouter />
-                        </Suspense>
+                        <ErrorBoundary>
+                            <Suspense fallback={<Spin spinning={true} fullscreen delay={1000} />}>
+                                <AsyncAdminDashboardRouter offline={offline} />
+                            </Suspense>
+                        </ErrorBoundary>
                     }
                 />
             </Routes>

@@ -1,11 +1,11 @@
 import { FunctionComponent, useState } from "react";
-import { Col, Form, Input, InputNumber, Modal } from "antd";
+import { App, Col, Form, Input, InputNumber, Modal } from "antd";
 import Row from "antd/es/grid/row";
 import TextArea from "antd/es/input/TextArea";
 import { EditOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { getColorPrimary } from "../../utils/constants";
+import { getColorPrimary, getRes } from "../../utils/constants";
 
 const layout = {
     labelCol: { span: 4 },
@@ -15,14 +15,20 @@ const layout = {
 export type EditLinkProps = {
     record: any;
     editSuccessCall: () => void;
+    offline: boolean;
 };
 
-const EditLink: FunctionComponent<EditLinkProps> = ({ record, editSuccessCall }) => {
+const EditLink: FunctionComponent<EditLinkProps> = ({ record, editSuccessCall, offline }) => {
     const [showModel, setShowModel] = useState<boolean>(false);
     const [updateForm, setUpdateForm] = useState<any>(record);
+    const { message } = App.useApp();
 
     const handleOk = () => {
-        axios.post("/api/admin/link/update", updateForm).then(() => {
+        axios.post("/api/admin/link/update", updateForm).then(async ({ data }) => {
+            if (data.error) {
+                await message.error(data.message);
+                return;
+            }
             setShowModel(false);
             if (editSuccessCall) {
                 editSuccessCall();
@@ -36,13 +42,20 @@ const EditLink: FunctionComponent<EditLinkProps> = ({ record, editSuccessCall })
 
     return (
         <>
-            <Link to={"#"}>
-                <EditOutlined
-                    onClick={() => setShowModel(true)}
-                    style={{ marginBottom: 8, color: getColorPrimary() }}
-                />
+            <Link
+                to={"#edit-" + record.id}
+                onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (offline) {
+                        return;
+                    }
+                    setShowModel(true);
+                }}
+            >
+                <EditOutlined style={{ marginBottom: 8, color: getColorPrimary() }} />
             </Link>
-            <Modal title="编辑" open={showModel} onOk={handleOk} onCancel={() => setShowModel(false)}>
+            <Modal title={getRes()["edit"]} open={showModel} onOk={handleOk} onCancel={() => setShowModel(false)}>
                 <Form initialValues={record} onValuesChange={(_k, v) => setValue(v)} {...layout}>
                     <Form.Item name="id" style={{ display: "none" }}>
                         <Input hidden={true} />
@@ -50,7 +63,7 @@ const EditLink: FunctionComponent<EditLinkProps> = ({ record, editSuccessCall })
                     <Row>
                         <Col span={24}>
                             <Form.Item
-                                label="链接"
+                                label={getRes()["admin.link.manage"]}
                                 style={{ marginBottom: 8 }}
                                 name="url"
                                 rules={[{ required: true, message: "" }]}
@@ -86,7 +99,7 @@ const EditLink: FunctionComponent<EditLinkProps> = ({ record, editSuccessCall })
                     <Row>
                         <Col span={24}>
                             <Form.Item
-                                label="排序"
+                                label={getRes()["order"]}
                                 style={{ marginBottom: 8 }}
                                 name="sort"
                                 rules={[{ required: true, message: "" }]}

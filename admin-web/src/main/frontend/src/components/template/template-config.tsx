@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { App, Form, Input, Row } from "antd";
+import { useEffect, useState } from "react";
+import { App, ColorPicker, Form, Input, Row } from "antd";
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
 import Button from "antd/es/button";
@@ -10,6 +10,7 @@ import Col from "antd/es/grid/col";
 import axios from "axios";
 import { getRes } from "../../utils/constants";
 import { UploadChangeParam } from "antd/es/upload";
+import Switch from "antd/es/switch";
 
 const layout = {
     labelCol: { span: 8 },
@@ -28,13 +29,17 @@ export type ConfigParam = {
     placeholder: string;
 };
 
-const TemplateConfig = ({ data }: { data: TemplateConfigState }) => {
+const convertToDataMap = (data: TemplateConfigState) => {
     const dataMap = {};
     for (const [key, value] of Object.entries(data.config)) {
         //@ts-ignore
         dataMap[key] = value.value;
     }
+    return dataMap;
+};
 
+const TemplateConfig = ({ data, offline }: { data: TemplateConfigState; offline: boolean }) => {
+    const dataMap = convertToDataMap(data);
     const [state, setState] = useState<TemplateConfigState>({
         config: data.config,
         dataMap: dataMap,
@@ -67,20 +72,46 @@ const TemplateConfig = ({ data }: { data: TemplateConfigState }) => {
             return (
                 <>
                     <Dragger
-                        style={{ width: "128px" }}
+                        style={{ width: "128px", height: "128px" }}
                         multiple={false}
                         onChange={(e) => onUploadChange(e, key)}
                         name="imgFile"
                         action="/api/admin/upload?dir=image"
                     >
-                        <Image preview={false} width={128} src={state.dataMap[key]} />
+                        <Image
+                            style={{ borderRadius: 8 }}
+                            preview={false}
+                            height={128}
+                            width={128}
+                            src={state.dataMap[key]}
+                        />
                     </Dragger>
                 </>
             );
-        } else if (value.htmlElementType === "textarea") {
-            return <TextArea rows={5} placeholder={value.placeholder} />;
+        } else if (value.htmlElementType === "switch") {
+            return <Switch size={"small"} />;
+        } else if (value.htmlElementType === "textarea" || value.htmlElementType === "large-textarea") {
+            return (
+                <TextArea rows={value.htmlElementType === "large-textarea" ? 20 : 5} placeholder={value.placeholder} />
+            );
         } else if (value.type === "hidden") {
             return <Input hidden={true} />;
+        } else if (value.htmlElementType === "colorPicker") {
+            return (
+                <div style={{ display: "flex", justifyContent: "flex-start", alignItems: "center" }}>
+                    <ColorPicker
+                        value={state.dataMap[key]}
+                        onChange={(color) => {
+                            state.dataMap[key] = color.toHexString();
+                            setState({
+                                ...state,
+                                dataMap: state.dataMap,
+                            });
+                        }}
+                    />
+                    <span style={{ paddingLeft: 8 }}>{state.dataMap[key]}</span>
+                </div>
+            );
         }
         return <Input type={value.type} placeholder={value.placeholder} />;
     };
@@ -108,10 +139,17 @@ const TemplateConfig = ({ data }: { data: TemplateConfigState }) => {
             if (data.error) {
                 message.error(data.message);
             } else {
-                message.info(data.message);
+                message.success(data.message);
             }
         });
     };
+
+    useEffect(() => {
+        setState({
+            config: data.config,
+            dataMap: convertToDataMap(data),
+        });
+    }, [data]);
 
     return (
         <>
@@ -120,7 +158,7 @@ const TemplateConfig = ({ data }: { data: TemplateConfigState }) => {
             </Title>
             <Divider />
             <Row>
-                <Col md={12} xs={24}>
+                <Col xs={24} style={{ maxWidth: 600 }}>
                     <Form
                         onFinish={() => onFinish()}
                         initialValues={state.dataMap}
@@ -129,7 +167,7 @@ const TemplateConfig = ({ data }: { data: TemplateConfigState }) => {
                     >
                         {getFormItems()}
                         <Divider />
-                        <Button type="primary" htmlType="submit">
+                        <Button disabled={offline} type="primary" htmlType="submit">
                             {getRes()["submit"]}
                         </Button>
                     </Form>

@@ -3,22 +3,24 @@ package com.zrlog.business.service;
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.SecurityUtils;
+import com.hibegin.template.BasicTemplateRender;
 import com.zrlog.business.type.TestConnectDbResult;
-import com.zrlog.util.DbConnectUtils;
 import com.zrlog.common.Constants;
+import com.zrlog.common.type.RunMode;
+import com.zrlog.util.DbConnectUtils;
 import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ParseUtil;
+import com.zrlog.util.ZrLogUtil;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.*;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -65,8 +67,8 @@ public class InstallService {
         map.put("rows", 10);
         map.put("template", Constants.DEFAULT_TEMPLATE_PATH);
         map.put(Constants.AUTO_UPGRADE_VERSION_KEY, Constants.DEFAULT_AUTO_UPGRADE_VERSION_TYPE.getCycle());
-        map.put("title", webSite.get("title"));
-        map.put("second_title", webSite.get("second_title"));
+        map.put("title", Objects.requireNonNullElse(webSite.get("title"), ""));
+        map.put("second_title", Objects.requireNonNullElse(webSite.get("second_title"), ""));
         map.put("language", I18nUtil.getCurrentLocale());
         map.put(Constants.ZRLOG_SQL_VERSION_KEY, Constants.SQL_VERSION);
         return map;
@@ -76,33 +78,31 @@ public class InstallService {
      * 尝试使用填写的数据库信息连接数据库
      */
     public TestConnectDbResult testDbConn() {
-        TestConnectDbResult testConnectDbResult;
         Properties properties = new Properties();
         properties.putAll(dbConn);
         try (Connection connection = DbConnectUtils.getConnection(properties)) {
-            LOGGER.info("Db connect success " + connection.getCatalog());
-            testConnectDbResult = TestConnectDbResult.SUCCESS;
+            LOGGER.info("Db test connect success " + connection.getCatalog());
+            return TestConnectDbResult.SUCCESS;
         } catch (ClassNotFoundException e) {
             LOGGER.log(Level.SEVERE, "", e);
-            testConnectDbResult = TestConnectDbResult.MISSING_MYSQL_DRIVER;
+            return TestConnectDbResult.MISSING_MYSQL_DRIVER;
         } catch (SQLRecoverableException e) {
             LOGGER.log(Level.SEVERE, "", e);
-            testConnectDbResult = TestConnectDbResult.CREATE_CONNECT_ERROR;
+            return TestConnectDbResult.CREATE_CONNECT_ERROR;
         } catch (SQLSyntaxErrorException e) {
             LOGGER.log(Level.SEVERE, "", e);
-            testConnectDbResult = TestConnectDbResult.DB_NOT_EXISTS;
+            return TestConnectDbResult.DB_NOT_EXISTS;
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "", e);
             if (e.getMessage().contains("Access denied for user") && e.getMessage().contains("using password")) {
-                testConnectDbResult = TestConnectDbResult.USERNAME_OR_PASSWORD_ERROR;
+                return TestConnectDbResult.USERNAME_OR_PASSWORD_ERROR;
             } else {
-                testConnectDbResult = TestConnectDbResult.SQL_EXCEPTION_UNKNOWN;
+                return TestConnectDbResult.SQL_EXCEPTION_UNKNOWN;
             }
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "", e);
-            testConnectDbResult = TestConnectDbResult.UNKNOWN;
         }
-        return testConnectDbResult;
+        return TestConnectDbResult.UNKNOWN;
     }
 
     /**
@@ -111,8 +111,10 @@ public class InstallService {
      * @return false 表示安装没有正常执行，true 表示初始化数据库成功。
      */
     public boolean install() {
-        File lock = new File(basePath + "/install.lock");
-        return !lock.exists() && startInstall(dbConn, configMsg, lock);
+        if (getLockFile().exists()) {
+            return false;
+        }
+        return startInstall(dbConn, configMsg);
     }
 
     /**
@@ -121,50 +123,43 @@ public class InstallService {
      * @return
      */
     public boolean checkInstall() {
-        File lock = new File(basePath + "/install.lock");
-        return lock.exists();
+        return getLockFile().exists() && !Objects.equals(Constants.runMode, RunMode.NATIVE_AGENT);
     }
 
-    private boolean startInstall(Map<String, String> dbConn, Map<String, String> blogMsg, File lock) {
-        Connection connect;
-        try {
-            Properties properties = new Properties();
-            properties.putAll(dbConn);
-            connect = DbConnectUtils.getConnection(properties);
-        } catch (Exception e) {
-            return false;
-        }
+    public File getLockFile() {
+        return new File(basePath + "/install.lock");
+    }
 
-        File file = new File(basePath + "/db.properties");
-        Statement st;
-        if (file.exists()) {
-            file.delete();
+    /**
+     * 保存程序的数据库链接信息
+     *
+     * @throws IOException
+     */
+    private void installSuccess() throws IOException {
+        File dbFile = new File(basePath + "/db.properties");
+        if (dbFile.exists()) {
+            dbFile.delete();
         }
-        try (FileOutputStream out = new FileOutputStream(file)) {
-            lock.createNewFile();
-            file.createNewFile();
-            Properties prop = new Properties();
-            prop.putAll(dbConn);
-            prop.store(out, "This is a database configuration file");
-            String s = IOUtil.getStringInputStream(InstallService.class.getResourceAsStream("/init-table-structure.sql"));
-            String[] sql = s.split("\n");
-            StringBuilder tempSqlStr = new StringBuilder();
-            for (String sqlSt : sql) {
-                if (sqlSt.startsWith("#") || sqlSt.startsWith("/*")) {
-                    continue;
-                }
-                tempSqlStr.append(sqlSt);
-            }
-            sql = tempSqlStr.toString().split(";");
-            for (String sqlSt : sql) {
-                if (!"".equals(sqlSt)) {
-                    st = connect.createStatement();
+        dbFile.getParentFile().mkdirs();
+        dbFile.createNewFile();
+        Properties prop = new Properties();
+        prop.putAll(dbConn);
+        prop.store(new FileOutputStream(dbFile), "This is a database configuration dbFile");
+        File lockFile = getLockFile();
+        lockFile.getParentFile().mkdirs();
+        lockFile.createNewFile();
+    }
+
+    private boolean startInstall(Map<String, String> dbConn, Map<String, String> blogMsg) {
+        Properties properties = new Properties();
+        properties.putAll(dbConn);
+        try (Connection connect = DbConnectUtils.getConnection(properties)) {
+            String sql = IOUtil.getStringInputStream(InstallService.class.getResourceAsStream("/init-table-structure.sql"));
+            for(String sqlSt: ZrLogUtil.extractExecutableSql(sql)) {
+                try (Statement st = connect.createStatement()) {
                     st.execute(sqlSt);
-                    st.close();
                 }
-
             }
-
             //初始数据
             initWebSite(connect);
             initUser(blogMsg, connect);
@@ -173,51 +168,49 @@ public class InstallService {
             insertType(connect);
             insertTag(connect);
             insertFirstArticle(connect);
+            installSuccess();
             return true;
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "install error ", e);
-            lock.delete();
-        } finally {
-            try {
-                connect.close();
-            } catch (SQLException e) {
-                LOGGER.log(Level.SEVERE, "install error ", e);
-            }
         }
         return false;
     }
 
-    private void insertFirstArticle(Connection connect) throws SQLException {
-        String insetLog = "INSERT INTO `log`(`logId`,`canComment`,`keywords`,`alias`,`typeId`,`userId`,`title`,`content`,`plain_content`,`markdown`,`digest`,`releaseTime`,`last_update_date`,`rubbish`,`privacy`) VALUES (1,?,?,?,1,1,?,?,?,?,?,?,?,?,?)";
+    private void insertFirstArticle(Connection connect) throws Exception {
+        int logId = 1;
+        String insetLog = "INSERT INTO `log`(`logId`,`canComment`,`keywords`,`alias`,`typeId`,`userId`,`title`,`content`,`plain_content`,`markdown`,`digest`,`releaseTime`,`last_update_date`,`rubbish`,`privacy`) VALUES (" + logId + ",?,?,?,1,1,?,?,?,?,?,?,?,?,?)";
         try (PreparedStatement ps = connect.prepareStatement(insetLog)) {
-            ps.setBoolean(1, true);
-            String markdown = IOUtil.getStringInputStream(InstallService.class.getResourceAsStream("/init-blog/" + I18nUtil.getCurrentLocale() + ".md"));
-            markdown = markdown.replace("${basePath}", "/");
-            String content = renderMd(markdown);
-            ps.setString(2, I18nUtil.getBlogStringFromRes("defaultType"));
-            ps.setString(3, "hello-world");
-            ps.setString(4, I18nUtil.getBlogStringFromRes("helloWorld"));
-            ps.setString(5, content);
-            ps.setString(6, VisitorArticleService.getPlainSearchText(content));
-            ps.setString(7, markdown);
-            ps.setString(8, ParseUtil.autoDigest(content, Constants.getAutoDigestLength()));
-            ps.setObject(9, new java.util.Date());
-            ps.setObject(10, new java.util.Date());
-            ps.setBoolean(11, false);
-            ps.setBoolean(12, false);
-            ps.executeUpdate();
+            try (InputStream in = InstallService.class.getResourceAsStream("/init-blog/" + I18nUtil.getCurrentLocale() + ".md")) {
+                Map<String, Object> data = new HashMap<>();
+                data.put("editUrl", "/admin/article-edit?id=" + logId);
+                String markdown = new BasicTemplateRender(data, InstallService.class).render(in);
+                String content = renderMd(markdown);
+                ps.setBoolean(1, true);
+                ps.setString(2, I18nUtil.getInstallStringFromRes("defaultType"));
+                ps.setString(3, "hello-world");
+                ps.setString(4, I18nUtil.getInstallStringFromRes("helloWorld"));
+                ps.setString(5, content);
+                ps.setString(6, VisitorArticleService.getPlainSearchText(content));
+                ps.setString(7, markdown);
+                ps.setString(8, content);
+                ps.setObject(9, new java.util.Date());
+                ps.setObject(10, new java.util.Date());
+                ps.setBoolean(11, false);
+                ps.setBoolean(12, false);
+                ps.executeUpdate();
+            }
         }
     }
 
     private void insertType(Connection connect) throws SQLException {
-        String insertLogType = "INSERT INTO `type`(`typeId`, `typeName`, `remark`, `alias`) VALUES (1,'" + I18nUtil.getBlogStringFromRes("defaultType") + "','','note')";
+        String insertLogType = "INSERT INTO `type`(`typeId`, `typeName`, `remark`, `alias`) VALUES (1,'" + I18nUtil.getInstallStringFromRes("defaultType") + "','','note')";
         try (PreparedStatement ps = connect.prepareStatement(insertLogType)) {
             ps.executeUpdate();
         }
     }
 
     private void insertTag(Connection connect) throws SQLException {
-        String insertTag = "INSERT INTO `tag`(`tagId`,`text`,`count`) VALUES (1,'" + I18nUtil.getBlogStringFromRes("defaultType") + "',1)";
+        String insertTag = "INSERT INTO `tag`(`tagId`,`text`,`count`) VALUES (1,'" + I18nUtil.getInstallStringFromRes("defaultType") + "',1)";
         try (PreparedStatement ps = connect.prepareStatement(insertTag)) {
             ps.executeUpdate();
         }
@@ -235,7 +228,7 @@ public class InstallService {
         try (PreparedStatement ps = connect.prepareStatement(insertLogNavSql)) {
             ps.setObject(1, 2);
             ps.setObject(2, Constants.ADMIN_LOGIN_URI_PATH);
-            ps.setObject(3, I18nUtil.getBlogStringFromRes("manage"));
+            ps.setObject(3, I18nUtil.getInstallStringFromRes("manage"));
             ps.setObject(4, 2);
             ps.executeUpdate();
         }
@@ -244,7 +237,7 @@ public class InstallService {
         try (PreparedStatement ps = connect.prepareStatement(insertLogNavSql)) {
             ps.setObject(1, 1);
             ps.setObject(2, "/");
-            ps.setObject(3, I18nUtil.getBlogStringFromRes("home"));
+            ps.setObject(3, I18nUtil.getInstallStringFromRes("home"));
             ps.setObject(4, 1);
             ps.executeUpdate();
         }

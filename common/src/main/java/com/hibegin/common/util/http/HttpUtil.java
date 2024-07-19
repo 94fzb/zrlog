@@ -3,7 +3,9 @@ package com.hibegin.common.util.http;
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.http.handle.HttpHandle;
 import com.hibegin.common.util.http.handle.HttpStringHandle;
+import com.zrlog.common.Constants;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -16,14 +18,19 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class HttpUtil {
     private static final Logger LOGGER = LoggerUtil.getLogger(HttpUtil.class);
-    private static final HttpClient httpClient = HttpClient.newBuilder().build();
+    private final HttpClient httpClient;
 
     private static final HttpUtil instance = new HttpUtil();
+
+    public HttpUtil() {
+        this.httpClient = HttpClient.newBuilder().build();
+    }
 
     public static HttpUtil getInstance() {
         return instance;
@@ -33,7 +40,7 @@ public class HttpUtil {
             throws IOException, InterruptedException, URISyntaxException {
         String queryStr = mapToQueryStr(requestParam);
         HttpRequest.Builder builder = HttpRequest.newBuilder()
-                .uri(new URI(urlPath + "?" + queryStr))
+                .uri(new URI(urlPath + (urlPath.contains("?") ? "&" : "?") + queryStr))
                 .GET();
         setHttpHeaders(builder, reqHeaders);
         HttpRequest request = builder.build();
@@ -82,7 +89,20 @@ public class HttpUtil {
         requestBuilder.headers("Accept-Encoding", "gzip, deflate");
         requestBuilder.headers("Accept-Language", "zh-cn,zh;q=0.5");
         requestBuilder.headers("User-Agent", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:41.0) Gecko/20100101 Firefox/41.0");
-        headers.forEach(requestBuilder::header);
+        if (Constants.debugLoggerPrintAble()) {
+            LOGGER.info("headers = " + headers);
+        }
+        if (Objects.nonNull(headers)) {
+            headers.forEach((k, v) -> {
+                if (Objects.nonNull(v)) {
+                    try {
+                        requestBuilder.header(k, v);
+                    } catch (Exception e) {
+                        LOGGER.warning("set header " + k + ", " + v + ", error: " + e.getMessage());
+                    }
+                }
+            });
+        }
     }
 
     private <T> HttpHandle<T> handleResponse(HttpHandle<T> httpHandle, HttpRequest request, HttpResponse<InputStream> response) {

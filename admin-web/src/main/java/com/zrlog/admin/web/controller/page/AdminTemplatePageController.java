@@ -1,40 +1,48 @@
 package com.zrlog.admin.web.controller.page;
 
 import com.hibegin.common.util.FileUtils;
-import com.hibegin.common.util.ZipUtil;
-import com.hibegin.common.util.http.HttpUtil;
-import com.hibegin.common.util.http.handle.HttpFileHandle;
+import com.hibegin.http.server.api.HttpRequest;
+import com.hibegin.http.server.api.HttpResponse;
+import com.hibegin.http.server.util.MimeTypeUtil;
 import com.hibegin.http.server.util.PathUtil;
 import com.hibegin.http.server.web.Controller;
-import com.zrlog.admin.business.exception.ArgsException;
-import com.zrlog.admin.business.exception.TemplateExistsException;
+import com.zrlog.admin.business.service.TemplateService;
+import com.zrlog.admin.web.annotation.RefreshCache;
+import com.zrlog.business.plugin.TemplateDownloadPlugin;
 import com.zrlog.common.Constants;
+import com.zrlog.common.vo.TemplateVO;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.HashMap;
+import java.util.Objects;
 
 public class AdminTemplatePageController extends Controller {
 
+
+    @RefreshCache
     public void download() throws IOException, URISyntaxException, InterruptedException {
-        String fileName = getRequest().getParaToStr("templateName");
-        String templatePath = fileName.substring(0, fileName.indexOf('.'));
-        File path = new File(PathUtil.getStaticPath() + Constants.TEMPLATE_BASE_PATH + templatePath + File.separator);
-        if (path.exists()) {
-            throw new TemplateExistsException();
+        String downloadUrl = request.getParaToStr("downloadUrl");
+        TemplateDownloadPlugin.installByUrl(downloadUrl);
+        response.redirect(Constants.ADMIN_URI_BASE_PATH + "/website/template");
+    }
+
+    public void previewImage() {
+        String templateName = Constants.TEMPLATE_BASE_PATH + request.getParaToStr("shortTemplate");
+        TemplateVO templateVO = new TemplateService().loadTemplateConfig(templateName);
+        if (Objects.isNull(templateVO)) {
+            response.renderCode(404);
         }
-        String downloadHost = request.getParaToStr("host");
-        if (!Constants.TEMPLATE_REPO_HOSTS.contains(downloadHost)) {
-            throw new ArgsException();
+        if (templateVO.getPreviewImage().startsWith("/include/templates")) {
+            response.addHeader("Cache-Control", "max-age=31536000, immutable"); // 1 年的秒数
+            response.getHeader().put("Content-Type", MimeTypeUtil.getMimeStrByExt(FileUtils.getFileExt(templateVO.getPreviewImage())));
+            if (Objects.equals(templateVO.getTemplate(), Constants.DEFAULT_TEMPLATE_PATH)) {
+                response.write(AdminTemplatePageController.class.getResourceAsStream(templateVO.getPreviewImage()));
+            } else {
+                response.writeFile(PathUtil.getStaticFile(templateVO.getPreviewImage()));
+            }
+        } else {
+            response.renderCode(403);
         }
-        HttpFileHandle fileHandle = (HttpFileHandle) HttpUtil.getInstance().sendGetRequest(downloadHost +
-                        "/template/download?id=" + request.getParaToInt("id"),
-                new HttpFileHandle(PathUtil.getStaticPath() + Constants.TEMPLATE_BASE_PATH), new HashMap<>());
-        String target = fileHandle.getT().getParent() + "/" + fileName;
-        FileUtils.moveOrCopyFile(fileHandle.getT().toString(), target, true);
-        ZipUtil.unZip(target, path + "/");
-        response.redirect(Constants.ADMIN_URI_BASE_PATH + "/website#template");
     }
 
 

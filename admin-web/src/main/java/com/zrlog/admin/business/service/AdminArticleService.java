@@ -6,16 +6,17 @@ import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.common.util.http.HttpUtil;
 import com.hibegin.common.util.http.handle.HttpFileHandle;
+import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.admin.business.exception.ArticleMissingTitleException;
 import com.zrlog.admin.business.exception.ArticleMissingTypeException;
 import com.zrlog.admin.business.exception.UpdateArticleExpireException;
 import com.zrlog.admin.business.rest.request.CreateArticleRequest;
 import com.zrlog.admin.business.rest.request.UpdateArticleRequest;
-import com.zrlog.admin.business.rest.response.ArticleResponseEntry;
 import com.zrlog.admin.business.rest.response.CreateOrUpdateArticleResponse;
 import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
 import com.zrlog.admin.business.util.ThumbnailUtil;
+import com.zrlog.business.rest.response.ArticleResponseEntry;
 import com.zrlog.business.service.VisitorArticleService;
 import com.zrlog.common.Constants;
 import com.zrlog.common.rest.request.PageRequest;
@@ -32,13 +33,13 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -62,7 +63,7 @@ public class AdminArticleService {
             String path = url;
             byte[] bytes;
             if (url.startsWith("https://") || url.startsWith("http://")) {
-                path = new URL(url).getPath();
+                path = URI.create(url).getPath();
                 if (!path.startsWith(Constants.ATTACHED_FOLDER)) {
                     path = (Constants.ATTACHED_FOLDER + path).replace("//", "/");
                 } else {
@@ -98,7 +99,7 @@ public class AdminArticleService {
                 IOUtil.writeBytesToFile(bytes, thumbnailFile);
             }
             return new UploadService().getCloudUrl("", path, thumbnailFile.getPath(), null,
-                    adminTokenVO).getUrl() + "?h=" + height + "&w=" + width;
+                    adminTokenVO).url() + "?h=" + height + "&w=" + width;
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "", e);
         }
@@ -167,7 +168,7 @@ public class AdminArticleService {
 
     private Map<String, Object> getLog(AdminTokenVO adminTokenVO, CreateArticleRequest createArticleRequest) throws SQLException {
         Map<String, Object> log;
-        int articleId;
+        long articleId;
         if (createArticleRequest instanceof UpdateArticleRequest) {
             log = new Log().loadById(((UpdateArticleRequest) createArticleRequest).getLogId());
             articleId = Objects.requireNonNull(((UpdateArticleRequest) createArticleRequest).getLogId());
@@ -199,19 +200,26 @@ public class AdminArticleService {
         } else {
             log.put("thumbnail", createArticleRequest.getThumbnail());
         }
-        // 自动摘要
-        if (StringUtils.isEmpty(createArticleRequest.getDigest())) {
-            log.put("digest", ParseUtil.autoDigest((String) log.get("content"), Constants.getAutoDigestLength()));
-        } else {
-            log.put("digest", createArticleRequest.getDigest());
-        }
         //fix digest xss
-        Jsoup.clean(Objects.requireNonNullElse(log.get("digest"), "").toString(), Safelist.basicWithImages());
+        String parseInputDigest = Jsoup.clean(Objects.requireNonNullElse(createArticleRequest.getDigest(), ""), Safelist.basicWithImages());
+        // 自动摘要
+        if (StringUtils.isEmpty(parseInputDigest) && Objects.equals(createArticleRequest.isRubbish(), false)) {
+            int autoSize = Constants.getAutoDigestLength();
+            if (autoSize < 0) {
+                log.put("digest", log.get("content"));
+            } else if (autoSize == 0) {
+                log.put("digest", "");
+            } else {
+                log.put("digest", ParseUtil.autoDigest((String) log.get("content"), autoSize));
+            }
+        } else {
+            log.put("digest", parseInputDigest);
+        }
         log.put("plain_content", VisitorArticleService.getPlainSearchText((String) log.get("content")));
         log.put("editor_type", createArticleRequest.getEditorType());
         String alias;
         if (StringUtils.isEmpty(createArticleRequest.getAlias())) {
-            alias = Integer.toString(articleId);
+            alias = Long.toString(articleId);
         } else {
             alias = createArticleRequest.getAlias();
         }
@@ -219,27 +227,11 @@ public class AdminArticleService {
         return log;
     }
 
-    public PageData<ArticleResponseEntry> adminPage(PageRequest pageRequest, String keywords) throws SQLException {
+    public PageData<ArticleResponseEntry> adminPage(PageRequest pageRequest, String keywords, HttpRequest request) {
         PageData<Map<String, Object>> data = new Log().adminFind(pageRequest, keywords);
         VisitorArticleService.wrapperSearchKeyword(data, keywords);
-        return convertPageable(data);
+        return VisitorArticleService.convertPageable(data, request);
     }
 
-    /**
-     * 将输入的分页过后的对象，转化PageableResponse的对象
-     */
-    private PageData<ArticleResponseEntry> convertPageable(PageData<Map<String, Object>> object) {
-        List<ArticleResponseEntry> dataList = new ArrayList<>();
-        for (Map<String, Object> obj : object.getRows()) {
-            obj.put("releaseTime", ((LocalDateTime) obj.get("releaseTime")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-            obj.put("lastUpdateDate", ((LocalDateTime) obj.get("lastUpdateDate")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-            obj.remove("last_update_date");
-            dataList.add(BeanUtil.convert(obj, ArticleResponseEntry.class));
-        }
-        PageData<ArticleResponseEntry> pageData = new PageData<>();
-        pageData.setTotalElements(object.getTotalElements());
-        pageData.setRows(dataList);
-        return pageData;
-    }
 
 }

@@ -10,6 +10,7 @@ import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.web.cookie.Cookie;
 import com.zrlog.business.util.InstallUtils;
 import com.zrlog.common.Constants;
+import com.zrlog.common.TokenService;
 import com.zrlog.common.vo.AdminTokenVO;
 import com.zrlog.model.User;
 
@@ -24,20 +25,17 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class AdminTokenService {
+public class AdminTokenService implements TokenService {
 
-    public static final String ADMIN_TOKEN = "admin-token";
-    /**
-     * 字符长度必须要大于16个字符
-     */
-    public static final String AES_PUBLIC_KEY = "_BLOG_BLOG_BLOG_";
+    private static final String ADMIN_TOKEN_KEY_IN_COOKIE = "admin-token";
     private static final Logger LOGGER = LoggerUtil.getLogger(AdminTokenService.class);
     private static final String TOKEN_SPLIT_CHAR = "#";
     private static final IvParameterSpec iv;
     private static SecretKeySpec secretKeySpec;
 
     static {
-        iv = new IvParameterSpec(AES_PUBLIC_KEY.getBytes(StandardCharsets.UTF_8));
+        //字符长度必须要大于16个字符
+        iv = new IvParameterSpec("_BLOG_BLOG_BLOG_".getBytes(StandardCharsets.UTF_8));
     }
 
     private static byte[] encrypt(String secretKey, byte[] value) throws Exception {
@@ -58,6 +56,7 @@ public class AdminTokenService {
         return cipher.doFinal(encrypted);
     }
 
+    @Override
     public AdminTokenVO getAdminTokenVO(HttpRequest request) {
         if (!InstallUtils.isInstalled()) {
             return null;
@@ -68,7 +67,7 @@ public class AdminTokenService {
         }
         String decTokenString = null;
         for (Cookie cookie : cookies) {
-            if (cookie.getName().equals(ADMIN_TOKEN)) {
+            if (cookie.getName().equals(ADMIN_TOKEN_KEY_IN_COOKIE)) {
                 decTokenString = cookie.getValue();
             }
         }
@@ -95,7 +94,23 @@ public class AdminTokenService {
         return null;
     }
 
-    public void setAdminToken(Map<String, Object> user, int sessionId, String protocol, HttpRequest request, HttpResponse response) {
+    @Override
+    public void removeAdminToken(HttpRequest request, HttpResponse response) {
+        Cookie[] cookies = request.getCookies();
+        for (Cookie cookie : cookies) {
+            if (ADMIN_TOKEN_KEY_IN_COOKIE.equals(cookie.getName())) {
+                cookie.setValue("");
+                cookie.setExpireDate(new Date(0));
+                cookie.setPath("/");
+                cookie.setHttpOnly(true);
+                response.addCookie(cookie);
+            }
+        }
+        response.redirect(Constants.ADMIN_LOGIN_URI_PATH);
+    }
+
+    @Override
+    public void setAdminToken(Map<String, Object> user, String sessionId, String protocol, HttpRequest request, HttpResponse response) {
         AdminTokenVO adminTokenVO = new AdminTokenVO();
         adminTokenVO.setUserId((Integer) user.get("userId"));
         adminTokenVO.setSessionId(sessionId);
@@ -109,9 +124,9 @@ public class AdminTokenService {
             String encryptAfterString = ByteUtils.bytesToHexString(base64Bytes);
             String finalTokenString = adminTokenVO.getUserId() + TOKEN_SPLIT_CHAR + encryptAfterString;
             Cookie cookie = new Cookie();
-            cookie.setName(ADMIN_TOKEN);
+            cookie.setName(ADMIN_TOKEN_KEY_IN_COOKIE);
             cookie.setValue(finalTokenString);
-            cookie.setExpireDate(new Date(System.currentTimeMillis() + (Constants.getSessionTimeout() * 1000)));
+            cookie.setExpireDate(new Date(System.currentTimeMillis() + Constants.getSessionTimeout()));
             cookie.setHttpOnly(true);
             cookie.setPath("/");
             response.addCookie(cookie);

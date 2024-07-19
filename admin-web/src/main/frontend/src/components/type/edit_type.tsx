@@ -1,11 +1,11 @@
 import { FunctionComponent, useState } from "react";
-import { Col, Form, Input, Modal } from "antd";
+import { App, Col, Form, Input, Modal } from "antd";
 import Row from "antd/es/grid/row";
 import TextArea from "antd/es/input/TextArea";
 import { EditOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { getColorPrimary } from "../../utils/constants";
+import { getColorPrimary, getRes } from "../../utils/constants";
 
 const layout = {
     labelCol: { span: 4 },
@@ -15,14 +15,20 @@ const layout = {
 export type EditTypeProps = {
     record: any;
     editSuccessCall: () => void;
+    offline: boolean;
 };
 
-const EditType: FunctionComponent<EditTypeProps> = ({ record, editSuccessCall }) => {
+const EditType: FunctionComponent<EditTypeProps> = ({ record, editSuccessCall, offline }) => {
     const [showModel, setShowModel] = useState<boolean>(false);
     const [updateForm, setUpdateForm] = useState<any>(record);
+    const { message } = App.useApp();
 
     const handleOk = () => {
-        axios.post("/api/admin/type/update", updateForm).then(() => {
+        axios.post("/api/admin/type/update", updateForm).then(async ({ data }) => {
+            if (data.error) {
+                await message.error(data.message);
+                return;
+            }
             setShowModel(false);
             if (editSuccessCall) {
                 editSuccessCall();
@@ -36,13 +42,20 @@ const EditType: FunctionComponent<EditTypeProps> = ({ record, editSuccessCall })
 
     return (
         <>
-            <Link to={"#"}>
-                <EditOutlined
-                    onClick={() => setShowModel(true)}
-                    style={{ marginBottom: 8, color: getColorPrimary() }}
-                />
+            <Link
+                to={"#edit-" + record.id}
+                onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (offline) {
+                        return;
+                    }
+                    setShowModel(true);
+                }}
+            >
+                <EditOutlined style={{ marginBottom: 8, color: getColorPrimary() }} />
             </Link>
-            <Modal title="编辑" open={showModel} onOk={handleOk} onCancel={() => setShowModel(false)}>
+            <Modal title={getRes()["edit"]} open={showModel} onOk={handleOk} onCancel={() => setShowModel(false)}>
                 <Form initialValues={record} onValuesChange={(_k, v) => setValue(v)} {...layout}>
                     <Form.Item name="id" style={{ display: "none" }}>
                         <Input hidden={true} />
@@ -50,7 +63,7 @@ const EditType: FunctionComponent<EditTypeProps> = ({ record, editSuccessCall })
                     <Row>
                         <Col span={24}>
                             <Form.Item
-                                label="名称分类"
+                                label={getRes()["admin.type.manage"]}
                                 style={{ marginBottom: 8 }}
                                 name="typeName"
                                 rules={[{ required: true, message: "" }]}
@@ -62,7 +75,7 @@ const EditType: FunctionComponent<EditTypeProps> = ({ record, editSuccessCall })
                     <Row>
                         <Col span={24}>
                             <Form.Item
-                                label="别名"
+                                label={getRes()["alias"]}
                                 style={{ marginBottom: 8 }}
                                 name="alias"
                                 rules={[{ required: true, message: "" }]}
@@ -74,7 +87,7 @@ const EditType: FunctionComponent<EditTypeProps> = ({ record, editSuccessCall })
                     <Row>
                         <Col span={24}>
                             <Form.Item
-                                label="介绍"
+                                label="简介"
                                 style={{ marginBottom: 8 }}
                                 name="remark"
                                 rules={[{ required: true, message: "" }]}

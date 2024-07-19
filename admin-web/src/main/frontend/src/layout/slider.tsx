@@ -1,6 +1,6 @@
 import React, { CSSProperties, ReactElement, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getRes } from "../utils/constants";
+import { getColorPrimary, getRes } from "../utils/constants";
 import {
     ApiFilled,
     ApiOutlined,
@@ -29,36 +29,76 @@ type MenuEntry = {
     text: string;
 };
 
-const SliderMenu = () => {
-    const itemStyle = {
-        margin: 0,
-        borderRadius: 0,
-        width: "100%",
-        color: "#FFF",
-    };
+type IconInfo = { selected: boolean; icon: ReactElement };
 
+function colorToRgba(color: string, alpha: number) {
+    if (color.startsWith("#")) {
+        // Convert hexadecimal to rgba
+        const hex = color.slice(1);
+        let bigint;
+        if (hex.length === 3) {
+            bigint = parseInt(hex, 16) * 0x10101;
+        } else if (hex.length === 6) {
+            bigint = parseInt(hex, 16);
+        } else {
+            throw new Error("Invalid hexadecimal color format");
+        }
+        const r = (bigint >> 16) & 255;
+        const g = (bigint >> 8) & 255;
+        const b = bigint & 255;
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    } else if (color.startsWith("rgba(")) {
+        // Extract alpha from rgba and replace with the specified alpha
+        return color.replace(/[^,]+(?=\))/, alpha.toString());
+    } else if (color.startsWith("rgb(")) {
+        // Convert rgb to rgba
+        return `rgba(${color.slice(color.indexOf("(") + 1, color.lastIndexOf(","))}, ${alpha})`;
+    } else {
+        throw new Error("Unsupported color format");
+    }
+}
+
+const SliderMenu = () => {
     const location = useLocation();
 
-    const getIcon = (entry: MenuEntry) => {
+    const getInfo = (entry: MenuEntry): IconInfo => {
+        if (location.pathname.startsWith("/website") && entry.link.startsWith("/website")) {
+            return { selected: true, icon: entry.selectIcon };
+        }
         if (location.pathname === entry.link) {
-            return entry.selectIcon;
+            return { selected: true, icon: entry.selectIcon };
         }
         if (entry.link !== "#more") {
-            return entry.icon;
+            return { selected: false, icon: entry.icon };
         }
         if (location.pathname === "/link" || location.pathname === "/nav" || location.pathname === "/article-type") {
-            return entry.selectIcon;
+            return { selected: true, icon: entry.selectIcon };
         }
-        return entry.icon;
+        return { selected: false, icon: entry.icon };
     };
 
-    function getItem(entry: MenuEntry, key: React.Key | null, children: MenuItem[], style: CSSProperties): MenuItem {
+    function getItem(entry: MenuEntry, key: React.Key | null, children: MenuItem[]): MenuItem {
+        const info = getInfo(entry);
         const label = (
-            <Link to={entry.link} style={{ color: "inherit" }}>
-                {getIcon(entry)}
+            <Link
+                to={entry.link}
+                style={{
+                    color: info.selected && EnvUtils.isDarkMode() ? getColorPrimary() : "#FFF",
+                }}
+            >
+                {info.icon}
                 <span className="menu-title">{entry.text}</span>
             </Link>
         );
+        const style: CSSProperties = {
+            margin: 0,
+            borderRadius: 0,
+            width: "100%",
+            color: "#FFF",
+        };
+        if (info.selected) {
+            style.background = colorToRgba(getColorPrimary(), 0.3);
+        }
         if (children.length > 0) {
             return {
                 key,
@@ -83,8 +123,7 @@ const SliderMenu = () => {
                 icon: <DashboardOutlined style={{ fontSize: 24 }} />,
             },
             "/index",
-            [],
-            itemStyle
+            []
         ),
         getItem(
             {
@@ -94,8 +133,7 @@ const SliderMenu = () => {
                 icon: <EditOutlined style={{ fontSize: 24 }} />,
             },
             "/article-edit",
-            [],
-            itemStyle
+            []
         ),
         getItem(
             {
@@ -105,8 +143,7 @@ const SliderMenu = () => {
                 icon: <ContainerOutlined style={{ fontSize: 24 }} />,
             },
             "/article",
-            [],
-            itemStyle
+            []
         ),
         getItem(
             {
@@ -116,8 +153,7 @@ const SliderMenu = () => {
                 icon: <CommentOutlined style={{ fontSize: 24 }} />,
             },
             "/comment",
-            [],
-            itemStyle
+            []
         ),
         getItem(
             {
@@ -127,8 +163,7 @@ const SliderMenu = () => {
                 icon: <ApiOutlined style={{ fontSize: 24 }} />,
             },
             "/plugin",
-            [],
-            itemStyle
+            []
         ),
         getItem(
             {
@@ -137,10 +172,8 @@ const SliderMenu = () => {
                 selectIcon: <SettingFilled style={{ fontSize: 24 }} />,
                 icon: <SettingOutlined style={{ fontSize: 24 }} />,
             },
-
             "/website",
-            [],
-            itemStyle
+            []
         ),
         getItem(
             {
@@ -149,7 +182,7 @@ const SliderMenu = () => {
                 selectIcon: <AppstoreFilled style={{ fontSize: 24 }} />,
                 icon: <AppstoreOutlined style={{ fontSize: 24 }} />,
             },
-            "more",
+            "/more",
             [
                 getItem(
                     {
@@ -159,8 +192,7 @@ const SliderMenu = () => {
                         icon: <span />,
                     },
                     "/article-type",
-                    [],
-                    itemStyle
+                    []
                 ),
                 getItem(
                     {
@@ -170,8 +202,7 @@ const SliderMenu = () => {
                         icon: <span />,
                     },
                     "/link",
-                    [],
-                    itemStyle
+                    []
                 ),
                 getItem(
                     {
@@ -181,19 +212,25 @@ const SliderMenu = () => {
                         icon: <span />,
                     },
                     "/nav",
-                    [],
-                    itemStyle
+                    []
                 ),
-            ],
-            { ...itemStyle }
+            ]
         ),
     ];
 
     const getSelectMenu = () => {
         if (location.pathname === "") {
-            return "index";
+            return "/index";
+        } else if (location.pathname.startsWith("/website")) {
+            return "/website";
+        } else if (
+            location.pathname === "/link" ||
+            location.pathname === "/nav" ||
+            location.pathname === "/article-type"
+        ) {
+            return "/more";
         } else {
-            return location.pathname.replace("/admin", "");
+            return location.pathname;
         }
     };
 

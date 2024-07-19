@@ -13,6 +13,9 @@ public class ZipUtil {
 
     public static void unZip(String src, String target) throws IOException {
         ZipEntry in;
+        if (!target.endsWith("/")) {
+            target = target + "/";
+        }
         try (ZipInputStream zipIn = new ZipInputStream(new FileInputStream(src)); ZipFile zip = new ZipFile(src)) {
             //FIXME zip 文件不能有中文
             while ((in = zipIn.getNextEntry()) != null) {
@@ -20,13 +23,12 @@ public class ZipUtil {
                 if (in.getName().endsWith("/")) {
                     file.mkdirs();
                 } else {
-                    byte[] b = IOUtil.getByteByInputStream(zip.getInputStream(in));
                     if (!new File(file.getParent()).exists()) {
                         new File(file.getParent()).mkdirs();
                     }
-                    FileOutputStream fout = new FileOutputStream(file);
-                    fout.write(b);
-                    fout.close();
+                    try (FileOutputStream fout = new FileOutputStream(file)) {
+                        zip.getInputStream(in).transferTo(fout);
+                    }
                 }
             }
         }

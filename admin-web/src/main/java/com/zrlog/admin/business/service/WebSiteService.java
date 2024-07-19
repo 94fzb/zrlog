@@ -1,42 +1,63 @@
 package com.zrlog.admin.business.service;
 
-import com.zrlog.admin.business.rest.base.BasicWebSiteRequest;
-import com.zrlog.admin.business.rest.base.BlogWebSiteRequest;
-import com.zrlog.admin.business.rest.base.OtherWebSiteRequest;
-import com.zrlog.admin.business.rest.base.UpgradeWebSiteRequest;
-import com.zrlog.admin.business.rest.response.WebSiteSettingsResponse;
+import com.zrlog.admin.business.rest.base.*;
 import com.zrlog.common.Constants;
+import com.zrlog.data.dto.FaviconBase64DTO;
+import com.zrlog.model.WebSite;
 
 import java.util.Objects;
 
 public class WebSiteService {
 
-    public WebSiteSettingsResponse loadSettings() {
-        WebSiteSettingsResponse webSiteSettingsResponse = new WebSiteSettingsResponse();
-        BasicWebSiteRequest basic = new BasicWebSiteRequest();
-        basic.setTitle((String) Constants.WEB_SITE.get("title"));
-        basic.setSecond_title((String) Constants.WEB_SITE.get("second_title"));
-        basic.setDescription((String) Constants.WEB_SITE.get("description"));
-        basic.setKeywords((String) Constants.WEB_SITE.get("keywords"));
-        webSiteSettingsResponse.setBasic(basic);
-        OtherWebSiteRequest other = new OtherWebSiteRequest();
-        other.setIcp((String) Constants.WEB_SITE.get("icp"));
-        other.setWebCm((String) Constants.WEB_SITE.get("webCm"));
-        webSiteSettingsResponse.setOther(other);
-        UpgradeWebSiteRequest upgrade = new UpgradeWebSiteRequest();
+
+    public UpgradeWebSiteInfo upgradeWebSiteInfo() {
+        UpgradeWebSiteInfo upgrade = new UpgradeWebSiteInfo();
         upgrade.setUpgradePreview(Constants.getBooleanByFromWebSite("upgradePreview"));
-        upgrade.setAutoUpgradeVersion((long) Double.parseDouble((String) Constants.WEB_SITE.get("autoUpgradeVersion")));
-        webSiteSettingsResponse.setUpgrade(upgrade);
-        BlogWebSiteRequest blog = new BlogWebSiteRequest();
-        blog.setArticle_route((String) Constants.WEB_SITE.get("article_route"));
-        blog.setAdmin_darkMode(Constants.getBooleanByFromWebSite("admin_darkMode"));
-        blog.setLanguage((String) Constants.WEB_SITE.get("language"));
-        blog.setAdmin_color_primary(Objects.toString(Constants.WEB_SITE.get("admin_color_primary"), "#1677ff"));
+        if (Objects.nonNull(Constants.zrLogConfig.getWebSite().get("autoUpgradeVersion"))) {
+            upgrade.setAutoUpgradeVersion((long) Double.parseDouble((String) Constants.zrLogConfig.getWebSite().get("autoUpgradeVersion")));
+        }
+        return upgrade;
+
+    }
+
+    public BlogWebSiteInfo blogWebSiteInfo() {
+        BlogWebSiteInfo blog = new BlogWebSiteInfo();
         blog.setGenerator_html_status(Constants.getBooleanByFromWebSite("generator_html_status"));
+        blog.setHost(Objects.requireNonNullElse((String) Constants.zrLogConfig.getWebSite().get("host"), ""));
         blog.setDisable_comment_status(Constants.getBooleanByFromWebSite("disable_comment_status"));
-        blog.setSession_timeout(Constants.getSessionTimeout() / 60 / 1000);
         blog.setArticle_thumbnail_status(Constants.getBooleanByFromWebSite("article_thumbnail_status"));
-        webSiteSettingsResponse.setBlog(blog);
-        return webSiteSettingsResponse;
+        return blog;
+    }
+
+    public BasicWebSiteInfo basicWebSiteInfo() {
+        FaviconBase64DTO faviconBase64DTO = new WebSite().faviconBase64DTO();
+        BasicWebSiteInfo basic = new BasicWebSiteInfo();
+        basic.setTitle((String) Constants.zrLogConfig.getWebSite().get("title"));
+        basic.setSecond_title((String) Constants.zrLogConfig.getWebSite().get("second_title"));
+        basic.setDescription((String) Constants.zrLogConfig.getWebSite().get("description"));
+        basic.setKeywords((String) Constants.zrLogConfig.getWebSite().get("keywords"));
+        basic.setFavicon_ico_base64(faviconBase64DTO.getFavicon_ico_base64());
+        return basic;
+    }
+
+    public AdminWebSiteInfo adminWebSiteInfo() {
+        AdminWebSiteInfo admin = new AdminWebSiteInfo();
+        FaviconBase64DTO faviconBase64DTO = new WebSite().faviconBase64DTO();
+        admin.setAdmin_darkMode(Constants.getBooleanByFromWebSite("admin_darkMode"));
+        admin.setLanguage((String) Constants.zrLogConfig.getWebSite().get("language"));
+        admin.setAdmin_color_primary(Objects.toString(Constants.zrLogConfig.getWebSite().get("admin_color_primary"), "#1677ff"));
+        admin.setSession_timeout(Constants.getSessionTimeout() / 60 / 1000);
+        admin.setArticle_auto_digest_length(Constants.getAutoDigestLength());
+        admin.setFavicon_png_pwa_512_base64(faviconBase64DTO.getFavicon_png_pwa_512_base64());
+        admin.setFavicon_png_pwa_192_base64(faviconBase64DTO.getFavicon_png_pwa_192_base64());
+        return admin;
+    }
+
+    public OtherWebSiteInfo other() {
+        OtherWebSiteInfo other = new OtherWebSiteInfo();
+        other.setIcp((String) Constants.zrLogConfig.getWebSite().get("icp"));
+        other.setWebCm((String) Constants.zrLogConfig.getWebSite().get("webCm"));
+        other.setRobotRuleContent((String) Constants.zrLogConfig.getWebSite().get("robotRuleContent"));
+        return other;
     }
 }

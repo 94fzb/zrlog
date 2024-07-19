@@ -1,6 +1,5 @@
 package com.zrlog.business.service;
 
-import com.google.gson.Gson;
 import com.hibegin.common.util.BeanUtil;
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.StringUtils;
@@ -13,14 +12,16 @@ import com.zrlog.business.cache.vo.BaseDataInitVO;
 import com.zrlog.business.util.PagerVO;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.OutlineVO;
-import com.zrlog.common.vo.TemplateVO;
 import com.zrlog.data.dto.PageData;
+import com.zrlog.model.WebSite;
 import com.zrlog.util.I18nUtil;
 import com.zrlog.util.OutlineUtil;
 import com.zrlog.util.ParseUtil;
 import com.zrlog.util.ZrLogUtil;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -31,7 +32,8 @@ public class TemplateHelper {
 
     private static final Logger LOGGER = LoggerUtil.getLogger(TemplateHelper.class);
 
-    public static String getSuffix(HttpRequest request){
+
+    public static String getSuffix(HttpRequest request) {
         if (ZrLogUtil.isStaticBlogPlugin(request) || Constants.isStaticHtmlStatus()) {
             return ".html";
         }
@@ -44,7 +46,7 @@ public class TemplateHelper {
         request.getAttr().put("staticBlog", staticBlog);
         request.getAttr().put("suffix", suffix);
 
-        BaseDataInitVO baseDataInitVO = BeanUtil.cloneObject(request.getAttr().get("init"));
+        BaseDataInitVO baseDataInitVO = BeanUtil.cloneObject((BaseDataInitVO) request.getAttr().get("init"));
         request.getAttr().put("init", baseDataInitVO);
         Map<String, Object> webSite = baseDataInitVO.getWebSite();
         String baseUrl = setBaseUrl(request, staticBlog, webSite);
@@ -52,7 +54,7 @@ public class TemplateHelper {
         request.getAttr().put("webs", webSite);
         String title = webSite.get("title") + " - " + webSite.get("second_title");
         if (request.getAttr().get("log") != null) {
-            title = ((Map<String,Object>) request.getAttr().get("log")).get("title") + " - " + title;
+            title = ((Map<String, Object>) request.getAttr().get("log")).get("title") + " - " + title;
         }
         request.getAttr().put("title", title);
 
@@ -61,14 +63,14 @@ public class TemplateHelper {
         if (pager != null && !pager.getPageList().isEmpty()) {
             List<PagerVO.PageEntry> pageList = pager.getPageList();
             for (PagerVO.PageEntry pageMap : pageList) {
-                pageMap.setUrl(baseUrl + pageMap.getUrl() + suffix);
+                pageMap.setUrl(baseUrl + WebTools.encodeUrl(pageMap.getUrl()) + suffix);
             }
 
             pager.setPageStartUrl(baseUrl + pager.getPageStartUrl() + suffix);
             pager.setPageEndUrl(baseUrl + pager.getPageEndUrl() + suffix);
         }
         fillTags(suffix, baseUrl, baseDataInitVO.getTags());
-        fillType(suffix, baseUrl, baseDataInitVO.getTypes());
+        fillType(suffix, baseUrl, baseDataInitVO.getTypes(),request);
         fullNavBar(request, suffix, baseDataInitVO);
         baseDataInitVO.setArchiveList(getConvertedArchives(suffix, baseUrl, baseDataInitVO.getArchives()));
     }
@@ -93,17 +95,19 @@ public class TemplateHelper {
         }
     }
 
-    private static void fillType(String suffix, String baseUrl, List<Map<String, Object>> types) {
+    private static void fillType(String suffix, String baseUrl, List<Map<String, Object>> types,HttpRequest request) {
         for (Map<String, Object> type : types) {
-            String tagUri = baseUrl + Constants.getArticleUri() + "sort/" + URLEncoder.encode((String) type.get("alias"),
-                    StandardCharsets.UTF_8) + suffix;
-            type.put("url", tagUri);
+            String typeUri = baseUrl + Constants.getArticleUri() + "sort/" +  type.get("alias");
+            if(request.getUri().startsWith(typeUri)){
+                tryEnableArrangePlugin((String) type.get("arrange_plugin"),request);
+            }
+            type.put("url", WebTools.encodeUrl(typeUri) + suffix);
         }
     }
 
     private static boolean isHomePage(HttpRequest request) {
         String uri = request.getUri().replace(".html", "");
-        return "".equals(uri) || "/".equals(uri) || "/all-1".equals(uri) || "/all".equals(uri) || ("/" + Constants.getArticleUri() + "all").equals(uri) || ("/" + Constants.getArticleUri() + "all-1").equals(uri);
+        return uri.isEmpty() || "/".equals(uri) || "/all-1".equals(uri) || "/all".equals(uri) || ("/" + Constants.getArticleUri() + "all").equals(uri) || ("/" + Constants.getArticleUri() + "all-1").equals(uri);
     }
 
     private static void fullNavBar(HttpRequest request, String suffix, BaseDataInitVO baseDataInitVO) {
@@ -124,23 +128,26 @@ public class TemplateHelper {
         }
     }
 
-    private static String getNavUrl(HttpRequest request, String suffix, String url) {
+    public static String getNavUrl(HttpRequest request, String suffix, String url) {
         if ("/".equals(url)) {
-            return WebTools.getHomeUrlWithHost(request);
+            return ZrLogUtil.getHomeUrlWithHost(request);
         }
         //文章页
-        else if (url.startsWith("/")) {
-            String nUrl = WebTools.getHomeUrlWithHost(request) + url.substring(1);
-            if (!nUrl.endsWith(suffix)) {
-                return nUrl + suffix;
+        if (url.startsWith("/")) {
+            String nUrl = ZrLogUtil.getHomeUrlWithHost(request) + url.substring(1);
+            if (Objects.nonNull(suffix) && !suffix.trim().isEmpty() && nUrl.endsWith(suffix)) {
+                return nUrl;
             }
-            return nUrl;
+            if (Objects.equals("/admin/login", url)) {
+                return nUrl;
+            }
+            return nUrl + suffix;
         }
         return url;
     }
 
     private static String ignoreScheme(String url, String suffix) {
-        if (suffix != null && suffix.length() > 0 && url.endsWith(suffix)) {
+        if (suffix != null && !suffix.isEmpty() && url.endsWith(suffix)) {
             url = url.substring(0, url.length() - suffix.length());
         }
         if (url.startsWith("http://")) {
@@ -172,7 +179,7 @@ public class TemplateHelper {
         request.getAttr().put("templateUrl", templateUrl);
         request.getAttr().put("rurl", baseUrl);
         request.getAttr().put("baseUrl", baseUrl);
-        request.getAttr().put("host", request.getHeader("host"));
+        request.getAttr().put("host", ZrLogUtil.getBlogHost(request));
         request.getAttr().put("searchUrl", baseUrl + Constants.getArticleUri() + "search");
         return baseUrl;
     }
@@ -194,6 +201,9 @@ public class TemplateHelper {
     }
 
     private static void staticHtml(HttpRequest request, String suffix, boolean thumbnailEnableArticle) {
+        String webSiteTitle = (String) Constants.zrLogConfig.getWebSite().get("title");
+        String webSiteSecondTitle = (String) Constants.zrLogConfig.getWebSite().get("second_title");
+        StringJoiner sj = new StringJoiner(" - ");
         if (request.getAttr().get("data") != null) {
             PageData<Map<String, Object>> map = (PageData) request.getAttr().get("data");
             List<Map<String, Object>> logList = map.getRows();
@@ -206,28 +216,52 @@ public class TemplateHelper {
                         log.put("thumbnail", null);
                     }
                     log.put("canComment", Objects.equals(log.get("canComment"), true) && Constants.isAllowComment());
-                    log.put("url",
-                            WebTools.getHomeUrl(request) + Constants.getArticleUri() + log.get("alias") + suffix);
-                    log.put("typeUrl", WebTools.getHomeUrl(request) + Constants.getArticleUri() + "sort/" + log.get(
-                            "typeAlias") + suffix);
+                    log.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + URLEncoder.encode((String) log.get("alias"), StandardCharsets.UTF_8) + suffix);
+                    log.put("typeUrl", WebTools.getHomeUrl(request) + Constants.getArticleUri() + "sort/" + URLEncoder.encode((String) log.get("typeAlias"), StandardCharsets.UTF_8) + suffix);
+                    if (Objects.isNull(log.get("digest"))) {
+                        log.put("digest", "");
+                    }
+                    if (Objects.isNull(log.get("content"))) {
+                        log.put("content", "");
+                    }
                 }
             }
+            request.getAttr().put("keywords", Constants.zrLogConfig.getWebSite().get("keywords"));
         } else if (request.getAttr().get("log") != null) {
-            fillArticleInfo((Map<String, Object>) request.getAttr().get("log"), request, suffix);
+            Map<String, Object> objectMap = (Map<String, Object>) request.getAttr().get("log");
+            fillArticleInfo(objectMap, request, suffix);
+            String articleTitle = (String) objectMap.get("title");
+            if (StringUtils.isNotEmpty(articleTitle)) {
+                sj.add(articleTitle);
+            }
+            String keywords = (String) objectMap.get("keywords");
+            if (StringUtils.isNotEmpty(keywords)) {
+                request.getAttr().put("keywords", keywords);
+            } else {
+                request.getAttr().put("keywords", Objects.requireNonNullElse(Constants.zrLogConfig.getWebSite().get("keywords"), ""));
+            }
         }
+        if (StringUtils.isNotEmpty(webSiteTitle)) {
+            sj.add(webSiteTitle);
+        }
+        if (StringUtils.isNotEmpty(webSiteSecondTitle)) {
+            sj.add(webSiteSecondTitle);
+        }
+        request.getAttr().put("description", Objects.requireNonNullElse(Constants.zrLogConfig.getWebSite().get("description"), ""));
+        request.getAttr().put("title", sj.toString());
     }
 
     private static void fillArticleInfo(Map<String, Object> log, HttpRequest request, String suffix) {
-        log.put("alias", log.get("alias") + suffix);
+        String aliasUrl = URLEncoder.encode((String) log.get("alias"), StandardCharsets.UTF_8) + suffix;
+        log.put("alias", aliasUrl);
         log.put("canComment", Objects.equals(log.get("canComment"), true) && Constants.isAllowComment());
-        log.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + log.get("alias"));
-        log.put("noSchemeUrl", WebTools.getHomeUrlWithHost(request) + Constants.getArticleUri() + log.get("alias"));
-        log.put("typeUrl",
-                WebTools.getHomeUrl(request) + Constants.getArticleUri() + "sort/" + log.get("typeAlias") + suffix);
+        log.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + aliasUrl);
+        log.put("noSchemeUrl", ZrLogUtil.getHomeUrlWithHost(request) + aliasUrl);
+        log.put("typeUrl", WebTools.getHomeUrl(request) + Constants.getArticleUri() + "sort/" + URLEncoder.encode((String) log.get("typeAlias"), StandardCharsets.UTF_8) + suffix);
         Map<String, Object> lastLog = (Map<String, Object>) log.get("lastLog");
         Map<String, Object> nextLog = (Map<String, Object>) log.get("nextLog");
-        nextLog.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + nextLog.get("alias") + suffix);
-        lastLog.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + lastLog.get("alias") + suffix);
+        nextLog.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + URLEncoder.encode((String) nextLog.get("alias"), StandardCharsets.UTF_8) + suffix);
+        lastLog.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + URLEncoder.encode((String) lastLog.get("alias"), StandardCharsets.UTF_8) + suffix);
 
         //没有使用md的toc目录的文章才尝试使用系统提取的目录
         if (log.get("markdown") != null && !log.get("markdown").toString().toLowerCase().contains("[toc]") && !log.get("markdown").toString().toLowerCase().contains("[tocm]")) {
@@ -238,33 +272,45 @@ public class TemplateHelper {
             }
             log.put("toc", outlineVO);
         }
+        tryEnableArrangePlugin((String) log.get("arrange_plugin"),request);
+        if (Objects.isNull(log.get("content"))) {
+            log.put("content", "");
+        }
+    }
+
+    private static void tryEnableArrangePlugin(String pluginName,HttpRequest request){
+        if(Objects.nonNull(pluginName) && StringUtils.isNotEmpty(pluginName)) {
+            request.getAttr().put("arrangePlugin", pluginName);
+        }
+    }
+
+    public static boolean isArrangeable(HttpRequest request){
+        return Objects.nonNull(request.getAttr().get("arrangePlugin"));
     }
 
     /**
      * 获取主题的相对于程序的路径，当Cookie中有值的情况下，优先使用Cookie里面的数据（仅当主题存在的情况下，否则返回默认的主题），
      */
-    private static String getTemplatePath(HttpRequest request) {
-        String templatePath = Constants.WEB_SITE.get("template").toString();
-        templatePath = templatePath == null ? Constants.DEFAULT_TEMPLATE_PATH : templatePath;
-        String previewTheme = getTemplatePathByCookie(request.getCookies());
-        if (previewTheme != null) {
-            templatePath = previewTheme;
-        }
-        if (!new File(PathUtil.getStaticPath() + templatePath).exists()) {
-            templatePath = Constants.DEFAULT_TEMPLATE_PATH;
+    public static String getTemplatePath(HttpRequest request) {
+        String templatePath = Objects.requireNonNullElse((String) Constants.zrLogConfig.getWebSite().get("template"), Constants.DEFAULT_TEMPLATE_PATH);
+        if (Objects.nonNull(request)) {
+            String previewTheme = getTemplatePathByCookie(request.getCookies());
+            if (previewTheme != null) {
+                if (new File(PathUtil.getStaticPath() + templatePath).exists()) {
+                    return previewTheme;
+                }
+                return Constants.DEFAULT_TEMPLATE_PATH;
+            }
         }
         return templatePath;
     }
 
     public static void fullTemplateInfo(HttpRequest request) {
-        String basePath = getTemplatePath(request);
-        request.getAttr().put("template", basePath);
-        I18nUtil.addToRequest(PathUtil.getStaticPath() + basePath + "/language/", request, false);
-        String jsonStr = (String) Constants.WEB_SITE.get(getTemplatePath(request) + Constants.TEMPLATE_CONFIG_SUFFIX);
-        if (StringUtils.isNotEmpty(jsonStr)) {
-            Map<String, Object> res = (Map<String, Object>) request.getAttr().get("_res");
-            res.putAll(new Gson().fromJson(jsonStr, Map.class));
-        }
+        String templatePath = getTemplatePath(request);
+        request.getAttr().put("template", templatePath);
+        I18nUtil.addToRequest(templatePath, request);
+        Map<String, Object> res = (Map<String, Object>) request.getAttr().get("_res");
+        res.putAll(new WebSite().getTemplateConfigMapWithCache(templatePath));
         fullInfo(request);
     }
 
@@ -281,53 +327,5 @@ public class TemplateHelper {
         return previewTemplate;
     }
 
-    public static TemplateVO getTemplateVO(File file) {
-        String templatePath = file.toString().substring(PathUtil.getStaticPath().length() - 1).replace("\\", "/");
-        TemplateVO templateVO = new TemplateVO();
-        File templateInfo = new File(file + "/template.properties");
-        if (templateInfo.exists()) {
-            Properties properties = new Properties();
-            try (InputStream in = new FileInputStream(templateInfo)) {
-                properties.load(in);
-                templateVO.setAuthor(properties.getProperty("author"));
-                templateVO.setName(properties.getProperty("name"));
-                templateVO.setDigest(properties.getProperty("digest"));
-                templateVO.setVersion(properties.getProperty("version"));
-                templateVO.setUrl(properties.getProperty("url"));
-                templateVO.setViewType(properties.getProperty("viewType"));
-                if (properties.get("previewImages") != null) {
-                    String[] images = properties.get("previewImages").toString().split(",");
-                    for (int i = 0; i < images.length; i++) {
-                        String image = images[i];
-                        if (!image.startsWith("https://") && !image.startsWith("http://")) {
-                            images[i] = templatePath + "/" + image;
-                        }
-                    }
-                    if (images.length > 0) {
-                        templateVO.setPreviewImage(images[0]);
-                    }
-                    templateVO.setPreviewImages(Arrays.asList(images));
-                }
-            } catch (IOException e) {
-                //LOGGER.log(Level.SEVERE,"", e);
-            }
-        } else {
-            templateVO.setAuthor("");
-            templateVO.setName(templatePath.substring(Constants.TEMPLATE_BASE_PATH.length()));
-            templateVO.setUrl("");
-            templateVO.setViewType("jsp");
-            templateVO.setVersion("");
-        }
-        if (templateVO.getPreviewImages() == null || templateVO.getPreviewImages().isEmpty()) {
-            templateVO.setPreviewImages(Collections.singletonList("assets/images/template-default-preview.jpg"));
-        }
-        if (StringUtils.isEmpty(templateVO.getDigest())) {
-            templateVO.setDigest(I18nUtil.getBlogStringFromRes("noIntroduction"));
-        }
-        File settingFile =
-                new File(PathUtil.getStaticPath() + templatePath + "/setting/index" + ZrLogUtil.getViewExt(templateVO.getViewType()));
-        templateVO.setConfigAble(settingFile.exists());
-        templateVO.setTemplate(templatePath);
-        return templateVO;
-    }
+
 }

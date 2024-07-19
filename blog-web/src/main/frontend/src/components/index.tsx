@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from 'react';
-import {Alert, Button, Card, Divider,App, Form, FormInstance, Input, Layout, Steps, Typography} from 'antd';
+import {Alert, App, Button, Card, Divider, Form, FormInstance, Input, Layout, Steps, Typography} from 'antd';
 
 import axios from "axios";
 import Text from "antd/es/typography/Text";
@@ -197,7 +197,7 @@ const IndexLayout = () => {
                                     </FormItem>
                                     <FormItem name='dbPort' label={getRes().installDbPort}
                                               rules={[{required: true}]}>
-                                        <Input type='number' placeholder='3306'/>
+                                        <Input type='number' placeholder='3306' style={{maxWidth: 108}}/>
                                     </FormItem>
                                 </Form>
                             )}

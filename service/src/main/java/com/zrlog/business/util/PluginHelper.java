@@ -7,11 +7,11 @@ import com.hibegin.common.util.http.handle.CloseResponseHandle;
 import com.hibegin.http.HttpMethod;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
+import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.AdminTokenVO;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.I18nUtil;
-import com.zrlog.util.ZrLogUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,23 +30,25 @@ public class PluginHelper {
         map.put("Current-Locale", I18nUtil.getCurrentLocale());
         map.put("Blog-Version", BlogBuildInfoUtil.getVersion());
         map.put("Dark-Mode", Constants.getBooleanByFromWebSite("admin_darkMode") + "");
+        map.put("Admin-Color-Primary", Objects.toString(Constants.zrLogConfig.getWebSite().get("admin_color_primary"), "#1677ff"));
         if (request != null) {
-            String fullUrl = ZrLogUtil.getFullUrl(request);
-            if (request.getQueryStr() != null) {
-                fullUrl = fullUrl + "?" + request.getQueryStr();
+            if (Objects.nonNull(request.getHeader("Cookie"))) {
+                map.put("Cookie", request.getHeader("Cookie"));
             }
-            if (adminTokenVO != null) {
-                fullUrl = adminTokenVO.getProtocol() + ":" + fullUrl;
-            }
-            map.put("Cookie", request.getHeader("Cookie"));
             map.put("AccessUrl", "http://127.0.0.1:" + request.getServerConfig().getPort());
-            if (request.getHeader("Content-Type") != null) {
+            if (Objects.nonNull(request.getHeader("Content-Type"))) {
                 map.put("Content-Type", request.getHeader("Content-Type"));
             }
             if (StringUtils.isNotEmpty(request.getHeader("Referer"))) {
                 map.put("Referer", request.getHeader("Referer"));
             }
-            map.put("Full-Url", fullUrl);
+            String fullUrl;
+            if (Objects.nonNull(adminTokenVO)) {
+                fullUrl = request.getFullUrl().replaceAll("http://", adminTokenVO.getProtocol() + "://");
+            } else {
+                fullUrl = request.getFullUrl();
+            }
+            map.put("Full-Url", WebTools.encodeUrl(fullUrl));
         }
         return map;
     }
@@ -62,11 +64,13 @@ public class PluginHelper {
             if ("application/x-www-form-urlencoded".equals(request.getHeader("Content-Type"))) {
                 HttpUtil.getInstance().sendPostRequest(pluginServerHttp + uri, request.getParamMap(), handle, PluginHelper.genHeaderMapByRequest(request, adminTokenVO));
             } else {
-                HttpUtil.getInstance().sendPostRequest(pluginServerHttp + uri + "?" + request.getQueryStr(), IOUtil.getByteByInputStream(request.getInputStream()), handle, PluginHelper.genHeaderMapByRequest(request, adminTokenVO)).getT();
+                String appendQueryStr = StringUtils.isEmpty(request.getQueryStr()) ? "?" + request.getQueryStr() : "";
+                HttpUtil.getInstance().sendPostRequest(pluginServerHttp + uri + appendQueryStr, IOUtil.getByteByInputStream(request.getInputStream()), handle, PluginHelper.genHeaderMapByRequest(request, adminTokenVO)).getT();
             }
         }
         return handle;
     }
+
 
     /**
      * 代理中转HTTP请求，目前仅支持，GET，POST 请求方式的中转。

@@ -4,6 +4,8 @@
     <base href="/"/>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <link href="%PUBLIC_URL%/manifest.json" rel="manifest">
+    <meta content="#000000" name="theme-color">
     <title>&nbsp;</title>
     <style>
         body {
@@ -15,12 +17,9 @@
             -moz-osx-font-smoothing: grayscale;
         }
 
-        /* 暗黑模式样式 */
-        @media (prefers-color-scheme: dark) {
-            body {
-                background-color: black;
-                color: white;
-            }
+        .dark {
+            background-color: black;
+            color: white;
         }
     </style>
 </head>

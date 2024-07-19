@@ -3,20 +3,23 @@ import Divider from "antd/es/divider";
 import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
 import { Badge, Card } from "antd";
-import { CheckOutlined, DeleteOutlined, EyeOutlined, SettingOutlined } from "@ant-design/icons";
+import { CheckOutlined, CloudDownloadOutlined, DeleteOutlined, EyeOutlined, SettingOutlined } from "@ant-design/icons";
 import Meta from "antd/es/card/Meta";
 import Button from "antd/es/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getRes } from "../../utils/constants";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import Popconfirm from "antd/es/popconfirm";
 
 export type TemplateEntry = {
     template: string;
     deleteAble: boolean;
     use: boolean;
     name: string;
+    shortTemplate: string;
     previewImage: string;
+    adminPreviewImage: string;
     preview: boolean;
     digest: string;
 };
@@ -30,43 +33,52 @@ const Template = ({ data }: { data: TemplateEntry[] }) => {
         });
     };
 
-    const preview = (template: string) => {
-        axios.post("/api/admin/template/preview?template=" + template).then(() => {
+    const preview = (shortTemplate: string) => {
+        axios.post("/api/admin/template/preview?shortTemplate=" + shortTemplate).then(() => {
             window.open(document.baseURI, "_blank");
             load();
         });
     };
 
-    const apply = (template: string) => {
-        axios.post("/api/admin/template/apply?template=" + template).then(() => {
+    const apply = (shortTemplate: string) => {
+        axios.post("/api/admin/template/apply?shortTemplate=" + shortTemplate).then(() => {
             load();
         });
     };
 
-    const deleteTemplate = (template: string) => {
-        axios.post("/api/admin/template/delete?template=" + template).then(() => {
+    const deleteTemplate = (shortTemplate: string) => {
+        axios.post("/api/admin/template/delete?shortTemplate=" + shortTemplate).then(() => {
             load();
         });
     };
+
+    useEffect(() => {
+        setTemplateState(data);
+    }, [data]);
 
     const getActions = (template: TemplateEntry) => {
         const links = [];
         links.push(
-            <div onClick={() => preview(template.template)}>
+            <div onClick={() => preview(template.shortTemplate)}>
                 <EyeOutlined key="preview" />
             </div>,
-            <Link to={"/template-config?template=" + template.template}>
+            <Link to={"/template-config?shortTemplate=" + template.shortTemplate}>
                 <SettingOutlined key="setting" />
             </Link>,
-            <div onClick={() => apply(template.template)}>
+            <div onClick={() => apply(template.shortTemplate)}>
                 <CheckOutlined />
             </div>
         );
         if (template.deleteAble) {
             links.push(
-                <Link to={"#"} onClick={() => deleteTemplate(template.template)}>
+                <Popconfirm
+                    title={getRes()["deleteTips"]}
+                    onConfirm={() => {
+                        deleteTemplate(template.shortTemplate);
+                    }}
+                >
                     <DeleteOutlined key="delete" />
-                </Link>
+                </Popconfirm>
             );
         }
         return links;
@@ -99,7 +111,7 @@ const Template = ({ data }: { data: TemplateEntry[] }) => {
                                             style={{ width: "100%", minHeight: 250 }}
                                             alt={template.name}
                                             title={template.name}
-                                            src={template.previewImage}
+                                            src={template.adminPreviewImage}
                                         />
                                     }
                                     actions={getActions(template)}
@@ -112,8 +124,10 @@ const Template = ({ data }: { data: TemplateEntry[] }) => {
                 })}
             </Row>
             <Divider />
-            <Link to="/template-center">
-                <Button type={"primary"}>{getRes()["admin.theme.download"]}</Button>
+            <Link to={`/template-center?host=${window.location.host}`}>
+                <Button icon={<CloudDownloadOutlined />} type={"primary"}>
+                    {getRes()["admin.theme.download"]}
+                </Button>
             </Link>
         </>
     );

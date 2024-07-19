@@ -19,7 +19,6 @@ import com.zrlog.common.Constants;
 import com.zrlog.common.rest.response.ApiStandardResponse;
 import com.zrlog.model.User;
 import com.zrlog.util.I18nUtil;
-import com.zrlog.util.ZrLogUtil;
 
 import java.sql.SQLException;
 import java.util.Map;
@@ -44,29 +43,25 @@ public class AdminUserController extends Controller {
     @ResponseBody
     public ApiStandardResponse<UserBasicInfoResponse> index() {
         Map<String, Object> byId = new User().loadById(AdminTokenThreadLocal.getUserId());
-        UserBasicInfoResponse basicInfoResponse = BeanUtil.convert(byId, UserBasicInfoResponse.class);
+        UserBasicInfoResponse basicInfoResponse = Objects.requireNonNullElse(BeanUtil.convert(byId, UserBasicInfoResponse.class), new UserBasicInfoResponse());
         if (StringUtils.isEmpty(basicInfoResponse.getHeader())) {
             basicInfoResponse.setHeader("/assets/images/default-portrait.gif");
         }
-        UpdateVersionPlugin plugin = (UpdateVersionPlugin) Constants.plugins.stream().filter(x -> x instanceof UpdateVersionPlugin).findFirst().orElse(null);
-        basicInfoResponse.setLastVersion(upgradeService.getCheckVersionResponse(false, Objects.requireNonNull(plugin)));
+        UpdateVersionPlugin plugin = (UpdateVersionPlugin) Constants.zrLogConfig.getPlugins().stream().filter(x -> x instanceof UpdateVersionPlugin).findFirst().orElse(null);
+        basicInfoResponse.setLastVersion(upgradeService.getCheckVersionResponse(false, plugin));
         return new ApiStandardResponse<>(basicInfoResponse);
     }
 
     @RefreshCache
     @ResponseBody
     public UpdateRecordResponse update() throws SQLException {
-        UpdateAdminRequest updateAdminRequest = ZrLogUtil.convertRequestBody(getRequest(), UpdateAdminRequest.class);
+        UpdateAdminRequest updateAdminRequest = Objects.requireNonNullElse(BeanUtil.convertWithValid(getRequest().getInputStream(), UpdateAdminRequest.class), new UpdateAdminRequest());
         UpdateRecordResponse updateRecordResponse = new UpdateRecordResponse();
-        if (updateAdminRequest != null) {
-            if (StringUtils.isEmpty(updateAdminRequest.getUserName())) {
-                updateRecordResponse.setError(1);
-            } else {
-                userService.update(AdminTokenThreadLocal.getUserId(), updateAdminRequest);
-                updateRecordResponse.setMessage(I18nUtil.getBlogStringFromRes("updatePersonInfoSuccess"));
-            }
-        } else {
+        if (StringUtils.isEmpty(updateAdminRequest.getUserName())) {
             updateRecordResponse.setError(1);
+        } else {
+            userService.update(AdminTokenThreadLocal.getUserId(), updateAdminRequest);
+            updateRecordResponse.setMessage(I18nUtil.getBackendStringFromRes("updatePersonInfoSuccess"));
         }
         return updateRecordResponse;
     }
@@ -74,6 +69,6 @@ public class AdminUserController extends Controller {
     @ResponseBody
     public UpdateRecordResponse updatePassword() throws SQLException {
         return userService.updatePassword(AdminTokenThreadLocal.getUserId(),
-                ZrLogUtil.convertRequestBody(getRequest(), UpdatePasswordRequest.class));
+                BeanUtil.convertWithValid(getRequest().getInputStream(), UpdatePasswordRequest.class));
     }
 }

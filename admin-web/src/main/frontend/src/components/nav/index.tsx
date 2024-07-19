@@ -4,21 +4,18 @@ import BaseTable, { PageDataSource } from "../../common/BaseTable";
 import { getRes } from "../../utils/constants";
 import AddNav from "./add_nav";
 import EditNav from "./edit_nav";
-import { Tooltip } from "antd";
 
-const Nav = ({ data }: { data: PageDataSource }) => {
+const Nav = ({ data, offline }: { data: PageDataSource; offline: boolean }) => {
     const getColumns = () => {
         return [
             {
-                title: "链接",
+                title: getRes()["admin.nav.manage"],
                 dataIndex: "url",
                 width: 240,
                 key: "url",
-                render: (url: string) => (
-                    <a style={{ display: "inline" }} rel="noopener noreferrer" target={"_blank"} href={url}>
-                        <Tooltip placement="topLeft" title={url}>
-                            <div style={{ display: "inline" }} dangerouslySetInnerHTML={{ __html: url }} />
-                        </Tooltip>
+                render: (url: string, r: Record<string, any>) => (
+                    <a style={{ display: "inline" }} rel="noopener noreferrer" target={"_blank"} href={r["jumpUrl"]}>
+                        {url}
                     </a>
                 ),
             },
@@ -29,7 +26,7 @@ const Nav = ({ data }: { data: PageDataSource }) => {
                 width: 240,
             },
             {
-                title: "排序",
+                title: getRes()["order"],
                 key: "sort",
                 dataIndex: "sort",
                 width: 60,
@@ -44,16 +41,17 @@ const Nav = ({ data }: { data: PageDataSource }) => {
             </Title>
             <Divider />
             <BaseTable
+                offline={offline}
+                hideId={true}
                 columns={getColumns()}
                 addBtnRender={(addSuccessCall) => {
-                    return <AddNav addSuccessCall={addSuccessCall} />;
+                    return <AddNav offline={offline} addSuccessCall={addSuccessCall} />;
                 }}
                 editBtnRender={(_id, record, editSuccessCall) => (
-                    <EditNav record={record} editSuccessCall={editSuccessCall} />
+                    <EditNav offline={offline} record={record} editSuccessCall={editSuccessCall} />
                 )}
                 datasource={data}
                 deleteApi={"/api/admin/nav/delete"}
-                dataApi={"/api/admin/nav"}
             />
         </>
     );

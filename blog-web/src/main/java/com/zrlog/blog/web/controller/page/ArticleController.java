@@ -2,22 +2,19 @@ package com.zrlog.blog.web.controller.page;
 
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.StringUtils;
-import com.hibegin.http.server.api.HttpRequest;
-import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.web.Controller;
-import com.zrlog.admin.web.token.AdminTokenService;
 import com.zrlog.blog.web.util.WebTools;
-import com.zrlog.business.cache.CacheService;
 import com.zrlog.business.rest.request.CreateCommentRequest;
 import com.zrlog.business.rest.response.CreateCommentResponse;
+import com.zrlog.business.service.ArticleService;
 import com.zrlog.business.service.CommentService;
+import com.zrlog.business.service.TemplateHelper;
 import com.zrlog.business.service.VisitorArticleService;
 import com.zrlog.business.util.PagerUtil;
 import com.zrlog.common.Constants;
 import com.zrlog.common.rest.request.PageRequest;
-import com.zrlog.common.vo.AdminTokenVO;
+import com.zrlog.common.rest.request.PageRequestImpl;
 import com.zrlog.data.dto.PageData;
-import com.zrlog.model.Comment;
 import com.zrlog.model.Log;
 import com.zrlog.model.Type;
 import com.zrlog.util.I18nUtil;
@@ -27,26 +24,19 @@ import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
 
 import java.math.BigDecimal;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.logging.Level;
+import java.util.*;
+import java.util.logging.Logger;
 
 public class ArticleController extends Controller {
 
+    private static final Logger LOGGER = LoggerUtil.getLogger(ArticleController.class);
     private final VisitorArticleService visitorArticleService = new VisitorArticleService();
 
     private final CommentService commentService = new CommentService();
-
-    private final AdminTokenService adminTokenService = new AdminTokenService();
-
-    public ArticleController() {
-    }
-
-    public ArticleController(HttpRequest request, HttpResponse response) {
-        super(request, response);
-    }
+    private final ArticleService articleService = new ArticleService();
 
     /**
      * add page info for template more easy
@@ -65,24 +55,16 @@ public class ArticleController extends Controller {
     }
 
     public String index() throws SQLException {
-        int page = getPage();
-
-        PageRequest pageRequest = new PageRequest(page, Constants.getDefaultRows());
+        PageRequest pageRequest = new PageRequestImpl(parseUriInfo(request.getUri()).page(), Constants.getDefaultRows());
         PageData<Map<String, Object>> data = new Log().visitorFind(pageRequest, null);
         setPageDataInfo(Constants.getArticleUri() + "all-", data, pageRequest);
         return "index";
     }
 
-    private int getPage() {
-        int page = 1;
-        if (getRequest().getUri().contains("-")) {
-            page = ParseUtil.strToInt(getRequest().getUri().split("-")[1].replace(".html", ""), 1);
-        }
-        return page;
-    }
 
     public String search() throws SQLException {
         String key = request.getParaToStr("key");
+        ArticleUriInfoVO uriInfoVO = parseUriInfo(request.getUri());
         PageData<Map<String, Object>> data;
         if (StringUtils.isNotEmpty(key)) {
             if ("GET".equals(getRequest().getMethod().name())) {
@@ -90,34 +72,32 @@ public class ArticleController extends Controller {
             }
         } else {
             try {
-                key = parseArgs(request.getUri(), 2, 0);
+                key = uriInfoVO.key();
             } catch (Exception e) {
-                LoggerUtil.getLogger(ArticleController.class).log(Level.WARNING, "Parse " + request.getUri() + " error " + e.getMessage());
+                LOGGER.warning("Parse " + request.getUri() + " error " + e.getMessage());
             }
         }
         if (StringUtils.isEmpty(key)) {
             return index();
         }
-        data = visitorArticleService.pageByKeywords(new PageRequest(1, Constants.getDefaultRows()), key);
+        data = visitorArticleService.pageByKeywords(new PageRequestImpl(1L, Constants.getDefaultRows()), key);
         // 记录回话的Key
         request.getAttr().put("key", WebTools.htmlEncode(key));
 
         request.getAttr().put("tipsType", I18nUtil.getBlogStringFromRes("search"));
         request.getAttr().put("tipsName", WebTools.htmlEncode(key));
 
-        setPageDataInfo(Constants.getArticleUri() + "search/" + key + "-", data, new PageRequest(getPage(),
-                Constants.getDefaultRows()));
+        setPageDataInfo(Constants.getArticleUri() + "search/" + key + "-", data, new PageRequestImpl(uriInfoVO.page(), Constants.getDefaultRows()));
         return "page";
     }
 
-    public String record() throws SQLException {
-        String dateStr = parseArgs(request.getUri(), 2, 0);
-
+    public String record() {
+        ArticleUriInfoVO uriInfoVO = parseUriInfo(request.getUri());
         request.getAttr().put("tipsType", I18nUtil.getBlogStringFromRes("archive"));
-        request.getAttr().put("tipsName", dateStr);
+        request.getAttr().put("tipsName", uriInfoVO.key());
 
-        setPageDataInfo(Constants.getArticleUri() + "record/" + dateStr + "-", new Log().findByDate(getPage(), Constants.getDefaultRows(),
-                dateStr), new PageRequest(getPage(),
+        setPageDataInfo(Constants.getArticleUri() + "record/" + uriInfoVO.key() + "-", new Log().findByDate(uriInfoVO.page(), Constants.getDefaultRows(),
+                uriInfoVO.key()), new PageRequestImpl(uriInfoVO.page(),
                 Constants.getDefaultRows()));
         return "page";
     }
@@ -127,7 +107,7 @@ public class ArticleController extends Controller {
         String ext = "";
         if (Constants.isStaticHtmlStatus()) {
             ext = ".html";
-            new CacheService().refreshInitDataCache(this.getRequest(), true);
+            Constants.zrLogConfig.getCacheService().refreshInitDataCacheAsync(this.getRequest(), true).join();
         }
         response.redirect("/" + Constants.getArticleUri() + x.getAlias() + ext);
     }
@@ -142,40 +122,60 @@ public class ArticleController extends Controller {
 
     public String detail() throws SQLException {
         String uri = getRequest().getUri();
-        return detail(uri.replace("/", "").replace(".html", ""));
+        Map<String, Object> detail = articleService.detail(uri.replace("/", "").replace(".html", ""));
+        if (Objects.nonNull(detail)) {
+            List<Map<String,Object>> tags = new ArrayList<>();
+            String keywords = Objects.requireNonNullElse(detail.get("keywords"),"").toString();
+            for (String tag : keywords.split(",")) {
+                if(StringUtils.isEmpty(tag.trim())){
+                    continue;
+                }
+                String tagUrl = WebTools.getHomeUrl(request) + Constants.getArticleUri() + "tag/" + URLEncoder.encode( tag, StandardCharsets.UTF_8) + TemplateHelper.getSuffix(request);;
+                tags.add(Map.of("name",tag,"url",tagUrl));
+            }
+            detail.put("tags", tags);
+            request.getAttr().put("log", detail);
+        }
+        return "detail";
     }
 
-    private String detail(Object idOrAlias) throws SQLException {
-        AdminTokenVO adminTokenVO = adminTokenService.getAdminTokenVO(getRequest());
-        Map<String, Object> log;
-        if (adminTokenVO == null) {
-            log = new Log().findByIdOrAlias(idOrAlias);
+
+    private static ArticleUriInfoVO parseUriInfo(String uri) {
+        String rawUrl = uri;
+        if (rawUrl.endsWith(".html")) {
+            rawUrl = rawUrl.substring(0, rawUrl.length() - ".html".length());
+        }
+        String rawArgs = rawUrl.substring(rawUrl.lastIndexOf("/") + 1);
+        List<String> list = Arrays.asList(rawArgs.split("-"));
+        boolean numeric = ParseUtil.isNumeric(list.getLast());
+        StringJoiner sj = new StringJoiner("-");
+        int page = 1;
+        if (numeric) {
+            page = ParseUtil.strToInt(list.getLast(), 1);
+            for (int i = 0; i < list.size() - 1; i++) {
+                sj.add(list.get(i));
+            }
         } else {
-            log = new Log().adminFindByIdOrAlias(idOrAlias);
+            for (String arg : list) {
+                sj.add(arg);
+            }
         }
-        if (log != null) {
-            Integer logId = (Integer) log.get("logId");
-            Map<String,Object> lastLog = Objects.requireNonNullElse(new Log().findLastLog(logId),new HashMap<>(Map.of("title", I18nUtil.getBlogStringFromRes("noLastLog"),"alias",idOrAlias)));
-            Map<String,Object> nextLog = Objects.requireNonNullElse(new Log().findNextLog(logId),new HashMap<>(Map.of("title", I18nUtil.getBlogStringFromRes("noNextLog"),"alias",idOrAlias)));
-            log.put("lastLog", lastLog);
-            log.put("nextLog", nextLog);
-            log.put("comments", new Comment().findAllByLogId(logId));
-            getRequest().getAttr().put("log", log);
-            return "detail";
-        }
-        return "index";
+        String key = sj.toString();
+        return new ArticleUriInfoVO(WebTools.convertRequestParam(key), page);
     }
 
-    private static String parseArgs(String uri, Integer idx, Integer args) {
-        return WebTools.convertRequestParam(uri.split("/")[idx].split("-")[args]).replace(".html", "");
+    public static void main(String[] args) {
+        ArticleUriInfoVO uriInfoVO = parseUriInfo("/record/2015-06.html");
+        System.out.println(uriInfoVO);
     }
 
     public String sort() throws SQLException {
-        String typeStr = parseArgs(request.getUri(), 2, 0);
-        setPageDataInfo(Constants.getArticleUri() + "sort/" + typeStr + "-", new Log().findByTypeAlias(getPage(), Constants.getDefaultRows(), typeStr), new PageRequest(getPage(),
+        ArticleUriInfoVO uriInfoVO = parseUriInfo(request.getUri());
+        setPageDataInfo(Constants.getArticleUri() + "sort/" + uriInfoVO.key() + "-", new Log().findByTypeAlias(uriInfoVO.page(), Constants.getDefaultRows(),
+                uriInfoVO.key()), new PageRequestImpl(uriInfoVO.page(),
                 Constants.getDefaultRows()));
 
-        Map<String, Object> type = new Type().findByAlias(typeStr);
+        Map<String, Object> type = new Type().findByAlias(uriInfoVO.key());
         request.getAttr().put("type", type);
         request.getAttr().put("tipsType", I18nUtil.getBlogStringFromRes("category"));
         if (type != null) {
@@ -185,9 +185,12 @@ public class ArticleController extends Controller {
     }
 
     public String tag() throws SQLException {
-        String tag = WebTools.convertRequestParam(parseArgs(request.getUri(), 2, 0));
-        setPageDataInfo(Constants.getArticleUri() + "tag/" + tag + "-", new Log().findByTag(getPage(), Constants.getDefaultRows(), tag), new PageRequest(getPage(),
-                Constants.getDefaultRows()));
+        ArticleUriInfoVO uriInfoVO = parseUriInfo(request.getUri());
+
+        String tag = WebTools.convertRequestParam(uriInfoVO.key());
+        setPageDataInfo(Constants.getArticleUri() + "tag/" + tag + "-", new Log().findByTag(uriInfoVO.page(), Constants.getDefaultRows(), tag),
+                new PageRequestImpl(uriInfoVO.page(),
+                        Constants.getDefaultRows()));
         getRequest().getAttr().put("tipsType", I18nUtil.getBlogStringFromRes("tag"));
         getRequest().getAttr().put("tipsName", tag);
         return "page";

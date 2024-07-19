@@ -1,6 +1,7 @@
 package com.zrlog.business.service;
 
 import com.hibegin.http.server.api.HttpRequest;
+import com.zrlog.business.rest.response.PublicInfoVO;
 import com.zrlog.business.util.InstallUtils;
 import com.zrlog.common.Constants;
 import com.zrlog.util.BlogBuildInfoUtil;
@@ -14,25 +15,57 @@ import java.util.Objects;
 
 public class CommonService {
 
-    public Map<String, Object> blogResourceInfo() {
-        Map<String, Object> stringObjectMap = I18nUtil.threadLocal.get().getBlog().get(I18nUtil.getCurrentLocale());
-        stringObjectMap.put("currentVersion", BlogBuildInfoUtil.getVersion());
-        stringObjectMap.put("websiteTitle", Constants.WEB_SITE.get("title"));
+    public Map<String, Object> blogResourceInfo(HttpRequest request) {
+        if (Objects.isNull(I18nUtil.threadLocal.get())) {
+            return new HashMap<>();
+        }
+        Map<String, Object> stringObjectMap = Objects.requireNonNullElse(I18nUtil.getBlog().get(I18nUtil.getCurrentLocale()), new HashMap<>());
+        PublicInfoVO publicInfoVO = getPublicInfo(request);
+        stringObjectMap.put("websiteTitle", publicInfoVO.websiteTitle());
+        stringObjectMap.put("homeUrl", publicInfoVO.homeUrl());
         stringObjectMap.put("articleRoute", "");
-        stringObjectMap.put("admin_darkMode", Constants.getBooleanByFromWebSite("admin_darkMode"));
+        stringObjectMap.put("admin_darkMode", publicInfoVO.admin_darkMode());
+        stringObjectMap.put("buildId", BlogBuildInfoUtil.getBuildId());
+        return stringObjectMap;
+    }
+
+    public Map<String, Object> adminResourceInfo(HttpRequest request) {
+        if (Objects.isNull(I18nUtil.threadLocal.get())) {
+            return new HashMap<>();
+        }
+        Map<String, Object> stringObjectMap = Objects.requireNonNullElse(I18nUtil.getAdmin().get(I18nUtil.getCurrentLocale()), new HashMap<>());
+        PublicInfoVO publicInfoVO = getPublicInfo(request);
+        stringObjectMap.put("currentVersion", publicInfoVO.currentVersion());
+        stringObjectMap.put("websiteTitle", publicInfoVO.websiteTitle());
+        stringObjectMap.put("homeUrl", publicInfoVO.homeUrl());
+        stringObjectMap.put("articleRoute", "");
+        stringObjectMap.put("admin_darkMode", publicInfoVO.admin_darkMode());
         if (ZrLogUtil.isPreviewMode()) {
             Map<String, String> defaultLoginInfo = new HashMap<>();
             defaultLoginInfo.put("userName", System.getenv("DEFAULT_USERNAME"));
             defaultLoginInfo.put("password", System.getenv("DEFAULT_PASSWORD"));
             stringObjectMap.put("defaultLoginInfo", defaultLoginInfo);
         }
-        stringObjectMap.put("admin_color_primary", Objects.toString(Constants.WEB_SITE.get("admin_color_primary"), "#1677ff"));
+        stringObjectMap.put("buildId", BlogBuildInfoUtil.getBuildId());
+        stringObjectMap.put("admin_color_primary", publicInfoVO.admin_color_primary());
+        stringObjectMap.put("lang", I18nUtil.getCurrentLocale());
         return stringObjectMap;
     }
 
+    public PublicInfoVO getPublicInfo(HttpRequest request) {
+        Boolean darkMode = Constants.getBooleanByFromWebSite("admin_darkMode");
+        String themeColor;
+        String adminColor = Objects.toString(Constants.zrLogConfig.getWebSite().get("admin_color_primary"), "#1677ff");
+        if (darkMode) {
+            themeColor = "#000000";
+        } else {
+            themeColor = adminColor;
+        }
+        return new PublicInfoVO(BlogBuildInfoUtil.getVersion(), (String) Constants.zrLogConfig.getWebSite().get("title"), ZrLogUtil.getHomeUrlWithHost(request), darkMode, adminColor, themeColor);
+    }
+
     public Map<String, Object> installResourceInfo(HttpRequest request) {
-        Map<String, Object> stringObjectMap =
-                I18nUtil.threadLocal.get().getInstall().get(I18nUtil.getAcceptLocal(request));
+        Map<String, Object> stringObjectMap = Objects.requireNonNullElse(I18nUtil.getInstall().get(I18nUtil.getAcceptLocal(request)), new HashMap<>());
         stringObjectMap.put("currentVersion", BlogBuildInfoUtil.getVersion());
         //encoding ok, remove utfTips
         if (Charset.defaultCharset().displayName().toLowerCase().contains("utf")) {

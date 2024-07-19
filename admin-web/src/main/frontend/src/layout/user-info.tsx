@@ -10,7 +10,7 @@ import { BasicUserInfo } from "../type";
 
 const { Text } = Typography;
 
-const UserInfo = ({ data }: { data: BasicUserInfo }) => {
+const UserInfo = ({ data, offline }: { data: BasicUserInfo; offline: boolean }) => {
     const adminSettings = (res: Record<string, never>): MenuProps["items"] => {
         let base = [
             {
@@ -37,7 +37,9 @@ const UserInfo = ({ data }: { data: BasicUserInfo }) => {
                     <Divider style={{ marginTop: "5px", marginBottom: "5px", userSelect: "none", cursor: "none" }} />
                 ),
             },
-            {
+        ];
+        if (!offline) {
+            base.push({
                 key: "3",
                 label: (
                     <a href="./admin/logout">
@@ -45,8 +47,8 @@ const UserInfo = ({ data }: { data: BasicUserInfo }) => {
                         <Text style={{ paddingLeft: "5px", paddingRight: 16 }}>{res["admin.user.logout"]}</Text>
                     </a>
                 ),
-            },
-        ];
+            });
+        }
         if (data.lastVersion?.upgrade) {
             base = [
                 {

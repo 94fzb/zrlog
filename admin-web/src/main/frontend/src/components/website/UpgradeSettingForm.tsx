@@ -1,14 +1,14 @@
 import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
 import Button from "antd/es/button";
-import { getRes, removeRes } from "../../utils/constants";
+import { getRes } from "../../utils/constants";
 import Form from "antd/es/form";
 import Select from "antd/es/select";
 import Switch from "antd/es/switch";
 import Divider from "antd/es/divider";
 import { App } from "antd";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Upgrade } from "./index";
 
@@ -22,7 +22,7 @@ type UpgradeFormState = {
     upgradePreview: boolean;
 };
 
-const UpgradeSettingForm = ({ data }: { data: Upgrade }) => {
+const UpgradeSettingForm = ({ data, offline }: { data: Upgrade; offline: boolean }) => {
     const [checking, setChecking] = useState<boolean>(false);
     const { modal, message } = App.useApp();
     const [form, setForm] = useState<UpgradeFormState>(data);
@@ -30,13 +30,14 @@ const UpgradeSettingForm = ({ data }: { data: Upgrade }) => {
     const navigate = useNavigate();
 
     const websiteFormFinish = (changedValues: any) => {
-        axios.post("/api/admin/website/upgrade", changedValues).then(({ data }) => {
-            if (!data.error) {
-                message.info(data.message).then(() => {
-                    removeRes();
-                    window.location.reload();
-                });
+        axios.post("/api/admin/website/upgrade", { ...form, ...changedValues }).then(({ data }) => {
+            if (data.error) {
+                message.error(data.message).then();
+                return;
             }
+            message.success(data.message).then(() => {
+                //ignore
+            });
         });
     };
 
@@ -48,14 +49,7 @@ const UpgradeSettingForm = ({ data }: { data: Upgrade }) => {
         try {
             await axios.get("/api/admin/upgrade").then(async ({ data }) => {
                 if (data.data.upgrade) {
-                    const title =
-                        "V" +
-                        data.data.version.version +
-                        "-" +
-                        data.data.version.buildId +
-                        " (" +
-                        data.data.version.type +
-                        ")";
+                    const title = `${getRes()["newVersion"]} - #${data.data.version.type}`;
                     modal.info({
                         title: title,
                         content: (
@@ -66,7 +60,7 @@ const UpgradeSettingForm = ({ data }: { data: Upgrade }) => {
                             />
                         ),
                         closable: true,
-                        okText: "去更新",
+                        okText: getRes()["doUpgrade"],
                         onOk: function () {
                             navigate("/upgrade");
                         },
@@ -80,25 +74,35 @@ const UpgradeSettingForm = ({ data }: { data: Upgrade }) => {
         }
     };
 
+    useEffect(() => {
+        setForm(data);
+    }, [data]);
+
     return (
-        <>
+        <div style={{ maxWidth: 600 }}>
             <Row>
-                <Col md={12} xs={24}>
-                    <Button type="dashed" loading={checking} onClick={checkNewVersion} style={{ float: "right" }}>
+                <Col xs={24}>
+                    <Button
+                        type="dashed"
+                        disabled={offline}
+                        loading={checking}
+                        onClick={checkNewVersion}
+                        style={{ float: "right" }}
+                    >
                         {getRes().checkUpgrade}
                     </Button>
                 </Col>
             </Row>
             <Row>
-                <Col md={12} xs={24}>
+                <Col xs={24}>
                     <Form
                         {...layout}
                         initialValues={form}
-                        onValuesChange={(_k, v) => setForm(v)}
+                        onValuesChange={(_k, v) => setForm({ ...form, ...v })}
                         onFinish={(k) => websiteFormFinish(k)}
                     >
                         <Form.Item name="autoUpgradeVersion" label={getRes()["admin.upgrade.autoCheckCycle"]}>
-                            <Select style={{ maxWidth: "100px" }}>
+                            <Select style={{ maxWidth: "120px" }}>
                                 <Select.Option key="86400" value={86400}>
                                     {getRes()["admin.upgrade.cycle.oneDay"]}
                                 </Select.Option>
@@ -121,13 +125,13 @@ const UpgradeSettingForm = ({ data }: { data: Upgrade }) => {
                             <Switch size={"small"} />
                         </Form.Item>
                         <Divider />
-                        <Button type="primary" htmlType="submit">
+                        <Button disabled={offline} type="primary" htmlType="submit">
                             {getRes().submit}
                         </Button>
                     </Form>
                 </Col>
             </Row>
-        </>
+        </div>
     );
 };
 

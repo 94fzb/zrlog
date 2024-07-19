@@ -1,6 +1,8 @@
 package com.zrlog.admin.business.rest.response;
 
-import java.util.Map;
+import com.zrlog.common.vo.ServerInfo;
 
-public record IndexResponse(StatisticsInfoResponse statisticsInfo, Map<String,Object> serverInfo) {
+import java.util.List;
+
+public record IndexResponse(StatisticsInfoResponse statisticsInfo, List<ServerInfo> serverInfos, List<String> tips,Boolean dockerMode,Boolean nativeImageMode) {
 }

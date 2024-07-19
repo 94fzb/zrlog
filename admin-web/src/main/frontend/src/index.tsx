@@ -1,6 +1,7 @@
 import * as serviceWorker from "./serviceWorker";
 import zh_CN from "antd/es/locale/zh_CN";
-import { App, ConfigProvider, Modal, Spin, theme } from "antd";
+import en_US from "antd/es/locale/en_US";
+import { App, ConfigProvider, Spin, theme } from "antd";
 import { BrowserRouter } from "react-router-dom";
 import EnvUtils from "./utils/env-utils";
 import AppBase from "./AppBase";
@@ -11,6 +12,7 @@ import { getColorPrimary, getRes, setRes } from "./utils/constants";
 
 import axios from "axios";
 import { BasicUserInfo } from "./type";
+import UnknownErrorPage from "./components/unknown-error-page";
 
 const url = new URL(document.baseURI);
 export const basePath = url.pathname + "admin/";
@@ -21,54 +23,84 @@ const { darkAlgorithm, defaultAlgorithm } = theme;
 
 type AppState = {
     resLoaded: boolean;
+    resLoadErrorMsg: string;
     dark: boolean;
+    offline: boolean;
+    lang: string;
     colorPrimary: string;
 };
 
 type SsDate = {
-    pageData: any;
-    resourceInfo: Record<string, never>;
-    user: BasicUserInfo;
+    pageData?: any;
+    resourceInfo?: Record<string, never>;
+    user?: BasicUserInfo;
+    key?: string;
 };
 
 export let ssData: SsDate | undefined;
+const ssDataStr = document.getElementById("__SS_DATA__")?.innerText;
+// @ts-ignore
+if (ssDataStr?.length > 0) {
+    ssData = JSON.parse(ssDataStr as string);
+} else {
+    ssData = {};
+}
+
+const isOffline = () => {
+    return !navigator.onLine;
+};
 
 const Index = () => {
     const [appState, setAppState] = useState<AppState>({
         resLoaded: false,
+        resLoadErrorMsg: "",
+        lang: "zh_CN",
+        offline: isOffline(),
         dark: EnvUtils.isDarkMode(),
         colorPrimary: getColorPrimary(),
     });
 
     const loadResourceFromServer = () => {
-        const resourceApi = "/api/public/blogResource";
+        const resourceApi = "/api/public/adminResource";
         axios
             .get(resourceApi)
             .then(({ data }: { data: Record<string, any> }) => {
                 handleRes(data.data);
             })
-            .catch((error: any) => {
-                Modal.error({
-                    title: "加载 " + resourceApi + " 错误",
-                    content: (
-                        <div style={{ paddingTop: 20 }} dangerouslySetInnerHTML={{ __html: error.response.data }} />
-                    ),
-                    okText: "确认",
+            .catch((e) => {
+                setAppState((prevState) => {
+                    return {
+                        dark: document.body.className.includes("dark"),
+                        resLoadErrorMsg: "Request " + resourceApi + " error -> " + e.message,
+                        resLoaded: false,
+                        lang: "zh_CN",
+                        offline: prevState.offline,
+                        colorPrimary: getColorPrimary(),
+                    };
                 });
             });
     };
     const handleRes = (data: Record<string, never>) => {
         // @ts-ignore
         data.copyrightTips =
-            data.copyright + ' <a target="_blank" href="https://blog.zrlog.com/about?footer">ZrLog</a>';
+            data.copyright + ' <a target="_blank" href="https://blog.zrlog.com/about.html?footer">ZrLog</a>';
         setRes(data);
-        setAppState({ dark: EnvUtils.isDarkMode(), resLoaded: true, colorPrimary: getColorPrimary() });
+        setAppState((prevState) => {
+            return {
+                lang: data.lang,
+                offline: prevState.offline,
+                dark: EnvUtils.isDarkMode(),
+                resLoadErrorMsg: "",
+                resLoaded: true,
+                colorPrimary: getColorPrimary(),
+            };
+        });
     };
 
     const initRes = () => {
         const resourceData = getRes();
         if (resourceData === null || Object.keys(resourceData).length === 0) {
-            if (ssData) {
+            if (ssData && ssData.resourceInfo) {
                 handleRes(ssData.resourceInfo);
             } else {
                 loadResourceFromServer();
@@ -78,20 +110,29 @@ const Index = () => {
         }
     };
 
+    const updateOnlineStatus = () => {
+        setAppState((prevState) => {
+            return {
+                ...prevState,
+                offline: isOffline(),
+            };
+        });
+    };
+
     useEffect(() => {
-        if (ssData === undefined) {
-            const ssDataStr = document.getElementById("__SS_DATA__")?.innerText;
-            // @ts-ignore
-            if (ssDataStr?.length > 0) {
-                ssData = JSON.parse(ssDataStr as string);
-            }
-        }
+        window.addEventListener("online", updateOnlineStatus);
+        window.addEventListener("offline", updateOnlineStatus);
         initRes();
+        // Cleanup event listeners on component unmount
+        return () => {
+            window.removeEventListener("online", updateOnlineStatus);
+            window.removeEventListener("offline", updateOnlineStatus);
+        };
     }, []);
 
     return (
         <ConfigProvider
-            locale={zh_CN}
+            locale={appState.lang.startsWith("zh") ? zh_CN : en_US}
             theme={{
                 algorithm: appState.dark ? darkAlgorithm : defaultAlgorithm,
                 token: {
@@ -108,16 +149,29 @@ const Index = () => {
                     margin: "16px 0",
                 },
             }}
+            card={{
+                styles: {
+                    body: {
+                        padding: "8px",
+                    },
+                },
+            }}
         >
             <App>
                 <StyleProvider transformers={[legacyLogicalPropertiesTransformer]}>
                     <BrowserRouter basename={basePath}>
                         {appState.resLoaded ? (
-                            <AppBase />
-                        ) : (
+                            <AppBase offline={appState.offline} />
+                        ) : appState.resLoadErrorMsg.length === 0 ? (
                             <Spin delay={1000} style={{ maxHeight: "100vh" }}>
-                                <div style={{ height: "100vh", width: "100vw" }}></div>
+                                <div style={{ width: "100vw", height: "100vh" }}></div>
                             </Spin>
+                        ) : (
+                            <UnknownErrorPage
+                                code={500}
+                                data={{ message: appState.resLoadErrorMsg }}
+                                style={{ width: "100vw", height: "100vh" }}
+                            />
                         )}
                     </BrowserRouter>
                 </StyleProvider>
@@ -132,4 +186,4 @@ root.render(<Index />);
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+serviceWorker.register();

@@ -1,4 +1,4 @@
-baseVersion=3.0
+baseVersion=3.1
 releaseVersion=${baseVersion}.${1}
 nextVersion=${baseVersion}.$((${1}+1))-SNAPSHOT
 ./mvnw versions:set -DnewVersion=${releaseVersion}

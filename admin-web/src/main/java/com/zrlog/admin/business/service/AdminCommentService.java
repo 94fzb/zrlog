@@ -9,6 +9,7 @@ import com.zrlog.model.Comment;
 
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.Objects;
 
 public class AdminCommentService {
 
@@ -20,6 +21,9 @@ public class AdminCommentService {
     }
 
     public UpdateRecordResponse read(ReadCommentRequest commentRequest) {
+        if (Objects.isNull(commentRequest)) {
+            return new UpdateRecordResponse(false);
+        }
         new Comment().doRead(commentRequest.getId());
         return new UpdateRecordResponse();
     }

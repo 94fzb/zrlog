@@ -3,8 +3,8 @@ import Divider from "antd/es/divider";
 import Form from "antd/es/form";
 import TextArea from "antd/es/input/TextArea";
 import Button from "antd/es/button";
-import { getRes, removeRes } from "../../utils/constants";
-import { useState } from "react";
+import { getRes } from "../../utils/constants";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { App } from "antd";
 
@@ -15,24 +15,25 @@ const layout = {
     wrapperCol: { span: 16 },
 };
 
-const OtherForm = ({ data }: { data: Other }) => {
+const OtherForm = ({ data, offline }: { data: Other; offline: boolean }) => {
     const [form, setForm] = useState<any>(data);
     const { message } = App.useApp();
 
     const websiteFormFinish = (changedValues: any) => {
-        axios.post("/api/admin/website/other", changedValues).then(({ data }) => {
-            if (!data.error) {
-                message.info(data.message).then(() => {
-                    removeRes();
-                    window.location.reload();
-                });
+        axios.post("/api/admin/website/other", { ...form, ...changedValues }).then(({ data }) => {
+            if (data.error) {
+                message.error(data.message).then();
+                return;
             }
+            message.success(data.message).then(() => {
+                //ignore
+            });
         });
     };
 
-    if (form === undefined) {
-        return <></>;
-    }
+    useEffect(() => {
+        setForm(data);
+    }, [data]);
 
     return (
         <>
@@ -41,7 +42,7 @@ const OtherForm = ({ data }: { data: Other }) => {
             <Form
                 {...layout}
                 initialValues={form}
-                onValuesChange={(_k, v) => setForm(v)}
+                onValuesChange={(_k, v) => setForm({ ...form, ...v })}
                 onFinish={(k) => websiteFormFinish(k)}
             >
                 <Form.Item name="icp" label="ICP备案信息">
@@ -50,8 +51,11 @@ const OtherForm = ({ data }: { data: Other }) => {
                 <Form.Item name="webCm" label="网站统计">
                     <TextArea rows={7} />
                 </Form.Item>
+                <Form.Item name="robotRuleContent" label="robots.txt">
+                    <TextArea rows={7} placeholder={"User-agent: *\n" + "Disallow: "} />
+                </Form.Item>
                 <Divider />
-                <Button type="primary" htmlType="submit">
+                <Button disabled={offline} type="primary" htmlType="submit">
                     {getRes().submit}
                 </Button>
             </Form>

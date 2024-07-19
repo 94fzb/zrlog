@@ -7,10 +7,7 @@ import com.zrlog.model.Log;
 import com.zrlog.plugin.IPlugin;
 import com.zrlog.util.ZrLogUtil;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -25,11 +22,7 @@ public class RequestStatisticsPlugin implements IPlugin {
     private static final long REMOVE_TIME = 2 * 1000 * 60L;
     private static final List<RequestInfo> requestInfoList = Collections.synchronizedList(new ArrayList<>());
     private static final ReentrantLock saveLock = new ReentrantLock();
-    private final ScheduledExecutorService clickSchedule = new ScheduledThreadPoolExecutor(1, r -> {
-        Thread thread = new Thread(r);
-        thread.setName("request-statistics-click-thread");
-        return thread;
-    });
+    private ScheduledExecutorService clickSchedule;
 
     public static void record(RequestInfo requestInfo) {
         saveLock.lock();
@@ -42,6 +35,10 @@ public class RequestStatisticsPlugin implements IPlugin {
 
     @Override
     public boolean start() {
+        if (Objects.nonNull(clickSchedule)) {
+            return true;
+        }
+        clickSchedule = new ScheduledThreadPoolExecutor(1, Thread.ofVirtual().factory());
         clickSchedule.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -71,6 +68,11 @@ public class RequestStatisticsPlugin implements IPlugin {
         return true;
     }
 
+    @Override
+    public boolean isStarted() {
+        return Objects.nonNull(clickSchedule);
+    }
+
     private String getAlias(String tUri) {
         String uri = tUri;
         for (String router : Constants.articleRouterList()) {
@@ -92,7 +94,10 @@ public class RequestStatisticsPlugin implements IPlugin {
 
     @Override
     public boolean stop() {
-        clickSchedule.shutdownNow();
+        if (Objects.nonNull(clickSchedule)) {
+            clickSchedule.shutdownNow();
+            clickSchedule = null;
+        }
         return true;
     }
 }

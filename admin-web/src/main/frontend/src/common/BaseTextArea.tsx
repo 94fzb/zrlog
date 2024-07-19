@@ -1,54 +1,46 @@
 import Form from "antd/es/form";
-import { FunctionComponent, useRef, useState } from "react";
-import TextArea, { TextAreaRef } from "antd/es/input/TextArea";
+import React, { FunctionComponent, useEffect, useState } from "react";
+import TextArea from "antd/es/input/TextArea";
 
 type BaseTextAreaProps = {
     placeholder?: string;
-    defaultValue?: string;
+    value?: string;
     onChange: (value: string) => Promise<void>;
     required?: boolean;
     rows?: number;
 };
-const BaseInput: FunctionComponent<BaseTextAreaProps> = ({ defaultValue, rows, onChange, required, placeholder }) => {
-    const [composing, setComposing] = useState<boolean>(false);
-    const inputRef = useRef<TextAreaRef>(null);
+const BaseTextArea: FunctionComponent<BaseTextAreaProps> = ({ value, rows, onChange, required, placeholder }) => {
+    const [isComposing, setIsComposing] = useState<boolean>(false);
+    const [inputValue, setInputValue] = useState<string>(value || "");
+    // 更新 inputValue 以匹配外部传入的 value，处理受控组件的需求
+    useEffect(() => {
+        setInputValue(value || "");
+    }, [value]);
+
+    const handleInputChange = async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setInputValue(e.target.value);
+        if (!isComposing) {
+            onChange(e.target.value).then(() => {
+                //ignore
+            });
+        }
+    };
 
     return (
         <Form.Item style={{ marginBottom: 8, width: "100%" }} rules={[{ required: required, message: "" }]}>
             <TextArea
-                ref={inputRef}
-                defaultValue={defaultValue}
-                onCompositionStart={() => {
-                    setComposing(true);
-                }}
-                onCompositionUpdate={() => {
-                    setComposing(true);
+                value={inputValue}
+                onChange={handleInputChange}
+                onCompositionStart={() => setIsComposing(true)}
+                onCompositionUpdate={() => setIsComposing(true)}
+                onCompositionEnd={async () => {
+                    setIsComposing(false);
+                    await onChange(inputValue);
                 }}
                 rows={rows}
-                onChange={async (e) => {
-                    if (composing) {
-                        return;
-                    }
-                    setTimeout(async () => {
-                        await onChange(e.target.value);
-                    }, 2000);
-                }}
-                onCompositionEnd={() => {
-                    setComposing(false);
-                    setTimeout(async () => {
-                        if (
-                            inputRef.current &&
-                            inputRef.current.resizableTextArea &&
-                            inputRef.current.resizableTextArea.textArea
-                        ) {
-                            const val = inputRef.current.resizableTextArea.textArea.value as unknown as never;
-                            await onChange(val);
-                        }
-                    });
-                }}
                 placeholder={placeholder}
             />
         </Form.Item>
     );
 };
-export default BaseInput;
+export default BaseTextArea;

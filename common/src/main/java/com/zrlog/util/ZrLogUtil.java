@@ -1,25 +1,18 @@
 package com.zrlog.util;
 
-import com.google.gson.Gson;
 import com.hibegin.common.util.*;
-import com.hibegin.common.util.IOUtil;
-import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.http.server.api.HttpRequest;
-import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.util.PathUtil;
-import com.hibegin.http.server.web.Controller;
 import com.zrlog.common.Constants;
 import eu.bitwalker.useragentutils.BrowserType;
 import eu.bitwalker.useragentutils.UserAgent;
 
 import java.io.InputStream;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.sql.*;
-import java.util.Date;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,19 +24,10 @@ public class ZrLogUtil {
 
     private static final Logger LOGGER = LoggerUtil.getLogger(ZrLogUtil.class);
 
+    public static String STATIC_USER_AGENT = "Static-Blog-Plugin/" + UUID.randomUUID().toString().replace("-", "");
+
     private ZrLogUtil() {
     }
-
-    public static <T> T convertRequestBody(HttpRequest request, Class<T> clazz) {
-        try {
-            String jsonStr = IOUtil.getStringInputStream(request.getInputStream());
-            return new Gson().fromJson(jsonStr, clazz);
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "", e);
-            throw new RuntimeException(e);
-        }
-    }
-
 
     public static <T> T convertRequestParam(Map<String, String[]> requestParam, Class<T> clazz) {
         Map<String, Object> tempMap = new HashMap<>();
@@ -59,16 +43,50 @@ public class ZrLogUtil {
         return BeanUtil.convert(tempMap, clazz);
     }
 
-    public static boolean isStaticBlogPlugin(HttpRequest HttpRequest) {
-        return HttpRequest.getHeader("User-Agent") != null && HttpRequest.getHeader("User-Agent").startsWith("Static-Blog-Plugin");
+    public static boolean isStaticBlogPlugin(HttpRequest request) {
+        if (Objects.isNull(request)) {
+            return false;
+        }
+        String ua = request.getHeader("User-Agent");
+        if (Objects.isNull(ua)) {
+            return false;
+        }
+        return Objects.equals(ua, STATIC_USER_AGENT);
+    }
+
+    public static String getHomeUrlWithHost(HttpRequest request) {
+        return "//" + getHomeUrlWithHostNotProtocol(request);
+    }
+
+    public static String getHomeUrlWithHostNotProtocol(HttpRequest request) {
+        return getBlogHost(request) + "/";
+    }
+
+    public static String getBlogHost(HttpRequest request) {
+        String websiteHost = getBlogHostByWebSite();
+        if (Objects.nonNull(websiteHost) && !websiteHost.trim().isEmpty()) {
+            return websiteHost;
+        }
+        if (Objects.isNull(request)) {
+            return "";
+        }
+        return request.getHeader("Host");
+    }
+
+    public static String getBlogHostByWebSite() {
+        String websiteHost = (String) Constants.zrLogConfig.getWebSite().get("host");
+        if (Objects.nonNull(websiteHost) && !websiteHost.trim().isEmpty()) {
+            return websiteHost;
+        }
+        return "";
     }
 
     public static String getFullUrl(HttpRequest request) {
-        return "//" + request.getHeader("Host") + request.getUri();
+        return "//" + getBlogHost(request) + request.getUri().substring(1);
     }
 
     public static String getDatabaseServerVersion(Properties dbConfig) {
-        try (Connection  connect = DbConnectUtils.getConnection(dbConfig)){
+        try (Connection connect = DbConnectUtils.getConnection(dbConfig)) {
             if (connect != null) {
                 String queryVersionSQL = "select version()";
                 try (PreparedStatement ps = connect.prepareStatement(queryVersionSQL)) {
@@ -85,15 +103,15 @@ public class ZrLogUtil {
         return "Unknown";
     }
 
-    public static String getCurrentSqlVersion(Properties dbConfig) {
-        try (Connection connection = DbConnectUtils.getConnection(dbConfig)){
+    public static Long getCurrentSqlVersion(Properties dbConfig) {
+        try (Connection connection = DbConnectUtils.getConnection(dbConfig)) {
             if (connection != null) {
                 String queryVersionSQL = "select value from website where name = ?";
                 try (PreparedStatement ps = connection.prepareStatement(queryVersionSQL)) {
                     ps.setString(1, Constants.ZRLOG_SQL_VERSION_KEY);
                     try (ResultSet resultSet = ps.executeQuery()) {
                         if (resultSet.next()) {
-                            return resultSet.getString(1);
+                            return Long.parseLong(resultSet.getString(1));
                         }
                     }
                 }
@@ -101,7 +119,7 @@ public class ZrLogUtil {
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "DB connect error ", e);
         }
-        return "-1";
+        return -1L;
     }
 
 
@@ -117,19 +135,14 @@ public class ZrLogUtil {
         return fileList;
     }
 
-    public static List<Map.Entry<Integer, List<String>>> getExecSqlList(String sqlVersion) {
+    public static List<Map.Entry<Integer, List<String>>> getExecSqlList(Long dbVersion) {
         List<Map.Entry<Integer, List<String>>> sqlList = new ArrayList<>();
-        int version = 0;
-        try {
-            version = Integer.parseInt(sqlVersion);
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "", e);
-        }
+
         for (Map.Entry<Integer, String> f : getSqlFileList().entrySet()) {
             int fileVersion = f.getKey();
-            if (fileVersion > version) {
-                LOGGER.info("need update sql " + f);
-                Map.Entry<Integer, List<String>> entry = new AbstractMap.SimpleEntry<>(fileVersion, Arrays.asList(f.getValue().split("\n")));
+            if (fileVersion > dbVersion) {
+                Map.Entry<Integer, List<String>> entry = new AbstractMap.SimpleEntry<>(fileVersion, extractExecutableSql(f.getValue()));
+                LOGGER.info("Need update sql "+ fileVersion+".sql \n" + String.join(";\n",entry.getValue()) + ";");
                 sqlList.add(entry);
             }
         }
@@ -196,19 +209,39 @@ public class ZrLogUtil {
         return browserType == BrowserType.MOBILE_BROWSER || browserType == BrowserType.WEB_BROWSER;
     }
 
-    public static Controller buildController(Method method, HttpRequest request, HttpResponse response) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
-        Constructor[] constructors = method.getDeclaringClass().getConstructors();
-        Controller controller = null;
-        for (Constructor constructor : constructors) {
-            if (constructor.getParameterTypes().length == 2) {
-                if (constructor.getParameterTypes()[0].getName().equals(HttpRequest.class.getName()) && constructor.getParameterTypes()[1].getName().equals(HttpResponse.class.getName())) {
-                    controller = (Controller) constructor.newInstance(request, response);
+    public static Integer getPort(String[] args) {
+        if (Objects.nonNull(args)) {
+            for (String arg : args) {
+                if (arg.startsWith("--port=")) {
+                    return Integer.parseInt(arg.split("=")[1]);
                 }
             }
         }
-        if (controller == null) {
-            throw new RuntimeException(method.getDeclaringClass().getSimpleName() + " not find 2 args " + "constructor");
+        String webPort = System.getenv("PORT");
+        if (Objects.nonNull(webPort)) {
+            return Integer.parseInt(webPort);
         }
-        return controller;
+        return 8080;
     }
+
+    public static List<String> extractExecutableSql(String sql){
+        String[] sqlArr = sql.split("\n");
+        StringBuilder tempSqlStr = new StringBuilder();
+        List<String> sqlList = new ArrayList<>();
+        for (String sqlSt : sqlArr) {
+            if (sqlSt.startsWith("#") || sqlSt.startsWith("/*")) {
+                continue;
+            }
+            tempSqlStr.append(sqlSt);
+        }
+        String[] cleanSql = tempSqlStr.toString().split(";");
+        for (String sqlSt : cleanSql) {
+            if (StringUtils.isEmpty(sqlSt) || sqlSt.trim().isEmpty()) {
+                continue;
+            }
+            sqlList.add(sqlSt);
+        }
+        return sqlList;
+    }
+
 }

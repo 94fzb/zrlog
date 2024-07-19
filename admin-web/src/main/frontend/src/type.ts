@@ -4,6 +4,8 @@ export type StatisticsInfoState = {
     commCount: number;
     toDayCommCount: number;
     loading: boolean;
+    usedCacheSpace: number;
+    usedDiskSpace: number;
 };
 
 export type Version= {
@@ -30,7 +32,15 @@ export type UserInfoState = {
     type: string;
 };
 
+export type ServerInfoEntry = {
+    name:string;
+    value:string;
+}
+
 export type IndexData = {
-    serverInfo: Record<string, any>[],
-    statisticsInfo: StatisticsInfoState
+    serverInfos: ServerInfoEntry[],
+    statisticsInfo: StatisticsInfoState,
+    dockerMode: boolean;
+    nativeImageMode: boolean;
+    tips: string[];
 }

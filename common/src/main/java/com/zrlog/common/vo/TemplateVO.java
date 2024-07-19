@@ -1,11 +1,13 @@
 package com.zrlog.common.vo;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 public class TemplateVO {
 
     private String template;
+    private String shortTemplate;
     private String url;
     private String version;
     private String name;
@@ -19,6 +21,8 @@ public class TemplateVO {
     private TemplateConfigMap config;
     private String viewType;
     private boolean use;
+    private String adminPreviewImage;
+    private List<String> staticResources = new ArrayList<>();
 
     public String getViewType() {
         return viewType;
@@ -132,6 +136,14 @@ public class TemplateVO {
         this.config = config;
     }
 
+    public String getShortTemplate() {
+        return shortTemplate;
+    }
+
+    public void setShortTemplate(String shortTemplate) {
+        this.shortTemplate = shortTemplate;
+    }
+
     public static class TemplateConfigMap extends LinkedHashMap<String, TemplateConfigVO> {
 
     }
@@ -183,5 +195,21 @@ public class TemplateVO {
         public void setValue(Object value) {
             this.value = value;
         }
+    }
+
+    public String getAdminPreviewImage() {
+        return adminPreviewImage;
+    }
+
+    public void setAdminPreviewImage(String adminPreviewImage) {
+        this.adminPreviewImage = adminPreviewImage;
+    }
+
+    public List<String> getStaticResources() {
+        return staticResources;
+    }
+
+    public void setStaticResources(List<String> staticResources) {
+        this.staticResources = staticResources;
     }
 }

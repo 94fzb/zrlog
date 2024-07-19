@@ -9,12 +9,16 @@ import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.ZrLogUtil;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
  * 用于对静态文件的请求的检查
  */
 public class GlobalBaseInterceptor implements Interceptor {
+
+    public GlobalBaseInterceptor() {
+    }
 
     /**
      * 不希望部分技术人走后门，拦截一些不合法的请求
@@ -36,6 +40,8 @@ public class GlobalBaseInterceptor implements Interceptor {
     public boolean doInterceptor(HttpRequest request, HttpResponse response) {
         String target = request.getUri();
         request.getAttr().put("requrl", ZrLogUtil.getFullUrl(request));
+        request.getAttr().put("reqUriPath", Objects.requireNonNullElse(request.getUri(),"/"));
+        request.getAttr().put("reqQueryString", Objects.requireNonNullElse(request.getQueryStr(),""));
         Constants.setLastAccessTime(System.currentTimeMillis());
         //便于Wappalyzer读取
         response.addHeader("X-ZrLog", BlogBuildInfoUtil.getVersion());
@@ -48,7 +54,7 @@ public class GlobalBaseInterceptor implements Interceptor {
             response.addHeader("Content-Type", "application/json;charset=UTF-8");
         }
         request.getAttr().put("basePath", WebTools.getHomeUrl(request));
-        request.getAttr().put("baseWithHostPath", WebTools.getHomeUrlWithHostNotProtocol(request));
+        request.getAttr().put("baseWithHostPath", ZrLogUtil.getHomeUrlWithHostNotProtocol(request));
         return true;
     }
 

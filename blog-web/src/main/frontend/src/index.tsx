@@ -1,6 +1,6 @@
 import * as serviceWorker from "./serviceWorker";
 import zh_CN from "antd/es/locale/zh_CN";
-import {ConfigProvider, theme} from "antd";
+import {App, ConfigProvider, theme} from "antd";
 import AppBase from "./AppBase";
 import {useEffect, useState} from "react";
 import EnvUtils from "./utils/env-utils";
@@ -31,11 +31,13 @@ const Index = () => {
                 algorithm: dark ? darkAlgorithm : defaultAlgorithm,
             }}
         >
-            <BrowserRouter>
-                <StyleProvider transformers={[legacyLogicalPropertiesTransformer]}>
-                    <AppBase/>
-                </StyleProvider>
-            </BrowserRouter>
+            <App>
+                <BrowserRouter>
+                    <StyleProvider transformers={[legacyLogicalPropertiesTransformer]}>
+                        <AppBase/>
+                    </StyleProvider>
+                </BrowserRouter>
+            </App>
         </ConfigProvider>
     );
 };

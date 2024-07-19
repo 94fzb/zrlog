@@ -1,0 +1,44 @@
+{
+  "navBarBrand": {
+    "label": "导航栏",
+    "htmlElementType": "input",
+    "placeholder": "",
+    "type": "text"
+  },
+  "navStickyTop": {
+    "label": "导航栏吸顶",
+    "htmlElementType": "switch",
+    "placeholder": "",
+    "type": "boolean"
+  },
+  "navBg": {
+    "label": "导航栏背景色",
+    "htmlElementType": "colorPicker",
+    "placeholder": "",
+    "type": "text"
+  },
+  "globalStyle": {
+    "label": "全局样式",
+    "htmlElementType": "large-textarea",
+    "placeholder": "<style>body {color: blue}</style>",
+    "type": "text"
+  },
+  "footerLink": {
+    "label": "底部链接",
+    "htmlElementType": "textarea",
+    "placeholder": "html格式",
+    "type": "text"
+  },
+  "widgetAd": {
+    "label": "侧边栏广告",
+    "htmlElementType": "textarea",
+    "placeholder": "html格式",
+    "type": "text"
+  },
+  "detailAd": {
+    "label": "文章页广告",
+    "htmlElementType": "textarea",
+    "placeholder": "html格式",
+    "type": "text"
+  }
+}

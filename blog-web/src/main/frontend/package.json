@@ -26,7 +26,8 @@
     "extends": "react-app"
   },
   "devDependencies": {
-    "node": "16.15.1",
+    "node": "18.9.0",
+    "node-bin-darwin-arm64": "18.9.0",
     "@types/react": "18.0.14",
     "@types/react-dom": "18.0.5",
     "@types/react-loadable": "5.5.6",

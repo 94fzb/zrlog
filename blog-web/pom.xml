@@ -5,10 +5,12 @@
     <parent>
         <artifactId>zrlog</artifactId>
         <groupId>com.zrlog</groupId>
-        <version>3.0.1-SNAPSHOT</version>
+        <version>3.1.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>blog-web</artifactId>
+    <version>3.1.0</version>
+
 
     <dependencies>
         <dependency>
@@ -20,40 +22,52 @@
             <artifactId>service</artifactId>
         </dependency>
     </dependencies>
+    <profiles>
+        <profile>
+            <id>nodeBuild</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>install node and yarn</id>
+                                <goals>
+                                    <goal>install-node-and-yarn</goal>
+                                </goals>
+                                <phase>generate-resources</phase>
+                            </execution>
+                            <execution>
+                                <id>yarn install</id>
+                                <goals>
+                                    <goal>yarn</goal>
+                                </goals>
+                                <configuration>
+                                    <arguments>install --registry=https://registry.npmmirror.com --frozen-lockfile</arguments>
+                                </configuration>
+                                <phase>generate-resources</phase>
+                            </execution>
+                            <execution>
+                                <id>yarn build</id>
+                                <goals>
+                                    <goal>yarn</goal>
+                                </goals>
+                                <configuration>
+                                    <arguments>build</arguments>
+                                </configuration>
+                                <phase>generate-resources</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>com.github.eirslett</groupId>
-                <artifactId>frontend-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>install node and yarn</id>
-                        <goals>
-                            <goal>install-node-and-yarn</goal>
-                        </goals>
-                        <phase>generate-resources</phase>
-                    </execution>
-                    <execution>
-                        <id>yarn install</id>
-                        <goals>
-                            <goal>yarn</goal>
-                        </goals>
-                        <configuration>
-                            <arguments>install --frozen-lockfile</arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>yarn build</id>
-                        <goals>
-                            <goal>yarn</goal>
-                        </goals>
-                        <configuration>
-                            <arguments>build</arguments>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.2.0</version>

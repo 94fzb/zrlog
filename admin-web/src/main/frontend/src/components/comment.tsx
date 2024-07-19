@@ -4,11 +4,11 @@ import { getRes } from "../utils/constants";
 import BaseTable, { PageDataSource } from "../common/BaseTable";
 import TextArea from "antd/es/input/TextArea";
 
-const Comment = ({ data }: { data: PageDataSource }) => {
+const Comment = ({ data, offline }: { data: PageDataSource; offline: boolean }) => {
     const getColumns = () => {
         return [
             {
-                title: "内容",
+                title: getRes()["content"],
                 dataIndex: "userComment",
                 key: "userComment",
                 width: 600,
@@ -22,7 +22,7 @@ const Comment = ({ data }: { data: PageDataSource }) => {
                 ),
             },
             {
-                title: "昵称",
+                title: getRes()["nickName"],
                 dataIndex: "userName",
                 key: "userName",
             },
@@ -33,11 +33,11 @@ const Comment = ({ data }: { data: PageDataSource }) => {
             },
             {
                 title: "IP",
-                key: "ip",
-                dataIndex: "ip",
+                key: "userIp",
+                dataIndex: "userIp",
             },
             {
-                title: "邮箱",
+                title: getRes()["email"],
                 key: "userMail",
                 dataIndex: "userMail",
             },
@@ -59,12 +59,7 @@ const Comment = ({ data }: { data: PageDataSource }) => {
                 {getRes()["admin.comment.manage"]}
             </Title>
             <Divider />
-            <BaseTable
-                datasource={data}
-                columns={getColumns()}
-                deleteApi={getDeleteApiUri()}
-                dataApi={"/api/admin/comment"}
-            />
+            <BaseTable offline={offline} datasource={data} columns={getColumns()} deleteApi={getDeleteApiUri()} />
         </>
     );
 };

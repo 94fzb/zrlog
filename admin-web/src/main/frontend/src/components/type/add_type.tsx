@@ -1,20 +1,26 @@
 import { useState } from "react";
-import { Button, Col, Form, Input, Modal } from "antd";
+import { App, Button, Col, Form, Input, Modal } from "antd";
 import Row from "antd/es/grid/row";
 import TextArea from "antd/es/input/TextArea";
 import axios from "axios";
+import { getRes } from "../../utils/constants";
 
 const layout = {
     labelCol: { span: 4 },
     wrapperCol: { span: 20 },
 };
 
-const AddType = ({ addSuccessCall }: { addSuccessCall: () => void }) => {
+const AddType = ({ addSuccessCall, offline }: { addSuccessCall: () => void; offline: boolean }) => {
     const [showModel, setShowModel] = useState<boolean>(false);
     const [form, setForm] = useState<any>();
+    const { message } = App.useApp();
 
     const handleOk = () => {
-        axios.post("/api/admin/type/add", form).then(() => {
+        axios.post("/api/admin/type/add", form).then(async ({ data }) => {
+            if (data.error) {
+                await message.error(data.message);
+                return;
+            }
             setShowModel(false);
             addSuccessCall();
         });
@@ -25,15 +31,15 @@ const AddType = ({ addSuccessCall }: { addSuccessCall: () => void }) => {
     };
     return (
         <>
-            <Button type="primary" onClick={() => setShowModel(true)} style={{ marginBottom: 8 }}>
-                添加
+            <Button type="primary" disabled={offline} onClick={() => setShowModel(true)} style={{ marginBottom: 8 }}>
+                {getRes()["add"]}
             </Button>
-            <Modal title="添加" open={showModel} onOk={handleOk} onCancel={() => setShowModel(false)}>
+            <Modal title={getRes()["add"]} open={showModel} onOk={handleOk} onCancel={() => setShowModel(false)}>
                 <Form onValuesChange={(_k, v) => setValue(v)} {...layout}>
                     <Row>
                         <Col span={24}>
                             <Form.Item
-                                label="名称分类"
+                                label={getRes()["admin.type.manage"]}
                                 style={{ marginBottom: 8 }}
                                 name="typeName"
                                 rules={[{ required: true, message: "" }]}
@@ -45,7 +51,7 @@ const AddType = ({ addSuccessCall }: { addSuccessCall: () => void }) => {
                     <Row>
                         <Col span={24}>
                             <Form.Item
-                                label="别名"
+                                label={getRes()["alias"]}
                                 style={{ marginBottom: 8 }}
                                 name="alias"
                                 rules={[{ required: true, message: "" }]}
@@ -57,7 +63,7 @@ const AddType = ({ addSuccessCall }: { addSuccessCall: () => void }) => {
                     <Row>
                         <Col span={24}>
                             <Form.Item
-                                label="介绍"
+                                label="简介"
                                 style={{ marginBottom: 8 }}
                                 name="remark"
                                 rules={[{ required: true, message: "" }]}

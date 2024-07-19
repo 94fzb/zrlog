@@ -2,19 +2,22 @@ package com.zrlog.blog.web.interceptor;
 
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.LoggerUtil;
+import com.hibegin.common.util.SecurityUtils;
 import com.hibegin.common.util.http.handle.CloseResponseHandle;
 import com.hibegin.http.HttpMethod;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
-import com.zrlog.business.cache.CacheService;
 import com.zrlog.business.util.PluginHelper;
+import com.zrlog.common.Constants;
 import com.zrlog.common.vo.AdminTokenVO;
+import com.zrlog.util.ZrLogUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.parser.Parser;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
@@ -29,6 +32,7 @@ class ResponseRenderPrintWriter extends PrintWriter {
     private static final Logger LOGGER = LoggerUtil.getLogger(ResponseRenderPrintWriter.class);
 
     private final StringBuilder builder = new StringBuilder();
+
 
     private String body;
 
@@ -55,8 +59,7 @@ class ResponseRenderPrintWriter extends PrintWriter {
         return true;
     }
 
-    ResponseRenderPrintWriter(OutputStream out, String baseUrl, HttpRequest request,
-                              HttpResponse response, AdminTokenVO adminTokenVO) {
+    public ResponseRenderPrintWriter(OutputStream out, String baseUrl, HttpRequest request, HttpResponse response, AdminTokenVO adminTokenVO) {
         super(out);
         this.baseUrl = baseUrl;
         this.request = request;
@@ -123,12 +126,16 @@ class ResponseRenderPrintWriter extends PrintWriter {
         }
         String html = document.html();
         for (Map.Entry<String, String> entry : replaceMap.entrySet()) {
-            html = html.replaceAll(entry.getKey(), entry.getValue());
+            html = html.replace(entry.getKey(), entry.getValue());
         }
-        return html + "<!--" + (System.currentTimeMillis() - startTime) + "ms-->";
+        String versionInfo = SecurityUtils.md5(html);
+        if (ZrLogUtil.isStaticBlogPlugin(request)) {
+            return html + "<!--" + versionInfo + "-->";
+        }
+        return html + "<!--" + (System.currentTimeMillis() - startTime) + "ms(" + versionInfo + ")-->";
     }
 
-    private void parseCustomHtmlTag(Element element, String tagName, Map<String, String> replaceMap) throws IOException {
+    private void parseCustomHtmlTag(Element element, String tagName, Map<String, String> replaceMap) {
         if ("plugin".equals(tagName) && !element.attr("name").isEmpty()) {
             try {
                 String url = "/" + element.attr("name") + "/" + element.attr("view");
@@ -137,10 +144,15 @@ class ResponseRenderPrintWriter extends PrintWriter {
                 }
                 element.attr("_id", UUID.randomUUID().toString());
                 CloseResponseHandle handle = PluginHelper.getContext(url, HttpMethod.GET, request, adminTokenVO);
-                byte[] bytes = IOUtil.getByteByInputStream(handle.getT().body());
-                replaceMap.put(element.outerHtml(), new String(bytes, StandardCharsets.UTF_8));
+                try (InputStream in = handle.getT().body()) {
+                    if (handle.getStatusCode() != 200) {
+                        return;
+                    }
+                    byte[] bytes = IOUtil.getByteByInputStream(in);
+                    replaceMap.put(element.outerHtml(), new String(bytes, StandardCharsets.UTF_8));
+                }
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "", e);
+                LOGGER.warning("Template plugin page render error " + e.getMessage());
             }
         }
     }
@@ -176,7 +188,7 @@ class ResponseRenderPrintWriter extends PrintWriter {
             if (uriPath.contains("?")) {
                 uriPath = uriPath.substring(0, uriPath.lastIndexOf("?"));
             }
-            String flag = CacheService.getFileFlag(uriPath);
+            String flag = Constants.zrLogConfig.getCacheService().getFileFlagFirstByCache(uriPath);
             if (flag != null) {
                 if (href.contains("?")) {
                     href = href + "&t=" + flag;
