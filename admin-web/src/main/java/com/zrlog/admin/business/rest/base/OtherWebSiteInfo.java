@@ -38,7 +38,7 @@ public class OtherWebSiteInfo implements Validator {
             this.robotRuleContent = Jsoup.clean(robotRuleContent, Safelist.none());
         }
         if (StringUtils.isNotEmpty(icp)) {
-            this.icp = Jsoup.clean(robotRuleContent, Safelist.basicWithImages());
+            this.icp = Jsoup.clean(icp, Safelist.basicWithImages());
         }
     }
 
