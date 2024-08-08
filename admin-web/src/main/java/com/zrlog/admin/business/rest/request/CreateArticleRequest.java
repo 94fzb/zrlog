@@ -149,5 +149,8 @@ public class CreateArticleRequest implements Validator {
         if (StringUtils.isNotEmpty(this.keywords)) {
             setKeywords(Jsoup.clean(this.keywords, Safelist.none()));
         }
+        if (StringUtils.isNotEmpty(this.digest)) {
+            setDigest(Jsoup.clean(this.digest, Safelist.relaxed()));
+        }
     }
 }
