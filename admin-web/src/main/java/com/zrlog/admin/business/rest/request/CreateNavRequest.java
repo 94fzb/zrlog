@@ -6,6 +6,7 @@ import com.zrlog.common.Validator;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
 
+import java.net.URI;
 import java.util.Objects;
 
 public class CreateNavRequest implements Validator {
@@ -54,7 +55,7 @@ public class CreateNavRequest implements Validator {
             this.setNavName(Jsoup.clean(this.getNavName(), Safelist.none()));
         }
         if (StringUtils.isNotEmpty(this.getUrl())) {
-            this.setUrl(Jsoup.clean(this.getUrl(), Safelist.none()));
+            this.setUrl(URI.create(this.getUrl()).toString());
         }
     }
 }
