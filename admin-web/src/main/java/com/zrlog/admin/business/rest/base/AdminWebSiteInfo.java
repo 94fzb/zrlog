@@ -1,7 +1,10 @@
 package com.zrlog.admin.business.rest.base;
 
+import com.hibegin.common.util.StringUtils;
 import com.zrlog.common.Constants;
 import com.zrlog.common.Validator;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
 
 import java.util.Objects;
 
@@ -60,6 +63,22 @@ public class AdminWebSiteInfo implements Validator {
     public void doValid() {
         if (Objects.isNull(article_auto_digest_length)) {
             article_auto_digest_length = Constants.DEFAULT_ARTICLE_DIGEST_LENGTH;
+        }
+    }
+
+    @Override
+    public void doClean() {
+        if (StringUtils.isNotEmpty(favicon_png_pwa_512_base64)) {
+            this.favicon_png_pwa_512_base64 = Jsoup.clean(favicon_png_pwa_512_base64, Safelist.none());
+        }
+        if (StringUtils.isNotEmpty(favicon_png_pwa_192_base64)) {
+            this.favicon_png_pwa_192_base64 = Jsoup.clean(favicon_png_pwa_192_base64, Safelist.none());
+        }
+        if (StringUtils.isNotEmpty(language)) {
+            this.language = Jsoup.clean(language, Safelist.none());
+        }
+        if (StringUtils.isNotEmpty(admin_color_primary)) {
+            this.admin_color_primary = Jsoup.clean(admin_color_primary, Safelist.none());
         }
     }
 
