@@ -1,7 +1,10 @@
 package com.zrlog.admin.business.rest.request;
 
+import com.hibegin.common.util.StringUtils;
 import com.zrlog.admin.business.exception.ArgsException;
 import com.zrlog.common.Validator;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
 
 import java.util.Objects;
 
@@ -129,6 +132,22 @@ public class CreateArticleRequest implements Validator {
     public void doValid() {
         if (Objects.isNull(typeId) || typeId <= 0) {
             throw new ArgsException("typeId");
+        }
+    }
+
+    @Override
+    public void doClean() {
+        if (StringUtils.isNotEmpty(this.alias)) {
+            setAlias(Jsoup.clean(this.alias, Safelist.none()));
+        }
+        if (StringUtils.isNotEmpty(this.title)) {
+            setTitle(Jsoup.clean(this.title, Safelist.none()));
+        }
+        if (StringUtils.isNotEmpty(this.thumbnail)) {
+            setThumbnail(Jsoup.clean(this.thumbnail, Safelist.none()));
+        }
+        if (StringUtils.isNotEmpty(this.keywords)) {
+            setKeywords(Jsoup.clean(this.keywords, Safelist.none()));
         }
     }
 }

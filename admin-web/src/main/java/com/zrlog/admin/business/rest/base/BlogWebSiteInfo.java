@@ -3,6 +3,8 @@ package com.zrlog.admin.business.rest.base;
 import com.hibegin.common.util.StringUtils;
 import com.zrlog.admin.business.exception.StaticHtmlConfigException;
 import com.zrlog.common.Validator;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
 
 import java.util.Objects;
 
@@ -53,6 +55,13 @@ public class BlogWebSiteInfo implements Validator {
     public void doValid() {
         if (Objects.equals(generator_html_status, true) && StringUtils.isEmpty(host)) {
             throw new StaticHtmlConfigException();
+        }
+    }
+
+    @Override
+    public void doClean() {
+        if (StringUtils.isNotEmpty(host)) {
+            this.host = Jsoup.clean(host, Safelist.none());
         }
     }
 }
