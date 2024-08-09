@@ -47,30 +47,30 @@ const UpgradeSettingForm = ({ data, offline }: { data: Upgrade; offline: boolean
         }
         setChecking(true);
         try {
-            await axios.get("/api/admin/upgrade").then(async ({ data }) => {
-                if (data.data.upgrade) {
-                    const title = `${getRes()["newVersion"]} - #${data.data.version.type}`;
-                    modal.info({
-                        title: title,
-                        content: (
-                            <div
-                                dangerouslySetInnerHTML={{
-                                    __html: data.data.version.changeLog,
-                                }}
-                            />
-                        ),
-                        closable: true,
-                        okText: getRes()["doUpgrade"],
-                        onOk: function () {
-                            navigate("/upgrade");
-                        },
-                    });
-                } else {
-                    if (data.error === 0) {
-                        await message.info(getRes()["notFoundNewVersion"]);
-                    }
+            const { data } = await axios.get("/api/admin/upgrade");
+            if (data.data.upgrade) {
+                const title = `${getRes()["newVersion"]} - #${data.data.version.type}`;
+                modal.info({
+                    title: title,
+                    content: (
+                        <div
+                            dangerouslySetInnerHTML={{
+                                __html: data.data.version.changeLog,
+                            }}
+                        />
+                    ),
+                    closable: true,
+                    okText: getRes()["doUpgrade"],
+                    onOk: function () {
+                        navigate("/upgrade");
+                    },
+                });
+            } else {
+                if (data.error === 0) {
+                    setChecking(false);
+                    await message.info(getRes()["notFoundNewVersion"]);
                 }
-            });
+            }
         } finally {
             setChecking(false);
         }
