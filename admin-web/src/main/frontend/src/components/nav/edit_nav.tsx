@@ -1,4 +1,4 @@
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, useEffect, useState } from "react";
 import { App, Col, Form, Input, InputNumber, Modal } from "antd";
 import Row from "antd/es/grid/row";
 import { EditOutlined } from "@ant-design/icons";
@@ -38,6 +38,10 @@ const EditNav: FunctionComponent<EditNavProps> = ({ record, editSuccessCall, off
     const setValue = (changedValues: any) => {
         setUpdateForm(changedValues);
     };
+
+    useEffect(() => {
+        setUpdateForm(record);
+    }, [record]);
 
     return (
         <>

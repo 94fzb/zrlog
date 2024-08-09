@@ -1,4 +1,4 @@
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, useEffect, useState } from "react";
 import { App, Col, Form, Input, Modal } from "antd";
 import Row from "antd/es/grid/row";
 import TextArea from "antd/es/input/TextArea";
@@ -39,6 +39,10 @@ const EditType: FunctionComponent<EditTypeProps> = ({ record, editSuccessCall, o
     const setValue = (changedValues: any) => {
         setUpdateForm(changedValues);
     };
+
+    useEffect(() => {
+        setUpdateForm(record);
+    }, [record]);
 
     return (
         <>
