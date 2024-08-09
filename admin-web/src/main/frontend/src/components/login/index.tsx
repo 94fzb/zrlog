@@ -56,7 +56,7 @@ const Index = ({ offline }: { offline: boolean }) => {
                     if (ssData) {
                         ssData.key = data.data.key;
                     }
-                    const redirectFrom = query.get("redirectFrom");
+                    const redirectFrom = query.get("redirectFrom") as string;
                     if (redirectFrom !== null && redirectFrom !== "") {
                         navigate(decodeURIComponent(redirectFrom).replace("/admin", ""), { replace: true });
                     } else {
