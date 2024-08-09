@@ -53,13 +53,12 @@ const Index = ({ offline }: { offline: boolean }) => {
                     await message.error(data.message);
                 } else if (data.error == 0) {
                     const query = new URLSearchParams(window.location.search);
+                    if (ssData) {
+                        ssData.key = data.data.key;
+                    }
                     if (query.get("redirectFrom") !== null && query.get("redirectFrom") !== "") {
-                        //need reload page, because basename error
-                        window.location.href = decodeURIComponent(query.get("redirectFrom") + "");
+                        navigate(decodeURIComponent(query.get("redirectFrom") + ""), { replace: true });
                     } else {
-                        if (ssData) {
-                            ssData.key = data.data.key;
-                        }
                         navigate("/index", { replace: true });
                     }
                 } else {
