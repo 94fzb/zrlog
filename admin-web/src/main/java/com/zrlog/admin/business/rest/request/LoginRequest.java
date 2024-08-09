@@ -3,6 +3,8 @@ package com.zrlog.admin.business.rest.request;
 import com.hibegin.common.util.StringUtils;
 import com.zrlog.admin.business.exception.UserNameAndPasswordRequiredException;
 import com.zrlog.common.Validator;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
 
 public class LoginRequest implements Validator {
 
@@ -38,6 +40,13 @@ public class LoginRequest implements Validator {
     public void doValid() {
         if (StringUtils.isEmpty(userName) || StringUtils.isEmpty(password)) {
             throw new UserNameAndPasswordRequiredException();
+        }
+    }
+
+    @Override
+    public void doClean() {
+        if (StringUtils.isNotEmpty(userName)) {
+            this.userName = Jsoup.clean(this.userName, Safelist.none());
         }
     }
 }

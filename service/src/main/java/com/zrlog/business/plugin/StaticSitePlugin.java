@@ -129,6 +129,7 @@ public class StaticSitePlugin extends BaseLockObject implements IPlugin {
         copyResourceToCacheFolder("/assets/css/font/vjs.ttf");
         copyResourceToCacheFolder("/assets/css/font/vjs.woff");
         copyResourceToCacheFolder("/assets/css/video-js.css");
+        copyResourceToCacheFolder("/assets/css/katex.min.css");
         copyResourceToCacheFolder("/assets/js/video.js");
         //default avatar url
         copyResourceToCacheFolder("/assets/images/default-portrait.gif");

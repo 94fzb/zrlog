@@ -1,7 +1,10 @@
 package com.zrlog.admin.business.rest.base;
 
+import com.hibegin.common.util.StringUtils;
 import com.zrlog.admin.business.exception.ArgsException;
 import com.zrlog.common.Validator;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
 
 import java.util.Objects;
 
@@ -49,6 +52,25 @@ public class BasicWebSiteInfo implements Validator {
     public void doValid() {
         if (Objects.isNull(title) || title.trim().isEmpty()) {
             throw new ArgsException("title");
+        }
+    }
+
+    @Override
+    public void doClean() {
+        if (StringUtils.isNotEmpty(second_title)) {
+            this.second_title = Jsoup.clean(second_title, Safelist.none());
+        }
+        if (StringUtils.isNotEmpty(keywords)) {
+            this.keywords = Jsoup.clean(keywords, Safelist.none());
+        }
+        if (StringUtils.isNotEmpty(title)) {
+            this.title = Jsoup.clean(title, Safelist.none());
+        }
+        if (StringUtils.isNotEmpty(description)) {
+            this.description = Jsoup.clean(description, Safelist.none());
+        }
+        if (StringUtils.isNotEmpty(favicon_ico_base64)) {
+            this.favicon_ico_base64 = Jsoup.clean(favicon_ico_base64, Safelist.none());
         }
     }
 

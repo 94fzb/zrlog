@@ -6,8 +6,8 @@ import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.rest.request.CreateNavRequest;
 import com.zrlog.admin.business.rest.request.UpdateNavRequestRequest;
 import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
-import com.zrlog.blog.web.util.ControllerUtil;
 import com.zrlog.admin.web.annotation.RefreshCache;
+import com.zrlog.blog.web.util.ControllerUtil;
 import com.zrlog.business.service.TemplateHelper;
 import com.zrlog.common.rest.response.ApiStandardResponse;
 import com.zrlog.data.dto.PageData;
@@ -23,7 +23,7 @@ public class BlogNavController extends Controller {
     @RefreshCache(async = true)
     @ResponseBody
     public UpdateRecordResponse delete() throws SQLException {
-        String[] ids = Objects.requireNonNullElse(request.getParaToStr("id"),"").split(",");
+        String[] ids = Objects.requireNonNullElse(request.getParaToStr("id"), "").split(",");
         for (String id : ids) {
             new LogNav().deleteById(Integer.parseInt(id));
         }
