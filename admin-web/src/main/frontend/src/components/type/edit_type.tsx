@@ -29,9 +29,11 @@ const EditType: FunctionComponent<EditTypeProps> = ({ record, editSuccessCall, o
                 await message.error(data.message);
                 return;
             }
-            setShowModel(false);
-            if (editSuccessCall) {
-                editSuccessCall();
+            if (data.error === 0) {
+                setShowModel(false);
+                if (editSuccessCall) {
+                    editSuccessCall();
+                }
             }
         });
     };

@@ -272,32 +272,34 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
                 });
                 return;
             }
-            exitNotTips();
-            if (release) {
-                message.success(getRes()["releaseSuccess"]);
-            } else {
-                if (!autoSave) {
-                    message.info(getRes()["saveSuccess"]);
+            if (data.error === 0) {
+                exitNotTips();
+                if (release) {
+                    message.success(getRes()["releaseSuccess"]);
+                } else {
+                    if (!autoSave) {
+                        message.info(getRes()["saveSuccess"]);
+                    }
                 }
+                if (preview) {
+                    window.open(data.data["previewUrl"], "_blank");
+                }
+                const respData = data.data;
+                if (create) {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set("id", respData.logId);
+                    window.history.replaceState(null, "", url.toString());
+                    newArticle = { ...newArticle, ...respData };
+                } else {
+                    newArticle = {
+                        ...newArticle,
+                        thumbnail: respData.thumbnail,
+                        lastUpdateDate: respData.lastUpdateDate,
+                        version: respData.version,
+                    };
+                }
+                deleteCacheDataByKey(ck);
             }
-            if (preview) {
-                window.open(data.data["previewUrl"], "_blank");
-            }
-            const respData = data.data;
-            if (create) {
-                const url = new URL(window.location.href);
-                url.searchParams.set("id", respData.logId);
-                window.history.replaceState(null, "", url.toString());
-                newArticle = { ...newArticle, ...respData };
-            } else {
-                newArticle = {
-                    ...newArticle,
-                    thumbnail: respData.thumbnail,
-                    lastUpdateDate: respData.lastUpdateDate,
-                    version: respData.version,
-                };
-            }
-            deleteCacheDataByKey(ck);
         } finally {
             if (release) {
                 setState((prevState) => {

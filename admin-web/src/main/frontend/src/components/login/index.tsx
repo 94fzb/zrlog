@@ -48,12 +48,10 @@ const Index = ({ offline }: { offline: boolean }) => {
         setLogging(true);
         axios
             .post("/api/admin/login", loginForm)
-            .then(({ data }) => {
+            .then(async ({ data }) => {
                 if (data.error) {
-                    message.error(data.message).then(() => {
-                        //ignore
-                    });
-                } else {
+                    await message.error(data.message);
+                } else if (data.error == 0) {
                     const query = new URLSearchParams(window.location.search);
                     if (query.get("redirectFrom") !== null && query.get("redirectFrom") !== "") {
                         //need reload page, because basename error
@@ -64,6 +62,8 @@ const Index = ({ offline }: { offline: boolean }) => {
                         }
                         navigate("/index", { replace: true });
                     }
+                } else {
+                    await message.error("未知错误");
                 }
             })
             .finally(() => {

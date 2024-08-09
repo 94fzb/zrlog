@@ -16,15 +16,11 @@ const UserUpdatePassword = ({ offline }: { offline: boolean }) => {
     const { message } = App.useApp();
 
     const onFinish = (allValues: Record<string, any>) => {
-        axios.post("/api/admin/user/updatePassword", allValues).then(({ data }) => {
+        axios.post("/api/admin/user/updatePassword", allValues).then(async ({ data }) => {
             if (data.error) {
-                message.error(data.message).then(() => {
-                    //ignore
-                });
-            } else {
-                message.success(data.message).then(() => {
-                    //ignore
-                });
+                await message.error(data.message);
+            } else if (data.error === 0) {
+                await message.success(data.message);
             }
         });
     };

@@ -66,7 +66,9 @@ const UpgradeSettingForm = ({ data, offline }: { data: Upgrade; offline: boolean
                         },
                     });
                 } else {
-                    message.info(getRes()["notFoundNewVersion"]);
+                    if (data.error === 0) {
+                        await message.info(getRes()["notFoundNewVersion"]);
+                    }
                 }
             });
         } finally {

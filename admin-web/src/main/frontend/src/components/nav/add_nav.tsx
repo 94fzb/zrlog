@@ -20,8 +20,11 @@ const AddNav = ({ addSuccessCall, offline }: { offline: boolean; addSuccessCall:
                 await message.error(data.message);
                 return;
             }
-            setShowModel(false);
-            addSuccessCall();
+
+            if (data.error === 0) {
+                setShowModel(false);
+                addSuccessCall();
+            }
         });
     };
 

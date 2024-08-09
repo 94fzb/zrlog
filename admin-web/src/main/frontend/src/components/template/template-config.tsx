@@ -135,11 +135,11 @@ const TemplateConfig = ({ data, offline }: { data: TemplateConfigState; offline:
     };
 
     const onFinish = () => {
-        axios.post("/api/admin/template/config", state.dataMap).then(({ data }) => {
+        axios.post("/api/admin/template/config", state.dataMap).then(async ({ data }) => {
             if (data.error) {
-                message.error(data.message);
-            } else {
-                message.success(data.message);
+                await message.error(data.message);
+            } else if (data.error === 0) {
+                await message.success(data.message);
             }
         });
     };

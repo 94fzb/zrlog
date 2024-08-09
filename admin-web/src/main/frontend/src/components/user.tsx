@@ -41,11 +41,11 @@ const User = ({ data, offline }: { data: BasicUserInfo; offline: boolean }) => {
     };
 
     const onFinish = () => {
-        axios.post("/api/admin/user/update", userInfo).then(({ data }) => {
+        axios.post("/api/admin/user/update", userInfo).then(async ({ data }) => {
             if (data.error) {
-                message.error(data.message);
-            } else {
-                message.success(data.message);
+                await message.error(data.message);
+            } else if (data.error === 0) {
+                await message.success(data.message);
             }
         });
     };

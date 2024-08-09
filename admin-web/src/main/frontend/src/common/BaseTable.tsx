@@ -110,14 +110,18 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
     });
 
     const [messageApi, contextHolder] = message.useMessage();
-    const handleDelete = async (pagination: MyPagination, deleteApiUri: string, key: string) => {
+    const handleDelete = async (pagination: MyPagination, deleteApiUri: string, key: string): Promise<boolean> => {
         const response = await axios.post(deleteApiUri + "?id=" + key);
         if (response.data.error) {
             messageApi.error(response.data.message);
-            return;
+            return false;
         }
-        messageApi.success(getRes()["deleteSuccess"]);
-        fetchDataWithReload(pagination.page, pagination.size, tableDataState.query);
+        if (response.data.error === 0) {
+            messageApi.success(getRes()["deleteSuccess"]);
+            fetchDataWithReload(pagination.page, pagination.size, tableDataState.query);
+            return true;
+        }
+        return false;
     };
 
     useEffect(() => {
@@ -179,13 +183,14 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
                             <Popconfirm
                                 disabled={offline}
                                 title={getRes()["deleteTips"]}
-                                onConfirm={() =>
-                                    handleDelete(tableDataState.pagination, deleteApi, record.id).then(() => {
+                                onConfirm={async () => {
+                                    const success = await handleDelete(tableDataState.pagination, deleteApi, record.id);
+                                    if (success) {
                                         if (deleteSuccessCallback) {
                                             deleteSuccessCallback(record.id);
                                         }
-                                    })
-                                }
+                                    }
+                                }}
                             >
                                 <DeleteOutlined style={{ color: "red" }} />
                             </Popconfirm>

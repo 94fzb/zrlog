@@ -24,15 +24,16 @@ const BlogForm = ({ data, offline }: { data: Admin; offline: boolean }) => {
     const { message } = App.useApp();
 
     const websiteFormFinish = (changedValues: Admin) => {
-        axios.post("/api/admin/website/admin", { ...form, ...changedValues }).then(({ data }) => {
+        axios.post("/api/admin/website/admin", { ...form, ...changedValues }).then(async ({ data }) => {
             if (data.error) {
-                message.error(data.message).then();
+                await message.error(data.message);
                 return;
             }
-            message.success(data.message).then(() => {
+            if (data.error === 0) {
+                await message.success(data.message);
                 removeRes();
                 window.location.reload();
-            });
+            }
         });
     };
 
