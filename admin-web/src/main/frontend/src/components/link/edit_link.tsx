@@ -62,7 +62,7 @@ const EditLink: FunctionComponent<EditLinkProps> = ({ record, editSuccessCall, o
                 <EditOutlined style={{ marginBottom: 8, color: getColorPrimary() }} />
             </Link>
             <Modal title={getRes()["edit"]} open={showModel} onOk={handleOk} onCancel={() => setShowModel(false)}>
-                <Form initialValues={record} onValuesChange={(_k, v) => setValue(v)} {...layout}>
+                <Form initialValues={updateForm} onValuesChange={(_k, v) => setValue(v)} {...layout}>
                     <Form.Item name="id" style={{ display: "none" }}>
                         <Input hidden={true} />
                     </Form.Item>
