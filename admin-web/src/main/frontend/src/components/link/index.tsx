@@ -24,6 +24,9 @@ const BLink = ({ data, offline }: { data: PageDataSource; offline: boolean }) =>
                 key: "linkName",
                 dataIndex: "linkName",
                 width: 240,
+                render: (e: string) => {
+                    return <span dangerouslySetInnerHTML={{ __html: e }} />;
+                },
             },
             {
                 title: "描述",
