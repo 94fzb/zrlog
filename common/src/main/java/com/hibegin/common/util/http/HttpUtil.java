@@ -5,7 +5,6 @@ import com.hibegin.common.util.http.handle.HttpHandle;
 import com.hibegin.common.util.http.handle.HttpStringHandle;
 import com.zrlog.common.Constants;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -36,51 +35,48 @@ public class HttpUtil {
         return instance;
     }
 
-    public <T> HttpHandle<T> sendGetRequest(String urlPath, Map<String, String[]> requestParam, HttpHandle<T> httpHandle, Map<String, String> reqHeaders)
-            throws IOException, InterruptedException, URISyntaxException {
+    private static URI getUri(String urlPath, Map<String, String[]> requestParam) {
+        if (requestParam.isEmpty()) {
+            return URI.create(urlPath);
+        }
         String queryStr = mapToQueryStr(requestParam);
-        HttpRequest.Builder builder = HttpRequest.newBuilder()
-                .uri(new URI(urlPath + (urlPath.contains("?") ? "&" : "?") + queryStr))
-                .GET();
+        if (urlPath.contains("?")) {
+            return URI.create(urlPath + "&" + queryStr);
+        }
+        return URI.create(urlPath + "?" + queryStr);
+    }
+
+    public <T> HttpHandle<T> sendGetRequest(String urlPath, Map<String, String[]> requestParam, HttpHandle<T> httpHandle, Map<String, String> reqHeaders) throws IOException, InterruptedException, URISyntaxException {
+        HttpRequest.Builder builder = HttpRequest.newBuilder().uri(getUri(urlPath, requestParam)).GET();
         setHttpHeaders(builder, reqHeaders);
         HttpRequest request = builder.build();
         HttpResponse<InputStream> response = httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
         return handleResponse(httpHandle, request, response);
     }
 
-    public <T> HttpHandle<T> sendGetRequest(String urlPath, HttpHandle<T> httpHandle, Map<String, String> reqHeaders)
-            throws IOException, InterruptedException, URISyntaxException {
+    public <T> HttpHandle<T> sendGetRequest(String urlPath, HttpHandle<T> httpHandle, Map<String, String> reqHeaders) throws IOException, InterruptedException, URISyntaxException {
         sendGetRequest(urlPath, new HashMap<>(), httpHandle, reqHeaders);
         return httpHandle;
     }
 
-    public <T> HttpHandle<T> sendPostRequest(String urlPath, Map<String, String[]> params, HttpHandle<T> httpHandle, Map<String, String> reqHeaders)
-            throws IOException, InterruptedException {
-        HttpRequest.Builder builder = HttpRequest.newBuilder()
-                .uri(URI.create(urlPath))
-                .POST(HttpRequest.BodyPublishers.ofString(mapToQueryStr(params)));
+    public <T> HttpHandle<T> sendPostRequest(String urlPath, Map<String, String[]> params, HttpHandle<T> httpHandle, Map<String, String> reqHeaders) throws IOException, InterruptedException {
+        HttpRequest.Builder builder = HttpRequest.newBuilder().uri(URI.create(urlPath)).POST(HttpRequest.BodyPublishers.ofString(mapToQueryStr(params)));
         setHttpHeaders(builder, reqHeaders);
         HttpRequest request = builder.build();
         HttpResponse<InputStream> response = httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
         return handleResponse(httpHandle, request, response);
     }
 
-    public <T> HttpHandle<T> sendPostRequest(String urlPath, byte[] bodyBytes, HttpHandle<T> httpHandle, Map<String, String> reqHeaders)
-            throws IOException, InterruptedException {
-        HttpRequest.Builder builder = HttpRequest.newBuilder()
-                .uri(URI.create(urlPath))
-                .POST(HttpRequest.BodyPublishers.ofByteArray(bodyBytes));
+    public <T> HttpHandle<T> sendPostRequest(String urlPath, byte[] bodyBytes, HttpHandle<T> httpHandle, Map<String, String> reqHeaders) throws IOException, InterruptedException {
+        HttpRequest.Builder builder = HttpRequest.newBuilder().uri(URI.create(urlPath)).POST(HttpRequest.BodyPublishers.ofByteArray(bodyBytes));
         setHttpHeaders(builder, reqHeaders);
         HttpRequest request = builder.build();
         HttpResponse<InputStream> response = httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
         return handleResponse(httpHandle, request, response);
     }
 
-    private String mapToQueryStr(Map<String, String[]> params) {
-        return params.entrySet().stream()
-                .flatMap(entry -> Arrays.stream(entry.getValue())
-                        .map(value -> entry.getKey() + "=" + URLEncoder.encode(value, StandardCharsets.UTF_8)))
-                .collect(Collectors.joining("&"));
+    private static String mapToQueryStr(Map<String, String[]> params) {
+        return params.entrySet().stream().flatMap(entry -> Arrays.stream(entry.getValue()).map(value -> entry.getKey() + "=" + URLEncoder.encode(value, StandardCharsets.UTF_8))).collect(Collectors.joining("&"));
     }
 
     private void setHttpHeaders(HttpRequest.Builder requestBuilder, Map<String, String> headers) {

@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -41,16 +40,30 @@ public class HttpFileHandle extends HttpHandle<File> {
         return fileName;
     }
 
+    private static String getFileNameByHeader(String header) {
+        if (Objects.nonNull(header) && header.startsWith("attachment;")) {
+            String s = header.substring("attachment;".length()).trim();
+            if (s.startsWith("filename=\"") && s.endsWith("\"")) {
+                return s.substring("filename=\"".length(), s.length() - 1); // 带引号
+            } else if (s.startsWith("filename=")) {
+                return s.substring("filename=".length()); // 不带引号
+            }
+        }
+        return null;
+    }
+
+    public static void main(String[] args) {
+        String fileName = getFileNameByHeader("attachment;filename=1.png");
+        System.out.println("fileName = " + fileName);
+    }
+
     @Override
     public boolean handle(HttpRequest request, HttpResponse<InputStream> response) {
         String contentDis = response.headers().firstValue("Content-Disposition").orElse(null);
         if (Objects.nonNull(contentDis)) {
-            String[] strings = contentDis.split(",");
-            for (String str : strings) {
-                String[] tArr = str.split(";");
-                if ("attachment".equals(tArr[0])) {
-                    setT(new File(filePath + "/" + new String(tArr[1].split("=")[1].getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8)));
-                }
+            String fileName = getFileNameByHeader(contentDis);
+            if (Objects.nonNull(fileName)) {
+                setT(new File(fileName + "/" + fileName));
             }
         }
         if (getT() == null) {
