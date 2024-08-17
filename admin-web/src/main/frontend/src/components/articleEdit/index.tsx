@@ -1,5 +1,5 @@
 import { FunctionComponent, useEffect, useState } from "react";
-import { EyeOutlined, SaveOutlined, SendOutlined } from "@ant-design/icons";
+import { EyeOutlined, FullscreenExitOutlined, FullscreenOutlined, SaveOutlined, SendOutlined } from "@ant-design/icons";
 import { App, Button, Space } from "antd";
 import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
@@ -19,9 +19,10 @@ import ThumbnailUpload from "./thumbnail-upload";
 import BaseInput from "../../common/BaseInput";
 import BaseTextArea from "../../common/BaseTextArea";
 import Form from "antd/es/form";
-import { addToCache, deleteCacheDataByKey, getCacheByKey, getPageFullState } from "../../cache";
+import { addToCache, deleteCacheDataByKey, getCacheByKey, getPageFullState, savePageFullState } from "../../cache";
 import { getFullPath } from "../../utils/helpers";
 import { useLocation } from "react-router";
+import { isPWA } from "../../utils/env-utils";
 
 export type ArticleEntry = ChangedContent &
     ThumbnailChanged &
@@ -95,18 +96,10 @@ const StyledArticleEdit = styled("div")`
     }
 
     .save-btn-full-screen {
-        position: fixed;
-        z-index: 100000;
-        top: 3px;
-        right: 8px;
         min-width: 120px;
     }
 
     .saveToRubbish-btn-full-screen {
-        position: fixed;
-        z-index: 100000;
-        top: 3px;
-        right: 140px;
         min-width: 120px;
     }
 
@@ -117,9 +110,6 @@ const StyledArticleEdit = styled("div")`
     }
 
     .save-text-full-screen {
-        position: fixed;
-        z-index: 100000;
-        top: 3px;
         right: 300px;
     }
 
@@ -195,7 +185,7 @@ const saveToCache = (article: ArticleEntry) => {
 const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullScreen, onFullScreen }) => {
     const location = useLocation();
     const defaultState = dataToState(data, getPageFullState(getFullPath(location)), offline);
-
+    const articleEditPanel = "article-edit-panel";
     const [state, setState] = useState<ArticleEditState>(defaultState);
 
     const [content, setContent] = useState<ChangedContent | undefined>(undefined);
@@ -334,13 +324,6 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
         }
     };
 
-    const getArticleRoute = () => {
-        if (state === undefined || getRes() === undefined || getRes()["articleRoute"] === undefined) {
-            return "";
-        }
-        return getRes()["articleRoute"];
-    };
-
     const doFullState = () => {
         setState((prevState) => {
             return {
@@ -350,17 +333,24 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
         });
     };
 
-    const onfullscreen = (editor: any) => {
+    const toggleFullScreen = () => {
+        if (state.fullScreen) {
+            onfullscreenExit();
+        } else {
+            onfullscreen();
+        }
+    };
+
+    const onfullscreen = () => {
         try {
             if (screenfull.isEnabled) {
-                screenfull.request().then(() => {
+                screenfull.request(document.getElementById(articleEditPanel) as Element).then(() => {
                     doFullState();
                 });
                 screenfull.on("change", () => {
                     //@ts-ignore
                     if (!screenfull.isFullscreen) {
-                        editor.fullscreenExit();
-                        onExitFullScreen();
+                        onfullscreenExit();
                     }
                 });
             } else {
@@ -456,10 +446,19 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
     }, [data, offline]);
 
     useEffect(() => {
+        if (state.fullScreen) {
+            onfullscreen();
+        }
         return () => {
             exitNotTips();
         };
     }, []);
+
+    useEffect(() => {
+        if (isPWA()) {
+            savePageFullState(getFullPath(location), state.fullScreen);
+        }
+    }, [state.fullScreen]);
 
     const validForm = (changedArticle: ArticleEntry): boolean => {
         const titleError =
@@ -538,20 +537,9 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
         );
     };
 
-    return (
-        <StyledArticleEdit>
-            <Row gutter={[8, 8]} style={{ paddingTop: state.fullScreen ? 0 : 20 }}>
-                <Col md={12} xxl={15} sm={6} span={24}>
-                    <Title
-                        className="page-header"
-                        style={{ marginTop: 0, marginBottom: 0 }}
-                        level={3}
-                        hidden={state.fullScreen}
-                    >
-                        {getRes()["admin.log.edit"]}
-                    </Title>
-                </Col>
-                {getRubbishText()}
+    const getActionBar = () => {
+        return (
+            <>
                 <Col xxl={2} md={3} sm={4} className={state.fullScreen ? "saveToRubbish-btn-full-screen" : ""}>
                     <Button
                         type={state.fullScreen ? "default" : "dashed"}
@@ -590,158 +578,231 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
                         {getRes().release}
                     </Button>
                 </Col>
+            </>
+        );
+    };
+
+    return (
+        <StyledArticleEdit>
+            <Row gutter={[8, 8]} style={{ paddingTop: state.fullScreen ? 0 : 20 }}>
+                <Col md={12} xxl={15} sm={6} span={24}>
+                    <Title
+                        className="page-header"
+                        style={{ marginTop: 0, marginBottom: 0 }}
+                        level={3}
+                        hidden={state.fullScreen}
+                    >
+                        {getRes()["admin.log.edit"]}
+                    </Title>
+                </Col>
+                {getRubbishText()}
+                {!state.fullScreen && getActionBar()}
             </Row>
-            {!state.fullScreen && <Divider />}
-            <Row gutter={[8, 8]} style={{ paddingBottom: state.fullScreen ? 0 : 8 }}>
-                <Col md={13} xs={24}>
-                    <Space.Compact style={{ display: "flex" }} hidden={state.fullScreen}>
-                        <Select
-                            style={{ minWidth: 156, display: state.fullScreen ? "none" : "flex" }}
-                            status={formValidState.typeError ? "error" : ""}
-                            value={state.article.typeId}
-                            showSearch={true}
-                            optionFilterProp="children"
-                            filterOption={(input, option) => (option?.label ?? "").includes(input)}
-                            filterSort={(optionA, optionB) =>
-                                (optionA?.label ?? "").toLowerCase().localeCompare((optionB?.label ?? "").toLowerCase())
-                            }
-                            onChange={async (value) => {
-                                await handleValuesChange({ typeId: value });
-                            }}
-                            options={state.typeOptions}
-                            placeholder={getRes()["pleaseChoose"] + getRes()["admin.type.manage"]}
-                        />
+            {!state.fullScreen && <Divider style={{ marginTop: 16, marginBottom: 8 }} />}
+            <Card
+                title={""}
+                id={articleEditPanel}
+                styles={{
+                    body: {
+                        padding: 0,
+                        overflow: "hidden",
+                    },
+                }}
+            >
+                <Row gutter={[8, 8]} style={{ position: "relative", borderBottom: "1px solid #DDD" }}>
+                    <Col md={12} xs={24}>
                         <BaseInput
-                            hidden={state.fullScreen}
+                            maxLength={96}
+                            variant={"borderless"}
+                            size={"large"}
                             status={formValidState.titleError ? "error" : ""}
                             placeholder={getRes().inputArticleTitle}
                             value={state.article.title ? state.article.title : undefined}
                             onChange={async (e) => {
                                 await handleValuesChange({ title: e });
                             }}
+                            style={{ fontSize: 22, fontWeight: 500 }}
                         />
-                    </Space.Compact>
-                </Col>
-                <Col md={5} xs={24}>
-                    <BaseInput
-                        hidden={state.fullScreen}
-                        value={state.article.alias}
-                        onChange={async (e) => {
-                            await handleValuesChange({ alias: e });
+                    </Col>
+                    <Col md={6} xs={24} style={{ display: "flex", alignItems: "center" }}>
+                        <Space.Compact style={{ display: "flex" }} hidden={state.fullScreen}>
+                            <Select
+                                getPopupContainer={(triggerNode) => triggerNode.parentElement}
+                                variant={"borderless"}
+                                style={{
+                                    minWidth: 156,
+                                    paddingLeft: 0,
+                                    display: "flex",
+                                }}
+                                size={"large"}
+                                status={formValidState.typeError ? "error" : ""}
+                                value={state.article.typeId}
+                                showSearch={true}
+                                optionFilterProp="children"
+                                filterOption={(input, option) => (option?.label ?? "").includes(input)}
+                                filterSort={(optionA, optionB) =>
+                                    (optionA?.label ?? "")
+                                        .toLowerCase()
+                                        .localeCompare((optionB?.label ?? "").toLowerCase())
+                                }
+                                onChange={async (value) => {
+                                    await handleValuesChange({ typeId: value });
+                                }}
+                                options={state.typeOptions}
+                                placeholder={getRes()["pleaseChoose"] + getRes()["admin.type.manage"]}
+                            />
+                            <BaseInput
+                                value={state.article.alias}
+                                onChange={async (e) => {
+                                    await handleValuesChange({ alias: e });
+                                }}
+                                maxLength={256}
+                                size={"large"}
+                                variant={"borderless"}
+                                placeholder={getRes().inputArticleAlias}
+                                style={{ fontSize: 16, paddingLeft: 0 }}
+                            />
+                        </Space.Compact>
+                    </Col>
+                    <Col
+                        md={6}
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "flex-end",
+                            position: "absolute",
+                            right: 0,
+                            top: 0,
                         }}
-                        addonBefore={getArticleRoute() + "/"}
-                        placeholder={getRes().inputArticleAlias}
-                    />
-                </Col>
-            </Row>
-            <Row gutter={[state.fullScreen ? 0 : 8, state.fullScreen ? 0 : 8]}>
-                <Col
-                    md={state.fullScreen ? 24 : 18}
-                    sm={24}
-                    xs={24}
-                    style={{ zIndex: 10, minHeight: state.fullScreen ? 0 : 1 }}
-                >
-                    <MyEditorMdWrapper
-                        key={data.article.logId + "_" + state.editorVersion + "_offline:" + state.offline}
-                        onfullscreen={onfullscreen}
-                        onfullscreenExit={onfullscreenExit}
-                        markdown={state.article.markdown}
-                        onChange={async (v) => {
-                            if (
-                                v.markdown === "" &&
-                                (state.article.markdown === "" ||
-                                    state.article.markdown === undefined ||
-                                    state.article.markdown === null)
-                            ) {
-                                return;
-                            }
-                            //不检查 content，避免因为 markdown 渲染库升级，载入文章时自动更新为草稿
-                            if (v.markdown === state.article.markdown) {
-                                return;
-                            }
-                            setContent(v);
-                        }}
-                    />
-                </Col>
-                <Col
-                    md={state.fullScreen ? 0 : 6}
-                    sm={state.fullScreen ? 0 : 24}
-                    xs={state.fullScreen ? 0 : 24}
-                    style={{ cursor: isSaving() ? "none" : "inherit" }}
-                >
-                    <Row gutter={[8, 8]}>
-                        <Col span={24}>
-                            <Card size="small" style={{ textAlign: "center" }}>
-                                <ThumbnailUpload
-                                    thumbnail={state.article.thumbnail}
-                                    onChange={async (e) => {
-                                        await handleValuesChange({ thumbnail: e });
-                                    }}
-                                />
-                            </Card>
-                        </Col>
-                        <Col span={24}>
-                            <Card size="small" title={getRes()["admin.setting"]}>
-                                <Row>
-                                    <Col xs={24} md={12}>
-                                        <Form.Item
-                                            style={{ marginBottom: 0 }}
-                                            valuePropName="checked"
-                                            label={getRes()["commentAble"]}
-                                        >
-                                            <Switch
-                                                value={state.article.canComment}
-                                                size="small"
-                                                onChange={async (checked) => {
-                                                    await handleValuesChange({ canComment: checked });
-                                                }}
-                                            />
-                                        </Form.Item>
-                                    </Col>
-                                    <Col xs={24} md={12}>
-                                        <Form.Item
-                                            style={{ marginBottom: 0 }}
-                                            valuePropName="checked"
-                                            label={getRes()["private"]}
-                                        >
-                                            <Switch
-                                                value={state.article.privacy}
-                                                size="small"
-                                                onChange={async (checked) => {
-                                                    await handleValuesChange({ privacy: checked });
-                                                }}
-                                            />
-                                        </Form.Item>
-                                    </Col>
-                                </Row>
-                            </Card>
-                        </Col>
-                        <Col span={24}>
-                            <Card size="small" title={getRes().tag}>
-                                <ArticleEditTag
-                                    onKeywordsChange={async (text: string) => {
-                                        await handleValuesChange({ keywords: text });
-                                    }}
-                                    keywords={state.article!.keywords ? state.article.keywords : ""}
-                                    allTags={state.tags.map((x) => x.text)}
-                                />
-                            </Card>
-                        </Col>
-                        <Col span={24}>
-                            <Card size="small" title={getRes().digest}>
-                                <BaseTextArea
-                                    value={state.article.digest}
-                                    placeholder={getRes().digestTips}
-                                    rows={3}
-                                    onChange={async (text: string) => {
-                                        await handleValuesChange({ digest: text });
-                                    }}
-                                />
-                            </Card>
-                        </Col>
-                    </Row>
-                </Col>
-            </Row>
+                    >
+                        {state.fullScreen && getActionBar()}
+                        <div
+                            style={{
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center",
+                                width: 48,
+                                minWidth: 48,
+                                height: 48,
+                                fontSize: 24,
+                                cursor: "pointer",
+                                color: "rgb(102, 102, 102)",
+                            }}
+                            onClick={() => toggleFullScreen()}
+                        >
+                            {state.fullScreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
+                        </div>
+                    </Col>
+                </Row>
+                <Row gutter={[state.fullScreen ? 0 : 8, state.fullScreen ? 0 : 8]}>
+                    <Col
+                        md={state.fullScreen ? 24 : 18}
+                        sm={24}
+                        xs={24}
+                        style={{ minHeight: state.fullScreen ? 0 : 1 }}
+                    >
+                        <MyEditorMdWrapper
+                            key={data.article.logId + "_" + state.editorVersion + "_offline:" + state.offline}
+                            markdown={state.article.markdown}
+                            onChange={async (v) => {
+                                if (
+                                    v.markdown === "" &&
+                                    (state.article.markdown === "" ||
+                                        state.article.markdown === undefined ||
+                                        state.article.markdown === null)
+                                ) {
+                                    return;
+                                }
+                                //不检查 content，避免因为 markdown 渲染库升级，载入文章时自动更新为草稿
+                                if (v.markdown === state.article.markdown) {
+                                    return;
+                                }
+                                setContent(v);
+                            }}
+                        />
+                    </Col>
+                    <Col
+                        md={state.fullScreen ? 0 : 6}
+                        sm={state.fullScreen ? 0 : 24}
+                        xs={state.fullScreen ? 0 : 24}
+                        style={{ cursor: isSaving() ? "none" : "inherit" }}
+                    >
+                        <Row gutter={[8, 8]}>
+                            <Col span={24}>
+                                <Card size="small" style={{ textAlign: "center" }}>
+                                    <ThumbnailUpload
+                                        thumbnail={state.article.thumbnail}
+                                        onChange={async (e) => {
+                                            await handleValuesChange({ thumbnail: e });
+                                        }}
+                                    />
+                                </Card>
+                            </Col>
+                            <Col span={24}>
+                                <Card size="small" title={getRes()["admin.setting"]}>
+                                    <Row>
+                                        <Col xs={24} md={12}>
+                                            <Form.Item
+                                                style={{ marginBottom: 0 }}
+                                                valuePropName="checked"
+                                                label={getRes()["commentAble"]}
+                                            >
+                                                <Switch
+                                                    value={state.article.canComment}
+                                                    size="small"
+                                                    onChange={async (checked) => {
+                                                        await handleValuesChange({ canComment: checked });
+                                                    }}
+                                                />
+                                            </Form.Item>
+                                        </Col>
+                                        <Col xs={24} md={12}>
+                                            <Form.Item
+                                                style={{ marginBottom: 0 }}
+                                                valuePropName="checked"
+                                                label={getRes()["private"]}
+                                            >
+                                                <Switch
+                                                    value={state.article.privacy}
+                                                    size="small"
+                                                    onChange={async (checked) => {
+                                                        await handleValuesChange({ privacy: checked });
+                                                    }}
+                                                />
+                                            </Form.Item>
+                                        </Col>
+                                    </Row>
+                                </Card>
+                            </Col>
+                            <Col span={24}>
+                                <Card size="small" title={getRes().tag}>
+                                    <ArticleEditTag
+                                        onKeywordsChange={async (text: string) => {
+                                            await handleValuesChange({ keywords: text });
+                                        }}
+                                        keywords={state.article!.keywords ? state.article.keywords : ""}
+                                        allTags={state.tags.map((x) => x.text)}
+                                    />
+                                </Card>
+                            </Col>
+                            <Col span={24}>
+                                <Card size="small" title={getRes().digest}>
+                                    <BaseTextArea
+                                        variant={"borderless"}
+                                        value={state.article.digest}
+                                        placeholder={getRes().digestTips}
+                                        rows={3}
+                                        onChange={async (text: string) => {
+                                            await handleValuesChange({ digest: text });
+                                        }}
+                                        style={{ padding: 0 }}
+                                    />
+                                </Card>
+                            </Col>
+                        </Row>
+                    </Col>
+                </Row>
+            </Card>
         </StyledArticleEdit>
     );
 };

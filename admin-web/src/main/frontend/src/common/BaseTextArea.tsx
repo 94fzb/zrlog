@@ -1,6 +1,7 @@
 import Form from "antd/es/form";
-import React, { FunctionComponent, useEffect, useState } from "react";
+import React, { CSSProperties, FunctionComponent, useEffect, useState } from "react";
 import TextArea from "antd/es/input/TextArea";
+import { Variant } from "antd/es/config-provider/context";
 
 type BaseTextAreaProps = {
     placeholder?: string;
@@ -8,8 +9,18 @@ type BaseTextAreaProps = {
     onChange: (value: string) => Promise<void>;
     required?: boolean;
     rows?: number;
+    variant?: Variant;
+    style?: CSSProperties;
 };
-const BaseTextArea: FunctionComponent<BaseTextAreaProps> = ({ value, rows, onChange, required, placeholder }) => {
+const BaseTextArea: FunctionComponent<BaseTextAreaProps> = ({
+    style,
+    value,
+    variant,
+    rows,
+    onChange,
+    required,
+    placeholder,
+}) => {
     const [isComposing, setIsComposing] = useState<boolean>(false);
     const [inputValue, setInputValue] = useState<string>(value || "");
     // 更新 inputValue 以匹配外部传入的 value，处理受控组件的需求
@@ -29,6 +40,8 @@ const BaseTextArea: FunctionComponent<BaseTextAreaProps> = ({ value, rows, onCha
     return (
         <Form.Item style={{ marginBottom: 8, width: "100%" }} rules={[{ required: required, message: "" }]}>
             <TextArea
+                style={{ ...style }}
+                variant={variant}
                 value={inputValue}
                 onChange={handleInputChange}
                 onCompositionStart={() => setIsComposing(true)}

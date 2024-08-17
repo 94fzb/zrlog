@@ -49,16 +49,16 @@ const BasicForm = ({ data, offline }: { data: Basic; offline: boolean }) => {
                 onFinish={(k) => websiteFormFinish(k)}
             >
                 <Form.Item name="title" label="网站标题" rules={[{ required: true }]}>
-                    <Input placeholder="请输入网站标题" />
+                    <Input placeholder="请输入网站标题" showCount={true} maxLength={30} />
                 </Form.Item>
                 <Form.Item name="second_title" label="网站副标题">
-                    <Input placeholder="请输入网站副标题" />
+                    <Input placeholder="请输入网站副标题" showCount={true} maxLength={30} />
                 </Form.Item>
                 <Form.Item name="keywords" label="网站关键词">
-                    <Input placeholder="请输入网站关键词" />
+                    <Input showCount={true} placeholder="请输入网站关键词" maxLength={40} />
                 </Form.Item>
                 <Form.Item name="description" label="网站描述">
-                    <TextArea rows={5} />
+                    <TextArea showCount={true} rows={5} maxLength={160} />
                 </Form.Item>
                 <Form.Item name="favicon_ico_base64" label={`${getRes()["favicon"]}`}>
                     <FaviconUpload

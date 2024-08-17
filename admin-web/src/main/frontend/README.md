@@ -12,3 +12,9 @@ check `yarn.lock`
 ```shell
 less yarn.lock |grep "https://" | cut -d '/' -f 3|sort|uniq
 ```
+
+#### fetch too slow
+
+```
+yarn install --registry=https://registry.npmmirror.com
+```
