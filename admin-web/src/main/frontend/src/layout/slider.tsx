@@ -242,6 +242,13 @@ const SliderMenu = () => {
         setSelectMenu(getSelectMenu());
     }, [location]);
 
-    return <Menu selectedKeys={[selectMenu]} items={items} theme={EnvUtils.isDarkMode() ? "light" : "dark"} />;
+    return (
+        <Menu
+            selectedKeys={[selectMenu]}
+            items={items}
+            theme={EnvUtils.isDarkMode() ? "light" : "dark"}
+            style={{ height: "100vh", backgroundColor: EnvUtils.isDarkMode() ? "#1f1f1f" : "#001529" }}
+        />
+    );
 };
 export default SliderMenu;

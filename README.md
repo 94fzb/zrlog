@@ -11,11 +11,25 @@ ZrLog是使用 Java 开发的博客/CMS程序，具有简约，易用，组件�
 
 ### 一图胜千言
 
-![](https://www.zrlog.com/assets/screenprint/post-detail.png)
+#### 文章详情页
 
-![](https://www.zrlog.com/assets/screenprint/article-edit-light.png)
+![](https://www.zrlog.com/assets/screenprint/post-detail.png?v=2)
 
-![](https://www.zrlog.com/assets/screenprint/article-edit-dark.png)
+#### 文章编辑页
+
+![](https://www.zrlog.com/assets/screenprint/article-edit-light.png?v=2)
+
+#### 文章编辑页【暗黑模式】
+
+![](https://www.zrlog.com/assets/screenprint/article-edit-dark.png?v=2)
+
+#### 文章编辑页【PWA全屏】
+
+![](https://www.zrlog.com/assets/screenprint/article-edit-light-pwa-full-screen.png?v=2)
+
+#### 文章编辑页【PWA全屏-打开设置抽屉】
+
+![](https://www.zrlog.com/assets/screenprint/article-edit-light-pwa-full-screen-setting.png?v=2)
 
 ### 特性
 
@@ -71,7 +85,7 @@ ZrLog是使用 Java 开发的博客/CMS程序，具有简约，易用，组件�
 
 [解决办法](https://blog.zrlog.com/faq-collect.html#%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7%E6%89%93%E5%BC%80%E5%90%8E%E6%B2%A1%E6%9C%89%20web/src/main/webapp%20%E9%87%8C%E9%9D%A2%E6%B2%A1%E6%9C%89%20admin%20%E7%9B%AE%E5%BD%95%EF%BC%8C%E6%88%96%E8%AE%BF%E9%97%AE%20admin%20%E6%8F%90%E7%A4%BA%E9%A1%B5%E9%9D%A2%E6%B2%A1%E6%9C%89%E6%89%BE%E5%88%B0)
 
-### docker模式下，输入正确的数据库信息，仍无法完成安装
+#### docker模式下，输入正确的数据库信息，仍无法完成安装
 
 - https://blog.zrlog.com/faq-collect.html
 

@@ -7,11 +7,11 @@ import Form from "antd/es/form";
 import Switch from "antd/es/switch";
 import ArticleEditTag from "./article-edit-tag";
 import BaseTextArea from "../../common/BaseTextArea";
-import { Drawer } from "antd";
+import { Drawer, InputRef } from "antd";
 import EnvUtils from "../../utils/env-utils";
 import { SettingFilled, SettingOutlined } from "@ant-design/icons";
 import { RefObject, useState } from "react";
-import { ArticleChangeableValue, ArticleEntry } from "./index";
+import { ArticleChangeableValue, ArticleEntry } from "./index.types";
 import Button from "antd/es/button";
 
 const ArticleEditSettingButton = ({
@@ -19,13 +19,15 @@ const ArticleEditSettingButton = ({
     saving,
     tags,
     containerRef,
+    digestRef,
     handleValuesChange,
 }: {
     article: ArticleEntry;
     saving: () => boolean;
     tags: any;
     containerRef: RefObject<HTMLDivElement>;
-    handleValuesChange: (cv: ArticleChangeableValue) => Promise<void>;
+    digestRef: RefObject<InputRef>;
+    handleValuesChange: (cv: ArticleChangeableValue) => void;
 }) => {
     const [settingsOpen, setSettingsOpen] = useState(false);
 
@@ -75,10 +77,10 @@ const ArticleEditSettingButton = ({
                     header: {
                         padding: 12,
                     },
-                }}
-                bodyStyle={{
-                    padding: 12,
-                    overflowX: "hidden",
+                    body: {
+                        padding: 12,
+                        overflowX: "hidden",
+                    },
                 }}
                 open={settingsOpen}
                 //@ts-ignore
@@ -100,8 +102,8 @@ const ArticleEditSettingButton = ({
                             >
                                 <ThumbnailUpload
                                     thumbnail={article.thumbnail}
-                                    onChange={async (e) => {
-                                        await handleValuesChange({ thumbnail: e });
+                                    onChange={(e) => {
+                                        handleValuesChange({ thumbnail: e });
                                     }}
                                 />
                             </Card>
@@ -118,8 +120,8 @@ const ArticleEditSettingButton = ({
                                             <Switch
                                                 value={article.canComment}
                                                 size="small"
-                                                onChange={async (checked) => {
-                                                    await handleValuesChange({ canComment: checked });
+                                                onChange={(checked) => {
+                                                    handleValuesChange({ canComment: checked });
                                                 }}
                                             />
                                         </Form.Item>
@@ -133,8 +135,8 @@ const ArticleEditSettingButton = ({
                                             <Switch
                                                 value={article.privacy}
                                                 size="small"
-                                                onChange={async (checked) => {
-                                                    await handleValuesChange({ privacy: checked });
+                                                onChange={(checked) => {
+                                                    handleValuesChange({ privacy: checked });
                                                 }}
                                             />
                                         </Form.Item>
@@ -145,8 +147,8 @@ const ArticleEditSettingButton = ({
                         <Col span={24}>
                             <Card size="small" title={getRes().tag}>
                                 <ArticleEditTag
-                                    onKeywordsChange={async (text: string) => {
-                                        await handleValuesChange({ keywords: text });
+                                    onKeywordsChange={(text: string) => {
+                                        handleValuesChange({ keywords: text });
                                     }}
                                     keywords={article!.keywords ? article.keywords : ""}
                                     allTags={tags.map((x: { text: any }) => x.text)}
@@ -156,12 +158,13 @@ const ArticleEditSettingButton = ({
                         <Col span={24}>
                             <Card size="small" title={getRes().digest} style={{ marginBottom: 36 }}>
                                 <BaseTextArea
+                                    ref={digestRef}
                                     variant={"borderless"}
-                                    value={article.digest}
+                                    defaultValue={article.digest}
                                     placeholder={getRes().digestTips}
                                     rows={6}
-                                    onChange={async (text: string) => {
-                                        await handleValuesChange({ digest: text });
+                                    onChange={(text: string) => {
+                                        handleValuesChange({ digest: text });
                                     }}
                                     style={{ padding: 0 }}
                                 />

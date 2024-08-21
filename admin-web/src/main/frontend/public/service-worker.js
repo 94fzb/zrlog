@@ -52,9 +52,11 @@ self.addEventListener('install', event => {
 
 self.addEventListener('fetch', event => {
     const request = event.request;
-    if (request.protocol === 'chrome-extension:') {
+    // 跳过不支持的协议
+    if (!request.url.startsWith('http')) {
         return;
     }
+
     event.respondWith(
         fetch(request)
             .then(response => {

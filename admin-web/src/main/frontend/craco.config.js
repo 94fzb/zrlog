@@ -5,7 +5,7 @@ module.exports = {
                 chunks: 'all',
                 cacheGroups: {
                     vendor: {
-                        test: /[\\/]node_modules[\\/](react|react-dom|antd|axios|react-router|react-router-dom|styled-components|@ant-design\/cssinjs)[\\/]/,
+                        test: /[\\/]node_modules[\\/](react|react-dom|antd|md5|aes-js|axios|react-router|react-router-dom|styled-components|@ant-design\/cssinjs)[\\/]/,
                         name: 'vendor',
                         chunks: 'all',
                     },

@@ -11,3 +11,12 @@
 - Remove fullscreen listen (use screenfull.js)
 - Add copy html preview
 - Add video upload
+
+#### 1.5.2
+
+- revoke unwatch
+
+#### 1.5.3
+
+- add eye icon
+- remove watch border light

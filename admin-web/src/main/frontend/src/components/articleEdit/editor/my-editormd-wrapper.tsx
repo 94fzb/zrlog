@@ -19,6 +19,8 @@ import {
     faBold,
     faClipboard,
     faClose,
+    faEye,
+    faEyeSlash,
     faFileCode,
     faFileVideo,
     faImage,
@@ -38,6 +40,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { StyledEditormd } from "./styled-editormd";
 import axios from "axios";
+import { ChangedContent } from "../index.types";
 // Add the icons to the library so you can use it in your page
 const icons = [
     faBold,
@@ -67,6 +70,8 @@ const icons = [
     faPhotoFilm,
     faLink,
     faClose,
+    faEyeSlash,
+    faEye,
 ];
 icons.forEach((e) => {
     library.add(e);
@@ -79,11 +84,6 @@ type MyEditorMdWrapperState = {
     editorLoading: boolean;
     mdEditorScriptLoaded: boolean;
     id: string;
-};
-
-export type ChangedContent = {
-    content?: string;
-    markdown?: string;
 };
 
 export type ScriptLoaderProps = {
@@ -100,6 +100,8 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({ height, markdow
         editorLoading: true,
         id: "editor-" + new Date().getTime(),
     });
+
+    const [content, setContent] = useState<ChangedContent>({ content: "", markdown: markdown });
 
     const [messageApi, contextHolder] = message.useMessage();
 
@@ -120,7 +122,7 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({ height, markdow
         }
     }
 
-    const initEditor = (md: string) => {
+    const initEditor = () => {
         // eslint-disable-next-line no-undef,no-unused-vars
         //@ts-ignore
         editor = editormd(state.id, $, {
@@ -136,7 +138,7 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({ height, markdow
             dialogMaskOpacity: 0,
             dialogMaskBgColor: "#000",
             imageUpload: true,
-            watch: true,
+            watch: window.innerWidth > 600,
             toolbarIcons: function () {
                 return [
                     "bold",
@@ -163,6 +165,7 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({ height, markdow
                     "code-block",
                     "table",
                     "copyPreviewHtml",
+                    "watch",
                     "|",
                     "help",
                 ];
@@ -170,7 +173,7 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({ height, markdow
             imageUploadURL: document.baseURI + "api/admin/upload",
             path: document.baseURI + "admin/vendors/markdown/lib/",
             placeholder: getRes()["editorPlaceholder"],
-            markdown: md,
+            markdown: content.markdown,
             onload: function () {
                 setTimeout(() => {
                     $("#fileDialog").on("click", function () {
@@ -231,11 +234,10 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({ height, markdow
             },
 
             onchange: async function () {
-                const changed = {
+                setContent({
                     markdown: editor.getMarkdown(),
                     content: editor.getPreviewedHTML(),
-                };
-                await onChange(changed);
+                });
             },
 
             onfullscreen: function () {
@@ -248,9 +250,13 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({ height, markdow
     };
 
     useEffect(() => {
+        onChange(content);
+    }, [content]);
+
+    useEffect(() => {
         //@ts-ignore
         window.createEditorMDInstance();
-        initEditor(markdown ? markdown : "");
+        initEditor();
         return () => {
             $(document.getElementById(state.id) as HTMLDivElement).off();
             $(document.body as HTMLBodyElement).off();
@@ -273,7 +279,7 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({ height, markdow
 
 type MyEditorMdWrapperProps = {
     height: any;
-    onChange: (content: ChangedContent) => Promise<void>;
+    onChange: (content: ChangedContent) => void;
     markdown?: string;
     loadSuccess?: (editor: any) => void;
 };
@@ -282,7 +288,7 @@ const MyEditorMdWrapper: FunctionComponent<MyEditorMdWrapperProps> = ({ height, 
     const [mdEditorScriptLoaded, setMdEditorScriptLoaded] = useState<boolean>(false);
 
     const EditMdAsyncScriptLoader = makeAsyncScriptLoader(
-        document.baseURI + "admin/vendors/markdown/js/editormd-1.5.1.js"
+        document.baseURI + "admin/vendors/markdown/js/editormd-1.5.5.js"
     )(MyLoadingComponent) as unknown as FunctionComponent<ScriptLoaderProps>;
     if (mdEditorScriptLoaded) {
         return <MyEditorMd height={height} markdown={markdown} loadSuccess={loadSuccess} onChange={onChange} />;

@@ -48,13 +48,18 @@ public class AdminArticleController extends Controller {
         return new ApiStandardResponse<>(new DeleteLogResponse(true));
     }
 
+    private String getResponseMsg(CreateOrUpdateArticleResponse response) {
+        return I18nUtil.getBackendStringFromRes(Objects.equals(response.getRubbish(), true)
+                || Objects.equals(response.getPrivacy(), true) ? "saveSuccess" : "releaseSuccess");
+    }
+
     @RefreshCache(async = true)
     @ResponseBody
     public ApiStandardResponse<CreateOrUpdateArticleResponse> create() {
         CreateOrUpdateArticleResponse create = articleService.create(AdminTokenThreadLocal.getUser(), BeanUtil.convertWithValid(getRequest().getInputStream(),
                 CreateArticleRequest.class));
         create.setPreviewUrl(getPreviewUrl(create));
-        return new ApiStandardResponse<>(create);
+        return new ApiStandardResponse<>(create, getResponseMsg(create));
     }
 
     @RefreshCache(async = true)
@@ -63,7 +68,7 @@ public class AdminArticleController extends Controller {
         CreateOrUpdateArticleResponse update = articleService.update(AdminTokenThreadLocal.getUser(), BeanUtil.convertWithValid(getRequest().getInputStream(),
                 UpdateArticleRequest.class));
         update.setPreviewUrl(getPreviewUrl(update));
-        return new ApiStandardResponse<>(update);
+        return new ApiStandardResponse<>(update, getResponseMsg(update));
     }
 
     @ResponseBody
