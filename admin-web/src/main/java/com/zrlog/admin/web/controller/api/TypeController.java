@@ -9,8 +9,8 @@ import com.zrlog.admin.business.rest.request.UpdateTypeRequest;
 import com.zrlog.admin.business.rest.response.ArticleTypeResponseEntry;
 import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
 import com.zrlog.admin.business.service.ArticleTypeService;
-import com.zrlog.blog.web.util.ControllerUtil;
 import com.zrlog.admin.web.annotation.RefreshCache;
+import com.zrlog.blog.web.util.ControllerUtil;
 import com.zrlog.common.Constants;
 import com.zrlog.common.rest.response.ApiStandardResponse;
 import com.zrlog.data.dto.PageData;
@@ -43,9 +43,10 @@ public class TypeController extends Controller {
     @ResponseBody
     public UpdateRecordResponse add() throws IOException, SQLException {
         CreateTypeRequest typeRequest = BeanUtil.convertWithValid(getRequest().getInputStream(), CreateTypeRequest.class);
-        return new UpdateRecordResponse(new Type().set("typeName", typeRequest.getTypeName()).set("alias",
-                typeRequest.getAlias()).set("remark", Objects.requireNonNullElse(typeRequest.getRemark(), "")).save());
+        return new UpdateRecordResponse(new Type().set("typeName", typeRequest.getTypeName())
+                .set("alias", typeRequest.getAlias()).set("remark", Objects.requireNonNullElse(typeRequest.getRemark(), "")).save());
     }
+
 
     @RefreshCache(async = true)
     @ResponseBody

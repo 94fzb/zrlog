@@ -124,11 +124,16 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
     }
 
     @Override
+    public File getCacheHtmlFolder() {
+        return new File(CACHE_HTML_PATH + "/zh_CN/");
+    }
+
+    @Override
     public void saveToCacheFolder(InputStream inputStream, String uri) {
         if (!Constants.isStaticHtmlStatus()) {
             return;
         }
-        File file = new File(CACHE_HTML_PATH + "/zh_CN/" + uri);
+        File file = new File(getCacheHtmlFolder() + "/" + uri);
         if (!file.exists()) {
             file.getParentFile().mkdirs();
         }
@@ -160,36 +165,24 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
         return cacheMap;
     }
 
+    private long getUpdateVersion(boolean cleanAble) {
+        if (Objects.isNull(cacheInit) || cleanAble) {
+            return version.incrementAndGet();
+        }
+        return version.get();
+    }
+
     @Override
-    public CompletableFuture<Void> refreshInitDataCacheAsync(HttpRequest servletRequest, boolean cleanAble) {
-        long expectVersion = version.incrementAndGet();
-        return CompletableFuture.runAsync(() -> {
-            refreshInitDataCache(servletRequest, cleanAble, expectVersion);
+    public CompletableFuture<BaseDataInitVO> refreshInitDataCacheAsync(HttpRequest servletRequest, boolean cleanAble) {
+        long expectVersion = getUpdateVersion(cleanAble);
+        return CompletableFuture.supplyAsync(() -> {
+            BaseDataInitVO cache = refreshInitDataCache(cleanAble, expectVersion);
+            setToRequest(servletRequest, cache);
+            return cache;
         });
     }
 
-    private void refreshInitDataCache(HttpRequest servletRequest, boolean cleanAble, long expectVersion) {
-        if (cleanAble || cacheInit == null) {
-            lock.lock();
-            if (!Objects.equals(version.get(), expectVersion)) {
-                return;
-            }
-            long start = System.currentTimeMillis();
-            try {
-                cacheInit = getCacheInit();
-                //缓存静态资源map
-                Map<String, String> tempMap = getCacheFileMap();
-                cacheFileMap.clear();
-                //重新填充Map
-                cacheFileMap.putAll(tempMap);
-                //清除模版的缓存数据
-                WebSite.clearTemplateConfigMap();
-                PluginUtils.refreshPluginCacheData();
-            } finally {
-                lock.unlock();
-                LOGGER.info("RefreshInitDataCache used time " + (System.currentTimeMillis() - start) + "ms");
-            }
-        }
+    private static void setToRequest(HttpRequest servletRequest, BaseDataInitVO cacheInit) {
         if (Objects.isNull(servletRequest)) {
             return;
         }
@@ -199,6 +192,34 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
         servletRequest.getAttr().put("webSite", cacheInit.getWebSite());
         servletRequest.getAttr().put("webs", cacheInit.getWebSite());
         servletRequest.getAttr().put("WEB_SITE", cacheInit.getWebSite());
+    }
+
+    private BaseDataInitVO refreshInitDataCache(boolean cleanAble, long expectVersion) {
+        if (cleanAble || cacheInit == null) {
+            lock.lock();
+            if (!Objects.equals(version.get(), expectVersion)) {
+                /*//LOGGER.info("Version skip " + version.get() + " -> " + expectVersion);
+                return;*/
+                return cacheInit;
+            } else {
+                long start = System.currentTimeMillis();
+                try {
+                    cacheInit = getCacheInit();
+                    //缓存静态资源map
+                    Map<String, String> tempMap = getCacheFileMap();
+                    cacheFileMap.clear();
+                    //重新填充Map
+                    cacheFileMap.putAll(tempMap);
+                    //清除模版的缓存数据
+                    WebSite.clearTemplateConfigMap();
+                    PluginUtils.refreshPluginCacheData();
+                } finally {
+                    lock.unlock();
+                    LOGGER.info("RefreshInitDataCache used time " + (System.currentTimeMillis() - start) + "ms");
+                }
+            }
+        }
+        return cacheInit;
     }
 
 

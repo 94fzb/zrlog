@@ -16,6 +16,7 @@ type BaseTableProps = {
     searchKey?: string;
     hideId?: boolean;
     offline: boolean;
+    defaultPageSize: number;
     addBtnRender?: (addSuccessCall: () => void) => any;
     editBtnRender?: (id: number, record: any, editSuccessCall: () => void) => any;
 };
@@ -25,6 +26,7 @@ export type PageDataSource = {
     page: number;
     key?: string;
     size: number;
+    defaultPageSize: number;
     totalElements: number;
 };
 
@@ -48,6 +50,7 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
     addBtnRender,
     columns,
     datasource,
+    defaultPageSize,
     searchKey,
     deleteSuccessCallback,
     hideId,
@@ -65,8 +68,8 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
         if (page > 1) {
             queryParam.page = page;
         }
-        //默认10， 1000000，为不分页时候返回的值
-        if (size != 10 && size != 1000000) {
+        //默认分页的， 1000000，为不分页时候返回的值
+        if (size != defaultPageSize && size != 1000000) {
             queryParam.size = size;
         }
         if (searchKey && searchKey.trim().length > 0) {
@@ -94,7 +97,7 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
         pagination: {
             page: datasource?.page ? datasource.page : 1,
             key: datasource?.key,
-            size: datasource?.size ? datasource?.size : 10,
+            size: datasource?.size ? datasource?.size : defaultPageSize,
         },
         query: datasource?.key,
         tableLoaded: true,
@@ -110,14 +113,18 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
     });
 
     const [messageApi, contextHolder] = message.useMessage();
-    const handleDelete = async (pagination: MyPagination, deleteApiUri: string, key: string) => {
+    const handleDelete = async (pagination: MyPagination, deleteApiUri: string, key: string): Promise<boolean> => {
         const response = await axios.post(deleteApiUri + "?id=" + key);
         if (response.data.error) {
             messageApi.error(response.data.message);
-            return;
+            return false;
         }
-        messageApi.success(getRes()["deleteSuccess"]);
-        fetchDataWithReload(pagination.page, pagination.size, tableDataState.query);
+        if (response.data.error === 0) {
+            messageApi.success(getRes()["deleteSuccess"]);
+            fetchDataWithReload(pagination.page, pagination.size, tableDataState.query);
+            return true;
+        }
+        return false;
     };
 
     useEffect(() => {
@@ -179,13 +186,14 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
                             <Popconfirm
                                 disabled={offline}
                                 title={getRes()["deleteTips"]}
-                                onConfirm={() =>
-                                    handleDelete(tableDataState.pagination, deleteApi, record.id).then(() => {
+                                onConfirm={async () => {
+                                    const success = await handleDelete(tableDataState.pagination, deleteApi, record.id);
+                                    if (success) {
                                         if (deleteSuccessCallback) {
                                             deleteSuccessCallback(record.id);
                                         }
-                                    })
-                                }
+                                    }
+                                }}
                             >
                                 <DeleteOutlined style={{ color: "red" }} />
                             </Popconfirm>

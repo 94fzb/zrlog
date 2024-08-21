@@ -1,6 +1,7 @@
 package com.zrlog.business.plugin;
 
 import com.hibegin.common.BaseLockObject;
+import com.hibegin.common.util.FileUtils;
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.HttpMethod;
@@ -96,6 +97,10 @@ public class StaticSitePlugin extends BaseLockObject implements IPlugin {
         if (StringUtils.isEmpty(ZrLogUtil.getBlogHostByWebSite())) {
             return;
         }
+        File cacheFolder = Constants.zrLogConfig.getCacheService().getCacheHtmlFolder();
+        if (cacheFolder.exists()) {
+            FileUtils.deleteFile(cacheFolder.toString());
+        }
         copyCommonAssert();
         copyDefaultTemplateAssets();
         handleStatusPageMap.clear();
@@ -129,6 +134,7 @@ public class StaticSitePlugin extends BaseLockObject implements IPlugin {
         copyResourceToCacheFolder("/assets/css/font/vjs.ttf");
         copyResourceToCacheFolder("/assets/css/font/vjs.woff");
         copyResourceToCacheFolder("/assets/css/video-js.css");
+        copyResourceToCacheFolder("/assets/css/katex.min.css");
         copyResourceToCacheFolder("/assets/js/video.js");
         //default avatar url
         copyResourceToCacheFolder("/assets/images/default-portrait.gif");

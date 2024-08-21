@@ -1,6 +1,8 @@
 import { Input } from "antd";
 import React, { FunctionComponent, ReactElement, useEffect, useState } from "react";
 import { InputStatus } from "antd/es/_util/statusUtils";
+import { Variant } from "antd/es/config-provider/context";
+import { SizeType } from "antd/es/config-provider/SizeContext";
 
 type BaseInputProps = {
     addonBefore?: ReactElement | string;
@@ -11,6 +13,10 @@ type BaseInputProps = {
     onChange: (value: string) => Promise<void>;
     required?: boolean;
     hidden?: boolean;
+    maxLength?: number;
+    variant?: Variant;
+    size?: SizeType;
+    style?: React.CSSProperties;
 };
 const BaseInput: FunctionComponent<BaseInputProps> = ({
     hidden,
@@ -19,6 +25,10 @@ const BaseInput: FunctionComponent<BaseInputProps> = ({
     addonBefore,
     status,
     placeholder,
+    style,
+    variant,
+    size,
+    maxLength,
 }) => {
     const [inputValue, setInputValue] = useState<string>(value || "");
     const [isComposing, setIsComposing] = useState<boolean>(false);
@@ -40,11 +50,15 @@ const BaseInput: FunctionComponent<BaseInputProps> = ({
     return (
         <Input
             style={{
+                ...style,
                 display: hidden ? "none" : "flex",
             }}
+            variant={variant}
             status={status}
+            maxLength={maxLength}
             addonBefore={addonBefore}
             value={inputValue}
+            size={size}
             onChange={handleInputChange}
             onCompositionStart={() => setIsComposing(true)}
             onCompositionUpdate={() => setIsComposing(true)}

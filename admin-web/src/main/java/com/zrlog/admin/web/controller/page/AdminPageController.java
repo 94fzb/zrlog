@@ -3,7 +3,7 @@ package com.zrlog.admin.web.controller.page;
 import com.google.gson.Gson;
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.http.server.web.Controller;
-import com.zrlog.admin.business.rest.response.AdminApiPageDataStrandardResponse;
+import com.zrlog.admin.business.rest.response.AdminApiPageDataStandardResponse;
 import com.zrlog.admin.business.rest.response.ServerSideDataResponse;
 import com.zrlog.admin.business.rest.response.UserBasicInfoResponse;
 import com.zrlog.admin.web.controller.api.AdminUserController;
@@ -82,7 +82,7 @@ public class AdminPageController extends Controller {
                 Controller controller = Controller.buildController(method, request, response);
                 ApiStandardResponse<Object> result = (ApiStandardResponse<Object>) method.invoke(controller);
                 if (Objects.nonNull(result)) {
-                    if (result instanceof AdminApiPageDataStrandardResponse<?> data) {
+                    if (result instanceof AdminApiPageDataStandardResponse<?> data) {
                         return new ServerSideDataResponse(basicInfoResponse, resourceInfo, result.getData(), AdminTokenThreadLocal.getUser().getSessionId(), data.getDocumentTitle());
                     }
                     return new ServerSideDataResponse(basicInfoResponse, resourceInfo, result.getData(), AdminTokenThreadLocal.getUser().getSessionId(), Constants.getAdminTitle(""));

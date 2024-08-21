@@ -1,8 +1,12 @@
 package com.zrlog.admin.business.rest.request;
 
+import com.hibegin.common.util.StringUtils;
 import com.zrlog.admin.business.exception.ArgsException;
 import com.zrlog.common.Validator;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
 
+import java.net.URI;
 import java.util.Objects;
 
 public class CreateLinkRequest implements Validator {
@@ -51,6 +55,19 @@ public class CreateLinkRequest implements Validator {
         }
         if (Objects.isNull(linkName) || linkName.trim().isEmpty()) {
             throw new ArgsException("linkName");
+        }
+    }
+
+    @Override
+    public void doClean() {
+        if (StringUtils.isNotEmpty(this.getAlt())) {
+            this.setAlt(Jsoup.clean(this.getAlt(), Safelist.basic()));
+        }
+        if (StringUtils.isNotEmpty(this.getLinkName())) {
+            this.setLinkName(Jsoup.clean(this.getLinkName(), Safelist.basic()));
+        }
+        if (StringUtils.isNotEmpty(this.getUrl())) {
+            this.setUrl(URI.create(this.getUrl()).toString());
         }
     }
 }

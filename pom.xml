@@ -4,7 +4,7 @@
     <groupId>com.zrlog</groupId>
     <artifactId>zrlog</artifactId>
     <packaging>pom</packaging>
-    <version>3.1.1-SNAPSHOT</version>
+    <version>3.1.1</version>
     <modules>
         <module>web</module>
         <module>service</module>
@@ -76,7 +76,7 @@
         <dependency>
             <groupId>com.hibegin</groupId>
             <artifactId>simplewebserver</artifactId>
-            <version>0.3.126</version>
+            <version>0.3.128</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -91,37 +91,37 @@
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>common</artifactId>
-                <version>3.1.1-SNAPSHOT</version>
+                <version>3.1.1</version>
             </dependency>
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>data</artifactId>
-                <version>3.1.1-SNAPSHOT</version>
+                <version>3.1.1</version>
             </dependency>
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>admin-token</artifactId>
-                <version>3.1.1-SNAPSHOT</version>
+                <version>3.1.1</version>
             </dependency>
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>blog-web</artifactId>
-                <version>3.1.1-SNAPSHOT</version>
+                <version>3.1.1</version>
             </dependency>
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>service</artifactId>
-                <version>3.1.1-SNAPSHOT</version>
+                <version>3.1.1</version>
             </dependency>
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>admin-web</artifactId>
-                <version>3.1.1-SNAPSHOT</version>
+                <version>3.1.1</version>
             </dependency>
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>web</artifactId>
-                <version>3.1.1-SNAPSHOT</version>
+                <version>3.1.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

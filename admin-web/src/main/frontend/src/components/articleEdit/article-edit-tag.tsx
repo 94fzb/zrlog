@@ -162,7 +162,7 @@ const ArticleEditTag: FunctionComponent<ArticleEditTagProps> = ({ allTags, keywo
                         </Tag>
                     </Space>
                     <Title level={5}>{getRes()["allTag"]}</Title>
-                    <div style={{ maxHeight: "120px", overflowY: "scroll" }}>
+                    <div style={{ maxHeight: "240px", overflowY: "auto" }}>
                         <Space size={[0, 8]} wrap>
                             {allTagChild}
                         </Space>

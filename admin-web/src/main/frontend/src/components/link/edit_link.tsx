@@ -1,4 +1,4 @@
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, useEffect, useState } from "react";
 import { App, Col, Form, Input, InputNumber, Modal } from "antd";
 import Row from "antd/es/grid/row";
 import TextArea from "antd/es/input/TextArea";
@@ -29,12 +29,18 @@ const EditLink: FunctionComponent<EditLinkProps> = ({ record, editSuccessCall, o
                 await message.error(data.message);
                 return;
             }
-            setShowModel(false);
-            if (editSuccessCall) {
-                editSuccessCall();
+            if (data.error === 0) {
+                setShowModel(false);
+                if (editSuccessCall) {
+                    editSuccessCall();
+                }
             }
         });
     };
+
+    useEffect(() => {
+        setUpdateForm(record);
+    }, [record]);
 
     const setValue = (changedValues: any) => {
         setUpdateForm(changedValues);
@@ -56,7 +62,7 @@ const EditLink: FunctionComponent<EditLinkProps> = ({ record, editSuccessCall, o
                 <EditOutlined style={{ marginBottom: 8, color: getColorPrimary() }} />
             </Link>
             <Modal title={getRes()["edit"]} open={showModel} onOk={handleOk} onCancel={() => setShowModel(false)}>
-                <Form initialValues={record} onValuesChange={(_k, v) => setValue(v)} {...layout}>
+                <Form initialValues={updateForm} onValuesChange={(_k, v) => setValue(v)} {...layout}>
                     <Form.Item name="id" style={{ display: "none" }}>
                         <Input hidden={true} />
                     </Form.Item>

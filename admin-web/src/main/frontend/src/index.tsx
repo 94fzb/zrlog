@@ -46,6 +46,15 @@ if (ssDataStr?.length > 0) {
     ssData = {};
 }
 
+export const getItems_per_page = () => {
+    if (getRes()["lang"] === "zh_CN") {
+        // @ts-ignore
+        return zh_CN.Pagination.items_per_page;
+    }
+    // @ts-ignore
+    return en_US.Pagination.items_per_page;
+};
+
 const isOffline = () => {
     return !navigator.onLine;
 };

@@ -41,6 +41,7 @@ const Nav = ({ data, offline }: { data: PageDataSource; offline: boolean }) => {
             </Title>
             <Divider />
             <BaseTable
+                defaultPageSize={10}
                 offline={offline}
                 hideId={true}
                 columns={getColumns()}

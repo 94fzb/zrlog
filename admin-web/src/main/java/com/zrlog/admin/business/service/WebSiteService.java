@@ -50,6 +50,7 @@ public class WebSiteService {
         admin.setArticle_auto_digest_length(Constants.getAutoDigestLength());
         admin.setFavicon_png_pwa_512_base64(faviconBase64DTO.getFavicon_png_pwa_512_base64());
         admin.setFavicon_png_pwa_192_base64(faviconBase64DTO.getFavicon_png_pwa_192_base64());
+        admin.setAdmin_article_page_size(Constants.getAdminArticlePageSize());
         return admin;
     }
 

@@ -15,7 +15,7 @@ public class ControllerUtil {
         return toPageRequest(controller, 10);
     }
 
-    private static PageRequest toPageRequest(Controller controller, int defaultPageSize) {
+    public static PageRequest toPageRequest(Controller controller, int defaultPageSize) {
         PageRequestImpl pageRequest = new PageRequestImpl();
         pageRequest.setSize((long) controller.getRequest().getParaToInt("size"));
         if (pageRequest.getSize() <= 0) {

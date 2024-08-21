@@ -241,9 +241,8 @@ const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ offline,
         <PWAHandler>
             <StyledIndexLayout>
                 <Header
-                    hidden={fullScreen}
                     style={{
-                        display: "flex",
+                        display: fullScreen ? "none" : "flex",
                         justifyContent: "space-between",
                         backgroundColor: EnvUtils.isDarkMode() ? "#1f1f1f" : "#011529",
                     }}

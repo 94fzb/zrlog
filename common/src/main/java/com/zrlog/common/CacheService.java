@@ -1,6 +1,7 @@
 package com.zrlog.common;
 
 import com.hibegin.http.server.api.HttpRequest;
+import com.zrlog.business.cache.vo.BaseDataInitVO;
 
 import java.io.File;
 import java.io.InputStream;
@@ -15,9 +16,11 @@ public interface CacheService {
 
     File saveResponseBodyToHtml(HttpRequest httpRequest, String copy);
 
+    File getCacheHtmlFolder();
+
     void saveToCacheFolder(InputStream inputStream, String uri);
 
-    CompletableFuture<Void> refreshInitDataCacheAsync(HttpRequest servletRequest, boolean cleanAble);
+    CompletableFuture<BaseDataInitVO> refreshInitDataCacheAsync(HttpRequest servletRequest, boolean cleanAble);
 
     String getFileFlagFirstByCache(String uriPath);
 

@@ -12,7 +12,6 @@ import com.zrlog.admin.business.rest.request.UpdateArticleRequest;
 import com.zrlog.admin.business.rest.response.*;
 import com.zrlog.admin.business.service.AdminArticleService;
 import com.zrlog.admin.web.annotation.RefreshCache;
-import com.zrlog.admin.web.controller.page.AdminPageController;
 import com.zrlog.admin.web.token.AdminTokenThreadLocal;
 import com.zrlog.blog.web.util.ControllerUtil;
 import com.zrlog.blog.web.util.WebTools;
@@ -68,13 +67,15 @@ public class AdminArticleController extends Controller {
     }
 
     @ResponseBody
-    public AdminApiPageDataStrandardResponse<PageData<ArticleResponseEntry>> index() throws SQLException {
+    public AdminApiPageDataStandardResponse<PageData<ArticleResponseEntry>> index() throws SQLException {
         String key = WebTools.convertRequestParam(request.getParaToStr("key"));
-        PageData<ArticleResponseEntry> pageData = articleService.adminPage(ControllerUtil.getPageRequest(this), key, request);
+        int articlePageSize = Constants.getAdminArticlePageSize();
+        PageData<ArticleResponseEntry> pageData = articleService.adminPage(ControllerUtil.toPageRequest(this, articlePageSize), key, request);
         pageData.setKey(key);
-        AdminApiPageDataStrandardResponse<PageData<ArticleResponseEntry>> strandardResponse = new AdminApiPageDataStrandardResponse<>(pageData);
-        strandardResponse.setDocumentTitle(Constants.getAdminTitle(I18nUtil.getAdminStringFromRes("blogManage")));
-        return strandardResponse;
+        pageData.setDefaultPageSize(Long.parseLong(articlePageSize + ""));
+        AdminApiPageDataStandardResponse<PageData<ArticleResponseEntry>> standardResponse = new AdminApiPageDataStandardResponse<>(pageData);
+        standardResponse.setDocumentTitle(Constants.getAdminTitle(I18nUtil.getAdminStringFromRes("blogManage")));
+        return standardResponse;
     }
 
 
@@ -90,7 +91,7 @@ public class AdminArticleController extends Controller {
     }
 
     @ResponseBody
-    public AdminApiPageDataStrandardResponse<ArticleGlobalResponse> articleEdit() throws SQLException {
+    public AdminApiPageDataStandardResponse<ArticleGlobalResponse> articleEdit() throws SQLException {
         ArticleGlobalResponse response = new ArticleGlobalResponse();
         response.setTags(new Tag().findAll());
         response.setTypes(new Type().findAll());
@@ -100,14 +101,14 @@ public class AdminArticleController extends Controller {
         } else {
             response.setArticle(new LoadEditArticleResponse());
         }
-        AdminApiPageDataStrandardResponse<ArticleGlobalResponse> strandardResponse = new AdminApiPageDataStrandardResponse<>(response);
+        AdminApiPageDataStandardResponse<ArticleGlobalResponse> standardResponse = new AdminApiPageDataStandardResponse<>(response);
         StringJoiner sj = new StringJoiner(Constants.ADMIN_TITLE_CHAR);
         if (Objects.nonNull(response.getArticle().getTitle())) {
             sj.add(response.getArticle().getTitle());
         }
         sj.add(I18nUtil.getAdminStringFromRes("admin.log.edit"));
-        strandardResponse.setDocumentTitle(Constants.getAdminTitle(sj.toString()));
-        return strandardResponse;
+        standardResponse.setDocumentTitle(Constants.getAdminTitle(sj.toString()));
+        return standardResponse;
     }
 
     /**

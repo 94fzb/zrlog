@@ -11,6 +11,7 @@ import axios from "axios";
 import { App, ColorPicker } from "antd";
 import { Admin } from "./index";
 import FaviconUpload from "./FaviconUpload";
+import { getItems_per_page } from "index";
 
 const layout = {
     labelCol: { span: 8 },
@@ -24,15 +25,16 @@ const BlogForm = ({ data, offline }: { data: Admin; offline: boolean }) => {
     const { message } = App.useApp();
 
     const websiteFormFinish = (changedValues: Admin) => {
-        axios.post("/api/admin/website/admin", { ...form, ...changedValues }).then(({ data }) => {
+        axios.post("/api/admin/website/admin", { ...form, ...changedValues }).then(async ({ data }) => {
             if (data.error) {
-                message.error(data.message).then();
+                await message.error(data.message);
                 return;
             }
-            message.success(data.message).then(() => {
+            if (data.error === 0) {
+                await message.success(data.message);
                 removeRes();
                 window.location.reload();
-            });
+            }
         });
     };
 
@@ -40,6 +42,7 @@ const BlogForm = ({ data, offline }: { data: Admin; offline: boolean }) => {
         setForm(data);
     }, [data]);
 
+    // @ts-ignore
     return (
         <>
             <Form
@@ -61,13 +64,36 @@ const BlogForm = ({ data, offline }: { data: Admin; offline: boolean }) => {
                     />
                 </Form.Item>
                 <Form.Item name="language" label={getRes()["language"]}>
-                    <Select style={{ maxWidth: "100px" }}>
+                    <Select style={{ maxWidth: "120px" }}>
                         <Option value="zh_CN">{getRes()["languageChinese"]}</Option>
                         <Option value="en_US">{getRes()["languageEnglish"]}</Option>
                     </Select>
                 </Form.Item>
                 <Form.Item valuePropName="checked" name="admin_darkMode" label={getRes()["admin.dark.mode"]}>
                     <Switch size={"small"} />
+                </Form.Item>
+                <Form.Item name="admin_article_page_size" label={getRes()["admin_article_page_size"]}>
+                    <Select
+                        style={{ maxWidth: "120px" }}
+                        options={[
+                            {
+                                value: 10,
+                                label: "10 " + getItems_per_page(),
+                            },
+                            {
+                                value: 20,
+                                label: "20 " + getItems_per_page(),
+                            },
+                            {
+                                value: 50,
+                                label: "50 " + getItems_per_page(),
+                            },
+                            {
+                                value: 100,
+                                label: "100 " + getItems_per_page(),
+                            },
+                        ]}
+                    />
                 </Form.Item>
                 <Form.Item label={getRes()["admin.color.primary"]}>
                     <div style={{ display: "flex", justifyContent: "flex-start", alignItems: "center" }}>

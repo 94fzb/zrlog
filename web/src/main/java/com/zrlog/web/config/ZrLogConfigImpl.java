@@ -89,7 +89,9 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     }
 
     private ServerConfig initServerConfig() {
-        ServerConfig serverConfig = new ServerConfig().setApplicationName("zrlog").setDisablePrintWebServerInfo(true);
+        ServerConfig serverConfig = new ServerConfig().setApplicationName("zrlog")
+                .setApplicationVersion(BlogBuildInfoUtil.getVersionInfo())
+                .setDisablePrintWebServerInfo(true);
         serverConfig.setNativeImageAgent(Constants.runMode == RunMode.NATIVE_AGENT);
         serverConfig.setDisableSession(true);
         serverConfig.setPort(port);
@@ -299,7 +301,6 @@ public class ZrLogConfigImpl extends ZrLogConfig {
      * 系统停止后，关闭插件相关进程服务，防治内存泄漏
      */
     private void onStop() {
-        pluginCoreProcess.stopPluginCore();
         for (IPlugin plugin : plugins) {
             plugin.stop();
         }

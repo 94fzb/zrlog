@@ -1,7 +1,10 @@
 package com.zrlog.admin.business.rest.base;
 
+import com.hibegin.common.util.StringUtils;
 import com.zrlog.common.Constants;
 import com.zrlog.common.Validator;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
 
 import java.util.Objects;
 
@@ -12,6 +15,7 @@ public class AdminWebSiteInfo implements Validator {
     private String admin_color_primary;
     private Integer article_auto_digest_length;
     private Boolean admin_darkMode;
+    private Integer admin_article_page_size;
     private String favicon_png_pwa_192_base64;
     private String favicon_png_pwa_512_base64;
 
@@ -63,6 +67,22 @@ public class AdminWebSiteInfo implements Validator {
         }
     }
 
+    @Override
+    public void doClean() {
+        if (StringUtils.isNotEmpty(favicon_png_pwa_512_base64)) {
+            this.favicon_png_pwa_512_base64 = Jsoup.clean(favicon_png_pwa_512_base64, Safelist.none());
+        }
+        if (StringUtils.isNotEmpty(favicon_png_pwa_192_base64)) {
+            this.favicon_png_pwa_192_base64 = Jsoup.clean(favicon_png_pwa_192_base64, Safelist.none());
+        }
+        if (StringUtils.isNotEmpty(language)) {
+            this.language = Jsoup.clean(language, Safelist.none());
+        }
+        if (StringUtils.isNotEmpty(admin_color_primary)) {
+            this.admin_color_primary = Jsoup.clean(admin_color_primary, Safelist.none());
+        }
+    }
+
     public String getFavicon_png_pwa_192_base64() {
         return favicon_png_pwa_192_base64;
     }
@@ -77,5 +97,13 @@ public class AdminWebSiteInfo implements Validator {
 
     public void setFavicon_png_pwa_512_base64(String favicon_png_pwa_512_base64) {
         this.favicon_png_pwa_512_base64 = favicon_png_pwa_512_base64;
+    }
+
+    public Integer getAdmin_article_page_size() {
+        return admin_article_page_size;
+    }
+
+    public void setAdmin_article_page_size(Integer admin_article_page_size) {
+        this.admin_article_page_size = admin_article_page_size;
     }
 }

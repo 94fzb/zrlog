@@ -26,6 +26,7 @@ public class PageData<T> implements Serializable {
     private Long totalElements;
     private String key;
     private List<T> rows;
+    private Long defaultPageSize;
 
     public List<T> getRows() {
         return rows;
@@ -69,5 +70,13 @@ public class PageData<T> implements Serializable {
 
     public void setKey(String key) {
         this.key = key;
+    }
+
+    public Long getDefaultPageSize() {
+        return defaultPageSize;
+    }
+
+    public void setDefaultPageSize(Long defaultPageSize) {
+        this.defaultPageSize = defaultPageSize;
     }
 }

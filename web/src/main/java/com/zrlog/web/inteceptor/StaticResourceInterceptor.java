@@ -26,6 +26,9 @@ public class StaticResourceInterceptor implements Interceptor {
 
     @Override
     public boolean doInterceptor(HttpRequest request, HttpResponse response) throws Exception {
+        if (ZrLogUtil.isStaticBlogPlugin(request)) {
+            return true;
+        }
         String actionKey = request.getUri();
         //打包过后的静态资源文件进行拦截
         if (staticResourcePath.stream().anyMatch(e -> request.getUri().startsWith(e + "/"))) {

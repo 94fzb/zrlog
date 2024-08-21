@@ -170,6 +170,10 @@ public class Constants {
         return (long) Double.parseDouble((String) Objects.requireNonNullElse(Constants.zrLogConfig.getWebSite().get("rows"), "10"));
     }
 
+    public static int getAdminArticlePageSize() {
+        return (int) Double.parseDouble((String) Objects.requireNonNullElse(Constants.zrLogConfig.getWebSite().get("admin_article_page_size"), "10"));
+    }
+
 
     public static File getDbPropertiesFile() {
         File file = new File(PathUtil.getConfPath() + "/db.properties");
@@ -182,7 +186,7 @@ public class Constants {
     public static String getAdminTitle(String startTitle) {
         String title = (String) Constants.zrLogConfig.getWebSite().get("title");
         StringJoiner sj = new StringJoiner(ADMIN_TITLE_CHAR);
-        if (StringUtils.isNotEmpty(startTitle) && startTitle.trim().length() > 0) {
+        if (StringUtils.isNotEmpty(startTitle) && !startTitle.trim().isEmpty()) {
             sj.add(startTitle);
         }
         if (StringUtils.isNotEmpty(title)) {

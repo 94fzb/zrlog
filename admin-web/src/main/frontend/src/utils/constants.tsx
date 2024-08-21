@@ -37,4 +37,9 @@ export const removeRes = () => {
     window[resourceKey] = undefined;
 };
 
+export const createUri = "/api/admin/article/create";
+export const updateUri = "/api/admin/article/update";
+
+//export const ARTICLE_URIS = [createUri,updateUri]
+
 export default Constants;

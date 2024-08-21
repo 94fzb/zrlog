@@ -1,4 +1,4 @@
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, useEffect, useState } from "react";
 import { App, Col, Form, Input, InputNumber, Modal } from "antd";
 import Row from "antd/es/grid/row";
 import { EditOutlined } from "@ant-design/icons";
@@ -28,9 +28,11 @@ const EditNav: FunctionComponent<EditNavProps> = ({ record, editSuccessCall, off
                 await message.error(data.message);
                 return;
             }
-            setShowModel(false);
-            if (editSuccessCall) {
-                editSuccessCall();
+            if (data.error === 0) {
+                setShowModel(false);
+                if (editSuccessCall) {
+                    editSuccessCall();
+                }
             }
         });
     };
@@ -38,6 +40,10 @@ const EditNav: FunctionComponent<EditNavProps> = ({ record, editSuccessCall, off
     const setValue = (changedValues: any) => {
         setUpdateForm(changedValues);
     };
+
+    useEffect(() => {
+        setUpdateForm(record);
+    }, [record]);
 
     return (
         <>
@@ -55,7 +61,7 @@ const EditNav: FunctionComponent<EditNavProps> = ({ record, editSuccessCall, off
                 <EditOutlined style={{ marginBottom: 8, color: getColorPrimary() }} />
             </Link>
             <Modal title={getRes()["edit"]} open={showModel} onOk={handleOk} onCancel={() => setShowModel(false)}>
-                <Form initialValues={record} onValuesChange={(_k, v) => setValue(v)} {...layout}>
+                <Form initialValues={updateForm} onValuesChange={(_k, v) => setValue(v)} {...layout}>
                     <Form.Item name="id" style={{ display: "none" }}>
                         <Input hidden={true} />
                     </Form.Item>

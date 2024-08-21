@@ -162,6 +162,7 @@ const Index = ({ data, offline }: { data: PageDataSource; offline: boolean }) =>
 
             <Divider />
             <BaseTable
+                defaultPageSize={data.defaultPageSize}
                 offline={offline}
                 datasource={data}
                 columns={getColumns()}

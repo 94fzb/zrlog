@@ -1,7 +1,10 @@
 package com.zrlog.admin.business.rest.request;
 
+import com.hibegin.common.util.StringUtils;
 import com.zrlog.admin.business.exception.ArgsException;
 import com.zrlog.common.Validator;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
 
 import java.util.Objects;
 
@@ -42,6 +45,19 @@ public class CreateTypeRequest implements Validator {
         }
         if (Objects.isNull(typeName) || typeName.trim().isEmpty()) {
             throw new ArgsException("typeName");
+        }
+    }
+
+    @Override
+    public void doClean() {
+        if (StringUtils.isNotEmpty(this.getAlias())) {
+            this.setAlias(Jsoup.clean(this.getAlias(), Safelist.none()));
+        }
+        if (StringUtils.isNotEmpty(this.getTypeName())) {
+            this.setTypeName(Jsoup.clean(this.getTypeName(), Safelist.none()));
+        }
+        if (StringUtils.isNotEmpty(this.getRemark())) {
+            this.setRemark(Jsoup.clean(this.getRemark(), Safelist.basicWithImages()));
         }
     }
 }

@@ -5,9 +5,53 @@ import { App, Spin } from "antd";
 import axios, { AxiosError } from "axios";
 import { API_VERSION_PATH } from "./components/upgrade";
 import ErrorBoundary from "./common/ErrorBoundary";
+import type { HookAPI as ModalHookAPI } from "antd/es/modal/useModal";
+import type { MessageInstance } from "antd/es/message/interface";
+import { AxiosInstance } from "axios/index";
 
 const AsyncLogin = lazy(() => import("components/login"));
 const AsyncAdminDashboardRouter = lazy(() => import("AdminDashboardRouter"));
+
+export const commonAxiosErrorHandle = (
+    error: any,
+    modal: ModalHookAPI,
+    message: MessageInstance,
+    modalContainer?: HTMLElement
+): Promise<any> => {
+    //ignore upgrade api error
+    if ((error as AxiosError) && error.config && error.config.url) {
+        if (error.config.url.includes(API_VERSION_PATH)) {
+            return Promise.reject(error.message);
+        }
+    }
+    if (error && error.response) {
+        if (error.response.status) {
+            modal.error({
+                title: "服务异常[" + error.response.status + "]",
+                content: <div style={{ paddingTop: 20 }} dangerouslySetInnerHTML={{ __html: error.response.data }} />,
+                getContainer: modalContainer,
+            });
+            return Promise.reject(error.response);
+        }
+    } else {
+        if ((error as AxiosError) && error.config && error.config.url) {
+            if (navigator.onLine) {
+                modal.error({
+                    title: "请求 " + error.config.url + " 错误",
+                    content: JSON.stringify(error),
+                    getContainer: modalContainer,
+                });
+            } else {
+                message.error("请求 " + error.config.url + " " + error.toString() + " network offline");
+            }
+        }
+    }
+    return Promise.reject(error);
+};
+
+export const createAxiosBaseInstance = (): AxiosInstance => {
+    return axios.create({});
+};
 
 const AppBase = ({ offline }: { offline: boolean }) => {
     const { modal, message } = App.useApp();
@@ -31,38 +75,7 @@ const AppBase = ({ offline }: { offline: boolean }) => {
                 return response;
             },
             (error) => {
-                //ignore upgrade api error
-                if ((error as AxiosError) && error.config && error.config.url) {
-                    if (error.config.url.includes(API_VERSION_PATH)) {
-                        return Promise.reject(error.message);
-                    }
-                }
-                if (error && error.response) {
-                    if (error.response.status) {
-                        modal.error({
-                            title: "服务异常[" + error.response.status + "]",
-                            content: (
-                                <div
-                                    style={{ paddingTop: 20 }}
-                                    dangerouslySetInnerHTML={{ __html: error.response.data }}
-                                />
-                            ),
-                        });
-                        return Promise.reject(error.response);
-                    }
-                } else {
-                    if ((error as AxiosError) && error.config) {
-                        if (navigator.onLine) {
-                            modal.error({
-                                title: "请求 " + error.config.url + " 错误",
-                                content: error.toString(),
-                            });
-                        } else {
-                            message.error("请求 " + error.config.url + " " + error.toString() + " network offline");
-                        }
-                    }
-                }
-                return Promise.reject(error);
+                return commonAxiosErrorHandle(error, modal, message);
             }
         );
     };

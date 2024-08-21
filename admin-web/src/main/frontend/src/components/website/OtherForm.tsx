@@ -20,14 +20,14 @@ const OtherForm = ({ data, offline }: { data: Other; offline: boolean }) => {
     const { message } = App.useApp();
 
     const websiteFormFinish = (changedValues: any) => {
-        axios.post("/api/admin/website/other", { ...form, ...changedValues }).then(({ data }) => {
+        axios.post("/api/admin/website/other", { ...form, ...changedValues }).then(async ({ data }) => {
             if (data.error) {
-                message.error(data.message).then();
+                await message.error(data.message);
                 return;
             }
-            message.success(data.message).then(() => {
-                //ignore
-            });
+            if (data.error === 0) {
+                await message.success(data.message);
+            }
         });
     };
 

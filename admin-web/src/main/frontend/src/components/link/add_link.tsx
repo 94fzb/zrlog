@@ -21,8 +21,10 @@ const AddLink = ({ addSuccessCall, offline }: { addSuccessCall: () => void; offl
                 await message.error(data.message);
                 return;
             }
-            setShowModel(false);
-            addSuccessCall();
+            if (data.error === 0) {
+                setShowModel(false);
+                addSuccessCall();
+            }
         });
     };
 

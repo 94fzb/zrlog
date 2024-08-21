@@ -4,7 +4,7 @@ import Spin from "antd/es/spin";
 import { message } from "antd";
 import makeAsyncScriptLoader from "react-async-script";
 import MyLoadingComponent from "../../my-loading-component";
-import EnvUtils, { isPWA } from "../../../utils/env-utils";
+import EnvUtils from "../../../utils/env-utils";
 import { getRes } from "../../../utils/constants";
 import { dom, library } from "@fortawesome/fontawesome-svg-core";
 import {
@@ -16,7 +16,6 @@ import {
     faAlignLeft,
     faAlignRight,
     faAnchor,
-    faArrowsAlt,
     faBold,
     faClipboard,
     faClose,
@@ -37,16 +36,17 @@ import {
     faStrikethrough,
     faTable,
 } from "@fortawesome/free-solid-svg-icons";
-import { StyledEditor } from "./styled-editor";
+import { StyledEditormd } from "./styled-editormd";
 import axios from "axios";
-import { useLocation } from "react-router";
-import { getPageFullState, savePageFullState } from "../../../cache";
-import { getFullPath } from "../../../utils/helpers";
 // Add the icons to the library so you can use it in your page
 const icons = [
     faBold,
     faStrikethrough,
     fa4,
+    faAlignCenter,
+    faAlignJustify,
+    faAlignLeft,
+    faAlignRight,
     faItalic,
     faQuoteLeft,
     faListUl,
@@ -55,7 +55,6 @@ const icons = [
     faQuestionCircle,
     faAnchor,
     faInfoCircle,
-    faArrowsAlt,
     faClipboard,
     faTable,
     faFileCode,
@@ -68,10 +67,6 @@ const icons = [
     faPhotoFilm,
     faLink,
     faClose,
-    faAlignJustify,
-    faAlignCenter,
-    faAlignLeft,
-    faAlignRight,
 ];
 icons.forEach((e) => {
     library.add(e);
@@ -99,20 +94,14 @@ export type ScriptLoaderProps = {
 
 let editor: any;
 
-const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({
-    onfullscreen,
-    onfullscreenExit,
-    markdown,
-    onChange,
-    loadSuccess,
-}) => {
+const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({ height, markdown, onChange, loadSuccess }) => {
     const [state, setState] = useState<MyEditorMdWrapperState>({
         mdEditorScriptLoaded: true,
         editorLoading: true,
         id: "editor-" + new Date().getTime(),
     });
+
     const [messageApi, contextHolder] = message.useMessage();
-    const location = useLocation();
 
     function setDarkMode(editor: any, dark: boolean) {
         editor.setTheme(dark ? "dark" : "default");
@@ -120,21 +109,16 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({
         editor.setEditorTheme(dark ? "pastel-on-dark" : "default");
     }
 
-    function initSuccess() {
+    function initSuccess(editor: any) {
         $(".CodeMirror-gutters").css("left", "0px");
         setState({
             ...state,
             editorLoading: false,
         });
         if (loadSuccess) {
-            loadSuccess();
+            loadSuccess(editor);
         }
     }
-
-    const doFullScreen = (editor: any) => {
-        onfullscreen(editor);
-        editor.width("100%");
-    };
 
     const initEditor = (md: string) => {
         // eslint-disable-next-line no-undef,no-unused-vars
@@ -146,7 +130,7 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({
             taskList: true,
             tocm: false,
             tex: true,
-            height: getPageFullState(getFullPath(location)) && isPWA() ? "calc(100vh - 2px)" : "1240px",
+            height: height,
             flowChart: true,
             sequenceDiagram: true,
             dialogMaskOpacity: 0,
@@ -180,7 +164,6 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({
                     "table",
                     "copyPreviewHtml",
                     "|",
-                    "fullscreen",
                     "help",
                 ];
             },
@@ -244,10 +227,7 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({
                     });
                 }
                 setDarkMode(editor, EnvUtils.isDarkMode());
-                if (getPageFullState(getFullPath(location)) && isPWA()) {
-                    $(".svg-inline--fa[name=fullscreen]").click();
-                }
-                setTimeout(initSuccess, 100);
+                initSuccess(editor);
             },
 
             onchange: async function () {
@@ -257,24 +237,19 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({
                 };
                 await onChange(changed);
             },
-            onfullscreen: function () {
-                if (isPWA()) {
-                    savePageFullState(getFullPath(location), true);
-                }
-                doFullScreen(editor);
-            },
 
+            onfullscreen: function () {
+                editor.width("100%");
+            },
             onfullscreenExit: function () {
-                onfullscreenExit();
-                if (isPWA()) {
-                    savePageFullState(getFullPath(location), false);
-                }
                 editor.width("100%");
             },
         });
     };
 
     useEffect(() => {
+        //@ts-ignore
+        window.createEditorMDInstance();
         initEditor(markdown ? markdown : "");
         return () => {
             $(document.getElementById(state.id) as HTMLDivElement).off();
@@ -283,52 +258,37 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({
     }, []);
 
     return (
-        <StyledEditor>
-            <Spin spinning={state.editorLoading} delay={500}>
+        <StyledEditormd>
+            <Spin spinning={state.editorLoading} delay={500} style={{ height: "100%", overflowY: "auto" }}>
                 {contextHolder}
                 <div
                     id={state.id}
                     className={EnvUtils.isDarkMode() ? "editor-dark" : "editor-light"}
-                    style={{ borderRadius: 8, height: 1240 }}
+                    style={{ height: height }}
                 />
             </Spin>
-        </StyledEditor>
+        </StyledEditormd>
     );
 };
 
 type MyEditorMdWrapperProps = {
-    onfullscreen: (editor: any) => void;
-    onfullscreenExit: () => void;
-    onChange: (content: ChangedContent) => void;
+    height: any;
+    onChange: (content: ChangedContent) => Promise<void>;
     markdown?: string;
-    loadSuccess?: () => void;
+    loadSuccess?: (editor: any) => void;
 };
 
-const MyEditorMdWrapper: FunctionComponent<MyEditorMdWrapperProps> = ({
-    onfullscreen,
-    markdown,
-    onChange,
-    onfullscreenExit,
-    loadSuccess,
-}) => {
+const MyEditorMdWrapper: FunctionComponent<MyEditorMdWrapperProps> = ({ height, markdown, onChange, loadSuccess }) => {
     const [mdEditorScriptLoaded, setMdEditorScriptLoaded] = useState<boolean>(false);
 
     const EditMdAsyncScriptLoader = makeAsyncScriptLoader(
-        document.baseURI + "admin/vendors/markdown/js/editormd.min.js"
+        document.baseURI + "admin/vendors/markdown/js/editormd-1.5.1.js"
     )(MyLoadingComponent) as unknown as FunctionComponent<ScriptLoaderProps>;
     if (mdEditorScriptLoaded) {
-        return (
-            <MyEditorMd
-                markdown={markdown}
-                loadSuccess={loadSuccess}
-                onChange={onChange}
-                onfullscreen={onfullscreen}
-                onfullscreenExit={onfullscreenExit}
-            />
-        );
+        return <MyEditorMd height={height} markdown={markdown} loadSuccess={loadSuccess} onChange={onChange} />;
     }
     return (
-        <>
+        <div style={{ height: height }}>
             <EditMdAsyncScriptLoader
                 asyncScriptOnLoad={() => {
                     setMdEditorScriptLoaded(true);
@@ -336,7 +296,7 @@ const MyEditorMdWrapper: FunctionComponent<MyEditorMdWrapperProps> = ({
                 isLoading={false}
                 error={<></>}
             />
-        </>
+        </div>
     );
 };
 

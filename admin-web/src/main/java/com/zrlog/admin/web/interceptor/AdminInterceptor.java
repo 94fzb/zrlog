@@ -80,7 +80,7 @@ public class AdminInterceptor implements HandleAbleInterceptor {
             if (Objects.nonNull(method)) {
                 RefreshCache annotation = method.getAnnotation(RefreshCache.class);
                 if (Objects.nonNull(annotation)) {
-                    //跳过更新
+                    //跳过非更新
                     if (annotation.onlyOnPostMethod() && request.getMethod() != HttpMethod.POST) {
                         return false;
                     }

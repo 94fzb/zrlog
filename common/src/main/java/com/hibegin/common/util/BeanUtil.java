@@ -5,6 +5,7 @@ import com.zrlog.common.Validator;
 import com.zrlog.common.ValidatorUtils;
 
 import java.io.*;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,6 +28,9 @@ public class BeanUtil {
     public static <T extends Validator> T convertWithValid(InputStream inputStream, Class<T> tClass) {
         T obj = new Gson().fromJson(com.hibegin.common.util.IOUtil.getStringInputStream(inputStream), tClass);
         ValidatorUtils.doValid(obj);
+        if (Objects.nonNull(obj)) {
+            obj.doClean();
+        }
         return obj;
     }
 

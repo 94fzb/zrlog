@@ -59,7 +59,13 @@ const Comment = ({ data, offline }: { data: PageDataSource; offline: boolean }) 
                 {getRes()["admin.comment.manage"]}
             </Title>
             <Divider />
-            <BaseTable offline={offline} datasource={data} columns={getColumns()} deleteApi={getDeleteApiUri()} />
+            <BaseTable
+                defaultPageSize={10}
+                offline={offline}
+                datasource={data}
+                columns={getColumns()}
+                deleteApi={getDeleteApiUri()}
+            />
         </>
     );
 };

@@ -20,5 +20,6 @@
   "rows",
   "staticResourceHost",
   "template",
-  "robotRuleContent"
+  "robotRuleContent",
+  "admin_article_page_size"
 ]

@@ -176,7 +176,9 @@ public class PluginCoreProcessImpl implements PluginCoreProcess {
 
     @Override
     public void stopPluginCore() {
-        thread.interrupt();
+        if (Objects.nonNull(thread)) {
+            thread.interrupt();
+        }
         canStart = false;
     }
 }

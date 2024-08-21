@@ -59,7 +59,7 @@ const ThumbnailUpload: FunctionComponent<ThumbnailUploadProps> = ({ onChange, th
                             margin: 0,
                         }}
                     >
-                        {getRes()["articleCover"]}
+                        {getRes()["uploadTips"]}
                     </p>
                 </>
             )}

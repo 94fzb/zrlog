@@ -32,6 +32,9 @@ const Type = ({ data, offline }: { data: PageDataSource; offline: boolean }) => 
                 key: "remark",
                 dataIndex: "remark",
                 width: 240,
+                render: (e: string) => {
+                    return <span dangerouslySetInnerHTML={{ __html: e }} />;
+                },
             },
             {
                 title: "文章数量",
@@ -49,6 +52,7 @@ const Type = ({ data, offline }: { data: PageDataSource; offline: boolean }) => 
             </Title>
             <Divider />
             <BaseTable
+                defaultPageSize={10}
                 offline={offline}
                 hideId={true}
                 columns={getColumns()}

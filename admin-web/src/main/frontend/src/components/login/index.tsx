@@ -48,22 +48,22 @@ const Index = ({ offline }: { offline: boolean }) => {
         setLogging(true);
         axios
             .post("/api/admin/login", loginForm)
-            .then(({ data }) => {
+            .then(async ({ data }) => {
                 if (data.error) {
-                    message.error(data.message).then(() => {
-                        //ignore
-                    });
-                } else {
+                    await message.error(data.message);
+                } else if (data.error == 0) {
                     const query = new URLSearchParams(window.location.search);
-                    if (query.get("redirectFrom") !== null && query.get("redirectFrom") !== "") {
-                        //need reload page, because basename error
-                        window.location.href = decodeURIComponent(query.get("redirectFrom") + "");
+                    if (ssData) {
+                        ssData.key = data.data.key;
+                    }
+                    const redirectFrom = query.get("redirectFrom") as string;
+                    if (redirectFrom !== null && redirectFrom !== "") {
+                        navigate(decodeURIComponent(redirectFrom).replace("/admin", ""), { replace: true });
                     } else {
-                        if (ssData) {
-                            ssData.key = data.data.key;
-                        }
                         navigate("/index", { replace: true });
                     }
+                } else {
+                    await message.error("未知错误");
                 }
             })
             .finally(() => {
@@ -97,6 +97,7 @@ const Index = ({ offline }: { offline: boolean }) => {
                                         position: "relative",
                                         display: "flex",
                                         flexDirection: "column",
+                                        borderRadius: "8px 8px 0 0",
                                         alignItems: "center",
                                         textAlign: "center",
                                         backgroundSize: "cover",

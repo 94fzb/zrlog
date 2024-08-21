@@ -29,7 +29,7 @@ public class DAO implements IDAO {
     private final boolean dev;
 
     public DAO() {
-        queryRunner = new QueryRunner(dataSource, true);
+        queryRunner = new CustomQueryRunner(dataSource, true);
         this.dev = false;
     }
 
