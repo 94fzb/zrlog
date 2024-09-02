@@ -22,12 +22,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class AdminTokenService implements TokenService {
 
     private static final String ADMIN_TOKEN_KEY_IN_COOKIE = "admin-token";
+    private static final String ADMIN_TOKEN_KEY_IN_REQUEST_HEADER = "X-ZrLog-Admin-Token";
     private static final Logger LOGGER = LoggerUtil.getLogger(AdminTokenService.class);
     private static final String TOKEN_SPLIT_CHAR = "#";
     private static final IvParameterSpec iv;
@@ -61,26 +63,38 @@ public class AdminTokenService implements TokenService {
         if (!InstallUtils.isInstalled()) {
             return null;
         }
+        //header first, seconds parse cookie
+        String tokenInHeader = request.getHeader(ADMIN_TOKEN_KEY_IN_REQUEST_HEADER);
+        if (StringUtils.isNotEmpty(tokenInHeader)) {
+            AdminTokenVO adminTokenVO = parseAdminTokenByStr(tokenInHeader);
+            if (Objects.nonNull(adminTokenVO)) {
+                return adminTokenVO;
+            }
+        }
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {
             return null;
         }
-        String decTokenString = null;
+        String tokenString = null;
         for (Cookie cookie : cookies) {
             if (cookie.getName().equals(ADMIN_TOKEN_KEY_IN_COOKIE)) {
-                decTokenString = cookie.getValue();
+                tokenString = cookie.getValue();
             }
         }
-        if (StringUtils.isEmpty(decTokenString)) {
+        if (StringUtils.isEmpty(tokenString)) {
             return null;
         }
+        return parseAdminTokenByStr(tokenString);
+    }
+
+    private AdminTokenVO parseAdminTokenByStr(String tokenString) {
         try {
-            int userId = Integer.parseInt(decTokenString.substring(0, decTokenString.indexOf(TOKEN_SPLIT_CHAR)));
+            int userId = Integer.parseInt(tokenString.substring(0, tokenString.indexOf(TOKEN_SPLIT_CHAR)));
             Map<String, Object> user = new User().loadById(userId);
             if (user == null) {
                 return null;
             }
-            byte[] adminTokenEncryptAfter = ByteUtils.hexString2Bytes(decTokenString.substring(decTokenString.indexOf(TOKEN_SPLIT_CHAR) + 1));
+            byte[] adminTokenEncryptAfter = ByteUtils.hexString2Bytes(tokenString.substring(tokenString.indexOf(TOKEN_SPLIT_CHAR) + 1));
             String base64Encode = new String(decrypt((String) user.get("secretKey"), Base64.getDecoder().decode(adminTokenEncryptAfter)));
             AdminTokenVO adminTokenVO = new Gson().fromJson(base64Encode, AdminTokenVO.class);
             if (adminTokenVO.getCreatedDate() + Constants.getSessionTimeout() > System.currentTimeMillis()) {
