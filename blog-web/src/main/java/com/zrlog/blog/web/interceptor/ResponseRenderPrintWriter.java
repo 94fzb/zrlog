@@ -27,6 +27,9 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * 对响应的模板文件生成的 html 进行转化，主要处理静态资源文件和插件相关的逻辑
+ */
 class ResponseRenderPrintWriter extends PrintWriter {
 
     private static final Logger LOGGER = LoggerUtil.getLogger(ResponseRenderPrintWriter.class);
@@ -145,10 +148,11 @@ class ResponseRenderPrintWriter extends PrintWriter {
                 element.attr("_id", UUID.randomUUID().toString());
                 CloseResponseHandle handle = PluginHelper.getContext(url, HttpMethod.GET, request, adminTokenVO);
                 try (InputStream in = handle.getT().body()) {
+                    byte[] bytes = IOUtil.getByteByInputStream(in);
                     if (handle.getStatusCode() != 200) {
+                        LOGGER.warning("Template plugin page render status error " + handle.getStatusCode() + ", response body " + new String(bytes));
                         return;
                     }
-                    byte[] bytes = IOUtil.getByteByInputStream(in);
                     replaceMap.put(element.outerHtml(), new String(bytes, StandardCharsets.UTF_8));
                 }
             } catch (Exception e) {
