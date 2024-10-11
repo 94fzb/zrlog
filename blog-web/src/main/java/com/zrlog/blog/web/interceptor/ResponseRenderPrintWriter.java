@@ -21,9 +21,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -50,6 +48,8 @@ class ResponseRenderPrintWriter extends PrintWriter {
 
     private final AdminTokenVO adminTokenVO;
 
+    private final List<String> pluginRenderErrors = new ArrayList<>();
+
     public HttpResponse getResponse() {
         return response;
     }
@@ -74,6 +74,14 @@ class ResponseRenderPrintWriter extends PrintWriter {
         if (isIncludePageEndTag(builder.toString())) {
             flush();
         }
+    }
+
+    public boolean isRenderSuccess() {
+        return pluginRenderErrors.isEmpty();
+    }
+
+    public List<String> getPluginRenderErrors() {
+        return pluginRenderErrors;
     }
 
     @Override
@@ -150,13 +158,17 @@ class ResponseRenderPrintWriter extends PrintWriter {
                 try (InputStream in = handle.getT().body()) {
                     byte[] bytes = IOUtil.getByteByInputStream(in);
                     if (handle.getStatusCode() != 200) {
-                        LOGGER.warning("Template plugin page render status error " + handle.getStatusCode() + ", response body " + new String(bytes));
+                        String errorInfo = "Template plugin page render status error " + handle.getStatusCode() + ", response body " + new String(bytes);
+                        pluginRenderErrors.add(errorInfo);
+                        LOGGER.warning(errorInfo);
                         return;
                     }
                     replaceMap.put(element.outerHtml(), new String(bytes, StandardCharsets.UTF_8));
                 }
             } catch (Exception e) {
-                LOGGER.warning("Template plugin page render error " + e.getMessage());
+                String errorInfo = "Template plugin page render error " + e.getMessage();
+                pluginRenderErrors.add(errorInfo);
+                LOGGER.warning(errorInfo);
             }
         }
     }

@@ -84,7 +84,7 @@ public class BlogPageInterceptor implements HandleAbleInterceptor {
         if (Objects.nonNull(invoke)) {
             TemplateHelper.fullTemplateInfo(request);
             TemplateUtils.initTemplate();
-            if(TemplateHelper.isArrangeable(request) && TemplateUtils.existsByTemplateName("arrange")){
+            if (TemplateHelper.isArrangeable(request) && TemplateUtils.existsByTemplateName("arrange")) {
                 invoke = "arrange";
             }
             String htmlStr = FreeMarkerUtil.renderToFM(invoke.toString(), request);
@@ -102,7 +102,7 @@ public class BlogPageInterceptor implements HandleAbleInterceptor {
             if (!ZrLogUtil.isStaticBlogPlugin(request)) {
                 response.renderHtmlStr(realHtmlStr);
             }
-            if (BlogPageInterceptor.catGeneratorHtml(target)) {
+            if (BlogPageInterceptor.catGeneratorHtml(target) && responseRenderPrintWriter.isRenderSuccess()) {
                 request.getAttr().put(StaticSitePlugin.HTML_FILE_KEY, Constants.zrLogConfig.getCacheService().saveResponseBodyToHtml(request, realHtmlStr));
             }
         }

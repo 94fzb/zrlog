@@ -29,6 +29,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -50,13 +51,14 @@ public class StaticSitePlugin extends BaseLockObject implements IPlugin {
     }
 
     enum HandleState {
-        NEW, HANDING, HANDLED
+        NEW, HANDING, RE_FETCH, HANDLED
     }
 
 
     private void doFetch() {
-        handleStatusPageMap.entrySet().stream().filter(e -> Objects.equals(e.getValue(), HandleState.NEW)).forEach((e) -> {
+        handleStatusPageMap.entrySet().stream().filter(e -> Arrays.asList(HandleState.NEW, HandleState.RE_FETCH).contains(e.getValue())).forEach((e) -> {
             handleStatusPageMap.put(e.getKey(), HandleState.HANDING);
+            boolean error = false;
             try {
                 ResponseConfig responseConfig = serverConfig.getResponseConfig();
                 responseConfig.setEnableGzip(false);
@@ -64,6 +66,8 @@ public class StaticSitePlugin extends BaseLockObject implements IPlugin {
                 new HttpRequestHandlerRunnable(httpRequest, new SimpleHttpResponse(httpRequest, serverConfig.getResponseConfig())).run();
                 File file = (File) httpRequest.getAttr().get(HTML_FILE_KEY);
                 if (Objects.isNull(file) || !file.exists()) {
+                    LOGGER.warning("Generator " + e.getKey() + " error: missing static file");
+                    error = true;
                     return;
                 }
                 Document document = Jsoup.parse(file);
@@ -84,7 +88,15 @@ public class StaticSitePlugin extends BaseLockObject implements IPlugin {
             } catch (Exception ex) {
                 LOGGER.warning("Generator " + e.getKey() + " error: " + ex.getMessage());
             } finally {
-                handleStatusPageMap.put(e.getKey(), HandleState.HANDLED);
+                if (error) {
+                    //如果抓取错误了，需要暂停一下，避免重新获取过快
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException ex) {
+                        LOGGER.warning("Generator " + e.getKey() + " error: " + ex.getMessage());
+                    }
+                }
+                handleStatusPageMap.put(e.getKey(), error ? HandleState.RE_FETCH : HandleState.HANDLED);
             }
         });
 
