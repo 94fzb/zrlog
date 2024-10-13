@@ -296,12 +296,8 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
             const data = responseData;
             if (data.error === 0) {
                 exitNotTips();
-                if (release) {
-                    messageApi.success(getRes()["releaseSuccess"]);
-                } else {
-                    if (!autoSave) {
-                        messageApi.info(getRes()["saveSuccess"]);
-                    }
+                if (!autoSave) {
+                    messageApi.info(data.message);
                 }
                 if (preview) {
                     window.open(data.data["previewUrl"], "_blank");
