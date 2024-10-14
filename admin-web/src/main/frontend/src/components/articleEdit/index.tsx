@@ -626,7 +626,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
                         }}
                     >
                         <SendOutlined />
-                        {getRes().release}
+                        {state.article.privacy === true ? getRes()["save"] : getRes().release}
                     </Button>
                 </Col>
             </Col>
