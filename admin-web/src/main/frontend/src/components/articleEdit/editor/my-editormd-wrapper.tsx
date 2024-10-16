@@ -38,6 +38,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { StyledEditormd } from "./styled-editormd";
 import axios from "axios";
+import { ChangedContent } from "../index.types";
 // Add the icons to the library so you can use it in your page
 const icons = [
     faBold,
@@ -79,11 +80,6 @@ type MyEditorMdWrapperState = {
     editorLoading: boolean;
     mdEditorScriptLoaded: boolean;
     id: string;
-};
-
-export type ChangedContent = {
-    content?: string;
-    markdown?: string;
 };
 
 export type ScriptLoaderProps = {

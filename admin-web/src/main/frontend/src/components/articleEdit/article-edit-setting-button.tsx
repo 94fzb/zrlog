@@ -11,7 +11,7 @@ import { Drawer } from "antd";
 import EnvUtils from "../../utils/env-utils";
 import { SettingFilled, SettingOutlined } from "@ant-design/icons";
 import { RefObject, useState } from "react";
-import { ArticleChangeableValue, ArticleEntry } from "./index";
+import { ArticleChangeableValue, ArticleEntry } from "./index.types";
 import Button from "antd/es/button";
 
 const ArticleEditSettingButton = ({
@@ -75,10 +75,10 @@ const ArticleEditSettingButton = ({
                     header: {
                         padding: 12,
                     },
-                }}
-                bodyStyle={{
-                    padding: 12,
-                    overflowX: "hidden",
+                    body: {
+                        padding: 12,
+                        overflowX: "hidden",
+                    },
                 }}
                 open={settingsOpen}
                 //@ts-ignore

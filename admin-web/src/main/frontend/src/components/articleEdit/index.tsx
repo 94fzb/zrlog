@@ -1,16 +1,15 @@
 import { FunctionComponent, useEffect, useRef, useState } from "react";
-import { EyeOutlined, FullscreenExitOutlined, FullscreenOutlined, SaveOutlined, SendOutlined } from "@ant-design/icons";
+import { FullscreenExitOutlined, FullscreenOutlined } from "@ant-design/icons";
 import { App, Button, message, Space } from "antd";
 import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
 import Divider from "antd/es/divider";
 import Title from "antd/es/typography/Title";
 import Card from "antd/es/card";
-import MyEditorMdWrapper, { ChangedContent } from "./editor/my-editormd-wrapper";
+import MyEditorMdWrapper from "./editor/my-editormd-wrapper";
 import { createUri, getRes, updateUri } from "../../utils/constants";
 import screenfull from "screenfull";
 import styled from "styled-components";
-import TimeAgo from "../../common/TimeAgo";
 import Select from "antd/es/select";
 import BaseInput from "../../common/BaseInput";
 import { addToCache, deleteCacheDataByKey, getCacheByKey, getPageFullState, savePageFullState } from "../../cache";
@@ -20,23 +19,10 @@ import EnvUtils, { isPWA } from "../../utils/env-utils";
 import EditorStatistics, { toStatisticsByMarkdown } from "./editor/editor-statistics-info";
 import { commonAxiosErrorHandle, createAxiosBaseInstance } from "../../AppBase";
 import ArticleEditSettingButton from "./article-edit-setting-button";
+import { ArticleEntry, ChangedContent, ArticleChangeableValue } from "./index.types";
+import ArticleEditActionBar from "./article-edit-action-bar";
 
-export type ArticleEntry = ChangedContent &
-    ThumbnailChanged &
-    TitleChanged &
-    AliasChanged &
-    DigestChanged &
-    KeywordsChanged &
-    PrivacyChanged &
-    CanCommentChanged &
-    TypeChanged & {
-        rubbish?: boolean;
-        logId?: number;
-        lastUpdateDate?: number;
-        version: number;
-    };
-
-type ArticleEditState = {
+export type ArticleEditState = {
     typeOptions: any[];
     tags: any[];
     rubbish: boolean;
@@ -53,37 +39,6 @@ type ArticleSavingState = {
     previewIng: boolean;
     autoSaving: boolean;
     releaseSaving: boolean;
-};
-
-export type ThumbnailChanged = {
-    thumbnail?: string;
-};
-
-export type TitleChanged = {
-    title: string;
-};
-
-export type AliasChanged = {
-    alias?: string;
-};
-
-export type DigestChanged = {
-    digest?: string;
-};
-
-export type KeywordsChanged = {
-    keywords?: string;
-};
-
-export type TypeChanged = {
-    typeId?: number;
-};
-
-export type CanCommentChanged = {
-    canComment?: boolean;
-};
-export type PrivacyChanged = {
-    privacy?: boolean;
 };
 
 const StyledArticleEdit = styled("div")`
@@ -137,18 +92,6 @@ export type ArticleEditProps = {
     onFullScreen: () => void;
     offline: boolean;
 };
-
-export type ArticleChangeableValue =
-    | ArticleEntry
-    | PrivacyChanged
-    | CanCommentChanged
-    | AliasChanged
-    | TypeChanged
-    | TitleChanged
-    | KeywordsChanged
-    | ChangedContent
-    | ThumbnailChanged
-    | DigestChanged;
 
 const buildCacheKey = (newArticle: ArticleEntry) => {
     return "local-article-info-" + (newArticle && newArticle.logId && newArticle.logId > 0 ? newArticle.logId : -1);
@@ -532,107 +475,6 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
         await save(newArticle);
     };
 
-    const getRubbishText = () => {
-        let tips;
-        if (state.offline) {
-            tips = getRes()["admin.offline.article-editing"];
-        } else {
-            if (!state.rubbish) {
-                return <Col xxl={3} md={3} sm={4} style={{ padding: 0 }} />;
-            }
-
-            if (state.article.lastUpdateDate && state.article.lastUpdateDate > 0) {
-                tips = (
-                    <>
-                        <TimeAgo timestamp={state.article.lastUpdateDate} />
-                        更新
-                    </>
-                );
-            } else {
-                tips = "当前为草稿";
-            }
-        }
-        return (
-            <Button
-                type={"default"}
-                className={state.fullScreen ? "saveToRubbish-btn-full-screen" : "item"}
-                style={{
-                    border: 0,
-                    width: "100%",
-                    maxWidth: 256,
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    textAlign: "center",
-                    height: "32px",
-                    paddingRight: "8px",
-                    paddingLeft: "8px",
-                    backgroundColor: state.fullScreen ? (EnvUtils.isDarkMode() ? "rgb(20 20 20)" : "white") : "inherit",
-                }}
-            >
-                {tips}
-            </Button>
-        );
-    };
-
-    const getActionBar = () => {
-        return (
-            <Col
-                id={"action-bar"}
-                xxl={9}
-                md={12}
-                sm={24}
-                style={{ display: "flex", justifyContent: "end", padding: 0 }}
-            >
-                <Col
-                    id={"item"}
-                    xxl={6}
-                    md={9}
-                    sm={24}
-                    className={state.fullScreen ? "saveToRubbish-btn-full-screen" : "item"}
-                >
-                    {getRubbishText()}
-                </Col>
-                <Col xxl={6} md={9} sm={24} className={state.fullScreen ? "saveToRubbish-btn-full-screen" : "item"}>
-                    <Button
-                        type={state.fullScreen ? "default" : "dashed"}
-                        style={{ width: "100%", maxWidth: 256 }}
-                        disabled={state.offline || (state.saving.rubbishSaving && !state.saving.autoSaving)}
-                        onClick={async () => await onSubmit(state.article, false, false, false)}
-                    >
-                        <SaveOutlined hidden={state.saving.rubbishSaving} />
-                        {state.saving.rubbishSaving ? getRes().saving : getRes().saveAsDraft}
-                    </Button>
-                </Col>
-                <Col xxl={6} md={9} sm={24} className={"item"} style={{ display: state.fullScreen ? "none" : "flex" }}>
-                    <Button
-                        type="dashed"
-                        disabled={state.offline || (state.saving.previewIng && !state.saving.autoSaving)}
-                        style={{ width: "100%", maxWidth: 256 }}
-                        onClick={async () => await onSubmit(state.article, !state.rubbish, true, false)}
-                    >
-                        <EyeOutlined />
-                        {getRes().preview}
-                    </Button>
-                </Col>
-                <Col xxl={6} md={9} sm={24} className={state.fullScreen ? "save-btn-full-screen" : "item"}>
-                    <Button
-                        type="primary"
-                        disabled={state.offline}
-                        loading={state.saving.releaseSaving}
-                        style={{ width: "100%", maxWidth: 256 }}
-                        onClick={async () => {
-                            await onSubmit(state.article, true, false, false);
-                        }}
-                    >
-                        <SendOutlined />
-                        {state.article.privacy === true ? getRes()["save"] : getRes().release}
-                    </Button>
-                </Col>
-            </Col>
-        );
-    };
-
     const editorHeight = state.fullScreen ? window.innerHeight - 47 : `calc(100vh - 200px)`;
 
     return (
@@ -648,7 +490,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
                         {getRes()["admin.log.edit"]}
                     </Title>
                 </Col>
-                {!state.fullScreen && getActionBar()}
+                {!state.fullScreen && <ArticleEditActionBar data={state} onSubmit={onSubmit} />}
             </Row>
             {!state.fullScreen && <Divider style={{ marginTop: 16, marginBottom: 16 }} />}
             {messageContextHolder}
@@ -736,7 +578,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
                             top: 0,
                         }}
                     >
-                        {state.fullScreen && getActionBar()}
+                        {state.fullScreen && <ArticleEditActionBar data={state} onSubmit={onSubmit} />}
                         <ArticleEditSettingButton
                             article={state.article}
                             saving={() => isSaving()}
