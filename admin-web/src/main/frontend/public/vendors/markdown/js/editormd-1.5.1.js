@@ -219,7 +219,7 @@
             pagebreak: "fa-newspaper",
             "goto-line": "fa-terminal", // fa-crosshairs
             watch: "fa-eye-slash",
-            unwatch: "fa-eye",
+            unwatch: "fa-eye-dropper",
             preview: "fa-desktop",
             search: "fa-search",
             fullscreen: "fa-arrows-alt",
@@ -2276,7 +2276,32 @@
          */
 
         unwatch: function (callback) {
-            //不处理这个事件，会导致功能不正常
+            var settings        = this.settings;
+            this.state.watching = settings.watch = false;
+            this.preview.hide();
+
+            if (this.toolbar)
+            {
+                var watchIcon   = settings.toolbarIconsClass.watch;
+                var unWatchIcon = settings.toolbarIconsClass.unwatch;
+
+                var icon    = this.toolbar.find(".fa[name=watch]");
+                icon.parent().attr("title", settings.lang.toolbar.unwatch);
+                icon.removeClass(watchIcon).addClass(unWatchIcon);
+            }
+
+            this.codeMirror.css("border-right", "none").width(this.editor.width());
+
+            this.resize();
+
+            if (!settings.onunwatch)
+            {
+                settings.onunwatch = callback || function() {};
+            }
+
+            $.proxy(settings.onunwatch, this)();
+
+            return this;
         },
 
         /**

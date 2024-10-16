@@ -19,6 +19,8 @@ import {
     faBold,
     faClipboard,
     faClose,
+    faEyeDropper,
+    faEyeSlash,
     faFileCode,
     faFileVideo,
     faImage,
@@ -68,6 +70,8 @@ const icons = [
     faPhotoFilm,
     faLink,
     faClose,
+    faEyeSlash,
+    faEyeDropper,
 ];
 icons.forEach((e) => {
     library.add(e);
@@ -159,6 +163,7 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({ height, markdow
                     "code-block",
                     "table",
                     "copyPreviewHtml",
+                    "watch",
                     "|",
                     "help",
                 ];
@@ -189,6 +194,9 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({ height, markdow
                         );
                         messageApi.info(getRes().copPreviewHtmlToClipboardSuccess);
                     });
+                    if (window.innerWidth < 600) {
+                        editor.unwatch();
+                    }
                 }, 100);
 
                 function uploadFile(file: File | null) {
