@@ -2290,7 +2290,7 @@
                 icon.removeClass(watchIcon).addClass(unWatchIcon);
             }
 
-            this.codeMirror.css().width(this.editor.width());
+            this.codeMirror.width(this.editor.width());
 
             this.resize();
 
