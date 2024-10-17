@@ -19,3 +19,4 @@
 #### 1.5.3
 
 - add eye icon
+- remove watch border light

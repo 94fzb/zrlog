@@ -2252,7 +2252,7 @@
                 icon.removeClass(unWatchIcon).addClass(watchIcon);
             }
 
-            this.codeMirror.css("border-right", "1px solid #ddd").width(this.editor.width() / 2);
+            //this.codeMirror.css("border-right", "1px solid #ddd").width(this.editor.width() / 2);
 
             timer = 0;
 
