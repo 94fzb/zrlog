@@ -11,3 +11,7 @@
 - Remove fullscreen listen (use screenfull.js)
 - Add copy html preview
 - Add video upload
+
+#### 1.5.2
+
+- revoke unwatch
