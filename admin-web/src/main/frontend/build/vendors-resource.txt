@@ -12,7 +12,7 @@ vendors/markdown/plugins/file-dialog/file-dialog.js
 vendors/markdown/plugins/help-dialog/help-dialog.js
 vendors/markdown/plugins/help-dialog/help.md
 vendors/markdown/plugins/link-dialog/link-dialog.js
-vendors/markdown/js/editormd-1.5.3.js
+vendors/markdown/js/editormd-1.5.4.js
 vendors/markdown/languages/en.js
 vendors/markdown/lib/codemirror/addons.min.js
 vendors/markdown/lib/codemirror/codemirror.min.js

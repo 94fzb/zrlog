@@ -2285,12 +2285,12 @@
                 var watchIcon   = settings.toolbarIconsClass.watch;
                 var unWatchIcon = settings.toolbarIconsClass.unwatch;
 
-                var icon    = this.toolbar.find(".fa[name=watch]");
+                var icon    = this.toolbar.find(".svg-inline--fa[name=watch]");
                 icon.parent().attr("title", settings.lang.toolbar.unwatch);
                 icon.removeClass(watchIcon).addClass(unWatchIcon);
             }
 
-            this.codeMirror.css("border-right", "none").width(this.editor.width());
+            this.codeMirror.css().width(this.editor.width());
 
             this.resize();
 
