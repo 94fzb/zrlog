@@ -15,3 +15,7 @@
 #### 1.5.2
 
 - revoke unwatch
+
+#### 1.5.3
+
+- add eye icon

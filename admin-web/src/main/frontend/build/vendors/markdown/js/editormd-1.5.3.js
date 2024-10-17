@@ -219,7 +219,7 @@
             pagebreak: "fa-newspaper",
             "goto-line": "fa-terminal", // fa-crosshairs
             watch: "fa-eye-slash",
-            unwatch: "fa-eye-dropper",
+            unwatch: "fa-eye",
             preview: "fa-desktop",
             search: "fa-search",
             fullscreen: "fa-arrows-alt",

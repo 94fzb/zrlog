@@ -19,7 +19,7 @@ import {
     faBold,
     faClipboard,
     faClose,
-    faEyeDropper,
+    faEye,
     faEyeSlash,
     faFileCode,
     faFileVideo,
@@ -71,7 +71,7 @@ const icons = [
     faLink,
     faClose,
     faEyeSlash,
-    faEyeDropper,
+    faEye,
 ];
 icons.forEach((e) => {
     library.add(e);
@@ -283,7 +283,7 @@ const MyEditorMdWrapper: FunctionComponent<MyEditorMdWrapperProps> = ({ height, 
     const [mdEditorScriptLoaded, setMdEditorScriptLoaded] = useState<boolean>(false);
 
     const EditMdAsyncScriptLoader = makeAsyncScriptLoader(
-        document.baseURI + "admin/vendors/markdown/js/editormd-1.5.2.js"
+        document.baseURI + "admin/vendors/markdown/js/editormd-1.5.3.js"
     )(MyLoadingComponent) as unknown as FunctionComponent<ScriptLoaderProps>;
     if (mdEditorScriptLoaded) {
         return <MyEditorMd height={height} markdown={markdown} loadSuccess={loadSuccess} onChange={onChange} />;
