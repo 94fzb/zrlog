@@ -136,7 +136,7 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({ height, markdow
             dialogMaskOpacity: 0,
             dialogMaskBgColor: "#000",
             imageUpload: true,
-            watch: true,
+            watch: window.innerWidth > 600,
             toolbarIcons: function () {
                 return [
                     "bold",
@@ -194,9 +194,6 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({ height, markdow
                         );
                         messageApi.info(getRes().copPreviewHtmlToClipboardSuccess);
                     });
-                    if (window.innerWidth < 600) {
-                        editor.unwatch();
-                    }
                 }, 100);
 
                 function uploadFile(file: File | null) {
