@@ -19,7 +19,7 @@ import EnvUtils, { isPWA } from "../../utils/env-utils";
 import EditorStatistics, { toStatisticsByMarkdown } from "./editor/editor-statistics-info";
 import { commonAxiosErrorHandle, createAxiosBaseInstance } from "../../AppBase";
 import ArticleEditSettingButton from "./article-edit-setting-button";
-import { ArticleEntry, ChangedContent, ArticleChangeableValue } from "./index.types";
+import { ArticleEntry, ArticleChangeableValue } from "./index.types";
 import ArticleEditActionBar from "./article-edit-action-bar";
 
 export type ArticleEditState = {
