@@ -157,7 +157,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
     const { modal } = App.useApp();
 
     // 1. 在组件顶层定义两个回调，用 useCallback 包裹
-    const updateRubbishState = useCallback((newArticle) => {
+    const updateRubbishState = useCallback((newArticle:ArticleEntry) => {
         setState((prevState) => ({
             ...prevState,
             rubbish: true,
@@ -171,7 +171,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
         }));
     }, []);
     
-    const updateReleaseState = useCallback((newArticle) => {
+    const updateReleaseState = useCallback((newArticle:ArticleEntry) => {
         setState((prevState) => ({
             ...prevState,
             rubbish: false,
