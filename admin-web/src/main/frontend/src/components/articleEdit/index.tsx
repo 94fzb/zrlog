@@ -267,7 +267,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
                     return {
                         ...prevState,
                         rubbish: false,
-                        article: newArticle,
+                        article: doMergeArticle(prevState.article, newArticle),
                         saving: {
                             ...prevState.saving,
                             releaseSaving: false,
@@ -282,7 +282,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
                     return {
                         ...prevState,
                         rubbish: true,
-                        article: newArticle,
+                        article: doMergeArticle(prevState.article, newArticle),
                         saving: {
                             ...prevState.saving,
                             rubbishSaving: false,
@@ -293,6 +293,25 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
                 });
             }
         }
+    };
+
+    const doMergeArticle = (stateArticle: ArticleEntry, updateResponseArticle: ArticleEntry): ArticleEntry => {
+        return {
+            ...updateResponseArticle,
+            ...stateArticle,
+            logId: updateResponseArticle.logId,
+            lastUpdateDate: updateResponseArticle.lastUpdateDate,
+            version: updateResponseArticle.version,
+            //优先使用本地变更的指
+            digest:
+                stateArticle.alias && stateArticle.alias.length > 0 ? stateArticle.alias : updateResponseArticle.digest,
+            alias:
+                stateArticle.alias && stateArticle.alias.length > 0 ? stateArticle.alias : updateResponseArticle.alias,
+            thumbnail:
+                stateArticle.thumbnail && stateArticle.thumbnail.length > 0
+                    ? stateArticle.thumbnail
+                    : updateResponseArticle.thumbnail,
+        };
     };
 
     const doFullState = () => {
