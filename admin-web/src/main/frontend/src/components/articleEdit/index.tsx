@@ -185,19 +185,6 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
             },
         }));
     }, []);
-
-    const updateSavingState = (release, autoSave, preview = false) => {
-        setState((prevState) => ({
-            ...prevState,
-            saving: {
-                ...prevState.saving,
-                releaseSaving: release,
-                rubbishSaving: !release,
-                autoSaving: autoSave,
-                previewIng: preview,
-            },
-        }));
-    };
     
     const onSubmit = async (article: ArticleEntry, release: boolean, preview: boolean, autoSave: boolean) => {
         if (isTitleError(article)) {
