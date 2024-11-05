@@ -1,4 +1,4 @@
-import { FunctionComponent, useEffect, useRef, useState } from "react";
+import { FunctionComponent, useCallback, useEffect, useRef, useState } from "react";
 import { FullscreenExitOutlined, FullscreenOutlined } from "@ant-design/icons";
 import { App, Button, message, Space } from "antd";
 import Row from "antd/es/grid/row";
@@ -263,34 +263,38 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
             }
         } finally {
             if (release) {
-                setState((prevState) => {
-                    return {
-                        ...prevState,
-                        rubbish: false,
-                        article: doMergeArticle(prevState.article, newArticle),
-                        saving: {
-                            ...prevState.saving,
-                            releaseSaving: false,
-                            rubbishSaving: false,
-                            previewIng: false,
-                            autoSaving: false,
-                        },
-                    };
-                });
+                useCallback(() => {
+                    setState((prevState) => {
+                        return {
+                            ...prevState,
+                            rubbish: false,
+                            article: doMergeArticle(prevState.article, newArticle),
+                            saving: {
+                                ...prevState.saving,
+                                releaseSaving: false,
+                                rubbishSaving: false,
+                                previewIng: false,
+                                autoSaving: false,
+                            },
+                        };
+                    });
+                }, []);
             } else {
-                setState((prevState) => {
-                    return {
-                        ...prevState,
-                        rubbish: true,
-                        article: doMergeArticle(prevState.article, newArticle),
-                        saving: {
-                            ...prevState.saving,
-                            rubbishSaving: false,
-                            previewIng: false,
-                            autoSaving: false,
-                        },
-                    };
-                });
+                useCallback(() => {
+                    setState((prevState) => {
+                        return {
+                            ...prevState,
+                            rubbish: true,
+                            article: doMergeArticle(prevState.article, newArticle),
+                            saving: {
+                                ...prevState.saving,
+                                rubbishSaving: false,
+                                previewIng: false,
+                                autoSaving: false,
+                            },
+                        };
+                    });
+                }, []);
             }
         }
     };
