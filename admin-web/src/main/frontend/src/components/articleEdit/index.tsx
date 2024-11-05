@@ -148,7 +148,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
     const defaultState = dataToState(data, getPageFullState(getFullPath(location)), offline);
     const [state, setState] = useState<ArticleEditState>(defaultState);
 
-    const [content, setContent] = useState<ChangedContent | undefined>(undefined);
+    //const [content, setContent] = useState<ChangedContent | undefined>(undefined);
 
     const [messageApi, messageContextHolder] = message.useMessage({
         maxCount: 3,
@@ -436,11 +436,11 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
         }
     };
 
-    useEffect(() => {
+    /*useEffect(() => {
         if (content) {
             handleValuesChange(content).then();
         }
-    }, [content]);
+    }, [content]);*/
 
     useEffect(() => {
         const lastOffline = state.offline;
