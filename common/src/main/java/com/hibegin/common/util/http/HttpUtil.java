@@ -27,7 +27,7 @@ public class HttpUtil {
 
     private static final HttpUtil instance = new HttpUtil();
 
-    public HttpUtil() {
+    private HttpUtil() {
         this.httpClient = HttpClient.newBuilder().build();
     }
 
