@@ -155,6 +155,37 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
         getContainer: () => editCardRef.current as HTMLElement,
     });
     const { modal } = App.useApp();
+
+    // 1. 在组件顶层定义两个回调，用 useCallback 包裹
+    const updateRubbishState = useCallback((newArticle) => {
+        setState((prevState) => ({
+            ...prevState,
+            rubbish: true,
+            article: doMergeArticle(prevState.article, newArticle),
+            saving: {
+                ...prevState.saving,
+                rubbishSaving: false,
+                previewIng: false,
+                autoSaving: false,
+            },
+        }));
+    }, []);
+    
+    const updateReleaseState = useCallback((newArticle) => {
+        setState((prevState) => ({
+            ...prevState,
+            rubbish: false,
+            article: doMergeArticle(prevState.article, newArticle),
+            saving: {
+                ...prevState.saving,
+                releaseSaving: false,
+                rubbishSaving: false,
+                previewIng: false,
+                autoSaving: false,
+            },
+        }));
+    }, []);
+    
     const onSubmit = async (article: ArticleEntry, release: boolean, preview: boolean, autoSave: boolean) => {
         if (isTitleError(article)) {
             messageApi.error({ content: "文章标题不能为空" });
@@ -262,40 +293,8 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
                 deleteCacheDataByKey(ck);
             }
         } finally {
-            if (release) {
-                useCallback(() => {
-                    setState((prevState) => {
-                        return {
-                            ...prevState,
-                            rubbish: false,
-                            article: doMergeArticle(prevState.article, newArticle),
-                            saving: {
-                                ...prevState.saving,
-                                releaseSaving: false,
-                                rubbishSaving: false,
-                                previewIng: false,
-                                autoSaving: false,
-                            },
-                        };
-                    });
-                }, []);
-            } else {
-                useCallback(() => {
-                    setState((prevState) => {
-                        return {
-                            ...prevState,
-                            rubbish: true,
-                            article: doMergeArticle(prevState.article, newArticle),
-                            saving: {
-                                ...prevState.saving,
-                                rubbishSaving: false,
-                                previewIng: false,
-                                autoSaving: false,
-                            },
-                        };
-                    });
-                }, []);
-            }
+            // 根据 release 的值调用对应的状态更新回调函数
+            release ? updateReleaseState(newArticle) : updateRubbishState(newArticle);
         }
     };
 
