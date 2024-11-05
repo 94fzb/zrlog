@@ -304,11 +304,15 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
             version: updateResponseArticle.version,
             //优先使用本地变更的指
             digest:
-                stateArticle.alias && stateArticle.alias.length > 0 ? stateArticle.alias : updateResponseArticle.digest,
+                stateArticle.digest && stateArticle.digest.trim().length > 0
+                    ? stateArticle.digest
+                    : updateResponseArticle.digest,
             alias:
-                stateArticle.alias && stateArticle.alias.length > 0 ? stateArticle.alias : updateResponseArticle.alias,
+                stateArticle.alias && stateArticle.alias.trim().length > 0
+                    ? stateArticle.alias
+                    : updateResponseArticle.alias,
             thumbnail:
-                stateArticle.thumbnail && stateArticle.thumbnail.length > 0
+                stateArticle.thumbnail && stateArticle.thumbnail.trim().length > 0
                     ? stateArticle.thumbnail
                     : updateResponseArticle.thumbnail,
         };
