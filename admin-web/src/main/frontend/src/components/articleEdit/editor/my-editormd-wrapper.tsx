@@ -84,8 +84,6 @@ type MyEditorMdWrapperState = {
     editorLoading: boolean;
     mdEditorScriptLoaded: boolean;
     id: string;
-    content: string;
-    markdown: string;
 };
 
 export type ScriptLoaderProps = {
@@ -100,10 +98,10 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({ height, markdow
     const [state, setState] = useState<MyEditorMdWrapperState>({
         mdEditorScriptLoaded: true,
         editorLoading: true,
-        content: "",
-        markdown: markdown ? markdown : "",
         id: "editor-" + new Date().getTime(),
     });
+
+    const [content, setContent] = useState<ChangedContent>({ content: "", markdown: markdown });
 
     const [messageApi, contextHolder] = message.useMessage();
 
@@ -175,7 +173,7 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({ height, markdow
             imageUploadURL: document.baseURI + "api/admin/upload",
             path: document.baseURI + "admin/vendors/markdown/lib/",
             placeholder: getRes()["editorPlaceholder"],
-            markdown: state.markdown,
+            markdown: content.markdown,
             onload: function () {
                 setTimeout(() => {
                     $("#fileDialog").on("click", function () {
@@ -236,8 +234,7 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({ height, markdow
             },
 
             onchange: async function () {
-                setState({
-                    ...state,
+                setContent({
                     markdown: editor.getMarkdown(),
                     content: editor.getPreviewedHTML(),
                 });
@@ -253,8 +250,8 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({ height, markdow
     };
 
     useEffect(() => {
-        onChange({ markdown: state.markdown, content: state.content });
-    }, [state.markdown, state.content]);
+        onChange(content);
+    }, [content]);
 
     useEffect(() => {
         //@ts-ignore
