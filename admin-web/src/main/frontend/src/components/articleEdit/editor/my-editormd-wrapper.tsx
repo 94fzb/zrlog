@@ -84,6 +84,8 @@ type MyEditorMdWrapperState = {
     editorLoading: boolean;
     mdEditorScriptLoaded: boolean;
     id: string;
+    content: string;
+    markdown: string;
 };
 
 export type ScriptLoaderProps = {
@@ -98,6 +100,8 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({ height, markdow
     const [state, setState] = useState<MyEditorMdWrapperState>({
         mdEditorScriptLoaded: true,
         editorLoading: true,
+        content: "",
+        markdown: markdown ? markdown : "",
         id: "editor-" + new Date().getTime(),
     });
 
@@ -120,7 +124,7 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({ height, markdow
         }
     }
 
-    const initEditor = (md: string) => {
+    const initEditor = () => {
         // eslint-disable-next-line no-undef,no-unused-vars
         //@ts-ignore
         editor = editormd(state.id, $, {
@@ -171,7 +175,7 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({ height, markdow
             imageUploadURL: document.baseURI + "api/admin/upload",
             path: document.baseURI + "admin/vendors/markdown/lib/",
             placeholder: getRes()["editorPlaceholder"],
-            markdown: md,
+            markdown: state.markdown,
             onload: function () {
                 setTimeout(() => {
                     $("#fileDialog").on("click", function () {
@@ -232,11 +236,11 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({ height, markdow
             },
 
             onchange: async function () {
-                const changed = {
+                setState({
+                    ...state,
                     markdown: editor.getMarkdown(),
                     content: editor.getPreviewedHTML(),
-                };
-                await onChange(changed);
+                });
             },
 
             onfullscreen: function () {
@@ -249,9 +253,13 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({ height, markdow
     };
 
     useEffect(() => {
+        onChange({ markdown: state.markdown, content: state.content });
+    }, [state.markdown, state.content]);
+
+    useEffect(() => {
         //@ts-ignore
         window.createEditorMDInstance();
-        initEditor(markdown ? markdown : "");
+        initEditor();
         return () => {
             $(document.getElementById(state.id) as HTMLDivElement).off();
             $(document.body as HTMLBodyElement).off();
