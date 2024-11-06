@@ -1,6 +1,6 @@
-import { FunctionComponent, useCallback, useEffect, useRef, useState } from "react";
+import { FunctionComponent, useEffect, useRef, useState } from "react";
 import { FullscreenExitOutlined, FullscreenOutlined } from "@ant-design/icons";
-import { App, Button, message, Space } from "antd";
+import { App, Button, InputRef, message, Space } from "antd";
 import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
 import Divider from "antd/es/divider";
@@ -148,7 +148,10 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
     const defaultState = dataToState(data, getPageFullState(getFullPath(location)), offline);
     const [state, setState] = useState<ArticleEditState>(defaultState);
 
-    //const [content, setContent] = useState<ChangedContent | undefined>(undefined);
+    const aliasRef = useRef<InputRef>(null);
+    const digestRef = useRef<InputRef>(null);
+    const versionRef = useRef<number>(data.article.version);
+    const changeQueue = useRef<ArticleEntry[]>([]);
 
     const [messageApi, messageContextHolder] = message.useMessage({
         maxCount: 3,
@@ -156,12 +159,11 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
     });
     const { modal } = App.useApp();
 
-    // 1. 在组件顶层定义两个回调，用 useCallback 包裹
-    const updateRubbishState = useCallback((newArticle:ArticleEntry) => {
+    const updateRubbishState = (newArticle: ArticleEntry, create: boolean) => {
         setState((prevState) => ({
             ...prevState,
             rubbish: true,
-            article: doMergeArticle(prevState.article, newArticle),
+            article: doMergeArticle(prevState.article, newArticle, create),
             saving: {
                 ...prevState.saving,
                 rubbishSaving: false,
@@ -169,13 +171,13 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
                 autoSaving: false,
             },
         }));
-    }, []);
-    
-    const updateReleaseState = useCallback((newArticle:ArticleEntry) => {
+    };
+
+    const updateReleaseState = (newArticle: ArticleEntry, create: boolean) => {
         setState((prevState) => ({
             ...prevState,
             rubbish: false,
-            article: doMergeArticle(prevState.article, newArticle),
+            article: doMergeArticle(prevState.article, newArticle, create),
             saving: {
                 ...prevState.saving,
                 releaseSaving: false,
@@ -184,8 +186,8 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
                 autoSaving: false,
             },
         }));
-    }, []);
-    
+    };
+
     const onSubmit = async (article: ArticleEntry, release: boolean, preview: boolean, autoSave: boolean) => {
         if (isTitleError(article)) {
             messageApi.error({ content: "文章标题不能为空" });
@@ -194,6 +196,10 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
         if (isTypeError(article)) {
             messageApi.error("文章分类不能为空");
             return;
+        }
+        //非自动保存的情况下，需要清空当前缓存队列
+        if (!autoSave) {
+            changeQueue.current = [];
         }
         let uri;
         const create = article!.logId === undefined;
@@ -228,7 +234,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
         }
         let newArticle = {
             ...article,
-            version: state.article.version,
+            version: versionRef.current,
             rubbish: !release,
         };
         const ck = buildCacheKey(newArticle);
@@ -264,6 +270,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
                     });
                     return;
                 }
+                versionRef.current = data.data.version;
             } catch (e) {
                 return commonAxiosErrorHandle(e, modal, messageApi, editCardRef.current as HTMLElement);
             }
@@ -294,31 +301,44 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
             }
         } finally {
             // 根据 release 的值调用对应的状态更新回调函数
-            release ? updateReleaseState(newArticle) : updateRubbishState(newArticle);
+            release ? updateReleaseState(newArticle, create) : updateRubbishState(newArticle, create);
         }
     };
 
-    const doMergeArticle = (stateArticle: ArticleEntry, updateResponseArticle: ArticleEntry): ArticleEntry => {
-        return {
+    const doMergeArticle = (
+        stateArticle: ArticleEntry,
+        updateResponseArticle: ArticleEntry,
+        create: boolean
+    ): ArticleEntry => {
+        const mergeArticle = {
             ...updateResponseArticle,
-            ...stateArticle,
             logId: updateResponseArticle.logId,
             lastUpdateDate: updateResponseArticle.lastUpdateDate,
             version: updateResponseArticle.version,
-            //优先使用本地变更的指
-            digest:
-                stateArticle.digest && stateArticle.digest.trim().length > 0
-                    ? stateArticle.digest
-                    : updateResponseArticle.digest,
-            alias:
-                stateArticle.alias && stateArticle.alias.trim().length > 0
-                    ? stateArticle.alias
-                    : updateResponseArticle.alias,
             thumbnail:
                 stateArticle.thumbnail && stateArticle.thumbnail.trim().length > 0
                     ? stateArticle.thumbnail
                     : updateResponseArticle.thumbnail,
         };
+        //处理文章别名
+        if (aliasRef.current && aliasRef.current.input) {
+            if (aliasRef.current.input.value.trim().length === 0 && create) {
+                mergeArticle.alias = updateResponseArticle.alias;
+                aliasRef.current.input.value = updateResponseArticle.alias as string;
+            } else {
+                mergeArticle.alias = aliasRef.current.input.value;
+            }
+        }
+        //处理摘要
+        if (digestRef.current && digestRef.current.input) {
+            if (digestRef.current.input.value.trim().length === 0 && create) {
+                mergeArticle.digest = updateResponseArticle.digest;
+                digestRef.current.input.value = updateResponseArticle.digest as string;
+            } else {
+                mergeArticle.digest = digestRef.current.input.value;
+            }
+        }
+        return mergeArticle;
     };
 
     const doFullState = () => {
@@ -397,37 +417,17 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
         window.onbeforeunload = null;
     };
 
-    let saving = false;
-
     const isSaving = () => {
-        return state.saving.rubbishSaving || state.saving.releaseSaving || state.saving.previewIng || saving;
+        return state.saving.rubbishSaving || state.saving.releaseSaving || state.saving.previewIng;
     };
 
     const save = async (article: ArticleEntry) => {
-        //如果正在保存，尝试10ms后再检查下
-        if (isSaving()) {
-            setTimeout(() => {
-                save(article);
-            }, 10);
-            return;
+        //copy log id
+        if (state.article.logId && state.article.logId > 0) {
+            article.logId = state.article.logId;
         }
-        try {
-            //copy log id
-            if (state.article.logId && state.article.logId > 0) {
-                article.logId = state.article.logId;
-            }
-            saving = true;
-            await onSubmit(article, false, false, true);
-        } finally {
-            saving = false;
-        }
+        await onSubmit(article, false, false, true);
     };
-
-    /*useEffect(() => {
-        if (content) {
-            handleValuesChange(content).then();
-        }
-    }, [content]);*/
 
     useEffect(() => {
         const lastOffline = state.offline;
@@ -457,6 +457,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
     }, [data, offline]);
 
     useEffect(() => {
+        autoSaveChange();
         if (state.fullScreen && isPWA()) {
             onfullscreen();
         }
@@ -485,20 +486,49 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
         return !(titleError || typeError);
     };
 
-    const handleValuesChange = async (cv: ArticleChangeableValue) => {
-        const newArticle: ArticleEntry = {
-            ...state.article,
-            ...cv,
-        };
-        //console.info(cv);
-        const ok = validForm(newArticle);
-        if (!ok) {
-            setState((prev) => {
-                return { ...prev, article: newArticle };
-            });
-            return;
+    const isProcessing = useRef(false); // 使用 ref 来持久化处理状态
+
+    const autoSaveChange = () => {
+        setTimeout(() => {
+            processQueue();
+        }, 20);
+    };
+
+    const processQueue = async () => {
+        try {
+            // 如果当前正在处理请求，直接返回
+            if (isProcessing.current || changeQueue.current.length === 0) {
+                return;
+            }
+
+            // 标记为正在处理
+            isProcessing.current = true;
+
+            while (changeQueue.current.length > 0) {
+                // 获取队列的第一个值并进行处理
+                const nextValue = changeQueue.current.shift();
+                if (nextValue) {
+                    const ok = validForm(nextValue);
+                    if (!ok) {
+                        continue;
+                    }
+                    //console.log("Submitting:", nextValue);
+                    await save(nextValue);
+                }
+            }
+            // 重置处理状态
+            isProcessing.current = false;
+        } finally {
+            autoSaveChange();
         }
-        await save(newArticle);
+    };
+
+    const handleValuesChange = async (cv: ArticleChangeableValue) => {
+        setState((prev) => {
+            const n = { ...prev.article, ...cv };
+            changeQueue.current.push(n);
+            return { ...prev, article: n };
+        });
     };
 
     const editorHeight = state.fullScreen ? window.innerHeight - 47 : `calc(100vh - 200px)`;
@@ -546,7 +576,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
                             variant={"borderless"}
                             size={"large"}
                             placeholder={getRes().inputArticleTitle}
-                            value={state.article.title ? state.article.title : undefined}
+                            defaultValue={state.article.title ? state.article.title : undefined}
                             onChange={async (e) => {
                                 await handleValuesChange({ title: e });
                             }}
@@ -581,7 +611,8 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
                                 placeholder={getRes()["pleaseChoose"] + getRes()["admin.type.manage"]}
                             />
                             <BaseInput
-                                value={state.article.alias}
+                                ref={aliasRef}
+                                defaultValue={state.article.alias}
                                 onChange={async (e) => {
                                     await handleValuesChange({ alias: e });
                                 }}
@@ -606,6 +637,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
                     >
                         {state.fullScreen && <ArticleEditActionBar data={state} onSubmit={onSubmit} />}
                         <ArticleEditSettingButton
+                            digestRef={digestRef}
                             article={state.article}
                             saving={() => isSaving()}
                             tags={state.tags}

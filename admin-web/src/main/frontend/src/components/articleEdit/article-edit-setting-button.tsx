@@ -7,7 +7,7 @@ import Form from "antd/es/form";
 import Switch from "antd/es/switch";
 import ArticleEditTag from "./article-edit-tag";
 import BaseTextArea from "../../common/BaseTextArea";
-import { Drawer } from "antd";
+import { Drawer, InputRef } from "antd";
 import EnvUtils from "../../utils/env-utils";
 import { SettingFilled, SettingOutlined } from "@ant-design/icons";
 import { RefObject, useState } from "react";
@@ -19,12 +19,14 @@ const ArticleEditSettingButton = ({
     saving,
     tags,
     containerRef,
+    digestRef,
     handleValuesChange,
 }: {
     article: ArticleEntry;
     saving: () => boolean;
     tags: any;
     containerRef: RefObject<HTMLDivElement>;
+    digestRef: RefObject<InputRef>;
     handleValuesChange: (cv: ArticleChangeableValue) => Promise<void>;
 }) => {
     const [settingsOpen, setSettingsOpen] = useState(false);
@@ -156,8 +158,9 @@ const ArticleEditSettingButton = ({
                         <Col span={24}>
                             <Card size="small" title={getRes().digest} style={{ marginBottom: 36 }}>
                                 <BaseTextArea
+                                    ref={digestRef}
                                     variant={"borderless"}
-                                    value={article.digest}
+                                    defaultValue={article.digest}
                                     placeholder={getRes().digestTips}
                                     rows={6}
                                     onChange={async (text: string) => {

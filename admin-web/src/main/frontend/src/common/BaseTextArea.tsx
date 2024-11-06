@@ -1,32 +1,31 @@
 import Form from "antd/es/form";
-import React, { CSSProperties, FunctionComponent, useEffect, useState } from "react";
+import React, { CSSProperties, FunctionComponent, Ref, useState } from "react";
 import TextArea from "antd/es/input/TextArea";
 import { Variant } from "antd/es/config-provider/context";
+import { InputRef } from "antd";
 
 type BaseTextAreaProps = {
     placeholder?: string;
-    value?: string;
+    defaultValue?: string;
     onChange: (value: string) => Promise<void>;
     required?: boolean;
+    ref?: Ref<InputRef>;
     rows?: number;
     variant?: Variant;
     style?: CSSProperties;
 };
 const BaseTextArea: FunctionComponent<BaseTextAreaProps> = ({
     style,
-    value,
+    defaultValue,
     variant,
+    ref,
     rows,
     onChange,
     required,
     placeholder,
 }) => {
     const [isComposing, setIsComposing] = useState<boolean>(false);
-    const [inputValue, setInputValue] = useState<string>(value || "");
-    // 更新 inputValue 以匹配外部传入的 value，处理受控组件的需求
-    useEffect(() => {
-        setInputValue(value || "");
-    }, [value]);
+    const [inputValue, setInputValue] = useState<string>(defaultValue || "");
 
     const handleInputChange = async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setInputValue(e.target.value);
@@ -40,9 +39,10 @@ const BaseTextArea: FunctionComponent<BaseTextAreaProps> = ({
     return (
         <Form.Item style={{ marginBottom: 8, width: "100%" }} rules={[{ required: required, message: "" }]}>
             <TextArea
+                ref={ref}
                 style={{ ...style }}
                 variant={variant}
-                value={inputValue}
+                defaultValue={inputValue}
                 onChange={handleInputChange}
                 onCompositionStart={() => setIsComposing(true)}
                 onCompositionUpdate={() => setIsComposing(true)}
