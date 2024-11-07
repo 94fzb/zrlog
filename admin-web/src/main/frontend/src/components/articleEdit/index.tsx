@@ -309,6 +309,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
     }, [data, offline]);
 
     useEffect(() => {
+        autoSaveChange();
         return () => {
             if (savingTimer.current) {
                 clearTimeout(savingTimer.current);
