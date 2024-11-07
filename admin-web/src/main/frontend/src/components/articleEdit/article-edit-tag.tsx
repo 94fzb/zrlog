@@ -1,5 +1,4 @@
 import { Input, Space, Tag } from "antd";
-import { TweenOneGroup } from "rc-tween-one";
 import { PlusOutlined, TagOutlined } from "@ant-design/icons";
 import Title from "antd/es/typography/Title";
 import { FunctionComponent, useState } from "react";
@@ -129,16 +128,6 @@ const ArticleEditTag: FunctionComponent<ArticleEditTagProps> = ({ allTags, keywo
     return (
         <>
             <div style={{ marginBottom: 16 }}>
-                <TweenOneGroup
-                    enter={{
-                        scale: 0.8,
-                        opacity: 0,
-                        type: "from",
-                        duration: 100,
-                    }}
-                    leave={{ opacity: 0, width: 0, scale: 0, duration: 200 }}
-                    appear={false}
-                />
                 <Space size={[0, 8]} wrap>
                     {tagChild}
                 </Space>
