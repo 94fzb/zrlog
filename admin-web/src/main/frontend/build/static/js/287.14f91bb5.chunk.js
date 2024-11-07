@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkadmin_web_frontend=self.webpackChunkadmin_web_frontend||[]).push([[287],{5287:function(e,n,a){a.r(n);var t=a(700),f=a(3712);n.default=function(){return(0,f.jsx)(t.default,{data:{message:"Current offline page"},code:"500"})}}}]);
