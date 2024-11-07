@@ -60,3 +60,40 @@ export type ArticleChangeableValue =
     | ChangedContent
     | ThumbnailChanged
     | DigestChanged;
+
+
+export type ArticleEditInfo = {
+    tags: any[];
+    types: any[];
+    article: ArticleEntry;
+};
+
+
+export type FullScreenProps = {
+    onExitFullScreen: () => void;
+    onFullScreen: () => void;
+}
+
+export type ArticleEditProps = FullScreenProps & {
+    data: ArticleEditInfo;
+    offline: boolean;
+};
+
+export type ArticleEditState = {
+    typeOptions: any[];
+    tags: any[];
+    rubbish: boolean;
+    fullScreen: boolean;
+    editorVersion: number;
+    editorInitSuccess: boolean;
+    article: ArticleEntry;
+    saving: ArticleSavingState;
+    offline: boolean;
+};
+
+export type ArticleSavingState = {
+    rubbishSaving: boolean;
+    previewIng: boolean;
+    autoSaving: boolean;
+    releaseSaving: boolean;
+};

@@ -4,7 +4,7 @@ import { EyeOutlined, SaveOutlined, SendOutlined } from "@ant-design/icons";
 import { getRes } from "../../utils/constants";
 import TimeAgo from "../../common/TimeAgo";
 import EnvUtils from "../../utils/env-utils";
-import { ArticleEditState } from "./index";
+import { ArticleEditState } from "./index.types";
 import { FunctionComponent, useEffect, useRef } from "react";
 import { ArticleEntry } from "./index.types";
 

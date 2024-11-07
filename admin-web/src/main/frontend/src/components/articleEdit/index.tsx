@@ -1,6 +1,5 @@
 import { FunctionComponent, useEffect, useRef, useState } from "react";
-import { FullscreenExitOutlined, FullscreenOutlined } from "@ant-design/icons";
-import { App, Button, InputRef, message, Space } from "antd";
+import { App, InputRef, message, Space } from "antd";
 import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
 import Divider from "antd/es/divider";
@@ -8,38 +7,20 @@ import Title from "antd/es/typography/Title";
 import Card from "antd/es/card";
 import MyEditorMdWrapper from "./editor/my-editormd-wrapper";
 import { createUri, getRes, updateUri } from "../../utils/constants";
-import screenfull from "screenfull";
 import styled from "styled-components";
 import Select from "antd/es/select";
 import BaseInput from "../../common/BaseInput";
-import { addToCache, deleteCacheDataByKey, getCacheByKey, getPageFullState, savePageFullState } from "../../cache";
+import { getPageFullState } from "../../cache";
 import { getFullPath } from "../../utils/helpers";
 import { useLocation } from "react-router";
-import EnvUtils, { isPWA } from "../../utils/env-utils";
+import EnvUtils from "../../utils/env-utils";
 import EditorStatistics, { toStatisticsByMarkdown } from "./editor/editor-statistics-info";
 import { commonAxiosErrorHandle, createAxiosBaseInstance } from "../../AppBase";
 import ArticleEditSettingButton from "./article-edit-setting-button";
-import { ArticleEntry, ArticleChangeableValue } from "./index.types";
+import { ArticleEntry, ArticleChangeableValue, ArticleEditProps, ArticleEditState } from "./index.types";
 import ArticleEditActionBar from "./article-edit-action-bar";
-
-export type ArticleEditState = {
-    typeOptions: any[];
-    tags: any[];
-    rubbish: boolean;
-    fullScreen: boolean;
-    editorVersion: number;
-    editorInitSuccess: boolean;
-    article: ArticleEntry;
-    saving: ArticleSavingState;
-    offline: boolean;
-};
-
-type ArticleSavingState = {
-    rubbishSaving: boolean;
-    previewIng: boolean;
-    autoSaving: boolean;
-    releaseSaving: boolean;
-};
+import { articleDataToState, articleSaveToCache, deleteArticleCache } from "../../utils/article-cache";
+import ArticleEditFullscreenButton from "./article-edit-fullscreen-button";
 
 const StyledArticleEdit = styled("div")`
     .ant-btn {
@@ -80,78 +61,21 @@ const StyledArticleEdit = styled("div")`
     }
 `;
 
-type ArticleEditInfo = {
-    tags: any[];
-    types: any[];
-    article: ArticleEntry;
-};
-
-export type ArticleEditProps = {
-    data: ArticleEditInfo;
-    onExitFullScreen: () => void;
-    onFullScreen: () => void;
-    offline: boolean;
-};
-
-const buildCacheKey = (newArticle: ArticleEntry) => {
-    return "local-article-info-" + (newArticle && newArticle.logId && newArticle.logId > 0 ? newArticle.logId : -1);
-};
-
-const dataToState = (data: ArticleEditInfo, fullScreen: boolean, offline: boolean): ArticleEditState => {
-    const article: ArticleEntry =
-        data.article.logId && data.article.logId > 0
-            ? data.article
-            : {
-                  version: -1,
-                  title: "",
-                  keywords: "",
-              };
-    const cachedArticle = getCacheByKey(buildCacheKey(article)) as ArticleEntry;
-    const realArticle = {
-        ...article,
-        ...cachedArticle,
-        //use input version
-        version: data.article.version,
-    };
-    return {
-        offline: offline,
-        typeOptions: data.types
-            ? data.types.map((x) => {
-                  return { value: x.id, label: x.typeName };
-              })
-            : [],
-        editorInitSuccess: false,
-        editorVersion: realArticle.version,
-        fullScreen: fullScreen,
-        tags: data.tags ? data.tags : [],
-        rubbish: data.article && data.article.rubbish ? data.article.rubbish : false,
-        article: realArticle,
-        saving: {
-            previewIng: false,
-            releaseSaving: false,
-            rubbishSaving: false,
-            autoSaving: false,
-        },
-    };
-};
-
-const saveToCache = (article: ArticleEntry) => {
-    addToCache(buildCacheKey(article), article);
-};
-
 let editorInstance: { width: (arg0: string) => void };
 
 const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullScreen, onFullScreen }) => {
     const location = useLocation();
     const editCardRef = useRef<HTMLDivElement>(null);
 
-    const defaultState = dataToState(data, getPageFullState(getFullPath(location)), offline);
+    const defaultState = articleDataToState(data, getPageFullState(getFullPath(location)), offline);
     const [state, setState] = useState<ArticleEditState>(defaultState);
 
     const aliasRef = useRef<InputRef>(null);
     const digestRef = useRef<InputRef>(null);
-    const versionRef = useRef<number>(data.article.version);
+    const versionRef = useRef<number>(defaultState.article.version);
     const changeQueue = useRef<ArticleEntry[]>([]);
+    const isProcessing = useRef(false); // 使用 ref 来持久化处理状态
+    const savingTimer = useRef<NodeJS.Timeout | null>(null);
 
     const [messageApi, messageContextHolder] = message.useMessage({
         maxCount: 3,
@@ -237,9 +161,8 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
             version: versionRef.current,
             rubbish: !release,
         };
-        const ck = buildCacheKey(newArticle);
         if (offline) {
-            saveToCache(newArticle);
+            articleSaveToCache(newArticle);
             setState((prevState) => {
                 return {
                     ...prevState,
@@ -276,7 +199,10 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
             }
             const data = responseData;
             if (data.error === 0) {
-                exitNotTips();
+                //没有堆积的消息了，才能触发移除强制离开页面的提示
+                if (changeQueue.current.length == 0) {
+                    exitNotTips();
+                }
                 if (!autoSave) {
                     messageApi.info(data.message);
                 }
@@ -297,7 +223,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
                         version: respData.version,
                     };
                 }
-                deleteCacheDataByKey(ck);
+                deleteArticleCache(newArticle);
             }
         } finally {
             // 根据 release 的值调用对应的状态更新回调函数
@@ -341,72 +267,6 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
         return mergeArticle;
     };
 
-    const doFullState = () => {
-        setState((prevState) => {
-            return {
-                ...prevState,
-                fullScreen: true,
-            };
-        });
-        if (editorInstance) {
-            editorInstance.width("100%");
-        }
-    };
-
-    const toggleFullScreen = () => {
-        if (state.fullScreen) {
-            onfullscreenExit();
-        } else {
-            onfullscreen();
-        }
-    };
-
-    const onfullscreen = () => {
-        try {
-            if (screenfull.isEnabled) {
-                screenfull
-                    .request(editCardRef.current as Element)
-                    .then(() => {
-                        doFullState();
-                    })
-                    .catch((e) => {
-                        console.error(e);
-                        doFullState();
-                    });
-                screenfull.on("change", () => {
-                    if (screenfull.isEnabled && !screenfull.isFullscreen) {
-                        onfullscreenExit();
-                    }
-                });
-            } else {
-                doFullState();
-            }
-        } catch (e) {
-            console.error(e);
-            doFullState();
-        } finally {
-            onFullScreen();
-        }
-    };
-
-    const onfullscreenExit = () => {
-        setState((prevState) => {
-            return {
-                ...prevState,
-                fullScreen: false,
-            };
-        });
-        if (editorInstance) {
-            editorInstance.width("100%");
-        }
-        onExitFullScreen();
-        if (screenfull.isEnabled) {
-            screenfull.exit().catch((e) => {
-                console.error(e);
-            });
-        }
-    };
-
     const exitTips = (tips: string) => {
         window.onbeforeunload = function () {
             return tips;
@@ -421,19 +281,11 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
         return state.saving.rubbishSaving || state.saving.releaseSaving || state.saving.previewIng;
     };
 
-    const save = async (article: ArticleEntry) => {
-        //copy log id
-        if (state.article.logId && state.article.logId > 0) {
-            article.logId = state.article.logId;
-        }
-        await onSubmit(article, false, false, true);
-    };
-
     useEffect(() => {
         const lastOffline = state.offline;
         //离线，保存到本地编辑
         if (!lastOffline && offline) {
-            saveToCache(state.article);
+            articleSaveToCache(state.article);
             setState((prevState) => {
                 return {
                     ...prevState,
@@ -442,7 +294,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
             });
             return;
         }
-        const newSate = dataToState(data, getPageFullState(getFullPath(location)), offline);
+        const newSate = articleDataToState(data, getPageFullState(getFullPath(location)), offline);
         setState(newSate);
         //如果网络恢复，自动保存一次
         if (lastOffline && !offline) {
@@ -457,20 +309,12 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
     }, [data, offline]);
 
     useEffect(() => {
-        autoSaveChange();
-        if (state.fullScreen && isPWA()) {
-            onfullscreen();
-        }
         return () => {
-            exitNotTips();
+            if (savingTimer.current) {
+                clearTimeout(savingTimer.current);
+            }
         };
     }, []);
-
-    useEffect(() => {
-        if (isPWA()) {
-            savePageFullState(getFullPath(location), state.fullScreen);
-        }
-    }, [state.fullScreen]);
 
     const isTitleError = (changedArticle: ArticleEntry) => {
         return changedArticle.title === undefined || changedArticle.title === null || changedArticle.title === "";
@@ -486,10 +330,8 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
         return !(titleError || typeError);
     };
 
-    const isProcessing = useRef(false); // 使用 ref 来持久化处理状态
-
     const autoSaveChange = () => {
-        setTimeout(() => {
+        savingTimer.current = setTimeout(() => {
             processQueue();
         }, 20);
     };
@@ -506,14 +348,17 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
 
             while (changeQueue.current.length > 0) {
                 // 获取队列的第一个值并进行处理
-                const nextValue = changeQueue.current.shift();
-                if (nextValue) {
-                    const ok = validForm(nextValue);
+                const article = changeQueue.current.shift();
+                if (article) {
+                    const ok = validForm(article);
                     if (!ok) {
                         continue;
                     }
                     //console.log("Submitting:", nextValue);
-                    await save(nextValue);
+                    if (state.article.logId && state.article.logId > 0) {
+                        article.logId = state.article.logId;
+                    }
+                    await onSubmit(article, false, false, true);
                 }
             }
             // 重置处理状态
@@ -644,40 +489,20 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
                             containerRef={editCardRef}
                             handleValuesChange={handleValuesChange}
                         />
-                        <Button
-                            type={"default"}
-                            icon={
-                                state.fullScreen ? (
-                                    <FullscreenExitOutlined style={{ fontSize: 24 }} />
-                                ) : (
-                                    <FullscreenOutlined style={{ fontSize: 24 }} />
-                                )
-                            }
-                            href={
-                                state.fullScreen
-                                    ? window.location.pathname + "#exitFullScreen"
-                                    : window.location.pathname + "#enterFullScreen"
-                            }
-                            style={{
-                                border: 0,
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                width: 46,
-                                minWidth: 46,
-                                borderRadius: 8,
-                                height: 46,
-                                fontSize: 24,
-                                cursor: "pointer",
-                                color: "rgb(102, 102, 102)",
-                                background: EnvUtils.isDarkMode() ? "#141414" : "white",
+                        <ArticleEditFullscreenButton
+                            fullScreenElement={editCardRef.current as HTMLDivElement}
+                            editorInstance={editorInstance}
+                            onExitFullScreen={onExitFullScreen}
+                            onFullScreen={onFullScreen}
+                            onChange={(full) => {
+                                setState((prevState) => {
+                                    return {
+                                        ...prevState,
+                                        fullScreen: full,
+                                    };
+                                });
                             }}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                e.preventDefault();
-                                toggleFullScreen();
-                            }}
-                        ></Button>
+                        />
                     </Col>
                 </Row>
                 <Row gutter={[state.fullScreen ? 0 : 8, state.fullScreen ? 0 : 8]}>
