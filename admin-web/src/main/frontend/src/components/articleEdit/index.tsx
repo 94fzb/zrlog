@@ -114,11 +114,11 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
 
     const onSubmit = async (article: ArticleEntry, release: boolean, preview: boolean, autoSave: boolean) => {
         if (isTitleError(article)) {
-            messageApi.error({ content: "文章标题不能为空" });
+            messageApi.error({ content: getRes()["article_require_title"] });
             return;
         }
         if (isTypeError(article)) {
-            messageApi.error("文章分类不能为空");
+            messageApi.error(getRes()["article_require_type"]);
             return;
         }
         //非自动保存的情况下，需要清空当前缓存队列

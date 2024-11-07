@@ -1,6 +1,7 @@
 package com.zrlog.admin.business.exception;
 
 import com.zrlog.common.exception.AbstractBusinessException;
+import com.zrlog.util.I18nUtil;
 
 public class ArticleMissingTitleException extends AbstractBusinessException {
     @Override
@@ -10,6 +11,6 @@ public class ArticleMissingTitleException extends AbstractBusinessException {
 
     @Override
     public String getMessage() {
-        return "文章标题不能为空";
+        return I18nUtil.getAdminStringFromRes("article_require_title");
     }
 }
