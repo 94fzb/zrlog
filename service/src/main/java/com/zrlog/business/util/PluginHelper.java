@@ -30,7 +30,7 @@ public class PluginHelper {
         map.put("Current-Locale", I18nUtil.getCurrentLocale());
         map.put("Blog-Version", BlogBuildInfoUtil.getVersion());
         map.put("Dark-Mode", Constants.getBooleanByFromWebSite("admin_darkMode") + "");
-        map.put("Admin-Color-Primary", Objects.toString(Constants.zrLogConfig.getWebSite().get("admin_color_primary"), "#1677ff"));
+        map.put("Admin-Color-Primary", Objects.toString(Constants.zrLogConfig.getPublicWebSite().get("admin_color_primary"), "#1677ff"));
         if (request != null) {
             if (Objects.nonNull(request.getHeader("Cookie"))) {
                 map.put("Cookie", request.getHeader("Cookie"));

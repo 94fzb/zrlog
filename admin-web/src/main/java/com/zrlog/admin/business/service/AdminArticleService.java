@@ -15,7 +15,6 @@ import com.zrlog.admin.business.rest.request.CreateArticleRequest;
 import com.zrlog.admin.business.rest.request.UpdateArticleRequest;
 import com.zrlog.admin.business.rest.response.CreateOrUpdateArticleResponse;
 import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
-import com.zrlog.admin.business.util.ThumbnailUtil;
 import com.zrlog.business.rest.response.ArticleResponseEntry;
 import com.zrlog.business.service.VisitorArticleService;
 import com.zrlog.common.Constants;
@@ -28,8 +27,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
 import org.jsoup.select.Elements;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -81,23 +78,9 @@ public class AdminArticleService {
             }
             int height = -1;
             int width = -1;
-            try {
-                String extName = thumbnailFile.getName().substring(thumbnailFile.getName().lastIndexOf('.'));
-                //创建文件夹，避免保存失败
-                thumbnailFile.getParentFile().mkdirs();
-                if (!".gif".equalsIgnoreCase(extName)) {
-                    IOUtil.writeBytesToFile(ThumbnailUtil.jpeg(bytes, 1f), thumbnailFile);
-                    BufferedImage bimg = ImageIO.read(thumbnailFile);
-                    height = bimg.getHeight();
-                    width = bimg.getWidth();
-                } else {
-                    IOUtil.writeBytesToFile(bytes, thumbnailFile);
-                }
-            } catch (Throwable e) {
-                //fixme jpeg()，对内存使用过大
-                LOGGER.log(Level.SEVERE, "generation jpeg thumbnail error ", e);
-                IOUtil.writeBytesToFile(bytes, thumbnailFile);
-            }
+            //创建文件夹，避免保存失败
+            thumbnailFile.getParentFile().mkdirs();
+            IOUtil.writeBytesToFile(bytes, thumbnailFile);
             return new UploadService().getCloudUrl("", path, thumbnailFile.getPath(), null,
                     adminTokenVO).url() + "?h=" + height + "&w=" + width;
         } catch (Exception e) {
@@ -232,6 +215,4 @@ public class AdminArticleService {
         VisitorArticleService.wrapperSearchKeyword(data, keywords);
         return VisitorArticleService.convertPageable(data, request);
     }
-
-
 }

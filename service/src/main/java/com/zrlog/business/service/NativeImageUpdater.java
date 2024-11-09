@@ -91,8 +91,8 @@ public record NativeImageUpdater(String[] args, File execFile) implements Update
     }
 
     @Override
-    public CompletableFuture<Void> restartProcessAsync(Version upgradeVersion) {
-        return CompletableFuture.runAsync(() -> {
+    public void restartProcessAsync(Version upgradeVersion) {
+        Thread.ofVirtual().start(() -> {
             try {
                 String cmd = buildUpgradeCmd(upgradeVersion);
                 // 构造完整的命令启动

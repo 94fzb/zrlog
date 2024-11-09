@@ -15,6 +15,7 @@
   "admin_color_primary",
   "article_auto_digest_length",
   "admin_darkMode",
+  "admin_static_resource_base_url",
   "autoUpgradeVersion",
   "upgradePreview",
   "rows",

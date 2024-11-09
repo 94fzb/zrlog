@@ -4,9 +4,6 @@ import { Button } from "antd";
 import screenfull from "screenfull";
 import { FunctionComponent, useEffect } from "react";
 import { FullScreenProps } from "./index.types";
-import { savePageFullState } from "../../cache";
-import { getFullPath } from "../../utils/helpers";
-import { useLocation } from "react-router";
 
 type ArticleEditFullscreenButton = FullScreenProps & {
     fullScreenElement: HTMLDivElement;
@@ -22,14 +19,6 @@ const ArticleEditFullscreenButton: FunctionComponent<ArticleEditFullscreenButton
     editorInstance,
     onChange,
 }) => {
-    const location = useLocation();
-
-    useEffect(() => {
-        if (isPWA()) {
-            savePageFullState(getFullPath(location), fullScreen);
-        }
-    }, [fullScreen]);
-
     const toggleFullScreen = () => {
         if (fullScreen) {
             onfullscreenExit();

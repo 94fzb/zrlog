@@ -11,7 +11,7 @@ public abstract class ZrLogConfig extends AbstractServerConfig {
     /**
      * 调用了该方法，主要用于配置，启动插件功能，以及相应的ZrLog的插件服务。
      */
-    public abstract CompletableFuture<Void> startPluginsAsync();
+    public abstract void startPluginsAsync();
 
     public abstract void configDatabase() throws Exception;
 
@@ -23,5 +23,5 @@ public abstract class ZrLogConfig extends AbstractServerConfig {
 
     public abstract TokenService getTokenService();
 
-    public abstract Map<String, Object> getWebSite();
+    public abstract Map<String, Object> getPublicWebSite();
 }

@@ -9,8 +9,6 @@ import com.zrlog.util.I18nUtil;
 
 import java.io.File;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
  * 存放全局的静态变量，有多个地方使用一个key时，存放在这里，方便代码的维护。
@@ -102,7 +100,7 @@ public class Constants {
     }
 
     public static int getInitDataMaxCacheTimeout() {
-        Object dbSettingSize = zrLogConfig.getWebSite().get("cache_timeout_minutes");
+        Object dbSettingSize = zrLogConfig.getPublicWebSite().get("cache_timeout_minutes");
         if (dbSettingSize != null) {
             try {
                 return (int) (Double.parseDouble(dbSettingSize.toString()) * 60 * 1000);
@@ -118,7 +116,7 @@ public class Constants {
     }
 
     public static int getAutoDigestLength() {
-        Object dbSettingSize = zrLogConfig.getWebSite().get("article_auto_digest_length");
+        Object dbSettingSize = zrLogConfig.getPublicWebSite().get("article_auto_digest_length");
         if (dbSettingSize != null) {
             try {
                 return (int) Double.parseDouble(dbSettingSize.toString());
@@ -130,7 +128,7 @@ public class Constants {
     }
 
     public static boolean getBooleanByFromWebSite(String key) {
-        Object dbSetting = zrLogConfig.getWebSite().get(key);
+        Object dbSetting = zrLogConfig.getPublicWebSite().get(key);
         return websiteValueIsTrue(dbSetting);
     }
 
@@ -146,7 +144,7 @@ public class Constants {
 
 
     public static Long getSessionTimeout() {
-        String sessionTimeoutString = (String) Constants.zrLogConfig.getWebSite().get(SESSION_TIMEOUT_KEY);
+        String sessionTimeoutString = (String) Constants.zrLogConfig.getPublicWebSite().get(SESSION_TIMEOUT_KEY);
         if (StringUtils.isEmpty(sessionTimeoutString)) {
             return DEFAULT_SESSION_TIMEOUT;
         }
@@ -167,11 +165,11 @@ public class Constants {
     }
 
     public static long getDefaultRows() {
-        return (long) Double.parseDouble((String) Objects.requireNonNullElse(Constants.zrLogConfig.getWebSite().get("rows"), "10"));
+        return (long) Double.parseDouble((String) Objects.requireNonNullElse(Constants.zrLogConfig.getPublicWebSite().get("rows"), "10"));
     }
 
     public static int getAdminArticlePageSize() {
-        return (int) Double.parseDouble((String) Objects.requireNonNullElse(Constants.zrLogConfig.getWebSite().get("admin_article_page_size"), "10"));
+        return (int) Double.parseDouble((String) Objects.requireNonNullElse(Constants.zrLogConfig.getPublicWebSite().get("admin_article_page_size"), "10"));
     }
 
 
@@ -184,7 +182,7 @@ public class Constants {
     public static final String ADMIN_TITLE_CHAR = " - ";
 
     public static String getAdminTitle(String startTitle) {
-        String title = (String) Constants.zrLogConfig.getWebSite().get("title");
+        String title = (String) Constants.zrLogConfig.getPublicWebSite().get("title");
         StringJoiner sj = new StringJoiner(ADMIN_TITLE_CHAR);
         if (StringUtils.isNotEmpty(startTitle) && !startTitle.trim().isEmpty()) {
             sj.add(startTitle);

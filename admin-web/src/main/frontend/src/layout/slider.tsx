@@ -247,7 +247,7 @@ const SliderMenu = () => {
             selectedKeys={[selectMenu]}
             items={items}
             theme={EnvUtils.isDarkMode() ? "light" : "dark"}
-            style={{ height: "100vh", backgroundColor: EnvUtils.isDarkMode() ? "#1f1f1f" : "#001529" }}
+            style={{ height: "100%", backgroundColor: EnvUtils.isDarkMode() ? "#1f1f1f" : "#001529" }}
         />
     );
 };

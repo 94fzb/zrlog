@@ -8,13 +8,10 @@ import com.hibegin.http.server.util.PathUtil;
 import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.rest.response.UploadFileResponse;
 import com.zrlog.admin.business.service.UploadService;
-import com.zrlog.admin.business.util.ThumbnailUtil;
 import com.zrlog.admin.web.token.AdminTokenThreadLocal;
 import com.zrlog.common.Constants;
 import com.zrlog.common.rest.response.ApiStandardResponse;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -22,12 +19,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class UploadController extends Controller {
 
-    private static final Logger LOGGER = LoggerUtil.getLogger(UploadController.class);
+    //private static final Logger LOGGER = LoggerUtil.getLogger(UploadController.class);
 
     @ResponseBody
     public ApiStandardResponse<UploadFileResponse> index() {
@@ -56,32 +51,23 @@ public class UploadController extends Controller {
     public ApiStandardResponse<UploadFileResponse> thumbnail() throws IOException {
         String uploadFieldName = "imgFile";
         String uri = generatorUri(uploadFieldName);
-        File imgFile = request.getFile(uploadFieldName);
-        String finalFilePath = PathUtil.getStaticPath() + uri;
-        byte[] bytes = IOUtil.getByteByInputStream(new FileInputStream(imgFile));
-        File thumbnailFile = new File(finalFilePath);
-        if (!thumbnailFile.getParentFile().exists()) {
-            thumbnailFile.getParentFile().mkdirs();
-        }
-        int height = -1;
-        int width = -1;
-        if (!".gif".endsWith(uri)) {
-            try {
-                IOUtil.writeBytesToFile(ThumbnailUtil.jpeg(bytes, 1f), thumbnailFile);
-                BufferedImage bimg = ImageIO.read(thumbnailFile);
-                height = bimg.getHeight();
-                width = bimg.getWidth();
-            } catch (Throwable e) {
-                LOGGER.log(Level.SEVERE, "generation jpeg thumbnail error ", e);
-                IOUtil.writeBytesToFile(bytes, thumbnailFile);
+        File tempImgFile = request.getFile(uploadFieldName);
+        try {
+            String finalFilePath = PathUtil.getStaticPath() + uri;
+            byte[] bytes = IOUtil.getByteByInputStream(new FileInputStream(tempImgFile));
+            File thumbnailFile = new File(finalFilePath);
+            if (!thumbnailFile.getParentFile().exists()) {
+                thumbnailFile.getParentFile().mkdirs();
             }
-        } else {
+            int height = -1;
+            int width = -1;
+            //copy file
             IOUtil.writeBytesToFile(bytes, thumbnailFile);
+            UploadFileResponse uploadFileResponse = new UploadService().getCloudUrl("", uri, finalFilePath, getRequest(), AdminTokenThreadLocal.getUser());
+            return new ApiStandardResponse<>(new UploadFileResponse(uploadFileResponse.url() + "?h=" + height + "&w=" + width));
+        } finally {
+            tempImgFile.delete();
         }
-        UploadFileResponse uploadFileResponse = new UploadService().getCloudUrl("", uri,
-                finalFilePath, getRequest(), AdminTokenThreadLocal.getUser());
-        imgFile.delete();
-        return new ApiStandardResponse<>(new UploadFileResponse(uploadFileResponse.url() + "?h=" + height + "&w=" + width));
     }
 
 }

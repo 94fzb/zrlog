@@ -102,7 +102,7 @@ public class UpgradeService {
         }
         HttpFileHandle handle = downloadProcessHandleMap.computeIfAbsent(preUpgradeKey, k -> {
             HttpFileHandle fileHandle = createFileHandle();
-            CompletableFuture.runAsync(() -> {
+            Thread.ofVirtual().start(() -> {
                 try {
                     HttpUtil.getInstance().sendGetRequest(version.getZipDownloadUrl(), fileHandle, new HashMap<>());
                 } catch (IOException | InterruptedException | URISyntaxException e) {

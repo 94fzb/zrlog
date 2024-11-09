@@ -1957,7 +1957,7 @@
                             editormd.$katex = katex;
                             editormd.kaTeXLoaded = true;
                             _this.katexRender();
-                        });
+                        }, settings.path);
                     } else {
                         editormd.$katex = katex;
                         this.katexRender();
@@ -2276,16 +2276,15 @@
          */
 
         unwatch: function (callback) {
-            var settings        = this.settings;
+            var settings = this.settings;
             this.state.watching = settings.watch = false;
             this.preview.hide();
 
-            if (this.toolbar)
-            {
-                var watchIcon   = settings.toolbarIconsClass.watch;
+            if (this.toolbar) {
+                var watchIcon = settings.toolbarIconsClass.watch;
                 var unWatchIcon = settings.toolbarIconsClass.unwatch;
 
-                var icon    = this.toolbar.find(".svg-inline--fa[name=watch]");
+                var icon = this.toolbar.find(".svg-inline--fa[name=watch]");
                 icon.parent().attr("title", settings.lang.toolbar.unwatch);
                 icon.removeClass(watchIcon).addClass(unWatchIcon);
             }
@@ -2294,9 +2293,9 @@
 
             this.resize();
 
-            if (!settings.onunwatch)
-            {
-                settings.onunwatch = callback || function() {};
+            if (!settings.onunwatch) {
+                settings.onunwatch = callback || function () {
+                };
             }
 
             $.proxy(settings.onunwatch, this)();
@@ -3727,7 +3726,7 @@
                     editormd.$katex = katex;
                     editormd.kaTeXLoaded = true;
                     katexHandle();
-                });
+                },settings.path);
             } else {
                 katexHandle();
             }
@@ -3873,13 +3872,6 @@
         }
     };
 
-    // 使用国外的CDN，加载速度有时会很慢，或者自定义URL
-    // You can custom KaTeX load url.
-    editormd.katexURL = {
-        css: "admin/vendors/markdown/lib/katex/katex.min",
-        js: "admin/vendors/markdown/lib/katex/katex.min"
-    };
-
     editormd.kaTeXLoaded = false;
 
     /**
@@ -3889,9 +3881,9 @@
      * @param {Function} [callback=function()]  加载成功后执行的回调函数
      */
 
-    editormd.loadKaTeX = function (callback) {
-        editormd.loadCSS(editormd.katexURL.css, function () {
-            editormd.loadScript(editormd.katexURL.js, callback || function () {
+    editormd.loadKaTeX = function (callback, path) {
+        editormd.loadCSS(path + "katex/katex.min", function () {
+            editormd.loadScript(path + "katex/katex.min", callback || function () {
             });
         });
     };

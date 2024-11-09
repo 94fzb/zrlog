@@ -1,14 +1,14 @@
 {
   "files": {
-    "main.js": "./admin/static/js/main.24d16a24.js",
-    "static/js/298.a8fc1abf.chunk.js": "./admin/static/js/298.a8fc1abf.chunk.js",
-    "static/js/719.74c56f83.chunk.js": "./admin/static/js/719.74c56f83.chunk.js",
-    "static/js/72.1f541da9.chunk.js": "./admin/static/js/72.1f541da9.chunk.js",
+    "main.js": "./admin/static/js/main.9da5d94b.js",
+    "static/js/298.5dd081ac.chunk.js": "./admin/static/js/298.5dd081ac.chunk.js",
+    "static/js/719.d8ee0ed8.chunk.js": "./admin/static/js/719.d8ee0ed8.chunk.js",
+    "static/js/72.88961c06.chunk.js": "./admin/static/js/72.88961c06.chunk.js",
     "static/js/26.b0186717.chunk.js": "./admin/static/js/26.b0186717.chunk.js",
     "static/js/711.41eb5c71.chunk.js": "./admin/static/js/711.41eb5c71.chunk.js",
     "static/js/700.014eb15f.chunk.js": "./admin/static/js/700.014eb15f.chunk.js",
     "static/js/489.82a8e6a5.chunk.js": "./admin/static/js/489.82a8e6a5.chunk.js",
-    "static/js/944.57f126d7.chunk.js": "./admin/static/js/944.57f126d7.chunk.js",
+    "static/js/944.7d2cc7da.chunk.js": "./admin/static/js/944.7d2cc7da.chunk.js",
     "static/js/674.147064e4.chunk.js": "./admin/static/js/674.147064e4.chunk.js",
     "static/js/622.0c1ff2b0.chunk.js": "./admin/static/js/622.0c1ff2b0.chunk.js",
     "static/js/981.3c898d53.chunk.js": "./admin/static/js/981.3c898d53.chunk.js",
@@ -18,7 +18,7 @@
     "static/js/91.8f305342.chunk.js": "./admin/static/js/91.8f305342.chunk.js",
     "static/js/9.6c846bc1.chunk.js": "./admin/static/js/9.6c846bc1.chunk.js",
     "static/js/299.148c60a4.chunk.js": "./admin/static/js/299.148c60a4.chunk.js",
-    "static/js/657.016fddcd.chunk.js": "./admin/static/js/657.016fddcd.chunk.js",
+    "static/js/657.ff83a14f.chunk.js": "./admin/static/js/657.ff83a14f.chunk.js",
     "vendor.js": "./admin/static/js/vendor.db1eefd7.js",
     "static/js/243.d37ec950.chunk.js": "./admin/static/js/243.d37ec950.chunk.js",
     "static/js/78.e7185de9.chunk.js": "./admin/static/js/78.e7185de9.chunk.js",
@@ -39,6 +39,6 @@
   "entrypoints": [
     "static/js/vendor.db1eefd7.js",
     "static/js/563.da5c8043.js",
-    "static/js/main.24d16a24.js"
+    "static/js/main.9da5d94b.js"
   ]
 }

@@ -201,8 +201,8 @@ public class TemplateHelper {
     }
 
     private static void staticHtml(HttpRequest request, String suffix, boolean thumbnailEnableArticle) {
-        String webSiteTitle = (String) Constants.zrLogConfig.getWebSite().get("title");
-        String webSiteSecondTitle = (String) Constants.zrLogConfig.getWebSite().get("second_title");
+        String webSiteTitle = (String) Constants.zrLogConfig.getPublicWebSite().get("title");
+        String webSiteSecondTitle = (String) Constants.zrLogConfig.getPublicWebSite().get("second_title");
         StringJoiner sj = new StringJoiner(" - ");
         if (request.getAttr().get("data") != null) {
             PageData<Map<String, Object>> map = (PageData) request.getAttr().get("data");
@@ -226,7 +226,7 @@ public class TemplateHelper {
                     }
                 }
             }
-            request.getAttr().put("keywords", Constants.zrLogConfig.getWebSite().get("keywords"));
+            request.getAttr().put("keywords", Constants.zrLogConfig.getPublicWebSite().get("keywords"));
         } else if (request.getAttr().get("log") != null) {
             Map<String, Object> objectMap = (Map<String, Object>) request.getAttr().get("log");
             fillArticleInfo(objectMap, request, suffix);
@@ -238,7 +238,7 @@ public class TemplateHelper {
             if (StringUtils.isNotEmpty(keywords)) {
                 request.getAttr().put("keywords", keywords);
             } else {
-                request.getAttr().put("keywords", Objects.requireNonNullElse(Constants.zrLogConfig.getWebSite().get("keywords"), ""));
+                request.getAttr().put("keywords", Objects.requireNonNullElse(Constants.zrLogConfig.getPublicWebSite().get("keywords"), ""));
             }
         }
         if (StringUtils.isNotEmpty(webSiteTitle)) {
@@ -247,7 +247,7 @@ public class TemplateHelper {
         if (StringUtils.isNotEmpty(webSiteSecondTitle)) {
             sj.add(webSiteSecondTitle);
         }
-        request.getAttr().put("description", Objects.requireNonNullElse(Constants.zrLogConfig.getWebSite().get("description"), ""));
+        request.getAttr().put("description", Objects.requireNonNullElse(Constants.zrLogConfig.getPublicWebSite().get("description"), ""));
         request.getAttr().put("title", sj.toString());
     }
 
@@ -292,7 +292,7 @@ public class TemplateHelper {
      * 获取主题的相对于程序的路径，当Cookie中有值的情况下，优先使用Cookie里面的数据（仅当主题存在的情况下，否则返回默认的主题），
      */
     public static String getTemplatePath(HttpRequest request) {
-        String templatePath = Objects.requireNonNullElse((String) Constants.zrLogConfig.getWebSite().get("template"), Constants.DEFAULT_TEMPLATE_PATH);
+        String templatePath = Objects.requireNonNullElse((String) Constants.zrLogConfig.getPublicWebSite().get("template"), Constants.DEFAULT_TEMPLATE_PATH);
         if (Objects.nonNull(request)) {
             String previewTheme = getTemplatePathByCookie(request.getCookies());
             if (previewTheme != null) {

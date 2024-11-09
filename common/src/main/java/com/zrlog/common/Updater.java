@@ -8,7 +8,7 @@ import java.util.concurrent.CompletableFuture;
 
 public interface Updater {
 
-    CompletableFuture<Void> restartProcessAsync(Version upgradeVersion);
+    void restartProcessAsync(Version upgradeVersion);
 
     File execFile();
 

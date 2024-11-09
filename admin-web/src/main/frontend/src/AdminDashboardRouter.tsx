@@ -4,7 +4,14 @@ import { useLocation } from "react-router";
 import { getCsrData } from "./api";
 import MyLoadingComponent from "./components/my-loading-component";
 import { ssData } from "./index";
-import { getCachedData, getLastOpenedPage, getPageDataCacheKey, getPageFullState, putCache } from "./cache";
+import {
+    getCachedData,
+    getLastOpenedPage,
+    getPageDataCacheKey,
+    getPageFullState,
+    putCache,
+    savePageFullState,
+} from "./cache";
 import { deepEqual, getFullPath } from "./utils/helpers";
 import { UpgradeData } from "./components/upgrade";
 import { getRes } from "./utils/constants";
@@ -368,6 +375,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({ of
                                     offline={state.offline}
                                     onFullScreen={() => {
                                         setState((prevState) => {
+                                            savePageFullState(getFullPath(location), true);
                                             return {
                                                 ...prevState,
                                                 fullScreen: true,
@@ -375,14 +383,15 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({ of
                                         });
                                     }}
                                     data={getDataFromState()}
-                                    onExitFullScreen={() =>
+                                    onExitFullScreen={() => {
                                         setState((prevState) => {
+                                            savePageFullState(getFullPath(location), false);
                                             return {
                                                 ...prevState,
                                                 fullScreen: false,
                                             };
-                                        })
-                                    }
+                                        });
+                                    }}
                                 />
                             </Suspense>
                         )}

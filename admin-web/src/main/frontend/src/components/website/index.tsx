@@ -24,6 +24,7 @@ export interface Admin {
     session_timeout: number;
     disable_comment_status: boolean;
     article_thumbnail_status: boolean;
+    admin_static_resource_base_url: string;
     language: string;
     admin_darkMode: boolean;
     admin_color_primary: string;

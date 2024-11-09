@@ -131,9 +131,9 @@ export const deleteCacheDataByKey = (key: string) => {
 
 const buildPageFullStateKey = (key: string) => {
     if (isPWA()) {
-        return key + "_page_fullState_pwa";
+        return key + "_page_fullScreen_pwa";
     }
-    return key + "_page_fullState";
+    return key + "_page_fullScreen_normal";
 };
 
 export const savePageFullState = (key: string, full: boolean) => {

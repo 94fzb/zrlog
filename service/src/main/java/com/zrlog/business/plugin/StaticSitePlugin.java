@@ -2,6 +2,7 @@ package com.zrlog.business.plugin;
 
 import com.hibegin.common.BaseLockObject;
 import com.hibegin.common.util.FileUtils;
+import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.HttpMethod;
@@ -16,6 +17,7 @@ import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.business.service.TemplateHelper;
 import com.zrlog.business.service.TemplateInfoHelper;
 import com.zrlog.business.util.PageServiceUtil;
+import com.zrlog.business.util.ResourceUtils;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.TemplateVO;
 import com.zrlog.plugin.IPlugin;
@@ -24,10 +26,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.*;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Map;
@@ -140,6 +139,8 @@ public class StaticSitePlugin extends BaseLockObject implements IPlugin {
     }
 
     private static void copyCommonAssert() {
+        //admin resource
+        ResourceUtils.getAdminStaticResourceUris().forEach(StaticSitePlugin::copyResourceToCacheFolder);
         //video.js
         copyResourceToCacheFolder("/assets/css/font/vjs.eot");
         copyResourceToCacheFolder("/assets/css/font/vjs.svg");
@@ -167,6 +168,12 @@ public class StaticSitePlugin extends BaseLockObject implements IPlugin {
         InputStream inputStream = StaticSitePlugin.class.getResourceAsStream(resourceName);
         if (Objects.isNull(inputStream)) {
             LOGGER.warning("Missing resource " + resourceName);
+            return;
+        }
+        if (ResourceUtils.isAdminMainJs(resourceName) && StringUtils.isNotEmpty(ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite())) {
+            String stringInputStream = IOUtil.getStringInputStream(inputStream);
+            String newStr = stringInputStream.replace("./admin/", ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite() + "/admin/");
+            Constants.zrLogConfig.getCacheService().saveToCacheFolder(new ByteArrayInputStream(newStr.getBytes()), resourceName);
             return;
         }
         Constants.zrLogConfig.getCacheService().saveToCacheFolder(inputStream, resourceName);

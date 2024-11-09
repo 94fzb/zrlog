@@ -1,6 +1,7 @@
 package com.zrlog.admin.business.rest.base;
 
 import com.hibegin.common.util.StringUtils;
+import com.zrlog.admin.business.exception.ArgsException;
 import com.zrlog.common.Constants;
 import com.zrlog.common.Validator;
 import org.jsoup.Jsoup;
@@ -11,6 +12,7 @@ import java.util.Objects;
 public class AdminWebSiteInfo implements Validator {
 
     private Long session_timeout;
+    private String admin_static_resource_base_url;
     private String language;
     private String admin_color_primary;
     private Integer article_auto_digest_length;
@@ -81,6 +83,13 @@ public class AdminWebSiteInfo implements Validator {
         if (StringUtils.isNotEmpty(admin_color_primary)) {
             this.admin_color_primary = Jsoup.clean(admin_color_primary, Safelist.none());
         }
+        if (StringUtils.isNotEmpty(admin_static_resource_base_url)) {
+            if (admin_static_resource_base_url.startsWith("http://") || admin_static_resource_base_url.startsWith("https://")) {
+                this.admin_static_resource_base_url = Jsoup.clean(admin_static_resource_base_url, Safelist.none());
+            } else {
+                throw new ArgsException("admin_static_resource_base_url");
+            }
+        }
     }
 
     public String getFavicon_png_pwa_192_base64() {
@@ -105,5 +114,13 @@ public class AdminWebSiteInfo implements Validator {
 
     public void setAdmin_article_page_size(Integer admin_article_page_size) {
         this.admin_article_page_size = admin_article_page_size;
+    }
+
+    public String getAdmin_static_resource_base_url() {
+        return admin_static_resource_base_url;
+    }
+
+    public void setAdmin_static_resource_base_url(String admin_static_resource_base_url) {
+        this.admin_static_resource_base_url = admin_static_resource_base_url;
     }
 }

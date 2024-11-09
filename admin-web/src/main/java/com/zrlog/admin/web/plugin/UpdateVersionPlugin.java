@@ -36,7 +36,7 @@ public class UpdateVersionPlugin implements IPlugin {
 
     private void initExecutorService() {
         scheduledExecutorService = new ScheduledThreadPoolExecutor(1, r -> {
-            Thread thread = new Thread(r);
+            Thread thread = Thread.ofVirtual().unstarted(r);
             thread.setName("update-version-plugin-thread");
             return thread;
         });
@@ -47,7 +47,7 @@ public class UpdateVersionPlugin implements IPlugin {
         if (isStarted()) {
             return true;
         }
-        String value = (String) Constants.zrLogConfig.getWebSite().get(Constants.AUTO_UPGRADE_VERSION_KEY);
+        String value = (String) Constants.zrLogConfig.getPublicWebSite().get(Constants.AUTO_UPGRADE_VERSION_KEY);
         if (value != null && !value.isEmpty()) {
             AutoUpgradeVersionType autoUpgradeVersionType = AutoUpgradeVersionType.cycle((int) Double.parseDouble(value));
             if (scheduledExecutorService != null) {
