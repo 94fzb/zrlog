@@ -7,7 +7,7 @@ import { getRes, removeRes } from "../../utils/constants";
 import Button from "antd/es/button";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { App } from "antd";
+import { message } from "antd";
 import { Blog } from "./index";
 
 const layout = {
@@ -17,16 +17,16 @@ const layout = {
 
 const BlogForm = ({ data, offline }: { data: Blog; offline?: boolean }) => {
     const [form, setForm] = useState<any>(data);
-    const { message } = App.useApp();
+    const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
 
     const websiteFormFinish = (changedValues: any) => {
         axios.post("/api/admin/website/blog", { ...form, ...changedValues }).then(async ({ data }) => {
             if (data.error) {
-                await message.error(data.message);
+                await messageApi.error(data.message);
                 return;
             }
             if (data.error === 0) {
-                await message.success(data.message);
+                await messageApi.success(data.message);
                 removeRes();
                 window.location.reload();
             }
@@ -39,6 +39,7 @@ const BlogForm = ({ data, offline }: { data: Blog; offline?: boolean }) => {
 
     return (
         <>
+            {contextHolder}
             <Form
                 {...layout}
                 initialValues={form}

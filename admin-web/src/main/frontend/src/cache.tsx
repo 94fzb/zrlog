@@ -2,6 +2,9 @@
 import { ModeOfOperation } from "aes-js";
 import { ssData } from "./index";
 import { isPWA } from "./utils/env-utils";
+import { removeQueryParam } from "./utils/helpers";
+import { cacheIgnoreReloadKey } from "./utils/constants";
+import * as H from "history";
 
 // AES加密函数
 function aesEncrypt(text: string, key: string): string {
@@ -80,6 +83,14 @@ function padStringToLength(str: string, length: number, paddingChar: string = " 
     }
 }
 
+export const removePageCacheByLocation = (location: H.Location) => {
+    deleteCacheDataByKey(getPageDataCacheKey(location));
+};
+
+export const getPageDataCacheKey = (location: H.Location) => {
+    return location.pathname + removeQueryParam(location.search, cacheIgnoreReloadKey);
+};
+
 export const getCachedData = (): Record<string, any> => {
     const tempData = localStorage.getItem(getCacheKey());
     try {
@@ -113,7 +124,7 @@ export const getCacheByKey = (key: string) => {
 
 export const deleteCacheDataByKey = (key: string) => {
     const data: Record<string, any> = getCachedData();
-    console.info("deleted -> " + key + "==" + data[key]);
+    console.info("deleted -> " + key + ":" + JSON.stringify(data[key]));
     delete data[key];
     putCache(data);
 };

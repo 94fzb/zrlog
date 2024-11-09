@@ -7,7 +7,7 @@ import Button from "antd/es/button";
 import { getRes, removeRes } from "../../utils/constants";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { App } from "antd";
+import { message } from "antd";
 import { Basic } from "./index";
 import FaviconUpload from "./FaviconUpload";
 
@@ -19,15 +19,15 @@ const layout = {
 const BasicForm = ({ data, offline }: { data: Basic; offline: boolean }) => {
     const [form, setForm] = useState<Basic>(data);
 
-    const { message } = App.useApp();
+    const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
     const websiteFormFinish = (changedValues: Basic) => {
         axios.post("/api/admin/website/basic", { ...form, ...changedValues }).then(async ({ data }) => {
             if (data.error) {
-                await message.error(data.message);
+                await messageApi.error(data.message);
                 return;
             }
             if (data.error === 0) {
-                await message.success(data.message);
+                await messageApi.success(data.message);
                 removeRes();
                 window.location.reload();
             }
@@ -40,6 +40,7 @@ const BasicForm = ({ data, offline }: { data: Basic; offline: boolean }) => {
 
     return (
         <>
+            {contextHolder}
             <Title level={4}>认真输入，有助于网站被收录</Title>
             <Divider />
             <Form

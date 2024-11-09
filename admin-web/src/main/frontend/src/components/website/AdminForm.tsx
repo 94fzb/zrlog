@@ -8,7 +8,7 @@ import Select from "antd/es/select";
 import Button from "antd/es/button";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { App, ColorPicker } from "antd";
+import { ColorPicker, message } from "antd";
 import { Admin } from "./index";
 import FaviconUpload from "./FaviconUpload";
 import { getItems_per_page } from "index";
@@ -22,16 +22,16 @@ const { Option } = Select;
 
 const BlogForm = ({ data, offline }: { data: Admin; offline: boolean }) => {
     const [form, setForm] = useState<Admin>(data);
-    const { message } = App.useApp();
+    const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
 
     const websiteFormFinish = (changedValues: Admin) => {
         axios.post("/api/admin/website/admin", { ...form, ...changedValues }).then(async ({ data }) => {
             if (data.error) {
-                await message.error(data.message);
+                await messageApi.error(data.message);
                 return;
             }
             if (data.error === 0) {
-                await message.success(data.message);
+                await messageApi.success(data.message);
                 removeRes();
                 window.location.reload();
             }
@@ -45,6 +45,7 @@ const BlogForm = ({ data, offline }: { data: Admin; offline: boolean }) => {
     // @ts-ignore
     return (
         <>
+            {contextHolder}
             <Form
                 {...layout}
                 initialValues={form}

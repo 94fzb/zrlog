@@ -1,5 +1,5 @@
 import { FunctionComponent, useEffect, useState } from "react";
-import { App, Col, Form, Input, InputNumber, Modal } from "antd";
+import { Col, Form, Input, InputNumber, message, Modal } from "antd";
 import Row from "antd/es/grid/row";
 import { EditOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
@@ -20,12 +20,12 @@ export type EditNavProps = {
 const EditNav: FunctionComponent<EditNavProps> = ({ record, editSuccessCall, offline }) => {
     const [showModel, setShowModel] = useState<boolean>(false);
     const [updateForm, setUpdateForm] = useState<any>(record);
-    const { message } = App.useApp();
+    const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
 
     const handleOk = () => {
         axios.post("/api/admin/nav/update", updateForm).then(async ({ data }) => {
             if (data.error) {
-                await message.error(data.message);
+                await messageApi.error(data.message);
                 return;
             }
             if (data.error === 0) {
@@ -47,6 +47,7 @@ const EditNav: FunctionComponent<EditNavProps> = ({ record, editSuccessCall, off
 
     return (
         <>
+            {contextHolder}
             <Link
                 to={"#edit-" + record.id}
                 onClick={(e) => {

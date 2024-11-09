@@ -4,7 +4,7 @@ import Image from "antd/es/image";
 import Dragger from "antd/es/upload/Dragger";
 import { FunctionComponent } from "react";
 import { UploadChangeParam } from "antd/es/upload";
-import { App } from "antd";
+import { message } from "antd";
 import { getColorPrimary, getRes } from "../../utils/constants";
 
 type ThumbnailUploadProps = {
@@ -13,20 +13,20 @@ type ThumbnailUploadProps = {
 };
 
 const ThumbnailUpload: FunctionComponent<ThumbnailUploadProps> = ({ onChange, thumbnail }) => {
-    const { message } = App.useApp();
+    const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
 
     const onUploadChange = async (info: UploadChangeParam) => {
         const { status } = info.file;
         if (status === "done") {
             if (info.file.response.error && info.file.response.error > 0) {
-                message.error(`${info.file.name} file upload failed.` + `${info.file.response.message}`);
+                messageApi.error(`${info.file.name} file upload failed.` + `${info.file.response.message}`);
                 return;
             }
             if (onChange) {
                 onChange(info.file.response.data.url);
             }
         } else if (status === "error") {
-            message.error(`${info.file.name} file upload failed.`);
+            messageApi.error(`${info.file.name} file upload failed.`);
         }
     };
 
@@ -38,6 +38,7 @@ const ThumbnailUpload: FunctionComponent<ThumbnailUploadProps> = ({ onChange, th
             name="imgFile"
             onChange={(e) => onUploadChange(e)}
         >
+            {contextHolder}
             {(thumbnail === undefined || thumbnail === null || thumbnail === "") && (
                 <>
                     <p

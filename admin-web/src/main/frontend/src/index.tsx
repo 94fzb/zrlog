@@ -168,7 +168,13 @@ const Index = () => {
         >
             <App>
                 <StyleProvider transformers={[legacyLogicalPropertiesTransformer]}>
-                    <BrowserRouter basename={basePath}>
+                    <BrowserRouter
+                        basename={basePath}
+                        future={{
+                            v7_relativeSplatPath: true,
+                            v7_startTransition: true,
+                        }}
+                    >
                         {appState.resLoaded ? (
                             <AppBase offline={appState.offline} />
                         ) : appState.resLoadErrorMsg.length === 0 ? (

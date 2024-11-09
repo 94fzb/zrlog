@@ -4,10 +4,10 @@ import { useLocation } from "react-router";
 import { getCsrData } from "./api";
 import MyLoadingComponent from "./components/my-loading-component";
 import { ssData } from "./index";
-import { getCachedData, getLastOpenedPage, getPageFullState, putCache } from "./cache";
-import { deepEqual, getFullPath, removeQueryParam } from "./utils/helpers";
+import { getCachedData, getLastOpenedPage, getPageDataCacheKey, getPageFullState, putCache } from "./cache";
+import { deepEqual, getFullPath } from "./utils/helpers";
 import { UpgradeData } from "./components/upgrade";
-import { cacheIgnoreReloadKey, getRes } from "./utils/constants";
+import { getRes } from "./utils/constants";
 import { isPWA } from "./utils/env-utils";
 import * as H from "history";
 
@@ -87,8 +87,19 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({ of
     });
 
     const getDataFromState = () => {
-        const uri = location.pathname + removeQueryParam(location.search, cacheIgnoreReloadKey);
+        const uri = getPageDataCacheKey(location);
         return state.data[uri] !== undefined && state.data[uri] !== null ? state.data[uri] : undefined;
+    };
+
+    const deleteThisPageStateCache = () => {
+        const mergeData = state.data;
+        mergeData[getPageDataCacheKey(location)] = undefined;
+        setState((prevState) => {
+            return {
+                ...prevState,
+                data: mergeData,
+            };
+        });
     };
 
     const loadData = (uri: string, location: H.Location) => {
@@ -130,7 +141,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({ of
     };
 
     useEffect(() => {
-        const uri = location.pathname + removeQueryParam(location.search, cacheIgnoreReloadKey);
+        const uri = getPageDataCacheKey(location);
         if (getDataFromState()) {
             if (state.firstRender) {
                 setState((prevState) => {
@@ -350,6 +361,10 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({ of
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
                                 <AsyncArticleEdit
+                                    fullScreen={state.fullScreen}
+                                    deleteStateCacheOnDestroy={() => {
+                                        deleteThisPageStateCache();
+                                    }}
                                     offline={state.offline}
                                     onFullScreen={() => {
                                         setState((prevState) => {

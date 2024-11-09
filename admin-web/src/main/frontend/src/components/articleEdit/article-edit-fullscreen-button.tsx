@@ -2,9 +2,9 @@ import { FullscreenExitOutlined, FullscreenOutlined } from "@ant-design/icons";
 import EnvUtils, { isPWA } from "../../utils/env-utils";
 import { Button } from "antd";
 import screenfull from "screenfull";
-import { FunctionComponent, useEffect, useState } from "react";
+import { FunctionComponent, useEffect } from "react";
 import { FullScreenProps } from "./index.types";
-import { getPageFullState, savePageFullState } from "../../cache";
+import { savePageFullState } from "../../cache";
 import { getFullPath } from "../../utils/helpers";
 import { useLocation } from "react-router";
 
@@ -18,12 +18,11 @@ const ArticleEditFullscreenButton: FunctionComponent<ArticleEditFullscreenButton
     fullScreenElement,
     onExitFullScreen,
     onFullScreen,
+    fullScreen,
     editorInstance,
     onChange,
 }) => {
     const location = useLocation();
-    const initFullScreen = getPageFullState(getFullPath(location));
-    const [fullScreen, setFullScreen] = useState<boolean>(initFullScreen);
 
     useEffect(() => {
         if (isPWA()) {
@@ -68,7 +67,6 @@ const ArticleEditFullscreenButton: FunctionComponent<ArticleEditFullscreenButton
     };
 
     const doFullState = () => {
-        setFullScreen(true);
         onChange(true);
         if (editorInstance) {
             editorInstance.width("100%");
@@ -76,7 +74,6 @@ const ArticleEditFullscreenButton: FunctionComponent<ArticleEditFullscreenButton
     };
 
     const onfullscreenExit = () => {
-        setFullScreen(false);
         onChange(false);
         if (editorInstance) {
             editorInstance.width("100%");
@@ -125,9 +122,9 @@ const ArticleEditFullscreenButton: FunctionComponent<ArticleEditFullscreenButton
                 background: EnvUtils.isDarkMode() ? "#141414" : "white",
             }}
             onClick={(e) => {
+                toggleFullScreen();
                 e.stopPropagation();
                 e.preventDefault();
-                toggleFullScreen();
             }}
         ></Button>
     );

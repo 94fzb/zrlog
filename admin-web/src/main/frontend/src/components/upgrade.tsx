@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { App, Button, Col, Progress, Row, Steps } from "antd";
+import { App, Button, Col, message, Progress, Row, Steps } from "antd";
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
 import { getRes } from "../utils/constants";
@@ -55,7 +55,9 @@ const Upgrade = ({ data, offline }: { data: UpgradeData; offline: boolean }) => 
         upgradeMessage: "",
     });
 
-    const { modal, message } = App.useApp();
+    const { modal } = App.useApp();
+
+    const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
 
     const checkRestartSuccess = (newBuildId: string) => {
         axios
@@ -105,7 +107,7 @@ const Upgrade = ({ data, offline }: { data: UpgradeData; offline: boolean }) => 
         } catch (e) {
             if (e instanceof AxiosError) {
                 if (e.response && e.response.data) {
-                    message.error(e.response.data.message);
+                    messageApi.error(e.response.data.message);
                 }
             }
         }
@@ -177,6 +179,7 @@ const Upgrade = ({ data, offline }: { data: UpgradeData; offline: boolean }) => 
 
     return (
         <Row>
+            {contextHolder}
             <Col style={{ maxWidth: 600 }} xs={24}>
                 <Title className="page-header" level={3}>
                     {getRes()["upgradeWizard"]}

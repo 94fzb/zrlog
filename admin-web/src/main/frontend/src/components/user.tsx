@@ -2,7 +2,7 @@ import { useState } from "react";
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
 import Form from "antd/es/form";
-import { Button, Input, App } from "antd";
+import { Button, Input, message } from "antd";
 import Dragger from "antd/es/upload/Dragger";
 import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
@@ -25,7 +25,7 @@ type BasicUserInfo = {
 
 const User = ({ data, offline }: { data: BasicUserInfo; offline: boolean }) => {
     const [userInfo, setUserInfo] = useState<BasicUserInfo>(data);
-    const { message } = App.useApp();
+    const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
 
     const setValue = (changedValues: BasicUserInfo) => {
         setUserInfo({ ...userInfo, ...changedValues });
@@ -36,22 +36,23 @@ const User = ({ data, offline }: { data: BasicUserInfo; offline: boolean }) => {
         if (status === "done") {
             setValue({ ...userInfo, header: info.file.response.data.url });
         } else if (status === "error") {
-            message.error(`${info.file.name} file upload failed.`);
+            messageApi.error(`${info.file.name} file upload failed.`);
         }
     };
 
     const onFinish = () => {
         axios.post("/api/admin/user/update", userInfo).then(async ({ data }) => {
             if (data.error) {
-                await message.error(data.message);
+                await messageApi.error(data.message);
             } else if (data.error === 0) {
-                await message.success(data.message);
+                await messageApi.success(data.message);
             }
         });
     };
 
     return (
         <>
+            {contextHolder}
             <Title className="page-header" level={3}>
                 {getRes()["admin.user.info"]}
             </Title>

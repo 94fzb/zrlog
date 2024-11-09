@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { App, ColorPicker, Form, Input, Row } from "antd";
+import { ColorPicker, Form, Input, message, Row } from "antd";
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
 import Button from "antd/es/button";
@@ -45,7 +45,7 @@ const TemplateConfig = ({ data, offline }: { data: TemplateConfigState; offline:
         dataMap: dataMap,
     });
 
-    const { message } = App.useApp();
+    const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
 
     const setValue = (changedValues: any) => {
         setState({
@@ -63,7 +63,7 @@ const TemplateConfig = ({ data, offline }: { data: TemplateConfigState; offline:
                 dataMap: state.dataMap,
             });
         } else if (status === "error") {
-            message.error(`${info.file.name} file upload failed.`);
+            messageApi.error(`${info.file.name} file upload failed.`);
         }
     };
 
@@ -137,9 +137,9 @@ const TemplateConfig = ({ data, offline }: { data: TemplateConfigState; offline:
     const onFinish = () => {
         axios.post("/api/admin/template/config", state.dataMap).then(async ({ data }) => {
             if (data.error) {
-                await message.error(data.message);
+                await messageApi.error(data.message);
             } else if (data.error === 0) {
-                await message.success(data.message);
+                await messageApi.success(data.message);
             }
         });
     };
@@ -153,6 +153,7 @@ const TemplateConfig = ({ data, offline }: { data: TemplateConfigState; offline:
 
     return (
         <>
+            {contextHolder}
             <Title className="page-header" level={3}>
                 {getRes()["templateConfig"]}
             </Title>

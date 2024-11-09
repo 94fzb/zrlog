@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 export const StyledEditormd = styled("div")`
     @charset "UTF-8";
-    /*! Editor.md v1.5.0 | my-editormd.css | Open source online markdown editor. | MIT License | By: Pandao | https://github.com/pandao/editor.md | 2015-06-09 */
+    /*! Editor.md v1.5.0 | editormd.css | Open source online markdown editor. | MIT License | By: Pandao | https://github.com/pandao/editor.md | 2015-06-09 */
     /*! prefixes.scss v0.1.0 | Author: Pandao | https://github.com/pandao/prefixes.scss | MIT license | Copyright (c) 2015 */
     position: relative;
 
@@ -789,7 +789,6 @@ export const StyledEditormd = styled("div")`
         color: inherit;
         margin: 0;
         line-height: normal;
-        font: 13px/1.4 Helvetica, arial, freesans, clean, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
     }
 
     .markdown-body html input[disabled] {
@@ -854,7 +853,6 @@ export const StyledEditormd = styled("div")`
     }
 
     .markdown-body .octicon {
-        font: normal normal 16px octicons-anchor;
         line-height: 1;
         display: inline-block;
         text-decoration: none;
@@ -1247,7 +1245,6 @@ export const StyledEditormd = styled("div")`
     .markdown-body kbd {
         display: inline-block;
         padding: 3px 5px;
-        font: 11px Consolas, "Liberation Mono", Menlo, Courier, monospace;
         line-height: 10px;
         color: #555;
         vertical-align: middle;

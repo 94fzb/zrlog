@@ -56,6 +56,9 @@ self.addEventListener('fetch', event => {
     if (!request.url.startsWith('http')) {
         return;
     }
+    if(request.method !== "GET") {
+        return;
+    }
 
     event.respondWith(
         fetch(request)

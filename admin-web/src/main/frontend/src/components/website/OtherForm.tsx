@@ -6,7 +6,7 @@ import Button from "antd/es/button";
 import { getRes } from "../../utils/constants";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { App } from "antd";
+import { message } from "antd";
 
 import { Other } from "./index";
 
@@ -17,16 +17,16 @@ const layout = {
 
 const OtherForm = ({ data, offline }: { data: Other; offline: boolean }) => {
     const [form, setForm] = useState<any>(data);
-    const { message } = App.useApp();
+    const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
 
     const websiteFormFinish = (changedValues: any) => {
         axios.post("/api/admin/website/other", { ...form, ...changedValues }).then(async ({ data }) => {
             if (data.error) {
-                await message.error(data.message);
+                await messageApi.error(data.message);
                 return;
             }
             if (data.error === 0) {
-                await message.success(data.message);
+                await messageApi.success(data.message);
             }
         });
     };
@@ -37,6 +37,7 @@ const OtherForm = ({ data, offline }: { data: Other; offline: boolean }) => {
 
     return (
         <>
+            {contextHolder}
             <Title level={4}>ICP，网站统计等信息</Title>
             <Divider />
             <Form

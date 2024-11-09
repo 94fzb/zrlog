@@ -10,10 +10,11 @@ import { ArticleEntry } from "./index.types";
 
 type ArticleEditActionBarProps = {
     data: ArticleEditState;
+    fullScreen: boolean;
     onSubmit: (article: ArticleEntry, release: boolean, preview: boolean, autoSave: boolean) => Promise<void>;
 };
 
-const ArticleEditActionBar: FunctionComponent<ArticleEditActionBarProps> = ({ data, onSubmit }) => {
+const ArticleEditActionBar: FunctionComponent<ArticleEditActionBarProps> = ({ data, fullScreen, onSubmit }) => {
     const enterBtnRef = useRef<HTMLAnchorElement | HTMLButtonElement>(null);
 
     const getRubbishText = () => {
@@ -39,7 +40,7 @@ const ArticleEditActionBar: FunctionComponent<ArticleEditActionBarProps> = ({ da
         return (
             <Button
                 type={"default"}
-                className={data.fullScreen ? "saveToRubbish-btn-full-screen" : "item"}
+                className={fullScreen ? "saveToRubbish-btn-full-screen" : "item"}
                 style={{
                     border: 0,
                     width: "100%",
@@ -51,7 +52,7 @@ const ArticleEditActionBar: FunctionComponent<ArticleEditActionBarProps> = ({ da
                     height: "32px",
                     paddingRight: "8px",
                     paddingLeft: "8px",
-                    backgroundColor: data.fullScreen ? (EnvUtils.isDarkMode() ? "rgb(20 20 20)" : "white") : "inherit",
+                    backgroundColor: fullScreen ? (EnvUtils.isDarkMode() ? "rgb(20 20 20)" : "white") : "inherit",
                 }}
             >
                 {tips}
@@ -101,13 +102,13 @@ const ArticleEditActionBar: FunctionComponent<ArticleEditActionBarProps> = ({ da
                     xxl={6}
                     md={9}
                     sm={24}
-                    className={data.fullScreen ? "saveToRubbish-btn-full-screen" : "item"}
+                    className={fullScreen ? "saveToRubbish-btn-full-screen" : "item"}
                 >
                     {getRubbishText()}
                 </Col>
-                <Col xxl={6} md={9} sm={24} className={data.fullScreen ? "saveToRubbish-btn-full-screen" : "item"}>
+                <Col xxl={6} md={9} sm={24} className={fullScreen ? "saveToRubbish-btn-full-screen" : "item"}>
                     <Button
-                        type={data.fullScreen ? "default" : "dashed"}
+                        type={fullScreen ? "default" : "dashed"}
                         style={{ width: "100%", maxWidth: 256 }}
                         disabled={data.offline || (data.saving.rubbishSaving && !data.saving.autoSaving)}
                         onClick={async () => await onSubmit(data.article, false, false, false)}
@@ -116,7 +117,7 @@ const ArticleEditActionBar: FunctionComponent<ArticleEditActionBarProps> = ({ da
                         {data.saving.rubbishSaving ? getRes().saving : getRes().saveAsDraft}
                     </Button>
                 </Col>
-                <Col xxl={6} md={9} sm={24} className={"item"} style={{ display: data.fullScreen ? "none" : "flex" }}>
+                <Col xxl={6} md={9} sm={24} className={"item"} style={{ display: fullScreen ? "none" : "flex" }}>
                     <Button
                         type="dashed"
                         disabled={data.offline || (data.saving.previewIng && !data.saving.autoSaving)}
@@ -127,7 +128,7 @@ const ArticleEditActionBar: FunctionComponent<ArticleEditActionBarProps> = ({ da
                         {getRes().preview}
                     </Button>
                 </Col>
-                <Col xxl={6} md={9} sm={24} className={data.fullScreen ? "save-btn-full-screen" : "item"}>
+                <Col xxl={6} md={9} sm={24} className={fullScreen ? "save-btn-full-screen" : "item"}>
                     <Button
                         ref={enterBtnRef}
                         type="primary"

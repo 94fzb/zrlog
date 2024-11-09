@@ -72,18 +72,19 @@ export type ArticleEditInfo = {
 export type FullScreenProps = {
     onExitFullScreen: () => void;
     onFullScreen: () => void;
+    fullScreen: boolean;
 }
 
 export type ArticleEditProps = FullScreenProps & {
     data: ArticleEditInfo;
     offline: boolean;
+    deleteStateCacheOnDestroy: () => void;
 };
 
 export type ArticleEditState = {
     typeOptions: any[];
     tags: any[];
     rubbish: boolean;
-    fullScreen: boolean;
     editorVersion: number;
     editorInitSuccess: boolean;
     article: ArticleEntry;

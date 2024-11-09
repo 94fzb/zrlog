@@ -1,7 +1,7 @@
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
 import Form from "antd/es/form";
-import { App, Input, Row } from "antd";
+import { Input, message, Row } from "antd";
 import Button from "antd/es/button";
 import Col from "antd/es/grid/col";
 import { getRes } from "../utils/constants";
@@ -13,20 +13,21 @@ const layout = {
 };
 
 const UserUpdatePassword = ({ offline }: { offline: boolean }) => {
-    const { message } = App.useApp();
+    const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
 
     const onFinish = (allValues: Record<string, any>) => {
         axios.post("/api/admin/user/updatePassword", allValues).then(async ({ data }) => {
             if (data.error) {
-                await message.error(data.message);
+                await messageApi.error(data.message);
             } else if (data.error === 0) {
-                await message.success(data.message);
+                await messageApi.success(data.message);
             }
         });
     };
 
     return (
         <>
+            {contextHolder}
             <Title className="page-header" level={3}>
                 {getRes()["admin.changePwd"]}
             </Title>

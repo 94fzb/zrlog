@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { LoginOutlined } from "@ant-design/icons";
-import { Button, Col, Form, Input, Layout, App } from "antd";
+import { Button, Col, Form, Input, Layout, message } from "antd";
 import Card from "antd/es/card";
 import Row from "antd/es/grid/row";
 import { getColorPrimary, getRes } from "../../utils/constants";
@@ -31,7 +31,7 @@ const Index = ({ offline }: { offline: boolean }) => {
         password: "",
     });
 
-    const { message } = App.useApp();
+    const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
 
     const navigate = useNavigate();
 
@@ -50,7 +50,7 @@ const Index = ({ offline }: { offline: boolean }) => {
             .post("/api/admin/login", loginForm)
             .then(async ({ data }) => {
                 if (data.error) {
-                    await message.error(data.message);
+                    await messageApi.error(data.message);
                 } else if (data.error == 0) {
                     const query = new URLSearchParams(window.location.search);
                     if (ssData) {
@@ -63,7 +63,7 @@ const Index = ({ offline }: { offline: boolean }) => {
                         navigate("/index", { replace: true });
                     }
                 } else {
-                    await message.error("未知错误");
+                    await messageApi.error("未知错误");
                 }
             })
             .finally(() => {
@@ -73,6 +73,7 @@ const Index = ({ offline }: { offline: boolean }) => {
 
     return (
         <PWAHandler>
+            {contextHolder}
             <Layout style={{ height: "100vh" }}>
                 <Content
                     style={{

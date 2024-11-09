@@ -103,7 +103,7 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({ height, markdow
 
     const [content, setContent] = useState<ChangedContent>({ content: "", markdown: markdown });
 
-    const [messageApi, contextHolder] = message.useMessage();
+    const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
 
     function setDarkMode(editor: any, dark: boolean) {
         editor.setTheme(dark ? "dark" : "default");

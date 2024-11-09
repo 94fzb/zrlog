@@ -1,5 +1,5 @@
 import { FunctionComponent, useEffect, useState } from "react";
-import { App, Col, Form, Input, Modal } from "antd";
+import { Col, Form, Input, message, Modal } from "antd";
 import Row from "antd/es/grid/row";
 import TextArea from "antd/es/input/TextArea";
 import { EditOutlined } from "@ant-design/icons";
@@ -21,12 +21,12 @@ export type EditTypeProps = {
 const EditType: FunctionComponent<EditTypeProps> = ({ record, editSuccessCall, offline }) => {
     const [showModel, setShowModel] = useState<boolean>(false);
     const [updateForm, setUpdateForm] = useState<any>(record);
-    const { message } = App.useApp();
+    const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
 
     const handleOk = () => {
         axios.post("/api/admin/type/update", updateForm).then(async ({ data }) => {
             if (data.error) {
-                await message.error(data.message);
+                await messageApi.error(data.message);
                 return;
             }
             if (data.error === 0) {
@@ -48,6 +48,7 @@ const EditType: FunctionComponent<EditTypeProps> = ({ record, editSuccessCall, o
 
     return (
         <>
+            {contextHolder}
             <Link
                 to={"#edit-" + record.id}
                 onClick={(e) => {

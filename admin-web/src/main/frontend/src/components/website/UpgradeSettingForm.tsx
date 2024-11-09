@@ -6,7 +6,7 @@ import Form from "antd/es/form";
 import Select from "antd/es/select";
 import Switch from "antd/es/switch";
 import Divider from "antd/es/divider";
-import { App } from "antd";
+import { App, message } from "antd";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -24,7 +24,9 @@ type UpgradeFormState = {
 
 const UpgradeSettingForm = ({ data, offline }: { data: Upgrade; offline: boolean }) => {
     const [checking, setChecking] = useState<boolean>(false);
-    const { modal, message } = App.useApp();
+    const { modal } = App.useApp();
+    const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
+
     const [form, setForm] = useState<UpgradeFormState>(data);
 
     const navigate = useNavigate();
@@ -32,10 +34,10 @@ const UpgradeSettingForm = ({ data, offline }: { data: Upgrade; offline: boolean
     const websiteFormFinish = (changedValues: any) => {
         axios.post("/api/admin/website/upgrade", { ...form, ...changedValues }).then(({ data }) => {
             if (data.error) {
-                message.error(data.message).then();
+                messageApi.error(data.message).then();
                 return;
             }
-            message.success(data.message).then(() => {
+            messageApi.success(data.message).then(() => {
                 //ignore
             });
         });
@@ -68,7 +70,7 @@ const UpgradeSettingForm = ({ data, offline }: { data: Upgrade; offline: boolean
             } else {
                 if (data.error === 0) {
                     setChecking(false);
-                    await message.info(getRes()["notFoundNewVersion"]);
+                    await messageApi.info(getRes()["notFoundNewVersion"]);
                 }
             }
         } finally {
@@ -82,6 +84,7 @@ const UpgradeSettingForm = ({ data, offline }: { data: Upgrade; offline: boolean
 
     return (
         <div style={{ maxWidth: 600 }}>
+            {contextHolder}
             <Row>
                 <Col xs={24}>
                     <Button

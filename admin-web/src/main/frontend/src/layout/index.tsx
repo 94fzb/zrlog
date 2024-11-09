@@ -273,7 +273,11 @@ const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ offline,
                     {userInfo && <UserInfo offline={offline} data={userInfo} />}
                 </Header>
                 <Row>
-                    <Sider hidden={fullScreen} width={70}>
+                    <Sider
+                        hidden={fullScreen}
+                        width={70}
+                        style={{ minHeight: "100vh", backgroundColor: EnvUtils.isDarkMode() ? "#1f1f1f" : "#001529" }}
+                    >
                         <SliderMenu />
                     </Sider>
                     <Col style={{ flex: 1, width: 100, minHeight: fullScreen ? 0 : 1 }}>

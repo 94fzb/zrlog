@@ -112,7 +112,7 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
         },
     });
 
-    const [messageApi, contextHolder] = message.useMessage();
+    const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
     const handleDelete = async (pagination: MyPagination, deleteApiUri: string, key: string): Promise<boolean> => {
         const response = await axios.post(deleteApiUri + "?id=" + key);
         if (response.data.error) {

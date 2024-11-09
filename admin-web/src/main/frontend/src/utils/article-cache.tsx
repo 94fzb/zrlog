@@ -1,11 +1,12 @@
 import { ArticleEditInfo, ArticleEditState, ArticleEntry } from "../components/articleEdit/index.types";
-import { addToCache, deleteCacheDataByKey, getCacheByKey } from "../cache";
+import { addToCache, deleteCacheDataByKey, getCacheByKey, removePageCacheByLocation } from "../cache";
+import * as H from "history";
 
 const buildCacheKey = (newArticle: ArticleEntry) => {
     return "local-article-info-" + (newArticle && newArticle.logId && newArticle.logId > 0 ? newArticle.logId : -1);
 };
 
-export const articleDataToState = (data: ArticleEditInfo, fullScreen: boolean, offline: boolean): ArticleEditState => {
+export const articleDataToState = (data: ArticleEditInfo, offline: boolean): ArticleEditState => {
     const article: ArticleEntry =
         data.article.logId && data.article.logId > 0
             ? data.article
@@ -30,7 +31,6 @@ export const articleDataToState = (data: ArticleEditInfo, fullScreen: boolean, o
             : [],
         editorInitSuccess: false,
         editorVersion: realArticle.version,
-        fullScreen: fullScreen,
         tags: data.tags ? data.tags : [],
         rubbish: data.article && data.article.rubbish ? data.article.rubbish : false,
         article: realArticle,
@@ -47,6 +47,7 @@ export const articleSaveToCache = (article: ArticleEntry) => {
     addToCache(buildCacheKey(article), article);
 };
 
-export const deleteArticleCache = (article: ArticleEntry) => {
+export const deleteArticleCacheWithPageCache = (article: ArticleEntry, location: H.Location) => {
     deleteCacheDataByKey(buildCacheKey(article));
+    removePageCacheByLocation(location);
 };

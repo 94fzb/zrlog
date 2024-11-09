@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { App, Button, Col, Form, Input, InputNumber, Modal } from "antd";
+import { Button, Col, Form, Input, InputNumber, message, Modal } from "antd";
 import Row from "antd/es/grid/row";
 import axios from "axios";
 import { getRes } from "../../utils/constants";
@@ -12,12 +12,12 @@ const layout = {
 const AddNav = ({ addSuccessCall, offline }: { offline: boolean; addSuccessCall: () => void }) => {
     const [showModel, setShowModel] = useState<boolean>(false);
     const [form, setForm] = useState<any>();
-    const { message } = App.useApp();
+    const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
 
     const handleOk = () => {
         axios.post("/api/admin/nav/add", form).then(async ({ data }) => {
             if (data.error) {
-                await message.error(data.message);
+                await messageApi.error(data.message);
                 return;
             }
 
@@ -34,6 +34,7 @@ const AddNav = ({ addSuccessCall, offline }: { offline: boolean; addSuccessCall:
 
     return (
         <>
+            {contextHolder}
             <Button type="primary" disabled={offline} onClick={() => setShowModel(true)} style={{ marginBottom: 8 }}>
                 {getRes()["add"]}
             </Button>

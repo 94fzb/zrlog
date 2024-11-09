@@ -10,18 +10,16 @@ import { createUri, getRes, updateUri } from "../../utils/constants";
 import styled from "styled-components";
 import Select from "antd/es/select";
 import BaseInput from "../../common/BaseInput";
-import { getPageFullState } from "../../cache";
-import { getFullPath } from "../../utils/helpers";
 import { useLocation } from "react-router";
 import EnvUtils from "../../utils/env-utils";
 import EditorStatistics, { toStatisticsByMarkdown } from "./editor/editor-statistics-info";
 import { commonAxiosErrorHandle, createAxiosBaseInstance } from "../../AppBase";
 import ArticleEditSettingButton from "./article-edit-setting-button";
-import { ArticleEntry, ArticleChangeableValue, ArticleEditProps, ArticleEditState } from "./index.types";
+import { ArticleChangeableValue, ArticleEditProps, ArticleEditState, ArticleEntry } from "./index.types";
 import ArticleEditActionBar from "./article-edit-action-bar";
-import { articleDataToState, articleSaveToCache, deleteArticleCache } from "../../utils/article-cache";
+import { articleDataToState, articleSaveToCache, deleteArticleCacheWithPageCache } from "../../utils/article-cache";
 import ArticleEditFullscreenButton from "./article-edit-fullscreen-button";
-import { auditTime, Subject, tap } from "rxjs";
+import { auditTime, concatMap, Subject, tap } from "rxjs";
 import { Subscription } from "rxjs/internal/Subscription";
 
 const StyledArticleEdit = styled("div")`
@@ -65,11 +63,18 @@ const StyledArticleEdit = styled("div")`
 
 let editorInstance: { width: (arg0: string) => void };
 
-const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullScreen, onFullScreen }) => {
+const Index: FunctionComponent<ArticleEditProps> = ({
+    offline,
+    data,
+    onExitFullScreen,
+    onFullScreen,
+    fullScreen,
+    deleteStateCacheOnDestroy,
+}) => {
     const location = useLocation();
     const editCardRef = useRef<HTMLDivElement>(null);
 
-    const defaultState = articleDataToState(data, getPageFullState(getFullPath(location)), offline);
+    const defaultState = articleDataToState(data, offline);
     const [state, setState] = useState<ArticleEditState>(defaultState);
 
     const aliasRef = useRef<InputRef>(null);
@@ -77,7 +82,8 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
     const versionRef = useRef<number>(defaultState.article.version);
     const subjectRef = useRef<Subject<ArticleEntry> | null>(null);
     const subRef = useRef<Subscription | null>(null);
-    let isPending = false; // 跟踪是否有未处理的消息
+    const deletePageStateRef = useRef<boolean>(false);
+    let pendingMessages = 0;
 
     const [messageApi, messageContextHolder] = message.useMessage({
         maxCount: 3,
@@ -202,7 +208,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
             const data = responseData;
             if (data.error === 0) {
                 //没有堆积的消息了，才能触发移除强制离开页面的提示
-                if (!isPending) {
+                if (pendingMessages === 0) {
                     disableExitTips();
                 }
                 if (!autoSave) {
@@ -225,11 +231,12 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
                         version: respData.version,
                     };
                 }
-                deleteArticleCache(newArticle);
+                deleteArticleCacheWithPageCache(newArticle, location);
             }
         } finally {
             // 根据 release 的值调用对应的状态更新回调函数
             release ? updateReleaseState(newArticle, create) : updateRubbishState(newArticle, create);
+            deletePageStateRef.current = true;
         }
     };
 
@@ -296,11 +303,14 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
             });
             return;
         }
-        const newSate = articleDataToState(data, getPageFullState(getFullPath(location)), offline);
-        setState(newSate);
+        const newState = articleDataToState(data, offline);
         //如果网络恢复，自动保存一次
         if (lastOffline && !offline) {
-            handleValuesChange(newSate.article);
+            handleValuesChange(newState.article);
+        } else {
+            //仅设置状态，同时覆盖版本信息
+            versionRef.current = newState.article.version;
+            setState(newState);
         }
     }, [data, offline]);
 
@@ -314,24 +324,22 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
             .pipe(
                 tap(() => {
                     enableExitTips();
-                    isPending = true; // 有新消息进入，标记为“待处理”
                 }),
                 auditTime(2000),
                 tap(() => {
-                    isPending = false; // 消息被处理，标记为“无待处理”
+                    pendingMessages += 1; // 有新消息进入，标记为“待处理”
+                }),
+                concatMap(async (article) => {
+                    // 确保顺序执行
+                    pendingMessages -= 1;
+                    //console.log("Submitting:", nextValue);
+                    if (state.article.logId && state.article.logId > 0) {
+                        article.logId = state.article.logId;
+                    }
+                    await onSubmit(article, false, false, true);
                 })
             )
-            .subscribe(async (article: ArticleEntry) => {
-                const ok = validForm(article);
-                if (!ok) {
-                    return;
-                }
-                //console.log("Submitting:", nextValue);
-                if (state.article.logId && state.article.logId > 0) {
-                    article.logId = state.article.logId;
-                }
-                await onSubmit(article, false, false, true);
-            });
+            .subscribe();
         if (subRef.current) {
             subRef.current = subscription;
         }
@@ -344,6 +352,9 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
         return () => {
             if (subRef.current) {
                 subRef.current.unsubscribe();
+            }
+            if (deletePageStateRef.current) {
+                deleteStateCacheOnDestroy();
             }
         };
     }, []);
@@ -366,37 +377,38 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
         setState((prev) => {
             const newArticle = { ...prev.article, ...cv };
             const sub = subjectRef.current;
-            if (sub) {
+            const ok = validForm(newArticle);
+            if (ok && sub) {
                 sub.next(newArticle);
             }
             return { ...prev, article: newArticle };
         });
     };
 
-    const editorHeight = state.fullScreen ? window.innerHeight - 47 : `calc(100vh - 200px)`;
+    const editorHeight = fullScreen ? window.innerHeight - 47 : `calc(100vh - 200px)`;
 
     return (
         <StyledArticleEdit>
-            <Row gutter={[8, 8]} style={{ paddingTop: state.fullScreen ? 0 : 20 }}>
+            <Row gutter={[8, 8]} style={{ paddingTop: fullScreen ? 0 : 20 }}>
                 <Col md={12} xxl={15} sm={6} span={24}>
                     <Title
                         className="page-header"
                         style={{ marginTop: 0, marginBottom: 0 }}
                         level={3}
-                        hidden={state.fullScreen}
+                        hidden={fullScreen}
                     >
                         {getRes()["admin.log.edit"]}
                     </Title>
                 </Col>
-                {!state.fullScreen && <ArticleEditActionBar data={state} onSubmit={onSubmit} />}
+                {!fullScreen && <ArticleEditActionBar fullScreen={fullScreen} data={state} onSubmit={onSubmit} />}
             </Row>
-            {!state.fullScreen && <Divider style={{ marginTop: 16, marginBottom: 16 }} />}
+            {!fullScreen && <Divider style={{ marginTop: 16, marginBottom: 16 }} />}
             {messageContextHolder}
             <Card
                 title={""}
                 ref={editCardRef}
                 style={{
-                    borderRadius: state.fullScreen ? 0 : 8,
+                    borderRadius: fullScreen ? 0 : 8,
                 }}
                 styles={{
                     body: {
@@ -417,6 +429,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
                             maxLength={100}
                             variant={"borderless"}
                             size={"large"}
+                            key={data.article.version}
                             placeholder={getRes().inputArticleTitle}
                             defaultValue={state.article.title ? state.article.title : undefined}
                             onChange={(e) => {
@@ -426,7 +439,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
                         />
                     </Col>
                     <Col md={6} xs={24} style={{ display: "flex", alignItems: "center" }}>
-                        <Space.Compact style={{ display: "flex" }} hidden={state.fullScreen}>
+                        <Space.Compact style={{ display: "flex" }} hidden={fullScreen}>
                             <Select
                                 getPopupContainer={(triggerNode) => triggerNode.parentElement}
                                 variant={"borderless"}
@@ -458,6 +471,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
                                 onChange={(e) => {
                                     handleValuesChange({ alias: e });
                                 }}
+                                key={data.article.version}
                                 maxLength={256}
                                 size={"large"}
                                 variant={"borderless"}
@@ -477,7 +491,9 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
                             top: 0,
                         }}
                     >
-                        {state.fullScreen && <ArticleEditActionBar data={state} onSubmit={onSubmit} />}
+                        {fullScreen && (
+                            <ArticleEditActionBar fullScreen={fullScreen} data={state} onSubmit={onSubmit} />
+                        )}
                         <ArticleEditSettingButton
                             digestRef={digestRef}
                             article={state.article}
@@ -487,6 +503,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
                             handleValuesChange={handleValuesChange}
                         />
                         <ArticleEditFullscreenButton
+                            fullScreen={fullScreen}
                             fullScreenElement={editCardRef.current as HTMLDivElement}
                             editorInstance={editorInstance}
                             onExitFullScreen={onExitFullScreen}
@@ -502,7 +519,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
                         />
                     </Col>
                 </Row>
-                <Row gutter={[state.fullScreen ? 0 : 8, state.fullScreen ? 0 : 8]}>
+                <Row gutter={[fullScreen ? 0 : 8, fullScreen ? 0 : 8]}>
                     <Col
                         md={24}
                         sm={24}
@@ -519,7 +536,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
                             key={
                                 data.article.logId +
                                 "_" +
-                                state.fullScreen +
+                                fullScreen +
                                 "_" +
                                 state.editorVersion +
                                 "_offline:" +
@@ -544,7 +561,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({ offline, data, onExitFullS
                         />
                         <EditorStatistics
                             data={toStatisticsByMarkdown(state.article.markdown)}
-                            fullScreen={state.fullScreen}
+                            fullScreen={fullScreen}
                         />
                     </Col>
                 </Row>
