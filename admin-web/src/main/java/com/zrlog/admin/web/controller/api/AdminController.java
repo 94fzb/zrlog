@@ -10,6 +10,7 @@ import com.zrlog.admin.business.rest.response.IndexResponse;
 import com.zrlog.admin.business.rest.response.LoginResponse;
 import com.zrlog.admin.business.rest.response.StatisticsInfoResponse;
 import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
+import com.zrlog.admin.business.service.AdminArticleService;
 import com.zrlog.admin.business.service.UserService;
 import com.zrlog.admin.web.controller.page.AdminPageController;
 import com.zrlog.business.exception.MissingInstallException;
@@ -138,10 +139,15 @@ public class AdminController extends Controller {
 
     @ResponseBody
     public ApiStandardResponse<IndexResponse> index() throws SQLException {
-        List<String> tips = new ArrayList<>(Arrays.asList(I18nUtil.getBackendStringFromRes("admin.index.welcomeTips_1"),
-                I18nUtil.getBackendStringFromRes("admin.index.welcomeTips_2"), I18nUtil.getBackendStringFromRes("admin.index.welcomeTips_3")));
+        List<String> tips = new ArrayList<>();
+        for (int i = 1; i <= 4; i++) {
+            tips.add(I18nUtil.getBackendStringFromRes("admin.index.welcomeTips_" + i));
+        }
         Collections.shuffle(tips);
-        return new ApiStandardResponse<>(new IndexResponse(statisticsInfo().getData(), serverInfo().getData(),
-                new ArrayList<>(Collections.singletonList(tips.getFirst())), ZrLogUtil.isDockerMode(), Objects.equals(Constants.runMode, RunMode.NATIVE)));
+        return new ApiStandardResponse<>(new IndexResponse(statisticsInfo().getData(),
+                serverInfo().getData(),
+                I18nUtil.getBackendStringFromRes("admin.index.welcomeTip"),
+                new ArrayList<>(Collections.singletonList(tips.getFirst())), ZrLogUtil.isDockerMode(), Objects.equals(Constants.runMode, RunMode.NATIVE),
+                new AdminArticleService().activityDataList()));
     }
 }

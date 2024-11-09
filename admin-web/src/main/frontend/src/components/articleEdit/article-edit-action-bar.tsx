@@ -11,15 +11,21 @@ import { ArticleEntry } from "./index.types";
 type ArticleEditActionBarProps = {
     data: ArticleEditState;
     fullScreen: boolean;
+    offline: boolean;
     onSubmit: (article: ArticleEntry, release: boolean, preview: boolean, autoSave: boolean) => Promise<void>;
 };
 
-const ArticleEditActionBar: FunctionComponent<ArticleEditActionBarProps> = ({ data, fullScreen, onSubmit }) => {
+const ArticleEditActionBar: FunctionComponent<ArticleEditActionBarProps> = ({
+    data,
+    offline,
+    fullScreen,
+    onSubmit,
+}) => {
     const enterBtnRef = useRef<HTMLAnchorElement | HTMLButtonElement>(null);
 
     const getRubbishText = () => {
         let tips;
-        if (data.offline) {
+        if (offline) {
             tips = getRes()["admin.offline.article-editing"];
         } else {
             if (!data.rubbish) {
@@ -110,7 +116,7 @@ const ArticleEditActionBar: FunctionComponent<ArticleEditActionBarProps> = ({ da
                     <Button
                         type={fullScreen ? "default" : "dashed"}
                         style={{ width: "100%", maxWidth: 256 }}
-                        disabled={data.offline || (data.saving.rubbishSaving && !data.saving.autoSaving)}
+                        disabled={offline || (data.saving.rubbishSaving && !data.saving.autoSaving)}
                         onClick={async () => await onSubmit(data.article, false, false, false)}
                     >
                         <SaveOutlined hidden={data.saving.rubbishSaving} />
@@ -120,7 +126,7 @@ const ArticleEditActionBar: FunctionComponent<ArticleEditActionBarProps> = ({ da
                 <Col xxl={6} md={9} sm={24} className={"item"} style={{ display: fullScreen ? "none" : "flex" }}>
                     <Button
                         type="dashed"
-                        disabled={data.offline || (data.saving.previewIng && !data.saving.autoSaving)}
+                        disabled={offline || (data.saving.previewIng && !data.saving.autoSaving)}
                         style={{ width: "100%", maxWidth: 256 }}
                         onClick={async () => await onSubmit(data.article, !data.rubbish, true, false)}
                     >
@@ -132,7 +138,7 @@ const ArticleEditActionBar: FunctionComponent<ArticleEditActionBarProps> = ({ da
                     <Button
                         ref={enterBtnRef}
                         type="primary"
-                        disabled={data.offline}
+                        disabled={offline}
                         loading={data.saving.releaseSaving}
                         style={{ width: "100%", maxWidth: 256 }}
                         onClick={async () => {

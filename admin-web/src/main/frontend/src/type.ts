@@ -1,3 +1,5 @@
+import {ActivityDay} from "./components/index/ActivityGraph";
+
 export type StatisticsInfoState = {
     clickCount: number;
     articleCount: number;
@@ -34,6 +36,7 @@ export type UserInfoState = {
 
 export type ServerInfoEntry = {
     name:string;
+    key :string;
     value:string;
 }
 
@@ -42,5 +45,7 @@ export type IndexData = {
     statisticsInfo: StatisticsInfoState,
     dockerMode: boolean;
     nativeImageMode: boolean;
+    activityData: ActivityDay[]
     tips: string[];
+    welcomeTip: string;
 }

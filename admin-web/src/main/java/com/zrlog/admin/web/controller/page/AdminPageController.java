@@ -2,6 +2,7 @@ package com.zrlog.admin.web.controller.page;
 
 import com.google.gson.Gson;
 import com.hibegin.common.util.IOUtil;
+import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.rest.response.AdminApiPageDataStandardResponse;
 import com.zrlog.admin.business.rest.response.ServerSideDataResponse;
@@ -13,6 +14,7 @@ import com.zrlog.business.service.CommonService;
 import com.zrlog.common.Constants;
 import com.zrlog.common.rest.response.ApiStandardResponse;
 import com.zrlog.util.I18nUtil;
+import com.zrlog.util.ZrLogUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -60,6 +62,16 @@ public class AdminPageController extends Controller {
                 first.attr("content", publicInfo.pwaThemeColor());
             }
         }
+        String adminStaticResourceHostByWebSite = ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite();
+        if (StringUtils.isNotEmpty(adminStaticResourceHostByWebSite)) {
+            Elements scripts = document.head().select("script");
+            if (!scripts.isEmpty()) {
+                scripts.forEach(script -> {
+                    script.attr("src", script.attr("src").replace("./", adminStaticResourceHostByWebSite + "/"));
+                });
+            }
+        }
+
         ServerSideDataResponse serverSideDataResponse = serverSide(request.getUri());
         document.getElementById("__SS_DATA__").text(new Gson().toJson(serverSideDataResponse));
         document.title(serverSideDataResponse.documentTitle());

@@ -92,6 +92,14 @@ export type ScriptLoaderProps = {
     error: ReactNode;
 };
 
+const getResourceBaseUrl = () => {
+    const url = getRes()["admin_static_resource_base_url"] as string;
+    if (url && url.trim().length > 0) {
+        return url + "/";
+    }
+    return document.baseURI;
+};
+
 let editor: any;
 
 const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({ height, markdown, onChange, loadSuccess }) => {
@@ -171,7 +179,7 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({ height, markdow
                 ];
             },
             imageUploadURL: document.baseURI + "api/admin/upload",
-            path: document.baseURI + "admin/vendors/markdown/lib/",
+            path: getResourceBaseUrl() + "admin/vendors/markdown/lib/",
             placeholder: getRes()["editorPlaceholder"],
             markdown: content.markdown,
             onload: function () {
@@ -288,7 +296,7 @@ const MyEditorMdWrapper: FunctionComponent<MyEditorMdWrapperProps> = ({ height, 
     const [mdEditorScriptLoaded, setMdEditorScriptLoaded] = useState<boolean>(false);
 
     const EditMdAsyncScriptLoader = makeAsyncScriptLoader(
-        document.baseURI + "admin/vendors/markdown/js/editormd-1.5.5.js"
+        getResourceBaseUrl() + "admin/vendors/markdown/js/editormd-1.5.6.js"
     )(MyLoadingComponent) as unknown as FunctionComponent<ScriptLoaderProps>;
     if (mdEditorScriptLoaded) {
         return <MyEditorMd height={height} markdown={markdown} loadSuccess={loadSuccess} onChange={onChange} />;

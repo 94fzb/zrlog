@@ -12,6 +12,7 @@ import { ColorPicker, message } from "antd";
 import { Admin } from "./index";
 import FaviconUpload from "./FaviconUpload";
 import { getItems_per_page } from "index";
+import { colorPickerBgColors } from "../../utils/helpers";
 
 const layout = {
     labelCol: { span: 8 },
@@ -54,6 +55,9 @@ const BlogForm = ({ data, offline }: { data: Admin; offline: boolean }) => {
             >
                 <Title level={4}>管理界面设置</Title>
                 <Divider />
+                <Form.Item name="admin_static_resource_base_url" label="管理页静态资源（URL）">
+                    <Input style={{ maxWidth: "300px" }} placeholder="留空，及禁用" />
+                </Form.Item>
                 <Form.Item name="session_timeout" label="管理界面会话超时" rules={[{ required: true }]}>
                     <Input
                         suffix="分钟"
@@ -103,6 +107,13 @@ const BlogForm = ({ data, offline }: { data: Admin; offline: boolean }) => {
                             onChange={(color) => {
                                 setForm({ ...form, admin_color_primary: color.toHexString() });
                             }}
+                            presets={[
+                                {
+                                    defaultOpen: true,
+                                    label: "预设",
+                                    colors: colorPickerBgColors,
+                                },
+                            ]}
                         />
                         <span style={{ paddingLeft: 8 }}>{form["admin_color_primary"]}</span>
                     </div>

@@ -49,19 +49,20 @@ public class CommonService {
         stringObjectMap.put("buildId", BlogBuildInfoUtil.getBuildId());
         stringObjectMap.put("admin_color_primary", publicInfoVO.admin_color_primary());
         stringObjectMap.put("lang", I18nUtil.getCurrentLocale());
+        stringObjectMap.put("admin_static_resource_base_url", ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite());
         return stringObjectMap;
     }
 
     public PublicInfoVO getPublicInfo(HttpRequest request) {
         Boolean darkMode = Constants.getBooleanByFromWebSite("admin_darkMode");
         String themeColor;
-        String adminColor = Objects.toString(Constants.zrLogConfig.getWebSite().get("admin_color_primary"), "#1677ff");
+        String adminColor = Objects.toString(Constants.zrLogConfig.getPublicWebSite().get("admin_color_primary"), "#1677ff");
         if (darkMode) {
             themeColor = "#000000";
         } else {
             themeColor = adminColor;
         }
-        return new PublicInfoVO(BlogBuildInfoUtil.getVersion(), (String) Constants.zrLogConfig.getWebSite().get("title"), ZrLogUtil.getHomeUrlWithHost(request), darkMode, adminColor, themeColor);
+        return new PublicInfoVO(BlogBuildInfoUtil.getVersion(), (String) Constants.zrLogConfig.getPublicWebSite().get("title"), ZrLogUtil.getHomeUrlWithHost(request), darkMode, adminColor, themeColor);
     }
 
     public Map<String, Object> installResourceInfo(HttpRequest request) {

@@ -7,7 +7,7 @@ import { API_VERSION_PATH } from "./components/upgrade";
 import ErrorBoundary from "./common/ErrorBoundary";
 import type { HookAPI as ModalHookAPI } from "antd/es/modal/useModal";
 import type { MessageInstance } from "antd/es/message/interface";
-import { AxiosInstance } from "axios/index";
+import { AxiosInstance } from "axios";
 
 const AsyncLogin = lazy(() => import("components/login"));
 const AsyncAdminDashboardRouter = lazy(() => import("AdminDashboardRouter"));

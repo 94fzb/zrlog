@@ -20,3 +20,7 @@
 
 - add eye icon
 - remove watch border light
+
+### 1.5.6
+
+- update katex path

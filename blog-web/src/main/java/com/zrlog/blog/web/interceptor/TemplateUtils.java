@@ -15,7 +15,7 @@ public class TemplateUtils {
         if (!InstallUtils.isInstalled()) {
             return;
         }
-        String configTemplate = Constants.zrLogConfig.getWebSite().getOrDefault("template", Constants.DEFAULT_TEMPLATE_PATH).toString();
+        String configTemplate = Constants.zrLogConfig.getPublicWebSite().getOrDefault("template", Constants.DEFAULT_TEMPLATE_PATH).toString();
         File path = new File(PathUtil.getStaticPath() + configTemplate);
         if (path.exists() && !Objects.equals(configTemplate, Constants.DEFAULT_TEMPLATE_PATH)) {
             try {
@@ -33,7 +33,7 @@ public class TemplateUtils {
     }
 
     public static boolean existsByTemplateName(String templateName) {
-        String configTemplate = Constants.zrLogConfig.getWebSite().getOrDefault("template", Constants.DEFAULT_TEMPLATE_PATH).toString();
+        String configTemplate = Constants.zrLogConfig.getPublicWebSite().getOrDefault("template", Constants.DEFAULT_TEMPLATE_PATH).toString();
         File path = new File(PathUtil.getStaticPath() + configTemplate);
         if (path.exists() && !Objects.equals(configTemplate, Constants.DEFAULT_TEMPLATE_PATH)) {
             return Arrays.stream(Objects.requireNonNull(path.listFiles())).anyMatch(e -> e.getName().startsWith(templateName + "."));

@@ -1,5 +1,5 @@
 import { DownOutlined, KeyOutlined, LogoutOutlined, SoundOutlined, UserOutlined } from "@ant-design/icons";
-import { Badge, MenuProps, Typography } from "antd";
+import { Badge, MenuProps, Modal, Typography } from "antd";
 import { Link } from "react-router-dom";
 
 import Dropdown from "antd/es/dropdown";
@@ -7,16 +7,19 @@ import Image from "antd/es/image";
 import Constants, { getRes } from "../utils/constants";
 import Divider from "antd/es/divider";
 import { BasicUserInfo } from "../type";
+import { tryBlock } from "../utils/helpers";
 
 const { Text } = Typography;
 
 const UserInfo = ({ data, offline }: { data: BasicUserInfo; offline: boolean }) => {
+    const [modal, contextHolder] = Modal.useModal();
+
     const adminSettings = (res: Record<string, never>): MenuProps["items"] => {
         let base = [
             {
                 key: "1",
                 label: (
-                    <Link to="/user">
+                    <Link to="/user" onClick={(e) => tryBlock(e, modal)}>
                         <UserOutlined />
                         <Text style={{ paddingLeft: "5px", paddingRight: 16 }}>{res["admin.user.info"]}</Text>
                     </Link>
@@ -25,7 +28,7 @@ const UserInfo = ({ data, offline }: { data: BasicUserInfo; offline: boolean }) 
             {
                 key: "2",
                 label: (
-                    <Link to="/user-update-password">
+                    <Link to="/user-update-password" onClick={(e) => tryBlock(e, modal)}>
                         <KeyOutlined />
                         <Text style={{ paddingLeft: "5px", paddingRight: 16 }}>{res["admin.changePwd"]}</Text>
                     </Link>
@@ -74,36 +77,39 @@ const UserInfo = ({ data, offline }: { data: BasicUserInfo; offline: boolean }) 
     const items = adminSettings(getRes());
 
     return (
-        <Dropdown menu={{ items }} placement="bottom" arrow={{ pointAtCenter: true }}>
-            <div
-                style={{
-                    color: "#ffffff",
-                    height: "64px",
-                    borderRadius: 0,
-                    marginRight: 16,
-                    float: "right",
-                }}
-            >
-                <Image
-                    preview={false}
-                    fallback={Constants.getFillBackImg()}
-                    className={"userAvatarImg"}
-                    src={data.header}
-                    style={{ cursor: "pointer", width: 40, height: 40 }}
-                />
-                <Badge dot={data.lastVersion?.upgrade}>
-                    <Text
-                        style={{
-                            color: "#ffffff",
-                            paddingLeft: 8,
-                        }}
-                    >
-                        {data.userName}
-                    </Text>
-                </Badge>
-                <DownOutlined />
-            </div>
-        </Dropdown>
+        <>
+            {contextHolder}
+            <Dropdown menu={{ items }} placement="bottom" arrow={{ pointAtCenter: true }}>
+                <div
+                    style={{
+                        color: "#ffffff",
+                        height: "64px",
+                        borderRadius: 0,
+                        marginRight: 16,
+                        float: "right",
+                    }}
+                >
+                    <Image
+                        preview={false}
+                        fallback={Constants.getFillBackImg()}
+                        className={"userAvatarImg"}
+                        src={data.header}
+                        style={{ cursor: "pointer", width: 40, height: 40 }}
+                    />
+                    <Badge dot={data.lastVersion?.upgrade}>
+                        <Text
+                            style={{
+                                color: "#ffffff",
+                                paddingLeft: 8,
+                            }}
+                        >
+                            {data.userName}
+                        </Text>
+                    </Badge>
+                    <DownOutlined />
+                </div>
+            </Dropdown>
+        </>
     );
 };
 

@@ -115,11 +115,11 @@ public class I18nUtil {
         String locale = null;
         if (Objects.nonNull(request)) {
             if (request.getUri().contains(Constants.ADMIN_URI_BASE_PATH + "/") || request.getUri().contains("/api" + Constants.ADMIN_URI_BASE_PATH + "/")) {
-                locale = (String) Constants.zrLogConfig.getWebSite().get("language");
+                locale = (String) Constants.zrLogConfig.getPublicWebSite().get("language");
             } else {
                 String referer = request.getHeader("referer");
                 if (StringUtils.isNotEmpty(referer) && referer.contains(Constants.ADMIN_URI_BASE_PATH + "/")) {
-                    locale = (String) Constants.zrLogConfig.getWebSite().get("language");
+                    locale = (String) Constants.zrLogConfig.getPublicWebSite().get("language");
                 } else {
                     //try get locale info from HTTP header
                     locale = getAcceptLocal(request);
@@ -241,8 +241,8 @@ public class I18nUtil {
         if (threadLocal.get() != null) {
             locale = threadLocal.get().getLocale();
         } else {
-            if (Objects.nonNull(Constants.zrLogConfig) && Constants.zrLogConfig.getWebSite().get("language") != null) {
-                locale = (String) Constants.zrLogConfig.getWebSite().get("language");
+            if (Objects.nonNull(Constants.zrLogConfig) && Constants.zrLogConfig.getPublicWebSite().get("language") != null) {
+                locale = (String) Constants.zrLogConfig.getPublicWebSite().get("language");
             }
         }
         if (StringUtils.isNotEmpty(locale)) {

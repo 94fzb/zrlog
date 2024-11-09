@@ -11,6 +11,7 @@ import axios from "axios";
 import { getRes } from "../../utils/constants";
 import { UploadChangeParam } from "antd/es/upload";
 import Switch from "antd/es/switch";
+import { colorPickerBgColors } from "../../utils/helpers";
 
 const layout = {
     labelCol: { span: 8 },
@@ -108,6 +109,13 @@ const TemplateConfig = ({ data, offline }: { data: TemplateConfigState; offline:
                                 dataMap: state.dataMap,
                             });
                         }}
+                        presets={[
+                            {
+                                defaultOpen: true,
+                                label: "预设",
+                                colors: colorPickerBgColors,
+                            },
+                        ]}
                     />
                     <span style={{ paddingLeft: 8 }}>{state.dataMap[key]}</span>
                 </div>

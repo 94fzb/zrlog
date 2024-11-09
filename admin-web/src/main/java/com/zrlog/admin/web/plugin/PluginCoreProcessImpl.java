@@ -4,13 +4,16 @@ import com.hibegin.common.util.CmdUtil;
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.http.HttpUtil;
 import com.hibegin.common.util.http.handle.HttpFileHandle;
+import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.common.Constants;
 import com.zrlog.common.PluginCoreProcess;
 import com.zrlog.common.type.RunMode;
 import com.zrlog.util.BlogBuildInfoUtil;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,26 +22,20 @@ public class PluginCoreProcessImpl implements PluginCoreProcess {
 
     private static final Logger LOGGER = LoggerUtil.getLogger(PluginCoreProcessImpl.class);
 
-    private Thread thread;
+    private AbstractPluginCoreProcessHandle pluginCoreProcessHandle;
     private boolean canStart = true;
+    private final File infoLogFile;
+    private final File errorLogFile;
 
-    private void printInputStreamWithThread(final InputStream in, final File serverFileName) {
-        Thread.ofVirtual().start(() -> {
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
-            String str;
-            try {
-                str = br.readLine();
-                if (str != null && str.startsWith("Error: Invalid or corrupt jarfile")) {
-                    System.out.println(str);
-                    serverFileName.delete();
-                }
-                while ((str = br.readLine()) != null) {
-                    System.out.println(str);
-                }
-            } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "plugin output error", e);
-            }
-        });
+    public PluginCoreProcessImpl(int port) {
+        infoLogFile = new File(PathUtil.getLogPath() + "/plugin-core-info." + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + "." + port + ".log");
+        if (infoLogFile.exists()) {
+            infoLogFile.delete();
+        }
+        errorLogFile = new File(PathUtil.getLogPath() + "/plugin-core-error." + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + "." + port + ".log");
+        if (errorLogFile.exists()) {
+            errorLogFile.delete();
+        }
     }
 
     private String programName(File pluginCoreFile) {
@@ -53,7 +50,7 @@ public class PluginCoreProcessImpl implements PluginCoreProcess {
     }
 
     private Process startPluginCore(final File pluginCoreFile, final String dbProperties, final String pluginJvmArgs,
-                                    final String runtimePath, final String runTimeVersion, String token, int randomServerPort, int randomWatcherListenPort) {
+                                    final String runtimePath, final String runTimeVersion, String token, int randomServerPort, int randomWatcherListenPort) throws IOException {
         final int randomMasterPort = randomServerPort + 20000;
 
         tryDownloadPluginCoreFile(pluginCoreFile);
@@ -68,7 +65,7 @@ public class PluginCoreProcessImpl implements PluginCoreProcess {
         }
         List<String> args = new ArrayList<>();
         if (Constants.runMode == RunMode.DEV || Constants.runMode == RunMode.JAR) {
-            args.add(pluginJvmArgs);
+            args.addAll(Arrays.asList(pluginJvmArgs.split(" ")));
             args.add("-jar");
             args.add(pluginCoreFile.toString());
         }
@@ -90,7 +87,13 @@ public class PluginCoreProcessImpl implements PluginCoreProcess {
         //参数位置顺序需要固定
         args.add("-Duser.dir=" + pluginCoreFile.getParent());
         //args end
-        return CmdUtil.getProcess(programName(pluginCoreFile), args.toArray());
+        List<String> cmd = new ArrayList<>();
+        cmd.add(programName(pluginCoreFile));
+        cmd.addAll(args);
+        return new ProcessBuilder(cmd)
+                .redirectOutput(infoLogFile)
+                .redirectError(errorLogFile)
+                .start();
     }
 
 
@@ -104,39 +107,58 @@ public class PluginCoreProcessImpl implements PluginCoreProcess {
         try {
             Process pr = startPluginCore(pluginCoreFile, dbProperties, pluginJvmArgs, runtimePath, runTimeVersion, token, randomServerPort, randomWatcherListenPort);
             registerShutdownHook();
-            thread = new Thread() {
+            if (Objects.nonNull(pluginCoreProcessHandle)) {
+                pluginCoreProcessHandle.close();
+            }
+            pluginCoreProcessHandle = new AbstractPluginCoreProcessHandle() {
+
                 private Process process = pr;
 
                 public void run() {
                     Thread.currentThread().setName("plugin-core-thread");
 
-                    while (true) {
-                        if (process != null) {
-                            printInputStreamWithThread(process.getInputStream(), pluginCoreFile);
-                            printInputStreamWithThread(process.getErrorStream(), pluginCoreFile);
-                        }
-                        new PluginGhostWatcher("127.0.0.1", randomWatcherListenPort).doWatch();
-                        //避免执行失败的情况下，重复执行
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            //ignore
-                        }
-                        if (!canStart) {
+                    while (!Thread.currentThread().isInterrupted() && canStart) {
+                        if (Objects.isNull(process)) {
                             return;
                         }
-                        process = startPluginCore(pluginCoreFile, dbProperties, pluginJvmArgs, runtimePath, runTimeVersion, token, randomServerPort, randomWatcherListenPort);
+                        PluginConsole errroPluginConsole = new PluginConsole(errorLogFile, pluginCoreFile, true);
+                        PluginConsole infoPluginConsole = new PluginConsole(infoLogFile, pluginCoreFile, false);
+                        try {
+                            infoPluginConsole.printAsync();
+                            errroPluginConsole.printAsync();
+                            new PluginGhostWatcher("127.0.0.1", randomWatcherListenPort).doWatch();
+                            //避免执行失败的情况下，重复执行
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                //ignore
+                            }
+                            process = startPluginCore(pluginCoreFile, dbProperties, pluginJvmArgs, runtimePath, runTimeVersion, token, randomServerPort, randomWatcherListenPort);
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        } finally {
+                            try {
+                                errroPluginConsole.close();
+                            } catch (Exception e) {
+                                LOGGER.warning("Close error stream " + e.getMessage());
+                            }
+                            try {
+                                infoPluginConsole.close();
+                            } catch (Exception e) {
+                                LOGGER.warning("Close info stream " + e.getMessage());
+                            }
+                        }
                     }
                 }
 
-                @Override
-                public void interrupt() {
+                public void close() {
                     if (Objects.nonNull(process)) {
                         process.destroy();
+                        process = null;
                     }
                 }
             };
-            thread.start();
+            Thread.ofVirtual().uncaughtExceptionHandler((t, ex) -> pluginCoreProcessHandle.close()).start(pluginCoreProcessHandle);
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "start plugin exception ", e);
         }
@@ -176,9 +198,9 @@ public class PluginCoreProcessImpl implements PluginCoreProcess {
 
     @Override
     public void stopPluginCore() {
-        if (Objects.nonNull(thread)) {
-            thread.interrupt();
-        }
         canStart = false;
+        if (Objects.nonNull(pluginCoreProcessHandle)) {
+            pluginCoreProcessHandle.close();
+        }
     }
 }

@@ -21,10 +21,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
 
@@ -175,11 +172,13 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
     @Override
     public CompletableFuture<BaseDataInitVO> refreshInitDataCacheAsync(HttpRequest servletRequest, boolean cleanAble) {
         long expectVersion = getUpdateVersion(cleanAble);
-        return CompletableFuture.supplyAsync(() -> {
-            BaseDataInitVO cache = refreshInitDataCache(cleanAble, expectVersion);
-            setToRequest(servletRequest, cache);
-            return cache;
-        });
+        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            return CompletableFuture.supplyAsync(() -> {
+                BaseDataInitVO cache = refreshInitDataCache(cleanAble, expectVersion);
+                setToRequest(servletRequest, cache);
+                return cache;
+            }, executor);
+        }
     }
 
     private static void setToRequest(HttpRequest servletRequest, BaseDataInitVO cacheInit) {
@@ -195,16 +194,19 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
     }
 
     private BaseDataInitVO refreshInitDataCache(boolean cleanAble, long expectVersion) {
-        if (cleanAble || cacheInit == null) {
-            lock.lock();
+        if (!cleanAble && Objects.nonNull(cacheInit)) {
+            return cacheInit;
+        }
+        lock.lock();
+        try {
             if (!Objects.equals(version.get(), expectVersion)) {
-                /*//LOGGER.info("Version skip " + version.get() + " -> " + expectVersion);
-                return;*/
+            /*//LOGGER.info("Version skip " + version.get() + " -> " + expectVersion);
+            return;*/
                 return cacheInit;
             } else {
                 long start = System.currentTimeMillis();
-                try {
-                    cacheInit = getCacheInit();
+                try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+                    cacheInit = getCacheInit(executor);
                     //缓存静态资源map
                     Map<String, String> tempMap = getCacheFileMap();
                     cacheFileMap.clear();
@@ -214,10 +216,11 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
                     WebSite.clearTemplateConfigMap();
                     PluginUtils.refreshPluginCacheData();
                 } finally {
-                    lock.unlock();
                     LOGGER.info("RefreshInitDataCache used time " + (System.currentTimeMillis() - start) + "ms");
                 }
             }
+        } finally {
+            lock.unlock();
         }
         return cacheInit;
     }
@@ -228,9 +231,9 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
         if (!InstallUtils.isInstalled()) {
             return new HashMap<>();
         }
-        Map<String, Object> website = new WebSite().getWebSite();
-        Constants.zrLogConfig.getWebSite().clear();
-        Constants.zrLogConfig.getWebSite().putAll(website);
+        Map<String, Object> website = new WebSite().getPublicWebSite();
+        Constants.zrLogConfig.getPublicWebSite().clear();
+        Constants.zrLogConfig.getPublicWebSite().putAll(website);
         String robotTxt = (String) website.get("robotRuleContent");
         if (StringUtils.isEmpty(robotTxt)) {
             return website;
@@ -278,113 +281,111 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
         }
     }
 
-    private BaseDataInitVO getCacheInit() {
+    private BaseDataInitVO getCacheInit(Executor executor) {
         BaseDataInitVO cacheInit = new BaseDataInitVO();
         //first set website info
         cacheInit.setWebSite(refreshWebSite());
 
         List<CompletableFuture<Void>> futures = new ArrayList<>();
-        try (ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor()) {
-            BaseDataInitVO.Statistics statistics = new BaseDataInitVO.Statistics();
-            futures.add(CompletableFuture.runAsync(() -> {
-                statistics.setTotalArticleSize(new Log().getVisitorCount());
-                cacheInit.setStatistics(statistics);
-            }, executorService));
-            futures.add(CompletableFuture.runAsync(() -> {
-                try {
-                    cacheInit.setLinks(new Link().findAll());
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            }, executorService));
-            futures.add(CompletableFuture.runAsync(() -> {
-                try {
-                    cacheInit.setTypes(new Type().findAll());
-                    statistics.setTotalTypeSize((long) cacheInit.getTypes().size());
-                    List<Map<String, Object>> types = cacheInit.getTypes();
-                    //Last article
-                    cacheInit.setHotLogs(new Log().visitorFind(new PageRequestImpl(1L, 6L), "").getRows().stream().map(this::convertToBasicVO).toList());
-                    Map<Map<String, Object>, List<HotLogBasicInfoVO>> indexHotLog = new LinkedHashMap<>();
-                    cacheInit.setIndexHotLogs(indexHotLog);
-                    //设置分类Hot
-                    for (Map<String, Object> type : types) {
-                        futures.add(CompletableFuture.runAsync(() -> {
-                            Map<String, Object> typeMap = new TreeMap<>();
-                            typeMap.put("typeName", type.get("typeName"));
-                            String alias = (String) type.get("alias");
-                            typeMap.put("alias", alias);
-                            indexHotLog.put(typeMap, new Log().findByTypeAlias(1, 6, alias).getRows().stream().map(this::convertToBasicVO).toList());
-                        }, executorService));
-                    }
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            }, executorService));
-            futures.add(CompletableFuture.runAsync(() -> {
-                try {
-                    cacheInit.setLogNavs(new LogNav().findAll());
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            }, executorService));
-            futures.add(CompletableFuture.runAsync(() -> {
-                try {
-                    cacheInit.setPlugins(new Plugin().findAll());
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            }, executorService));
-            futures.add(CompletableFuture.runAsync(() -> {
-                try {
-                    cacheInit.setArchives(new Log().getArchives());
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            }, executorService));
-            futures.add(CompletableFuture.runAsync(this::refreshFavicon, executorService));
-            futures.add(CompletableFuture.runAsync(() -> {
-                List<Map<String, Object>> all;
-                try {
-                    new Tag().refreshTag();
-                    all = new Tag().findAll();
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-                for (Map<String, Object> kv : all) {
-                    kv.put("keycode", kv.get("text").hashCode());
-                }
-                cacheInit.setTags(all);
-                statistics.setTotalTagSize((long) cacheInit.getTags().size());
-            }, executorService));
+        BaseDataInitVO.Statistics statistics = new BaseDataInitVO.Statistics();
+        futures.add(CompletableFuture.runAsync(() -> {
+            statistics.setTotalArticleSize(new Log().getVisitorCount());
+            cacheInit.setStatistics(statistics);
+        }, executor));
+        futures.add(CompletableFuture.runAsync(() -> {
             try {
-                CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
-            } catch (Exception e) {
-                LOGGER.warning("Load data error " + e.getMessage());
+                cacheInit.setLinks(new Link().findAll());
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
             }
-            if (cacheInit.getTags() == null || cacheInit.getTags().isEmpty()) {
-                cacheInit.getPlugins().stream().filter(e -> Objects.equals(e.get("pluginName"), "tags")).findFirst().ifPresent(e -> {
-                    cacheInit.getPlugins().remove(e);
-                });
+        }, executor));
+        futures.add(CompletableFuture.runAsync(() -> {
+            try {
+                cacheInit.setTypes(new Type().findAll());
+                statistics.setTotalTypeSize((long) cacheInit.getTypes().size());
+                List<Map<String, Object>> types = cacheInit.getTypes();
+                //Last article
+                cacheInit.setHotLogs(new Log().visitorFind(new PageRequestImpl(1L, 6L), "").getRows().stream().map(this::convertToBasicVO).toList());
+                Map<Map<String, Object>, List<HotLogBasicInfoVO>> indexHotLog = new LinkedHashMap<>();
+                cacheInit.setIndexHotLogs(indexHotLog);
+                //设置分类Hot
+                for (Map<String, Object> type : types) {
+                    futures.add(CompletableFuture.runAsync(() -> {
+                        Map<String, Object> typeMap = new TreeMap<>();
+                        typeMap.put("typeName", type.get("typeName"));
+                        String alias = (String) type.get("alias");
+                        typeMap.put("alias", alias);
+                        indexHotLog.put(typeMap, new Log().findByTypeAlias(1, 6, alias).getRows().stream().map(this::convertToBasicVO).toList());
+                    }, executor));
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
             }
-            if (cacheInit.getArchives() == null || cacheInit.getArchives().isEmpty()) {
-                cacheInit.getPlugins().stream().filter(e -> Objects.equals(e.get("pluginName"), "archives")).findFirst().ifPresent(e -> {
-                    cacheInit.getPlugins().remove(e);
-                });
+        }, executor));
+        futures.add(CompletableFuture.runAsync(() -> {
+            try {
+                cacheInit.setLogNavs(new LogNav().findAll());
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
             }
-            if (cacheInit.getTypes() == null || cacheInit.getTypes().isEmpty()) {
-                cacheInit.getPlugins().stream().filter(e -> Objects.equals(e.get("pluginName"), "types")).findFirst().ifPresent(e -> {
-                    cacheInit.getPlugins().remove(e);
-                });
+        }, executor));
+        futures.add(CompletableFuture.runAsync(() -> {
+            try {
+                cacheInit.setPlugins(new Plugin().findAll());
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
             }
-            if (cacheInit.getLinks() == null || cacheInit.getLinks().isEmpty()) {
-                cacheInit.getPlugins().stream().filter(e -> Objects.equals(e.get("pluginName"), "links")).findFirst().ifPresent(e -> {
-                    cacheInit.getPlugins().remove(e);
-                });
+        }, executor));
+        futures.add(CompletableFuture.runAsync(() -> {
+            try {
+                cacheInit.setArchives(new Log().getArchives());
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
             }
-            //默认开启文章封面
-            cacheInit.getWebSite().putIfAbsent("article_thumbnail_status", "1");
-            return cacheInit;
+        }, executor));
+        futures.add(CompletableFuture.runAsync(this::refreshFavicon, executor));
+        futures.add(CompletableFuture.runAsync(() -> {
+            List<Map<String, Object>> all;
+            try {
+                new Tag().refreshTag();
+                all = new Tag().findAll();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            for (Map<String, Object> kv : all) {
+                kv.put("keycode", kv.get("text").hashCode());
+            }
+            cacheInit.setTags(all);
+            statistics.setTotalTagSize((long) cacheInit.getTags().size());
+        }, executor));
+        try {
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+        } catch (Exception e) {
+            LOGGER.warning("Load data error " + e.getMessage());
         }
+        if (cacheInit.getTags() == null || cacheInit.getTags().isEmpty()) {
+            cacheInit.getPlugins().stream().filter(e -> Objects.equals(e.get("pluginName"), "tags")).findFirst().ifPresent(e -> {
+                cacheInit.getPlugins().remove(e);
+            });
+        }
+        if (cacheInit.getArchives() == null || cacheInit.getArchives().isEmpty()) {
+            cacheInit.getPlugins().stream().filter(e -> Objects.equals(e.get("pluginName"), "archives")).findFirst().ifPresent(e -> {
+                cacheInit.getPlugins().remove(e);
+            });
+        }
+        if (cacheInit.getTypes() == null || cacheInit.getTypes().isEmpty()) {
+            cacheInit.getPlugins().stream().filter(e -> Objects.equals(e.get("pluginName"), "types")).findFirst().ifPresent(e -> {
+                cacheInit.getPlugins().remove(e);
+            });
+        }
+        if (cacheInit.getLinks() == null || cacheInit.getLinks().isEmpty()) {
+            cacheInit.getPlugins().stream().filter(e -> Objects.equals(e.get("pluginName"), "links")).findFirst().ifPresent(e -> {
+                cacheInit.getPlugins().remove(e);
+            });
+        }
+        //默认开启文章封面
+        cacheInit.getWebSite().putIfAbsent("article_thumbnail_status", "1");
+        return cacheInit;
     }
 
 }

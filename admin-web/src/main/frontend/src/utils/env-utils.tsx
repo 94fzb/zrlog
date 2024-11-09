@@ -30,4 +30,8 @@ export const isPWA = (): boolean => {
     return window.matchMedia("(display-mode: standalone)").matches;
 };
 
+export const isOffline = () => {
+    return !navigator.onLine;
+};
+
 export default EnvUtils;

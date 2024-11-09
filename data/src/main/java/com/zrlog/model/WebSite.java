@@ -3,7 +3,6 @@ package com.zrlog.model;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.hibegin.common.util.BooleanUtils;
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.StringUtils;
@@ -43,7 +42,7 @@ public class WebSite extends DAO {
         this.pk = "siteId";
     }
 
-    public Map<String, Object> getWebSite() {
+    public Map<String, Object> getPublicWebSite() {
         Map<String, Object> webSites = new HashMap<>();
         List<Map<String, Object>> lw;
         try {

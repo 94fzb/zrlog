@@ -16,9 +16,10 @@ import {
     SettingFilled,
     SettingOutlined,
 } from "@ant-design/icons";
-import { Menu, MenuProps } from "antd";
+import { Menu, MenuProps, Modal } from "antd";
 import EnvUtils from "../utils/env-utils";
 import { useLocation } from "react-router";
+import { tryBlock } from "../utils/helpers";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -60,6 +61,7 @@ function colorToRgba(color: string, alpha: number) {
 
 const SliderMenu = () => {
     const location = useLocation();
+    const [modal, contextHolder] = Modal.useModal();
 
     const getInfo = (entry: MenuEntry): IconInfo => {
         if (location.pathname.startsWith("/website") && entry.link.startsWith("/website")) {
@@ -84,6 +86,9 @@ const SliderMenu = () => {
                 to={entry.link}
                 style={{
                     color: info.selected && EnvUtils.isDarkMode() ? getColorPrimary() : "#FFF",
+                }}
+                onClick={(e) => {
+                    tryBlock(e, modal);
                 }}
             >
                 {info.icon}
@@ -243,12 +248,19 @@ const SliderMenu = () => {
     }, [location]);
 
     return (
-        <Menu
-            selectedKeys={[selectMenu]}
-            items={items}
-            theme={EnvUtils.isDarkMode() ? "light" : "dark"}
-            style={{ height: "100vh", backgroundColor: EnvUtils.isDarkMode() ? "#1f1f1f" : "#001529" }}
-        />
+        <>
+            {contextHolder}
+            <Menu
+                selectedKeys={[selectMenu]}
+                items={items}
+                theme={EnvUtils.isDarkMode() ? "light" : "dark"}
+                style={{
+                    minHeight: "100%",
+                    backgroundColor: EnvUtils.isDarkMode() ? "#1f1f1f" : "#001529",
+                    borderInlineEnd: "unset",
+                }}
+            />
+        </>
     );
 };
 export default SliderMenu;

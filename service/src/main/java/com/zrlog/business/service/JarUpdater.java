@@ -18,8 +18,8 @@ public record JarUpdater(String[] args, File execFile) implements Updater {
 
     private static final Logger LOGGER = LoggerUtil.getLogger(JarUpdater.class);
 
-    public CompletableFuture<Void> restartProcessAsync(Version upgradeVersion) {
-        return CompletableFuture.runAsync(() -> {
+    public void restartProcessAsync(Version upgradeVersion) {
+        Thread.ofVirtual().start(() -> {
             List<String> inputArguments = ManagementFactory.getRuntimeMXBean().getInputArguments();
             // 构造完整的命令
             List<String> cmdArgs = new ArrayList<>();

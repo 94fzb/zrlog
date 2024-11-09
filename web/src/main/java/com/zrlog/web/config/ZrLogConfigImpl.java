@@ -8,7 +8,9 @@ import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpRequestListener;
 import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.api.Interceptor;
-import com.hibegin.http.server.config.*;
+import com.hibegin.http.server.config.RequestConfig;
+import com.hibegin.http.server.config.ResponseConfig;
+import com.hibegin.http.server.config.ServerConfig;
 import com.zaxxer.hikari.util.DriverDataSource;
 import com.zrlog.admin.web.config.AdminRouters;
 import com.zrlog.admin.web.interceptor.AdminInterceptor;
@@ -50,8 +52,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -69,14 +72,16 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     private final CacheService cacheService;
     private final PluginCoreProcess pluginCoreProcess;
     private final Map<String, Object> website = new TreeMap<>();
+    private final long uptime;
 
-    public ZrLogConfigImpl(Integer port, Updater updater) throws Exception {
+    public ZrLogConfigImpl(Integer port, Updater updater) {
         this.port = port;
         this.plugins = new Plugins();
         this.updater = updater;
         this.cacheService = new CacheServiceImpl();
-        this.pluginCoreProcess = new PluginCoreProcessImpl();
+        this.pluginCoreProcess = new PluginCoreProcessImpl(port);
         this.serverConfig = initServerConfig();
+        this.uptime = System.currentTimeMillis();
     }
 
     /**
@@ -102,6 +107,9 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         serverConfig.addErrorHandle(500, new ZrLogErrorHandle(500));
         serverConfig.setRequestExecutor(Executors.newVirtualThreadPerTaskExecutor());
         serverConfig.setDecodeExecutor(Executors.newVirtualThreadPerTaskExecutor());
+        serverConfig.setRequestCheckerExecutor(new ScheduledThreadPoolExecutor(1, r -> {
+            return Thread.ofVirtual().unstarted(r);
+        }));
         serverConfig.addRequestListener(new HttpRequestListener() {
             @Override
             public void destroy(HttpRequest request, HttpResponse httpResponse) {
@@ -327,11 +335,11 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     }
 
     @Override
-    public CompletableFuture<Void> startPluginsAsync() {
+    public void startPluginsAsync() {
         if (!InstallUtils.isInstalled()) {
-            return CompletableFuture.completedFuture(null);
+            return;
         }
-        return CompletableFuture.runAsync(() -> {
+        Thread.ofVirtual().start(() -> {
             this.plugins.forEach(IPlugin::stop);
             this.plugins.clear();
             this.plugins.addAll(getPluginList());
@@ -353,7 +361,23 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     }
 
     @Override
-    public Map<String, Object> getWebSite() {
+    public Map<String, Object> getPublicWebSite() {
         return website;
+    }
+
+    @Override
+    public String getProgramUptime() {
+        return toNamingDurationString(System.currentTimeMillis() - uptime, I18nUtil.getCurrentLocale().contains("en"));
+    }
+
+    static String toNamingDurationString(long milliseconds, boolean en) {
+        long days = TimeUnit.MILLISECONDS.toDays(milliseconds);
+        long hours = TimeUnit.MILLISECONDS.toHours(milliseconds) % 24;
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(milliseconds) % 60;
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(milliseconds) % 60;
+        if (en) {
+            return String.format("%dd %dh %dm %ds", days, hours, minutes, seconds);
+        }
+        return String.format("%d天 %d时 %d分 %d秒", days, hours, minutes, seconds);
     }
 }
