@@ -1,5 +1,5 @@
 import { HomeOutlined } from "@ant-design/icons";
-import { Col, Layout, Row, Typography } from "antd";
+import { Col, Layout, Row } from "antd";
 
 import { getRes } from "../utils/constants";
 import { FunctionComponent, PropsWithChildren, useEffect, useState } from "react";
@@ -7,7 +7,6 @@ import EnvUtils from "../utils/env-utils";
 import UserInfo from "./user-info";
 import styled from "styled-components";
 import { getColorPrimary } from "../utils/constants";
-//import { useLocation } from "react-router";
 import SliderMenu from "./slider";
 import { BasicUserInfo } from "../type";
 import { ssData } from "../index";
@@ -15,8 +14,7 @@ import axios from "axios";
 import MyLoadingComponent from "../components/my-loading-component";
 import PWAHandler from "../PWAHandler";
 
-const { Header, Content, Footer, Sider } = Layout;
-const { Text } = Typography;
+const { Header, Content, Sider } = Layout;
 
 const StyledIndexLayout = styled("div")`
     .ant-menu-item {
@@ -237,6 +235,10 @@ const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ offline,
         }
     }, []);
 
+    const getMainHeight = () => {
+        return "calc(100vh - 64px)";
+    };
+
     return (
         <PWAHandler>
             <StyledIndexLayout>
@@ -276,31 +278,25 @@ const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ offline,
                     <Sider
                         hidden={fullScreen}
                         width={70}
-                        style={{ minHeight: "100vh", backgroundColor: EnvUtils.isDarkMode() ? "#1f1f1f" : "#001529" }}
+                        style={{
+                            minHeight: getMainHeight(),
+                            backgroundColor: EnvUtils.isDarkMode() ? "#1f1f1f" : "#001529",
+                        }}
                     >
                         <SliderMenu />
                     </Sider>
                     <Col style={{ flex: 1, width: 100, minHeight: fullScreen ? 0 : 1 }}>
-                        <Layout style={{ minHeight: "100vh", overflow: fullScreen ? "hidden" : "auto" }}>
-                            <Content style={{ paddingRight: fullScreen ? 0 : 12, paddingLeft: fullScreen ? 0 : 12 }}>
+                        <Layout style={{ minHeight: getMainHeight(), overflow: fullScreen ? "hidden" : "auto" }}>
+                            <Content
+                                style={{
+                                    paddingRight: fullScreen ? 0 : 12,
+                                    paddingLeft: fullScreen ? 0 : 12,
+                                    paddingBottom: fullScreen ? 0 : 12,
+                                }}
+                            >
                                 {loading && <MyLoadingComponent />}
                                 {children}
                             </Content>
-                            <Footer hidden={fullScreen}>
-                                <Row>
-                                    <Col xs={24} md={12}>
-                                        <div
-                                            className="ant-layout-footer-copyright"
-                                            dangerouslySetInnerHTML={{
-                                                __html: getRes().copyrightTips + ". All Rights Reserved.",
-                                            }}
-                                        />
-                                    </Col>
-                                    <Col xs={0} md={12}>
-                                        <Text style={{ float: "right" }}>Version {getRes().currentVersion}</Text>
-                                    </Col>
-                                </Row>
-                            </Footer>
                         </Layout>
                     </Col>
                 </Row>
