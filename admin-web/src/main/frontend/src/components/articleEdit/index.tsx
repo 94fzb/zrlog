@@ -201,11 +201,20 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                     });
                     return;
                 }
-                if(data.data) {
+                if (data.data) {
                     versionRef.current = data.data.version;
                 }
             } catch (e) {
-                return commonAxiosErrorHandle(e, modal, messageApi, editCardRef.current as HTMLElement);
+                try {
+                    return commonAxiosErrorHandle(e, modal, messageApi, editCardRef.current as HTMLElement);
+                } catch (ex) {
+                    modal.error({
+                        title: "保存失败",
+                        content: JSON.stringify(ex),
+                        okText: "确认",
+                        getContainer: () => editCardRef.current as HTMLElement,
+                    });
+                }
             }
             const data = responseData;
             if (data.error === 0) {
