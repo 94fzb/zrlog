@@ -201,7 +201,9 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                     });
                     return;
                 }
-                versionRef.current = data.data.version;
+                if(data.data) {
+                    versionRef.current = data.data.version;
+                }
             } catch (e) {
                 return commonAxiosErrorHandle(e, modal, messageApi, editCardRef.current as HTMLElement);
             }
