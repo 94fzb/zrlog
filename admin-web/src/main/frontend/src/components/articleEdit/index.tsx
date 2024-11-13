@@ -74,7 +74,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({
     const location = useLocation();
     const editCardRef = useRef<HTMLDivElement>(null);
 
-    const defaultState = articleDataToState(data, offline);
+    const defaultState = articleDataToState(data);
     const [state, setState] = useState<ArticleEditState>(defaultState);
 
     const aliasRef = useRef<InputRef>(null);
@@ -302,28 +302,22 @@ const Index: FunctionComponent<ArticleEditProps> = ({
     };
 
     useEffect(() => {
-        const lastOffline = state.offline;
-        //离线，保存到本地编辑
-        if (!lastOffline && offline) {
+        const newState = articleDataToState(data);
+        //仅设置状态，同时覆盖版本信息
+        versionRef.current = newState.article.version;
+        handleValuesChange(newState.article);
+    }, [data]);
+
+    useEffect(() => {
+        if (offline) {
             articleSaveToCache(state.article);
-            setState((prevState) => {
-                return {
-                    ...prevState,
-                    offline: true,
-                };
-            });
             return;
-        }
-        const newState = articleDataToState(data, offline);
-        //如果网络恢复，自动保存一次
-        if (lastOffline && !offline) {
-            handleValuesChange(newState.article);
         } else {
-            //仅设置状态，同时覆盖版本信息
-            versionRef.current = newState.article.version;
-            setState(newState);
+            //覆盖版本信息
+            versionRef.current = state.article.version;
+            handleValuesChange(state.article);
         }
-    }, [data, offline]);
+    }, [offline]);
 
     const setSubject = () => {
         if (subRef.current) {
@@ -347,7 +341,11 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                     if (state.article.logId && state.article.logId > 0) {
                         article.logId = state.article.logId;
                     }
-                    await onSubmit(article, false, false, true);
+                    try {
+                        await onSubmit(article, false, false, true);
+                    } catch (e) {
+                        console.error(e);
+                    }
                 })
             )
             .subscribe();
@@ -411,7 +409,9 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                         {getRes()["admin.log.edit"]}
                     </Title>
                 </Col>
-                {!fullScreen && <ArticleEditActionBar fullScreen={fullScreen} data={state} onSubmit={onSubmit} />}
+                {!fullScreen && (
+                    <ArticleEditActionBar fullScreen={fullScreen} offline={offline} data={state} onSubmit={onSubmit} />
+                )}
             </Row>
             {!fullScreen && <Divider style={{ marginTop: 16, marginBottom: 16 }} />}
             {messageContextHolder}
@@ -503,7 +503,12 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                         }}
                     >
                         {fullScreen && (
-                            <ArticleEditActionBar fullScreen={fullScreen} data={state} onSubmit={onSubmit} />
+                            <ArticleEditActionBar
+                                offline={offline}
+                                fullScreen={fullScreen}
+                                data={state}
+                                onSubmit={onSubmit}
+                            />
                         )}
                         <ArticleEditSettingButton
                             digestRef={digestRef}
@@ -551,7 +556,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                                 "_" +
                                 state.editorVersion +
                                 "_offline:" +
-                                state.offline
+                                offline
                             }
                             markdown={state.article.markdown}
                             onChange={(v) => {

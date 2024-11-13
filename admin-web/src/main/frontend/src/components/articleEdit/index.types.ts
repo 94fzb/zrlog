@@ -89,7 +89,6 @@ export type ArticleEditState = {
     editorInitSuccess: boolean;
     article: ArticleEntry;
     saving: ArticleSavingState;
-    offline: boolean;
 };
 
 export type ArticleSavingState = {

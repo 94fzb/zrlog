@@ -34,6 +34,7 @@ export type UserInfoState = {
 
 export type ServerInfoEntry = {
     name:string;
+    key :string;
     value:string;
 }
 

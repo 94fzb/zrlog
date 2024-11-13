@@ -87,7 +87,7 @@ public class GraalvmAgentApplication {
         new Gson().toJson(new DeleteLogResponse(true));
         new Gson().toJson(new LoadEditArticleResponse());
         new Gson().toJson(new UserBasicInfoResponse());
-        new Gson().toJson(new ServerInfo("1", "1"));
+        new Gson().toJson(new ServerInfo("1", "1",""));
     }
 
     private static void adminJson() {

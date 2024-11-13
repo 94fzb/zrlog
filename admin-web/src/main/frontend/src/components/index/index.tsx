@@ -28,14 +28,14 @@ const Index: FunctionComponent<IndexProps> = ({ data }) => {
                 return <Alert message={e} type="info" showIcon />;
             })}
             <Row gutter={[8, 8]} style={{ paddingTop: "12px" }}>
-                <Col xs={24} md={14}>
+                <Col xs={24} md={12}>
                     <ServerInfo
                         data={data.serverInfos}
                         nativeImageMode={data.nativeImageMode}
                         dockerMode={data.dockerMode}
                     />
                 </Col>
-                <Col xs={24} md={10}>
+                <Col xs={24} md={12}>
                     <StatisticsInfo data={data.statisticsInfo} />
                 </Col>
             </Row>
