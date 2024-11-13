@@ -68,6 +68,7 @@ const ServerInfo = ({
                                         valueRender={() => render(e.value, e) as React.ReactNode}
                                         valueStyle={{
                                             fontSize: 18,
+                                            lineHeight: "38px",
                                             overflow: "hidden",
                                             textOverflow: "ellipsis",
                                             whiteSpace: "nowrap",
