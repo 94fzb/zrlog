@@ -27,8 +27,6 @@ const ServerInfo = ({
                             flexFlow: "row",
                             alignItems: "center",
                             fontSize: 18,
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
                         }}
                     >
                         {dockerMode && <DockerOutlined />}
@@ -37,7 +35,14 @@ const ServerInfo = ({
                                 <GraalVmOutlined />
                             </Col>
                         )}
-                        <span>{e}</span>
+                        <span
+                            style={{
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                            }}
+                        >
+                            {e}
+                        </span>
                     </Row>
                 );
             }
