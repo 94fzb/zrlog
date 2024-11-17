@@ -20,14 +20,29 @@ const ServerInfo = ({
         if (r.key === "runtime") {
             if (dockerMode || nativeImageMode) {
                 return (
-                    <Row style={{ display: "flex", gap: 3, flexFlow: "row", alignItems: "center" }}>
+                    <Row
+                        style={{
+                            display: "flex",
+                            gap: 3,
+                            flexFlow: "row",
+                            alignItems: "center",
+                            fontSize: 18,
+                        }}
+                    >
                         {dockerMode && <DockerOutlined />}
                         {nativeImageMode && (
                             <Col xs={0} md={12} style={{ maxWidth: 92, height: 30 }}>
                                 <GraalVmOutlined />
                             </Col>
                         )}
-                        <span>{e}</span>
+                        <span
+                            style={{
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                            }}
+                        >
+                            {e}
+                        </span>
                     </Row>
                 );
             }
