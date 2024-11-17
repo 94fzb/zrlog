@@ -11,7 +11,7 @@ import styled from "styled-components";
 import Select from "antd/es/select";
 import BaseInput from "../../common/BaseInput";
 import { useLocation } from "react-router";
-import EnvUtils from "../../utils/env-utils";
+import EnvUtils, { isOffline } from "../../utils/env-utils";
 import EditorStatistics, { toStatisticsByMarkdown } from "./editor/editor-statistics-info";
 import { commonAxiosErrorHandle, createAxiosBaseInstance } from "../../AppBase";
 import ArticleEditSettingButton from "./article-edit-setting-button";
@@ -120,7 +120,43 @@ const Index: FunctionComponent<ArticleEditProps> = ({
         }));
     };
 
+    const persistToCache = (newArticle: ArticleEntry) => {
+        articleSaveToCache(newArticle);
+        setState((prevState) => {
+            return {
+                ...prevState,
+                article: newArticle,
+                saving: {
+                    ...prevState.saving,
+                    releaseSaving: false,
+                    rubbishSaving: false,
+                    previewIng: false,
+                    autoSaving: false,
+                },
+            };
+        });
+
+        //没有堆积的消息了，才能触发移除强制离开页面的提示
+        if (pendingMessages === 0) {
+            disableExitTips();
+        }
+    };
+
     const onSubmit = async (article: ArticleEntry, release: boolean, preview: boolean, autoSave: boolean) => {
+        let newArticle = {
+            ...article,
+            version: versionRef.current,
+            rubbish: !release,
+        };
+        if (isOffline()) {
+            persistToCache(article);
+            return;
+        }
+        if (autoSave && !validForm(article)) {
+            persistToCache(article);
+            return;
+        }
+        //do check
         if (isTitleError(article)) {
             messageApi.error({ content: getRes()["article_require_title"] });
             return;
@@ -164,28 +200,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                 };
             });
         }
-        let newArticle = {
-            ...article,
-            version: versionRef.current,
-            rubbish: !release,
-        };
-        if (offline) {
-            articleSaveToCache(newArticle);
-            setState((prevState) => {
-                return {
-                    ...prevState,
-                    article: newArticle,
-                    saving: {
-                        ...prevState.saving,
-                        releaseSaving: false,
-                        rubbishSaving: false,
-                        previewIng: false,
-                        autoSaving: false,
-                    },
-                };
-            });
-            return;
-        }
+
         enableExitTips();
         try {
             let responseData;
@@ -386,8 +401,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({
         setState((prev) => {
             const newArticle = { ...prev.article, ...cv };
             const sub = subjectRef.current;
-            const ok = validForm(newArticle);
-            if (ok && sub) {
+            if (sub) {
                 sub.next(newArticle);
             }
             return { ...prev, article: newArticle };
@@ -410,7 +424,13 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                     </Title>
                 </Col>
                 {!fullScreen && (
-                    <ArticleEditActionBar fullScreen={fullScreen} offline={offline} data={state} onSubmit={onSubmit} />
+                    <ArticleEditActionBar
+                        key={data.article.logId + "actionbar_offline:" + offline}
+                        fullScreen={fullScreen}
+                        offline={offline}
+                        data={state}
+                        onSubmit={onSubmit}
+                    />
                 )}
             </Row>
             {!fullScreen && <Divider style={{ marginTop: 16, marginBottom: 16 }} />}
