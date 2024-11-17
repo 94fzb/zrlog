@@ -94,8 +94,6 @@ const ArticleEditActionBar: FunctionComponent<ArticleEditActionBarProps> = ({
         };
     }, []);
 
-    console.info(offline);
-
     return (
         <>
             <Col

@@ -1,4 +1,7 @@
 import * as H from "history";
+import React from "react";
+import { ExclamationCircleOutlined } from "@ant-design/icons";
+import { HookAPI } from "antd/es/modal/useModal";
 
 export const mapToQueryString = (map: Record<string, string | boolean | number | undefined>): string => {
     return Object.keys(map)
@@ -69,4 +72,34 @@ export const getFullPath = (location: H.Location) => {
         return location.pathname;
     }
     return location.pathname + location.search;
+};
+
+export const getExitTips = () => {
+    //@ts-ignore
+    return window.onbeforeunloadTips;
+};
+
+export const enableExitTips = (str: string) => {
+    //@ts-ignore
+    window.onbeforeunloadTips = str;
+    window.onbeforeunload = function () {
+        return str;
+    };
+};
+
+export const disableExitTips = () => {
+    window.onbeforeunload = null;
+    //@ts-ignore
+    window.onbeforeunloadTips = null;
+};
+
+export const tryBlock = (e: React.MouseEvent, modal: HookAPI) => {
+    if (window.onbeforeunload !== null) {
+        modal.warning({
+            title: "提示",
+            icon: <ExclamationCircleOutlined />,
+            content: getExitTips(),
+        });
+        e.preventDefault();
+    }
 };

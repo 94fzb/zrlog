@@ -21,6 +21,7 @@ import { articleDataToState, articleSaveToCache, deleteArticleCacheWithPageCache
 import ArticleEditFullscreenButton from "./article-edit-fullscreen-button";
 import { auditTime, concatMap, Subject, tap } from "rxjs";
 import { Subscription } from "rxjs/internal/Subscription";
+import { disableExitTips, enableExitTips } from "../../utils/helpers";
 
 const StyledArticleEdit = styled("div")`
     .ant-btn {
@@ -152,10 +153,6 @@ const Index: FunctionComponent<ArticleEditProps> = ({
             persistToCache(article);
             return;
         }
-        if (autoSave && !validForm(article)) {
-            persistToCache(article);
-            return;
-        }
         //do check
         if (isTitleError(article)) {
             messageApi.error({ content: getRes()["article_require_title"] });
@@ -201,7 +198,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({
             });
         }
 
-        enableExitTips();
+        enableExitTips(getRes()["articleEditExitWithOutSaveSuccess"]);
         try {
             let responseData;
             try {
@@ -302,16 +299,6 @@ const Index: FunctionComponent<ArticleEditProps> = ({
         return mergeArticle;
     };
 
-    const enableExitTips = () => {
-        window.onbeforeunload = function () {
-            return getRes()["articleEditExitWithOutSaveSuccess"];
-        };
-    };
-
-    const disableExitTips = () => {
-        window.onbeforeunload = null;
-    };
-
     const isSaving = () => {
         return state.saving.rubbishSaving || state.saving.releaseSaving || state.saving.previewIng;
     };
@@ -343,7 +330,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({
         const subscription = subjectRef.current
             .pipe(
                 tap(() => {
-                    enableExitTips();
+                    enableExitTips(getRes()["articleEditExitWithOutSaveSuccess"]);
                 }),
                 auditTime(2000),
                 tap(() => {
@@ -400,9 +387,14 @@ const Index: FunctionComponent<ArticleEditProps> = ({
     const handleValuesChange = (cv: ArticleChangeableValue) => {
         setState((prev) => {
             const newArticle = { ...prev.article, ...cv };
-            const sub = subjectRef.current;
-            if (sub) {
-                sub.next(newArticle);
+            //没有验证通过的情况下，保存本地缓存
+            if (!validForm(newArticle)) {
+                persistToCache(newArticle);
+            } else {
+                const sub = subjectRef.current;
+                if (sub) {
+                    sub.next(newArticle);
+                }
             }
             return { ...prev, article: newArticle };
         });
