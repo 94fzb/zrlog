@@ -46,6 +46,7 @@ const Index: FunctionComponent<IndexProps> = ({ data }) => {
                             body: {
                                 overflow: "auto",
                                 marginTop: 8,
+                                marginRight: 8,
                             },
                         }}
                         style={{ marginTop: 8 }}
