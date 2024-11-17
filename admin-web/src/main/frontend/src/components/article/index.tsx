@@ -1,17 +1,28 @@
-import { EditOutlined, TagOutlined } from "@ant-design/icons";
+import { EditOutlined, LockOutlined, TagOutlined } from "@ant-design/icons";
 
 import { Col, Row, Space, Tag, Tooltip } from "antd";
 import Search from "antd/es/input/Search";
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
 import { getColorPrimary, getRes } from "../../utils/constants";
-import { ReactElement, useState } from "react";
-import BaseTable, { PageDataSource } from "../../common/BaseTable";
+import { ReactElement, useEffect, useRef, useState } from "react";
+import BaseTable, { ArticlePageDataSource } from "../../common/BaseTable";
 import { Link } from "react-router-dom";
 import { deleteCacheDataByKey } from "../../cache";
-import { LockOutlined } from "@ant-design/icons";
+import { useLocation } from "react-router";
 
-const Index = ({ data, offline }: { data: PageDataSource; offline: boolean }) => {
+const Index = ({ data, offline }: { data: ArticlePageDataSource; offline: boolean }) => {
+    const location = useLocation();
+    const types = new URLSearchParams(location.search).get("types") as unknown as string;
+    const ds = data.types
+        ? data.types.map((e) => {
+              return { text: e.typeName, value: e.alias, selected: types ? types.split(",").includes(e.alias) : false };
+          })
+        : [];
+
+    const [filters, setFilters] = useState<Record<string, any>[]>(ds); // 用于存储选中的筛选项
+    const jumped = useRef(false);
+
     const tagForMap = (tag: string) => {
         const tagElem = (
             <Tag icon={<TagOutlined />} closable={false} color={getColorPrimary()} style={{ userSelect: "none" }}>
@@ -33,6 +44,38 @@ const Index = ({ data, offline }: { data: PageDataSource; offline: boolean }) =>
                 {children}
             </span>
         );
+    };
+
+    const handleNavigation = () => {
+        if (jumped.current) {
+            return;
+        }
+        jumped.current = true;
+        location.pathname =
+            location.pathname +
+            "?types=" +
+            encodeURIComponent(
+                filters
+                    .filter((e) => e.selected)
+                    .map((e) => e.value)
+                    .join(",")
+            );
+    };
+
+    useEffect(() => {
+        jumped.current = false;
+    }, [data]);
+
+    const handleFilterChange = (value: string, checked: boolean) => {
+        console.log(value);
+        filters.forEach((filter) => {
+            if (filter.value === value) {
+                filter.selected = checked;
+            } else {
+                filter.selected = false;
+            }
+        });
+        setFilters(filters);
     };
 
     const getColumns = () => {
@@ -95,6 +138,23 @@ const Index = ({ data, offline }: { data: PageDataSource; offline: boolean }) =>
                 key: "typeName",
                 dataIndex: "typeName",
                 width: 100,
+                filters: filters,
+                filterMultiple: false,
+                filteredValue: filters.filter((e) => e.selected).map((e) => e.value), // 动态绑定当前选中值
+                onFilter: (value: string) => {
+                    // 更新选中状态
+                    if (
+                        filters
+                            .filter((e) => e.selected)
+                            .map((e) => e.value)
+                            .includes(value)
+                    ) {
+                        return true;
+                    }
+                    handleFilterChange(value, true);
+                    handleNavigation();
+                    return true; // 保留默认筛选功能
+                },
             },
             {
                 title: "浏览量",
