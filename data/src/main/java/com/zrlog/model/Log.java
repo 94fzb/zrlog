@@ -166,6 +166,31 @@ public class Log extends BasePageableDAO implements Serializable {
         return archives;
     }
 
+    public Map<String, Long> getAdminArticleData() throws SQLException {
+        List<Map<String, Object>> lo = queryListWithParams("select releaseTime from " + tableName + " order by releaseTime desc");
+        Map<String, Long> archives = new LinkedHashMap<>();
+        for (Map<String, Object> entry : lo) {
+            Object value = entry.get("releaseTime");
+            if (value != null) {
+                String key;
+                if (value instanceof LocalDateTime) {
+                    key = ((LocalDateTime) value).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                } else if (value instanceof Timestamp) {
+                    key = new SimpleDateFormat("yyyy-MM-dd").format(new Date(((Timestamp) value).getTime()));
+                } else {
+                    key = "";
+                }
+                if (archives.containsKey(key)) {
+                    archives.put(key, archives.get(key) + 1);
+                } else {
+                    archives.put(key, 1L);
+                }
+            }
+        }
+        return archives;
+    }
+
+
     public PageData<Map<String, Object>> findByTag(long page, long pageSize, String tag) {
         String sql =
                 "select l.*,t.typeName,t.alias  as typeAlias,(select count(commentId) from " + Comment.TABLE_NAME +
