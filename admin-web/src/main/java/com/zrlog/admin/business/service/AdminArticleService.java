@@ -13,6 +13,8 @@ import com.zrlog.admin.business.exception.ArticleMissingTypeException;
 import com.zrlog.admin.business.exception.UpdateArticleExpireException;
 import com.zrlog.admin.business.rest.request.CreateArticleRequest;
 import com.zrlog.admin.business.rest.request.UpdateArticleRequest;
+import com.zrlog.admin.business.rest.response.ArticleActivityData;
+import com.zrlog.admin.business.rest.response.ArticlePageData;
 import com.zrlog.admin.business.rest.response.CreateOrUpdateArticleResponse;
 import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
 import com.zrlog.business.rest.response.ArticleResponseEntry;
@@ -33,10 +35,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -210,9 +209,17 @@ public class AdminArticleService {
         return log;
     }
 
-    public PageData<ArticleResponseEntry> adminPage(PageRequest pageRequest, String keywords, HttpRequest request) {
-        PageData<Map<String, Object>> data = new Log().adminFind(pageRequest, keywords);
+    public ArticlePageData adminPage(PageRequest pageRequest, String keywords,String typeAlias, HttpRequest request) {
+        PageData<Map<String, Object>> data = new Log().adminFind(pageRequest, keywords,typeAlias);
         VisitorArticleService.wrapperSearchKeyword(data, keywords);
-        return VisitorArticleService.convertPageable(data, request);
+        PageData<ArticleResponseEntry> articleResponseEntryPageData = VisitorArticleService.convertPageable(data, request);
+        return BeanUtil.convert(articleResponseEntryPageData, ArticlePageData.class);
+    }
+
+    public List<ArticleActivityData> activityDataList() throws SQLException {
+        Map<String, Long> adminArticleData = new Log().getAdminArticleData();
+        return adminArticleData.entrySet().stream().map(e -> {
+            return new ArticleActivityData(e.getKey(), e.getValue());
+        }).toList();
     }
 }

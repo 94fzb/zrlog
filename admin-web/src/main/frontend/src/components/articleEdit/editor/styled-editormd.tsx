@@ -1773,14 +1773,14 @@ export const StyledEditormd = styled("div")`
     }
 
     .editormd-preview-theme-dark .editormd-preview-container blockquote {
-        color: #555;
+        color: inherit;
         padding: 0.5rem;
         background: #222;
         border-color: #333;
     }
 
     .editormd-preview-theme-dark .editormd-preview-container abbr {
-        color: #fff;
+        color: rgb(220, 220, 220);
         padding: 1px 3px;
         -webkit-border-radius: 8px;
         -moz-border-radius: 8px;

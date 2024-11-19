@@ -18,6 +18,7 @@ import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.business.rest.response.ArticleResponseEntry;
 import com.zrlog.business.service.TemplateHelper;
 import com.zrlog.common.Constants;
+import com.zrlog.common.ZrLogConfig;
 import com.zrlog.common.rest.response.ApiStandardResponse;
 import com.zrlog.data.dto.PageData;
 import com.zrlog.model.Log;
@@ -30,6 +31,7 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.Objects;
 import java.util.StringJoiner;
+import java.util.concurrent.ExecutionException;
 
 public class AdminArticleController extends Controller {
 
@@ -72,13 +74,15 @@ public class AdminArticleController extends Controller {
     }
 
     @ResponseBody
-    public AdminApiPageDataStandardResponse<PageData<ArticleResponseEntry>> index() throws SQLException {
+    public AdminApiPageDataStandardResponse<ArticlePageData> index() throws SQLException, ExecutionException, InterruptedException {
         String key = WebTools.convertRequestParam(request.getParaToStr("key"));
+        String types = WebTools.convertRequestParam(request.getParaToStr("types"));
         int articlePageSize = Constants.getAdminArticlePageSize();
-        PageData<ArticleResponseEntry> pageData = articleService.adminPage(ControllerUtil.toPageRequest(this, articlePageSize), key, request);
+        ArticlePageData pageData = articleService.adminPage(ControllerUtil.toPageRequest(this, articlePageSize), key, types, request);
         pageData.setKey(key);
         pageData.setDefaultPageSize(Long.parseLong(articlePageSize + ""));
-        AdminApiPageDataStandardResponse<PageData<ArticleResponseEntry>> standardResponse = new AdminApiPageDataStandardResponse<>(pageData);
+        pageData.setTypes(Constants.zrLogConfig.getCacheService().refreshInitDataCacheAsync(request, false).get().getTypes());
+        AdminApiPageDataStandardResponse<ArticlePageData> standardResponse = new AdminApiPageDataStandardResponse<>(pageData);
         standardResponse.setDocumentTitle(Constants.getAdminTitle(I18nUtil.getAdminStringFromRes("blogManage")));
         return standardResponse;
     }

@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom";
-import { FunctionComponent, lazy, Suspense, useEffect, useState } from "react";
+import { FunctionComponent, lazy, Suspense, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router";
 import { getCsrData } from "./api";
 import MyLoadingComponent from "./components/my-loading-component";
@@ -12,7 +12,7 @@ import {
     putCache,
     savePageFullState,
 } from "./cache";
-import { deepEqual, getFullPath } from "./utils/helpers";
+import { deepEqualWithSpecialJSON, getFullPath } from "./utils/helpers";
 import { UpgradeData } from "./components/upgrade";
 import { getRes } from "./utils/constants";
 import { isPWA } from "./utils/env-utils";
@@ -53,7 +53,6 @@ const AsyncError = lazy(() => import("components/unknown-error-page"));
 const AdminManageLayout = lazy(() => import("layout/index"));
 
 type AdminDashboardRouterState = {
-    firstRender: boolean;
     currentUri: string;
     axiosRequesting: boolean;
     fullScreen: boolean;
@@ -82,15 +81,16 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({ of
     const location = useLocation();
     const pwaLastOpenedPage = isPWA() ? getLastOpenedPage() : null;
     const defaultFullScreen = getPageFullState(pwaLastOpenedPage ? pwaLastOpenedPage : getFullPath(location));
-    //console.info(pwaLastOpenedPage + " => full screen " + defaultFullScreen);
+    const initUri = location.pathname + location.search;
+    const defaultData = { ...getCachedData(), [initUri]: ssData?.pageData };
 
+    const firstRender = useRef<boolean>(ssData && ssData.pageData);
     const [state, setState] = useState<AdminDashboardRouterState>({
-        firstRender: ssData && ssData.pageData,
-        currentUri: location.pathname + location.search,
+        currentUri: initUri,
         axiosRequesting: false,
         offline: offline,
         fullScreen: defaultFullScreen,
-        data: { ...getCachedData(), [location.pathname + location.search]: ssData?.pageData },
+        data: defaultData,
     });
 
     const getDataFromState = () => {
@@ -109,73 +109,63 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({ of
         });
     };
 
-    const loadData = (uri: string, location: H.Location) => {
-        getCsrData(uri)
-            .then((e) => {
-                const { data, documentTitle } = e;
-                const mergeData = state.data;
-                updateDocumentTitle(documentTitle);
-                //如果请求回来的和请求回来的一致的情况就跳过 setState
-                if (deepEqual(mergeData[uri], data)) {
-                    console.debug(uri + " cache hits");
-                    return;
-                }
-                mergeData[uri] = data;
-                setState((prevState) => {
-                    return {
-                        offline: prevState.offline,
-                        firstRender: false,
-                        axiosRequesting: false,
-                        currentUri: uri,
-                        data: mergeData,
-                        fullScreen: getPageFullState(getFullPath(location)),
-                    };
-                });
-                putCache(mergeData);
+    const loadData = async (uri: string, location: H.Location) => {
+        const responseData = await getCsrData(uri);
+        const { data, documentTitle } = responseData;
+        const mergeData = state.data;
+        updateDocumentTitle(documentTitle);
+        //如果请求回来的和请求回来的一致的情况就跳过 setState
+        if (deepEqualWithSpecialJSON(mergeData[uri], data)) {
+            console.info(uri + " cache hits");
+            return;
+        }
+        mergeData[uri] = data;
+        putCache(mergeData);
+        setState((prevState) => {
+            return {
+                offline: prevState.offline,
+                firstRender: false,
+                axiosRequesting: false,
+                currentUri: uri,
+                data: mergeData,
+                fullScreen: getPageFullState(getFullPath(location)),
+            };
+        });
+    };
+
+    useEffect(() => {
+        const uri = getPageDataCacheKey(location);
+        if (getDataFromState()) {
+            if (firstRender.current) {
+                firstRender.current = false;
+                return;
+            }
+            setState((prevState) => {
+                return {
+                    currentUri: uri,
+                    axiosRequesting: true,
+                    fullScreen: getPageFullState(getFullPath(location)),
+                    data: prevState.data,
+                    offline: prevState.offline,
+                };
+            });
+        }
+        loadData(uri, location)
+            .then(() => {
+                //ignore
             })
-            .finally(() => {
+            .catch(() => {
+                //标记未没有请求了
                 setState((prevState) => {
                     return {
                         offline: prevState.offline,
                         currentUri: uri,
-                        firstRender: false,
                         axiosRequesting: false,
                         data: prevState.data,
                         fullScreen: getPageFullState(getFullPath(location)),
                     };
                 });
             });
-    };
-
-    useEffect(() => {
-        const uri = getPageDataCacheKey(location);
-        if (getDataFromState()) {
-            if (state.firstRender) {
-                setState((prevState) => {
-                    return {
-                        currentUri: uri,
-                        fullScreen: getPageFullState(getFullPath(location)),
-                        firstRender: false,
-                        axiosRequesting: false,
-                        offline: prevState.offline,
-                        data: prevState.data,
-                    };
-                });
-                return;
-            } else {
-                setState((prevState) => {
-                    return {
-                        currentUri: uri,
-                        axiosRequesting: true,
-                        firstRender: false,
-                        fullScreen: getPageFullState(getFullPath(location)),
-                        data: prevState.data,
-                        offline: prevState.offline,
-                    };
-                });
-            }
-        }
-        loadData(uri, location);
     }, [location.pathname, location.search]);
 
     useEffect(() => {

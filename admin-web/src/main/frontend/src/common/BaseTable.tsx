@@ -29,6 +29,15 @@ export type PageDataSource = {
     defaultPageSize: number;
     totalElements: number;
 };
+export type ArticlePageDataSource = {
+    rows: [];
+    page: number;
+    key?: string;
+    size: number;
+    defaultPageSize: number;
+    totalElements: number;
+    types: Record<string, any>[];
+};
 
 export type TableData = {
     tableLoaded: boolean;

@@ -124,7 +124,7 @@ export const getCacheByKey = (key: string) => {
 
 export const deleteCacheDataByKey = (key: string) => {
     const data: Record<string, any> = getCachedData();
-    console.info("deleted -> " + key + ":" + JSON.stringify(data[key]));
+    //console.info("deleted -> " + key + ":" + JSON.stringify(data[key]));
     delete data[key];
     putCache(data);
 };

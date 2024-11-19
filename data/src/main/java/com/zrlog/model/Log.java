@@ -97,7 +97,7 @@ public class Log extends BasePageableDAO implements Serializable {
     /**
      * 管理员查询文章
      */
-    public PageData<Map<String, Object>> adminFind(PageRequest pageRequest, String keywords) {
+    public PageData<Map<String, Object>> adminFind(PageRequest pageRequest, String keywords, String typeAlias) {
         String searchKeywords = "";
         List<Object> searchParam = new ArrayList<>();
         if (StringUtils.isNotEmpty(keywords)) {
@@ -106,6 +106,10 @@ public class Log extends BasePageableDAO implements Serializable {
             searchParam.add("%" + keywords + "%");
             searchParam.add("%" + keywords + "%");
             searchParam.add("%" + keywords + "%");
+        }
+        if (StringUtils.isNotEmpty(typeAlias)) {
+            searchKeywords += " and t.alias = ?";
+            searchParam.add(typeAlias);
         }
         String pageSort = getPageSort(pageRequest);
         String sql =
@@ -166,6 +170,31 @@ public class Log extends BasePageableDAO implements Serializable {
         return archives;
     }
 
+    public Map<String, Long> getAdminArticleData() throws SQLException {
+        List<Map<String, Object>> lo = queryListWithParams("select releaseTime from " + tableName + " order by releaseTime desc");
+        Map<String, Long> archives = new LinkedHashMap<>();
+        for (Map<String, Object> entry : lo) {
+            Object value = entry.get("releaseTime");
+            if (value != null) {
+                String key;
+                if (value instanceof LocalDateTime) {
+                    key = ((LocalDateTime) value).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                } else if (value instanceof Timestamp) {
+                    key = new SimpleDateFormat("yyyy-MM-dd").format(new Date(((Timestamp) value).getTime()));
+                } else {
+                    key = "";
+                }
+                if (archives.containsKey(key)) {
+                    archives.put(key, archives.get(key) + 1);
+                } else {
+                    archives.put(key, 1L);
+                }
+            }
+        }
+        return archives;
+    }
+
+
     public PageData<Map<String, Object>> findByTag(long page, long pageSize, String tag) {
         String sql =
                 "select l.*,t.typeName,t.alias  as typeAlias,(select count(commentId) from " + Comment.TABLE_NAME +
@@ -214,6 +243,6 @@ public class Log extends BasePageableDAO implements Serializable {
     }
 
     public long getAdminCount() {
-        return adminFind(new PageRequestImpl(1L, 0L), null).getTotalElements();
+        return adminFind(new PageRequestImpl(1L, 0L), null, null).getTotalElements();
     }
 }

@@ -6,7 +6,7 @@ const buildCacheKey = (newArticle: ArticleEntry) => {
     return "local-article-info-" + (newArticle && newArticle.logId && newArticle.logId > 0 ? newArticle.logId : -1);
 };
 
-export const articleDataToState = (data: ArticleEditInfo, offline: boolean): ArticleEditState => {
+export const articleDataToState = (data: ArticleEditInfo): ArticleEditState => {
     const article: ArticleEntry =
         data.article.logId && data.article.logId > 0
             ? data.article
@@ -16,14 +16,17 @@ export const articleDataToState = (data: ArticleEditInfo, offline: boolean): Art
                   keywords: "",
               };
     const cachedArticle = getCacheByKey(buildCacheKey(article)) as ArticleEntry;
-    const realArticle = {
-        ...article,
-        ...cachedArticle,
-        //use input version
-        version: data.article.version,
-    };
+    let realArticle;
+    //本地缓存版本是没有被服务器再次修改的情况下才使用缓存数据
+    if (cachedArticle && cachedArticle.version >= data.article.version) {
+        realArticle = cachedArticle;
+    } else if (cachedArticle && article.version === -1) {
+        realArticle = cachedArticle;
+    } else {
+        realArticle = data.article;
+    }
+
     return {
-        offline: offline,
         typeOptions: data.types
             ? data.types.map((x) => {
                   return { value: x.id, label: x.typeName };

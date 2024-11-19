@@ -54,6 +54,7 @@ import java.sql.Statement;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -71,6 +72,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     private final CacheService cacheService;
     private final PluginCoreProcess pluginCoreProcess;
     private final Map<String, Object> website = new TreeMap<>();
+    private long uptime;
 
     public ZrLogConfigImpl(Integer port, Updater updater) {
         this.port = port;
@@ -79,6 +81,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         this.cacheService = new CacheServiceImpl();
         this.pluginCoreProcess = new PluginCoreProcessImpl(port);
         this.serverConfig = initServerConfig();
+        this.uptime = System.currentTimeMillis();
     }
 
     /**
@@ -360,5 +363,21 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     @Override
     public Map<String, Object> getPublicWebSite() {
         return website;
+    }
+
+    @Override
+    public String getProgramUptime() {
+        return toNamingDurationString(System.currentTimeMillis() - uptime, I18nUtil.getCurrentLocale().contains("en"));
+    }
+
+    static String toNamingDurationString(long milliseconds, boolean en) {
+        long days = TimeUnit.MILLISECONDS.toDays(milliseconds);
+        long hours = TimeUnit.MILLISECONDS.toHours(milliseconds) % 24;
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(milliseconds) % 60;
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(milliseconds) % 60;
+        if (en) {
+            return String.format("%dd %dh %dm %ds", days, hours, minutes, seconds);
+        }
+        return String.format("%d天 %d时 %d分 %d秒", days, hours, minutes, seconds);
     }
 }

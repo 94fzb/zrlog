@@ -11,7 +11,7 @@ import styled from "styled-components";
 import Select from "antd/es/select";
 import BaseInput from "../../common/BaseInput";
 import { useLocation } from "react-router";
-import EnvUtils from "../../utils/env-utils";
+import EnvUtils, { isOffline } from "../../utils/env-utils";
 import EditorStatistics, { toStatisticsByMarkdown } from "./editor/editor-statistics-info";
 import { commonAxiosErrorHandle, createAxiosBaseInstance } from "../../AppBase";
 import ArticleEditSettingButton from "./article-edit-setting-button";
@@ -21,6 +21,7 @@ import { articleDataToState, articleSaveToCache, deleteArticleCacheWithPageCache
 import ArticleEditFullscreenButton from "./article-edit-fullscreen-button";
 import { auditTime, concatMap, Subject, tap } from "rxjs";
 import { Subscription } from "rxjs/internal/Subscription";
+import { deepEqualWithSpecialJSON, disableExitTips, enableExitTips } from "../../utils/helpers";
 
 const StyledArticleEdit = styled("div")`
     .ant-btn {
@@ -74,12 +75,13 @@ const Index: FunctionComponent<ArticleEditProps> = ({
     const location = useLocation();
     const editCardRef = useRef<HTMLDivElement>(null);
 
-    const defaultState = articleDataToState(data, offline);
+    const defaultState = articleDataToState(data);
     const [state, setState] = useState<ArticleEditState>(defaultState);
 
     const aliasRef = useRef<InputRef>(null);
     const digestRef = useRef<InputRef>(null);
     const versionRef = useRef<number>(defaultState.article.version);
+    const logIdRef = useRef<number>(defaultState.article.logId ? defaultState.article.logId : -1);
     const subjectRef = useRef<Subject<ArticleEntry> | null>(null);
     const subRef = useRef<Subscription | null>(null);
     const deletePageStateRef = useRef<boolean>(false);
@@ -120,7 +122,39 @@ const Index: FunctionComponent<ArticleEditProps> = ({
         }));
     };
 
+    const persistToCache = (newArticle: ArticleEntry) => {
+        articleSaveToCache(newArticle);
+        setState((prevState) => {
+            return {
+                ...prevState,
+                article: newArticle,
+                saving: {
+                    ...prevState.saving,
+                    releaseSaving: false,
+                    rubbishSaving: false,
+                    previewIng: false,
+                    autoSaving: false,
+                },
+            };
+        });
+
+        //没有堆积的消息了，才能触发移除强制离开页面的提示
+        if (pendingMessages === 0) {
+            disableExitTips();
+        }
+    };
+
     const onSubmit = async (article: ArticleEntry, release: boolean, preview: boolean, autoSave: boolean) => {
+        let newArticle = {
+            ...article,
+            version: versionRef.current,
+            rubbish: !release,
+        };
+        if (isOffline()) {
+            persistToCache(article);
+            return;
+        }
+        //do check
         if (isTitleError(article)) {
             messageApi.error({ content: getRes()["article_require_title"] });
             return;
@@ -134,7 +168,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({
             setSubject();
         }
         let uri;
-        const create = article!.logId === undefined;
+        const create = article.logId === undefined || article.logId === null || article.logId <= 0;
         if (create) {
             uri = createUri;
         } else {
@@ -164,29 +198,8 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                 };
             });
         }
-        let newArticle = {
-            ...article,
-            version: versionRef.current,
-            rubbish: !release,
-        };
-        if (offline) {
-            articleSaveToCache(newArticle);
-            setState((prevState) => {
-                return {
-                    ...prevState,
-                    article: newArticle,
-                    saving: {
-                        ...prevState.saving,
-                        releaseSaving: false,
-                        rubbishSaving: false,
-                        previewIng: false,
-                        autoSaving: false,
-                    },
-                };
-            });
-            return;
-        }
-        enableExitTips();
+
+        enableExitTips(getRes()["articleEditExitWithOutSaveSuccess"]);
         try {
             let responseData;
             try {
@@ -196,14 +209,23 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                     modal.error({
                         title: "保存失败",
                         content: data.message,
-                        okText: "确认",
                         getContainer: () => editCardRef.current as HTMLElement,
                     });
                     return;
                 }
-                versionRef.current = data.data.version;
+                if (data.data) {
+                    versionRef.current = data.data.version;
+                }
             } catch (e) {
-                return commonAxiosErrorHandle(e, modal, messageApi, editCardRef.current as HTMLElement);
+                try {
+                    return commonAxiosErrorHandle(e, modal, messageApi, editCardRef.current as HTMLElement);
+                } catch (ex) {
+                    modal.error({
+                        title: "保存失败",
+                        content: JSON.stringify(ex),
+                        getContainer: () => editCardRef.current as HTMLElement,
+                    });
+                }
             }
             const data = responseData;
             if (data.error === 0) {
@@ -219,6 +241,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                 }
                 const respData = data.data;
                 if (create) {
+                    logIdRef.current = respData.logId;
                     const url = new URL(window.location.href);
                     url.searchParams.set("id", respData.logId);
                     window.history.replaceState(null, "", url.toString());
@@ -276,43 +299,38 @@ const Index: FunctionComponent<ArticleEditProps> = ({
         return mergeArticle;
     };
 
-    const enableExitTips = () => {
-        window.onbeforeunload = function () {
-            return getRes()["articleEditExitWithOutSaveSuccess"];
-        };
-    };
-
-    const disableExitTips = () => {
-        window.onbeforeunload = null;
-    };
-
     const isSaving = () => {
         return state.saving.rubbishSaving || state.saving.releaseSaving || state.saving.previewIng;
     };
 
     useEffect(() => {
-        const lastOffline = state.offline;
-        //离线，保存到本地编辑
-        if (!lastOffline && offline) {
-            articleSaveToCache(state.article);
-            setState((prevState) => {
-                return {
-                    ...prevState,
-                    offline: true,
-                };
-            });
+        const newState = articleDataToState(data);
+        //如果文章内容没有变更，不更新 state，避免触发更新导致文章状态不对
+        if (deepEqualWithSpecialJSON(newState.article, data.article)) {
+            console.info("Skip article data useEffect() " + JSON.stringify(data.article.logId));
             return;
         }
-        const newState = articleDataToState(data, offline);
-        //如果网络恢复，自动保存一次
-        if (lastOffline && !offline) {
-            handleValuesChange(newState.article);
+
+        //仅设置状态，同时覆盖版本信息
+        versionRef.current = newState.article.version;
+        if (newState.article.logId) {
+            logIdRef.current = newState.article.logId;
         } else {
-            //仅设置状态，同时覆盖版本信息
-            versionRef.current = newState.article.version;
-            setState(newState);
+            logIdRef.current = -1;
         }
-    }, [data, offline]);
+        handleValuesChange(newState.article);
+    }, [data]);
+
+    useEffect(() => {
+        if (offline) {
+            articleSaveToCache(state.article);
+            return;
+        } else {
+            //覆盖版本信息
+            versionRef.current = state.article.version;
+            handleValuesChange(state.article);
+        }
+    }, [offline]);
 
     const setSubject = () => {
         if (subRef.current) {
@@ -323,7 +341,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({
         const subscription = subjectRef.current
             .pipe(
                 tap(() => {
-                    enableExitTips();
+                    enableExitTips(getRes()["articleEditExitWithOutSaveSuccess"]);
                 }),
                 auditTime(2000),
                 tap(() => {
@@ -333,10 +351,12 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                     // 确保顺序执行
                     pendingMessages -= 1;
                     //console.log("Submitting:", nextValue);
-                    if (state.article.logId && state.article.logId > 0) {
-                        article.logId = state.article.logId;
+                    article.logId = logIdRef.current;
+                    try {
+                        await onSubmit(article, false, false, true);
+                    } catch (e) {
+                        console.error(e);
                     }
-                    await onSubmit(article, false, false, true);
                 })
             )
             .subscribe();
@@ -376,16 +396,20 @@ const Index: FunctionComponent<ArticleEditProps> = ({
     const handleValuesChange = (cv: ArticleChangeableValue) => {
         setState((prev) => {
             const newArticle = { ...prev.article, ...cv };
-            const sub = subjectRef.current;
-            const ok = validForm(newArticle);
-            if (ok && sub) {
-                sub.next(newArticle);
+            //没有验证通过的情况下，保存本地缓存
+            if (!validForm(newArticle)) {
+                persistToCache(newArticle);
+            } else {
+                const sub = subjectRef.current;
+                if (sub) {
+                    sub.next(newArticle);
+                }
             }
             return { ...prev, article: newArticle };
         });
     };
 
-    const editorHeight = fullScreen ? window.innerHeight - 47 : `calc(100vh - 200px)`;
+    const editorHeight = fullScreen ? window.innerHeight - 47 : `calc(100vh - 236px)`;
 
     return (
         <StyledArticleEdit>
@@ -400,7 +424,15 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                         {getRes()["admin.log.edit"]}
                     </Title>
                 </Col>
-                {!fullScreen && <ArticleEditActionBar fullScreen={fullScreen} data={state} onSubmit={onSubmit} />}
+                {!fullScreen && (
+                    <ArticleEditActionBar
+                        key={data.article.logId + "actionbar_offline:" + offline}
+                        fullScreen={fullScreen}
+                        offline={offline}
+                        data={state}
+                        onSubmit={onSubmit}
+                    />
+                )}
             </Row>
             {!fullScreen && <Divider style={{ marginTop: 16, marginBottom: 16 }} />}
             {messageContextHolder}
@@ -492,7 +524,12 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                         }}
                     >
                         {fullScreen && (
-                            <ArticleEditActionBar fullScreen={fullScreen} data={state} onSubmit={onSubmit} />
+                            <ArticleEditActionBar
+                                offline={offline}
+                                fullScreen={fullScreen}
+                                data={state}
+                                onSubmit={onSubmit}
+                            />
                         )}
                         <ArticleEditSettingButton
                             digestRef={digestRef}
@@ -540,7 +577,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                                 "_" +
                                 state.editorVersion +
                                 "_offline:" +
-                                state.offline
+                                offline
                             }
                             markdown={state.article.markdown}
                             onChange={(v) => {

@@ -3,7 +3,7 @@ import zh_CN from "antd/es/locale/zh_CN";
 import en_US from "antd/es/locale/en_US";
 import { App, ConfigProvider, Spin, theme } from "antd";
 import { BrowserRouter } from "react-router-dom";
-import EnvUtils from "./utils/env-utils";
+import EnvUtils, { isOffline } from "./utils/env-utils";
 import AppBase from "./AppBase";
 import { legacyLogicalPropertiesTransformer, StyleProvider } from "@ant-design/cssinjs";
 import { useEffect, useState } from "react";
@@ -53,10 +53,6 @@ export const getItems_per_page = () => {
     }
     // @ts-ignore
     return en_US.Pagination.items_per_page;
-};
-
-const isOffline = () => {
-    return !navigator.onLine;
 };
 
 const Index = () => {

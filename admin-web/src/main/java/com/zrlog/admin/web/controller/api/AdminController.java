@@ -10,6 +10,7 @@ import com.zrlog.admin.business.rest.response.IndexResponse;
 import com.zrlog.admin.business.rest.response.LoginResponse;
 import com.zrlog.admin.business.rest.response.StatisticsInfoResponse;
 import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
+import com.zrlog.admin.business.service.AdminArticleService;
 import com.zrlog.admin.business.service.UserService;
 import com.zrlog.admin.web.controller.page.AdminPageController;
 import com.zrlog.business.exception.MissingInstallException;
@@ -142,6 +143,6 @@ public class AdminController extends Controller {
                 I18nUtil.getBackendStringFromRes("admin.index.welcomeTips_2"), I18nUtil.getBackendStringFromRes("admin.index.welcomeTips_3")));
         Collections.shuffle(tips);
         return new ApiStandardResponse<>(new IndexResponse(statisticsInfo().getData(), serverInfo().getData(),
-                new ArrayList<>(Collections.singletonList(tips.getFirst())), ZrLogUtil.isDockerMode(), Objects.equals(Constants.runMode, RunMode.NATIVE)));
+                new ArrayList<>(Collections.singletonList(tips.getFirst())), ZrLogUtil.isDockerMode(), Objects.equals(Constants.runMode, RunMode.NATIVE), new AdminArticleService().activityDataList()));
     }
 }

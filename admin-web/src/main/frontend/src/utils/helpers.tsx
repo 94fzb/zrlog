@@ -1,4 +1,7 @@
 import * as H from "history";
+import React from "react";
+import { ExclamationCircleOutlined } from "@ant-design/icons";
+import { HookAPI } from "antd/es/modal/useModal";
 
 export const mapToQueryString = (map: Record<string, string | boolean | number | undefined>): string => {
     return Object.keys(map)
@@ -15,34 +18,38 @@ export const mapToQueryString = (map: Record<string, string | boolean | number |
         .join("&");
 };
 
-export function deepEqual(obj1: any, obj2: any): boolean {
-    if (obj1 === obj2) {
-        return true;
+function sortKeysWithSpecialHandling(obj: any): any {
+    if (obj === null || typeof obj !== "object") {
+        return obj;
     }
 
-    if (typeof obj1 !== "object" || obj1 === null || typeof obj2 !== "object" || obj2 === null) {
-        return false;
+    if (obj instanceof Date) {
+        return obj.toISOString(); // 转换 Date 为字符串
     }
 
-    const keys1 = Object.keys(obj1);
-    const keys2 = Object.keys(obj2);
-
-    // 检查键的数量是否相同
-    if (keys1.length !== keys2.length) {
-        return false;
+    if (obj instanceof RegExp) {
+        return obj.toString(); // 转换 RegExp 为字符串
     }
 
-    for (const key of keys1) {
-        const val1 = obj1[key];
-        const val2 = obj2[key];
-        const areObjects = isObject(val1) && isObject(val2);
-
-        if ((areObjects && !deepEqual(val1, val2)) || (!areObjects && val1 !== val2)) {
-            return false;
-        }
+    if (Array.isArray(obj)) {
+        return obj.map(sortKeysWithSpecialHandling);
     }
 
-    return true;
+    const sortedObj: any = {};
+    Object.keys(obj)
+        .sort()
+        .forEach((key) => {
+            sortedObj[key] = sortKeysWithSpecialHandling(obj[key]);
+        });
+
+    return sortedObj;
+}
+
+export function deepEqualWithSpecialJSON(obj1: any, obj2: any): boolean {
+    const sortedObj1 = sortKeysWithSpecialHandling(obj1);
+    const sortedObj2 = sortKeysWithSpecialHandling(obj2);
+
+    return JSON.stringify(sortedObj1) === JSON.stringify(sortedObj2);
 }
 
 export function removeQueryParam(search: string, key: string) {
@@ -60,13 +67,39 @@ export function removeQueryParam(search: string, key: string) {
     return newSearch ? (hasQuestionMark ? `?${newSearch}` : newSearch) : "";
 }
 
-function isObject(object: any): boolean {
-    return object != null && typeof object === "object";
-}
-
 export const getFullPath = (location: H.Location) => {
     if (location.search.length <= 0) {
         return location.pathname;
     }
     return location.pathname + location.search;
+};
+
+export const getExitTips = () => {
+    //@ts-ignore
+    return window.onbeforeunloadTips;
+};
+
+export const enableExitTips = (str: string) => {
+    //@ts-ignore
+    window.onbeforeunloadTips = str;
+    window.onbeforeunload = function () {
+        return str;
+    };
+};
+
+export const disableExitTips = () => {
+    window.onbeforeunload = null;
+    //@ts-ignore
+    window.onbeforeunloadTips = null;
+};
+
+export const tryBlock = (e: React.MouseEvent, modal: HookAPI) => {
+    if (window.onbeforeunload !== null) {
+        modal.warning({
+            title: "提示",
+            icon: <ExclamationCircleOutlined />,
+            content: getExitTips(),
+        });
+        e.preventDefault();
+    }
 };
