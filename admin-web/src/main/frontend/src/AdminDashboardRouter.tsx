@@ -117,6 +117,12 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({ of
         //如果请求回来的和请求回来的一致的情况就跳过 setState
         if (deepEqualWithSpecialJSON(mergeData[uri], data)) {
             console.info(uri + " cache hits");
+            setState((prevState) => {
+                return {
+                    ...prevState,
+                    axiosRequesting: false,
+                };
+            });
             return;
         }
         mergeData[uri] = data;
@@ -140,6 +146,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({ of
                 firstRender.current = false;
                 return;
             }
+            //使用缓存显示一次
             setState((prevState) => {
                 return {
                     currentUri: uri,
