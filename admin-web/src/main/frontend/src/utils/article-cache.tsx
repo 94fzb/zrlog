@@ -3,7 +3,10 @@ import { addToCache, deleteCacheDataByKey, getCacheByKey, removePageCacheByLocat
 import * as H from "history";
 
 const buildCacheKey = (logId: number | undefined | null) => {
-    return "local-article-info-" + (logId && logId > 0 ? logId : -1);
+    if (logId === undefined || logId === null || logId <= 0) {
+        return "local-article-cache-draft";
+    }
+    return "local-article-cache-" + logId;
 };
 
 export const articleDataToState = (data: ArticleEditInfo): ArticleEditState => {
