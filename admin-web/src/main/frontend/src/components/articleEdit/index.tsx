@@ -17,7 +17,12 @@ import { commonAxiosErrorHandle, createAxiosBaseInstance } from "../../AppBase";
 import ArticleEditSettingButton from "./article-edit-setting-button";
 import { ArticleChangeableValue, ArticleEditProps, ArticleEditState, ArticleEntry } from "./index.types";
 import ArticleEditActionBar from "./article-edit-action-bar";
-import { articleDataToState, articleSaveToCache, deleteArticleCacheWithPageCache } from "../../utils/article-cache";
+import {
+    articleDataToState,
+    articleSaveToCache,
+    deleteArticleCacheWithPageCache,
+    deleteLocalArticleCache,
+} from "../../utils/article-cache";
 import ArticleEditFullscreenButton from "./article-edit-fullscreen-button";
 import { auditTime, concatMap, Subject, tap } from "rxjs";
 import { Subscription } from "rxjs/internal/Subscription";
@@ -246,6 +251,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                     url.searchParams.set("id", respData.logId);
                     window.history.replaceState(null, "", url.toString());
                     newArticle = { ...newArticle, ...respData };
+                    deleteLocalArticleCache();
                 } else {
                     newArticle = {
                         ...newArticle,

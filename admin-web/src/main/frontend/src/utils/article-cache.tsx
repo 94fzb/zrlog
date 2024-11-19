@@ -2,8 +2,8 @@ import { ArticleEditInfo, ArticleEditState, ArticleEntry } from "../components/a
 import { addToCache, deleteCacheDataByKey, getCacheByKey, removePageCacheByLocation } from "../cache";
 import * as H from "history";
 
-const buildCacheKey = (newArticle: ArticleEntry) => {
-    return "local-article-info-" + (newArticle && newArticle.logId && newArticle.logId > 0 ? newArticle.logId : -1);
+const buildCacheKey = (logId: number | undefined | null) => {
+    return "local-article-info-" + (logId && logId > 0 ? logId : -1);
 };
 
 export const articleDataToState = (data: ArticleEditInfo): ArticleEditState => {
@@ -15,7 +15,7 @@ export const articleDataToState = (data: ArticleEditInfo): ArticleEditState => {
                   title: "",
                   keywords: "",
               };
-    const cachedArticle = getCacheByKey(buildCacheKey(article)) as ArticleEntry;
+    const cachedArticle = getCacheByKey(buildCacheKey(article.logId)) as ArticleEntry;
     let realArticle;
     //本地缓存版本是没有被服务器再次修改的情况下才使用缓存数据
     if (cachedArticle && cachedArticle.version >= data.article.version) {
@@ -47,10 +47,14 @@ export const articleDataToState = (data: ArticleEditInfo): ArticleEditState => {
 };
 
 export const articleSaveToCache = (article: ArticleEntry) => {
-    addToCache(buildCacheKey(article), article);
+    addToCache(buildCacheKey(article.logId), article);
 };
 
 export const deleteArticleCacheWithPageCache = (article: ArticleEntry, location: H.Location) => {
-    deleteCacheDataByKey(buildCacheKey(article));
+    deleteCacheDataByKey(buildCacheKey(article.logId));
     removePageCacheByLocation(location);
+};
+
+export const deleteLocalArticleCache = () => {
+    deleteCacheDataByKey(buildCacheKey(null));
 };
