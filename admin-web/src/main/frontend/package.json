@@ -12,7 +12,7 @@
     "@fortawesome/fontawesome-svg-core": "6.6.0",
     "@fortawesome/free-solid-svg-icons": "6.6.0",
     "aes-js": "3.1.2",
-    "antd": "5.22.1",
+    "antd": "5.22.2",
     "axios": "1.7.7",
     "jquery": "3.7.1",
     "md5": "2.3.0",
