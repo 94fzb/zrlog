@@ -37,7 +37,7 @@ const Index: FunctionComponent<IndexProps> = ({ data }) => {
                             },
                         }}
                         style={{
-                            background: EnvUtils.isDarkMode() ? "#000000" : getColorPrimary(),
+                            background: EnvUtils.isDarkMode() ? "#141414" : getColorPrimary(),
                             padding: 0,
                             marginBottom: 8,
                             color: "white",
