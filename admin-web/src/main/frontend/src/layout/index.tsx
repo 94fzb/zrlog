@@ -15,6 +15,8 @@ import PWAHandler from "../PWAHandler";
 import StyledIndexLayout from "./styled-index-layout";
 import type { ScreenMap } from "antd/es/_util/responsiveObserver";
 import useBreakpoint from "antd/es/grid/hooks/useBreakpoint";
+import { Link } from "react-router-dom";
+import { useLocation } from "react-router";
 
 const { Header, Content, Sider } = Layout;
 
@@ -27,12 +29,16 @@ type AdminManageLayoutProps = PropsWithChildren & {
 const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ offline, children, loading, fullScreen }) => {
     const [userInfo, setUser] = useState<BasicUserInfo | undefined>(ssData?.user);
     const screens = useBreakpoint();
+    const location = useLocation();
 
     const needCollSlider = (s: ScreenMap) => {
-        return s.xs;
+        if (location.hash.endsWith("#openSlider")) {
+            return false;
+        }
+        return s.xs === true;
     };
+    const [showSliderBtn, setShowSliderBtn] = useState<boolean>(window.innerWidth < 576);
     const defaultHiddenSlider = needCollSlider(screens) || window.innerWidth < 576;
-    console.info(defaultHiddenSlider);
     const [hiddenSlider, setHiddenSlider] = useState(defaultHiddenSlider);
 
     useEffect(() => {
@@ -48,7 +54,8 @@ const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ offline,
     };
 
     useEffect(() => {
-        setHiddenSlider(needCollSlider(screens) || window.innerWidth < 576);
+        setHiddenSlider(needCollSlider(screens));
+        setShowSliderBtn(screens.xs === true);
     }, [screens]);
 
     if (screens.xs === undefined) {
@@ -67,11 +74,12 @@ const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ offline,
                 <HomeOutlined />
             </a>
         );
-        if (needCollSlider(screens)) {
+        if (showSliderBtn) {
             return (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-start" }}>
-                    <a
+                    <Link
                         id={"log"}
+                        to={hiddenSlider ? "#openSlider" : "#hideSlider"}
                         style={{
                             textAlign: "center",
                             width: 70,
@@ -84,9 +92,8 @@ const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ offline,
                             setHiddenSlider(!hiddenSlider);
                         }}
                     >
-                        {" "}
                         <Button type="primary">{hiddenSlider ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}</Button>
-                    </a>
+                    </Link>
                     {home}
                 </div>
             );
@@ -128,21 +135,19 @@ const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ offline,
                         minHeight: getMainHeight(),
                     }}
                 >
-                    {!hiddenSlider && (
-                        <Sider
-                            width={70}
-                            style={{
-                                opacity: fullScreen || hiddenSlider ? 0 : 1,
-                                position: "absolute",
-                                left: hiddenSlider ? "-70px" : "0", // 动画控制显示隐藏
-                                height: "100%",
-                                transform: fullScreen || hiddenSlider ? "translateX(-100%)" : "translateX(0)",
-                                backgroundColor: EnvUtils.isDarkMode() ? "#1f1f1f" : "#001529",
-                            }}
-                        >
-                            <SliderMenu />
-                        </Sider>
-                    )}
+                    <Sider
+                        width={70}
+                        style={{
+                            opacity: fullScreen || hiddenSlider ? 0 : 1,
+                            position: "absolute",
+                            left: hiddenSlider ? "-70px" : "0", // 动画控制显示隐藏
+                            height: "100%",
+                            transform: fullScreen || hiddenSlider ? "translateX(-100%)" : "translateX(0)",
+                            backgroundColor: EnvUtils.isDarkMode() ? "#1f1f1f" : "#001529",
+                        }}
+                    >
+                        <SliderMenu />
+                    </Sider>
                     <Col
                         style={{
                             flex: 1,
