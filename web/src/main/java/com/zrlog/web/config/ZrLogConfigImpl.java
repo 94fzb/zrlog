@@ -48,6 +48,7 @@ import com.zrlog.web.inteceptor.StaticResourceInterceptor;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -182,19 +183,20 @@ public class ZrLogConfigImpl extends ZrLogConfig {
             return;
         }
         tryInitDbPropertiesFile();
-        Properties dbProperties = InstallUtils.getDbProp();
-        try (Connection connection = DbConnectUtils.getConnection(Objects.requireNonNull(dbProperties))) {
-            LOGGER.info("Db connect success " + connection.getCatalog());
-        }
+        Properties dbProperties = Objects.requireNonNull(InstallUtils.getDbProp());
         int newDbVersion = tryDoUpgrade(dbProperties);
         //启动时候进行数据库连接
         HikariDataSource hikariDataSource = new HikariDataSource();
+        hikariDataSource.setDataSourceProperties(dbProperties);
         hikariDataSource.setDriverClassName(dbProperties.getProperty("driverClass"));
         hikariDataSource.setUsername(dbProperties.getProperty("user"));
         hikariDataSource.setPassword(dbProperties.getProperty("password"));
         hikariDataSource.setJdbcUrl(dbProperties.getProperty("jdbcUrl"));
-        hikariDataSource.setDataSourceProperties(dbProperties);
         DAO.setDs(hikariDataSource);
+        //Test
+        try (Connection connection = hikariDataSource.getConnection()) {
+            LOGGER.info("Db connect success " + connection.getCatalog());
+        }
         if (newDbVersion > 0) {
             new WebSite().updateByKV(Constants.ZRLOG_SQL_VERSION_KEY, newDbVersion + "");
         }
