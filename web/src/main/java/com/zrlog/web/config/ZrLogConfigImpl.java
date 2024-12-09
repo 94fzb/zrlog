@@ -189,7 +189,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         int newDbVersion = tryDoUpgrade(dbProperties);
         //启动时候进行数据库连接
         HikariDataSource hikariDataSource = new HikariDataSource();
-        hikariDataSource.setDataSourceClassName(dbProperties.getProperty("driverClass"));
+        hikariDataSource.setDriverClassName(dbProperties.getProperty("driverClass"));
         hikariDataSource.setUsername(dbProperties.getProperty("user"));
         hikariDataSource.setPassword(dbProperties.getProperty("password"));
         hikariDataSource.setJdbcUrl(dbProperties.getProperty("jdbcUrl"));
