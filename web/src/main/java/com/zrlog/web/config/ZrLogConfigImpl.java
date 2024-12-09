@@ -11,7 +11,7 @@ import com.hibegin.http.server.api.Interceptor;
 import com.hibegin.http.server.config.RequestConfig;
 import com.hibegin.http.server.config.ResponseConfig;
 import com.hibegin.http.server.config.ServerConfig;
-import com.zaxxer.hikari.util.DriverDataSource;
+import com.zaxxer.hikari.HikariDataSource;
 import com.zrlog.admin.web.config.AdminRouters;
 import com.zrlog.admin.web.interceptor.AdminInterceptor;
 import com.zrlog.admin.web.interceptor.AdminPwaInterceptor;
@@ -188,7 +188,13 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         }
         int newDbVersion = tryDoUpgrade(dbProperties);
         //启动时候进行数据库连接
-        DAO.setDs(new DriverDataSource(dbProperties.getProperty("jdbcUrl"), dbProperties.getProperty("driverClass"), dbProperties, dbProperties.getProperty("user"), dbProperties.getProperty("password")));
+        HikariDataSource hikariDataSource = new HikariDataSource();
+        hikariDataSource.setDataSourceClassName(dbProperties.getProperty("driverClass"));
+        hikariDataSource.setUsername(dbProperties.getProperty("user"));
+        hikariDataSource.setPassword(dbProperties.getProperty("password"));
+        hikariDataSource.setJdbcUrl(dbProperties.getProperty("jdbcUrl"));
+        hikariDataSource.setDataSourceProperties(dbProperties);
+        DAO.setDs(hikariDataSource);
         if (newDbVersion > 0) {
             new WebSite().updateByKV(Constants.ZRLOG_SQL_VERSION_KEY, newDbVersion + "");
         }
