@@ -15,8 +15,7 @@ import PWAHandler from "../PWAHandler";
 import StyledIndexLayout from "./styled-index-layout";
 import type { ScreenMap } from "antd/es/_util/responsiveObserver";
 import useBreakpoint from "antd/es/grid/hooks/useBreakpoint";
-import { Link } from "react-router-dom";
-import { useLocation } from "react-router";
+import { addToCache, getCacheByKey } from "../cache";
 
 const { Header, Content, Sider } = Layout;
 
@@ -29,16 +28,17 @@ type AdminManageLayoutProps = PropsWithChildren & {
 const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ offline, children, loading, fullScreen }) => {
     const [userInfo, setUser] = useState<BasicUserInfo | undefined>(ssData?.user);
     const screens = useBreakpoint();
-    const location = useLocation();
+
+    const sliderStateKey = "sliderOpen";
 
     const needCollSlider = (s: ScreenMap) => {
-        if (location.hash.endsWith("#openSlider")) {
-            return false;
+        if (window.innerWidth < 576) {
+            return getCacheByKey(sliderStateKey);
         }
         return s.xs === true;
     };
     const [showSliderBtn, setShowSliderBtn] = useState<boolean>(window.innerWidth < 576);
-    const defaultHiddenSlider = needCollSlider(screens) || window.innerWidth < 576;
+    const defaultHiddenSlider = needCollSlider(screens);
     const [hiddenSlider, setHiddenSlider] = useState(defaultHiddenSlider);
 
     useEffect(() => {
@@ -77,23 +77,24 @@ const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ offline,
         if (showSliderBtn) {
             return (
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-start" }}>
-                    <Link
-                        id={"log"}
-                        to={hiddenSlider ? "#openSlider" : "#hideSlider"}
+                    <div
                         style={{
                             textAlign: "center",
                             width: 70,
                             height: "100%",
+                            cursor: "pointer",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
                         }}
                         onClick={() => {
-                            setHiddenSlider(!hiddenSlider);
+                            const newState = !hiddenSlider;
+                            addToCache(sliderStateKey, newState);
+                            setHiddenSlider(newState);
                         }}
                     >
                         <Button type="primary">{hiddenSlider ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}</Button>
-                    </Link>
+                    </div>
                     {home}
                 </div>
             );
