@@ -31,13 +31,16 @@ const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ offline,
 
     const sliderStateKey = "sliderOpen";
 
+    const mobileDevice = 576;
+
     const needCollSlider = (s: ScreenMap) => {
-        if (window.innerWidth < 576) {
-            return getCacheByKey(sliderStateKey);
+        if (window.innerWidth < mobileDevice) {
+            const state = getCacheByKey(sliderStateKey);
+            return state === undefined || state === null || state;
         }
         return s.xs === true;
     };
-    const [showSliderBtn, setShowSliderBtn] = useState<boolean>(window.innerWidth < 576);
+    const [showSliderBtn, setShowSliderBtn] = useState<boolean>(window.innerWidth < mobileDevice);
     const defaultHiddenSlider = needCollSlider(screens);
     const [hiddenSlider, setHiddenSlider] = useState(defaultHiddenSlider);
 
