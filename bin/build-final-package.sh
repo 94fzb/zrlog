@@ -21,4 +21,4 @@ cp zrlog.zip ${zipFinalFileName}
 cp zrlog.zip ${syncPath}/${zipFileName}
 zipFileSize=$(ls ${zipFinalFileName} -ls | awk '{print $6}')
 zipMd5sum=$(md5sum ${zipFinalFileName} | awk '{print $1}')
-echo -e '{"zipMd5sum":"'${zipMd5sum}'","zipDownloadUrl":"'${mirrorWebSite}${zipFileName}'","type":"'${runModeDesc}'","version":"'${version}'","buildId":"'${buildId}'","zipFileSize":'${zipFileSize}',"releaseDate":"'${Date}'"}' > ${syncPath}/${runMode}/last.version.json
+echo -e '{"zipMd5sum":"'${zipMd5sum}'","md5sum":"54db99172e53542a152c505f0c23a845","zipDownloadUrl":"'${mirrorWebSite}${zipFileName}'" ,"downloadUrl":"'${mirrorWebSite}release/zrlog.war'","type":"'${runModeDesc}'","version":"'${version}'","buildId":"'${buildId}'","fileSize":10794045,"zipFileSize":'${zipFileSize}',"releaseDate":"'${Date}'"}' > ${syncPath}/${runMode}/last.version.json
