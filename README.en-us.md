@@ -60,7 +60,7 @@ program.
 ### Getting help
 
 * QQ group 6399942
-* Mail xchun90@163.com
+* Mail 90xchun@gmail.com
 * Have any questions about the program, welcome
   feedback [http://blog.zrlog.com/feedback.html](https://blog.zrlog.com/feedback.html)
 
