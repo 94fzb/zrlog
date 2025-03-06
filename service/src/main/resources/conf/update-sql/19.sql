@@ -1,2 +1,2 @@
 insert
-`website` (`value`,`name`) value(UUID(),'appId')
+`website` (`name`,`value`) value('appId',UUID())
