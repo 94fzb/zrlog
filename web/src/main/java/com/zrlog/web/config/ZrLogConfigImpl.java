@@ -270,8 +270,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
             }
             for (Map.Entry<Integer, List<String>> entry : sqlList) {
                 //执行需要更新的sql脚本
-                Statement statement = connection.createStatement();
-                try {
+                try (Statement statement = connection.createStatement()) {
                     for (String sql : entry.getValue()) {
                         if (StringUtils.isEmpty(sql.trim())) {
                             continue;
@@ -282,14 +281,6 @@ public class ZrLogConfigImpl extends ZrLogConfig {
                     LOGGER.log(Level.SEVERE, "execution sql ", e);
                     //有异常终止升级
                     return -1;
-                } finally {
-                    if (statement != null) {
-                        try {
-                            statement.close();
-                        } catch (SQLException e) {
-                            LOGGER.log(Level.SEVERE, "", e);
-                        }
-                    }
                 }
                 //执行需要转换的数据
                 try {

@@ -193,4 +193,8 @@ public class Constants {
         sj.add(I18nUtil.getAdminStringFromRes("admin.management"));
         return sj.toString();
     }
+
+    public static String getAppId() {
+        return String.valueOf(zrLogConfig.getPublicWebSite().get("appId"));
+    }
 }
