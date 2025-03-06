@@ -64,6 +64,8 @@ public class AdminController extends Controller {
             }
             map.put("name", Constants.getAdminTitle(""));
             map.put("theme_color", publicInfoVO.pwaThemeColor());
+            map.put("description", Objects.requireNonNullElse(Constants.zrLogConfig.getPublicWebSite().get("description"), ""));
+            map.put("id", Objects.requireNonNullElse(Constants.zrLogConfig.getPublicWebSite().get("appId"), ""));
             map.put("background_color", publicInfoVO.admin_darkMode() ? "#000000" : "#FFFFFF");
             return map;
         }

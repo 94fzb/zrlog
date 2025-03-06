@@ -64,12 +64,13 @@ public class InstallService {
      */
     private Map<String, Object> getDefaultWebSiteSettingMap(Map<String, String> webSite) {
         Map<String, Object> map = new LinkedHashMap<>();
-        map.put("rows", 10);
-        map.put("template", Constants.DEFAULT_TEMPLATE_PATH);
-        map.put(Constants.AUTO_UPGRADE_VERSION_KEY, Constants.DEFAULT_AUTO_UPGRADE_VERSION_TYPE.getCycle());
+        map.put("appId", UUID.randomUUID().toString());
         map.put("title", Objects.requireNonNullElse(webSite.get("title"), ""));
         map.put("second_title", Objects.requireNonNullElse(webSite.get("second_title"), ""));
         map.put("language", I18nUtil.getCurrentLocale());
+        map.put("rows", 10);
+        map.put("template", Constants.DEFAULT_TEMPLATE_PATH);
+        map.put(Constants.AUTO_UPGRADE_VERSION_KEY, Constants.DEFAULT_AUTO_UPGRADE_VERSION_TYPE.getCycle());
         map.put(Constants.ZRLOG_SQL_VERSION_KEY, Constants.SQL_VERSION);
         return map;
     }
@@ -155,7 +156,7 @@ public class InstallService {
         properties.putAll(dbConn);
         try (Connection connect = DbConnectUtils.getConnection(properties)) {
             String sql = IOUtil.getStringInputStream(InstallService.class.getResourceAsStream("/init-table-structure.sql"));
-            for(String sqlSt: ZrLogUtil.extractExecutableSql(sql)) {
+            for (String sqlSt : ZrLogUtil.extractExecutableSql(sql)) {
                 try (Statement st = connect.createStatement()) {
                     st.execute(sqlSt);
                 }
