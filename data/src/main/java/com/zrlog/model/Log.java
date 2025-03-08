@@ -135,6 +135,7 @@ public class Log extends BasePageableDAO implements Serializable {
                 case "releaseTime" -> "l.releaseTime";
                 case "commentSize" -> "commentSize";
                 case "privacy" -> "l.privacy";
+                case "click" -> "l.click";
                 case "lastUpdateDate" -> "l.last_update_date";
                 default -> "l.logId";
             }).append(" ").append(orderBy.direction().name().toLowerCase());
