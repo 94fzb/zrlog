@@ -1,4 +1,4 @@
-import { message, PaginationProps, Space, Table } from "antd";
+import { message, PaginationProps, Space, Table, TableColumnsType } from "antd";
 import { FunctionComponent, useEffect, useState } from "react";
 import axios from "axios";
 import { mapToQueryString } from "../utils/helpers";
@@ -12,7 +12,7 @@ import { SorterResult } from "antd/es/table/interface";
 type BaseTableProps = {
     deleteApi: string;
     deleteSuccessCallback?: (id: number) => void;
-    columns: any[];
+    columns: TableColumnsType<any>;
     datasource?: PageDataSource;
     searchKey?: string;
     hideId?: boolean;

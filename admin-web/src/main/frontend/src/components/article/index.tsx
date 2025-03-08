@@ -1,6 +1,6 @@
 import { EditOutlined, LockOutlined, TagOutlined } from "@ant-design/icons";
 
-import { Col, Row, Space, Tag, Tooltip } from "antd";
+import { Col, Row, Space, TableColumnsType, Tag, Tooltip } from "antd";
 import Search from "antd/es/input/Search";
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
@@ -10,6 +10,8 @@ import BaseTable, { ArticlePageDataSource } from "../../common/BaseTable";
 import { Link } from "react-router-dom";
 import { deleteCacheDataByKey } from "../../cache";
 import { useLocation } from "react-router";
+import { SortOrder } from "antd/es/table/interface";
+import type * as React from "react";
 
 const genTypes = (d: ArticlePageDataSource, search: string) => {
     const types = new URLSearchParams(search).get("types") as unknown as string;
@@ -93,8 +95,8 @@ const Index = ({ data, offline }: { data: ArticlePageDataSource; offline: boolea
         setFilters(filters);
     };
 
-    const getColumns = () => {
-        const sorterMap: Record<string, string> = {};
+    const getColumns = (): TableColumnsType<any> => {
+        const sorterMap: Record<string, SortOrder> = {};
 
         data.sort &&
             data.sort.map((e) => {
@@ -104,7 +106,7 @@ const Index = ({ data, offline }: { data: ArticlePageDataSource; offline: boolea
 
         return [
             {
-                title: getRes()["title"],
+                title: getRes()["title"] as string,
                 dataIndex: "title",
                 key: "title",
                 ellipsis: {
@@ -161,10 +163,11 @@ const Index = ({ data, offline }: { data: ArticlePageDataSource; offline: boolea
                 key: "typeName",
                 dataIndex: "typeName",
                 width: 100,
+                //@ts-ignore
                 filters: filters,
                 filterMultiple: false,
                 filteredValue: filters.filter((e) => e.selected).map((e) => e.value), // 动态绑定当前选中值
-                onFilter: (value: string) => {
+                onFilter: (value: React.Key | boolean) => {
                     // 更新选中状态
                     if (
                         filters
@@ -174,6 +177,7 @@ const Index = ({ data, offline }: { data: ArticlePageDataSource; offline: boolea
                     ) {
                         return true;
                     }
+                    //@ts-ignore
                     handleFilterChange(value, true);
                     handleNavigation();
                     return true; // 保留默认筛选功能
@@ -185,6 +189,7 @@ const Index = ({ data, offline }: { data: ArticlePageDataSource; offline: boolea
                 dataIndex: "click",
                 width: 100,
                 sorter: true,
+                sortDirections: ["descend", "ascend"],
                 sortOrder: sorterMap["click"],
             },
             {
@@ -200,6 +205,7 @@ const Index = ({ data, offline }: { data: ArticlePageDataSource; offline: boolea
                 dataIndex: "commentSize",
                 width: 100,
                 sorter: true,
+                sortDirections: ["descend", "ascend"],
                 sortOrder: sorterMap["commentSize"],
             },
             {
@@ -208,6 +214,7 @@ const Index = ({ data, offline }: { data: ArticlePageDataSource; offline: boolea
                 dataIndex: "releaseTime",
                 width: 120,
                 sorter: true,
+                sortDirections: ["ascend", "descend"],
                 sortOrder: sorterMap["releaseTime"],
             },
             {
@@ -216,6 +223,7 @@ const Index = ({ data, offline }: { data: ArticlePageDataSource; offline: boolea
                 dataIndex: "lastUpdateDate",
                 width: 120,
                 sorter: true,
+                sortDirections: ["ascend", "descend"],
                 sortOrder: sorterMap["lastUpdateDate"],
             },
         ];
