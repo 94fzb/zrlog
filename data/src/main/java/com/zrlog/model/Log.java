@@ -130,11 +130,11 @@ public class Log extends BasePageableDAO implements Serializable {
         }
         StringBuilder orderSort = new StringBuilder();
         for (OrderBy orderBy : orders) {
-            orderSort.append(switch (orderBy.sortKey()) {
-                case "typeName" -> "l.typeId";
-                case "privacy" -> "l.privacy";
-                case "lastUpdateDate" -> "l.last_update_date";
-                default -> "l.logId";
+            orderSort.append("l.").append(switch (orderBy.sortKey()) {
+                case "typeName" -> "typeId";
+                case "privacy" -> "privacy";
+                case "lastUpdateDate" -> "last_update_date";
+                default -> "logId";
             }).append(" ").append(orderBy.direction().name().toLowerCase());
         }
         return orderSort.toString();
