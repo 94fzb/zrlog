@@ -170,7 +170,7 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
         const c = [];
         if (hideId === null || hideId === undefined || !hideId) {
             c.push({
-                title: "ID",
+                title: getRes()["id"],
                 dataIndex: "id",
                 key: "id",
                 fixed: true,

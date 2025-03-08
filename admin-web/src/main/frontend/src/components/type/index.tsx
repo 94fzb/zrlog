@@ -28,7 +28,7 @@ const Type = ({ data, offline }: { data: PageDataSource; offline: boolean }) => 
                 width: 120,
             },
             {
-                title: "简介",
+                title: getRes()["introduction"],
                 key: "remark",
                 dataIndex: "remark",
                 width: 240,
@@ -37,7 +37,7 @@ const Type = ({ data, offline }: { data: PageDataSource; offline: boolean }) => 
                 },
             },
             {
-                title: "文章数量",
+                title: getRes()["articleSize"],
                 dataIndex: "amount",
                 key: "amount",
                 width: 80,

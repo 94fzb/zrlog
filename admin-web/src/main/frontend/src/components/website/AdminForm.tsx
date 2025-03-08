@@ -53,7 +53,7 @@ const BlogForm = ({ data, offline }: { data: Admin; offline: boolean }) => {
                 onValuesChange={(_k, v) => setForm({ ...form, ...v })}
                 onFinish={(v) => websiteFormFinish(v)}
             >
-                <Title level={4}>管理界面设置</Title>
+                <Title level={4}>{getRes()["admin.admin.manage"]}</Title>
                 <Divider />
                 <Form.Item name="admin_static_resource_base_url" label="管理页静态资源（URL）">
                     <Input style={{ maxWidth: "300px" }} placeholder="留空，及禁用" />

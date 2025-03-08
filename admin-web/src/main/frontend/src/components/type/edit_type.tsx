@@ -94,7 +94,7 @@ const EditType: FunctionComponent<EditTypeProps> = ({ record, editSuccessCall, o
                     <Row>
                         <Col span={24}>
                             <Form.Item
-                                label="简介"
+                                label={getRes()["introduction"]}
                                 style={{ marginBottom: 8 }}
                                 name="remark"
                                 rules={[{ required: true, message: "" }]}

@@ -1,4 +1,3 @@
-import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
 import Form from "antd/es/form";
 import Input from "antd/es/input";
@@ -9,6 +8,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { message } from "antd";
 import { Blog } from "./index";
+import Title from "antd/es/typography/Title";
 
 const layout = {
     labelCol: { span: 8 },
@@ -46,7 +46,7 @@ const BlogForm = ({ data, offline }: { data: Blog; offline?: boolean }) => {
                 onValuesChange={(_k, v) => setForm({ ...form, ...v })}
                 onFinish={(v) => websiteFormFinish(v)}
             >
-                <Title level={4}>博客设置</Title>
+                <Title level={4}>{getRes()["admin.blog.manage"]}</Title>
                 <Divider />
                 <Form.Item name="host" label="博客域名（Host）">
                     <Input style={{ maxWidth: "300px" }} placeholder="留空，程序将读取接收到的 Host 字段" />
@@ -57,7 +57,7 @@ const BlogForm = ({ data, offline }: { data: Blog; offline?: boolean }) => {
                 <Form.Item valuePropName="checked" name="disable_comment_status" label="关闭评论">
                     <Switch size={"small"} />
                 </Form.Item>
-                <Form.Item valuePropName="checked" name="article_thumbnail_status" label="文章封面">
+                <Form.Item valuePropName="checked" name="article_thumbnail_status" label={getRes()["articleCover"]}>
                     <Switch size={"small"} />
                 </Form.Item>
                 <Divider />

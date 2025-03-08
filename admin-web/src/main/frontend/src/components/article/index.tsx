@@ -180,7 +180,7 @@ const Index = ({ data, offline }: { data: ArticlePageDataSource; offline: boolea
                 },
             },
             {
-                title: "浏览量",
+                title: getRes()["viewCount"],
                 key: "click",
                 dataIndex: "click",
                 width: 100,
@@ -191,11 +191,11 @@ const Index = ({ data, offline }: { data: ArticlePageDataSource; offline: boolea
                 title: getRes()["commentAble"],
                 key: "canComment",
                 dataIndex: "canComment",
-                render: (v: boolean) => (v ? "是" : "否"),
+                render: (v: boolean) => (v ? getRes()["yes"] : getRes()["no"]),
                 width: 80,
             },
             {
-                title: "评论量",
+                title: getRes()["commentSize"],
                 key: "commentSize",
                 dataIndex: "commentSize",
                 width: 100,

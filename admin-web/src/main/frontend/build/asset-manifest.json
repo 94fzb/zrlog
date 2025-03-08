@@ -1,22 +1,22 @@
 {
   "files": {
-    "main.js": "./admin/static/js/main.eb2651c6.js",
+    "main.js": "./admin/static/js/main.7c2eb9df.js",
     "static/js/566.8e3e9074.chunk.js": "./admin/static/js/566.8e3e9074.chunk.js",
     "static/js/719.371faff6.chunk.js": "./admin/static/js/719.371faff6.chunk.js",
     "static/js/72.2340f514.chunk.js": "./admin/static/js/72.2340f514.chunk.js",
     "static/js/26.120ac15d.chunk.js": "./admin/static/js/26.120ac15d.chunk.js",
-    "static/js/711.bcd03eb2.chunk.js": "./admin/static/js/711.bcd03eb2.chunk.js",
+    "static/js/711.f30981a5.chunk.js": "./admin/static/js/711.f30981a5.chunk.js",
     "static/js/700.3a8f1ee5.chunk.js": "./admin/static/js/700.3a8f1ee5.chunk.js",
     "static/js/896.0388491b.chunk.js": "./admin/static/js/896.0388491b.chunk.js",
-    "static/js/944.c4e839ab.chunk.js": "./admin/static/js/944.c4e839ab.chunk.js",
-    "static/js/34.ba28cfd5.chunk.js": "./admin/static/js/34.ba28cfd5.chunk.js",
-    "static/js/610.f60102c5.chunk.js": "./admin/static/js/610.f60102c5.chunk.js",
-    "static/js/538.6fd93735.chunk.js": "./admin/static/js/538.6fd93735.chunk.js",
+    "static/js/944.ff56eb69.chunk.js": "./admin/static/js/944.ff56eb69.chunk.js",
+    "static/js/34.811215d3.chunk.js": "./admin/static/js/34.811215d3.chunk.js",
+    "static/js/610.69e72f7c.chunk.js": "./admin/static/js/610.69e72f7c.chunk.js",
+    "static/js/538.1e94a166.chunk.js": "./admin/static/js/538.1e94a166.chunk.js",
     "static/js/271.4d169e8b.chunk.js": "./admin/static/js/271.4d169e8b.chunk.js",
     "static/js/799.93ea26c1.chunk.js": "./admin/static/js/799.93ea26c1.chunk.js",
     "static/js/861.2b5e3b8e.chunk.js": "./admin/static/js/861.2b5e3b8e.chunk.js",
     "static/js/91.844717d4.chunk.js": "./admin/static/js/91.844717d4.chunk.js",
-    "static/js/9.1d2fbdaa.chunk.js": "./admin/static/js/9.1d2fbdaa.chunk.js",
+    "static/js/9.2f408238.chunk.js": "./admin/static/js/9.2f408238.chunk.js",
     "static/js/986.4a38f363.chunk.js": "./admin/static/js/986.4a38f363.chunk.js",
     "static/js/423.a9da8c8d.chunk.js": "./admin/static/js/423.a9da8c8d.chunk.js",
     "vendor.js": "./admin/static/js/vendor.1d7a9a7a.js",
@@ -40,6 +40,6 @@
   "entrypoints": [
     "static/js/vendor.1d7a9a7a.js",
     "static/js/735.5082ebe2.js",
-    "static/js/main.eb2651c6.js"
+    "static/js/main.7c2eb9df.js"
   ]
 }
