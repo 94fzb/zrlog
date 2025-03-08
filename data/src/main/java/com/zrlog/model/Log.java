@@ -1,6 +1,7 @@
 package com.zrlog.model;
 
 import com.hibegin.common.util.StringUtils;
+import com.zrlog.common.rest.request.OrderBy;
 import com.zrlog.common.rest.request.PageRequest;
 import com.zrlog.common.rest.request.PageRequestImpl;
 import com.zrlog.data.dto.PageData;
@@ -123,19 +124,20 @@ public class Log extends BasePageableDAO implements Serializable {
     }
 
     private static String getPageSort(PageRequest pageRequest) {
-        String pageSort = "l.logId desc";
-        String sortField = pageRequest.getSort();
-        String order = pageRequest.getOrder();
-        if (order != null && !order.isEmpty() && sortField != null && !sortField.isEmpty()) {
-            sortField = switch (sortField) {
-                case "typeName" -> "typeId";
-                case "privacy" -> "privacy";
-                case "lastUpdateDate" -> "last_update_date";
-                default -> "logId";
-            };
-            pageSort = "l." + sortField + " " + order;
+        List<OrderBy> orders = pageRequest.getOrders();
+        if (orders == null || orders.isEmpty()) {
+            return "l.logId desc";
         }
-        return pageSort;
+        StringBuilder orderSort = new StringBuilder();
+        for (OrderBy orderBy : orders) {
+            orderSort.append(switch (orderBy.sortKey()) {
+                case "typeName" -> "l.typeId";
+                case "privacy" -> "l.privacy";
+                case "lastUpdateDate" -> "l.last_update_date";
+                default -> "l.logId";
+            }).append(" ").append(orderBy.direction().name().toLowerCase());
+        }
+        return orderSort.toString();
     }
 
     public PageData<Map<String, Object>> findByTypeAlias(long page, long pageSize, String typeAlias) {

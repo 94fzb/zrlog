@@ -1,12 +1,13 @@
 package com.zrlog.common.rest.request;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class UnPageRequestImpl implements PageRequest {
 
     private final Long page;
     private final Long size;
-    private String sort;
-    private String order;
-
+    private List<OrderBy> orders = new ArrayList<>();
 
     public UnPageRequestImpl(Long page) {
         this.page = page;
@@ -24,20 +25,11 @@ public class UnPageRequestImpl implements PageRequest {
     }
 
     @Override
-    public String getSort() {
-        return sort;
+    public List<OrderBy> getOrders() {
+        return orders;
     }
 
-    @Override
-    public String getOrder() {
-        return order;
-    }
-
-    public void setSort(String sort) {
-        this.sort = sort;
-    }
-
-    public void setOrder(String order) {
-        this.order = order;
+    public void setOrder(List<OrderBy> orders) {
+        this.orders = orders;
     }
 }

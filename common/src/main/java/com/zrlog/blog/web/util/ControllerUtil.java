@@ -1,10 +1,12 @@
 package com.zrlog.blog.web.util;
 
-import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.server.web.Controller;
-import com.zrlog.common.rest.request.PageRequest;
-import com.zrlog.common.rest.request.PageRequestImpl;
-import com.zrlog.common.rest.request.UnPageRequestImpl;
+import com.zrlog.common.rest.request.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class ControllerUtil {
 
@@ -25,11 +27,30 @@ public class ControllerUtil {
         if (pageRequest.getPage() <= 0) {
             pageRequest.setPage(1L);
         }
-        pageRequest.setSort(controller.getRequest().getParaToStr("sidx"));
-        if (StringUtils.isEmpty(pageRequest.getSort())) {
-            pageRequest.setSort("id");
-        }
+        pageRequest.setOrders(getOrderByListByParamMap(controller.getRequest().getParamMap()));
         return pageRequest;
+    }
+
+    private static List<OrderBy> getOrderByListByParamMap(Map<String, String[]> paramMap) {
+        String[] sorts = paramMap.get("sort");
+        if (Objects.isNull(sorts) || sorts.length == 0) {
+            //兼容旧的 key
+            sorts = paramMap.get("sidx");
+        }
+        if (Objects.isNull(sorts) || sorts.length == 0) {
+            return List.of(new OrderBy("id", Direction.DESC));
+        }
+        List<OrderBy> orders = new ArrayList<>(sorts.length);
+        for (String sort : sorts) {
+            String[] args = sort.split(",");
+            String key = args[0].trim();
+            if (args.length > 1) {
+                orders.add(new OrderBy(key, Direction.valueOf(args[1].toUpperCase())));
+            } else {
+                orders.add(new OrderBy(key, Direction.DESC));
+            }
+        }
+        return orders;
     }
 
     public static PageRequest unPageRequest() {
