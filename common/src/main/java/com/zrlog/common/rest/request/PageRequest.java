@@ -8,7 +8,7 @@ public interface PageRequest {
 
     Long getPage();
 
-    List<OrderBy> getOrders();
+    List<OrderBy> getSorts();
 
     default Long getOffset() {
         return (getPage() - 1) * getSize();

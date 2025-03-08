@@ -124,17 +124,19 @@ public class Log extends BasePageableDAO implements Serializable {
     }
 
     private static String getPageSort(PageRequest pageRequest) {
-        List<OrderBy> orders = pageRequest.getOrders();
+        List<OrderBy> orders = pageRequest.getSorts();
         if (orders == null || orders.isEmpty()) {
             return "l.logId desc";
         }
         StringBuilder orderSort = new StringBuilder();
         for (OrderBy orderBy : orders) {
-            orderSort.append("l.").append(switch (orderBy.sortKey()) {
-                case "typeName" -> "typeId";
-                case "privacy" -> "privacy";
-                case "lastUpdateDate" -> "last_update_date";
-                default -> "logId";
+            orderSort.append(switch (orderBy.sortKey()) {
+                case "typeName" -> "l.typeId";
+                case "releaseTime" -> "l.releaseTime";
+                case "commentSize" -> "commentSize";
+                case "privacy" -> "l.privacy";
+                case "lastUpdateDate" -> "l.last_update_date";
+                default -> "l.logId";
             }).append(" ").append(orderBy.direction().name().toLowerCase());
         }
         return orderSort.toString();

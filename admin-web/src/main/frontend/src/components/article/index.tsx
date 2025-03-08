@@ -56,6 +56,12 @@ const Index = ({ data, offline }: { data: ArticlePageDataSource; offline: boolea
             return;
         }
         jumped.current = true;
+        const sortArgs: string[] = [];
+        data.sort.forEach((e) => {
+            sortArgs.push("sort=" + encodeURIComponent(e));
+        });
+        //FIXME jump append sort
+        const endTag = location.search.includes("sort=") ? "&" : "";
         location.pathname =
             location.pathname +
             "?types=" +
@@ -64,7 +70,10 @@ const Index = ({ data, offline }: { data: ArticlePageDataSource; offline: boolea
                     .filter((e) => e.selected)
                     .map((e) => e.value)
                     .join(",")
-            );
+            ) +
+            "&" +
+            sortArgs.join("&") +
+            endTag;
     };
 
     useEffect(() => {
@@ -85,6 +94,14 @@ const Index = ({ data, offline }: { data: ArticlePageDataSource; offline: boolea
     };
 
     const getColumns = () => {
+        const sorterMap: Record<string, string> = {};
+
+        data.sort &&
+            data.sort.map((e) => {
+                const arr: string[] = e.split(",");
+                sorterMap[arr[0]] = arr[1] === "ASC" ? "ascend" : "descend";
+            });
+
         return [
             {
                 title: getRes()["title"],
@@ -180,18 +197,24 @@ const Index = ({ data, offline }: { data: ArticlePageDataSource; offline: boolea
                 key: "commentSize",
                 dataIndex: "commentSize",
                 width: 80,
+                sorter: true,
+                sortOrder: sorterMap["commentSize"],
             },
             {
                 title: getRes()["createTime"],
                 key: "releaseTime",
                 dataIndex: "releaseTime",
                 width: 120,
+                sorter: true,
+                sortOrder: sorterMap["releaseTime"],
             },
             {
                 title: getRes()["lastUpdateDate"],
                 key: "lastUpdateDate",
                 dataIndex: "lastUpdateDate",
                 width: 120,
+                sorter: true,
+                sortOrder: sorterMap["lastUpdateDate"],
             },
         ];
     };

@@ -38,7 +38,7 @@ public class PageRequestImpl implements PageRequest {
     }
 
     @Override
-    public List<OrderBy> getOrders() {
+    public List<OrderBy> getSorts() {
         return orders;
     }
 

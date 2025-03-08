@@ -27,7 +27,7 @@ public class ControllerUtil {
         if (pageRequest.getPage() <= 0) {
             pageRequest.setPage(1L);
         }
-        pageRequest.setOrders(getOrderByListByParamMap(controller.getRequest().getParamMap()));
+        pageRequest.setOrders(getOrderByListByParamMap(controller.getRequest().decodeParamMap()));
         return pageRequest;
     }
 
@@ -45,7 +45,8 @@ public class ControllerUtil {
             String[] args = sort.split(",");
             String key = args[0].trim();
             if (args.length > 1) {
-                orders.add(new OrderBy(key, Direction.valueOf(args[1].toUpperCase())));
+                //FIXME 页面路由问题
+                orders.add(new OrderBy(key, Direction.valueOf(args[1].split("\\?")[0].toUpperCase())));
             } else {
                 orders.add(new OrderBy(key, Direction.DESC));
             }

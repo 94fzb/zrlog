@@ -3,7 +3,7 @@ import React from "react";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { HookAPI } from "antd/es/modal/useModal";
 
-export const mapToQueryString = (map: Record<string, string | boolean | number | undefined>): string => {
+export const mapToQueryString = (map: Record<string, string[] | string | boolean | number | undefined>): string => {
     return Object.keys(map)
         .reduce(function (a, k) {
             if (map[k] === undefined) {
