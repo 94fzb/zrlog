@@ -4,7 +4,7 @@
     <groupId>com.zrlog</groupId>
     <artifactId>zrlog</artifactId>
     <packaging>pom</packaging>
-    <version>3.1.4-SNAPSHOT</version>
+    <version>3.1.4</version>
     <modules>
         <module>web</module>
         <module>service</module>
@@ -31,7 +31,7 @@
     <developers>
         <developer>
             <name>xiaochun</name>
-            <email>xchun90@163.com</email>
+            <email>90xchun@gmail.com</email>
             <url>https://xiaochun.zrlog.com</url>
             <roles>
                 <role>owner</role>
@@ -76,7 +76,7 @@
         <dependency>
             <groupId>com.hibegin</groupId>
             <artifactId>simplewebserver</artifactId>
-            <version>0.3.146</version>
+            <version>0.3.172</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -91,37 +91,37 @@
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>common</artifactId>
-                <version>3.1.4-SNAPSHOT</version>
+                <version>3.1.4</version>
             </dependency>
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>data</artifactId>
-                <version>3.1.4-SNAPSHOT</version>
+                <version>3.1.4</version>
             </dependency>
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>admin-token</artifactId>
-                <version>3.1.4-SNAPSHOT</version>
+                <version>3.1.4</version>
             </dependency>
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>blog-web</artifactId>
-                <version>3.1.4-SNAPSHOT</version>
+                <version>3.1.4</version>
             </dependency>
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>service</artifactId>
-                <version>3.1.4-SNAPSHOT</version>
+                <version>3.1.4</version>
             </dependency>
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>admin-web</artifactId>
-                <version>3.1.4-SNAPSHOT</version>
+                <version>3.1.4</version>
             </dependency>
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>web</artifactId>
-                <version>3.1.4-SNAPSHOT</version>
+                <version>3.1.4</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

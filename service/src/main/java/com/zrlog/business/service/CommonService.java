@@ -47,6 +47,7 @@ public class CommonService {
             stringObjectMap.put("defaultLoginInfo", defaultLoginInfo);
         }
         stringObjectMap.put("buildId", BlogBuildInfoUtil.getBuildId());
+        stringObjectMap.put("appId", Constants.getAppId());
         stringObjectMap.put("admin_color_primary", publicInfoVO.admin_color_primary());
         stringObjectMap.put("lang", I18nUtil.getCurrentLocale());
         stringObjectMap.put("admin_static_resource_base_url", ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite());

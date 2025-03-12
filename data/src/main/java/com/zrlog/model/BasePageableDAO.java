@@ -3,6 +3,7 @@ package com.zrlog.model;
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.dao.DAO;
 import com.zrlog.common.Constants;
+import com.zrlog.common.rest.request.OrderBy;
 import com.zrlog.common.rest.request.PageRequest;
 import com.zrlog.common.rest.request.PageRequestImpl;
 import com.zrlog.common.rest.request.UnPageRequestImpl;
@@ -66,6 +67,11 @@ class BasePageableDAO extends DAO {
                     throw new RuntimeException(e.getCause());
                 }
             }
+        }
+        if (pageRequest.getSorts() != null) {
+            data.setSort(new ArrayList<>(pageRequest.getSorts().stream().map(OrderBy::toParamString).toList()));
+        } else {
+            data.setSort(new ArrayList<>());
         }
         data.setPage(pageRequest.getPage());
         if (pageRequest instanceof UnPageRequestImpl) {

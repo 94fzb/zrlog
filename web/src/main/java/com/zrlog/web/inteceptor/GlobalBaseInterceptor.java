@@ -1,8 +1,10 @@
 package com.zrlog.web.inteceptor;
 
+import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.api.Interceptor;
+import com.zrlog.admin.web.controller.api.AdminController;
 import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.common.Constants;
 import com.zrlog.util.BlogBuildInfoUtil;
@@ -11,11 +13,14 @@ import com.zrlog.util.ZrLogUtil;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * 用于对静态文件的请求的检查
  */
 public class GlobalBaseInterceptor implements Interceptor {
+
+    private static final Logger LOGGER = LoggerUtil.getLogger(AdminController.class);
 
     public GlobalBaseInterceptor() {
     }
@@ -38,24 +43,33 @@ public class GlobalBaseInterceptor implements Interceptor {
 
     @Override
     public boolean doInterceptor(HttpRequest request, HttpResponse response) {
-        String target = request.getUri();
-        request.getAttr().put("requrl", ZrLogUtil.getFullUrl(request));
-        request.getAttr().put("reqUriPath", Objects.requireNonNullElse(request.getUri(),"/"));
-        request.getAttr().put("reqQueryString", Objects.requireNonNullElse(request.getQueryStr(),""));
-        Constants.setLastAccessTime(System.currentTimeMillis());
-        //便于Wappalyzer读取
-        response.addHeader("X-ZrLog", BlogBuildInfoUtil.getVersion());
-        if (FORBIDDEN_URI_EXT_SET.stream().anyMatch(target::endsWith) || FORBIDDEN_URI_SET.contains(target)) {
-            //非法请求, 返回403
-            response.renderCode(403);
-            return false;
+        try {
+            String target = request.getUri();
+            request.getAttr().put("requrl", ZrLogUtil.getFullUrl(request));
+            request.getAttr().put("reqUriPath", Objects.requireNonNullElse(request.getUri(), "/"));
+            request.getAttr().put("reqQueryString", Objects.requireNonNullElse(request.getQueryStr(), ""));
+            Constants.setLastAccessTime(System.currentTimeMillis());
+            //便于Wappalyzer读取
+            response.addHeader("X-ZrLog", BlogBuildInfoUtil.getVersion());
+            if (FORBIDDEN_URI_EXT_SET.stream().anyMatch(target::endsWith) || FORBIDDEN_URI_SET.contains(target)) {
+                //非法请求, 返回403
+                response.renderCode(403);
+                return false;
+            }
+            if (target.startsWith("/api")) {
+                response.addHeader("Content-Type", "application/json;charset=UTF-8");
+            }
+            request.getAttr().put("basePath", WebTools.getHomeUrl(request));
+            request.getAttr().put("baseWithHostPath", ZrLogUtil.getHomeUrlWithHostNotProtocol(request));
+            return true;
+        } finally {
+            long used = System.currentTimeMillis() - request.getCreateTime();
+            if (used > 5000) {
+                LOGGER.info("Slow request " + request.getUri() + " used time " + used + "ms");
+            } else if (Constants.debugLoggerPrintAble()) {
+                LOGGER.info("Request " + request.getUri() + " used time " + used + "ms");
+            }
         }
-        if (target.startsWith("/api")) {
-            response.addHeader("Content-Type", "application/json;charset=UTF-8");
-        }
-        request.getAttr().put("basePath", WebTools.getHomeUrl(request));
-        request.getAttr().put("baseWithHostPath", ZrLogUtil.getHomeUrlWithHostNotProtocol(request));
-        return true;
     }
 
 }

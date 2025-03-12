@@ -1,7 +1,7 @@
 {
   "short_name": "Admin frontend",
   "name": "ZrLog admin",
-  "start_url": "./index",
+  "start_url": "./index?pwa=true",
   "icons": [
     {
       "src": "/pwa/icon/favicon-192.png",

@@ -1,6 +1,6 @@
 import { EditOutlined, LockOutlined, TagOutlined } from "@ant-design/icons";
 
-import { Col, Row, Space, Tag, Tooltip } from "antd";
+import { Col, Row, Space, TableColumnsType, Tag, Tooltip } from "antd";
 import Search from "antd/es/input/Search";
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
@@ -10,6 +10,8 @@ import BaseTable, { ArticlePageDataSource } from "../../common/BaseTable";
 import { Link } from "react-router-dom";
 import { deleteCacheDataByKey } from "../../cache";
 import { useLocation } from "react-router";
+import { SortOrder } from "antd/es/table/interface";
+import type * as React from "react";
 
 const genTypes = (d: ArticlePageDataSource, search: string) => {
     const types = new URLSearchParams(search).get("types") as unknown as string;
@@ -56,6 +58,12 @@ const Index = ({ data, offline }: { data: ArticlePageDataSource; offline: boolea
             return;
         }
         jumped.current = true;
+        const sortArgs: string[] = [];
+        data.sort.forEach((e) => {
+            sortArgs.push("sort=" + encodeURIComponent(e));
+        });
+        //FIXME jump append sort
+        const endTag = location.search.includes("sort=") ? "&" : "";
         location.pathname =
             location.pathname +
             "?types=" +
@@ -64,7 +72,10 @@ const Index = ({ data, offline }: { data: ArticlePageDataSource; offline: boolea
                     .filter((e) => e.selected)
                     .map((e) => e.value)
                     .join(",")
-            );
+            ) +
+            "&" +
+            sortArgs.join("&") +
+            endTag;
     };
 
     useEffect(() => {
@@ -84,10 +95,18 @@ const Index = ({ data, offline }: { data: ArticlePageDataSource; offline: boolea
         setFilters(filters);
     };
 
-    const getColumns = () => {
+    const getColumns = (): TableColumnsType<any> => {
+        const sorterMap: Record<string, SortOrder> = {};
+
+        data.sort &&
+            data.sort.map((e) => {
+                const arr: string[] = e.split(",");
+                sorterMap[arr[0]] = arr[1] === "ASC" ? "ascend" : "descend";
+            });
+
         return [
             {
-                title: getRes()["title"],
+                title: getRes()["title"] as string,
                 dataIndex: "title",
                 key: "title",
                 ellipsis: {
@@ -144,10 +163,11 @@ const Index = ({ data, offline }: { data: ArticlePageDataSource; offline: boolea
                 key: "typeName",
                 dataIndex: "typeName",
                 width: 100,
+                //@ts-ignore
                 filters: filters,
                 filterMultiple: false,
                 filteredValue: filters.filter((e) => e.selected).map((e) => e.value), // 动态绑定当前选中值
-                onFilter: (value: string) => {
+                onFilter: (value: React.Key | boolean) => {
                     // 更新选中状态
                     if (
                         filters
@@ -157,41 +177,54 @@ const Index = ({ data, offline }: { data: ArticlePageDataSource; offline: boolea
                     ) {
                         return true;
                     }
+                    //@ts-ignore
                     handleFilterChange(value, true);
                     handleNavigation();
                     return true; // 保留默认筛选功能
                 },
             },
             {
-                title: "浏览量",
+                title: getRes()["viewCount"],
                 key: "click",
                 dataIndex: "click",
-                width: 80,
+                width: 100,
+                sorter: true,
+                sortDirections: ["descend", "ascend"],
+                sortOrder: sorterMap["click"],
             },
             {
                 title: getRes()["commentAble"],
                 key: "canComment",
                 dataIndex: "canComment",
-                render: (v: boolean) => (v ? "是" : "否"),
+                render: (v: boolean) => (v ? getRes()["yes"] : getRes()["no"]),
                 width: 80,
             },
             {
-                title: "评论量",
+                title: getRes()["commentSize"],
                 key: "commentSize",
                 dataIndex: "commentSize",
-                width: 80,
+                width: 100,
+                sorter: true,
+                sortDirections: ["descend", "ascend"],
+                sortOrder: sorterMap["commentSize"],
             },
             {
                 title: getRes()["createTime"],
                 key: "releaseTime",
                 dataIndex: "releaseTime",
                 width: 120,
+                sorter: true,
+                sortDirections: ["ascend", "descend"],
+                sortOrder: sorterMap["releaseTime"],
             },
             {
                 title: getRes()["lastUpdateDate"],
                 key: "lastUpdateDate",
                 dataIndex: "lastUpdateDate",
                 width: 120,
+                sorter: true,
+                sortDirections: ["ascend", "descend"],
+                sortOrder: sorterMap["lastUpdateDate"],
             },
         ];
     };

@@ -11,7 +11,7 @@ import com.hibegin.http.server.api.Interceptor;
 import com.hibegin.http.server.config.RequestConfig;
 import com.hibegin.http.server.config.ResponseConfig;
 import com.hibegin.http.server.config.ServerConfig;
-import com.zaxxer.hikari.util.DriverDataSource;
+import com.zaxxer.hikari.HikariDataSource;
 import com.zrlog.admin.web.config.AdminRouters;
 import com.zrlog.admin.web.interceptor.AdminInterceptor;
 import com.zrlog.admin.web.interceptor.AdminPwaInterceptor;
@@ -48,6 +48,7 @@ import com.zrlog.web.inteceptor.StaticResourceInterceptor;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -182,13 +183,20 @@ public class ZrLogConfigImpl extends ZrLogConfig {
             return;
         }
         tryInitDbPropertiesFile();
-        Properties dbProperties = InstallUtils.getDbProp();
-        try (Connection connection = DbConnectUtils.getConnection(Objects.requireNonNull(dbProperties))) {
-            LOGGER.info("Db connect success " + connection.getCatalog());
-        }
+        Properties dbProperties = Objects.requireNonNull(InstallUtils.getDbProp());
         int newDbVersion = tryDoUpgrade(dbProperties);
         //启动时候进行数据库连接
-        DAO.setDs(new DriverDataSource(dbProperties.getProperty("jdbcUrl"), dbProperties.getProperty("driverClass"), dbProperties, dbProperties.getProperty("user"), dbProperties.getProperty("password")));
+        HikariDataSource hikariDataSource = new HikariDataSource();
+        hikariDataSource.setDataSourceProperties(dbProperties);
+        hikariDataSource.setDriverClassName(dbProperties.getProperty("driverClass"));
+        hikariDataSource.setUsername(dbProperties.getProperty("user"));
+        hikariDataSource.setPassword(dbProperties.getProperty("password"));
+        hikariDataSource.setJdbcUrl(dbProperties.getProperty("jdbcUrl"));
+        DAO.setDs(hikariDataSource);
+        //Test
+        try (Connection connection = hikariDataSource.getConnection()) {
+            LOGGER.info("Db connect success " + connection.getCatalog());
+        }
         if (newDbVersion > 0) {
             new WebSite().updateByKV(Constants.ZRLOG_SQL_VERSION_KEY, newDbVersion + "");
         }
@@ -262,8 +270,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
             }
             for (Map.Entry<Integer, List<String>> entry : sqlList) {
                 //执行需要更新的sql脚本
-                Statement statement = connection.createStatement();
-                try {
+                try (Statement statement = connection.createStatement()) {
                     for (String sql : entry.getValue()) {
                         if (StringUtils.isEmpty(sql.trim())) {
                             continue;
@@ -274,14 +281,6 @@ public class ZrLogConfigImpl extends ZrLogConfig {
                     LOGGER.log(Level.SEVERE, "execution sql ", e);
                     //有异常终止升级
                     return -1;
-                } finally {
-                    if (statement != null) {
-                        try {
-                            statement.close();
-                        } catch (SQLException e) {
-                            LOGGER.log(Level.SEVERE, "", e);
-                        }
-                    }
                 }
                 //执行需要转换的数据
                 try {

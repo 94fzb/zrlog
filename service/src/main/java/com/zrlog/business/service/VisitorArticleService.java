@@ -86,6 +86,7 @@ public class VisitorArticleService {
         pageData.setRows(dataList);
         pageData.setPage(object.getPage());
         pageData.setSize(object.getSize());
+        pageData.setSort(object.getSort());
         return pageData;
     }
 

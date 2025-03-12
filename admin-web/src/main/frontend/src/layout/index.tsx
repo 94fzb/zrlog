@@ -1,11 +1,10 @@
-import { HomeOutlined } from "@ant-design/icons";
-import { Col, Layout, Row } from "antd";
+import { HomeOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
+import { Button, Col, Layout, Row } from "antd";
 
 import { getRes } from "../utils/constants";
 import { FunctionComponent, PropsWithChildren, useEffect, useState } from "react";
 import EnvUtils from "../utils/env-utils";
 import UserInfo from "./user-info";
-import styled from "styled-components";
 import { getColorPrimary } from "../utils/constants";
 import SliderMenu from "./slider";
 import { BasicUserInfo } from "../type";
@@ -13,210 +12,12 @@ import { ssData } from "../index";
 import axios from "axios";
 import MyLoadingComponent from "../components/my-loading-component";
 import PWAHandler from "../PWAHandler";
+import StyledIndexLayout from "./styled-index-layout";
+import type { ScreenMap } from "antd/es/_util/responsiveObserver";
+import useBreakpoint from "antd/es/grid/hooks/useBreakpoint";
+import { addToCache, getCacheByKey } from "../cache";
 
 const { Header, Content, Sider } = Layout;
-
-const StyledIndexLayout = styled("div")`
-    .ant-menu-item {
-        width: 100%;
-    }
-
-    #logo {
-        height: 64px;
-        padding-left: 23px;
-        padding-right: 23px;
-        overflow: hidden;
-        font-size: 25px;
-        display: inline-flex;
-        color: #ffffff;
-    }
-
-    .ant-layout-content {
-        padding-left: 12px;
-        padding-right: 12px;
-    }
-
-    .ant-layout-footer {
-        padding: 20px;
-    }
-
-    .ant-layout-footer-copyright {
-        display: block;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .ant-layout-header {
-        padding: 0;
-    }
-
-    li.ant-menu-item > a {
-        color: #ffffff;
-    }
-
-    .ant-menu-inline,
-    .ant-menu-vertical,
-    .ant-menu-vertical-left {
-        border: 0;
-    }
-
-    li.ant-menu-item-active > a:hover {
-        color: #ffffff;
-    }
-
-    .ant-menu-item .anticon,
-    .ant-menu-submenu-title .anticon {
-        margin-top: 12px;
-        display: block;
-        font-size: 25px;
-        margin-right: 0;
-    }
-
-    .ant-menu-item > a > span,
-    .ant-menu-submenu-title > span {
-        display: block;
-        font-size: 12px;
-        margin-right: 0;
-        text-align: center !important;
-    }
-
-    .ant-menu-vertical > .ant-menu-item,
-    .ant-menu-vertical-left > .ant-menu-item,
-    .ant-menu-vertical-right > .ant-menu-item,
-    .ant-menu-inline > .ant-menu-item,
-    .ant-menu-vertical > .ant-menu-submenu > .ant-menu-submenu-title,
-    .ant-menu-vertical-left > .ant-menu-submenu > .ant-menu-submenu-title,
-    .ant-menu-vertical-right > .ant-menu-submenu > .ant-menu-submenu-title,
-    .ant-menu-inline > .ant-menu-submenu > .ant-menu-submenu-title {
-        height: 72px;
-        padding: 0;
-    }
-
-    .ant-menu-sub > .ant-menu-item {
-        font-size: 14px;
-        height: 40px;
-    }
-
-    .ant-menu-submenu {
-        height: 72px;
-    }
-
-    .ant-menu-submenu-title > i {
-        display: none;
-    }
-
-    .ant-menu-submenu-title {
-        margin: 0;
-    }
-
-    .ant-menu-submenu-title:hover {
-        color: #ffffff;
-    }
-
-    h3.page-header {
-        margin-top: 20px;
-        border-left: 3px solid ${getColorPrimary()};
-        padding-left: 5px;
-        font-size: 1.75rem;
-    }
-
-    .userAvatarImg {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-    }
-
-    .ant-menu-vertical .ant-menu-item:not(:last-child),
-    .ant-menu-vertical-left .ant-menu-item:not(:last-child),
-    .ant-menu-vertical-right .ant-menu-item:not(:last-child),
-    .ant-menu-inline .ant-menu-item:not(:last-child) {
-        margin-bottom: 0;
-    }
-
-    .ant-menu-vertical .ant-menu-item,
-    .ant-menu-vertical-left .ant-menu-item,
-    .ant-menu-vertical-right .ant-menu-item,
-    .ant-menu-inline .ant-menu-item,
-    .ant-menu-vertical .ant-menu-submenu-title,
-    .ant-menu-vertical-left .ant-menu-submenu-title,
-    .ant-menu-vertical-right .ant-menu-submenu-title,
-    .ant-menu-inline .ant-menu-submenu-title {
-        margin: 0;
-    }
-
-    .ant-upload-list {
-        display: none;
-    }
-
-    .ant-menu-submenu-title {
-        margin: 0;
-        color: white;
-        border-radius: 0;
-        width: 100%;
-    }
-
-    ul {
-        margin-bottom: 0;
-    }
-
-    .ant-menu-item .anticon,
-    .ant-menu-submenu-title .anticon {
-        font-size: 24px;
-    }
-
-    .ant-typography h3,
-    h3.ant-typography {
-        margin-bottom: 0.5em;
-        font-weight: 600;
-        font-size: 24px;
-        line-height: 1.35;
-    }
-
-    .ant-typography h4,
-    h4.ant-typography {
-        margin-bottom: 0.5em;
-        font-weight: 600;
-        font-size: 20px;
-        line-height: 1.4;
-    }
-
-    .ant-menu {
-        text-align: center;
-        box-shadow: none;
-    }
-
-    .ant-menu .menu-title {
-        margin-left: 0 !important;
-        font-size: 12px;
-    }
-
-    .ant-form-item-explain-error {
-        color: #ff4d4f;
-    }
-
-    .ant-form-item-has-error .ant-radio-group {
-        border: 1px solid #ff4d4f;
-        border-radius: 6px;
-    }
-
-    .ant-upload {
-        padding: 0 !important;
-        box-sizing: content-box;
-    }
-
-    .ant-input-search-button {
-        background-color: ${getColorPrimary()} !important;
-    }
-
-    .ant-input-search-button:hover {
-        background-color: ${getColorPrimary()} !important;
-    }
-
-    .ant-input-search-button:active {
-        background-color: ${getColorPrimary()} !important;
-    }
-`;
 
 type AdminManageLayoutProps = PropsWithChildren & {
     loading: boolean;
@@ -226,6 +27,22 @@ type AdminManageLayoutProps = PropsWithChildren & {
 
 const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ offline, children, loading, fullScreen }) => {
     const [userInfo, setUser] = useState<BasicUserInfo | undefined>(ssData?.user);
+    const screens = useBreakpoint();
+
+    const sliderStateKey = "sliderOpen";
+
+    const mobileDevice = 576;
+
+    const needCollSlider = (s: ScreenMap) => {
+        if (window.innerWidth < mobileDevice) {
+            const state = getCacheByKey(sliderStateKey);
+            return state === undefined || state === null || state;
+        }
+        return s.xs === true;
+    };
+    const [showSliderBtn, setShowSliderBtn] = useState<boolean>(window.innerWidth < mobileDevice);
+    const defaultHiddenSlider = needCollSlider(screens);
+    const [hiddenSlider, setHiddenSlider] = useState(defaultHiddenSlider);
 
     useEffect(() => {
         if (userInfo === undefined) {
@@ -239,6 +56,55 @@ const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ offline,
         return "calc(100vh - 64px)";
     };
 
+    useEffect(() => {
+        setHiddenSlider(needCollSlider(screens));
+        setShowSliderBtn(screens.xs === true);
+    }, [screens]);
+
+    if (screens.xs === undefined) {
+        return <></>;
+    }
+
+    const getMainButton = () => {
+        const home = (
+            <a
+                href={getRes()["homeUrl"] + "?spm=admin&buildId=" + getRes()["buildId"]}
+                id="logo"
+                target="_blank"
+                title={getRes()["websiteTitle"]}
+                rel="noopener noreferrer"
+            >
+                <HomeOutlined />
+            </a>
+        );
+        if (showSliderBtn) {
+            return (
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-start" }}>
+                    <div
+                        style={{
+                            textAlign: "center",
+                            width: 70,
+                            height: "100%",
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                        }}
+                        onClick={() => {
+                            const newState = !hiddenSlider;
+                            addToCache(sliderStateKey, newState);
+                            setHiddenSlider(newState);
+                        }}
+                    >
+                        <Button type="primary">{hiddenSlider ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}</Button>
+                    </div>
+                    {home}
+                </div>
+            );
+        }
+        return home;
+    };
+
     return (
         <PWAHandler>
             <StyledIndexLayout>
@@ -249,43 +115,52 @@ const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ offline,
                         backgroundColor: EnvUtils.isDarkMode() ? "#1f1f1f" : "#011529",
                     }}
                 >
-                    <a
-                        href={getRes()["homeUrl"] + "?spm=admin&buildId=" + getRes()["buildId"]}
-                        id="logo"
-                        target="_blank"
-                        title={getRes()["websiteTitle"]}
-                        rel="noopener noreferrer"
-                    >
-                        <HomeOutlined />
-                        {offline && (
-                            <span
-                                style={{
-                                    display: "inline-block",
-                                    textAlign: "center",
-                                    fontSize: 20,
-                                    paddingLeft: 24,
-                                    userSelect: "none",
-                                    color: getColorPrimary(),
-                                }}
-                            >
-                                {getRes()["admin.offline.desc"]}
-                            </span>
-                        )}
-                    </a>
+                    {getMainButton()}
+                    {offline && (
+                        <span
+                            style={{
+                                display: "inline-block",
+                                textAlign: "center",
+                                fontSize: 20,
+                                paddingLeft: 24,
+                                userSelect: "none",
+                                color: getColorPrimary(),
+                            }}
+                        >
+                            {getRes()["admin.offline.desc"]}
+                        </span>
+                    )}
                     {userInfo && <UserInfo offline={offline} data={userInfo} />}
                 </Header>
-                <Row>
+                <Row
+                    style={{
+                        transition: "all .2s ease",
+                        position: "relative",
+                        minHeight: getMainHeight(),
+                    }}
+                >
                     <Sider
-                        hidden={fullScreen}
                         width={70}
                         style={{
-                            minHeight: getMainHeight(),
+                            opacity: fullScreen || hiddenSlider ? 0 : 1,
+                            position: "absolute",
+                            left: hiddenSlider ? "-70px" : "0", // 动画控制显示隐藏
+                            height: "100%",
+                            transform: fullScreen || hiddenSlider ? "translateX(-100%)" : "translateX(0)",
                             backgroundColor: EnvUtils.isDarkMode() ? "#1f1f1f" : "#001529",
                         }}
                     >
                         <SliderMenu />
                     </Sider>
-                    <Col style={{ flex: 1, width: 100, minHeight: fullScreen ? 0 : 1 }}>
+                    <Col
+                        style={{
+                            flex: 1,
+                            width: 100,
+                            minHeight: fullScreen ? 0 : 1,
+                            transition: "margin-left .2s ease", // 动画完成后调整布局
+                            marginLeft: hiddenSlider ? 0 : 70,
+                        }}
+                    >
                         <Layout style={{ minHeight: getMainHeight(), overflow: fullScreen ? "hidden" : "auto" }}>
                             <Content
                                 style={{

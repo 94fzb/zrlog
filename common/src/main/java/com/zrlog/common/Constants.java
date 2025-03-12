@@ -83,7 +83,7 @@ public class Constants {
     public static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ssXXX";
 
 
-    public static final Integer SQL_VERSION = 18;
+    public static final Integer SQL_VERSION = 19;
 
     /**
      * 1天
@@ -192,5 +192,9 @@ public class Constants {
         }
         sj.add(I18nUtil.getAdminStringFromRes("admin.management"));
         return sj.toString();
+    }
+
+    public static String getAppId() {
+        return String.valueOf(zrLogConfig.getPublicWebSite().get("appId"));
     }
 }

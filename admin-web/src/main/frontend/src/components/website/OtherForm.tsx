@@ -38,7 +38,7 @@ const OtherForm = ({ data, offline }: { data: Other; offline: boolean }) => {
     return (
         <>
             {contextHolder}
-            <Title level={4}>ICP，网站统计等信息</Title>
+            <Title level={4}>{getRes()["admin.other.manage"]}</Title>
             <Divider />
             <Form
                 {...layout}

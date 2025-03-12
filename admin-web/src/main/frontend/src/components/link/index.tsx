@@ -20,7 +20,7 @@ const BLink = ({ data, offline }: { data: PageDataSource; offline: boolean }) =>
                 ),
             },
             {
-                title: "网站名称",
+                title: getRes()["admin.link.name"],
                 key: "linkName",
                 dataIndex: "linkName",
                 width: 240,
@@ -29,7 +29,7 @@ const BLink = ({ data, offline }: { data: PageDataSource; offline: boolean }) =>
                 },
             },
             {
-                title: "描述",
+                title: getRes()["introduction"],
                 key: "alt",
                 dataIndex: "alt",
                 width: 240,

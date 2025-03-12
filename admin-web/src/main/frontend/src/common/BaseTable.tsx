@@ -1,4 +1,4 @@
-import { message, PaginationProps, Space, Table } from "antd";
+import { message, PaginationProps, Space, Table, TableColumnsType } from "antd";
 import { FunctionComponent, useEffect, useState } from "react";
 import axios from "axios";
 import { mapToQueryString } from "../utils/helpers";
@@ -7,11 +7,12 @@ import { cacheIgnoreReloadKey, getRes } from "../utils/constants";
 import { DeleteOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import { useLocation } from "react-router";
+import { SorterResult } from "antd/es/table/interface";
 
 type BaseTableProps = {
     deleteApi: string;
     deleteSuccessCallback?: (id: number) => void;
-    columns: any[];
+    columns: TableColumnsType<any>;
     datasource?: PageDataSource;
     searchKey?: string;
     hideId?: boolean;
@@ -25,17 +26,12 @@ export type PageDataSource = {
     rows: [];
     page: number;
     key?: string;
+    sort: string[];
     size: number;
     defaultPageSize: number;
     totalElements: number;
 };
-export type ArticlePageDataSource = {
-    rows: [];
-    page: number;
-    key?: string;
-    size: number;
-    defaultPageSize: number;
-    totalElements: number;
+export type ArticlePageDataSource = PageDataSource & {
     types: Record<string, any>[];
 };
 
@@ -51,6 +47,7 @@ export type MyPagination = {
     page: number;
     size: number;
     key?: string;
+    sort: string[];
 };
 
 const BaseTable: FunctionComponent<BaseTableProps> = ({
@@ -68,12 +65,12 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
     const navigate = useNavigate();
     const location = useLocation();
 
-    const buildJumpUrl = (page: number, size: number, searchKey: string | undefined) => {
-        return buildJumpUrlFull(page, size, searchKey, -1);
+    const buildJumpUrl = (page: number, size: number, searchKey: string | undefined, sorter: string[]) => {
+        return buildJumpUrlFull(page, size, searchKey, -1, sorter);
     };
 
-    const buildJumpUrlFull = (page: number, size: number, searchKey: string | undefined, t: number) => {
-        const queryParam: Record<string, number | string> = {};
+    const buildJumpUrlFull = (page: number, size: number, searchKey: string | undefined, t: number, sort: string[]) => {
+        const queryParam: Record<string, number | string | string[]> = {};
         if (page > 1) {
             queryParam.page = page;
         }
@@ -87,25 +84,31 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
         if (t > 0) {
             queryParam[cacheIgnoreReloadKey] = t;
         }
+        if (sort.length > 0) {
+            //暂时支持一个属性进行排序
+            queryParam["sort"] = sort[0];
+        }
         const queryStr = mapToQueryString(queryParam);
+        console.info(queryStr + "===<");
         if (queryStr.length === 0) {
             return location.pathname;
         }
         return location.pathname + "?" + queryStr;
     };
 
-    const fetchData = (page: number, size: number, searchKey: string | undefined) => {
-        navigate(buildJumpUrl(page, size, searchKey));
+    const fetchData = (page: number, size: number, searchKey: string | undefined, sorter: string[]) => {
+        navigate(buildJumpUrl(page, size, searchKey, sorter));
     };
 
-    const fetchDataWithReload = (page: number, size: number, searchKey: string | undefined) => {
-        navigate(buildJumpUrlFull(page, size, searchKey, new Date().getTime()));
+    const fetchDataWithReload = (page: number, size: number, searchKey: string | undefined, sorter: string[]) => {
+        navigate(buildJumpUrlFull(page, size, searchKey, new Date().getTime(), sorter));
     };
 
     const [tableDataState, setTableDataState] = useState<TableData>({
         pagination: {
             page: datasource?.page ? datasource.page : 1,
             key: datasource?.key,
+            sort: datasource?.sort ? datasource?.sort : [],
             size: datasource?.size ? datasource?.size : defaultPageSize,
         },
         query: datasource?.key,
@@ -116,7 +119,7 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
             current: datasource?.page,
             pageSize: datasource?.size,
             onChange: (page: number, size: number) => {
-                fetchData(page, size, tableDataState.query);
+                fetchData(page, size, tableDataState.query, []);
             },
         },
     });
@@ -130,7 +133,7 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
         }
         if (response.data.error === 0) {
             messageApi.success(getRes()["deleteSuccess"]);
-            fetchDataWithReload(pagination.page, pagination.size, tableDataState.query);
+            fetchDataWithReload(pagination.page, pagination.size, tableDataState.query, tableDataState.pagination.sort);
             return true;
         }
         return false;
@@ -141,7 +144,7 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
             return;
         }
         setTableDataState({ ...tableDataState, query: searchKey });
-        fetchData(1, tableDataState.pagination.size, searchKey);
+        fetchData(1, tableDataState.pagination.size, searchKey, tableDataState.pagination.sort);
     }, [searchKey]);
 
     useEffect(() => {
@@ -152,6 +155,7 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
                 pagination: {
                     page: datasource?.page ? datasource.page : 1,
                     size: datasource?.size ? datasource.size : 10,
+                    sort: datasource?.sort ? datasource.sort : [],
                 },
                 tablePagination: {
                     current: datasource?.page,
@@ -166,7 +170,7 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
         const c = [];
         if (hideId === null || hideId === undefined || !hideId) {
             c.push({
-                title: "ID",
+                title: getRes()["id"],
                 dataIndex: "id",
                 key: "id",
                 fixed: true,
@@ -212,7 +216,8 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
                                   fetchDataWithReload(
                                       tableDataState.pagination.page,
                                       tableDataState.pagination.size,
-                                      tableDataState.query
+                                      tableDataState.query,
+                                      tableDataState.pagination.sort
                                   );
                               })
                             : null}
@@ -233,16 +238,35 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
                       fetchDataWithReload(
                           tableDataState.pagination.page,
                           tableDataState.pagination.size,
-                          tableDataState.query
+                          tableDataState.query,
+                          tableDataState.pagination.sort
                       );
                   })
                 : undefined}
             <Table
-                onChange={(pagination) => {
+                onChange={(pagination, _filter, sorter) => {
+                    const sort =
+                        (sorter as SorterResult) && (sorter as SorterResult).field
+                            ? [
+                                  (sorter as SorterResult).field +
+                                      "," +
+                                      ((sorter as SorterResult).order === "descend" ? "DESC" : "ASC"),
+                              ]
+                            : [];
+                    if (sort.length > 0) {
+                        setTableDataState({
+                            ...tableDataState,
+                            pagination: {
+                                ...tableDataState.pagination,
+                                sort: sort,
+                            },
+                        });
+                    }
                     fetchData(
                         pagination.current ? pagination.current : 1,
                         pagination.pageSize ? pagination.pageSize : 10,
-                        tableDataState.query
+                        tableDataState.query,
+                        sort
                     );
                 }}
                 style={{ minHeight: 512 }}
@@ -254,7 +278,12 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
                         return (
                             <Link
                                 key={page}
-                                to={buildJumpUrl(page, datasource?.size ? datasource.size : 10, tableDataState.query)}
+                                to={buildJumpUrl(
+                                    page,
+                                    datasource?.size ? datasource.size : 10,
+                                    tableDataState.query,
+                                    datasource?.sort ? datasource.sort : []
+                                )}
                             >
                                 {e}
                             </Link>

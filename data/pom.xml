@@ -5,10 +5,10 @@
     <parent>
         <artifactId>zrlog</artifactId>
         <groupId>com.zrlog</groupId>
-        <version>3.1.4-SNAPSHOT</version>
+        <version>3.1.4</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <version>3.1.4-SNAPSHOT</version>
+    <version>3.1.4</version>
     <artifactId>data</artifactId>
 
     <dependencies>

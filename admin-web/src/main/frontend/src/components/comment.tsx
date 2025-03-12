@@ -27,7 +27,7 @@ const Comment = ({ data, offline }: { data: PageDataSource; offline: boolean }) 
                 key: "userName",
             },
             {
-                title: "评论者主页",
+                title: getRes()["commentUserHome"],
                 key: "userHome",
                 dataIndex: "userHome",
             },
@@ -42,7 +42,7 @@ const Comment = ({ data, offline }: { data: PageDataSource; offline: boolean }) 
                 dataIndex: "userMail",
             },
             {
-                title: "评论时间",
+                title: getRes()["commentDate"],
                 key: "commTime",
                 dataIndex: "commTime",
             },

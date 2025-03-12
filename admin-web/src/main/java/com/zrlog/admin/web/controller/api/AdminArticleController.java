@@ -64,12 +64,15 @@ public class AdminArticleController extends Controller {
         return new ApiStandardResponse<>(create, getResponseMsg(create));
     }
 
-    @RefreshCache(async = true)
     @ResponseBody
     public ApiStandardResponse<CreateOrUpdateArticleResponse> update() {
         CreateOrUpdateArticleResponse update = articleService.update(AdminTokenThreadLocal.getUser(), BeanUtil.convertWithValid(getRequest().getInputStream(),
                 UpdateArticleRequest.class));
         update.setPreviewUrl(getPreviewUrl(update));
+        //为发布状态才需要更新缓存信息（避免无用更新）
+        if (Objects.nonNull(update.getRubbish()) && Objects.equals(update.getRubbish(), false)) {
+            Constants.zrLogConfig.getCacheService().refreshInitDataCacheAsync(request, true);
+        }
         return new ApiStandardResponse<>(update, getResponseMsg(update));
     }
 

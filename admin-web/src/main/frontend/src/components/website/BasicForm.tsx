@@ -1,4 +1,3 @@
-import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
 import Form from "antd/es/form";
 import Input from "antd/es/input";
@@ -10,6 +9,7 @@ import axios from "axios";
 import { message } from "antd";
 import { Basic } from "./index";
 import FaviconUpload from "./FaviconUpload";
+import Title from "antd/es/typography/Title";
 
 const layout = {
     labelCol: { span: 8 },
@@ -41,7 +41,7 @@ const BasicForm = ({ data, offline }: { data: Basic; offline: boolean }) => {
     return (
         <>
             {contextHolder}
-            <Title level={4}>认真输入，有助于网站被收录</Title>
+            <Title level={4}>{getRes()["admin.basic.manage"]}</Title>
             <Divider />
             <Form
                 {...layout}
@@ -58,7 +58,7 @@ const BasicForm = ({ data, offline }: { data: Basic; offline: boolean }) => {
                 <Form.Item name="keywords" label="网站关键词">
                     <Input showCount={true} placeholder="请输入网站关键词" maxLength={40} />
                 </Form.Item>
-                <Form.Item name="description" label="网站描述">
+                <Form.Item name="description" label={getRes()["websiteDesc"]}>
                     <TextArea showCount={true} rows={5} maxLength={160} />
                 </Form.Item>
                 <Form.Item name="favicon_ico_base64" label={`${getRes()["favicon"]}`}>

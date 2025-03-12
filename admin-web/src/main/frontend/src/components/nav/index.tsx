@@ -20,7 +20,7 @@ const Nav = ({ data, offline }: { data: PageDataSource; offline: boolean }) => {
                 ),
             },
             {
-                title: "导航名称",
+                title: getRes()["admin.nav.name"],
                 dataIndex: "navName",
                 key: "navName",
                 width: 240,
