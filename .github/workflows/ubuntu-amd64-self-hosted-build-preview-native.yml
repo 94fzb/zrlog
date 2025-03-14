@@ -6,7 +6,8 @@ on:
 jobs:
   build:
     name: ZrLog on ${{ matrix.os }} ${{ matrix.architecture }}
-    runs-on: [self-hosted, Linux, X64]
+#    runs-on: [self-hosted, Linux, X64]
+    runs-on: buildjet-2vcpu-ubuntu-2204-arm
 
     strategy:
       matrix:
