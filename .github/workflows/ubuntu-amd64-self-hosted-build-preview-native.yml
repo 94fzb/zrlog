@@ -1,4 +1,4 @@
-name: build on Linux amd64 preview native
+name: build on Linux arm64 preview native
 on:
   push:
     branches:
@@ -10,7 +10,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ ubuntu-22.04 ]
+        os: [ ubuntu-latest ]
         architecture: [ amd64 ]
     steps:
       - uses: actions/checkout@v3
