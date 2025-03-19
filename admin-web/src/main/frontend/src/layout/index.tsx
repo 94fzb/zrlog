@@ -158,7 +158,7 @@ const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ offline,
                             width: 100,
                             minHeight: fullScreen ? 0 : 1,
                             transition: "margin-left .2s ease", // 动画完成后调整布局
-                            marginLeft: hiddenSlider ? 0 : 70,
+                            marginLeft: hiddenSlider || fullScreen ? 0 : 70,
                         }}
                     >
                         <Layout style={{ minHeight: getMainHeight(), overflow: fullScreen ? "hidden" : "auto" }}>
