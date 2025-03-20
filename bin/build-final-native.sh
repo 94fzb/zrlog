@@ -22,7 +22,7 @@ else
     fileArch=$(uname -s)-$(uname -m)
 fi
 echo -e "version=${version}\nrunMode=${runMode}\nbuildId=${buildId}\nbuildTime=${Date}\nmirrorWebSite=${mirrorWebSite}" > data/src/main/resources/build.properties
-bash -e bin/package-native-${4}-zip.sh
+bash -e bin/package-native-${4}-${packageExt}.sh
 mv zrlog-${version}-${fileArch}.${packageExt}  zrlog-${fileArch}.${packageExt}
 #finnally workPath, https://dl.zrlog.com mirror folder
 syncPath=${3}
