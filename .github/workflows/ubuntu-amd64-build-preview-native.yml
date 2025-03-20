@@ -27,5 +27,5 @@ jobs:
       - name: Build and upload binary
         run: |
           mkdir -p /tmp/download
-          bash -e bin/build-final-native.sh preview 预览版 /tmp/download unix
+          bash -e bin/build-final-native.sh preview 预览版 /tmp/download ubuntu
           bash -e bin/upload-bin.sh ${{ secrets.SECRET_ID }} ${{ secrets.SECRET_KEY }} ${{ secrets.BUCKET }} /tmp/download preview

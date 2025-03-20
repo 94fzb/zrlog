@@ -12,6 +12,8 @@ mkdir -p data/src/main/resources
 # 判断操作系统类型
 if [[ "${4}" == "windows" ]]; then
     fileArch=Windows-$(uname -m)
+elif [[ "${4}" == "ubuntu" ]]; then
+    fileArch=$(uname -s)-$(dpkg --print-architecture)
 else
     fileArch=$(uname -s)-$(uname -m)
 fi
