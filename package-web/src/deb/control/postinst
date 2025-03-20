@@ -1,0 +1,33 @@
+#!/bin/bash
+set -e
+# 配置变量
+SERVICE_USER="zrlog"
+SERVICE_GROUP="proxyzrlogserver"
+USER_HOME="/nonexistent"  # 用户无需登录，设置为无效目录
+USER_SHELL="/usr/sbin/nologin"
+
+# 创建用户组
+if ! getent group "${SERVICE_GROUP}" > /dev/null; then
+    groupadd --system "${SERVICE_GROUP}"
+else
+    echo "Group ${SERVICE_GROUP} already exists"
+fi
+
+# 创建用户
+if ! id -u "${SERVICE_USER}" > /dev/null 2>&1; then
+    useradd --system --no-create-home \
+            --home "${USER_HOME}" \
+            --shell "${USER_SHELL}" \
+            --gid "${SERVICE_GROUP}" \
+            "${SERVICE_USER}"
+else
+    echo "User ${SERVICE_USER} already exists"
+fi
+
+setcap cap_net_bind_service=+ep /usr/bin/${SERVICE_USER}
+systemctl daemon-reload
+# 开始启动
+service zrlog restart
+# 开机启动
+update-rc.d zrlog defaults
+exit 0
