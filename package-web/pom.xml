@@ -19,7 +19,9 @@
         <native.maven.plugin.version>0.10.2</native.maven.plugin.version>
         <libOutputPath>lib</libOutputPath>
         <native.target>../</native.target>
-
+        <packageName>zrlog</packageName>
+        <architecture>all</architecture>
+        <gitCommitId>0000000</gitCommitId>
     </properties>
 
     <dependencies>
