@@ -1,4 +1,4 @@
-name: build on Linux arm64 preview native
+name: build on Linux arm64 preview deb
 on:
   push:
     branches:

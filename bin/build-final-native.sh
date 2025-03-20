@@ -33,6 +33,6 @@ cp zrlog-${fileArch}.${packageExt} ${zipFinalFileName}
 cp zrlog-${fileArch}.${packageExt} ${syncPath}/${zipFileName}
 zipFileSize=$(ls -ls ${zipFinalFileName} | awk '{print $6}')
 zipMd5sum=$(md5sum ${zipFinalFileName} | awk '{print $1}')
-if [["${packageExt}" == "zip"]]; then
+if [[ "${packageExt}" == "zip" ]]; then
   echo -e '{"zipMd5sum":"'${zipMd5sum}'","zipDownloadUrl":"'${mirrorWebSite}${zipFileName}'","type":"'${runModeDesc}'","version":"'${version}'","buildId":"'${buildId}'","zipFileSize":'${zipFileSize}',"releaseDate":"'${Date}'"}' > ${syncPath}/${runMode}/last.${fileArch}.version.json
 fi
