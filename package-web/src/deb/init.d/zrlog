@@ -124,7 +124,7 @@ stop() {
 
 upgrade() {
   architecture=$(dpkg --print-architecture)
-  fileName=${PROCESS_NAME}-Linux_${architecture}.deb
+  fileName=${PROCESS_NAME}-Linux-${architecture}.deb
   fullFileName=/tmp/${fileName}
   test -f "${fullFileName}" && rm "${fullFileName}"
   sudo -u $SERVICE_USER \
