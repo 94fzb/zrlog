@@ -2,7 +2,7 @@
 set -e
 # 配置变量
 SERVICE_USER="zrlog"
-SERVICE_GROUP="proxyzrlogserver"
+SERVICE_GROUP="zrlog"
 USER_HOME="/nonexistent"  # 用户无需登录，设置为无效目录
 USER_SHELL="/usr/sbin/nologin"
 
