@@ -262,6 +262,17 @@
                                                 <filemode>777</filemode>
                                             </mapper>
                                         </data>
+                                        <data>
+                                            <src>../bin/config/zrlog.properties</src>
+                                            <type>file</type>
+                                            <mapper>
+                                                <type>perm</type>
+                                                <prefix>/etc/zrlog</prefix>
+                                                <user>zrlog</user>
+                                                <group>zrlog</group>
+                                                <filemode>777</filemode>
+                                            </mapper>
+                                        </data>
                                     </dataSet>
                                 </configuration>
                             </execution>
