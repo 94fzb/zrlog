@@ -250,7 +250,7 @@
                                             </mapper>
                                         </data>
                                         <data>
-                                            <src>../zrlog/README.md</src>
+                                            <src>../README.md</src>
                                             <type>file</type>
                                             <mapper>
                                                 <type>perm</type>
