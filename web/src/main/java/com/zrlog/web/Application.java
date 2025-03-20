@@ -14,10 +14,15 @@ import com.zrlog.web.config.ZrLogConfigImpl;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.util.Objects;
 
 public class Application {
 
     static {
+        String home = System.getenv().get("ZRLOG_HOME");
+        if (Objects.nonNull(home)) {
+            PathUtil.setRootPath(home);
+        }
         System.getProperties().put("java.util.logging.SimpleFormatter.format", "%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %4$s %5$s%6$s%n");
     }
 
