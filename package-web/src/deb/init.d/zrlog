@@ -5,7 +5,7 @@
 # Required-Stop:     $local_fs $network $named $time $syslog
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Description:       Network proxy tool (server)
+# Description:       ZrLog is a blog/CMS program developed in Java
 ### END INIT INFO
 # shellcheck disable=SC2188
 if [ "$(whoami &2>/dev/null)" != "root" ] && [ "$(id -un &2>/dev/null)" != "root" ]
