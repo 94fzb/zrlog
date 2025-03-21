@@ -14,6 +14,7 @@ import com.zrlog.web.config.ZrLogConfigImpl;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.sql.SQLRecoverableException;
 import java.util.Objects;
 
 public class Application {
@@ -57,16 +58,26 @@ public class Application {
         webServerBuilder(ZrLogUtil.getPort(args), getUpdater(args)).start();
     }
 
-    public static WebServerBuilder webServerBuilder(int port, Updater updater) throws Exception {
-        Constants.zrLogConfig = new ZrLogConfigImpl(port, updater);
+    private static void configDatabaseWithRetry(int timeoutInSeconds) throws InterruptedException {
         try {
             Constants.zrLogConfig.configDatabase();
         } catch (Exception e) {
+            if (timeoutInSeconds > 0 && e instanceof SQLRecoverableException) {
+                int seekSeconds = 5;
+                Thread.sleep(seekSeconds * 1000);
+                configDatabaseWithRetry(timeoutInSeconds - seekSeconds);
+                return;
+            }
             LoggerUtil.getLogger(Application.class).warning("Config database error " + e.getMessage());
             if (!Constants.zrLogConfig.getServerConfig().isNativeImageAgent()) {
                 System.exit(-1);
             }
         }
+    }
+
+    public static WebServerBuilder webServerBuilder(int port, Updater updater) throws Exception {
+        Constants.zrLogConfig = new ZrLogConfigImpl(port, updater);
+        configDatabaseWithRetry(20);
         WebServerBuilder builder = new WebServerBuilder.Builder().config(Constants.zrLogConfig).build();
         builder.addCreateErrorHandle(() -> {
             if (updater instanceof JarUpdater) {
