@@ -253,4 +253,8 @@ public class ZrLogUtil {
         return sqlList;
     }
 
+    public static boolean isSystemServiceMode() {
+        String value = System.getenv("SYSTEM_SERVICE_MODE");
+        return "true".equalsIgnoreCase(value);
+    }
 }

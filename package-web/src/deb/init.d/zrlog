@@ -69,6 +69,7 @@ start() {
       ZRLOG_HTTP_PORT_FILE=${PORTFILE} \
       ZRLOG_DISABLE_BIND_PORT_ERROR_RETRY_ABLE="true" \
       DEV_MODE=${ENABLE_DEV_MODE} \
+      SYSTEM_SERVICE_MODE="true" \
       bash -c "/usr/bin/${PROCESS_NAME} ${VM_ARG}  </dev/null >/dev/null 2>&1 & disown"
   echo 'Service started'
 }
