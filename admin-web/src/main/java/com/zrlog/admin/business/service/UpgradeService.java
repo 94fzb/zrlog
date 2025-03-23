@@ -50,6 +50,7 @@ public class UpgradeService {
         version.setVersion(version.getVersion().replaceAll("-SNAPSHOT", ""));
         checkVersionResponse.setVersion(version);
         checkVersionResponse.setDockerMode(ZrLogUtil.isDockerMode());
+        checkVersionResponse.setSystemServiceMode(ZrLogUtil.isSystemServiceMode());
         return checkVersionResponse;
     }
 
