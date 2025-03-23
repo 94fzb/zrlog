@@ -5,11 +5,11 @@
     <parent>
         <groupId>com.zrlog</groupId>
         <artifactId>zrlog</artifactId>
-        <version>3.1.6-SNAPSHOT</version>
+        <version>3.1.5</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>package-web</artifactId>
-    <version>3.1.6-SNAPSHOT</version>
+    <version>3.1.5</version>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
