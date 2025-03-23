@@ -189,6 +189,9 @@ public class I18nUtil {
     }
 
     public static String getAdminStringFromRes(String key) {
+        if (Objects.isNull(threadLocal.get())) {
+            return "";
+        }
         return Objects.requireNonNullElse(getAdmin().get(threadLocal.get().getLocale()).get(key), "").toString();
     }
 

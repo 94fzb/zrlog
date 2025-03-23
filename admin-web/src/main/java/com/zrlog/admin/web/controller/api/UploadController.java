@@ -6,6 +6,7 @@ import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.http.annotation.ResponseBody;
 import com.hibegin.http.server.util.PathUtil;
 import com.hibegin.http.server.web.Controller;
+import com.zrlog.admin.business.exception.ArgsException;
 import com.zrlog.admin.business.rest.response.UploadFileResponse;
 import com.zrlog.admin.business.service.UploadService;
 import com.zrlog.admin.web.token.AdminTokenThreadLocal;
@@ -29,6 +30,9 @@ public class UploadController extends Controller {
         String uploadFieldName = "imgFile";
         String uri = generatorUri(uploadFieldName);
         File imgFile = request.getFile(uploadFieldName);
+        if (imgFile == null || !imgFile.exists()) {
+            throw new ArgsException("imgFile");
+        }
         String finalFilePath = PathUtil.getStaticPath() + uri;
         FileUtils.moveOrCopyFile(imgFile.toString(), finalFilePath, true);
         return new ApiStandardResponse<>(new UploadService().getCloudUrl("", uri, finalFilePath, getRequest(),

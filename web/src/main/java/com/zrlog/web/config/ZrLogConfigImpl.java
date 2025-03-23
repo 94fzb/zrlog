@@ -101,6 +101,8 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         serverConfig.setNativeImageAgent(Constants.runMode == RunMode.NATIVE_AGENT);
         serverConfig.setDisableSession(true);
         serverConfig.setPort(port);
+        serverConfig.setPidFilePathEnvKey("ZRLOG_PID_FILE");
+        serverConfig.setServerPortFilePathEnvKey("ZRLOG_HTTP_PORT_FILE");
         serverConfig.setHttpJsonMessageConverter(new ZrLogHttpJsonMessageConverter());
         serverConfig.addErrorHandle(400, new ZrLogErrorHandle(400));
         serverConfig.addErrorHandle(403, new ZrLogErrorHandle(403));

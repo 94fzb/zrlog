@@ -2,6 +2,7 @@ package com.zrlog.util;
 
 import com.hibegin.common.util.*;
 import com.hibegin.http.server.api.HttpRequest;
+import com.hibegin.http.server.config.ConfigKit;
 import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.common.Constants;
 import eu.bitwalker.useragentutils.BrowserType;
@@ -150,7 +151,7 @@ public class ZrLogUtil {
             int fileVersion = f.getKey();
             if (fileVersion > dbVersion) {
                 Map.Entry<Integer, List<String>> entry = new AbstractMap.SimpleEntry<>(fileVersion, extractExecutableSql(f.getValue()));
-                LOGGER.info("Need update sql "+ fileVersion+".sql \n" + String.join(";\n",entry.getValue()) + ";");
+                LOGGER.info("Need update sql " + fileVersion + ".sql \n" + String.join(";\n", entry.getValue()) + ";");
                 sqlList.add(entry);
             }
         }
@@ -229,10 +230,10 @@ public class ZrLogUtil {
         if (Objects.nonNull(webPort)) {
             return Integer.parseInt(webPort);
         }
-        return 8080;
+        return ConfigKit.getInt("server.port", 8080);
     }
 
-    public static List<String> extractExecutableSql(String sql){
+    public static List<String> extractExecutableSql(String sql) {
         String[] sqlArr = sql.split("\n");
         StringBuilder tempSqlStr = new StringBuilder();
         List<String> sqlList = new ArrayList<>();
@@ -252,4 +253,8 @@ public class ZrLogUtil {
         return sqlList;
     }
 
+    public static boolean isSystemServiceMode() {
+        String value = System.getenv("SYSTEM_SERVICE_MODE");
+        return "true".equalsIgnoreCase(value);
+    }
 }

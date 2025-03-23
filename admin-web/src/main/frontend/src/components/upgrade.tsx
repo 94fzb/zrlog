@@ -16,6 +16,7 @@ type UpgradeState = {
 export type UpgradeData = {
     upgrade: boolean;
     dockerMode: boolean;
+    systemServiceMode: boolean;
     preUpgradeKey: string;
     version: UpgradeVersion;
 };
@@ -146,7 +147,7 @@ const Upgrade = ({ data, offline }: { data: UpgradeData; offline: boolean }) => 
 
     const next = async () => {
         if (state.current === 0) {
-            if (data.dockerMode) {
+            if (data.dockerMode || data.systemServiceMode) {
                 await upgrade();
             } else {
                 await downloadProcess();
@@ -188,8 +189,10 @@ const Upgrade = ({ data, offline }: { data: UpgradeData; offline: boolean }) => 
 
                 <Steps current={state.current} style={{ paddingTop: 16 }}>
                     {steps.map((item) => {
-                        if (item.alias === "downloadProcess" && data.dockerMode) {
-                            return <></>;
+                        if (item.alias === "downloadProcess") {
+                            if (data.systemServiceMode || data.dockerMode) {
+                                return <></>;
+                            }
                         }
                         return <Step key={item.alias} title={item.title} />;
                     })}

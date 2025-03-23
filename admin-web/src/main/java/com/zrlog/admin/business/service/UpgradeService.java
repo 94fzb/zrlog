@@ -11,10 +11,7 @@ import com.zrlog.admin.business.rest.response.CheckVersionResponse;
 import com.zrlog.admin.business.rest.response.DownloadUpdatePackageResponse;
 import com.zrlog.admin.business.rest.response.PreCheckVersionResponse;
 import com.zrlog.admin.business.rest.response.UpgradeProcessResponse;
-import com.zrlog.admin.web.plugin.DockerUpdateVersionHandle;
-import com.zrlog.admin.web.plugin.UpdateVersionHandler;
-import com.zrlog.admin.web.plugin.UpdateVersionPlugin;
-import com.zrlog.admin.web.plugin.ZipUpdateVersionHandle;
+import com.zrlog.admin.web.plugin.*;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.Version;
 import com.zrlog.util.I18nUtil;
@@ -53,6 +50,7 @@ public class UpgradeService {
         version.setVersion(version.getVersion().replaceAll("-SNAPSHOT", ""));
         checkVersionResponse.setVersion(version);
         checkVersionResponse.setDockerMode(ZrLogUtil.isDockerMode());
+        checkVersionResponse.setSystemServiceMode(ZrLogUtil.isSystemServiceMode());
         return checkVersionResponse;
     }
 
@@ -131,6 +129,8 @@ public class UpgradeService {
         }
         if (ZrLogUtil.isDockerMode()) {
             updateVersionHandler = new DockerUpdateVersionHandle(I18nUtil.getBackend());
+        } else if(ZrLogUtil.isSystemServiceMode()) {
+            updateVersionHandler = new SystemServiceUpdateVersionHandle(I18nUtil.getBackend());
         } else {
             HttpFileHandle handle = downloadProcessHandleMap.get(preUpgradeKey);
             if (handle == null) {

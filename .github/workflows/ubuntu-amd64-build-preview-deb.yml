@@ -1,4 +1,4 @@
-name: build on Linux amd64 preview native
+name: build on Linux arm64 preview deb
 on:
   push:
     branches:
@@ -6,6 +6,8 @@ on:
 jobs:
   build:
     name: ZrLog on ${{ matrix.os }} ${{ matrix.architecture }}
+#    runs-on: [self-hosted, Linux, X64]
+#    runs-on: buildjet-4vcpu-ubuntu-2204-arm
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -27,5 +29,5 @@ jobs:
       - name: Build and upload binary
         run: |
           mkdir -p /tmp/download
-          bash -e bin/build-final-native.sh preview 预览版 /tmp/download ubuntu
+          bash -e bin/build-final-native.sh preview 预览版 /tmp/download deb
           bash -e bin/upload-bin.sh ${{ secrets.SECRET_ID }} ${{ secrets.SECRET_KEY }} ${{ secrets.BUCKET }} /tmp/download preview
