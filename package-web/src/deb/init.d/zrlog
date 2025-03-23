@@ -20,6 +20,7 @@ PIDFILE=/var/run/${PROCESS_NAME}/${PROCESS_NAME}.pid
 PORTFILE=/var/run/${PROCESS_NAME}/http-${PROCESS_NAME}.port
 STOP_SCHEDULE="${STOP_SCHEDULE:-QUIT/1/TERM/5/KILL/1}"
 ENABLE_DEV_MODE='false'
+UPGRADE_VERSION='release'
 configFile="/etc/${PROCESS_NAME}/${PROCESS_NAME}.properties"
 
 prop() {
@@ -128,7 +129,7 @@ upgrade() {
   fullFileName=/tmp/${fileName}
   test -f "${fullFileName}" && rm "${fullFileName}"
   sudo -u $SERVICE_USER \
-    bash -c "wget -q --show-progress https://dl.zrlog.com/release/${fileName} -O ${fullFileName}"
+    bash -c "wget -q --show-progress https://dl.zrlog.com/${UPGRADE_VERSION}/${fileName} -O ${fullFileName}"
   dpkg -i "${fullFileName}"
   exit 0
 }
@@ -165,6 +166,11 @@ case "$1" in
     backup
     upgrade
     ;;
+  upgrade-preview)
+    backup
+    UPGRADE_VERSION="preview"
+    upgrade
+    ;;
   *)
-    echo "Usage: $0 {start|force-start|start-dev|stop|reload|restart|upgrade|dump|dev}"
+    echo "Usage: $0 {start|force-start|start-dev|stop|reload|restart|upgrade|upgrade-preview|dump|dev}"
 esac
