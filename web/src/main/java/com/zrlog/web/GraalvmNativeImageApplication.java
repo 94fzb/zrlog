@@ -21,6 +21,10 @@ import java.io.InputStreamReader;
 public class GraalvmNativeImageApplication {
 
 
+    static {
+        Application.initZrLogEnv();
+    }
+
     private static String getWindowsExecutablePath() {
         try {
             Process process = Runtime.getRuntime().exec("cmd /c wmic process where processid=" + Pid.get() + " get ExecutablePath");

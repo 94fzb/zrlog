@@ -20,6 +20,10 @@ import java.util.Objects;
 public class Application {
 
     static {
+        initZrLogEnv();
+    }
+
+    public static void initZrLogEnv() {
         String home = System.getenv().get("ZRLOG_HOME");
         if (Objects.nonNull(home)) {
             PathUtil.setRootPath(home);
