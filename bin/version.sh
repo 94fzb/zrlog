@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 baseVersion=3.1
 releaseVersion=${baseVersion}.${1}
 nextVersion=${baseVersion}.$((${1}+1))-SNAPSHOT
