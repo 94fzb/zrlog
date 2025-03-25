@@ -58,7 +58,13 @@ const Index = ({ offline }: { offline: boolean }) => {
                     }
                     const redirectFrom = query.get("redirectFrom") as string;
                     if (redirectFrom !== null && redirectFrom !== "") {
-                        navigate(decodeURIComponent(redirectFrom).replace("/admin", ""), { replace: true });
+                        const jumpTo = decodeURIComponent(redirectFrom);
+                        //处理非 https iframe 跳转登录问题
+                        if (jumpTo.startsWith("/admin/plugins/")) {
+                            window.location.href = window.location.protocol + "//" + window.location.host + jumpTo;
+                        } else {
+                            navigate(jumpTo.replace("/admin", ""), { replace: true });
+                        }
                     } else {
                         navigate("/index", { replace: true });
                     }
