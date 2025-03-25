@@ -4,7 +4,6 @@ import com.hibegin.common.util.ParseArgsUtil;
 import com.hibegin.common.util.Pid;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.server.WebServerBuilder;
-import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.business.service.NativeImageUpdater;
 import com.zrlog.common.Constants;
 import com.zrlog.common.type.RunMode;
@@ -43,16 +42,14 @@ public class GraalvmNativeImageApplication {
     }
 
     public static void main(String[] args) throws Exception {
+        Constants.runMode = RunMode.NATIVE;
         String envBinFile = System.getenv("_");
         if (StringUtils.isEmpty(envBinFile)) {
             envBinFile = getWindowsExecutablePath();
         }
         String execFile = envBinFile.replace("./", "");
-        Constants.runMode = RunMode.NATIVE;
-        String runtimeRoot = System.getProperty("user.dir");
-        PathUtil.setRootPath(runtimeRoot);
-        if (!execFile.startsWith(runtimeRoot)) {
-            execFile = new File(PathUtil.getRootPath() + "/" + execFile).toString();
+        if (!execFile.startsWith(Constants.getZrLogHome())) {
+            execFile = new File(Constants.getZrLogHome() + "/" + execFile).toString();
         }
         //parse args
         if (ParseArgsUtil.justTips(args, new File(execFile).getName(), BlogBuildInfoUtil.getVersionInfoFull())) {

@@ -17,14 +17,17 @@ import java.net.URISyntaxException;
 import java.sql.SQLRecoverableException;
 import java.util.Objects;
 
+import static com.zrlog.common.Constants.getZrLogHomeByEnv;
+
 public class Application {
+
 
     static {
         initZrLogEnv();
     }
 
     public static void initZrLogEnv() {
-        String home = System.getenv().get("ZRLOG_HOME");
+        String home = getZrLogHomeByEnv();
         if (Objects.nonNull(home)) {
             PathUtil.setRootPath(home);
         }

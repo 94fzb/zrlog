@@ -39,6 +39,19 @@ public class Constants {
         return os + "-" + System.getProperty("os.arch").replace("aarch64", "arm64");
     }
 
+    public static String getZrLogHomeByEnv() {
+        return System.getenv().get("ZRLOG_HOME");
+    }
+
+
+    public static String getZrLogHome() {
+        if (Constants.getZrLogHomeByEnv() == null) {
+            return System.getProperty("user.dir");
+        } else {
+            return Constants.getZrLogHomeByEnv();
+        }
+    }
+
     public static void setLastAccessTime(long lastAccessTime) {
         Constants.lastAccessTime = lastAccessTime;
     }
