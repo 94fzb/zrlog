@@ -63,7 +63,7 @@ const AppBase = () => {
     }, []);
 
     if (!appState.resLoaded) {
-        return <Spin delay={1000}/>;
+        return <Spin fullscreen delay={1000}/>;
     }
 
     return (
