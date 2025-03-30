@@ -1,17 +1,17 @@
 import * as serviceWorker from "./serviceWorker";
 import zh_CN from "antd/es/locale/zh_CN";
 import en_US from "antd/es/locale/en_US";
-import { App, ConfigProvider, Spin, theme } from "antd";
-import { BrowserRouter } from "react-router-dom";
-import EnvUtils, { isOffline } from "./utils/env-utils";
+import {App, ConfigProvider, Spin, theme} from "antd";
+import {BrowserRouter} from "react-router-dom";
+import EnvUtils, {isOffline} from "./utils/env-utils";
 import AppBase from "./AppBase";
-import { legacyLogicalPropertiesTransformer, StyleProvider } from "@ant-design/cssinjs";
-import { useEffect, useState } from "react";
-import { createRoot } from "react-dom/client";
-import { getColorPrimary, getRes, setRes } from "./utils/constants";
+import {legacyLogicalPropertiesTransformer, StyleProvider} from "@ant-design/cssinjs";
+import {useEffect, useState} from "react";
+import {createRoot} from "react-dom/client";
+import {getColorPrimary, getRes, setRes} from "./utils/constants";
 
 import axios from "axios";
-import { BasicUserInfo } from "./type";
+import {BasicUserInfo} from "./type";
 import UnknownErrorPage from "./components/unknown-error-page";
 
 const url = new URL(document.baseURI);
@@ -19,7 +19,7 @@ export const basePath = url.pathname + "admin/";
 export const apiBasePath = url.pathname + "api/admin/";
 
 axios.defaults.baseURL = document.baseURI;
-const { darkAlgorithm, defaultAlgorithm } = theme;
+const {darkAlgorithm, defaultAlgorithm} = theme;
 
 type AppState = {
     resLoaded: boolean;
@@ -69,7 +69,7 @@ const Index = () => {
         const resourceApi = "/api/public/adminResource";
         axios
             .get(resourceApi)
-            .then(({ data }: { data: Record<string, any> }) => {
+            .then(({data}: { data: Record<string, any> }) => {
                 handleRes(data.data);
             })
             .catch((e) => {
@@ -135,6 +135,19 @@ const Index = () => {
         };
     }, []);
 
+    const getBody = () => {
+        if (appState.resLoaded) {
+            return <AppBase offline={appState.offline}/>
+        } else if (appState.resLoadErrorMsg.length === 0) {
+            return <Spin delay={1000} fullscreen={true}/>;
+        }
+        return <UnknownErrorPage
+            code={500}
+            data={{message: appState.resLoadErrorMsg}}
+            style={{width: "100vw", height: "100vh"}}
+        />
+    }
+
     return (
         <ConfigProvider
             locale={appState.lang.startsWith("zh") ? zh_CN : en_US}
@@ -171,19 +184,7 @@ const Index = () => {
                             v7_startTransition: true,
                         }}
                     >
-                        {appState.resLoaded ? (
-                            <AppBase offline={appState.offline} />
-                        ) : appState.resLoadErrorMsg.length === 0 ? (
-                            <Spin delay={1000} style={{ maxHeight: "100vh" }}>
-                                <div style={{ width: "100vw", height: "100vh" }}></div>
-                            </Spin>
-                        ) : (
-                            <UnknownErrorPage
-                                code={500}
-                                data={{ message: appState.resLoadErrorMsg }}
-                                style={{ width: "100vw", height: "100vh" }}
-                            />
-                        )}
+                        {getBody()}
                     </BrowserRouter>
                 </StyleProvider>
             </App>
@@ -193,7 +194,7 @@ const Index = () => {
 
 const container = document.getElementById("app");
 const root = createRoot(container!); // createRoot(container!) if you use TypeScript
-root.render(<Index />);
+root.render(<Index/>);
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://bit.ly/CRA-PWA
