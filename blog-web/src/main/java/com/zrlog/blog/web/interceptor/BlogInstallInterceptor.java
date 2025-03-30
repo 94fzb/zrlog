@@ -12,7 +12,9 @@ import java.util.Objects;
 public class BlogInstallInterceptor implements HandleAbleInterceptor {
     @Override
     public boolean isHandleAble(HttpRequest request) {
-        return Objects.equals(request.getUri(), "/install") || request.getUri().startsWith("/api/install/");
+        return Objects.equals(request.getUri(), "/install") ||
+                request.getUri().startsWith("/api/install/") ||
+                request.getUri().startsWith("/api/public/installResource");
     }
 
     @Override

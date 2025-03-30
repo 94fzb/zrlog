@@ -5,6 +5,7 @@ import axios from "axios";
 import Text from "antd/es/typography/Text";
 import {getRes} from "../utils/constants";
 import {mapToQueryString} from "../utils/helpers";
+import DisclaimerAgreement from "./DisclaimerAgreement";
 
 const FormItem = Form.Item;
 const {Title} = Typography;
@@ -16,11 +17,13 @@ const {Step} = Steps;
 const formItemLayout = {
     labelCol: {
         xs: {span: 24},
-        sm: {span: 4},
+        sm: {span: 6},
+        md: {span: 4},
     },
     wrapperCol: {
         xs: {span: 24},
-        sm: {span: 8},
+        sm: {span: 12},
+        md: {span: 8},
     },
 };
 
@@ -50,6 +53,8 @@ const IndexLayout = () => {
     const getSteps = () => {
         return [
             {
+                title: getRes()['installAgreement'],
+            }, {
                 title: getRes()['installDatabaseInfo'],
             }, {
                 title: getRes()['installWebSiteInfo']
@@ -94,6 +99,10 @@ const IndexLayout = () => {
 
     const next = () => {
         if (state.current === 0) {
+            const current = state.current + 1;
+            setState({...state, current: current});
+        }
+        if (state.current === 1) {
             setState({...state, testConnecting: true})
             axios.get("/api/install/testDbConn?" + mapToQueryString(state.dataBaseInfo)).then(({data}) => {
                 if (!data.error) {
@@ -104,7 +113,7 @@ const IndexLayout = () => {
                     setState({...state, testConnecting: false})
                 }
             })
-        } else if (state.current === 1) {
+        } else if (state.current === 2) {
             setState({...state, installing: true})
             axios.post("/api/install/startInstall", mapToQueryString({
                 ...state.dataBaseInfo,
@@ -134,6 +143,18 @@ const IndexLayout = () => {
         return <></>
     }
 
+    const showFeedback = () => {
+        if (state.current === 1 || state.current === 2) {
+            return <>
+                <Divider/>
+                <Title level={4} style={{textAlign: "center", marginTop: '20px'}}>
+                    <div dangerouslySetInnerHTML={{__html: getRes().installFeedback}}/>
+                </Title>
+            </>
+        }
+        return <></>
+    }
+
 
     return (
         <Layout style={{
@@ -142,7 +163,7 @@ const IndexLayout = () => {
         }}>
             <Card title={getRes().installWizard} className='container' style={{
                 marginTop: 32, marginBottom: 32, width: "100%",
-                maxWidth: "1140px"
+                maxWidth: "960px"
             }}>
                 {state.installed && (
                     <Title level={3} type={"danger"}
@@ -164,7 +185,8 @@ const IndexLayout = () => {
                             ))}
                         </Steps>
                         <div className="steps-content" style={{marginTop: '20px'}}>
-                            {state.current === 0 && (
+                            {state.current === 0 && <DisclaimerAgreement/>}
+                            {state.current === 1 && (
                                 <Form ref={formDataBaseInfoRef} {...formItemLayout}
                                       onValuesChange={(k: any, v: any) => setDatabaseValue(k, v)}>
                                     <div>
@@ -201,7 +223,7 @@ const IndexLayout = () => {
                                     </FormItem>
                                 </Form>
                             )}
-                            {state.current === 1 && (
+                            {state.current === 2 && (
                                 <Form ref={formWeblogInfoRef} {...formItemLayout}
                                       onValuesChange={(k: Record<string, string | number>, v: Record<string, string | number>) => setWeblogValue(k, v)}>
                                     <Title level={3}>{getRes().installInputWebSiteInfo}</Title>
@@ -226,7 +248,7 @@ const IndexLayout = () => {
                                     </FormItem>
                                 </Form>
                             )}
-                            {state.current === 2 && (
+                            {state.current === 3 && (
                                 <div style={{textAlign: 'center'}}>
                                     <Title level={3} type='success'>{getRes().installSuccess}</Title>
                                     <a href={document.baseURI}>{getRes().installSuccessView}</a>
@@ -235,11 +257,16 @@ const IndexLayout = () => {
                         </div>
                         <div className="steps-action" style={{paddingTop: '20px'}}>
                             {state.current === 0 && (
+                                <Button type="primary" onClick={() => next()}>
+                                    {getRes().installAgreementNext}
+                                </Button>
+                            )}
+                            {state.current === 1 && (
                                 <Button loading={state.testConnecting} type="primary" onClick={() => next()}>
                                     {getRes().installNextStep}
                                 </Button>
                             )}
-                            {state.current === 1 && (
+                            {state.current === 2 && (
                                 <>
                                     <Button loading={state.installing} type="primary" onClick={() => next()}>
                                         {getRes().installNextStep}
@@ -252,10 +279,7 @@ const IndexLayout = () => {
                         </div>
                     </>
                 )}
-                <Divider/>
-                <Title level={4} style={{textAlign: "center", marginTop: '20px'}}>
-                    <div dangerouslySetInnerHTML={{__html: getRes().installFeedback}}/>
-                </Title>
+                {showFeedback()}
             </Card>
             <Footer style={{textAlign: 'center'}}><span
                 dangerouslySetInnerHTML={{__html: getRes().copyrightTips}}/> .

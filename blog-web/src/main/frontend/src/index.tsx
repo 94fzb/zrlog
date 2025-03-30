@@ -1,4 +1,3 @@
-import * as serviceWorker from "./serviceWorker";
 import zh_CN from "antd/es/locale/zh_CN";
 import {App, ConfigProvider, theme} from "antd";
 import AppBase from "./AppBase";
@@ -45,7 +44,3 @@ const Index = () => {
 const container = document.getElementById("app");
 const root = createRoot(container!); // createRoot(container!) if you use TypeScript
 root.render(<Index/>);
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
