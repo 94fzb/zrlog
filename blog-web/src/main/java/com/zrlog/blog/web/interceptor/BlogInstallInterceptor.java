@@ -20,7 +20,7 @@ public class BlogInstallInterceptor implements HandleAbleInterceptor {
     @Override
     public boolean doInterceptor(HttpRequest request, HttpResponse response) throws Exception {
         String target = request.getUri();
-        if (target.startsWith("/api/") && InstallUtils.isInstalled()) {
+        if (target.startsWith("/api/install/") && InstallUtils.isInstalled()) {
             throw new InstalledException();
         }
         new MethodInterceptor().doInterceptor(request, response);
