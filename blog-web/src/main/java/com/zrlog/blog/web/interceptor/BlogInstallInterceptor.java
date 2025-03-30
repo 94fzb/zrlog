@@ -13,14 +13,14 @@ public class BlogInstallInterceptor implements HandleAbleInterceptor {
     @Override
     public boolean isHandleAble(HttpRequest request) {
         return Objects.equals(request.getUri(), "/install") ||
-                request.getUri().startsWith("/api/install/") ||
-                request.getUri().startsWith("/api/public/installResource");
+                Objects.equals(request.getUri(),"/api/public/installResource") ||
+                request.getUri().startsWith("/api/install/");
     }
 
     @Override
     public boolean doInterceptor(HttpRequest request, HttpResponse response) throws Exception {
         String target = request.getUri();
-        if (target.startsWith("/api/install/") && InstallUtils.isInstalled()) {
+        if (target.startsWith("/api/") && InstallUtils.isInstalled()) {
             throw new InstalledException();
         }
         new MethodInterceptor().doInterceptor(request, response);
