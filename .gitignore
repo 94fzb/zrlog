@@ -20,8 +20,8 @@ conf/plugins/*
 web/log
 web/logs
 rebel.xml
-*.jar
-!.mvn/wrapper/maven-wrapper.jar
+lib/*.jar
+zrlog-starter.jar
 *.hprof
 log/
 web/sim.pid
