@@ -8,7 +8,7 @@ import { getColorPrimary, getRes } from "../../utils/constants";
 import { ReactElement, useEffect, useRef, useState } from "react";
 import BaseTable, { ArticlePageDataSource } from "../../common/BaseTable";
 import { Link } from "react-router-dom";
-import { deleteCacheDataByKey } from "../../cache";
+import { removeCacheDataByKey } from "../../cache";
 import { useLocation } from "react-router";
 import { SortOrder } from "antd/es/table/interface";
 import type * as React from "react";
@@ -271,7 +271,7 @@ const Index = ({ data, offline }: { data: ArticlePageDataSource; offline: boolea
                     </Link>
                 )}
                 deleteSuccessCallback={(id) => {
-                    deleteCacheDataByKey("/article-edit?id=" + id);
+                    removeCacheDataByKey("/article-edit?id=" + id);
                 }}
                 deleteApi={getDeleteApiUri()}
                 searchKey={searchKey}

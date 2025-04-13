@@ -20,8 +20,8 @@ import ArticleEditActionBar from "./article-edit-action-bar";
 import {
     articleDataToState,
     articleSaveToCache,
-    deleteArticleCacheWithPageCache,
-    deleteLocalArticleCache,
+    removeArticleCacheWithPageCache,
+    removeLocalArticleCache,
 } from "../../utils/article-cache";
 import ArticleEditFullscreenButton from "./article-edit-fullscreen-button";
 import { auditTime, concatMap, Subject, tap } from "rxjs";
@@ -251,7 +251,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                     url.searchParams.set("id", respData.logId);
                     window.history.replaceState(null, "", url.toString());
                     newArticle = { ...newArticle, ...respData };
-                    deleteLocalArticleCache();
+                    removeLocalArticleCache();
                 } else {
                     newArticle = {
                         ...newArticle,
@@ -260,7 +260,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                         version: respData.version,
                     };
                 }
-                deleteArticleCacheWithPageCache(newArticle, location);
+                removeArticleCacheWithPageCache(newArticle, location);
             }
         } finally {
             // 根据 release 的值调用对应的状态更新回调函数

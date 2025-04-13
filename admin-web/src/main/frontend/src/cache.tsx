@@ -1,9 +1,9 @@
 // @ts-ignore
-import { ModeOfOperation } from "aes-js";
-import { ssData } from "./index";
-import { isPWA } from "./utils/env-utils";
-import { removeQueryParam } from "./utils/helpers";
-import { cacheIgnoreReloadKey } from "./utils/constants";
+import {ModeOfOperation} from "aes-js";
+import {ssData} from "./index";
+import {isPWA} from "./utils/env-utils";
+import {removeQueryParam} from "./utils/helpers";
+import {cacheIgnoreReloadKey} from "./utils/constants";
 import * as H from "history";
 
 // AES加密函数
@@ -84,7 +84,7 @@ function padStringToLength(str: string, length: number, paddingChar: string = " 
 }
 
 export const removePageCacheByLocation = (location: H.Location) => {
-    deleteCacheDataByKey(getPageDataCacheKey(location));
+    removeCacheDataByKey(getPageDataCacheKey(location));
 };
 
 export const getPageDataCacheKey = (location: H.Location) => {
@@ -102,6 +102,14 @@ export const getCachedData = (): Record<string, any> => {
     }
     return {};
 };
+
+export const removeAllCaches = () => {
+    try {
+        localStorage.removeItem(getCacheKey());
+    } catch (e) {
+        console.error(e);
+    }
+}
 
 export const putCache = (cache: Record<string, any>) => {
     try {
@@ -122,7 +130,7 @@ export const getCacheByKey = (key: string) => {
     return record[key];
 };
 
-export const deleteCacheDataByKey = (key: string) => {
+export const removeCacheDataByKey = (key: string) => {
     const data: Record<string, any> = getCachedData();
     //console.info("deleted -> " + key + ":" + JSON.stringify(data[key]));
     delete data[key];

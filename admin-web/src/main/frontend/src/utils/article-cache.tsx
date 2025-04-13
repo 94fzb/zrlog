@@ -1,5 +1,5 @@
 import { ArticleEditInfo, ArticleEditState, ArticleEntry } from "../components/articleEdit/index.types";
-import { addToCache, deleteCacheDataByKey, getCacheByKey, removePageCacheByLocation } from "../cache";
+import { addToCache, removeCacheDataByKey, getCacheByKey, removePageCacheByLocation } from "../cache";
 import * as H from "history";
 
 const buildCacheKey = (logId: number | undefined | null) => {
@@ -53,11 +53,11 @@ export const articleSaveToCache = (article: ArticleEntry) => {
     addToCache(buildCacheKey(article.logId), article);
 };
 
-export const deleteArticleCacheWithPageCache = (article: ArticleEntry, location: H.Location) => {
-    deleteCacheDataByKey(buildCacheKey(article.logId));
+export const removeArticleCacheWithPageCache = (article: ArticleEntry, location: H.Location) => {
+    removeCacheDataByKey(buildCacheKey(article.logId));
     removePageCacheByLocation(location);
 };
 
-export const deleteLocalArticleCache = () => {
-    deleteCacheDataByKey(buildCacheKey(null));
+export const removeLocalArticleCache = () => {
+    removeCacheDataByKey(buildCacheKey(null));
 };
