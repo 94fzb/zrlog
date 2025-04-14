@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.http.server.web.Controller;
 import com.zrlog.business.service.CommonService;
+import com.zrlog.business.util.InstallUtils;
 import com.zrlog.common.Constants;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -35,7 +36,11 @@ public class InstallController extends Controller {
         Objects.requireNonNull(document.selectFirst("base")).attr("href", "/");
         Map<String, Object> stringObjectMap = new CommonService().installResourceInfo(getRequest());
         Objects.requireNonNull(document.getElementById("resourceInfo")).text(new Gson().toJson(stringObjectMap));
-        document.title(String.valueOf(stringObjectMap.get("installWizard")));
+        if (InstallUtils.isInstalled()) {
+            document.title(String.valueOf(stringObjectMap.get("installedTitle")));
+        } else {
+            document.title(String.valueOf(stringObjectMap.get("installWizard")));
+        }
         String html = document.html();
         response.renderHtmlStr(html);
     }
