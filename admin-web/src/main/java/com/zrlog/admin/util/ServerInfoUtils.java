@@ -13,6 +13,8 @@ import com.zrlog.util.I18nUtil;
 
 import java.io.File;
 import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
+import java.lang.management.MemoryUsage;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -58,9 +60,12 @@ public class ServerInfoUtils {
             allFileList.addAll(cacheFileList);
             // 获取堆内存的使用情况
             OperatingSystemMXBean osMXBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+            MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
+            MemoryUsage heapMemoryUsage = memoryMXBean.getHeapMemoryUsage();
+
             systemInfo.add(new ServerInfo(I18nUtil.getBackendStringFromRes("serverInfo.usedCacheSpace"), formatFileSize(cacheFileList.stream().mapToLong(File::length).sum()), "usedCacheSpace"));
             systemInfo.add(new ServerInfo(I18nUtil.getBackendStringFromRes("serverInfo.usedDiskSpace"), formatFileSize(allFileList.stream().mapToLong(File::length).sum()), "usedDiskSpace"));
-            systemInfo.add(new ServerInfo(I18nUtil.getBackendStringFromRes("serverInfo.usedMemorySpace"), formatFileSize(Runtime.getRuntime().freeMemory()), "usedMemorySpace"));
+            systemInfo.add(new ServerInfo(I18nUtil.getBackendStringFromRes("serverInfo.usedMemorySpace"), formatFileSize(heapMemoryUsage.getUsed()), "usedMemorySpace"));
             systemInfo.add(new ServerInfo(I18nUtil.getBackendStringFromRes("serverInfo.totalMemorySpace"), formatFileSize(osMXBean.getTotalMemorySize()), "totalMemorySpace"));
             systemInfo.add(new ServerInfo(I18nUtil.getBackendStringFromRes("serverInfo.cpuLoad"), CPUInfo.instance.getCpuLoad(), "cpuLoad"));
             systemInfo.add(new ServerInfo(I18nUtil.getBackendStringFromRes("serverInfo.systemLoad"), SystemLoad.getSystemLoad(), "systemLoad"));
@@ -69,7 +74,7 @@ public class ServerInfoUtils {
             systemInfo.add(new ServerInfo(I18nUtil.getBackendStringFromRes("serverInfo.uptime"), Constants.zrLogConfig.getProgramUptime(), "uptime"));
             return systemInfo;
         } catch (Exception e) {
-            LoggerUtil.getLogger(AdminController.class).warning("Load used disk info error " + e.getMessage());
+            LoggerUtil.getLogger(AdminController.class).warning("Load server info error " + e.getMessage());
         }
         return systemInfo;
     }
