@@ -35,6 +35,13 @@ public class ServerInfoUtils {
         return systemInfo;
     }
 
+    private static long getUsedMemory() {
+        Runtime runtime = Runtime.getRuntime();
+        long total = runtime.totalMemory();
+        long free = runtime.freeMemory();
+        return total - free;
+    }
+
     public static List<ServerInfo> getServerInfos2() {
         List<File> allFileList = new ArrayList<>();
         List<ServerInfo> systemInfo = new ArrayList<>();
@@ -65,7 +72,7 @@ public class ServerInfoUtils {
 
             systemInfo.add(new ServerInfo(I18nUtil.getBackendStringFromRes("serverInfo.usedCacheSpace"), formatFileSize(cacheFileList.stream().mapToLong(File::length).sum()), "usedCacheSpace"));
             systemInfo.add(new ServerInfo(I18nUtil.getBackendStringFromRes("serverInfo.usedDiskSpace"), formatFileSize(allFileList.stream().mapToLong(File::length).sum()), "usedDiskSpace"));
-            systemInfo.add(new ServerInfo(I18nUtil.getBackendStringFromRes("serverInfo.usedMemorySpace"), formatFileSize(heapMemoryUsage.getUsed()), "usedMemorySpace"));
+            systemInfo.add(new ServerInfo(I18nUtil.getBackendStringFromRes("serverInfo.usedMemorySpace"), formatFileSize(getUsedMemory()), "usedMemorySpace"));
             systemInfo.add(new ServerInfo(I18nUtil.getBackendStringFromRes("serverInfo.totalMemorySpace"), formatFileSize(osMXBean.getTotalMemorySize()), "totalMemorySpace"));
             systemInfo.add(new ServerInfo(I18nUtil.getBackendStringFromRes("serverInfo.cpuLoad"), CPUInfo.instance.getCpuLoad(), "cpuLoad"));
             systemInfo.add(new ServerInfo(I18nUtil.getBackendStringFromRes("serverInfo.systemLoad"), SystemLoad.getSystemLoad(), "systemLoad"));
