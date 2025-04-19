@@ -39,6 +39,7 @@ const ServerInfo = ({
                             </Col>
                         )}
                         <Typography.Text
+                            style={{fontSize: 18}}
                             ellipsis={true}
                         >
                             {e}
