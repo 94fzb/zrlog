@@ -1,10 +1,10 @@
 package com.zrlog.common;
 
 import com.hibegin.http.server.config.AbstractServerConfig;
+import com.zrlog.common.vo.DatabaseConnectPoolInfo;
 import com.zrlog.plugin.Plugins;
 
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 
 public abstract class ZrLogConfig extends AbstractServerConfig {
@@ -26,4 +26,6 @@ public abstract class ZrLogConfig extends AbstractServerConfig {
     public abstract Map<String, Object> getPublicWebSite();
 
     public abstract String getProgramUptime();
+
+    public abstract DatabaseConnectPoolInfo getDatabaseConnectPoolInfo();
 }

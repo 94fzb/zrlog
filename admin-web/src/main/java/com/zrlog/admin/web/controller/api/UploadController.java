@@ -2,26 +2,19 @@ package com.zrlog.admin.web.controller.api;
 
 import com.hibegin.common.util.FileUtils;
 import com.hibegin.common.util.IOUtil;
-import com.hibegin.common.util.SecurityUtils;
 import com.hibegin.http.annotation.ResponseBody;
-import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.util.PathUtil;
 import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.exception.ArgsException;
 import com.zrlog.admin.business.rest.response.UploadFileResponse;
 import com.zrlog.admin.business.service.UploadService;
 import com.zrlog.admin.web.token.AdminTokenThreadLocal;
-import com.zrlog.common.Constants;
 import com.zrlog.common.rest.response.ApiStandardResponse;
-import com.zrlog.util.UploadFileUtils;
+import com.zrlog.admin.util.UploadFileUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Objects;
-import java.util.StringJoiner;
 
 public class UploadController extends Controller {
 

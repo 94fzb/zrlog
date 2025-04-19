@@ -1,7 +1,12 @@
-package com.zrlog.util;
+package com.zrlog.admin.util;
+
+import com.sun.management.OperatingSystemMXBean;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.lang.management.ManagementFactory;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class CPUInfo {
 
@@ -67,5 +72,10 @@ public class CPUInfo {
         }
 
         return "Unable to retrieve CPU model"; // 如果无法获取 CPU 型号
+    }
+
+    public String getCpuLoad() {
+        OperatingSystemMXBean osMXBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+        return BigDecimal.valueOf(osMXBean.getCpuLoad()).setScale(2, RoundingMode.HALF_UP).toString();
     }
 }

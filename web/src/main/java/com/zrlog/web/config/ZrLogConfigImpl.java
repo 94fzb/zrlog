@@ -34,6 +34,7 @@ import com.zrlog.business.plugin.TemplateDownloadPlugin;
 import com.zrlog.business.util.InstallUtils;
 import com.zrlog.common.*;
 import com.zrlog.common.type.RunMode;
+import com.zrlog.common.vo.DatabaseConnectPoolInfo;
 import com.zrlog.model.WebSite;
 import com.zrlog.plugin.IPlugin;
 import com.zrlog.plugin.Plugins;
@@ -48,9 +49,7 @@ import com.zrlog.web.inteceptor.StaticResourceInterceptor;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URI;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -74,6 +73,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     private final PluginCoreProcess pluginCoreProcess;
     private final Map<String, Object> website = new TreeMap<>();
     private final long uptime;
+    private HikariDataSource dataSource;
 
     public ZrLogConfigImpl(Integer port, Updater updater) {
         this.port = port;
@@ -83,6 +83,43 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         this.pluginCoreProcess = new PluginCoreProcessImpl(port);
         this.serverConfig = initServerConfig();
         this.uptime = System.currentTimeMillis();
+    }
+
+    public static boolean isTest() {
+        return "junit-test".equals(InstallUtils.getSystemProp().getProperty("env"));
+    }
+
+    /**
+     * 将 docker 配置的 DB_PROPERTIES 写入到实际的文件中，便于程序读取
+     */
+    private static void tryInitDbPropertiesFile() throws IOException {
+        if (StringUtils.isNotEmpty(ZrLogUtil.getDbInfoByEnv())) {
+            IOUtil.writeBytesToFile(ZrLogUtil.getDbInfoByEnv().getBytes(), Constants.getDbPropertiesFile());
+        }
+        Properties properties = InstallUtils.getDbProp();
+        if (Objects.isNull(properties)) {
+            return;
+        }
+        if ("com.mysql.cj.jdbc.Driver".equals(properties.get("driverClass"))) {
+            return;
+        }
+        try (FileOutputStream fileOutputStream = new FileOutputStream(Constants.getDbPropertiesFile())) {
+            properties.put("driverClass", "com.mysql.cj.jdbc.Driver");
+            properties.put("jdbcUrl", properties.get("jdbcUrl") + "&" + ApiInstallController.JDBC_URL_BASE_QUERY_PARAM);
+            properties.store(fileOutputStream, "Support mysql8");
+            LOGGER.info("Upgrade properties success");
+        }
+    }
+
+    static String toNamingDurationString(long milliseconds, boolean en) {
+        long days = TimeUnit.MILLISECONDS.toDays(milliseconds);
+        long hours = TimeUnit.MILLISECONDS.toHours(milliseconds) % 24;
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(milliseconds) % 60;
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(milliseconds) % 60;
+        if (en) {
+            return String.format("%dd %dh %dm %ds", days, hours, minutes, seconds);
+        }
+        return String.format("%d天 %d时 %d分 %d秒", days, hours, minutes, seconds);
     }
 
     /**
@@ -151,11 +188,6 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         return config;
     }
 
-    public static boolean isTest() {
-        return "junit-test".equals(InstallUtils.getSystemProp().getProperty("env"));
-    }
-
-
     /**
      * 配置过滤器，这里配置时需要区分先后顺序的。由于提供拦截器并没有类似 Spring 的过滤器可以对请求路径的配置，这里并不是很优雅。
      * 及需要在对应 Interceptor 中自行通过路由进行拦截
@@ -176,7 +208,6 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         interceptors.add(BlogPageInterceptor.class);
     }
 
-
     @Override
     public void configDatabase() throws Exception {
         // 如果没有安装的情况下不初始化数据
@@ -188,15 +219,15 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         Properties dbProperties = Objects.requireNonNull(InstallUtils.getDbProp());
         int newDbVersion = tryDoUpgrade(dbProperties);
         //启动时候进行数据库连接
-        HikariDataSource hikariDataSource = new HikariDataSource();
-        hikariDataSource.setDataSourceProperties(dbProperties);
-        hikariDataSource.setDriverClassName(dbProperties.getProperty("driverClass"));
-        hikariDataSource.setUsername(dbProperties.getProperty("user"));
-        hikariDataSource.setPassword(dbProperties.getProperty("password"));
-        hikariDataSource.setJdbcUrl(dbProperties.getProperty("jdbcUrl"));
-        DAO.setDs(hikariDataSource);
+        dataSource = new HikariDataSource();
+        dataSource.setDataSourceProperties(dbProperties);
+        dataSource.setDriverClassName(dbProperties.getProperty("driverClass"));
+        dataSource.setUsername(dbProperties.getProperty("user"));
+        dataSource.setPassword(dbProperties.getProperty("password"));
+        dataSource.setJdbcUrl(dbProperties.getProperty("jdbcUrl"));
+        DAO.setDs(dataSource);
         //Test
-        try (Connection connection = hikariDataSource.getConnection()) {
+        try (Connection connection = dataSource.getConnection()) {
             LOGGER.info("Db connect success " + connection.getCatalog());
         }
         if (newDbVersion > 0) {
@@ -228,28 +259,6 @@ public class ZrLogConfigImpl extends ZrLogConfig {
             LOGGER.log(Level.WARNING, "configPlugin exception ", e);
         }
         return plugins;
-    }
-
-    /**
-     * 将 docker 配置的 DB_PROPERTIES 写入到实际的文件中，便于程序读取
-     */
-    private static void tryInitDbPropertiesFile() throws IOException {
-        if (StringUtils.isNotEmpty(ZrLogUtil.getDbInfoByEnv())) {
-            IOUtil.writeBytesToFile(ZrLogUtil.getDbInfoByEnv().getBytes(), Constants.getDbPropertiesFile());
-        }
-        Properties properties = InstallUtils.getDbProp();
-        if (Objects.isNull(properties)) {
-            return;
-        }
-        if ("com.mysql.cj.jdbc.Driver".equals(properties.get("driverClass"))) {
-            return;
-        }
-        try (FileOutputStream fileOutputStream = new FileOutputStream(Constants.getDbPropertiesFile())) {
-            properties.put("driverClass", "com.mysql.cj.jdbc.Driver");
-            properties.put("jdbcUrl", properties.get("jdbcUrl") + "&" + ApiInstallController.JDBC_URL_BASE_QUERY_PARAM);
-            properties.store(fileOutputStream, "Support mysql8");
-            LOGGER.info("Upgrade properties success");
-        }
     }
 
     /**
@@ -371,14 +380,11 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         return toNamingDurationString(System.currentTimeMillis() - uptime, I18nUtil.getCurrentLocale().contains("en"));
     }
 
-    static String toNamingDurationString(long milliseconds, boolean en) {
-        long days = TimeUnit.MILLISECONDS.toDays(milliseconds);
-        long hours = TimeUnit.MILLISECONDS.toHours(milliseconds) % 24;
-        long minutes = TimeUnit.MILLISECONDS.toMinutes(milliseconds) % 60;
-        long seconds = TimeUnit.MILLISECONDS.toSeconds(milliseconds) % 60;
-        if (en) {
-            return String.format("%dd %dh %dm %ds", days, hours, minutes, seconds);
+    @Override
+    public DatabaseConnectPoolInfo getDatabaseConnectPoolInfo() {
+        if (Objects.isNull(dataSource)) {
+            return new DatabaseConnectPoolInfo(0, 0);
         }
-        return String.format("%d天 %d时 %d分 %d秒", days, hours, minutes, seconds);
+        return new DatabaseConnectPoolInfo(dataSource.getHikariPoolMXBean().getActiveConnections(), dataSource.getHikariPoolMXBean().getTotalConnections());
     }
 }

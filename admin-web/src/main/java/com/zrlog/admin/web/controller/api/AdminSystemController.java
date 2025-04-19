@@ -10,8 +10,8 @@ import com.zrlog.util.ZrLogUtil;
 
 import java.util.Objects;
 
-import static com.zrlog.admin.util.SystemInfoUtils.systemIOInfoVO;
 import static com.zrlog.admin.util.SystemInfoUtils.serverInfo;
+import static com.zrlog.admin.util.SystemInfoUtils.systemIOInfoVO;
 
 public class AdminSystemController extends Controller {
 

@@ -4,6 +4,6 @@ import com.zrlog.common.vo.ServerInfo;
 
 import java.util.List;
 
-public record SystemResponse(SystemIOInfoVO systemIOInfo, List<ServerInfo> serverInfos, Boolean dockerMode,
+public record SystemResponse(List<ServerInfo> serverInfos2, List<ServerInfo> serverInfos, Boolean dockerMode,
                              Boolean nativeImageMode) {
 }

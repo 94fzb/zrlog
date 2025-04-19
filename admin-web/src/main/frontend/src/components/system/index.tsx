@@ -3,7 +3,6 @@ import {SystemData} from "../../type";
 import {FunctionComponent, useEffect, useState} from "react";
 import Title from "antd/es/typography/Title";
 import {getRes} from "../../utils/constants";
-import SystemDiskInfo from "./SystemDiskInfo";
 import Row from "antd/es/grid/row";
 import {Col} from "antd";
 import {getCsrData} from "../../api";
@@ -48,14 +47,16 @@ const System: FunctionComponent<SystemProps> = ({data}) => {
         <Title className="page-header" level={3}>
             {getRes()["systemInfo"]}
         </Title>
-        <Divider />
+        <Divider/>
         <Row gutter={[8, 8]}>
             <Col xs={24} md={12}>
-                <ServerInfo data={state.serverInfos} dockerMode={state.dockerMode}
+                <ServerInfo title={getRes()["serverInfo"]} data={state.serverInfos} dockerMode={state.dockerMode}
                             nativeImageMode={state.nativeImageMode}/>
             </Col>
             <Col xs={24} md={12}>
-                <SystemDiskInfo data={state.systemIOInfo}/>
+                <ServerInfo title={getRes()["admin.index.outline"]} data={state.serverInfos2}
+                            dockerMode={state.dockerMode}
+                            nativeImageMode={state.nativeImageMode}/>
             </Col>
         </Row>
     </>

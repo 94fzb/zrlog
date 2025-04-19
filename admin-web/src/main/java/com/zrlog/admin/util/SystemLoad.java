@@ -1,4 +1,4 @@
-package com.zrlog.util;
+package com.zrlog.admin.util;
 
 import com.hibegin.common.util.LoggerUtil;
 

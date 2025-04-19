@@ -48,16 +48,9 @@ export type IndexData = {
     versionInfo: string;
 }
 
-export type SystemIOInfo = {
-    usedDiskSpace: number;
-    usedCacheSpace: number;
-    usedMemorySpace: number;
-    totalMemorySpace: number;
-}
-
 export type SystemData = {
     serverInfos: ServerInfoEntry[],
-    systemIOInfo: SystemIOInfo,
+    serverInfos2: ServerInfoEntry[],
     dockerMode: boolean;
     nativeImageMode: boolean;
 }
