@@ -18,6 +18,19 @@ export const mapToQueryString = (map: Record<string, string[] | string | boolean
         .join("&");
 };
 
+export const parseQueryParamsToMap = (queryString: string): Map<string, string> => {
+    // 创建 URLSearchParams 对象
+    const params = new URLSearchParams(queryString);
+    // 将 URLSearchParams 转换为 Map
+    const map = new Map<string, string>();
+
+    // 使用 forEach 遍历每个键值对
+    params.forEach((value, key) => {
+        map.set(key, value);
+    });
+    return map;
+};
+
 function sortKeysWithSpecialHandling(obj: any): any {
     if (obj === null || typeof obj !== "object") {
         return obj;

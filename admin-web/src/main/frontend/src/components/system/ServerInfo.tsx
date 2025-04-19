@@ -1,17 +1,18 @@
-import { Card, Col, Row, Statistic } from "antd";
-import { getRes } from "../../utils/constants";
-import { ServerInfoEntry } from "../../type";
+import {Card, Col, Row, Statistic} from "antd";
+import {getRes} from "../../utils/constants";
+import {ServerInfoEntry} from "../../type";
 import GraalVmOutlined from "icons/GraalVMOutlined";
 import LinuxOutlined from "@ant-design/icons/lib/icons/LinuxOutlined";
 import DockerOutlined from "@ant-design/icons/lib/icons/DockerOutlined";
 import * as React from "react";
-import { Link } from "react-router-dom";
+import {Link} from "react-router-dom";
+import {DatabaseOutlined} from "@ant-design/icons";
 
 const ServerInfo = ({
-    data,
-    dockerMode,
-    nativeImageMode,
-}: {
+                        data,
+                        dockerMode,
+                        nativeImageMode,
+                    }: {
     data: ServerInfoEntry[];
     dockerMode: boolean;
     nativeImageMode: boolean;
@@ -29,10 +30,10 @@ const ServerInfo = ({
                             fontSize: 18,
                         }}
                     >
-                        {dockerMode && <DockerOutlined />}
+                        {dockerMode && <DockerOutlined/>}
                         {nativeImageMode && (
-                            <Col xs={0} md={12} style={{ maxWidth: 92, height: 30 }}>
-                                <GraalVmOutlined />
+                            <Col xs={0} md={12} style={{maxWidth: 92, height: 30}}>
+                                <GraalVmOutlined/>
                             </Col>
                         )}
                         <span
@@ -51,11 +52,19 @@ const ServerInfo = ({
             if (r.value.startsWith("Linux")) {
                 return (
                     <>
-                        <LinuxOutlined />
-                        <span style={{ marginLeft: 3 }}>{e}</span>
+                        <LinuxOutlined/>
+                        <span style={{marginLeft: 3}}>{e}</span>
                     </>
                 );
             }
+        }
+        if (r.key === "dbInfo") {
+            return (
+                <>
+                    <DatabaseOutlined/>
+                    <span style={{marginLeft: 3}}>{e}</span>
+                </>
+            );
         }
         return <>{e}</>;
     };
@@ -71,13 +80,13 @@ const ServerInfo = ({
     };
 
     return (
-        <Card size={"small"} title={getRes()["serverInfo"]} styles={{ body: { padding: 8, overflow: "hidden" } }}>
+        <Card size={"small"} title={getRes()["serverInfo"]} styles={{body: {padding: 8, overflow: "hidden"}}}>
             <Row gutter={[8, 8]}>
                 {data.map((e) => {
                     return (
                         <Col xs={24} md={12} key={e.key}>
                             <Link target={externalUrl(e.key).length > 0 ? "_blank" : ""} to={externalUrl(e.key)}>
-                                <Card styles={{ body: { padding: 16 } }}>
+                                <Card styles={{body: {padding: 16}}}>
                                     <Statistic
                                         title={e.name}
                                         valueRender={() => render(e.value, e) as React.ReactNode}

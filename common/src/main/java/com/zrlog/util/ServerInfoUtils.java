@@ -22,8 +22,10 @@ public class ServerInfoUtils {
         systemInfo.add(new ServerInfo(I18nUtil.getBackendStringFromRes("serverInfo.locale"), locale.getLanguage() + "/" + (StringUtils.isNotEmpty(locale.getCountry()) ? locale.getCountry() : "Unknown"), "locale"));
         systemInfo.add(new ServerInfo(I18nUtil.getBackendStringFromRes("serverInfo.dbInfo"), (String) data.get("dbServer.version"), "dbInfo"));
         systemInfo.add(new ServerInfo(I18nUtil.getBackendStringFromRes("serverInfo.encoding"), (String) data.get("file.encoding"), "encoding"));
-        systemInfo.add(new ServerInfo(I18nUtil.getBackendStringFromRes("serverInfo.uptime"), Constants.zrLogConfig.getProgramUptime(), "uptime"));
+        systemInfo.add(new ServerInfo(I18nUtil.getBackendStringFromRes("serverInfo.cpuInfo"), CPUInfo.instance.getCpuModel(), "cpuInfo"));
         systemInfo.add(new ServerInfo(I18nUtil.getBackendStringFromRes("serverInfo.programInfo"), BlogBuildInfoUtil.getVersionInfo(), "programInfo"));
+        systemInfo.add(new ServerInfo(I18nUtil.getBackendStringFromRes("serverInfo.uptime"), Constants.zrLogConfig.getProgramUptime(), "uptime"));
+        systemInfo.add(new ServerInfo(I18nUtil.getBackendStringFromRes("serverInfo.systemLoad"), SystemLoad.getSystemLoad(), "systemLoad"));
         return systemInfo;
     }
 }

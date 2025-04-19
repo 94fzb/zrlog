@@ -23,7 +23,9 @@ public class AdminRouters {
         router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/500", AdminPageController.class, "index");
         router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/403", AdminPageController.class, "index");
         router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/404", AdminPageController.class, "index");
+        //
         router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/upgrade", AdminPageController.class, "index");
+        router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/system", AdminPageController.class, "index");
         router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/article-edit", AdminPageController.class, "index");
         router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/offline", AdminPageController.class, "index");
         router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/article", AdminPageController.class, "index");
@@ -68,6 +70,7 @@ public class AdminRouters {
         router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/upload", UploadController.class);
         router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/upgrade", UpgradeController.class);
         router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/user", AdminUserController.class);
+        router.addMapper("/api" + Constants.ADMIN_URI_BASE_PATH + "/system", AdminSystemController.class);
 
     }
 }

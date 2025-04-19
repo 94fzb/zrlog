@@ -10,20 +10,20 @@ export type StatisticsInfoState = {
     usedDiskSpace: number;
 };
 
-export type Version= {
-    type:string;
-    version:string;
+export type Version = {
+    type: string;
+    version: string;
 }
 
 export type LastVersion = {
-    upgrade:boolean;
+    upgrade: boolean;
     version: Version;
 }
 
 export type BasicUserInfo = {
     userName: string;
     header: string;
-    lastVersion?:LastVersion
+    lastVersion?: LastVersion
 };
 
 export type UserInfoState = {
@@ -35,17 +35,29 @@ export type UserInfoState = {
 };
 
 export type ServerInfoEntry = {
-    name:string;
-    key :string;
-    value:string;
+    name: string;
+    key: string;
+    value: string;
 }
 
 export type IndexData = {
-    serverInfos: ServerInfoEntry[],
     statisticsInfo: StatisticsInfoState,
-    dockerMode: boolean;
-    nativeImageMode: boolean;
-    activityData: ActivityDay[]
+    activityData: ActivityDay[],
     tips: string[];
     welcomeTip: string;
+    versionInfo: string;
+}
+
+export type SystemIOInfo = {
+    usedDiskSpace: number;
+    usedCacheSpace: number;
+    usedMemorySpace: number;
+    totalMemorySpace: number;
+}
+
+export type SystemData = {
+    serverInfos: ServerInfoEntry[],
+    systemIOInfo: SystemIOInfo,
+    dockerMode: boolean;
+    nativeImageMode: boolean;
 }

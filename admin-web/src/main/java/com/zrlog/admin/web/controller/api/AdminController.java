@@ -1,17 +1,16 @@
 package com.zrlog.admin.web.controller.api;
 
 import com.google.gson.Gson;
-import com.hibegin.common.util.*;
+import com.hibegin.common.util.BeanUtil;
+import com.hibegin.common.util.IOUtil;
+import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.annotation.ResponseBody;
-import com.hibegin.http.server.util.PathUtil;
 import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.rest.request.LoginRequest;
-import com.zrlog.admin.business.rest.response.IndexResponse;
-import com.zrlog.admin.business.rest.response.LoginResponse;
-import com.zrlog.admin.business.rest.response.StatisticsInfoResponse;
-import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
+import com.zrlog.admin.business.rest.response.*;
 import com.zrlog.admin.business.service.AdminArticleService;
 import com.zrlog.admin.business.service.UserService;
+import com.zrlog.admin.util.SystemInfoUtils;
 import com.zrlog.admin.web.controller.page.AdminPageController;
 import com.zrlog.business.exception.MissingInstallException;
 import com.zrlog.business.rest.response.PublicInfoVO;
@@ -19,17 +18,12 @@ import com.zrlog.business.service.CommonService;
 import com.zrlog.business.util.InstallUtils;
 import com.zrlog.common.Constants;
 import com.zrlog.common.rest.response.ApiStandardResponse;
-import com.zrlog.common.type.RunMode;
-import com.zrlog.common.vo.ServerInfo;
 import com.zrlog.model.Comment;
 import com.zrlog.model.Log;
 import com.zrlog.model.User;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.I18nUtil;
-import com.zrlog.util.ServerInfoUtils;
-import com.zrlog.util.ZrLogUtil;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -80,47 +74,13 @@ public class AdminController extends Controller {
         return new UpdateRecordResponse();
     }
 
-    private ApiStandardResponse<List<ServerInfo>> serverInfo() {
-        Map<String, Object> info = new HashMap<>();
-        InstallUtils.getSystemProp().forEach((key, value) -> info.put(key.toString(), value));
-        BlogBuildInfoUtil.getBlogProp().forEach((key, value) -> info.put("zrlog." + key.toString(), value));
-        return new ApiStandardResponse<>(ServerInfoUtils.convertToServerInfos(info));
-    }
-
-    private ApiStandardResponse<StatisticsInfoResponse> statisticsInfo() throws SQLException {
+    private StatisticsInfoResponse statisticsInfo() throws SQLException {
         StatisticsInfoResponse info = new StatisticsInfoResponse();
         info.setCommCount(new Comment().count());
         info.setToDayCommCount(new Comment().countToDayComment());
         info.setClickCount(new Log().sumClick().longValue());
         info.setArticleCount(new Log().getAdminCount());
-        List<File> allFileList = new ArrayList<>();
-        try {
-            List<String> baseFolders = new ArrayList<>(Arrays.asList(PathUtil.getTempPath(),
-                    PathUtil.getLogPath(), PathUtil.getConfPath(), PathUtil.getStaticPath(),
-                    PathUtil.getRootPath() + "/doc",
-                    PathUtil.getRootPath() + "/LICENSE",
-                    PathUtil.getRootPath() + "/README.en-us.md",
-                    PathUtil.getRootPath() + "/README.md",
-                    PathUtil.getRootPath() + "/bin",
-                    PathUtil.getRootPath() + "/lib"
-            ));
-            if (Objects.nonNull(Constants.zrLogConfig.getUpdater())) {
-                allFileList.add(Constants.zrLogConfig.getUpdater().execFile());
-            }
-            for (String folder : baseFolders) {
-                FileUtils.getAllFiles(folder, allFileList);
-            }
-            List<File> cacheFileList = new ArrayList<>();
-            FileUtils.getAllFiles(PathUtil.getCachePath(), cacheFileList);
-            allFileList.addAll(cacheFileList);
-            info.setUsedDiskSpace(allFileList.stream().mapToLong(File::length).sum());
-            info.setUsedCacheSpace(cacheFileList.stream().mapToLong(File::length).sum());
-        } catch (Exception e) {
-            LoggerUtil.getLogger(AdminController.class).warning("Load used disk info error " + e.getMessage());
-            info.setUsedCacheSpace(-1L);
-            info.setUsedDiskSpace(-1L);
-        }
-        return new ApiStandardResponse<>(info);
+        return info;
     }
 
     @ResponseBody
@@ -146,10 +106,9 @@ public class AdminController extends Controller {
             tips.add(I18nUtil.getBackendStringFromRes("admin.index.welcomeTips_" + i));
         }
         Collections.shuffle(tips);
-        return new ApiStandardResponse<>(new IndexResponse(statisticsInfo().getData(),
-                serverInfo().getData(),
+        return new ApiStandardResponse<>(new IndexResponse(statisticsInfo(),
                 I18nUtil.getBackendStringFromRes("admin.index.welcomeTip"),
-                new ArrayList<>(Collections.singletonList(tips.getFirst())), ZrLogUtil.isDockerMode(), Objects.equals(Constants.runMode, RunMode.NATIVE),
-                new AdminArticleService().activityDataList()));
+                new ArrayList<>(Collections.singletonList(tips.getFirst())),
+                new AdminArticleService().activityDataList(), BlogBuildInfoUtil.getVersionInfo()));
     }
 }

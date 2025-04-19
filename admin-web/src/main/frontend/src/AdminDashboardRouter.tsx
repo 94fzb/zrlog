@@ -49,6 +49,7 @@ const AsyncArticle = lazy(() => import("components/article"));
 
 const AsyncUser = lazy(() => import("components/user"));
 const AsyncError = lazy(() => import("components/unknown-error-page"));
+const AsyncSystem = lazy(() => import("components/system"));
 
 const AdminManageLayout = lazy(() => import("layout/index"));
 
@@ -483,6 +484,18 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({ of
                     <Suspense fallback={<MyLoadingComponent />}>
                         <AsyncOffline />
                     </Suspense>
+                }
+            />
+            <Route
+                path={"system"}
+                element={
+                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
+                        {getDataFromState() && (
+                            <Suspense fallback={<MyLoadingComponent />}>
+                                <AsyncSystem offline={state.offline} data={getDataFromState()} />
+                            </Suspense>
+                        )}
+                    </AdminManageLayout>
                 }
             />
             <Route
