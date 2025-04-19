@@ -114,6 +114,10 @@ const ServerInfo = ({
         </Card>
     }
 
+    if (data === undefined || data.length === 0) {
+        return <></>
+    }
+
     return (
         <Card size={"small"} title={title} styles={{body: {padding: 8, overflow: "hidden"}}}>
             <Row gutter={[8, 8]}>
