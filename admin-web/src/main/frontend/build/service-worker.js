@@ -40,6 +40,8 @@ const urlsToCache = [
     '/api/admin/plugin',
     '/admin/upgrade',
     '/api/admin/upgrade',
+    '/admin/system',
+    '/api/admin/system',
     '___FILES___'
     // 其他需要缓存的静态资源路径
 ];
