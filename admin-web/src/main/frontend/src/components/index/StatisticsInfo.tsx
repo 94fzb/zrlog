@@ -20,28 +20,29 @@ const StatisticsInfo = ({data, versionInfo}: { data: StatisticsInfoState, versio
                     </Card>
                 </Col>
                 <Col xs={24} md={12}>
-                    <Card styles={{body: {padding: 16}}}>
-                        <Link to={"/comment"}>
+                    <Link to={"/comment"}>
+                        <Card styles={{body: {padding: 16}}}>
+
                             <Statistic
                                 title={getRes()["totalComment"]}
                                 value={data.commCount}
                                 prefix={<CommentOutlined/>}
                             />
-                        </Link>
-                    </Card>
+                        </Card>
+                    </Link>
                 </Col>
             </Row>
             <Row gutter={[8, 8]} style={{paddingTop: 8}}>
                 <Col xs={24} md={12}>
-                    <Card styles={{body: {padding: 16}}}>
-                        <Link to={"/article"}>
+                    <Link to={"/article"}>
+                        <Card styles={{body: {padding: 16}}}>
                             <Statistic
                                 title={getRes()["totalArticle"]}
                                 value={data.articleCount}
                                 prefix={<ContainerOutlined/>}
                             />
-                        </Link>
-                    </Card>
+                        </Card>
+                    </Link>
                 </Col>
                 <Col xs={24} md={12}>
                     <Card styles={{body: {padding: 16}}}>
@@ -53,41 +54,35 @@ const StatisticsInfo = ({data, versionInfo}: { data: StatisticsInfoState, versio
                     </Card>
                 </Col>
                 <Col xs={24} md={12}>
-                    <Card styles={{body: {padding: 16}}}>
-                        <Link to={"/system"}>
+                    <Link to={"/system"}>
+                        <Card styles={{body: {padding: 16}}}>
                             <Statistic
                                 title={getRes()["systemInfo"]}
-                                value={versionInfo}
                                 prefix={<InfoCircleOutlined/>}
                                 valueStyle={{
                                     lineHeight: "38px",
-                                    overflow: "hidden",
                                     display: "flex",
-                                    textOverflow: "ellipsis",
-                                    whiteSpace: "nowrap",
                                     fontSize: 18
                                 }}
-                                valueRender={(v) => {
+                                valueRender={() => {
                                     return <Row
                                         style={{
                                             display: "flex",
                                             gap: 3,
                                             flexFlow: "row",
                                             alignItems: "center",
-                                            fontSize: 18,
                                         }}
                                     >
                                         <Typography.Text
                                             style={{fontSize: 18}}
-                                            ellipsis={true}
-                                        >
-                                            {v}
+                                            ellipsis={true}>
+                                            {versionInfo}
                                         </Typography.Text>
                                     </Row>
                                 }}
                             />
-                        </Link>
-                    </Card>
+                        </Card>
+                    </Link>
                 </Col>
             </Row>
         </Card>

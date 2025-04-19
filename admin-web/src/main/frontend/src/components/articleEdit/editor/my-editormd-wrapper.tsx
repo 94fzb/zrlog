@@ -1,12 +1,12 @@
-import { FunctionComponent, ReactNode, useEffect, useState } from "react";
+import {FunctionComponent, ReactNode, useEffect, useState} from "react";
 import $ from "jquery";
 import Spin from "antd/es/spin";
-import { message } from "antd";
+import {message} from "antd";
 import makeAsyncScriptLoader from "react-async-script";
 import MyLoadingComponent from "../../my-loading-component";
 import EnvUtils from "../../../utils/env-utils";
-import { getRes } from "../../../utils/constants";
-import { dom, library } from "@fortawesome/fontawesome-svg-core";
+import {getRes} from "../../../utils/constants";
+import {dom, library} from "@fortawesome/fontawesome-svg-core";
 import {
     fa2,
     fa3,
@@ -38,9 +38,9 @@ import {
     faStrikethrough,
     faTable,
 } from "@fortawesome/free-solid-svg-icons";
-import { StyledEditormd } from "./styled-editormd";
+import {StyledEditormd} from "./styled-editormd";
 import axios from "axios";
-import { ChangedContent } from "../index.types";
+import {ChangedContent} from "../index.types";
 // Add the icons to the library so you can use it in your page
 const icons = [
     faBold,
@@ -102,16 +102,16 @@ const getResourceBaseUrl = () => {
 
 let editor: any;
 
-const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({ height, markdown, onChange, loadSuccess }) => {
+const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({height, markdown, onChange, loadSuccess}) => {
     const [state, setState] = useState<MyEditorMdWrapperState>({
         mdEditorScriptLoaded: true,
         editorLoading: true,
         id: "editor-" + new Date().getTime(),
     });
 
-    const [content, setContent] = useState<ChangedContent>({ content: "", markdown: markdown });
+    const [content, setContent] = useState<ChangedContent>({content: "", markdown: markdown});
 
-    const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
+    const [messageApi, contextHolder] = message.useMessage({maxCount: 3});
 
     function setDarkMode(editor: any, dark: boolean) {
         editor.setTheme(dark ? "dark" : "default");
@@ -213,7 +213,7 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({ height, markdow
                     const formData = new FormData();
                     if (file) {
                         formData.append("imgFile", file, fileName);
-                        axios.post("/api/admin/upload?dir=image", formData).then(({ data }) => {
+                        axios.post("/api/admin/upload?dir=image", formData).then(({data}) => {
                             const url = data.data.url;
                             editor.insertValue("![x](" + url + ")");
                         });
@@ -262,9 +262,15 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({ height, markdow
     }, [content]);
 
     useEffect(() => {
-        //@ts-ignore
-        window.createEditorMDInstance();
-        initEditor();
+        try {
+            //@ts-ignore
+            window.createEditorMDInstance();
+            initEditor();
+        } catch (e) {
+            messageApi.error((e as Error).message).then(() => {
+                //ignore
+            });
+        }
         return () => {
             $(document.getElementById(state.id) as HTMLDivElement).off();
             $(document.body as HTMLBodyElement).off();
@@ -273,12 +279,12 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({ height, markdow
 
     return (
         <StyledEditormd>
-            <Spin spinning={state.editorLoading} delay={500} style={{ height: "100%", overflowY: "auto" }}>
+            <Spin spinning={state.editorLoading} delay={500} style={{height: "100%", overflowY: "auto"}}>
                 {contextHolder}
                 <div
                     id={state.id}
                     className={EnvUtils.isDarkMode() ? "editor-dark" : "editor-light"}
-                    style={{ height: height }}
+                    style={{height: height}}
                 />
             </Spin>
         </StyledEditormd>
@@ -292,17 +298,17 @@ type MyEditorMdWrapperProps = {
     loadSuccess?: (editor: any) => void;
 };
 
-const MyEditorMdWrapper: FunctionComponent<MyEditorMdWrapperProps> = ({ height, markdown, onChange, loadSuccess }) => {
+const MyEditorMdWrapper: FunctionComponent<MyEditorMdWrapperProps> = ({height, markdown, onChange, loadSuccess}) => {
     const [mdEditorScriptLoaded, setMdEditorScriptLoaded] = useState<boolean>(false);
 
     const EditMdAsyncScriptLoader = makeAsyncScriptLoader(
         getResourceBaseUrl() + "admin/vendors/markdown/js/editormd-1.5.6.js"
     )(MyLoadingComponent) as unknown as FunctionComponent<ScriptLoaderProps>;
     if (mdEditorScriptLoaded) {
-        return <MyEditorMd height={height} markdown={markdown} loadSuccess={loadSuccess} onChange={onChange} />;
+        return <MyEditorMd height={height} markdown={markdown} loadSuccess={loadSuccess} onChange={onChange}/>;
     }
     return (
-        <div style={{ height: height }}>
+        <div style={{height: height}}>
             <EditMdAsyncScriptLoader
                 asyncScriptOnLoad={() => {
                     setMdEditorScriptLoaded(true);

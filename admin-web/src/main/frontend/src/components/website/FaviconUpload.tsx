@@ -47,7 +47,7 @@ const FaviconUpload: FunctionComponent<ThumbnailUploadProps> = ({ onChange, url 
                 </p>
             )}
             {url != null && url !== "" && (
-                <div style={{ position: "relative" }}>
+                <div style={{ position: "relative",height:"100%" }}>
                     <Image
                         style={{ borderRadius: 8, position: "relative" }}
                         preview={false}

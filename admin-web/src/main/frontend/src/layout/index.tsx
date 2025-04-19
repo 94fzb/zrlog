@@ -1,5 +1,5 @@
 import { HomeOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
-import { Button, Col, Layout, Row } from "antd";
+import { Button, Col, FloatButton, Layout, Row } from "antd";
 
 import { getRes } from "../utils/constants";
 import { FunctionComponent, PropsWithChildren, useEffect, useState } from "react";
@@ -175,6 +175,7 @@ const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ offline,
                         </Layout>
                     </Col>
                 </Row>
+                <FloatButton.BackTop />
             </StyledIndexLayout>
         </PWAHandler>
     );

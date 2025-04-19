@@ -1,4 +1,4 @@
-import {Card, Col, Row, Statistic} from "antd";
+import {Card, Col, Row, Statistic, Typography} from "antd";
 import {getRes} from "../../utils/constants";
 import {ServerInfoEntry} from "../../type";
 import GraalVmOutlined from "icons/GraalVMOutlined";
@@ -36,14 +36,11 @@ const ServerInfo = ({
                                 <GraalVmOutlined/>
                             </Col>
                         )}
-                        <span
-                            style={{
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                            }}
+                        <Typography.Text
+                            ellipsis={true}
                         >
                             {e}
-                        </span>
+                        </Typography.Text>
                     </Row>
                 );
             }
