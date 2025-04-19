@@ -7,6 +7,7 @@ import SystemDiskInfo from "./SystemDiskInfo";
 import Row from "antd/es/grid/row";
 import {Col} from "antd";
 import {getCsrData} from "../../api";
+import Divider from "antd/es/divider";
 
 type SystemProps = {
     data: SystemData;
@@ -47,6 +48,7 @@ const System: FunctionComponent<SystemProps> = ({data}) => {
         <Title className="page-header" level={3}>
             {getRes()["systemInfo"]}
         </Title>
+        <Divider />
         <Row gutter={[8, 8]}>
             <Col xs={24} md={12}>
                 <ServerInfo data={state.serverInfos} dockerMode={state.dockerMode}
