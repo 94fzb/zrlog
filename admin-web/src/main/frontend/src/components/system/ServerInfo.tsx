@@ -23,7 +23,7 @@ const ServerInfo = ({
         if (r.key === "runtime") {
             if (dockerMode || nativeImageMode) {
                 return (
-                    <Row
+                    <div
                         style={{
                             display: "flex",
                             gap: 3,
@@ -43,7 +43,7 @@ const ServerInfo = ({
                         >
                             {e}
                         </Typography.Text>
-                    </Row>
+                    </div>
                 );
             }
         }
@@ -109,7 +109,6 @@ const ServerInfo = ({
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     whiteSpace: "nowrap",
-                    display: "flex",
                 }}
             />
         </Card>
