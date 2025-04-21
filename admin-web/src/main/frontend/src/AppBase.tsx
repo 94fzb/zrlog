@@ -27,7 +27,7 @@ export const commonAxiosErrorHandle = (
         if (error.response.status) {
             modal.error({
                 title: "服务异常[" + error.response.status + "]",
-                content: <div style={{ paddingTop: 20 }} dangerouslySetInnerHTML={{ __html: error.response.data }} />,
+                content: <div style={{ paddingTop: 20,overflow:"auto" }} dangerouslySetInnerHTML={{ __html: error.response.data }} />,
                 getContainer: modalContainer,
             });
             return Promise.reject(error.response);
