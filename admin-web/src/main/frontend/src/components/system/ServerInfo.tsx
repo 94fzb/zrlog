@@ -5,8 +5,9 @@ import LinuxOutlined from "@ant-design/icons/lib/icons/LinuxOutlined";
 import DockerOutlined from "@ant-design/icons/lib/icons/DockerOutlined";
 import * as React from "react";
 import {Link} from "react-router-dom";
-import {DatabaseOutlined, HddOutlined} from "@ant-design/icons";
+import {AppleOutlined, DatabaseOutlined, HddOutlined, WindowsOutlined} from "@ant-design/icons";
 import MemoryIcon from "../../icons/MemoryIcon";
+import CPUIcon from "../../icons/CPUIcon";
 
 const ServerInfo = ({
                         data,
@@ -56,7 +57,18 @@ const ServerInfo = ({
                         <span style={{marginLeft: 3}}>{e}</span>
                     </>
                 );
+            } else if (r.value.startsWith("Darwin")) {
+                return <>
+                    <AppleOutlined/>
+                    <span style={{marginLeft: 3}}>{e}</span>
+                </>
+            } else {
+                return <>
+                    <WindowsOutlined/>
+                    <span style={{marginLeft: 3}}>{e}</span>
+                </>
             }
+
         }
         if (r.key === "usedCacheSpace" || r.key === "usedDiskSpace") {
             return (
@@ -78,6 +90,14 @@ const ServerInfo = ({
             return (
                 <>
                     <DatabaseOutlined/>
+                    <span style={{marginLeft: 3}}>{e}</span>
+                </>
+            );
+        }
+        if (r.key === "cpuInfo") {
+            return (
+                <>
+                    <CPUIcon/>
                     <span style={{marginLeft: 3}}>{e}</span>
                 </>
             );
