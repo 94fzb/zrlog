@@ -14,17 +14,33 @@ import StatisticsInfo from "./StatisticsInfo";
 import {Link} from "react-router-dom";
 import {DatabaseOutlined, FolderAddFilled, PlusCircleOutlined} from "@ant-design/icons";
 import {Typography} from "antd";
+import styled from "styled-components";
 
 type IndexProps = {
     data: IndexData;
 };
+
+const PREFIX = "index";
+
+const classes = {
+    card: `${PREFIX}-card`,
+}
+
+const StyledIndex = styled(`div`)({
+    [`& .${PREFIX}-card`]: {
+        background: EnvUtils.isDarkMode() ? "#141414" : getColorPrimary(),
+        padding: 0,
+        marginBottom: 8,
+        color: "white",
+    }
+})
 
 const Index: FunctionComponent<IndexProps> = ({data}) => {
     if (data.statisticsInfo === null) {
         return <></>;
     }
     return (
-        <>
+        <StyledIndex>
             <Title className="page-header" level={3}>
                 {getRes().dashboard}
             </Title>
@@ -38,16 +54,11 @@ const Index: FunctionComponent<IndexProps> = ({data}) => {
                                 padding: 0,
                             },
                         }}
-                        style={{
-                            background: EnvUtils.isDarkMode() ? "#141414" : getColorPrimary(),
-                            padding: 0,
-                            marginBottom: 8,
-                            color: "white",
-                        }}
+                        className={classes.card}
                     >
                         <IndexTipBg style={{position: "absolute", height: "100%", width: "100%", zIndex: 2}}/>
                         <div style={{padding: 12}}>
-                            <div style={{fontSize: 20, fontWeight: 500}}>{data.welcomeTip}</div>
+                            <div style={{fontSize: 20, fontWeight: 500,textOverflow: "ellipsis", whiteSpace: "nowrap",overflow:"hidden"}}>{data.welcomeTip}</div>
                             <div style={{overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap"}}>
                                 {data.tips.map((e) => {
                                     return e;
@@ -128,7 +139,7 @@ const Index: FunctionComponent<IndexProps> = ({data}) => {
                     </Card>
                 </Col>
             </Row>
-        </>
+        </StyledIndex>
     );
 };
 

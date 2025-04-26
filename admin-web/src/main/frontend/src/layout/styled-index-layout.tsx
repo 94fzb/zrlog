@@ -103,6 +103,9 @@ const StyledIndexLayout = styled("div")`
         margin-top: 20px;
         border-left: 3px solid ${getColorPrimary()};
         padding-left: 5px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
         font-size: 1.75rem;
     }
 
