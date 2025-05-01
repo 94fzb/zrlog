@@ -1,1 +1,0 @@
-./mvnw -PnodeBuild package -pl '!web,!blog-web'
