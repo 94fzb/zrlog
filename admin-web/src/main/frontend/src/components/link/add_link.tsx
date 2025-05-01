@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Button, Col, Form, Input, InputNumber, message, Modal } from "antd";
 import Row from "antd/es/grid/row";
 import TextArea from "antd/es/input/TextArea";
-import axios from "axios";
 import { getRes } from "../../utils/constants";
+import {useAxiosBaseInstance} from "../../base/AppBase";
 
 const layout = {
     labelCol: { span: 4 },
@@ -14,9 +14,9 @@ const AddLink = ({ addSuccessCall, offline }: { addSuccessCall: () => void; offl
     const [showModel, setShowModel] = useState<boolean>(false);
     const [form, setForm] = useState<any>();
     const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
-
+    const axiosInstance = useAxiosBaseInstance();
     const handleOk = () => {
-        axios.post("/api/admin/link/add", form).then(async ({ data }) => {
+        axiosInstance.post("/api/admin/link/add", form).then(async ({ data }) => {
             if (data.error) {
                 await messageApi.error(data.message);
                 return;

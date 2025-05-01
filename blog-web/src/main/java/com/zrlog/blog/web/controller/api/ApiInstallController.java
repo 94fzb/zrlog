@@ -49,8 +49,8 @@ public class ApiInstallController extends Controller {
         Map<String, String> dbConn = new HashMap<>();
         dbConn.put("jdbcUrl", "jdbc:mysql://" + getRequest().getParaToStr("dbHost") + ":" + getRequest().getParaToStr("dbPort") + "/" + getRequest().getParaToStr("dbName")
                 + "?" + JDBC_URL_BASE_QUERY_PARAM);
-        dbConn.put("user", getRequest().getParaToStr("dbUserName"));
-        dbConn.put("password", getRequest().getParaToStr("dbPassword"));
+        dbConn.put("user", getRequest().getParaToStr("dbUserName", ""));
+        dbConn.put("password", getRequest().getParaToStr("dbPassword", ""));
         dbConn.put("driverClass", "com.mysql.cj.jdbc.Driver");
 
         return dbConn;
@@ -62,11 +62,11 @@ public class ApiInstallController extends Controller {
     @ResponseBody
     public StandardResponse startInstall() throws Exception {
         Map<String, String> configMsg = new HashMap<>();
-        configMsg.put("title", getRequest().getParaToStr("title"));
-        configMsg.put("second_title", getRequest().getParaToStr("second_title"));
-        configMsg.put("username", getRequest().getParaToStr("username"));
-        configMsg.put("password", getRequest().getParaToStr("password"));
-        configMsg.put("email", getRequest().getParaToStr("email"));
+        configMsg.put("title", getRequest().getParaToStr("title", ""));
+        configMsg.put("second_title", getRequest().getParaToStr("second_title", ""));
+        configMsg.put("username", getRequest().getParaToStr("username", ""));
+        configMsg.put("password", getRequest().getParaToStr("password", ""));
+        configMsg.put("email", getRequest().getParaToStr("email", ""));
         if (!new InstallService(PathUtil.getConfPath(), getDbConn(), configMsg).install()) {
             throw new InstallException(TestConnectDbResult.UNKNOWN);
         }

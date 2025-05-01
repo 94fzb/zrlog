@@ -1,44 +1,38 @@
-import { apiBasePath } from "../../index";
-import { CameraOutlined, DeleteFilled } from "@ant-design/icons";
+import {CameraOutlined, DeleteFilled, LoadingOutlined} from "@ant-design/icons";
 import Image from "antd/es/image";
-import Dragger from "antd/es/upload/Dragger";
-import { FunctionComponent } from "react";
-import { UploadChangeParam } from "antd/es/upload";
-import { message } from "antd";
-import { getColorPrimary, getRes } from "../../utils/constants";
+import {FunctionComponent, useState} from "react";
+import {getColorPrimary, getRes} from "../../utils/constants";
+import BaseDragger from "../../common/BaseDragger";
 
 type ThumbnailUploadProps = {
     onChange?: (e: string) => void;
     thumbnail?: string;
 };
 
-const ThumbnailUpload: FunctionComponent<ThumbnailUploadProps> = ({ onChange, thumbnail }) => {
-    const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
+const ThumbnailUpload: FunctionComponent<ThumbnailUploadProps> = ({onChange, thumbnail}) => {
 
-    const onUploadChange = async (info: UploadChangeParam) => {
-        const { status } = info.file;
-        if (status === "done") {
-            if (info.file.response.error && info.file.response.error > 0) {
-                messageApi.error(`${info.file.name} file upload failed.` + `${info.file.response.message}`);
-                return;
-            }
-            if (onChange) {
-                onChange(info.file.response.data.url);
-            }
-        } else if (status === "error") {
-            messageApi.error(`${info.file.name} file upload failed.`);
-        }
-    };
+    const [uploading, setUploading] = useState<boolean>(false);
 
     return (
-        <Dragger
+        <BaseDragger
+            onSuccess={({data}) => {
+                setUploading(false)
+                if (onChange) {
+                    onChange(data.url);
+                }
+            }}
+            disabled={uploading}
+            onProgress={() => {
+                setUploading(true)
+            }}
+            onError={() => {
+                setUploading(false);
+            }}
             accept={"image/*"}
-            style={{ overflow: "hidden", minHeight: 102, maxHeight: 256 }}
-            action={apiBasePath + "upload/thumbnail?dir=thumbnail"}
+            style={{overflow: "hidden", minHeight: 102, maxHeight: 256}}
+            action={"/api/admin/upload/thumbnail?dir=thumbnail"}
             name="imgFile"
-            onChange={(e) => onUploadChange(e)}
         >
-            {contextHolder}
             {(thumbnail === undefined || thumbnail === null || thumbnail === "") && (
                 <>
                     <p
@@ -51,7 +45,7 @@ const ThumbnailUpload: FunctionComponent<ThumbnailUploadProps> = ({ onChange, th
                             alignItems: "center",
                         }}
                     >
-                        <CameraOutlined style={{ fontSize: "28px" }} />
+                        <CameraOutlined style={{fontSize: "28px"}}/>
                     </p>
                     <p
                         className="ant-upload-text"
@@ -60,18 +54,18 @@ const ThumbnailUpload: FunctionComponent<ThumbnailUploadProps> = ({ onChange, th
                             margin: 0,
                         }}
                     >
-                        {getRes()["uploadTips"]}
+                        {uploading && <LoadingOutlined/>} {getRes()["uploadTips"]}
                     </p>
                 </>
             )}
             {thumbnail != null && thumbnail !== "" && (
-                <div style={{ position: "relative" }}>
+                <div style={{position: "relative"}}>
                     <Image
-                        style={{ borderRadius: 8, position: "relative" }}
+                        style={{borderRadius: 0, position: "relative"}}
                         preview={false}
                         id="thumbnail"
                         src={thumbnail}
-                        wrapperStyle={{ position: "relative" }}
+                        wrapperStyle={{position: "relative"}}
                     />
                     <div
                         style={{
@@ -91,11 +85,11 @@ const ThumbnailUpload: FunctionComponent<ThumbnailUploadProps> = ({ onChange, th
                             e.stopPropagation();
                         }}
                     >
-                        <DeleteFilled />
+                        <DeleteFilled/>
                     </div>
                 </div>
             )}
-        </Dragger>
+        </BaseDragger>
     );
 };
 export default ThumbnailUpload;

@@ -5,7 +5,7 @@ import {message} from "antd";
 import makeAsyncScriptLoader from "react-async-script";
 import MyLoadingComponent from "../../my-loading-component";
 import EnvUtils from "../../../utils/env-utils";
-import {getRes} from "../../../utils/constants";
+import { getRes, isDev} from "../../../utils/constants";
 import {dom, library} from "@fortawesome/fontawesome-svg-core";
 import {
     fa2,
@@ -15,7 +15,6 @@ import {
     faAlignJustify,
     faAlignLeft,
     faAlignRight,
-    faAnchor,
     faBold,
     faClipboard,
     faClose,
@@ -39,8 +38,10 @@ import {
     faTable,
 } from "@fortawesome/free-solid-svg-icons";
 import {StyledEditormd} from "./styled-editormd";
-import axios from "axios";
 import {ChangedContent} from "../index.types";
+import {useAxiosBaseInstance} from "../../../base/AppBase";
+import {getContextPath} from "../../../utils/helpers";
+import EditorDialog from "./EditorDialog";
 // Add the icons to the library so you can use it in your page
 const icons = [
     faBold,
@@ -56,7 +57,6 @@ const icons = [
     faListOl,
     faMinus,
     faQuestionCircle,
-    faAnchor,
     faInfoCircle,
     faClipboard,
     faTable,
@@ -86,6 +86,12 @@ type MyEditorMdWrapperState = {
     id: string;
 };
 
+type EditorDialogState = {
+    open: boolean;
+    title: string;
+    type: "image" | "video" | "file" | "link";
+}
+
 export type ScriptLoaderProps = {
     asyncScriptOnLoad?: (() => void) | undefined;
     isLoading: boolean;
@@ -93,11 +99,14 @@ export type ScriptLoaderProps = {
 };
 
 const getResourceBaseUrl = () => {
+    if (isDev()) {
+        return "admin/"
+    }
     const url = getRes()["admin_static_resource_base_url"] as string;
     if (url && url.trim().length > 0) {
-        return url + "/";
+        return url + "/admin/";
     }
-    return document.baseURI;
+    return getContextPath() + "admin/";
 };
 
 let editor: any;
@@ -109,9 +118,17 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({height, markdown
         id: "editor-" + new Date().getTime(),
     });
 
+    const [dialogState, setDialogState] = useState<EditorDialogState>({
+        open: false,
+        title: "",
+        type: "image"
+    })
+
     const [content, setContent] = useState<ChangedContent>({content: "", markdown: markdown});
 
     const [messageApi, contextHolder] = message.useMessage({maxCount: 3});
+
+    const axiosInstance = useAxiosBaseInstance();
 
     function setDarkMode(editor: any, dark: boolean) {
         editor.setTheme(dark ? "dark" : "default");
@@ -164,7 +181,6 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({height, markdown
                     "pagebreak",
                     "|",
                     "link",
-                    "reference-link",
                     "image",
                     "file",
                     "video",
@@ -178,17 +194,38 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({height, markdown
                     "help",
                 ];
             },
-            imageUploadURL: document.baseURI + "api/admin/upload",
-            path: getResourceBaseUrl() + "admin/vendors/markdown/lib/",
+            path: getResourceBaseUrl() + "vendors/markdown/lib/",
             placeholder: getRes()["editorPlaceholder"],
             markdown: content.markdown,
             onload: function () {
                 setTimeout(() => {
                     $("#fileDialog").on("click", function () {
-                        editor.executePlugin("fileDialog", "file-dialog/file-dialog");
+                        setDialogState({
+                            open: true,
+                            title: "文件",
+                            type: "file"
+                        })
                     });
                     $("#videoDialog").on("click", function () {
-                        editor.executePlugin("videoDialog", "video-dialog/video-dialog");
+                        setDialogState({
+                            open: true,
+                            title: "视频",
+                            type: "video"
+                        })
+                    });
+                    $("#linkDialog").on("click", function () {
+                        setDialogState({
+                            open: true,
+                            title: "链接",
+                            type: "link"
+                        })
+                    });
+                    $("#imageDialog").on("click", function () {
+                        setDialogState({
+                            open: true,
+                            title: "图片",
+                            type: "image"
+                        })
                     });
                     $("#copPreviewHtmlToClipboard").on("click", function () {
                         function copyToClipboard(html: any) {
@@ -213,7 +250,7 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({height, markdown
                     const formData = new FormData();
                     if (file) {
                         formData.append("imgFile", file, fileName);
-                        axios.post("/api/admin/upload?dir=image", formData).then(({data}) => {
+                        axiosInstance.post("/api/admin/upload?dir=image", formData).then(({data}) => {
                             const url = data.data.url;
                             editor.insertValue("![x](" + url + ")");
                         });
@@ -286,6 +323,20 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({height, markdown
                     className={EnvUtils.isDarkMode() ? "editor-dark" : "editor-light"}
                     style={{height: height}}
                 />
+                {dialogState.open && <EditorDialog title={dialogState.title} type={dialogState.type} onOk={(mdStr) => {
+                    setDialogState({
+                        title: "",
+                        type: "image",
+                        open: false
+                    })
+                    editor.insertValue(mdStr);
+                }} onClose={() => {
+                    setDialogState({
+                        title: "",
+                        type: "image",
+                        open: false
+                    })
+                }}/>}
             </Spin>
         </StyledEditormd>
     );
@@ -302,7 +353,7 @@ const MyEditorMdWrapper: FunctionComponent<MyEditorMdWrapperProps> = ({height, m
     const [mdEditorScriptLoaded, setMdEditorScriptLoaded] = useState<boolean>(false);
 
     const EditMdAsyncScriptLoader = makeAsyncScriptLoader(
-        getResourceBaseUrl() + "admin/vendors/markdown/js/editormd-1.5.6.js"
+        getResourceBaseUrl() + "vendors/markdown/js/editormd-1.5.7.js"
     )(MyLoadingComponent) as unknown as FunctionComponent<ScriptLoaderProps>;
     if (mdEditorScriptLoaded) {
         return <MyEditorMd height={height} markdown={markdown} loadSuccess={loadSuccess} onChange={onChange}/>;

@@ -1,6 +1,7 @@
 package com.zrlog.blog.web.util;
 
 import com.hibegin.common.util.StringUtils;
+import com.hibegin.common.util.UrlEncodeUtils;
 import com.hibegin.http.HttpMethod;
 import com.hibegin.http.server.ApplicationContext;
 import com.hibegin.http.server.api.HttpRequest;
@@ -11,9 +12,9 @@ import com.zrlog.common.Constants;
 import com.zrlog.common.exception.AdminAuthException;
 import com.zrlog.util.ZrLogUtil;
 
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 /**
  * 存放与Web相关的工具代码
@@ -49,7 +50,20 @@ public class WebTools {
 
 
     public static String getHomeUrl(HttpRequest request) {
-        return "/";
+        if (Objects.equals("/", request.getContextPath())) {
+            return "/";
+        }
+        return request.getContextPath() + "/";
+    }
+
+    public static String buildEncodedUrl(HttpRequest request, String url) {
+        if (request == null) {
+            return UrlEncodeUtils.encodeUrl(url);
+        }
+        if (url.startsWith("/")) {
+            return UrlEncodeUtils.encodeUrl(getHomeUrl(request) + url.substring(1));
+        }
+        return UrlEncodeUtils.encodeUrl(getHomeUrl(request) + url);
     }
 
     public static String htmlEncode(String source) {
@@ -84,25 +98,6 @@ public class WebTools {
         return html;
     }
 
-    private static boolean containsHanScript(String s) {
-        return s.codePoints().anyMatch(codepoint -> Character.UnicodeScript.of(codepoint) == Character.UnicodeScript.HAN);
-    }
-
-    /**
-     * 用于转化 GET 的中文乱码
-     */
-    public static String convertRequestParam(String param) {
-        if (param == null) {
-            return "";
-        }
-        //如果可以正常读取到中文的情况，直接跳过转换
-        if (containsHanScript(param)) {
-            return param;
-        }
-        return URLDecoder.decode(new String(param.getBytes(StandardCharsets.ISO_8859_1)), StandardCharsets.UTF_8);
-    }
-
-
     public static void blockUnLoginRequestHandler(HttpRequest request, HttpResponse response) {
         String actionKey = request.getUri();
         if (actionKey.startsWith("/api")) {
@@ -119,7 +114,7 @@ public class WebTools {
     }
 
     private static String getRequestUriWithQueryString(HttpRequest request) {
-        String realUri = request.getUri();
+        String realUri = request.getContextPath() + request.getUri();
         if (request.getUri().endsWith(Constants.ADMIN_URI_BASE_PATH)) {
             realUri = realUri + Constants.INDEX_URI_PATH;
         }
@@ -127,36 +122,6 @@ public class WebTools {
             return realUri;
         }
         return realUri + "?" + request.getQueryStr();
-    }
-
-    public static String encodeUrl(String path) {
-        StringBuilder encoded = new StringBuilder();
-        for (char c : path.toCharArray()) {
-            if (isUnsafeCharacter(c)) {
-                encoded.append(URLEncoder.encode(String.valueOf(c), StandardCharsets.UTF_8));
-            } else {
-                encoded.append(c);
-            }
-        }
-        return encoded.toString();
-    }
-
-    private static boolean isUnsafeCharacter(char c) {
-        // 检查字符是否为需要编码的字符，保留保留字符和子分隔符
-        return !(isUnreservedCharacter(c) || isReservedCharacter(c));
-    }
-
-    private static boolean isUnreservedCharacter(char c) {
-        // 不需要编码的普通字符：字母、数字、- . _ ~
-        return (c >= 'a' && c <= 'z') ||
-                (c >= 'A' && c <= 'Z') ||
-                (c >= '0' && c <= '9') ||
-                c == '-' || c == '.' || c == '_' || c == '~';
-    }
-
-    private static boolean isReservedCharacter(char c) {
-        // 保留字符和子分隔符
-        return ":/?#[]@!$&'()*+,;=".indexOf(c) != -1;
     }
 
     public static HttpRequest buildMockRequest(HttpMethod method, String uri, RequestConfig requestConfig, ApplicationContext applicationContext) throws Exception {

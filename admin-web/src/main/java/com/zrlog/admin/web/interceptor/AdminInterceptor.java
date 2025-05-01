@@ -14,6 +14,7 @@ import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.AdminTokenVO;
 import com.zrlog.model.User;
+import com.zrlog.util.ZrLogUtil;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -31,7 +32,8 @@ public class AdminInterceptor implements HandleAbleInterceptor {
             throw new ArgsException("missing_token");
         }
         Constants.zrLogConfig.getPlugins().forEach(e -> {
-            if (e instanceof PluginCorePluginImpl plugin) {
+            if (e instanceof PluginCorePluginImpl) {
+                PluginCorePluginImpl plugin = (PluginCorePluginImpl) e;
                 if (!Objects.equals(plugin.getToken(), requestToken)) {
                     throw new ArgsException("token");
                 }
@@ -67,16 +69,17 @@ public class AdminInterceptor implements HandleAbleInterceptor {
                 new MethodInterceptor().doInterceptor(request, response);
                 return false;
             }
-            AdminTokenVO adminTokenVO = Constants.zrLogConfig.getTokenService().getAdminTokenVO(request);
-            if (adminTokenVO == null) {
-                WebTools.blockUnLoginRequestHandler(request, response);
-                return false;
-            }
-
-            Map<String, Object> user = new User().loadById(adminTokenVO.getUserId());
-            Constants.zrLogConfig.getTokenService().setAdminToken(user, adminTokenVO.getSessionId(), adminTokenVO.getProtocol(), request, response);
-            new MethodInterceptor().doInterceptor(request, response);
             Method method = request.getServerConfig().getRouter().getMethod(request.getUri());
+            if (Objects.nonNull(method) && !ZrLogUtil.isStaticPlugin(request)) {
+                AdminTokenVO adminTokenVO = Constants.zrLogConfig.getTokenService().getAdminTokenVO(request);
+                if (adminTokenVO == null) {
+                    WebTools.blockUnLoginRequestHandler(request, response);
+                    return false;
+                }
+                Map<String, Object> user = new User().loadById(adminTokenVO.getUserId());
+                Constants.zrLogConfig.getTokenService().setAdminToken(user, adminTokenVO.getSessionId(), adminTokenVO.getProtocol(), request, response);
+            }
+            new MethodInterceptor().doInterceptor(request, response);
             if (Objects.nonNull(method)) {
                 RefreshCache annotation = method.getAnnotation(RefreshCache.class);
                 if (Objects.nonNull(annotation)) {

@@ -8,7 +8,6 @@ import { FullScreenProps } from "./index.types";
 type ArticleEditFullscreenButton = FullScreenProps & {
     fullScreenElement: HTMLDivElement;
     editorInstance: { width: (arg0: string) => void };
-    onChange: (full: boolean) => void;
 };
 
 const ArticleEditFullscreenButton: FunctionComponent<ArticleEditFullscreenButton> = ({
@@ -17,7 +16,6 @@ const ArticleEditFullscreenButton: FunctionComponent<ArticleEditFullscreenButton
     onFullScreen,
     fullScreen,
     editorInstance,
-    onChange,
 }) => {
     const toggleFullScreen = () => {
         if (fullScreen) {
@@ -56,14 +54,12 @@ const ArticleEditFullscreenButton: FunctionComponent<ArticleEditFullscreenButton
     };
 
     const doFullState = () => {
-        onChange(true);
         if (editorInstance) {
             editorInstance.width("100%");
         }
     };
 
     const onfullscreenExit = () => {
-        onChange(false);
         if (editorInstance) {
             editorInstance.width("100%");
         }

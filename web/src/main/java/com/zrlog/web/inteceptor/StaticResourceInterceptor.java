@@ -26,13 +26,13 @@ public class StaticResourceInterceptor implements Interceptor {
 
     @Override
     public boolean doInterceptor(HttpRequest request, HttpResponse response) throws Exception {
-        if (ZrLogUtil.isStaticBlogPlugin(request)) {
+        if (ZrLogUtil.isStaticPlugin(request)) {
             return true;
         }
         String actionKey = request.getUri();
         //打包过后的静态资源文件进行拦截
         if (staticResourcePath.stream().anyMatch(e -> request.getUri().startsWith(e + "/"))) {
-            response.addHeader("Cache-Control", "max-age=31536000, immutable"); // 1 年的秒数
+            ZrLogUtil.putLongTimeCache(response);
             new MethodInterceptor().doInterceptor(request, response);
             return false;
         }
@@ -42,14 +42,14 @@ public class StaticResourceInterceptor implements Interceptor {
             if (staticFile.isFile() && staticFile.exists()) {
                 //缓存静态资源文件
                 if (Constants.zrLogConfig.getCacheService().isCacheableByRequest(request)) {
-                    response.addHeader("Cache-Control", "max-age=31536000, immutable"); // 1 年的秒数
+                    ZrLogUtil.putLongTimeCache(response);
                 }
                 response.writeFile(staticFile);
                 return false;
             }
             if (BlogPageInterceptor.catGeneratorHtml(actionKey)) {
                 File cacheFile = Constants.zrLogConfig.getCacheService().loadCacheFile(request);
-                if (cacheFile.exists() && !ZrLogUtil.isStaticBlogPlugin(request)) {
+                if (cacheFile.exists() && !ZrLogUtil.isStaticPlugin(request)) {
                     response.writeFile(cacheFile);
                     return false;
                 }

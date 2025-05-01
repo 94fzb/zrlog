@@ -24,14 +24,21 @@ public class PluginUtils {
         }
         //静态化插件，重新生成全量的 html
         Optional<IPlugin> stateSitePluginOp = Constants.zrLogConfig.getPlugins().stream().filter(e -> e instanceof StaticSitePlugin).findFirst();
-        if (stateSitePluginOp.isPresent() && stateSitePluginOp.get() instanceof StaticSitePlugin staticSitePlugin) {
+        if (stateSitePluginOp.isPresent() && stateSitePluginOp.get() instanceof StaticSitePlugin) {
+            StaticSitePlugin staticSitePlugin = (StaticSitePlugin) stateSitePluginOp.get();
             //restart plugin, for update
             staticSitePlugin.stop();
             staticSitePlugin.start();
         }
         //plugin cache
-        if (corePlugin.isPresent() && corePlugin.get() instanceof PluginCorePlugin pc) {
+        if (corePlugin.isPresent() && corePlugin.get() instanceof PluginCorePlugin) {
+            PluginCorePlugin pc = (PluginCorePlugin) corePlugin.get();
             pc.refreshCache();
         }
+    }
+
+    public static void stopAllPlugin(){
+        Constants.zrLogConfig.getPlugins().forEach(IPlugin::stop);
+        Constants.zrLogConfig.getPlugins().clear();
     }
 }

@@ -14,13 +14,9 @@ import com.zrlog.admin.business.service.AdminArticleService;
 import com.zrlog.admin.web.annotation.RefreshCache;
 import com.zrlog.admin.web.token.AdminTokenThreadLocal;
 import com.zrlog.blog.web.util.ControllerUtil;
-import com.zrlog.blog.web.util.WebTools;
-import com.zrlog.business.rest.response.ArticleResponseEntry;
 import com.zrlog.business.service.TemplateHelper;
 import com.zrlog.common.Constants;
-import com.zrlog.common.ZrLogConfig;
 import com.zrlog.common.rest.response.ApiStandardResponse;
-import com.zrlog.data.dto.PageData;
 import com.zrlog.model.Log;
 import com.zrlog.model.Tag;
 import com.zrlog.model.Type;
@@ -43,7 +39,7 @@ public class AdminArticleController extends Controller {
         if (ZrLogUtil.isPreviewMode()) {
             throw new PermissionErrorException();
         }
-        String[] ids = getRequest().getParaToStr("id").split(",");
+        String[] ids = getRequest().getParaToStr("id", "").split(",");
         for (String id : ids) {
             articleService.delete(Long.valueOf(id));
         }
@@ -78,15 +74,15 @@ public class AdminArticleController extends Controller {
 
     @ResponseBody
     public AdminApiPageDataStandardResponse<ArticlePageData> index() throws SQLException, ExecutionException, InterruptedException {
-        String key = WebTools.convertRequestParam(request.getParaToStr("key"));
-        String types = WebTools.convertRequestParam(request.getParaToStr("types"));
+        String key = request.getParaToStr("key", "");
+        String types = request.getParaToStr("types", "");
         int articlePageSize = Constants.getAdminArticlePageSize();
         ArticlePageData pageData = articleService.adminPage(ControllerUtil.toPageRequest(this, articlePageSize), key, types, request);
         pageData.setKey(key);
         pageData.setDefaultPageSize(Long.parseLong(articlePageSize + ""));
         pageData.setTypes(Constants.zrLogConfig.getCacheService().refreshInitDataCacheAsync(request, false).get().getTypes());
         AdminApiPageDataStandardResponse<ArticlePageData> standardResponse = new AdminApiPageDataStandardResponse<>(pageData);
-        standardResponse.setDocumentTitle(Constants.getAdminTitle(I18nUtil.getAdminStringFromRes("blogManage")));
+        standardResponse.setDocumentTitle(Constants.getAdminDocumentTitleByUri(request.getUri()));
         return standardResponse;
     }
 
@@ -107,7 +103,7 @@ public class AdminArticleController extends Controller {
         ArticleGlobalResponse response = new ArticleGlobalResponse();
         response.setTags(new Tag().findAll());
         response.setTypes(new Type().findAll());
-        String id = request.getParaToStr("id");
+        String id = request.getParaToStr("id", "");
         if (StringUtils.isNotEmpty(id)) {
             response.setArticle(detail().getData());
         } else {
@@ -118,8 +114,8 @@ public class AdminArticleController extends Controller {
         if (Objects.nonNull(response.getArticle().getTitle())) {
             sj.add(response.getArticle().getTitle());
         }
-        sj.add(I18nUtil.getAdminStringFromRes("admin.log.edit"));
-        standardResponse.setDocumentTitle(Constants.getAdminTitle(sj.toString()));
+        sj.add(Constants.getAdminDocumentTitleByUri(request.getUri()));
+        standardResponse.setDocumentTitle(sj.toString());
         return standardResponse;
     }
 
@@ -131,7 +127,7 @@ public class AdminArticleController extends Controller {
      */
     @ResponseBody
     public ApiStandardResponse<LoadEditArticleResponse> detail() throws SQLException {
-        String id = getRequest().getParaToStr("id");
+        String id = getRequest().getParaToStr("id", "");
         if (StringUtils.isEmpty(id)) {
             throw new ArgsException("id");
         }

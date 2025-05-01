@@ -6,8 +6,8 @@ import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.rest.request.ReadCommentRequest;
 import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
 import com.zrlog.admin.business.service.AdminCommentService;
-import com.zrlog.blog.web.util.ControllerUtil;
 import com.zrlog.admin.web.annotation.RefreshCache;
+import com.zrlog.blog.web.util.ControllerUtil;
 import com.zrlog.common.rest.response.ApiStandardResponse;
 import com.zrlog.common.rest.response.StandardResponse;
 import com.zrlog.data.dto.PageData;
@@ -22,7 +22,7 @@ public class CommentController extends Controller {
     @RefreshCache
     @ResponseBody
     public StandardResponse delete() throws SQLException {
-        return commentService.delete(request.getParaToStr("id").split(","));
+        return commentService.delete(request.getParaToStr("id", "").split(","));
     }
 
     @ResponseBody

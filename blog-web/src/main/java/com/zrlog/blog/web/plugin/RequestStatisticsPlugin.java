@@ -5,6 +5,7 @@ import com.hibegin.common.util.StringUtils;
 import com.zrlog.common.Constants;
 import com.zrlog.model.Log;
 import com.zrlog.plugin.IPlugin;
+import com.zrlog.util.ThreadUtils;
 import com.zrlog.util.ZrLogUtil;
 
 import java.util.*;
@@ -38,7 +39,7 @@ public class RequestStatisticsPlugin implements IPlugin {
         if (Objects.nonNull(clickSchedule)) {
             return true;
         }
-        clickSchedule = new ScheduledThreadPoolExecutor(1, Thread.ofVirtual().factory());
+        clickSchedule = new ScheduledThreadPoolExecutor(1, ThreadUtils.getThreadFactory());
         clickSchedule.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {

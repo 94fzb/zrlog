@@ -24,3 +24,7 @@
 ### 1.5.6
 
 - update katex path
+
+### 1.5.7
+
+- ant dialog instance javascript build dialog

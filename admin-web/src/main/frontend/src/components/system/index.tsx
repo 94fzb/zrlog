@@ -1,12 +1,12 @@
 import ServerInfo from "./ServerInfo";
 import {SystemData} from "../../type";
 import {FunctionComponent, useEffect, useState} from "react";
-import Title from "antd/es/typography/Title";
 import {getRes} from "../../utils/constants";
 import Row from "antd/es/grid/row";
 import {Col} from "antd";
 import {getCsrData} from "../../api";
-import Divider from "antd/es/divider";
+import {useAxiosBaseInstance} from "../../base/AppBase";
+import BaseTitle from "../../base/BaseTitle";
 
 type SystemProps = {
     data: SystemData;
@@ -19,9 +19,11 @@ const System: FunctionComponent<SystemProps> = ({data}) => {
 
     const [state, setState] = useState<SystemData>(data);
 
+    const axiosInstance = useAxiosBaseInstance();
+
     const fetchSystemInfo = () => {
         if (document.visibilityState === "visible") {
-            getCsrData("/system").then(({data}) => {
+            getCsrData("/system", axiosInstance).then(({data}) => {
                 setState(data)
                 timer = setTimeout(fetchSystemInfo, 5000);
             });
@@ -44,10 +46,7 @@ const System: FunctionComponent<SystemProps> = ({data}) => {
     }, [data])
 
     return <>
-        <Title className="page-header" level={3}>
-            {getRes()["systemInfo"]}
-        </Title>
-        <Divider/>
+        <BaseTitle title={getRes()["systemInfo"]}/>
         <Row gutter={[8, 8]}>
             <Col xs={24} md={12}>
                 <ServerInfo title={getRes()["serverInfo"]} data={state.serverInfos} dockerMode={state.dockerMode}

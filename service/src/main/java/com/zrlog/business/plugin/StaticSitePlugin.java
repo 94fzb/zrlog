@@ -17,7 +17,6 @@ import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.business.service.TemplateHelper;
 import com.zrlog.business.service.TemplateInfoHelper;
 import com.zrlog.business.util.PageServiceUtil;
-import com.zrlog.business.util.ResourceUtils;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.TemplateVO;
 import com.zrlog.plugin.IPlugin;
@@ -31,7 +30,8 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
 
 public class StaticSitePlugin extends BaseLockObject implements IPlugin {
@@ -42,6 +42,7 @@ public class StaticSitePlugin extends BaseLockObject implements IPlugin {
     private final AbstractServerConfig serverConfig;
     private final ApplicationContext applicationContext;
     private final Map<String, HandleState> handleStatusPageMap = new ConcurrentHashMap<>();
+    private final ReentrantLock parseLock = new ReentrantLock();
 
     public StaticSitePlugin(AbstractServerConfig abstractServerConfig) {
         this.applicationContext = new ApplicationContext(abstractServerConfig.getServerConfig());
@@ -49,98 +50,9 @@ public class StaticSitePlugin extends BaseLockObject implements IPlugin {
         this.serverConfig = abstractServerConfig;
     }
 
-    enum HandleState {
-        NEW, HANDING, RE_FETCH, HANDLED
-    }
-
-
-    private void doFetch() {
-        handleStatusPageMap.entrySet().stream().filter(e -> Arrays.asList(HandleState.NEW, HandleState.RE_FETCH).contains(e.getValue())).forEach((e) -> {
-            handleStatusPageMap.put(e.getKey(), HandleState.HANDING);
-            boolean error = false;
-            try {
-                ResponseConfig responseConfig = serverConfig.getResponseConfig();
-                responseConfig.setEnableGzip(false);
-                HttpRequest httpRequest = WebTools.buildMockRequest(HttpMethod.GET, e.getKey(), serverConfig.getRequestConfig(), applicationContext);
-                new HttpRequestHandlerRunnable(httpRequest, new SimpleHttpResponse(httpRequest, serverConfig.getResponseConfig())).run();
-                File file = (File) httpRequest.getAttr().get(HTML_FILE_KEY);
-                if (Objects.isNull(file) || !file.exists()) {
-                    LOGGER.warning("Generator " + e.getKey() + " error: missing static file");
-                    error = true;
-                    return;
-                }
-                Document document = Jsoup.parse(file);
-                Elements links = document.select("a");
-                links.forEach(element -> {
-                    String href = element.attr("href");
-                    if (href.startsWith("//")) {
-                        return;
-                    }
-                    //exists jobs
-                    if (handleStatusPageMap.containsKey(href)) {
-                        return;
-                    }
-                    if (href.startsWith("/") && href.endsWith(".html")) {
-                        handleStatusPageMap.put(href, HandleState.NEW);
-                    }
-                });
-            } catch (Exception ex) {
-                LOGGER.warning("Generator " + e.getKey() + " error: " + ex.getMessage());
-            } finally {
-                if (error) {
-                    //如果抓取错误了，需要暂停一下，避免重新获取过快
-                    try {
-                        Thread.sleep(2000);
-                    } catch (InterruptedException ex) {
-                        LOGGER.warning("Generator " + e.getKey() + " error: " + ex.getMessage());
-                    }
-                }
-                handleStatusPageMap.put(e.getKey(), error ? HandleState.RE_FETCH : HandleState.HANDLED);
-            }
-        });
-
-    }
-
-    private void doGeneratorAllAsync() {
-        if (!Constants.isStaticHtmlStatus()) {
-            return;
-        }
-        if (StringUtils.isEmpty(ZrLogUtil.getBlogHostByWebSite())) {
-            return;
-        }
-        File cacheFolder = Constants.zrLogConfig.getCacheService().getCacheHtmlFolder();
-        if (cacheFolder.exists()) {
-            FileUtils.deleteFile(cacheFolder.toString());
-        }
-        copyCommonAssert();
-        copyDefaultTemplateAssets();
-        handleStatusPageMap.clear();
-        //从首页开始查找
-        handleStatusPageMap.put("/", HandleState.NEW);
-        //生成 404 页面，用于配置第三方 cdn，或者云存储的错误页面
-        String notFindFile = "/error/404.html";
-        handleStatusPageMap.put(notFindFile, HandleState.NEW);
-        PageServiceUtil.saveRedirectRules(notFindFile);
-        lock.lock();
-        long start = System.currentTimeMillis();
-        try {
-            while (handleStatusPageMap.values().stream().anyMatch(e -> e == HandleState.NEW)) {
-                doFetch();
-            }
-        } finally {
-            lock.unlock();
-            long usedTime = (System.currentTimeMillis() - start);
-            if (Constants.debugLoggerPrintAble()) {
-                LOGGER.info("Generator " + ZrLogUtil.getBlogHostByWebSite() + " size " + handleStatusPageMap.size() + " finished in " + usedTime + "ms");
-            } else if (usedTime > Duration.ofMinutes(1).toMillis()) {
-                LOGGER.warning("Generator slow size " + handleStatusPageMap.size() + " finish in " + usedTime);
-            }
-        }
-    }
-
     private static void copyCommonAssert() {
         //admin resource
-        ResourceUtils.getAdminStaticResourceUris().forEach(StaticSitePlugin::copyResourceToCacheFolder);
+        Constants.zrLogConfig.getAdminResource().getAdminStaticResourceUris().forEach(StaticSitePlugin::copyResourceToCacheFolder);
         //video.js
         copyResourceToCacheFolder("/assets/css/font/vjs.eot");
         copyResourceToCacheFolder("/assets/css/font/vjs.svg");
@@ -164,15 +76,16 @@ public class StaticSitePlugin extends BaseLockObject implements IPlugin {
         }
     }
 
-    private static void copyResourceToCacheFolder(String resourceName) {
+    public static void copyResourceToCacheFolder(String resourceName) {
         InputStream inputStream = StaticSitePlugin.class.getResourceAsStream(resourceName);
         if (Objects.isNull(inputStream)) {
             LOGGER.warning("Missing resource " + resourceName);
             return;
         }
-        if (ResourceUtils.isAdminMainJs(resourceName) && StringUtils.isNotEmpty(ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite())) {
+        if (Constants.zrLogConfig.getAdminResource().isAdminMainJs(resourceName)) {
             String stringInputStream = IOUtil.getStringInputStream(inputStream);
-            String newStr = stringInputStream.replace("./admin/", ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite() + "/admin/");
+            String adminPath = "admin/";
+            String newStr = stringInputStream.replace("\"/admin/\"", "document.currentScript.baseURI + \"" + adminPath + "\"");
             Constants.zrLogConfig.getCacheService().saveToCacheFolder(new ByteArrayInputStream(newStr.getBytes()), resourceName);
             return;
         }
@@ -191,6 +104,128 @@ public class StaticSitePlugin extends BaseLockObject implements IPlugin {
         });
     }
 
+    private void doParse(File file) throws IOException {
+        parseLock.lock();
+        try {
+            Document document = Jsoup.parse(file);
+            Elements links = document.select("a");
+            links.forEach(element -> {
+                String href = element.attr("href");
+                if (href.startsWith("//")) {
+                    return;
+                }
+                //exists jobs
+                if (handleStatusPageMap.containsKey(href)) {
+                    return;
+                }
+                if (href.startsWith("/") && href.endsWith(".html")) {
+                    handleStatusPageMap.put(href, HandleState.NEW);
+                }
+            });
+        } finally {
+            parseLock.unlock();
+        }
+    }
+
+    private CompletableFuture<Void> doAsyncFetch(String key, Executor executor) {
+        handleStatusPageMap.put(key, HandleState.HANDING);
+        return CompletableFuture.runAsync(() -> {
+            boolean error = false;
+            ResponseConfig responseConfig = serverConfig.getResponseConfig();
+            responseConfig.setEnableGzip(false);
+            HttpRequest httpRequest;
+            try {
+                httpRequest = WebTools.buildMockRequest(HttpMethod.GET, key, serverConfig.getRequestConfig(), applicationContext);
+            } catch (Exception e) {
+                LOGGER.warning("Generator " + key + " error: " + e.getMessage());
+                return;
+            }
+            String uri = httpRequest.getUri();
+            try {
+                new HttpRequestHandlerRunnable(httpRequest, new SimpleHttpResponse(httpRequest, serverConfig.getResponseConfig())).run();
+                File file = (File) httpRequest.getAttr().get(HTML_FILE_KEY);
+                if (Objects.equals(uri, Constants.ADMIN_PWA_MANIFEST_JSON)) {
+                    return;
+                }
+                if (Objects.equals(uri, Constants.ADMIN_SERVICE_WORKER_JS)) {
+                    return;
+                }
+                if (Objects.isNull(file) || !file.exists()) {
+                    LOGGER.warning("Generator " + uri + " error: missing static file");
+                    error = true;
+                    return;
+                }
+                doParse(file);
+            } catch (Exception ex) {
+                LOGGER.warning("Generator " + uri + " error: " + ex.getMessage());
+            } finally {
+                if (error) {
+                    //如果抓取错误了，需要暂停一下，避免重新获取过快
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException ex) {
+                        LOGGER.warning("Generator " + uri + " error: " + ex.getMessage());
+                    }
+                }
+                handleStatusPageMap.put(key, error ? HandleState.RE_FETCH : HandleState.HANDLED);
+            }
+        }, executor);
+    }
+
+    private void doFetch() {
+        ExecutorService executorService = Executors.newFixedThreadPool(20);
+        try {
+            CompletableFuture.allOf(handleStatusPageMap.entrySet().stream().filter(e -> Arrays.asList(HandleState.NEW, HandleState.RE_FETCH).contains(e.getValue())).map(e -> {
+                return doAsyncFetch(e.getKey(), executorService);
+            }).toArray(CompletableFuture[]::new)).join();
+        } finally {
+            executorService.shutdown();
+        }
+    }
+
+    private void doGeneratorAllAsync() {
+        if (!Constants.isStaticHtmlStatus()) {
+            return;
+        }
+        if (StringUtils.isEmpty(ZrLogUtil.getBlogHostByWebSite())) {
+            return;
+        }
+        File cacheFolder = Constants.zrLogConfig.getCacheService().getCacheHtmlFolder();
+        if (cacheFolder.exists()) {
+            FileUtils.deleteFile(cacheFolder.toString());
+        }
+        Constants.zrLogConfig.getCacheService().refreshFavicon();
+        copyCommonAssert();
+        copyDefaultTemplateAssets();
+        handleStatusPageMap.clear();
+        //从首页开始查找
+        handleStatusPageMap.put(Constants.zrLogConfig.getContextPath() + "/", HandleState.NEW);
+        handleStatusPageMap.put(Constants.zrLogConfig.getContextPath() + Constants.ADMIN_PWA_MANIFEST_JSON, HandleState.NEW);
+        handleStatusPageMap.put(Constants.zrLogConfig.getContextPath() + Constants.ADMIN_SERVICE_WORKER_JS, HandleState.NEW);
+        Constants.zrLogConfig.getAdminResource().getAdminPageUris().forEach(uri -> {
+            handleStatusPageMap.put(Constants.zrLogConfig.getContextPath() + uri, HandleState.NEW);
+        });
+        //生成 404 页面，用于配置第三方 cdn，或者云存储的错误页面
+        String notFindFile = Constants.zrLogConfig.getContextPath() + "/error/404.html";
+        handleStatusPageMap.put(notFindFile, HandleState.NEW);
+        PageServiceUtil.saveRedirectRules(notFindFile);
+        lock.lock();
+        long start = System.currentTimeMillis();
+        try {
+            while (handleStatusPageMap.values().stream().anyMatch(e -> e == HandleState.NEW)) {
+                doFetch();
+            }
+        } finally {
+            lock.unlock();
+            long usedTime = (System.currentTimeMillis() - start);
+            if (Constants.debugLoggerPrintAble()) {
+                LOGGER.info("Generator " + ZrLogUtil.getBlogHostByWebSite() + " size " + handleStatusPageMap.size() + " finished in " + usedTime + "ms");
+            } else if (usedTime > Duration.ofSeconds(10).toMillis()) {
+                LOGGER.warning("Generator slow size " + handleStatusPageMap.size() + " finish in " + usedTime);
+            }
+        }
+    }
+
     @Override
     public boolean start() {
         doGeneratorAllAsync();
@@ -205,5 +240,9 @@ public class StaticSitePlugin extends BaseLockObject implements IPlugin {
     @Override
     public boolean stop() {
         return true;
+    }
+
+    enum HandleState {
+        NEW, HANDING, RE_FETCH, HANDLED
     }
 }

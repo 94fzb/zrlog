@@ -78,7 +78,7 @@ export type FullScreenProps = {
 export type ArticleEditProps = FullScreenProps & {
     data: ArticleEditInfo;
     offline: boolean;
-    deleteStateCacheOnDestroy: () => void;
+    deleteCacheOnDestroy: () => void;
 };
 
 export type ArticleEditState = {

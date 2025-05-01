@@ -5,10 +5,10 @@ import Switch from "antd/es/switch";
 import { getRes, removeRes } from "../../utils/constants";
 import Button from "antd/es/button";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { message } from "antd";
 import { Blog } from "./index";
 import Title from "antd/es/typography/Title";
+import {useAxiosBaseInstance} from "../../base/AppBase";
 
 const layout = {
     labelCol: { span: 8 },
@@ -19,8 +19,10 @@ const BlogForm = ({ data, offline }: { data: Blog; offline?: boolean }) => {
     const [form, setForm] = useState<any>(data);
     const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
 
+    const axiosInstance = useAxiosBaseInstance();
+
     const websiteFormFinish = (changedValues: any) => {
-        axios.post("/api/admin/website/blog", { ...form, ...changedValues }).then(async ({ data }) => {
+        axiosInstance.post("/api/admin/website/blog", { ...form, ...changedValues }).then(async ({ data }) => {
             if (data.error) {
                 await messageApi.error(data.message);
                 return;

@@ -18,6 +18,8 @@ public interface CacheService {
 
     File getCacheHtmlFolder();
 
+    long getWebSiteVersion();
+
     void saveToCacheFolder(InputStream inputStream, String uri);
 
     CompletableFuture<BaseDataInitVO> refreshInitDataCacheAsync(HttpRequest servletRequest, boolean cleanAble);

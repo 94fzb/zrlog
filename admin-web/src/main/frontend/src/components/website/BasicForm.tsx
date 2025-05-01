@@ -5,11 +5,11 @@ import TextArea from "antd/es/input/TextArea";
 import Button from "antd/es/button";
 import { getRes, removeRes } from "../../utils/constants";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { message } from "antd";
 import { Basic } from "./index";
 import FaviconUpload from "./FaviconUpload";
 import Title from "antd/es/typography/Title";
+import {useAxiosBaseInstance} from "../../base/AppBase";
 
 const layout = {
     labelCol: { span: 8 },
@@ -20,8 +20,9 @@ const BasicForm = ({ data, offline }: { data: Basic; offline: boolean }) => {
     const [form, setForm] = useState<Basic>(data);
 
     const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
+    const axiosInstance = useAxiosBaseInstance();
     const websiteFormFinish = (changedValues: Basic) => {
-        axios.post("/api/admin/website/basic", { ...form, ...changedValues }).then(async ({ data }) => {
+        axiosInstance.post("/api/admin/website/basic", { ...form, ...changedValues }).then(async ({ data }) => {
             if (data.error) {
                 await messageApi.error(data.message);
                 return;
