@@ -2,6 +2,7 @@ package com.zrlog.business.service;
 
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.StringUtils;
+import com.zrlog.business.util.StaticFileCacheUtils;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.TemplateVO;
 import com.zrlog.util.I18nUtil;
@@ -45,7 +46,7 @@ public class TemplateInfoHelper {
                     if (!image.startsWith("https://") && !image.startsWith("http://")) {
                         images[i] = templatePath + "/" + image;
                         if (i == 0) {
-                            adminPreviewImageUrl = ADMIN_PREVIEW_IMAGE_URI + "?shortTemplate=" + templateVO.getShortTemplate() + "&t=" + Constants.zrLogConfig.getCacheService().getFileFlagFirstByCache(images[i]);
+                            adminPreviewImageUrl = ADMIN_PREVIEW_IMAGE_URI + "?shortTemplate=" + templateVO.getShortTemplate() + "&t=" + StaticFileCacheUtils.getInstance().getFileFlagFirstByCache(images[i]);
                         }
                     } else {
                         if (i == 0) {

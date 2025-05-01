@@ -1,9 +1,8 @@
-import Title from "antd/es/typography/Title";
-import Divider from "antd/es/divider";
 import BaseTable, { PageDataSource } from "../../common/BaseTable";
 import { getRes } from "../../utils/constants";
 import EditLink from "./edit_link";
 import AddLink from "./add_link";
+import BaseTitle from "../../base/BaseTitle";
 
 const BLink = ({ data, offline }: { data: PageDataSource; offline: boolean }) => {
     const getColumns = () => {
@@ -45,10 +44,7 @@ const BLink = ({ data, offline }: { data: PageDataSource; offline: boolean }) =>
 
     return (
         <>
-            <Title className="page-header" level={3}>
-                {getRes()["admin.link.manage"]}
-            </Title>
-            <Divider />
+            <BaseTitle title={getRes()["admin.link.manage"]} />
             <BaseTable
                 defaultPageSize={10}
                 offline={offline}

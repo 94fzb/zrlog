@@ -24,7 +24,7 @@ public class UploadFileUtils {
             joiner.add(fileExt);
         }
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-        return Constants.ATTACHED_FOLDER + request.getParaToStr("dir") + "/" + sdf.format(new Date()) + "/" + joiner;
+        return Constants.ATTACHED_FOLDER + request.getParaToStr("dir", "") + "/" + sdf.format(new Date()) + "/" + joiner;
     }
 
 }

@@ -5,11 +5,11 @@ import TextArea from "antd/es/input/TextArea";
 import Button from "antd/es/button";
 import { getRes, removeRes } from "../../utils/constants";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { message } from "antd";
 import { Basic } from "./index";
 import FaviconUpload from "./FaviconUpload";
 import Title from "antd/es/typography/Title";
+import { useAxiosBaseInstance } from "../../base/AppBase";
 
 const layout = {
     labelCol: { span: 8 },
@@ -19,9 +19,18 @@ const layout = {
 const BasicForm = ({ data, offline }: { data: Basic; offline: boolean }) => {
     const [form, setForm] = useState<Basic>(data);
 
+    const [loading, setLoading] = useState<boolean>(false);
+
     const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
-    const websiteFormFinish = (changedValues: Basic) => {
-        axios.post("/api/admin/website/basic", { ...form, ...changedValues }).then(async ({ data }) => {
+    const axiosInstance = useAxiosBaseInstance();
+    const websiteFormFinish = async (changedValues: Basic) => {
+        if (loading) {
+            return;
+        }
+        try {
+            setLoading(true);
+            const { data } = await axiosInstance.post("/api/admin/website/basic", { ...form, ...changedValues });
+            setLoading(false);
             if (data.error) {
                 await messageApi.error(data.message);
                 return;
@@ -30,8 +39,15 @@ const BasicForm = ({ data, offline }: { data: Basic; offline: boolean }) => {
                 await messageApi.success(data.message);
                 removeRes();
                 window.location.reload();
+            } else {
+                await messageApi.error(data.message);
             }
-        });
+        } catch (e) {
+            setLoading(false);
+            await messageApi.error((e as Error).message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     useEffect(() => {
@@ -47,7 +63,7 @@ const BasicForm = ({ data, offline }: { data: Basic; offline: boolean }) => {
                 {...layout}
                 initialValues={form}
                 onValuesChange={(_k, v) => setForm({ ...form, ...v })}
-                onFinish={(k) => websiteFormFinish(k)}
+                onFinish={async (k) => await websiteFormFinish(k)}
             >
                 <Form.Item name="title" label="网站标题" rules={[{ required: true }]}>
                     <Input placeholder="请输入网站标题" showCount={true} maxLength={30} />
@@ -70,7 +86,7 @@ const BasicForm = ({ data, offline }: { data: Basic; offline: boolean }) => {
                     />
                 </Form.Item>
                 <Divider />
-                <Button disabled={offline} type="primary" htmlType="submit">
+                <Button loading={loading} disabled={offline} type="primary" htmlType="submit">
                     {getRes().submit}
                 </Button>
             </Form>

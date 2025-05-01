@@ -12,7 +12,6 @@ import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.logging.Logger;
 
@@ -35,7 +34,8 @@ public class HttpFileHandle extends HttpHandle<File> {
 
     private String getFileName(String uriPath) {
         if (StringUtils.isEmpty(fileName)) {
-            return Arrays.asList(uriPath.split("/")).getLast();
+            String[] split = uriPath.split("/");
+            return split[split.length - 1];
         }
         return fileName;
     }

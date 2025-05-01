@@ -33,7 +33,7 @@ public class TemplateService {
     }
 
     public UploadTemplateResponse upload(String templateName, File file) throws IOException {
-        String finalPath = PathUtil.getStaticPath() + Constants.TEMPLATE_BASE_PATH;
+        String finalPath = PathUtil.getStaticFile(Constants.TEMPLATE_BASE_PATH).toString();
         String finalFile = finalPath + templateName;
         FileUtils.deleteFile(finalFile);
         //start extract template file
@@ -54,7 +54,7 @@ public class TemplateService {
             defaultTemplateInfo.setConfigAble(true);
             templates.add(defaultTemplateInfo);
         }
-        File[] templatesFile = new File(PathUtil.getStaticPath() + Constants.TEMPLATE_BASE_PATH).listFiles();
+        File[] templatesFile = PathUtil.getStaticFile(Constants.TEMPLATE_BASE_PATH).listFiles();
         if (templatesFile != null) {
             for (File file : templatesFile) {
                 if (file.isDirectory() && !file.isHidden()) {
@@ -67,7 +67,7 @@ public class TemplateService {
                         continue;
                     }
                     templateVO.setDeleteAble(true);
-                    File settingFile = new File(PathUtil.getStaticPath() + templateVO.getTemplate() + "/setting/config-form.json");
+                    File settingFile = PathUtil.getStaticFile(templateVO.getTemplate() + "/setting/config-form.json");
                     templateVO.setConfigAble(settingFile.exists());
                     templates.add(templateVO);
                 }
@@ -75,7 +75,7 @@ public class TemplateService {
         }
         for (TemplateVO templateVO : templates) {
             //同时存在以使用为主
-            if (templateVO.getTemplate().equals(Constants.zrLogConfig.getPublicWebSite().get("template"))) {
+            if (templateVO.getTemplate().equals(Constants.getStringByFromWebSite("template"))) {
                 templateVO.setUse(true);
                 continue;
             }
@@ -89,7 +89,6 @@ public class TemplateService {
 
 
     private static TemplateVO getTemplateVO(File file) {
-        String templatePath = file.toString().substring(PathUtil.getStaticPath().length() - 1).replace("\\", "/");
         if (!file.exists() || !file.isDirectory()) {
             return null;
         }
@@ -98,6 +97,7 @@ public class TemplateService {
             return null;
         }
         try {
+            String templatePath = file.toString().substring(PathUtil.getStaticFile("/").toString().length()).replace("\\", "/");
             return TemplateInfoHelper.getTemplateVOByInputStream(templatePath, new FileInputStream(templateInfo));
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
@@ -109,7 +109,7 @@ public class TemplateService {
             String jsonStr = IOUtil.getStringInputStream(TemplateService.class.getResourceAsStream(Constants.DEFAULT_TEMPLATE_PATH + "/setting/config-form.json"));
             return new Gson().fromJson(jsonStr, TemplateVO.TemplateConfigMap.class);
         }
-        File configFile = new File(PathUtil.getStaticPath() + templateName + "/setting/config-form.json");
+        File configFile = PathUtil.getStaticFile(templateName + "/setting/config-form.json");
         //文件存在才配置
         if (configFile.exists()) {
             String jsonStr;
@@ -125,7 +125,7 @@ public class TemplateService {
 
     public TemplateVO loadTemplateConfig(String templateName) {
         TemplateVO templateVO = Objects.equals(templateName, Constants.DEFAULT_TEMPLATE_PATH) ? TemplateInfoHelper.getDefaultTemplateVO() : getTemplateVO(
-                new File(PathUtil.getStaticPath() + templateName));
+                PathUtil.getStaticFile(templateName));
         if (Objects.isNull(templateVO)) {
             return null;
         }

@@ -4,14 +4,14 @@ import { Col, Row, Space, TableColumnsType, Tag, Tooltip } from "antd";
 import Search from "antd/es/input/Search";
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
-import { getColorPrimary, getRes } from "../../utils/constants";
+import { getColorPrimary, getRealRouteUrl, getRes } from "../../utils/constants";
+import type * as React from "react";
 import { ReactElement, useEffect, useRef, useState } from "react";
 import BaseTable, { ArticlePageDataSource } from "../../common/BaseTable";
 import { Link } from "react-router-dom";
-import { removeCacheDataByKey } from "../../cache";
+import { removeCacheDataByKey } from "../../utils/cache";
 import { useLocation } from "react-router";
 import { SortOrder } from "antd/es/table/interface";
-import type * as React from "react";
 
 const genTypes = (d: ArticlePageDataSource, search: string) => {
     const types = new URLSearchParams(search).get("types") as unknown as string;
@@ -266,12 +266,12 @@ const Index = ({ data, offline }: { data: ArticlePageDataSource; offline: boolea
                 datasource={data}
                 columns={getColumns()}
                 editBtnRender={(id) => (
-                    <Link to={"/article-edit?id=" + id}>
+                    <Link to={getRealRouteUrl("/article-edit?id=" + id)}>
                         <EditOutlined style={{ color: getColorPrimary() }} />
                     </Link>
                 )}
                 deleteSuccessCallback={(id) => {
-                    removeCacheDataByKey("/article-edit?id=" + id);
+                    removeCacheDataByKey(getRealRouteUrl("/article-edit?id=" + id));
                 }}
                 deleteApi={getDeleteApiUri()}
                 searchKey={searchKey}

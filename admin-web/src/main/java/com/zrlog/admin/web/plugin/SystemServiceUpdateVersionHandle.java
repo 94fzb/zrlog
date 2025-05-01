@@ -1,7 +1,5 @@
 package com.zrlog.admin.web.plugin;
 
-import com.zrlog.business.service.InstallService;
-
 import java.util.Map;
 
 public class SystemServiceUpdateVersionHandle implements UpdateVersionHandler {
@@ -26,7 +24,7 @@ public class SystemServiceUpdateVersionHandle implements UpdateVersionHandler {
 
     @Override
     public void doHandle() {
-        message = InstallService.renderMd((String) blogRes.get("systemServiceUpgradeTips"));
+        message = (String) blogRes.get("systemServiceUpgradeTips");
         finish = true;
     }
 }

@@ -5,12 +5,12 @@ import com.hibegin.common.util.IOUtil;
 import com.hibegin.http.annotation.ResponseBody;
 import com.hibegin.http.server.util.PathUtil;
 import com.hibegin.http.server.web.Controller;
-import com.zrlog.admin.business.exception.ArgsException;
+import com.zrlog.admin.business.rest.response.AdminApiPageDataStandardResponse;
 import com.zrlog.admin.business.rest.response.UploadFileResponse;
 import com.zrlog.admin.business.service.UploadService;
-import com.zrlog.admin.web.token.AdminTokenThreadLocal;
-import com.zrlog.common.rest.response.ApiStandardResponse;
 import com.zrlog.admin.util.UploadFileUtils;
+import com.zrlog.admin.web.token.AdminTokenThreadLocal;
+import com.zrlog.common.exception.ArgsException;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,21 +21,21 @@ public class UploadController extends Controller {
     //private static final Logger LOGGER = LoggerUtil.getLogger(UploadController.class);
 
     @ResponseBody
-    public ApiStandardResponse<UploadFileResponse> index() {
+    public AdminApiPageDataStandardResponse<UploadFileResponse> index() {
         String uploadFieldName = "imgFile";
         File imgFile = request.getFile(uploadFieldName);
         if (imgFile == null || !imgFile.exists()) {
             throw new ArgsException("imgFile");
         }
         String uri = UploadFileUtils.generatorUri(uploadFieldName, request);
-        String finalFilePath = PathUtil.getStaticPath() + uri;
+        String finalFilePath = PathUtil.getStaticFile(uri).toString();
         FileUtils.moveOrCopyFile(imgFile.toString(), finalFilePath, true);
-        return new ApiStandardResponse<>(new UploadService().getCloudUrl("", uri, finalFilePath, getRequest(), AdminTokenThreadLocal.getUser()));
+        return new AdminApiPageDataStandardResponse<>(new UploadService().getCloudUrl("", uri, finalFilePath, getRequest(), AdminTokenThreadLocal.getUser()));
     }
 
 
     @ResponseBody
-    public ApiStandardResponse<UploadFileResponse> thumbnail() throws IOException {
+    public AdminApiPageDataStandardResponse<UploadFileResponse> thumbnail() throws IOException {
         String uploadFieldName = "imgFile";
         File tempImgFile = request.getFile(uploadFieldName);
         if (tempImgFile == null || !tempImgFile.exists()) {
@@ -43,7 +43,7 @@ public class UploadController extends Controller {
         }
         String uri = UploadFileUtils.generatorUri(uploadFieldName, request);
         try {
-            String finalFilePath = PathUtil.getStaticPath() + uri;
+            String finalFilePath = PathUtil.getStaticFile(uri).toString();
             byte[] bytes = IOUtil.getByteByInputStream(new FileInputStream(tempImgFile));
             File thumbnailFile = new File(finalFilePath);
             if (!thumbnailFile.getParentFile().exists()) {
@@ -54,7 +54,7 @@ public class UploadController extends Controller {
             //copy file
             IOUtil.writeBytesToFile(bytes, thumbnailFile);
             UploadFileResponse uploadFileResponse = new UploadService().getCloudUrl("", uri, finalFilePath, getRequest(), AdminTokenThreadLocal.getUser());
-            return new ApiStandardResponse<>(new UploadFileResponse(uploadFileResponse.url() + "?h=" + height + "&w=" + width));
+            return new AdminApiPageDataStandardResponse<>(new UploadFileResponse(uploadFileResponse.getUrl() + "?h=" + height + "&w=" + width));
         } finally {
             tempImgFile.delete();
         }

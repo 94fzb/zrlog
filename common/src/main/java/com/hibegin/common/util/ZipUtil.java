@@ -58,4 +58,8 @@ public class ZipUtil {
         }
         zos.close();
     }
+
+    public static void main(String[] args) throws IOException {
+        unZip("/Users/xiaochun/git/zrlog/conf/plugins.zip","/tmp/conf");
+    }
 }

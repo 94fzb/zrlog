@@ -1,16 +1,16 @@
 package com.zrlog.admin.web.controller.api;
 
-import com.hibegin.common.util.BeanUtil;
+import com.hibegin.common.dao.dto.PageData;
 import com.hibegin.http.annotation.ResponseBody;
-import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.rest.request.CreateNavRequest;
 import com.zrlog.admin.business.rest.request.UpdateNavRequestRequest;
+import com.zrlog.admin.business.rest.response.AdminApiPageDataStandardResponse;
 import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
 import com.zrlog.admin.web.annotation.RefreshCache;
-import com.zrlog.blog.web.util.ControllerUtil;
+import com.zrlog.business.plugin.StaticSitePlugin;
 import com.zrlog.business.service.TemplateHelper;
-import com.zrlog.common.rest.response.ApiStandardResponse;
-import com.zrlog.data.dto.PageData;
+import com.zrlog.business.util.ControllerUtil;
+import com.zrlog.common.controller.BaseController;
 import com.zrlog.model.LogNav;
 
 import java.io.IOException;
@@ -18,12 +18,13 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.Objects;
 
-public class BlogNavController extends Controller {
+public class BlogNavController extends BaseController {
 
     @RefreshCache(async = true)
     @ResponseBody
     public UpdateRecordResponse delete() throws SQLException {
-        String[] ids = Objects.requireNonNullElse(request.getParaToStr("id"), "").split(",");
+        String idStr = getParamWithEmptyCheck("id");
+        String[] ids = idStr.split(",");
         for (String id : ids) {
             new LogNav().deleteById(Integer.parseInt(id));
         }
@@ -31,18 +32,18 @@ public class BlogNavController extends Controller {
     }
 
     @ResponseBody
-    public ApiStandardResponse<PageData<Map<String, Object>>> index() throws SQLException {
+    public AdminApiPageDataStandardResponse<PageData<Map<String, Object>>> index() throws SQLException {
         PageData<Map<String, Object>> mapPageData = new LogNav().find(ControllerUtil.unPageRequest());
         mapPageData.getRows().forEach(e -> {
-            e.put("jumpUrl", TemplateHelper.getNavUrl(request, TemplateHelper.getSuffix(request), (String) e.get("url")));
+            e.put("jumpUrl", TemplateHelper.getNavUrl(request, StaticSitePlugin.getSuffix(request), (String) e.get("url")));
         });
-        return new ApiStandardResponse<>(mapPageData);
+        return new AdminApiPageDataStandardResponse<>(mapPageData);
     }
 
     @RefreshCache(async = true)
     @ResponseBody
     public UpdateRecordResponse add() throws IOException, SQLException {
-        CreateNavRequest createNavRequest = BeanUtil.convertWithValid(getRequest().getInputStream(), CreateNavRequest.class);
+        CreateNavRequest createNavRequest = getRequestBodyWithNullCheck(CreateNavRequest.class);
         return new UpdateRecordResponse(new LogNav().set("navName", createNavRequest.getNavName()).set("url",
                 createNavRequest.getUrl()).set("sort", createNavRequest.getSort()).save());
     }
@@ -50,7 +51,7 @@ public class BlogNavController extends Controller {
     @RefreshCache(async = true)
     @ResponseBody
     public UpdateRecordResponse update() throws IOException, SQLException {
-        UpdateNavRequestRequest createNavRequest = BeanUtil.convertWithValid(getRequest().getInputStream(), UpdateNavRequestRequest.class);
+        UpdateNavRequestRequest createNavRequest = getRequestBodyWithNullCheck(UpdateNavRequestRequest.class);
         return new UpdateRecordResponse(new LogNav()
                 .set("navName", createNavRequest.getNavName())
                 .set("url", createNavRequest.getUrl())

@@ -1,6 +1,6 @@
 package com.zrlog.model;
 
-import com.hibegin.dao.DAO;
+import com.hibegin.common.dao.DAO;
 
 import java.sql.SQLException;
 import java.util.Map;
@@ -14,14 +14,6 @@ public class User extends DAO {
     public User() {
         this.tableName = "user";
         this.pk = "userId";
-    }
-
-    public String getPasswordByUserName(String userName) throws SQLException {
-        Map<String, Object> user = queryFirstWithParams("select * from " + tableName + " where userName=?", userName);
-        if (user != null) {
-            return (String) user.get("password");
-        }
-        return null;
     }
 
     public Map<String, Object> getUserByUserName(String userName) throws SQLException {

@@ -1,30 +1,24 @@
 package com.zrlog.common;
 
-import com.hibegin.http.server.api.HttpRequest;
-import com.zrlog.business.cache.vo.BaseDataInitVO;
-
-import java.io.File;
-import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
-public interface CacheService {
+public interface CacheService<T> {
 
-    void refreshFavicon();
+    String ZRLOG_SQL_VERSION_KEY = "zrlogSqlVersion";
 
-    File loadCacheFile(HttpRequest request);
+    long getCurrentSqlVersion();
 
-    File saveResponseBodyToHtml(HttpRequest httpRequest, String copy);
+    long getWebSiteVersion();
 
-    File getCacheHtmlFolder();
+    T getInitData();
 
-    void saveToCacheFolder(InputStream inputStream, String uri);
+    T refreshInitData();
 
-    CompletableFuture<BaseDataInitVO> refreshInitDataCacheAsync(HttpRequest servletRequest, boolean cleanAble);
+    Object getPublicWebSiteInfoFirstByCache(String key);
 
-    String getFileFlagFirstByCache(String uriPath);
+    List<Map<String, Object>> getArticleTypes();
 
-    boolean isCacheableByRequest(HttpRequest request);
+    List<Map<String, Object>> getTags();
 
-    Map<String, Object> refreshWebSite();
 }

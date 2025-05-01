@@ -1,11 +1,18 @@
-import {useLocation} from "react-router";
-import {parseQueryParamsToMap} from "../utils/helpers";
+import { getBackendServerUrl } from "../utils/constants";
+import { FunctionComponent } from "react";
+import { AdminCommonProps } from "../type";
+import Offline from "../common/Offline";
 
-const Plugin = () => {
-    const location = useLocation();
-    const queryParamMap: Map<string, string> = parseQueryParamsToMap(location.search);
-    const pluginUrl = "admin/plugins/" + (queryParamMap.get('page') ? queryParamMap.get('page') : "");
-    return <iframe width="100%" style={{border: 0}} height={1200} src={document.baseURI + pluginUrl}/>;
+type PluginData = {
+    includePagePath: string;
+};
+
+const Plugin: FunctionComponent<AdminCommonProps<PluginData>> = ({ data, offline }) => {
+    const pluginUrl = getBackendServerUrl() + data.includePagePath;
+    if (offline) {
+        return <Offline />;
+    }
+    return <iframe width="100%" style={{ border: 0 }} height={1200} src={pluginUrl} />;
 };
 
 export default Plugin;

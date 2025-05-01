@@ -1,13 +1,13 @@
 import { message, PaginationProps, Space, Table, TableColumnsType } from "antd";
 import { FunctionComponent, useEffect, useState } from "react";
-import axios from "axios";
 import { mapToQueryString } from "../utils/helpers";
 import Popconfirm from "antd/es/popconfirm";
-import { cacheIgnoreReloadKey, getRes } from "../utils/constants";
+import { cacheIgnoreReloadTime, getRealRouteUrl, getRes, isDev } from "../utils/constants";
 import { DeleteOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import { useLocation } from "react-router";
 import { SorterResult } from "antd/es/table/interface";
+import { useAxiosBaseInstance } from "../base/AppBase";
 
 type BaseTableProps = {
     deleteApi: string;
@@ -25,7 +25,7 @@ type BaseTableProps = {
 export type PageDataSource = {
     rows: [];
     page: number;
-    key?: string;
+    key: string;
     sort: string[];
     size: number;
     defaultPageSize: number;
@@ -82,18 +82,20 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
             queryParam.key = searchKey.trim();
         }
         if (t > 0) {
-            queryParam[cacheIgnoreReloadKey] = t;
+            queryParam[cacheIgnoreReloadTime] = t;
         }
         if (sort.length > 0) {
             //暂时支持一个属性进行排序
             queryParam["sort"] = sort[0];
         }
         const queryStr = mapToQueryString(queryParam);
-        console.info(queryStr + "===<");
-        if (queryStr.length === 0) {
-            return location.pathname;
+        if (isDev()) {
+            console.info(queryStr + "===<");
         }
-        return location.pathname + "?" + queryStr;
+        if (queryStr.length === 0) {
+            return getRealRouteUrl(location.pathname);
+        }
+        return getRealRouteUrl(location.pathname + "?" + queryStr);
     };
 
     const fetchData = (page: number, size: number, searchKey: string | undefined, sorter: string[]) => {
@@ -125,8 +127,9 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
     });
 
     const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
+    const axiosInstance = useAxiosBaseInstance();
     const handleDelete = async (pagination: MyPagination, deleteApiUri: string, key: string): Promise<boolean> => {
-        const response = await axios.post(deleteApiUri + "?id=" + key);
+        const response = await axiosInstance.post(deleteApiUri + "?id=" + key);
         if (response.data.error) {
             messageApi.error(response.data.message);
             return false;

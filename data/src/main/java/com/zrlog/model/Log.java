@@ -1,18 +1,18 @@
 package com.zrlog.model;
 
+import com.hibegin.common.dao.BasePageableDAO;
+import com.hibegin.common.dao.ResultValueConvertUtils;
+import com.hibegin.common.dao.dto.OrderBy;
+import com.hibegin.common.dao.dto.PageData;
+import com.hibegin.common.dao.dto.PageRequest;
+import com.hibegin.common.dao.dto.PageRequestImpl;
 import com.hibegin.common.util.StringUtils;
-import com.zrlog.common.rest.request.OrderBy;
-import com.zrlog.common.rest.request.PageRequest;
-import com.zrlog.common.rest.request.PageRequestImpl;
-import com.zrlog.data.dto.PageData;
 import com.zrlog.util.ParseUtil;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -67,19 +67,23 @@ public class Log extends BasePageableDAO implements Serializable {
 
     public Map<String, Object> findLastLog(int id) throws SQLException {
         String lastLogSql =
-                "select l.alias as alias,l.title as title from " + tableName + " l where rubbish=? and " + "privacy" + "=? and l.logId<? order by logId desc";
+                "select l.alias as alias,l.title as title from " + tableName + " l where rubbish=? and " + "privacy" + "=? and l.logId<? order by logId desc limit 1";
         return queryFirstWithParams(lastLogSql, false, false, id);
 
     }
 
     public Map<String, Object> findNextLog(int id) throws SQLException {
         String nextLogSql =
-                "select l.alias as alias,l.title as title from " + tableName + " l where rubbish=? and " + "privacy" + "=? and l.logId>?";
+                "select l.alias as alias,l.title as title from " + tableName + " l where rubbish=? and " + "privacy" + "=? and l.logId>? limit 1";
         return queryFirstWithParams(nextLogSql, false, false, id);
     }
 
     public long findMaxId() throws SQLException {
-        return Objects.requireNonNullElse((Number) queryFirstObj("select max(logId) max from " + tableName), 0).longValue();
+        Number number = (Number) queryFirstObj("select max(logId) max from " + tableName);
+        if (Objects.isNull(number)) {
+            return 0;
+        }
+        return number.longValue();
 
     }
 
@@ -123,6 +127,18 @@ public class Log extends BasePageableDAO implements Serializable {
                 searchParam.toArray());
     }
 
+    private static final Map<String, String> sortKeyMap = new HashMap<>();
+
+    static {
+        sortKeyMap.put("typeName", "l.typeId");
+        sortKeyMap.put("releaseTime", "l.releaseTime");
+        sortKeyMap.put("commentSize", "commentSize");
+        sortKeyMap.put("privacy", "l.privacy");
+        sortKeyMap.put("click", "l.click");
+        sortKeyMap.put("lastUpdateDate", "l.last_update_date");
+    }
+
+
     private static String getPageSort(PageRequest pageRequest) {
         List<OrderBy> orders = pageRequest.getSorts();
         if (orders == null || orders.isEmpty()) {
@@ -130,15 +146,8 @@ public class Log extends BasePageableDAO implements Serializable {
         }
         StringBuilder orderSort = new StringBuilder();
         for (OrderBy orderBy : orders) {
-            orderSort.append(switch (orderBy.sortKey()) {
-                case "typeName" -> "l.typeId";
-                case "releaseTime" -> "l.releaseTime";
-                case "commentSize" -> "commentSize";
-                case "privacy" -> "l.privacy";
-                case "click" -> "l.click";
-                case "lastUpdateDate" -> "l.last_update_date";
-                default -> "l.logId";
-            }).append(" ").append(orderBy.direction().name().toLowerCase());
+            orderSort.append(sortKeyMap.getOrDefault(orderBy.getSortKey(), "l.logId"));
+            orderSort.append(" ").append(orderBy.getDirection().name().toLowerCase());
         }
         return orderSort.toString();
     }
@@ -152,19 +161,12 @@ public class Log extends BasePageableDAO implements Serializable {
 
     public Map<String, Long> getArchives() throws SQLException {
         List<Map<String, Object>> lo =
-                queryListWithParams("select  releaseTime from " + tableName + "  where rubbish=? and privacy=? " + "order by " + "releaseTime desc", false, false);
+                queryListWithParams("select releaseTime from " + tableName + "  where rubbish=? and privacy=? " + "order by " + "releaseTime desc", false, false);
         Map<String, Long> archives = new LinkedHashMap<>();
         for (Map<String, Object> entry : lo) {
             Object value = entry.get("releaseTime");
             if (value != null) {
-                String key;
-                if (value instanceof LocalDateTime) {
-                    key = ((LocalDateTime) value).format(DateTimeFormatter.ofPattern("yyyy_MM"));
-                } else if (value instanceof Timestamp) {
-                    key = new SimpleDateFormat("yyyy_MM").format(new Date(((Timestamp) value).getTime()));
-                } else {
-                    key = "";
-                }
+                String key = ResultValueConvertUtils.formatDate(value, "yyyy_MM");
                 if (archives.containsKey(key)) {
                     archives.put(key, archives.get(key) + 1);
                 } else {
@@ -180,20 +182,14 @@ public class Log extends BasePageableDAO implements Serializable {
         Map<String, Long> archives = new LinkedHashMap<>();
         for (Map<String, Object> entry : lo) {
             Object value = entry.get("releaseTime");
-            if (value != null) {
-                String key;
-                if (value instanceof LocalDateTime) {
-                    key = ((LocalDateTime) value).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-                } else if (value instanceof Timestamp) {
-                    key = new SimpleDateFormat("yyyy-MM-dd").format(new Date(((Timestamp) value).getTime()));
-                } else {
-                    key = "";
-                }
-                if (archives.containsKey(key)) {
-                    archives.put(key, archives.get(key) + 1);
-                } else {
-                    archives.put(key, 1L);
-                }
+            if (Objects.isNull(value)) {
+                continue;
+            }
+            String key = ResultValueConvertUtils.formatDate(value, "yyyy-MM-dd");
+            if (archives.containsKey(key)) {
+                archives.put(key, archives.get(key) + 1);
+            } else {
+                archives.put(key, 1L);
             }
         }
         return archives;
@@ -207,32 +203,24 @@ public class Log extends BasePageableDAO implements Serializable {
         return queryPageData(sql, new PageRequestImpl(page, pageSize), new Object[]{false, false, tag + ",%", "%," + tag + ",%", "%," + tag, tag});
     }
 
-    private List<Map<String, Object>> findEntry(String sql, Object[] paras) throws SQLException {
-        return queryListWithParams(sql, paras);
-    }
-
-    public PageData<Map<String, Object>> findByDate(long page, long pageSize, String date) {
+    public PageData<Map<String, Object>> findByDate(long page, long pageSize, String yyyyMM) {
+        if (StringUtils.isEmpty(yyyyMM)) {
+            return new PageData<>();
+        }
         String sql =
                 "select l.*,t.typeName,t.alias as typeAlias,(select count(commentId) from " + Comment.TABLE_NAME + " "
-                        + "where logId=l.logId ) commentSize,u.userName from " + tableName + " l inner join user u," + "type t where rubbish=? and privacy=? and u.userId=l.userId and t.typeId=l.typeId and " + "DATE_FORMAT(releaseTime,'%Y_%m')=? order by l.logId desc";
+                        + "where logId=l.logId ) commentSize,u.userName from " + tableName + " l inner join user u," + "type t where rubbish=? and privacy=? and u.userId=l.userId and t.typeId=l.typeId and releaseTime between ? and ? order by l.logId desc";
+        String start = yyyyMM.replace("_", "-") + "-01 00:00:00";
+        YearMonth parse = YearMonth.parse(yyyyMM, DateTimeFormatter.ofPattern("yyyy_MM"));
+        String end = parse.atEndOfMonth().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + " 23:59:59";
         return queryPageData(sql, new PageRequestImpl(page, pageSize)
-                , new Object[]{false, false, date});
-    }
+                , new Object[]{false, false, start, end});
 
-    /**
-     *
-     */
-    public void clickAdd(Object idOrAlias) throws SQLException {
-        Map<String, Object> log = adminFindByIdOrAlias(idOrAlias);
-        if (Objects.isNull(log)) {
-            return;
-        }
-        new Log().set("click", ((Integer) log.get("click")) + 1).updateById(log.get("logId"));
     }
 
     public BigDecimal sumClick() throws SQLException {
-        BigDecimal sum = (BigDecimal) queryFirstObj("select sum(click) from " + tableName);
-        return sum == null ? new BigDecimal(0) : sum;
+        Number sum = (Number) queryFirstObj("select sum(click) from " + tableName);
+        return sum == null ? new BigDecimal(0) : new BigDecimal(sum.longValue());
     }
 
     public long getVisitorCount() {
@@ -241,7 +229,7 @@ public class Log extends BasePageableDAO implements Serializable {
 
     public long countByTypeId(Integer typeId) {
         try {
-            return (long) queryFirstObj("select count(1) as count from " + tableName + " where typeId=?", typeId);
+            return ((Number) queryFirstObj("select count(1) as count from " + tableName + " where typeId=?", typeId)).longValue();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

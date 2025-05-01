@@ -5,10 +5,10 @@ import Switch from "antd/es/switch";
 import { getRes, removeRes } from "../../utils/constants";
 import Button from "antd/es/button";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { message } from "antd";
 import { Blog } from "./index";
 import Title from "antd/es/typography/Title";
+import { useAxiosBaseInstance } from "../../base/AppBase";
 
 const layout = {
     labelCol: { span: 8 },
@@ -18,9 +18,18 @@ const layout = {
 const BlogForm = ({ data, offline }: { data: Blog; offline?: boolean }) => {
     const [form, setForm] = useState<any>(data);
     const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
+    const [loading, setLoading] = useState<boolean>(false);
 
-    const websiteFormFinish = (changedValues: any) => {
-        axios.post("/api/admin/website/blog", { ...form, ...changedValues }).then(async ({ data }) => {
+    const axiosInstance = useAxiosBaseInstance();
+
+    const websiteFormFinish = async (changedValues: Blog) => {
+        if (loading) {
+            return;
+        }
+        try {
+            setLoading(true);
+            const { data } = await axiosInstance.post("/api/admin/website/blog", { ...form, ...changedValues });
+            setLoading(false);
             if (data.error) {
                 await messageApi.error(data.message);
                 return;
@@ -29,8 +38,15 @@ const BlogForm = ({ data, offline }: { data: Blog; offline?: boolean }) => {
                 await messageApi.success(data.message);
                 removeRes();
                 window.location.reload();
+            } else {
+                await messageApi.error(data.message);
             }
-        });
+        } catch (e) {
+            setLoading(false);
+            await messageApi.error((e as Error).message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     useEffect(() => {
@@ -61,7 +77,7 @@ const BlogForm = ({ data, offline }: { data: Blog; offline?: boolean }) => {
                     <Switch size={"small"} />
                 </Form.Item>
                 <Divider />
-                <Button type="primary" disabled={offline} htmlType="submit">
+                <Button loading={loading} type="primary" disabled={offline} htmlType="submit">
                     {getRes().submit}
                 </Button>
             </Form>

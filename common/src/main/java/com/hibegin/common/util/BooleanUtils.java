@@ -7,7 +7,7 @@ public class BooleanUtils {
     }
 
     public static boolean isTrue(String bool) {
-        return bool != null && "true".equals(bool);
+        return "true".equals(bool);
     }
 
     public static boolean isFalse(String bool) {

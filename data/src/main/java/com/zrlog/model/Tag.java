@@ -1,13 +1,13 @@
 package com.zrlog.model;
 
+import com.hibegin.common.dao.BasePageableDAO;
+import com.hibegin.common.dao.dto.PageData;
+import com.hibegin.common.dao.dto.PageRequest;
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.StringUtils;
-import com.zrlog.common.rest.request.PageRequest;
-import com.zrlog.data.dto.PageData;
 
 import java.sql.SQLException;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -71,7 +71,7 @@ public class Tag extends BasePageableDAO {
         return true;
     }
 
-    public void refreshTag() throws SQLException {
+    public List<Map<String, Object>> refreshTag() throws SQLException {
         execute("delete from " + tableName);
         Map<String, Integer> countMap = new HashMap<>();
         List<Map<String, Object>> logs = new Log().queryListWithParams("select keywords from " + Log.TABLE_NAME + " where rubbish=? and privacy=? ", false, false);
@@ -83,15 +83,51 @@ public class Tag extends BasePageableDAO {
                 }
             }
         }
-        int count = 1;
-        for (Map.Entry<String, Integer> tag : countMap.entrySet()) {
-            try {
-                new Tag().set("tagId", count++).set("text", tag.getKey()).set("count", tag.getValue()).save();
-            } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "save error", e);
-            }
-
+        List<Map<String, Object>> all = new ArrayList<>();
+        for (Map<String, Integer> t : splitList(countMap, 10)) {
+            List<Map<String, Object>> maps = batchInsert(t, all.size());
+            all.addAll(maps);
         }
+        return all;
+    }
+
+    private List<Map<String, Integer>> splitList(Map<String, Integer> countMap, int maxCount) {
+        List<Map<String, Integer>> splitList = new ArrayList<>();
+        Map<String, Integer> chunkMap = new LinkedHashMap<>(maxCount);
+        for (Map.Entry<String, Integer> tag : countMap.entrySet()) {
+            if (chunkMap.size() == maxCount) {
+                splitList.add(new LinkedHashMap<>(chunkMap));
+                chunkMap.clear();
+            }
+            chunkMap.put(tag.getKey(), tag.getValue());
+        }
+        if (!chunkMap.isEmpty()) {
+            splitList.add(chunkMap);
+        }
+        return splitList;
+    }
+
+    private List<Map<String, Object>> batchInsert(Map<String, Integer> countMap, int idBase) throws SQLException {
+        StringBuilder insertSql = new StringBuilder("insert into " + tableName + " (tagId,text,count) values ");
+        List<Object> params = new ArrayList<>();
+        int id = idBase;
+        StringJoiner valueJoiner = new StringJoiner(",");
+        List<Map<String, Object>> all = new ArrayList<>();
+        for (Map.Entry<String, Integer> tag : countMap.entrySet()) {
+            id += 1;
+            valueJoiner.add("(?,?,?)");
+            params.add(id);
+            params.add(tag.getKey());
+            params.add(tag.getValue());
+            Map<String, Object> tagDO = new HashMap<>();
+            tagDO.put("text", tag.getKey());
+            tagDO.put("count", tag.getValue());
+            tagDO.put("keycode", tag.getKey().hashCode());
+            all.add(tagDO);
+        }
+        insertSql.append(valueJoiner);
+        execute(insertSql.toString(), params.toArray());
+        return all;
     }
 
     private void insertTag(Set<String> now) {
@@ -106,7 +142,6 @@ public class Tag extends BasePageableDAO {
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
-
         }
     }
 

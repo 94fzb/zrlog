@@ -1,15 +1,13 @@
 import Result, { ExceptionStatusType } from "antd/es/result";
-import { CSSProperties } from "react";
+import { CSSProperties, FunctionComponent } from "react";
 
-const UnknownErrorPage = ({
-    code,
-    data,
-    style,
-}: {
+export type ErrorPageProps = {
     code: ExceptionStatusType;
     data: Record<string, any>;
     style?: CSSProperties;
-}) => {
+};
+
+const UnknownErrorPage: FunctionComponent<ErrorPageProps> = ({ code, data, style }) => {
     return <Result status={code} title={code} subTitle={data["message"]} style={style} />;
 };
 

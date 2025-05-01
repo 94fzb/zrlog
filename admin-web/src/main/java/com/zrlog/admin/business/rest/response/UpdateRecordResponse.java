@@ -1,8 +1,6 @@
 package com.zrlog.admin.business.rest.response;
 
-import com.zrlog.common.rest.response.StandardResponse;
-
-public class UpdateRecordResponse extends StandardResponse {
+public class UpdateRecordResponse extends AdminApiPageDataStandardResponse<Object> {
 
     public UpdateRecordResponse() {
     }

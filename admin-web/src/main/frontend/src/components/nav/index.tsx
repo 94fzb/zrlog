@@ -1,9 +1,8 @@
-import Title from "antd/es/typography/Title";
-import Divider from "antd/es/divider";
 import BaseTable, { PageDataSource } from "../../common/BaseTable";
 import { getRes } from "../../utils/constants";
 import AddNav from "./add_nav";
 import EditNav from "./edit_nav";
+import BaseTitle from "../../base/BaseTitle";
 
 const Nav = ({ data, offline }: { data: PageDataSource; offline: boolean }) => {
     const getColumns = () => {
@@ -36,10 +35,7 @@ const Nav = ({ data, offline }: { data: PageDataSource; offline: boolean }) => {
 
     return (
         <>
-            <Title className="page-header" level={3}>
-                {getRes()["admin.nav.manage"]}
-            </Title>
-            <Divider />
+            <BaseTitle title={getRes()["admin.nav.manage"]} />
             <BaseTable
                 defaultPageSize={10}
                 offline={offline}

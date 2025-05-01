@@ -1,11 +1,12 @@
 package com.zrlog.admin.web.plugin;
 
 import com.google.gson.Gson;
+import com.hibegin.common.util.EnvKit;
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.common.util.http.HttpUtil;
+import com.zrlog.business.util.NativeUtils;
 import com.zrlog.common.Constants;
-import com.zrlog.common.type.RunMode;
 import com.zrlog.common.vo.Version;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.I18nUtil;
@@ -69,10 +70,10 @@ class UpdateVersionTimerTask extends TimerTask {
     }
 
     private static String getJsonFilename() {
-        if (Constants.runMode == RunMode.JAR || Constants.runMode == RunMode.NATIVE_AGENT || Constants.runMode == RunMode.DEV) {
-            return "last.version.json";
+        if (EnvKit.isNativeImage()) {
+            return "last." + NativeUtils.getRealFileArch() + ".version.json";
         }
-        return "last." + Constants.getRealFileArch() + ".version.json";
+        return "last.version.json";
     }
 
     public static void main(String[] args) throws IOException, URISyntaxException, ParseException, InterruptedException {
@@ -94,8 +95,8 @@ class UpdateVersionTimerTask extends TimerTask {
         versionInfo.setReleaseDate(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(versionDate));
         //手动设置对应ChangeLog
         String language;
-        if(Objects.nonNull(Constants.zrLogConfig)) {
-            language = (String) Constants.zrLogConfig.getPublicWebSite().get("language");
+        if (Objects.nonNull(Constants.zrLogConfig)) {
+            language = Constants.getLanguage();
         } else {
             language = "zh_CN";
         }
@@ -106,7 +107,7 @@ class UpdateVersionTimerTask extends TimerTask {
             if (Objects.isNull(langRes)) {
                 versionInfo.setChangeLog("");
             } else {
-                versionInfo.setChangeLog(UpdateVersionPlugin.getChangeLog(versionInfo.getVersion(), versionInfo.getBuildDate(), versionInfo.getBuildId(), langRes));
+                versionInfo.setChangeLog(UpdateVersionInfoPlugin.getChangeLog(versionInfo.getVersion(), versionInfo.getBuildDate(), versionInfo.getBuildId(), langRes));
             }
         }
         return versionInfo;

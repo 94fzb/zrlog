@@ -7,10 +7,11 @@ import { CheckOutlined, CloudDownloadOutlined, DeleteOutlined, EyeOutlined, Sett
 import Meta from "antd/es/card/Meta";
 import Button from "antd/es/button";
 import { useEffect, useState } from "react";
-import { getRes } from "../../utils/constants";
-import axios from "axios";
+import { getBackendServerUrl, getRealRouteUrl, getRes } from "../../utils/constants";
 import { Link } from "react-router-dom";
 import Popconfirm from "antd/es/popconfirm";
+import { useAxiosBaseInstance } from "../../base/AppBase";
+import { getCsrData } from "../../api";
 
 export type TemplateEntry = {
     template: string;
@@ -27,27 +28,29 @@ export type TemplateEntry = {
 const Template = ({ data }: { data: TemplateEntry[] }) => {
     const [templateState, setTemplateState] = useState<TemplateEntry[]>(data);
 
+    const axiosInstance = useAxiosBaseInstance();
+
     const load = () => {
-        axios.get("/api/admin/template").then(({ data }) => {
-            setTemplateState(data.data);
+        getCsrData("/template", axiosInstance).then(({ data }) => {
+            setTemplateState(data);
         });
     };
 
     const preview = (shortTemplate: string) => {
-        axios.post("/api/admin/template/preview?shortTemplate=" + shortTemplate).then(() => {
+        axiosInstance.post("/api/admin/template/preview?shortTemplate=" + shortTemplate).then(() => {
             window.open(document.baseURI, "_blank");
             load();
         });
     };
 
     const apply = (shortTemplate: string) => {
-        axios.post("/api/admin/template/apply?shortTemplate=" + shortTemplate).then(() => {
+        axiosInstance.post("/api/admin/template/apply?shortTemplate=" + shortTemplate).then(() => {
             load();
         });
     };
 
     const deleteTemplate = (shortTemplate: string) => {
-        axios.post("/api/admin/template/delete?shortTemplate=" + shortTemplate).then(() => {
+        axiosInstance.post("/api/admin/template/delete?shortTemplate=" + shortTemplate).then(() => {
             load();
         });
     };
@@ -62,7 +65,7 @@ const Template = ({ data }: { data: TemplateEntry[] }) => {
             <div onClick={() => preview(template.shortTemplate)}>
                 <EyeOutlined key="preview" />
             </div>,
-            <Link to={"/template-config?shortTemplate=" + template.shortTemplate}>
+            <Link to={getRealRouteUrl("/template-config?shortTemplate=" + template.shortTemplate)}>
                 <SettingOutlined key="setting" />
             </Link>,
             <div onClick={() => apply(template.shortTemplate)}>
@@ -111,7 +114,7 @@ const Template = ({ data }: { data: TemplateEntry[] }) => {
                                             style={{ width: "100%", minHeight: 250 }}
                                             alt={template.name}
                                             title={template.name}
-                                            src={template.adminPreviewImage}
+                                            src={getBackendServerUrl() + template.adminPreviewImage.substring(1)}
                                         />
                                     }
                                     actions={getActions(template)}
@@ -124,7 +127,7 @@ const Template = ({ data }: { data: TemplateEntry[] }) => {
                 })}
             </Row>
             <Divider />
-            <Link to={`/template-center?host=${window.location.host}`}>
+            <Link to={getRealRouteUrl(`/template-center?host=${window.location.host}`)}>
                 <Button icon={<CloudDownloadOutlined />} type={"primary"}>
                     {getRes()["admin.theme.download"]}
                 </Button>

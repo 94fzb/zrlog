@@ -21,6 +21,22 @@
             background-color: black;
             color: white;
         }
+
+        /* default light scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.15);
+            border-radius: 4px;
+        }
+
+        /* dark mode */
+        body.dark ::-webkit-scrollbar-thumb {
+            background-color: #707070;
+        }
     </style>
 </head>
 <body class="light">

@@ -1,7 +1,8 @@
 package com.zrlog.model;
 
-import com.zrlog.common.rest.request.PageRequest;
-import com.zrlog.data.dto.PageData;
+import com.hibegin.common.dao.BasePageableDAO;
+import com.hibegin.common.dao.dto.PageData;
+import com.hibegin.common.dao.dto.PageRequest;
 
 import java.sql.SQLException;
 import java.util.List;

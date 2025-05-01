@@ -1,8 +1,7 @@
-import Title from "antd/es/typography/Title";
-import Divider from "antd/es/divider";
 import { getRes } from "../utils/constants";
 import BaseTable, { PageDataSource } from "../common/BaseTable";
 import TextArea from "antd/es/input/TextArea";
+import BaseTitle from "../base/BaseTitle";
 
 const Comment = ({ data, offline }: { data: PageDataSource; offline: boolean }) => {
     const getColumns = () => {
@@ -55,10 +54,7 @@ const Comment = ({ data, offline }: { data: PageDataSource; offline: boolean }) 
 
     return (
         <>
-            <Title className="page-header" level={3}>
-                {getRes()["admin.comment.manage"]}
-            </Title>
-            <Divider />
+            <BaseTitle title={getRes()["admin.comment.manage"]} />
             <BaseTable
                 defaultPageSize={10}
                 offline={offline}

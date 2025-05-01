@@ -1,8 +1,8 @@
 package com.zrlog.admin.business.rest.base;
 
 import com.hibegin.common.util.StringUtils;
-import com.zrlog.admin.business.exception.ArgsException;
 import com.zrlog.common.Validator;
+import com.zrlog.common.exception.ArgsException;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
 

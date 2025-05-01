@@ -2,28 +2,26 @@ package com.hibegin.common.util;
 
 import java.util.Comparator;
 
-public class VersionComparator implements Comparator {
+public class VersionComparator implements Comparator<String> {
 
-    public boolean equals(Object o1, Object o2) {
+    public boolean equals(String o1, String o2) {
         return compare(o1, o2) == 0;
     }
 
-    public int compare(Object o1, Object o2) {
-        String version1 = (String) o1;
-        String version2 = (String) o2;
+    public int compare(String version1, String version2) {
 
         VersionTokenizer tokenizer1 = new VersionTokenizer(version1);
         VersionTokenizer tokenizer2 = new VersionTokenizer(version2);
 
-        int number1 = 0, number2 = 0;
-        String suffix1 = "", suffix2 = "";
+        int number1, number2;
+        String suffix1, suffix2;
 
         while (tokenizer1.MoveNext()) {
             if (!tokenizer2.MoveNext()) {
                 do {
                     number1 = tokenizer1.getNumber();
                     suffix1 = tokenizer1.getSuffix();
-                    if (number1 != 0 || suffix1.length() != 0) {
+                    if (number1 != 0 || !suffix1.isEmpty()) {
                         // Version one is longer than number two, and non-zero
                         return 1;
                     }
@@ -48,8 +46,8 @@ public class VersionComparator implements Comparator {
                 return 1;
             }
 
-            boolean empty1 = suffix1.length() == 0;
-            boolean empty2 = suffix2.length() == 0;
+            boolean empty1 = suffix1.isEmpty();
+            boolean empty2 = suffix2.isEmpty();
 
             if (empty1 && empty2) continue; // No suffixes
             if (empty1) return 1; // First suffix is empty (1.2 > 1.2b)
@@ -64,7 +62,7 @@ public class VersionComparator implements Comparator {
             do {
                 number2 = tokenizer2.getNumber();
                 suffix2 = tokenizer2.getSuffix();
-                if (number2 != 0 || suffix2.length() != 0) {
+                if (number2 != 0 || !suffix2.isEmpty()) {
                     // Version one is longer than version two, and non-zero
                     return -1;
                 }

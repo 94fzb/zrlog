@@ -1,71 +1,62 @@
 package com.zrlog.web.inteceptor;
 
+import com.hibegin.http.server.api.HandleAbleInterceptor;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
-import com.hibegin.http.server.api.Interceptor;
 import com.hibegin.http.server.util.PathUtil;
 import com.hibegin.http.server.web.MethodInterceptor;
-import com.zrlog.blog.web.interceptor.BlogPageInterceptor;
-import com.zrlog.blog.web.plugin.RequestInfo;
-import com.zrlog.blog.web.plugin.RequestStatisticsPlugin;
-import com.zrlog.blog.web.util.WebTools;
-import com.zrlog.business.util.InstallUtils;
+import com.zrlog.business.plugin.StaticSitePlugin;
+import com.zrlog.business.util.StaticFileCacheUtils;
 import com.zrlog.common.Constants;
 import com.zrlog.util.ZrLogUtil;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Objects;
 
-public class StaticResourceInterceptor implements Interceptor {
+public class StaticResourceInterceptor implements HandleAbleInterceptor {
 
-    public static final List<String> staticResourcePath = Arrays.asList("/assets", "/admin/static", "/admin/vendors", "/install/static");
 
     public StaticResourceInterceptor() {
     }
 
     @Override
     public boolean doInterceptor(HttpRequest request, HttpResponse response) throws Exception {
-        if (ZrLogUtil.isStaticBlogPlugin(request)) {
-            return true;
-        }
         String actionKey = request.getUri();
         //打包过后的静态资源文件进行拦截
-        if (staticResourcePath.stream().anyMatch(e -> request.getUri().startsWith(e + "/"))) {
-            response.addHeader("Cache-Control", "max-age=31536000, immutable"); // 1 年的秒数
+        if (Constants.zrLogConfig.getStaticResourcePath().stream().anyMatch(e -> request.getUri().startsWith(e + "/"))) {
+            ZrLogUtil.putLongTimeCache(response);
             new MethodInterceptor().doInterceptor(request, response);
             return false;
         }
-        try {
-            File staticFile = PathUtil.getStaticFile(actionKey);
-            //静态文件进行拦截
-            if (staticFile.isFile() && staticFile.exists()) {
-                //缓存静态资源文件
-                if (Constants.zrLogConfig.getCacheService().isCacheableByRequest(request)) {
-                    response.addHeader("Cache-Control", "max-age=31536000, immutable"); // 1 年的秒数
-                }
-                response.writeFile(staticFile);
+        File staticFile = PathUtil.getStaticFile(actionKey);
+        //静态文件进行拦截
+        if (staticFile.isFile() && staticFile.exists()) {
+            //缓存静态资源文件
+            if (StaticFileCacheUtils.getInstance().isCacheableByRequest(request.getUri())) {
+                ZrLogUtil.putLongTimeCache(response);
+            }
+            response.writeFile(staticFile);
+            return false;
+        }
+        StaticSitePlugin staticSitePlugin = Constants.zrLogConfig.getPlugin(StaticSitePlugin.class);
+        if (Objects.nonNull(staticSitePlugin)) {
+            File cacheFile = staticSitePlugin.loadCacheFile(request);
+            if (cacheFile.isFile() && cacheFile.exists()) {
+                response.writeFile(cacheFile);
                 return false;
-            }
-            if (BlogPageInterceptor.catGeneratorHtml(actionKey)) {
-                File cacheFile = Constants.zrLogConfig.getCacheService().loadCacheFile(request);
-                if (cacheFile.exists() && !ZrLogUtil.isStaticBlogPlugin(request)) {
-                    response.writeFile(cacheFile);
-                    return false;
-                }
-            }
-        } finally {
-            //仅保留非静态资源请求或者是以 .html结尾的
-            if (InstallUtils.isInstalled() && !actionKey.contains(".") || actionKey.endsWith(".html")) {
-                RequestInfo requestInfo = new RequestInfo();
-                requestInfo.setIp(WebTools.getRealIp(request));
-                requestInfo.setUrl(WebTools.getHomeUrl(request));
-                requestInfo.setUserAgent(request.getHeader("User-Agent"));
-                requestInfo.setRequestTime(System.currentTimeMillis());
-                requestInfo.setRequestUri(actionKey);
-                RequestStatisticsPlugin.record(requestInfo);
             }
         }
         return true;
+    }
+
+    /**
+     * staticPlugin，自己控制缓存文件的读取和生成方式
+     *
+     * @param request
+     * @return
+     */
+    @Override
+    public boolean isHandleAble(HttpRequest request) {
+        return !StaticSitePlugin.isStaticPluginRequest(request);
     }
 }

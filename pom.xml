@@ -4,7 +4,7 @@
     <groupId>com.zrlog</groupId>
     <artifactId>zrlog</artifactId>
     <packaging>pom</packaging>
-    <version>3.1.6</version>
+    <version>3.1.7-SNAPSHOT</version>
     <modules>
         <module>web</module>
         <module>service</module>
@@ -21,11 +21,19 @@
     <url>https://www.zrlog.com</url>
 
     <properties>
-        <java.version>21</java.version>
+        <java.version>11</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.test.skip>true</maven.test.skip>
         <finalName>zrlog</finalName>
         <disableNodePackage>false</disableNodePackage>
+        <jakarta-scope>compile</jakarta-scope>
+        <servlet-scope>compile</servlet-scope>
+        <lambda-scope>compile</lambda-scope>
+        <sws.version>4.0.84</sws.version>
+        <disableJava21>false</disableJava21>
+        <project.build.outputTimestamp>2013-01-01T00:00:00Z</project.build.outputTimestamp>
     </properties>
 
     <developers>
@@ -69,14 +77,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.freemarker</groupId>
-            <artifactId>freemarker</artifactId>
-            <version>2.3.32</version>
-        </dependency>
-        <dependency>
             <groupId>com.hibegin</groupId>
             <artifactId>simplewebserver</artifactId>
-            <version>0.3.175</version>
+            <version>${sws.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -91,37 +94,62 @@
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>common</artifactId>
-                <version>3.1.6</version>
+                <version>3.1.7-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>data</artifactId>
-                <version>3.1.6</version>
+                <version>3.1.7-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>admin-token</artifactId>
-                <version>3.1.6</version>
+                <version>3.1.7-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>blog-web</artifactId>
-                <version>3.1.6</version>
+                <version>3.1.7-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>service</artifactId>
-                <version>3.1.6</version>
+                <version>3.1.7-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>admin-web</artifactId>
-                <version>3.1.6</version>
+                <version>3.1.7-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>web</artifactId>
-                <version>3.1.6</version>
+                <version>3.1.7-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.hibegin</groupId>
+                <artifactId>simplewebserver-servlet-api-impl</artifactId>
+                <version>${sws.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.hibegin</groupId>
+                <artifactId>simplewebserver-lambda-function-impl</artifactId>
+                <version>${sws.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>2.13.1</version>
+            </dependency>
+            <dependency>
+                <groupId>com.hibegin</groupId>
+                <artifactId>common-dao</artifactId>
+                <version>1.0.13</version>
+            </dependency>
+            <dependency>
+                <groupId>com.mysql</groupId>
+                <artifactId>mysql-connector-j</artifactId>
+                <version>9.3.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -131,18 +159,31 @@
         <testSourceDirectory>src/test/java</testSourceDirectory>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
-                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <release>${java.version}</release>
                 </configuration>
-                <version>3.11.0</version>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>
                 <version>2.7</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Multi-Release>true</Multi-Release>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
             </plugin>
         </plugins>
         <pluginManagement>
@@ -166,7 +207,43 @@
                     <artifactId>maven-dependency-plugin</artifactId>
                     <version>3.6.1</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <version>3.4.0</version>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
+
+
+    <profiles>
+        <profile>
+            <id>java21-enabled</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>compile-java-21</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>compile</goal>
+                                </goals>
+                                <configuration>
+                                    <release>21</release>
+                                    <compileSourceRoots>
+                                        <compileSourceRoot>${project.basedir}/src/main/java21</compileSourceRoot>
+                                    </compileSourceRoots>
+                                    <multiReleaseOutput>true</multiReleaseOutput>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

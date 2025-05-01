@@ -1,7 +1,7 @@
 package com.zrlog.admin.business.rest.base;
 
-import com.zrlog.admin.business.exception.ArgsException;
 import com.zrlog.common.Validator;
+import com.zrlog.common.exception.ArgsException;
 
 import java.util.Objects;
 

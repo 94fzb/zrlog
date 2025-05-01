@@ -1,29 +1,23 @@
-import { useEffect, useState } from "react";
+import { FunctionComponent, useEffect, useRef, useState } from "react";
 import { App, Button, Col, message, Progress, Row, Steps } from "antd";
 import Title from "antd/es/typography/Title";
-import Divider from "antd/es/divider";
-import { getRes } from "../utils/constants";
-import axios, { AxiosError } from "axios";
+import { getRealRouteUrl, getRes } from "../utils/constants";
+import { AxiosError } from "axios";
+import { getContextPath } from "../utils/helpers";
+import { useAxiosBaseInstance } from "../base/AppBase";
+import { getCsrData, getVersion } from "../api";
+import BaseTitle from "../base/BaseTitle";
+import { UpgradeData } from "../type";
+import UpgradeContent from "./upgrade-content";
 
 const { Step } = Steps;
-export const API_VERSION_PATH = "/api/admin/website/version";
+export const API_VERSION_PATH = "/api/public/version";
+export const API_DO_UPGRADE_PATH = "/api/admin/upgrade/doUpgrade";
 
 type UpgradeState = {
     current: number;
     downloadProcess: number;
     upgradeMessage: string;
-};
-export type UpgradeData = {
-    upgrade: boolean;
-    dockerMode: boolean;
-    systemServiceMode: boolean;
-    preUpgradeKey: string;
-    version: UpgradeVersion;
-};
-
-type UpgradeVersion = {
-    changeLog: string;
-    buildId: string;
 };
 
 type StepInfo = {
@@ -31,9 +25,13 @@ type StepInfo = {
     alias: "changeLog" | "downloadProcess" | "doUpgrade";
 };
 
-let upgradeTimer: NodeJS.Timeout;
+export type UpgradeProps = {
+    data: UpgradeData;
+    offline: boolean;
+    offlineData: boolean;
+};
 
-const Upgrade = ({ data, offline }: { data: UpgradeData; offline: boolean }) => {
+const Upgrade: FunctionComponent<UpgradeProps> = ({ data, offline, offlineData }) => {
     const preUpgradeKey = data.preUpgradeKey;
     const steps: StepInfo[] = [
         {
@@ -50,6 +48,8 @@ const Upgrade = ({ data, offline }: { data: UpgradeData; offline: boolean }) => 
         },
     ];
 
+    const upgradeTimer = useRef<NodeJS.Timeout | null>(null);
+
     const [state, setState] = useState<UpgradeState>({
         current: 0,
         downloadProcess: 0,
@@ -61,29 +61,31 @@ const Upgrade = ({ data, offline }: { data: UpgradeData; offline: boolean }) => 
     const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
 
     const checkRestartSuccess = (newBuildId: string) => {
-        axios
-            .get(API_VERSION_PATH + "?buildId=" + newBuildId)
+        getVersion(newBuildId, axiosInstance)
             .then(({ data }) => {
-                if (newBuildId === data.data.buildId) {
+                if (newBuildId === data.buildId) {
                     modal.success({
-                        title: data.data.message,
+                        title: data.message,
                         content: "",
                         onOk: function () {
-                            window.location.href = "/admin/index?buildId=" + newBuildId;
+                            window.location.href =
+                                getRealRouteUrl(getContextPath() + "admin/index") + "?buildId=" + newBuildId;
                         },
                     });
                     return;
                 }
-                upgradeTimer = setTimeout(() => {
+                upgradeTimer.current = setTimeout(() => {
                     checkRestartSuccess(newBuildId);
                 }, 500);
             })
             .catch(() => {
-                upgradeTimer = setTimeout(() => {
+                upgradeTimer.current = setTimeout(() => {
                     checkRestartSuccess(newBuildId);
                 }, 500);
             });
     };
+
+    const axiosInstance = useAxiosBaseInstance();
 
     const downloadProcess = async () => {
         const current = 1;
@@ -94,7 +96,11 @@ const Upgrade = ({ data, offline }: { data: UpgradeData; offline: boolean }) => 
             };
         });
         try {
-            const { data } = await axios.get("/api/admin/upgrade/download?preUpgradeKey=" + preUpgradeKey);
+            const data = await getCsrData("/upgrade/download?preUpgradeKey=" + preUpgradeKey, axiosInstance);
+            if (data.error) {
+                messageApi.error(data.message);
+                return;
+            }
             setState((prevState) => {
                 return {
                     ...prevState,
@@ -103,7 +109,7 @@ const Upgrade = ({ data, offline }: { data: UpgradeData; offline: boolean }) => 
                 };
             });
             if (data.data.process < 100) {
-                upgradeTimer = setTimeout(downloadProcess, 500);
+                upgradeTimer.current = setTimeout(downloadProcess, 500);
             }
         } catch (e) {
             if (e instanceof AxiosError) {
@@ -124,30 +130,32 @@ const Upgrade = ({ data, offline }: { data: UpgradeData; offline: boolean }) => 
                 current: current,
             };
         });
-        const { data } = await axios.get("/api/admin/upgrade/doUpgrade?preUpgradeKey=" + preUpgradeKey);
-        if (data.data) {
-            setState((prevState) => {
-                return {
-                    ...prevState,
-                    upgradeMessage: data.data.message,
-                    current: current,
-                };
-            });
-            if (data.data.finish) {
-                checkRestartSuccess(newBuildId);
+        try {
+            const { data } = await getCsrData("/upgrade/doUpgrade?preUpgradeKey=" + preUpgradeKey, axiosInstance);
+            if (data && data.message) {
+                setState((prevState) => {
+                    return {
+                        ...prevState,
+                        upgradeMessage: data.message,
+                        current: current,
+                    };
+                });
+            }
+            if (data && !data.finish) {
+                upgradeTimer.current = setTimeout(upgrade, 500);
                 return;
             }
-        } else {
-            //没有 data 也认为在重启中了
             checkRestartSuccess(newBuildId);
-            return;
+        } catch (e) {
+            console.error(e);
+            //need restart check
+            checkRestartSuccess(newBuildId);
         }
-        upgradeTimer = setTimeout(upgrade, 500);
     };
 
     const next = async () => {
         if (state.current === 0) {
-            if (data.dockerMode || data.systemServiceMode) {
+            if (isDisabledDownload()) {
                 await upgrade();
             } else {
                 await downloadProcess();
@@ -158,6 +166,9 @@ const Upgrade = ({ data, offline }: { data: UpgradeData; offline: boolean }) => 
     };
 
     const nextDisabled = (): boolean => {
+        if (offlineData) {
+            return true;
+        }
         if (offline) {
             return true;
         }
@@ -170,27 +181,27 @@ const Upgrade = ({ data, offline }: { data: UpgradeData; offline: boolean }) => 
         return false;
     };
 
+    const isDisabledDownload = () => {
+        return !data.onlineUpgradable;
+    };
+
     useEffect(() => {
         return () => {
-            if (upgradeTimer) {
-                clearTimeout(upgradeTimer);
+            if (upgradeTimer && upgradeTimer.current) {
+                clearTimeout(upgradeTimer.current);
             }
         };
     }, []);
 
     return (
-        <Row>
+        <Row key={data.preUpgradeKey}>
             {contextHolder}
             <Col style={{ maxWidth: 600 }} xs={24}>
-                <Title className="page-header" level={3}>
-                    {getRes()["upgradeWizard"]}
-                </Title>
-                <Divider />
-
+                <BaseTitle title={getRes()["upgradeWizard"]} />
                 <Steps current={state.current} style={{ paddingTop: 16 }}>
                     {steps.map((item) => {
                         if (item.alias === "downloadProcess") {
-                            if (data.systemServiceMode || data.dockerMode) {
+                            if (isDisabledDownload()) {
                                 return <></>;
                             }
                         }
@@ -201,10 +212,7 @@ const Upgrade = ({ data, offline }: { data: UpgradeData; offline: boolean }) => 
                     {state.current === 0 && (
                         <>
                             <Title level={4}>{getRes().changeLog}</Title>
-                            <div
-                                style={{ overflowWrap: "break-word" }}
-                                dangerouslySetInnerHTML={{ __html: data.version ? data.version.changeLog : "" }}
-                            />
+                            <UpgradeContent data={data} />
                         </>
                     )}
                     {state.current === 1 && (
@@ -225,7 +233,7 @@ const Upgrade = ({ data, offline }: { data: UpgradeData; offline: boolean }) => 
                 </div>
                 <div className="steps-action" style={{ paddingTop: "20px" }}>
                     {state.current < steps.length - 1 && (
-                        <Button type="primary" disabled={nextDisabled()} onClick={() => next()}>
+                        <Button type="primary" loading={offlineData} disabled={nextDisabled()} onClick={() => next()}>
                             {getRes().nextStep}
                         </Button>
                     )}

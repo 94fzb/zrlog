@@ -3,30 +3,22 @@ package com.zrlog.business.rest.response;
 public class ArticleResponseEntry {
 
     private String userName;
-    private long id;
+    private Long id;
     private String title;
-    private int click;
+    private Integer click;
     private String keywords;
     private String releaseTime;
 
     private String lastUpdateDate;
     private String typeName;
-    private boolean rubbish;
+    private Boolean rubbish;
     private Boolean canComment;
-    private String commentSize;
-    private boolean privacy;
+    private Long commentSize;
+    private Boolean privacy;
     private String url;
     private String alias;
     private String arrange_plugin;
     private String typeAlias;
-
-    public int getClick() {
-        return click;
-    }
-
-    public void setClick(int click) {
-        this.click = click;
-    }
 
     public String getUserName() {
         return userName;
@@ -36,11 +28,11 @@ public class ArticleResponseEntry {
         this.userName = userName;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -50,6 +42,14 @@ public class ArticleResponseEntry {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public Integer getClick() {
+        return click;
+    }
+
+    public void setClick(Integer click) {
+        this.click = click;
     }
 
     public String getKeywords() {
@@ -84,19 +84,35 @@ public class ArticleResponseEntry {
         this.typeName = typeName;
     }
 
-    public boolean isRubbish() {
+    public Boolean getRubbish() {
         return rubbish;
     }
 
-    public void setRubbish(boolean rubbish) {
+    public void setRubbish(Boolean rubbish) {
         this.rubbish = rubbish;
     }
 
-    public boolean isPrivacy() {
+    public Boolean getCanComment() {
+        return canComment;
+    }
+
+    public void setCanComment(Boolean canComment) {
+        this.canComment = canComment;
+    }
+
+    public Long getCommentSize() {
+        return commentSize;
+    }
+
+    public void setCommentSize(Long commentSize) {
+        this.commentSize = commentSize;
+    }
+
+    public Boolean getPrivacy() {
         return privacy;
     }
 
-    public void setPrivacy(boolean privacy) {
+    public void setPrivacy(Boolean privacy) {
         this.privacy = privacy;
     }
 
@@ -114,22 +130,6 @@ public class ArticleResponseEntry {
 
     public void setAlias(String alias) {
         this.alias = alias;
-    }
-
-    public Boolean getCanComment() {
-        return canComment;
-    }
-
-    public void setCanComment(Boolean canComment) {
-        this.canComment = canComment;
-    }
-
-    public String getCommentSize() {
-        return commentSize;
-    }
-
-    public void setCommentSize(String commentSize) {
-        this.commentSize = commentSize;
     }
 
     public String getArrange_plugin() {

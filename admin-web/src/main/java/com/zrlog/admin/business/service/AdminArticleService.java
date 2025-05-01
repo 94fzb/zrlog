@@ -1,13 +1,13 @@
 package com.zrlog.admin.business.service;
 
-import com.hibegin.common.util.BeanUtil;
-import com.hibegin.common.util.IOUtil;
-import com.hibegin.common.util.LoggerUtil;
-import com.hibegin.common.util.StringUtils;
+import com.hibegin.common.dao.dto.PageData;
+import com.hibegin.common.dao.dto.PageRequest;
+import com.hibegin.common.util.*;
 import com.hibegin.common.util.http.HttpUtil;
 import com.hibegin.common.util.http.handle.HttpFileHandle;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.util.PathUtil;
+import com.zrlog.admin.business.AdminConstants;
 import com.zrlog.admin.business.exception.ArticleMissingTitleException;
 import com.zrlog.admin.business.exception.ArticleMissingTypeException;
 import com.zrlog.admin.business.exception.UpdateArticleExpireException;
@@ -20,11 +20,10 @@ import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
 import com.zrlog.business.rest.response.ArticleResponseEntry;
 import com.zrlog.business.service.VisitorArticleService;
 import com.zrlog.common.Constants;
-import com.zrlog.common.rest.request.PageRequest;
 import com.zrlog.common.vo.AdminTokenVO;
-import com.zrlog.data.dto.PageData;
 import com.zrlog.model.Log;
 import com.zrlog.util.ParseUtil;
+import com.zrlog.util.ThreadUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
 import org.jsoup.select.Elements;
@@ -36,9 +35,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class AdminArticleService {
 
@@ -46,7 +49,7 @@ public class AdminArticleService {
 
     private static final ReentrantLock WRITE_ARTICLE_LOCK = new ReentrantLock();
 
-    public static String getFirstImgUrl(String htmlContent, AdminTokenVO adminTokenVO) {
+    private static String getFirstImgUrl(String htmlContent, AdminTokenVO adminTokenVO) {
         if (StringUtils.isEmpty(htmlContent)) {
             return "";
         }
@@ -68,10 +71,10 @@ public class AdminArticleService {
                 bytes = getRequestBodyBytes(url);
                 path = path.substring(0, path.indexOf('.')) + "_thumbnail" + path.substring(path.indexOf('.'));
             } else {
-                bytes = IOUtil.getByteByInputStream(new FileInputStream(PathUtil.getStaticPath() + url.replace("", "")));
+                bytes = IOUtil.getByteByInputStream(new FileInputStream(PathUtil.getStaticFile(url)));
                 path = url.substring(0, url.indexOf('.')) + "_thumbnail" + url.substring(path.indexOf('.'));
             }
-            File thumbnailFile = new File(PathUtil.getStaticPath() + path);
+            File thumbnailFile = PathUtil.getStaticFile(path);
             if (bytes.length == 0) {
                 return null;
             }
@@ -81,7 +84,7 @@ public class AdminArticleService {
             thumbnailFile.getParentFile().mkdirs();
             IOUtil.writeBytesToFile(bytes, thumbnailFile);
             return new UploadService().getCloudUrl("", path, thumbnailFile.getPath(), null,
-                    adminTokenVO).url() + "?h=" + height + "&w=" + width;
+                    adminTokenVO).getUrl() + "?h=" + height + "&w=" + width;
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "", e);
         }
@@ -103,7 +106,7 @@ public class AdminArticleService {
     }
 
     private CreateOrUpdateArticleResponse save(AdminTokenVO adminTokenVO, CreateArticleRequest createArticleRequest) {
-        if (StringUtils.isEmpty(createArticleRequest.getTitle())) {
+        if (Objects.isNull(createArticleRequest) || StringUtils.isEmpty(createArticleRequest.getTitle())) {
             throw new ArticleMissingTitleException();
         }
         if (Objects.isNull(createArticleRequest.getTypeId()) || createArticleRequest.getTypeId() < 1) {
@@ -183,10 +186,10 @@ public class AdminArticleService {
             log.put("thumbnail", createArticleRequest.getThumbnail());
         }
         //fix digest xss
-        String parseInputDigest = Jsoup.clean(Objects.requireNonNullElse(createArticleRequest.getDigest(), ""), Safelist.basicWithImages());
+        String parseInputDigest = Jsoup.clean(ObjectHelpers.requireNonNullElse(createArticleRequest.getDigest(), ""), Safelist.basicWithImages());
         // 自动摘要
         if (StringUtils.isEmpty(parseInputDigest) && Objects.equals(createArticleRequest.isRubbish(), false)) {
-            int autoSize = Constants.getAutoDigestLength();
+            int autoSize = AdminConstants.getAutoDigestLength();
             if (autoSize < 0) {
                 log.put("digest", log.get("content"));
             } else if (autoSize == 0) {
@@ -197,7 +200,7 @@ public class AdminArticleService {
         } else {
             log.put("digest", parseInputDigest);
         }
-        log.put("plain_content", VisitorArticleService.getPlainSearchText((String) log.get("content")));
+        log.put("plain_content", ParseUtil.getPlainSearchText((String) log.get("content")));
         log.put("editor_type", createArticleRequest.getEditorType());
         String alias;
         if (StringUtils.isEmpty(createArticleRequest.getAlias())) {
@@ -209,17 +212,39 @@ public class AdminArticleService {
         return log;
     }
 
-    public ArticlePageData adminPage(PageRequest pageRequest, String keywords,String typeAlias, HttpRequest request) {
-        PageData<Map<String, Object>> data = new Log().adminFind(pageRequest, keywords,typeAlias);
-        VisitorArticleService.wrapperSearchKeyword(data, keywords);
-        PageData<ArticleResponseEntry> articleResponseEntryPageData = VisitorArticleService.convertPageable(data, request);
-        return BeanUtil.convert(articleResponseEntryPageData, ArticlePageData.class);
+    public ArticlePageData adminPage(PageRequest pageRequest, String keywords, String typeAlias, HttpRequest request) {
+        ExecutorService executorService = ThreadUtils.newFixedThreadPool(2);
+        try {
+            CompletableFuture<PageData<Map<String, Object>>> dataCompletableFuture = CompletableFuture.supplyAsync(() -> {
+                return new Log().adminFind(pageRequest, keywords, typeAlias);
+            }, executorService);
+            CompletableFuture<List<Map<String, Object>>> listCompletableFuture = CompletableFuture.supplyAsync(() -> {
+                return Constants.zrLogConfig.getCacheService().getArticleTypes();
+            }, executorService);
+            CompletableFuture.allOf(listCompletableFuture, dataCompletableFuture).join();
+            VisitorArticleService.wrapperSearchKeyword(dataCompletableFuture.join(), keywords);
+            PageData<ArticleResponseEntry> articleResponseEntryPageData = VisitorArticleService.convertPageable(dataCompletableFuture.join(), request);
+            ArticlePageData convert = BeanUtil.convert(articleResponseEntryPageData, ArticlePageData.class);
+            convert.setTypes(listCompletableFuture.join());
+            convert.setKey(keywords);
+            convert.setDefaultPageSize(pageRequest.getSize());
+            return convert;
+        } finally {
+            executorService.shutdown();
+        }
     }
 
-    public List<ArticleActivityData> activityDataList() throws SQLException {
-        Map<String, Long> adminArticleData = new Log().getAdminArticleData();
-        return adminArticleData.entrySet().stream().map(e -> {
-            return new ArticleActivityData(e.getKey(), e.getValue());
-        }).toList();
+    public CompletableFuture<List<ArticleActivityData>> activityDataList(Executor executor) {
+        return CompletableFuture.supplyAsync(() -> {
+            Map<String, Long> adminArticleData;
+            try {
+                adminArticleData = new Log().getAdminArticleData();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            return adminArticleData.entrySet().stream().map(e -> {
+                return new ArticleActivityData(e.getKey(), e.getValue());
+            }).collect(Collectors.toList());
+        }, executor);
     }
 }

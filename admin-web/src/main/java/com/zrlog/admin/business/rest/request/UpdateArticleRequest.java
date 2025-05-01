@@ -2,7 +2,7 @@ package com.zrlog.admin.business.rest.request;
 
 public class UpdateArticleRequest extends CreateArticleRequest {
 
-    private Integer logId;
+    protected Integer logId;
     private Integer version;
 
     public Integer getLogId() {

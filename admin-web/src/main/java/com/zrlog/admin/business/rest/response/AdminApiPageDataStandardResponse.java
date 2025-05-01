@@ -1,23 +1,48 @@
 package com.zrlog.admin.business.rest.response;
 
-import com.zrlog.common.rest.response.ApiStandardResponse;
+import com.zrlog.admin.business.AdminConstants;
+import com.zrlog.common.Constants;
+import com.zrlog.common.ZrLogConfig;
+import com.zrlog.common.rest.response.StandardResponse;
 
-public class AdminApiPageDataStandardResponse<T> extends ApiStandardResponse {
+import java.util.Objects;
 
-    private String documentTitle;
+public class AdminApiPageDataStandardResponse<T> extends StandardResponse {
+    private final String pageBuildId;
+    protected String documentTitle;
+    private T data;
+
 
     public AdminApiPageDataStandardResponse() {
+        this(null);
     }
 
     public AdminApiPageDataStandardResponse(T data) {
-        super(data);
+        this(data, "");
     }
 
+    public T getData() {
+        return data;
+    }
+
+    public void setData(T data) {
+        this.data = data;
+    }
 
     public AdminApiPageDataStandardResponse(T data, String message) {
-        super(data, message);
+        this.data = data;
+        this.setMessage(message);
+        ZrLogConfig zrLogConfig = Constants.zrLogConfig;
+        if (Objects.nonNull(zrLogConfig) && Objects.nonNull(AdminConstants.adminResource)) {
+            this.pageBuildId = AdminConstants.adminResource.getStaticResourceBuildId();
+        } else {
+            this.pageBuildId = "";
+        }
     }
 
+    public String getPageBuildId() {
+        return pageBuildId;
+    }
 
     public String getDocumentTitle() {
         return documentTitle;

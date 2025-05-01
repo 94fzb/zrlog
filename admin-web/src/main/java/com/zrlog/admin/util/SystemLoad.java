@@ -1,5 +1,6 @@
 package com.zrlog.admin.util;
 
+import com.hibegin.common.util.EnvKit;
 import com.hibegin.common.util.LoggerUtil;
 
 import java.io.BufferedReader;
@@ -42,6 +43,9 @@ public class SystemLoad {
 
     public static String getSystemLoad() {
         if (isWindows()) {
+            return "-";
+        }
+        if (EnvKit.isFaaSMode()) {
             return "-";
         }
         try {

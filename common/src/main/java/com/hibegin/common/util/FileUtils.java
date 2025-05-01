@@ -53,7 +53,7 @@ public class FileUtils {
     public static void moveOrCopyFolder(String dest, String targetFolder, boolean isMove) {
         File f = new File(dest);
         if (f.isDirectory()) {
-            File fs[] = new File(dest).listFiles();
+            File[] fs = new File(dest).listFiles();
             targetFolder = targetFolder + File.separator + f.getName();
             new File(targetFolder).mkdirs();
             if (fs != null) {
@@ -115,7 +115,7 @@ public class FileUtils {
     private static void deleteDir(String filer) {
         File f = new File(filer);
         if (f.isDirectory()) {
-            File fs[] = new File(filer).listFiles();
+            File[] fs = new File(filer).listFiles();
             if (fs != null && fs.length > 0) {
                 for (File fl : fs) {
                     if (fl.isDirectory()) {

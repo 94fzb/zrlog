@@ -1,48 +1,62 @@
 package com.zrlog.admin.web.controller.api;
 
 import com.google.gson.Gson;
-import com.hibegin.common.util.BeanUtil;
+import com.hibegin.common.util.EnvKit;
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.annotation.ResponseBody;
-import com.hibegin.http.server.web.Controller;
+import com.hibegin.http.server.config.ServerConfig;
+import com.hibegin.http.server.util.PathUtil;
+import com.zrlog.admin.business.AdminConstants;
+import com.zrlog.admin.business.dto.UserLoginDTO;
 import com.zrlog.admin.business.rest.request.LoginRequest;
 import com.zrlog.admin.business.rest.response.*;
 import com.zrlog.admin.business.service.AdminArticleService;
+import com.zrlog.admin.business.service.AdminStatisticsService;
 import com.zrlog.admin.business.service.UserService;
-import com.zrlog.admin.util.SystemInfoUtils;
+import com.zrlog.admin.web.annotation.RefreshCache;
 import com.zrlog.admin.web.controller.page.AdminPageController;
+import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.business.exception.MissingInstallException;
+import com.zrlog.business.plugin.StaticSitePlugin;
 import com.zrlog.business.rest.response.PublicInfoVO;
 import com.zrlog.business.service.CommonService;
-import com.zrlog.business.util.InstallUtils;
 import com.zrlog.common.Constants;
-import com.zrlog.common.rest.response.ApiStandardResponse;
-import com.zrlog.model.Comment;
-import com.zrlog.model.Log;
-import com.zrlog.model.User;
+import com.zrlog.common.controller.BaseController;
+
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.I18nUtil;
+import com.zrlog.util.ThreadUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 
-public class AdminController extends Controller {
+import static com.zrlog.util.CrossUtils.cross;
+
+public class AdminController extends BaseController {
 
     private final UserService userService = new UserService();
 
     @ResponseBody
-    public ApiStandardResponse<LoginResponse> login() throws SQLException {
-        if (!InstallUtils.isInstalled()) {
+    public AdminApiPageDataStandardResponse<UserBasicInfoResponse> login() throws Exception {
+        if (!Constants.zrLogConfig.isInstalled()) {
             throw new MissingInstallException();
         }
-        LoginRequest loginRequest = BeanUtil.convertWithValid(getRequest().getInputStream(), LoginRequest.class);
-        userService.login(loginRequest);
-        String key = UUID.randomUUID().toString();
-        Constants.zrLogConfig.getTokenService().setAdminToken(new User().getUserByUserName(loginRequest.getUserName().toLowerCase()), key, Objects.equals(loginRequest.getHttps(), true) ? "https" : "http", getRequest(), getResponse());
-        return new ApiStandardResponse<>(new LoginResponse(key));
+        LoginRequest loginRequest = getRequestBodyWithNullCheck(LoginRequest.class);
+        UserLoginDTO dto = userService.login(loginRequest, request);
+        Constants.zrLogConfig.getTokenService().setAdminToken(dto.getId(), dto.getSecretKey(), dto.getUserBasicInfoResponse().getKey(),
+                Objects.equals(loginRequest.getHttps(), true) ? "https" : "http", getRequest(), getResponse());
+        return new AdminApiPageDataStandardResponse<>(dto.getUserBasicInfoResponse());
+    }
+
+    @ResponseBody
+    public AdminApiPageDataStandardResponse<Map<String, Object>> adminResource() {
+        cross(request, response);
+        return new AdminApiPageDataStandardResponse<>(AdminConstants.adminResource.adminResourceInfo(request));
     }
 
     @ResponseBody
@@ -53,14 +67,21 @@ public class AdminController extends Controller {
             }
             Map map = new Gson().fromJson(IOUtil.getStringInputStream(inputStream), Map.class);
             PublicInfoVO publicInfoVO = new CommonService().getPublicInfo(request);
-            if (StringUtils.isNotEmpty(publicInfoVO.websiteTitle())) {
-                map.put("short_name", publicInfoVO.websiteTitle());
+            if (StringUtils.isNotEmpty(publicInfoVO.getWebsiteTitle())) {
+                map.put("short_name", publicInfoVO.getWebsiteTitle());
             }
-            map.put("name", Constants.getAdminTitle(""));
-            map.put("theme_color", publicInfoVO.pwaThemeColor());
-            map.put("description", Objects.requireNonNullElse(Constants.zrLogConfig.getPublicWebSite().get("description"), ""));
+            map.put("name", AdminConstants.getAdminDocumentTitleByUri("/"));
+            map.put("theme_color", publicInfoVO.getPwaThemeColor());
+            map.put("description", Constants.getStringByFromWebSite("description", ""));
             map.put("id", Constants.getAppId());
-            map.put("background_color", publicInfoVO.admin_darkMode() ? "#000000" : "#FFFFFF");
+            map.put("background_color", publicInfoVO.getAdmin_darkMode() ? "#000000" : "#FFFFFF");
+            List<Map<String, Object>> list = (List<Map<String, Object>>) map.get("icons");
+            for (Map<String, Object> icon : list) {
+                icon.put("src", WebTools.buildEncodedUrl(request, (String) icon.get("src")));
+            }
+            if (StaticSitePlugin.isStaticPluginRequest(request)) {
+                map.put("start_url", ((String) map.get("start_url")).replace("./index", "./index.html"));
+            }
             return map;
         }
     }
@@ -69,46 +90,64 @@ public class AdminController extends Controller {
      * 触发更新缓存
      */
     @ResponseBody
+    @RefreshCache(async = true)
     public UpdateRecordResponse refreshCache() {
-        Constants.zrLogConfig.getCacheService().refreshInitDataCacheAsync(request, true);
         return new UpdateRecordResponse();
     }
 
-    private StatisticsInfoResponse statisticsInfo() throws SQLException {
-        StatisticsInfoResponse info = new StatisticsInfoResponse();
-        info.setCommCount(new Comment().count());
-        info.setToDayCommCount(new Comment().countToDayComment());
-        info.setClickCount(new Log().sumClick().longValue());
-        info.setArticleCount(new Log().getAdminCount());
-        return info;
+
+    @ResponseBody
+    public AdminApiPageDataStandardResponse<Map<String, Object>> error() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("message", request.getParaToStr("message", ""));
+        return new AdminApiPageDataStandardResponse<>(map);
     }
 
     @ResponseBody
-    public ApiStandardResponse<Map<String, Object>> error() {
-        return new ApiStandardResponse<>(Map.of("message", Objects.requireNonNullElse(request.getParaToStr("message"), "")));
+    public AdminApiPageDataStandardResponse<Map<String, Object>> plugin() {
+        String page = getRequest().getParaToStr("page", "");
+        Map<String, Object> data = new HashMap<>();
+        data.put("includePagePath", "admin/plugins/" + page);
+        return new AdminApiPageDataStandardResponse<>(data);
     }
 
     @ResponseBody
-    public ApiStandardResponse<Map<String, Object>> plugin() {
-        return new ApiStandardResponse<>(new HashMap<>());
+    public AdminApiPageDataStandardResponse<Void> dev() {
+        if (!request.getServerConfig().isNativeImageAgent()) {
+            System.getProperties().put("sws.run.mode", "dev");
+        }
+        configDev(request.getServerConfig());
+        return new AdminApiPageDataStandardResponse<>();
+    }
+
+    public static void configDev(ServerConfig serverConfig) {
+        serverConfig.addLocalFileStaticResourceMapper(AdminConstants.ADMIN_DEV_URI_BASE_PATH, PathUtil.getRootPath(), true);
+        if (EnvKit.isLambda()) {
+            serverConfig.addLocalFileStaticResourceMapper(AdminConstants.ADMIN_DEV_URI_BASE_PATH + "/lambda", "/tmp", true);
+        }
     }
 
     @ResponseBody
-    public ApiStandardResponse<Void> dev() {
-        Constants.devEnabled = true;
-        return new ApiStandardResponse<>();
-    }
-
-    @ResponseBody
-    public ApiStandardResponse<IndexResponse> index() throws SQLException {
+    public AdminApiPageDataStandardResponse<IndexResponse> index() throws SQLException {
         List<String> tips = new ArrayList<>();
         for (int i = 1; i <= 4; i++) {
             tips.add(I18nUtil.getBackendStringFromRes("admin.index.welcomeTips_" + i));
         }
         Collections.shuffle(tips);
-        return new ApiStandardResponse<>(new IndexResponse(statisticsInfo(),
-                I18nUtil.getBackendStringFromRes("admin.index.welcomeTip"),
-                new ArrayList<>(Collections.singletonList(tips.getFirst())),
-                new AdminArticleService().activityDataList(), BlogBuildInfoUtil.getVersionInfo()));
+        ExecutorService executor = ThreadUtils.newFixedThreadPool(20);
+        try {
+            List<CompletableFuture<?>> futures = new ArrayList<>();
+            CompletableFuture<StatisticsInfoResponse> statisticsInfo = new AdminStatisticsService().statisticsInfo(executor);
+            futures.add(statisticsInfo);
+            CompletableFuture<List<ArticleActivityData>> dataList = new AdminArticleService().activityDataList(executor);
+            futures.add(dataList);
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+            return new AdminApiPageDataStandardResponse<>(new IndexResponse(statisticsInfo.join(),
+                    I18nUtil.getBackendStringFromRes("admin.index.welcomeTip"),
+                    new ArrayList<>(Collections.singletonList(tips.get(0))),
+                    dataList.join(), BlogBuildInfoUtil.getVersionInfo()));
+        } finally {
+            executor.shutdown();
+        }
     }
 }

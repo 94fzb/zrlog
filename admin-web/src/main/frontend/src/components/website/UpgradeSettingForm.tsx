@@ -1,16 +1,19 @@
 import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
 import Button from "antd/es/button";
-import { getRes } from "../../utils/constants";
+import { getRealRouteUrl, getRes, removeRes } from "../../utils/constants";
 import Form from "antd/es/form";
 import Select from "antd/es/select";
 import Switch from "antd/es/switch";
 import Divider from "antd/es/divider";
 import { App, message } from "antd";
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Upgrade } from "./index";
+import { useAxiosBaseInstance } from "../../base/AppBase";
+import { ApiResponse, UpgradeData } from "../../type";
+import { AxiosResponse } from "axios";
+import UpgradeContent from "../upgrade-content";
 
 const layout = {
     labelCol: { span: 8 },
@@ -28,19 +31,37 @@ const UpgradeSettingForm = ({ data, offline }: { data: Upgrade; offline: boolean
     const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
 
     const [form, setForm] = useState<UpgradeFormState>(data);
+    const [loading, setLoading] = useState<boolean>(false);
 
     const navigate = useNavigate();
 
-    const websiteFormFinish = (changedValues: any) => {
-        axios.post("/api/admin/website/upgrade", { ...form, ...changedValues }).then(({ data }) => {
+    const axiosInstance = useAxiosBaseInstance();
+
+    const websiteFormFinish = async (changedValues: Upgrade) => {
+        if (loading) {
+            return;
+        }
+        try {
+            setLoading(true);
+            const { data } = await axiosInstance.post("/api/admin/website/upgrade", { ...form, ...changedValues });
+            setLoading(false);
             if (data.error) {
-                messageApi.error(data.message).then();
+                await messageApi.error(data.message);
                 return;
             }
-            messageApi.success(data.message).then(() => {
-                //ignore
-            });
-        });
+            if (data.error === 0) {
+                await messageApi.success(data.message);
+                removeRes();
+                window.location.reload();
+            } else {
+                await messageApi.error(data.message);
+            }
+        } catch (e) {
+            setLoading(false);
+            await messageApi.error((e as Error).message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const checkNewVersion = async () => {
@@ -49,22 +70,16 @@ const UpgradeSettingForm = ({ data, offline }: { data: Upgrade; offline: boolean
         }
         setChecking(true);
         try {
-            const { data } = await axios.get("/api/admin/upgrade");
+            const { data }: AxiosResponse<ApiResponse<UpgradeData>> = await axiosInstance.get("/api/admin/upgrade");
             if (data.data.upgrade) {
                 const title = `${getRes()["newVersion"]} - #${data.data.version.type}`;
                 modal.info({
                     title: title,
-                    content: (
-                        <div
-                            dangerouslySetInnerHTML={{
-                                __html: data.data.version.changeLog,
-                            }}
-                        />
-                    ),
+                    content: <UpgradeContent data={data.data} />,
                     closable: true,
                     okText: getRes()["doUpgrade"],
                     onOk: function () {
-                        navigate("/upgrade");
+                        navigate(getRealRouteUrl("/upgrade"));
                     },
                 });
             } else {
