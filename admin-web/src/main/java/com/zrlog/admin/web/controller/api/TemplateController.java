@@ -1,17 +1,14 @@
 package com.zrlog.admin.web.controller.api;
 
-import com.hibegin.common.util.BeanUtil;
 import com.hibegin.common.util.FileUtils;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.annotation.ResponseBody;
-import com.hibegin.http.server.api.HttpRequest;
-import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.util.PathUtil;
-import com.hibegin.http.server.web.Controller;
 import com.hibegin.http.server.web.cookie.Cookie;
-import com.zrlog.admin.business.exception.ArgsException;
+import com.zrlog.admin.business.rest.request.UpdateTemplateConfigRequest;
+import com.zrlog.common.controller.BaseController;
+import com.zrlog.common.exception.ArgsException;
 import com.zrlog.admin.business.exception.BadTemplatePathException;
-import com.zrlog.admin.business.exception.TemplatePathNotNullException;
 import com.zrlog.admin.business.rest.response.TemplateDownloadResponse;
 import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
 import com.zrlog.admin.business.rest.response.UploadTemplateResponse;
@@ -31,17 +28,17 @@ import java.io.IOException;
 import java.net.URI;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
-public class TemplateController extends Controller {
+public class TemplateController extends BaseController {
 
     private final TemplateService templateService = new TemplateService();
 
     @RefreshCache
     @ResponseBody
     public ApiStandardResponse<Void> apply() throws SQLException {
-        String template = Constants.TEMPLATE_BASE_PATH + request.getParaToStr("shortTemplate");
+        String shortTemplate = getParamWithEmptyCheck("shortTemplate");
+        String template = Constants.TEMPLATE_BASE_PATH + shortTemplate;
         new WebSite().updateByKV("template", template);
         ApiStandardResponse<Void> apiStandardResponse = new ApiStandardResponse<>();
         apiStandardResponse.setError(0);
@@ -58,13 +55,10 @@ public class TemplateController extends Controller {
     @RefreshCache
     @ResponseBody
     public ApiStandardResponse<Void> preview() {
-        String template = Constants.TEMPLATE_BASE_PATH + request.getParaToStr("shortTemplate");
-        if (StringUtils.isEmpty(template)) {
-            throw new TemplatePathNotNullException();
-        }
+        String template = getParamWithEmptyCheck("shortTemplate");
         Cookie cookie = new Cookie();
         cookie.setName("template");
-        cookie.setValue(template);
+        cookie.setValue(Constants.TEMPLATE_BASE_PATH + template);
         cookie.setPath("/");
         cookie.setHttpOnly(true);
         getResponse().addCookie(cookie);
@@ -73,7 +67,8 @@ public class TemplateController extends Controller {
 
     @ResponseBody
     public ApiStandardResponse<Void> delete() {
-        String template = checkByWhiteList(Constants.TEMPLATE_BASE_PATH + request.getParaToStr("shortTemplate"));
+        String shortTemplate = getParamWithEmptyCheck("shortTemplate");
+        String template = checkByWhiteList(Constants.TEMPLATE_BASE_PATH + shortTemplate);
         File file = new File(PathUtil.getStaticPath() + template);
         if (file.exists()) {
             FileUtils.deleteFile(file.toString());
@@ -111,11 +106,8 @@ public class TemplateController extends Controller {
     @RefreshCache
     @ResponseBody
     public UpdateRecordResponse config() throws SQLException {
-        Map<String, Object> param = BeanUtil.convert(getRequest().getInputStream(), Map.class);
-        if (Objects.isNull(param)) {
-            return new UpdateRecordResponse(false);
-        }
-        String template = (String) param.get("template");
+        UpdateTemplateConfigRequest param = getRequestBodyWithNullCheck(UpdateTemplateConfigRequest.class);
+        String template = param.getTemplate();
         if (StringUtils.isNotEmpty(template)) {
             param.remove("template");
             return templateService.save(template, param);
@@ -125,7 +117,7 @@ public class TemplateController extends Controller {
 
     @ResponseBody
     public ApiStandardResponse<TemplateVO> configParams() {
-        String template = Constants.TEMPLATE_BASE_PATH + request.getParaToStr("shortTemplate");
+        String template = Constants.TEMPLATE_BASE_PATH + getParamWithEmptyCheck("shortTemplate");
         if (StringUtils.isEmpty(template)) {
             return new ApiStandardResponse<>();
         }
@@ -139,7 +131,7 @@ public class TemplateController extends Controller {
 
     @ResponseBody
     public ApiStandardResponse<TemplateDownloadResponse> templateCenter() {
-        String host = request.getParaToStr("host");
+        String host = request.getParaToStr("host", "");
         if (StringUtils.isEmpty(host)) {
             String referer = request.getHeader("referer");
             if (StringUtils.isNotEmpty(referer)) {

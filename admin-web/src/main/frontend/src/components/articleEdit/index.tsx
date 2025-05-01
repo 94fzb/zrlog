@@ -5,15 +5,14 @@ import Col from "antd/es/grid/col";
 import Divider from "antd/es/divider";
 import Title from "antd/es/typography/Title";
 import Card from "antd/es/card";
-import MyEditorMdWrapper from "./editor/my-editormd-wrapper";
-import { createUri, getRes, updateUri } from "../../utils/constants";
+import { createUri, getColorPrimary, getRes, updateUri } from "../../utils/constants";
 import styled from "styled-components";
 import Select from "antd/es/select";
 import BaseInput from "../../common/BaseInput";
 import { useLocation } from "react-router";
 import EnvUtils, { isOffline } from "../../utils/env-utils";
-import EditorStatistics, { toStatisticsByMarkdown } from "./editor/editor-statistics-info";
-import { commonAxiosErrorHandle, createAxiosBaseInstance } from "../../AppBase";
+import EditorStatistics, { toStatisticsByMarkdown } from "../../common/editor/editor-statistics-info";
+import { useAxiosBaseInstance } from "../../base/AppBase";
 import ArticleEditSettingButton from "./article-edit-setting-button";
 import { ArticleChangeableValue, ArticleEditProps, ArticleEditState, ArticleEntry } from "./index.types";
 import ArticleEditActionBar from "./article-edit-action-bar";
@@ -27,6 +26,9 @@ import ArticleEditFullscreenButton from "./article-edit-fullscreen-button";
 import { auditTime, concatMap, Subject, tap } from "rxjs";
 import { Subscription } from "rxjs/internal/Subscription";
 import { deepEqualWithSpecialJSON, disableExitTips, enableExitTips } from "../../utils/helpers";
+import MarkedEditor from "../../common/editor/marked-editor";
+import { getBorderColor } from "../../common/editor/editor-helpers";
+import screenfull from "screenfull";
 
 const StyledArticleEdit = styled("div")`
     .ant-btn {
@@ -52,6 +54,12 @@ const StyledArticleEdit = styled("div")`
         right: 300px;
     }
 
+    .editor-icon:hover {
+        color: ${getColorPrimary()} !important;
+        background: ${getBorderColor()} !important;
+        border-radius: 2px;
+    }
+
     @media screen and (max-width: 560px) {
         #action-bar {
             flex-flow: column;
@@ -67,15 +75,13 @@ const StyledArticleEdit = styled("div")`
     }
 `;
 
-let editorInstance: { width: (arg0: string) => void };
-
 const Index: FunctionComponent<ArticleEditProps> = ({
     offline,
     data,
     onExitFullScreen,
     onFullScreen,
     fullScreen,
-    deleteStateCacheOnDestroy,
+    updateCache,
 }) => {
     const location = useLocation();
     const editCardRef = useRef<HTMLDivElement>(null);
@@ -89,7 +95,6 @@ const Index: FunctionComponent<ArticleEditProps> = ({
     const logIdRef = useRef<number>(defaultState.article.logId ? defaultState.article.logId : -1);
     const subjectRef = useRef<Subject<ArticleEntry> | null>(null);
     const subRef = useRef<Subscription | null>(null);
-    const deletePageStateRef = useRef<boolean>(false);
     let pendingMessages = 0;
 
     const [messageApi, messageContextHolder] = message.useMessage({
@@ -97,6 +102,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({
         getContainer: () => editCardRef.current as HTMLElement,
     });
     const { modal } = App.useApp();
+    const axiosInstance = useAxiosBaseInstance(() => editCardRef.current as HTMLElement);
 
     const updateRubbishState = (newArticle: ArticleEntry, create: boolean) => {
         setState((prevState) => ({
@@ -208,7 +214,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({
         try {
             let responseData;
             try {
-                const { data } = await createAxiosBaseInstance().post(uri, newArticle);
+                const { data } = await axiosInstance.post(uri, newArticle);
                 responseData = data;
                 if (data.error) {
                     modal.error({
@@ -221,16 +227,8 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                 if (data.data) {
                     versionRef.current = data.data.version;
                 }
-            } catch (e) {
-                try {
-                    return commonAxiosErrorHandle(e, modal, messageApi, editCardRef.current as HTMLElement);
-                } catch (ex) {
-                    modal.error({
-                        title: "保存失败",
-                        content: JSON.stringify(ex),
-                        getContainer: () => editCardRef.current as HTMLElement,
-                    });
-                }
+            } finally {
+                //@ts-ignore
             }
             const data = responseData;
             if (data.error === 0) {
@@ -261,11 +259,11 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                     };
                 }
                 removeArticleCacheWithPageCache(newArticle, location);
+                await updateCache();
             }
         } finally {
             // 根据 release 的值调用对应的状态更新回调函数
             release ? updateReleaseState(newArticle, create) : updateRubbishState(newArticle, create);
-            deletePageStateRef.current = true;
         }
     };
 
@@ -379,9 +377,6 @@ const Index: FunctionComponent<ArticleEditProps> = ({
             if (subRef.current) {
                 subRef.current.unsubscribe();
             }
-            if (deletePageStateRef.current) {
-                deleteStateCacheOnDestroy();
-            }
         };
     }, []);
 
@@ -415,7 +410,15 @@ const Index: FunctionComponent<ArticleEditProps> = ({
         });
     };
 
-    const editorHeight = fullScreen ? window.innerHeight - 47 : `calc(100vh - 236px)`;
+    const getEditorHeight = () => {
+        if (fullScreen) {
+            if (screenfull.isEnabled && screenfull.isFullscreen) {
+                return "100vh";
+            }
+            return "calc(100vh - 120px)";
+        }
+        return "calc(100vh - 286px)";
+    };
 
     return (
         <StyledArticleEdit>
@@ -476,7 +479,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                             style={{ fontSize: 22, fontWeight: 500, textOverflow: "ellipsis" }}
                         />
                     </Col>
-                    <Col md={6} xs={24} style={{ display: "flex", alignItems: "center" }}>
+                    <Col md={fullScreen ? 6 : 8} xs={24} style={{ display: "flex", alignItems: "center" }}>
                         <Space.Compact style={{ display: "flex" }} hidden={fullScreen}>
                             <Select
                                 getPopupContainer={(triggerNode) => triggerNode.parentElement}
@@ -519,7 +522,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                         </Space.Compact>
                     </Col>
                     <Col
-                        md={6}
+                        md={fullScreen ? 6 : 4}
                         style={{
                             display: "flex",
                             alignItems: "center",
@@ -548,17 +551,8 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                         <ArticleEditFullscreenButton
                             fullScreen={fullScreen}
                             fullScreenElement={editCardRef.current as HTMLDivElement}
-                            editorInstance={editorInstance}
                             onExitFullScreen={onExitFullScreen}
                             onFullScreen={onFullScreen}
-                            onChange={(full) => {
-                                setState((prevState) => {
-                                    return {
-                                        ...prevState,
-                                        fullScreen: full,
-                                    };
-                                });
-                            }}
                         />
                     </Col>
                 </Row>
@@ -571,21 +565,16 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                             paddingRight: 0,
                         }}
                     >
-                        <MyEditorMdWrapper
-                            height={editorHeight}
-                            loadSuccess={(editor) => {
-                                editorInstance = editor;
+                        <MarkedEditor
+                            fullscreen={fullScreen}
+                            height={getEditorHeight()}
+                            loadSuccess={() => {
+                                //ignore
                             }}
-                            key={
-                                data.article.logId +
-                                "_" +
-                                fullScreen +
-                                "_" +
-                                state.editorVersion +
-                                "_offline:" +
-                                offline
-                            }
-                            markdown={state.article.markdown}
+                            getContainer={() => {
+                                return editCardRef.current as HTMLDivElement;
+                            }}
+                            value={state.article.markdown}
                             onChange={(v) => {
                                 if (
                                     v.markdown === "" &&

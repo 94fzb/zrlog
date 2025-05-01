@@ -1,93 +1,87 @@
 package com.zrlog.web;
 
-import com.hibegin.common.util.LoggerUtil;
+import com.hibegin.common.util.EnvKit;
 import com.hibegin.common.util.ParseArgsUtil;
 import com.hibegin.http.server.WebServerBuilder;
 import com.hibegin.http.server.util.PathUtil;
-import com.zrlog.business.service.JarUpdater;
+import com.hibegin.lambda.LambdaApplication;
+import com.zrlog.admin.web.plugin.NativeImageUpdater;
+import com.zrlog.admin.web.plugin.ZipUpdater;
+import com.zrlog.web.config.UpdaterUtils;
 import com.zrlog.common.Constants;
 import com.zrlog.common.Updater;
 import com.zrlog.common.type.RunMode;
 import com.zrlog.util.BlogBuildInfoUtil;
+import com.zrlog.web.util.ZrLogNativeImageUtils;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.config.ZrLogConfigImpl;
 
 import java.io.File;
-import java.net.URISyntaxException;
-import java.sql.SQLRecoverableException;
 import java.util.Objects;
 
-import static com.zrlog.common.Constants.getZrLogHomeByEnv;
+import static com.zrlog.common.Constants.getZrLogHome;
 
 public class Application {
 
 
     static {
-        initZrLogEnv();
-    }
-
-    public static void initZrLogEnv() {
-        String home = getZrLogHomeByEnv();
-        if (Objects.nonNull(home)) {
-            PathUtil.setRootPath(home);
-        }
-        System.getProperties().put("java.util.logging.SimpleFormatter.format", "%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %4$s %5$s%6$s%n");
-    }
-
-    private static void initEnv() throws URISyntaxException {
-        String programDir = new File(Application.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath();
-        //对应的开发模式
-        if (programDir.contains("web/target/class") || programDir.contains("web\\target\\class")) {
-            programDir = new File(programDir).getParentFile().getParentFile().getParent();
-        }
-        Constants.runMode = programDir.endsWith(".jar") ? RunMode.JAR : RunMode.DEV;
-        if (Constants.runMode == RunMode.JAR) {
-            PathUtil.setRootPath(System.getProperty("user.dir"));
-        } else {
-            PathUtil.setRootPath(programDir);
+        if (EnvKit.isLambda()) {
+            LambdaApplication.initLambdaEnv();
         }
     }
 
-    private static Updater getUpdater(String[] args) {
-        if (Constants.runMode == RunMode.JAR) {
-            File jarFile = new File(System.getProperty("java.class.path"));
-            return new JarUpdater(args, jarFile);
+    private static void initZrLogEnv() {
+        String home = getZrLogHome();
+        if (Objects.isNull(home)) {
+            return;
         }
-        return null;
+        PathUtil.setRootPath(home);
     }
 
     public static void main(String[] args) throws Exception {
-        initEnv();
+        Application.initZrLogEnv();
+        if (EnvKit.isNativeImage()) {
+            nativeStart(args);
+            return;
+        }
+        start(args);
+    }
+
+    public static void start(String[] args) throws Exception {
         //parse tips args
         if (ParseArgsUtil.justTips(args, "zrlog", BlogBuildInfoUtil.getVersionInfoFull())) {
             return;
         }
-        webServerBuilder(ZrLogUtil.getPort(args), getUpdater(args)).start();
+        webServerBuilder(ZrLogUtil.getPort(args), ZrLogUtil.getContextPath(args), UpdaterUtils.getZipUpdater(args)).start();
     }
 
-    private static void configDatabaseWithRetry(int timeoutInSeconds) throws InterruptedException {
-        try {
-            Constants.zrLogConfig.configDatabase();
-        } catch (Exception e) {
-            if (timeoutInSeconds > 0 && e instanceof SQLRecoverableException) {
-                int seekSeconds = 5;
-                Thread.sleep(seekSeconds * 1000);
-                configDatabaseWithRetry(timeoutInSeconds - seekSeconds);
-                return;
-            }
-            LoggerUtil.getLogger(Application.class).warning("Config database error " + e.getMessage());
-            if (!Constants.zrLogConfig.getServerConfig().isNativeImageAgent()) {
-                System.exit(-1);
-            }
+    /**
+     * graalvm 实际的启动入口，开发阶段不使用这个方法启动
+     */
+    private static void nativeStart(String[] args) throws Exception {
+        Constants.runMode = RunMode.NATIVE;
+        int port = ZrLogUtil.getPort(args);
+        if (EnvKit.isLambda()) {
+            File file = new File(ZrLogUtil.getLambdaRoot() + "/zrlog");
+            WebServerBuilder webServerBuilder = webServerBuilder(port, ZrLogUtil.getContextPath(args), new NativeImageUpdater(args, file));
+            webServerBuilder.startInBackground();
+            LambdaApplication.startHandle(Constants.zrLogConfig);
+            return;
         }
+        String execFile = ZrLogNativeImageUtils.getExecFile();
+        //parse args
+        if (ParseArgsUtil.justTips(args, new File(execFile).getName(), BlogBuildInfoUtil.getVersionInfoFull())) {
+            return;
+        }
+        WebServerBuilder webServerBuilder = webServerBuilder(port, ZrLogUtil.getContextPath(args), new NativeImageUpdater(args, new File(execFile)));
+        webServerBuilder.start();
     }
 
-    public static WebServerBuilder webServerBuilder(int port, Updater updater) throws Exception {
-        Constants.zrLogConfig = new ZrLogConfigImpl(port, updater);
-        configDatabaseWithRetry(20);
+    public static WebServerBuilder webServerBuilder(int port, String contextPath, Updater updater) {
+        Constants.zrLogConfig = new ZrLogConfigImpl(port, updater, contextPath);
         WebServerBuilder builder = new WebServerBuilder.Builder().config(Constants.zrLogConfig).build();
         builder.addCreateErrorHandle(() -> {
-            if (updater instanceof JarUpdater) {
+            if (updater instanceof ZipUpdater) {
                 Thread.sleep(1000);
                 builder.start();
                 return null;

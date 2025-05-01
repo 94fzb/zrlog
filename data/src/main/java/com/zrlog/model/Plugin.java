@@ -1,7 +1,8 @@
 package com.zrlog.model;
 
 
-import com.hibegin.dao.DAO;
+import com.hibegin.common.dao.DAO;
+import com.hibegin.common.dao.ResultValueConvertUtils;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -17,6 +18,10 @@ public class Plugin extends DAO {
     }
 
     public List<Map<String, Object>> findAll() throws SQLException {
-        return queryListWithParams("select * from " + tableName + " where level>?", 0);
+        List<Map<String, Object>> maps = queryListWithParams("select * from " + tableName + " where level>?", 0);
+        for (Map<String, Object> map : maps) {
+            map.put("isSystem", ResultValueConvertUtils.toBoolean(map.get("isSystem")));
+        }
+        return maps;
     }
 }

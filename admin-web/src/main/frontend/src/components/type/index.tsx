@@ -1,9 +1,8 @@
-import Title from "antd/es/typography/Title";
-import Divider from "antd/es/divider";
 import { getRes } from "../../utils/constants";
 import BaseTable, { PageDataSource } from "../../common/BaseTable";
 import AddType from "./add_type";
 import EditType from "./edit_type";
+import BaseTitle from "../../base/BaseTitle";
 
 const Type = ({ data, offline }: { data: PageDataSource; offline: boolean }) => {
     const getColumns = () => {
@@ -47,10 +46,7 @@ const Type = ({ data, offline }: { data: PageDataSource; offline: boolean }) => 
 
     return (
         <>
-            <Title className="page-header" level={3}>
-                {getRes()["admin.type.manage"]}
-            </Title>
-            <Divider />
+            <BaseTitle title={getRes()["admin.type.manage"]} />
             <BaseTable
                 defaultPageSize={10}
                 offline={offline}

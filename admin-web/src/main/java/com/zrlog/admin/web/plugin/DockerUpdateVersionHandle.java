@@ -1,7 +1,5 @@
 package com.zrlog.admin.web.plugin;
 
-import com.zrlog.business.service.InstallService;
-
 import java.util.Map;
 
 public class DockerUpdateVersionHandle implements UpdateVersionHandler {
@@ -26,7 +24,7 @@ public class DockerUpdateVersionHandle implements UpdateVersionHandler {
 
     @Override
     public void doHandle() {
-        message = InstallService.renderMd((String) blogRes.get("dockerUpgradeTips"));
+        message = blogRes.get("dockerUpgradeTips").toString();
         finish = true;
     }
 }

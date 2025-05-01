@@ -1,40 +1,72 @@
 package com.zrlog.business.cache;
 
+import com.google.gson.Gson;
 import com.hibegin.common.BaseLockObject;
+import com.hibegin.common.dao.ResultValueConvertUtils;
+import com.hibegin.common.dao.dto.PageRequestImpl;
 import com.hibegin.common.util.*;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.business.cache.vo.BaseDataInitVO;
 import com.zrlog.business.cache.vo.HotLogBasicInfoVO;
-import com.zrlog.business.util.InstallUtils;
-import com.zrlog.business.util.PluginUtils;
+import com.zrlog.common.AdminResource;
 import com.zrlog.common.CacheService;
 import com.zrlog.common.Constants;
-import com.zrlog.common.rest.request.PageRequestImpl;
 import com.zrlog.data.dto.FaviconBase64DTO;
 import com.zrlog.model.*;
 import com.zrlog.util.I18nUtil;
+import com.zrlog.util.ThreadUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * 对缓存数据的操作
  */
-public class CacheServiceImpl extends BaseLockObject implements CacheService {
+public class CacheServiceImpl extends BaseLockObject implements CacheService<BaseDataInitVO> {
     private static final Logger LOGGER = LoggerUtil.getLogger(CacheServiceImpl.class);
-    private final String CACHE_HTML_PATH = PathUtil.getCachePath();
+    private final String cacheStaticPath;
 
     private final AtomicLong version = new AtomicLong();
     private final Map<String, String> cacheFileMap = new ConcurrentHashMap<>();
-    private BaseDataInitVO cacheInit;
+    private final String contextPath;
+    private volatile BaseDataInitVO cacheInit;
+    private final ExecutorService executor;
+
+    public CacheServiceImpl(String contextPath) {
+        this.contextPath = contextPath;
+        this.cacheStaticPath = PathUtil.getCachePath();
+        this.executor = ThreadUtils.newFixedThreadPool(10);
+
+    }
+
+    private static String getStreamTag(InputStream inputStream) {
+        return Math.abs(SecurityUtils.md5(inputStream).hashCode()) + "";
+    }
+
+    private static void setToRequest(HttpRequest servletRequest, BaseDataInitVO cacheInit) {
+        if (Objects.isNull(servletRequest)) {
+            return;
+        }
+        if (Objects.isNull(cacheInit)) {
+            return;
+        }
+        servletRequest.getAttr().put("init", cacheInit);
+        servletRequest.getAttr().put("website", cacheInit.getWebSite());
+        //website alias
+        servletRequest.getAttr().put("webSite", cacheInit.getWebSite());
+        servletRequest.getAttr().put("webs", cacheInit.getWebSite());
+        servletRequest.getAttr().put("WEB_SITE", cacheInit.getWebSite());
+    }
 
     @Override
     public boolean isCacheableByRequest(HttpRequest request) {
@@ -44,7 +76,6 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
         }
         return cacheFileMap.containsKey(request.getUri().substring(1));
     }
-
 
     @Override
     public String getFileFlagFirstByCache(String uri) {
@@ -81,16 +112,12 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
         return null;
     }
 
-    private static String getStreamTag(InputStream inputStream) {
-        return Math.abs(SecurityUtils.md5(inputStream).hashCode()) + "";
-    }
-
     @Override
     public void refreshFavicon() {
         FaviconBase64DTO faviconBase64DTO = new WebSite().faviconBase64DTO();
-        faviconHandle(faviconBase64DTO.getFavicon_ico_base64(), Constants.FAVICON_ICO_URI_PATH, faviconBase64DTO.getGenerator_html_status());
-        faviconHandle(faviconBase64DTO.getFavicon_png_pwa_192_base64(), Constants.FAVICON_PNG_PWA_192_URI_PATH, faviconBase64DTO.getGenerator_html_status());
-        faviconHandle(faviconBase64DTO.getFavicon_png_pwa_512_base64(), Constants.FAVICON_PNG_PWA_512_URI_PATH, faviconBase64DTO.getGenerator_html_status());
+        faviconHandle(faviconBase64DTO.getFavicon_ico_base64(), Constants.FAVICON_ICO_URI_PATH, ResultValueConvertUtils.toBoolean(faviconBase64DTO.getGenerator_html_status()));
+        faviconHandle(faviconBase64DTO.getFavicon_png_pwa_192_base64(), Constants.FAVICON_PNG_PWA_192_URI_PATH, ResultValueConvertUtils.toBoolean(faviconBase64DTO.getGenerator_html_status()));
+        faviconHandle(faviconBase64DTO.getFavicon_png_pwa_512_base64(), Constants.FAVICON_PNG_PWA_512_URI_PATH, ResultValueConvertUtils.toBoolean(faviconBase64DTO.getGenerator_html_status()));
     }
 
     @Override
@@ -100,7 +127,7 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
         if (Objects.equals(cacheKey, "/")) {
             cacheKey = "/index.html";
         }
-        return new File(CACHE_HTML_PATH + lang + "/" + cacheKey);
+        return new File(cacheStaticPath + lang + contextPath + "/" + cacheKey);
     }
 
     /**
@@ -116,13 +143,24 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
         if (!htmlFile.exists()) {
             htmlFile.getParentFile().mkdirs();
         }
+        if (httpRequest.getUri().startsWith("/admin") && !httpRequest.getUri().contains(".")) {
+            htmlFile = new File(htmlFile + ".html");
+        }
         IOUtil.writeBytesToFile(bytes, htmlFile);
         return htmlFile;
     }
 
     @Override
     public File getCacheHtmlFolder() {
-        return new File(CACHE_HTML_PATH + "/zh_CN/");
+        return new File(cacheStaticPath + "/zh_CN/" + contextPath + "/");
+    }
+
+    @Override
+    public long getWebSiteVersion() {
+        if (Objects.isNull(cacheInit)) {
+            return 0;
+        }
+        return ObjectUtil.requireNonNullElse(cacheInit.getWebSiteVersion(), 0L);
     }
 
     @Override
@@ -172,25 +210,11 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
     @Override
     public CompletableFuture<BaseDataInitVO> refreshInitDataCacheAsync(HttpRequest servletRequest, boolean cleanAble) {
         long expectVersion = getUpdateVersion(cleanAble);
-        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
-            return CompletableFuture.supplyAsync(() -> {
-                BaseDataInitVO cache = refreshInitDataCache(cleanAble, expectVersion);
-                setToRequest(servletRequest, cache);
-                return cache;
-            }, executor);
-        }
-    }
-
-    private static void setToRequest(HttpRequest servletRequest, BaseDataInitVO cacheInit) {
-        if (Objects.isNull(servletRequest)) {
-            return;
-        }
-        servletRequest.getAttr().put("init", cacheInit);
-        servletRequest.getAttr().put("website", cacheInit.getWebSite());
-        //website alias
-        servletRequest.getAttr().put("webSite", cacheInit.getWebSite());
-        servletRequest.getAttr().put("webs", cacheInit.getWebSite());
-        servletRequest.getAttr().put("WEB_SITE", cacheInit.getWebSite());
+        return CompletableFuture.supplyAsync(() -> {
+            BaseDataInitVO cache = refreshInitDataCache(cleanAble, expectVersion);
+            setToRequest(servletRequest, cache);
+            return cache;
+        }, executor);
     }
 
     private BaseDataInitVO refreshInitDataCache(boolean cleanAble, long expectVersion) {
@@ -205,17 +229,14 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
                 return cacheInit;
             } else {
                 long start = System.currentTimeMillis();
-                try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+                ExecutorService executor = ThreadUtils.newFixedThreadPool(10);
+                try {
                     cacheInit = getCacheInit(executor);
-                    //缓存静态资源map
-                    Map<String, String> tempMap = getCacheFileMap();
-                    cacheFileMap.clear();
-                    //重新填充Map
-                    cacheFileMap.putAll(tempMap);
                     //清除模版的缓存数据
                     WebSite.clearTemplateConfigMap();
-                    PluginUtils.refreshPluginCacheData();
+                    Constants.zrLogConfig.refreshPluginCacheData(expectVersion);
                 } finally {
+                    executor.shutdown();
                     LOGGER.info("RefreshInitDataCache used time " + (System.currentTimeMillis() - start) + "ms");
                 }
             }
@@ -225,10 +246,35 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
         return cacheInit;
     }
 
+    @Override
+    public List<Map<String, Object>> getArticleTypes(HttpRequest request) {
+        if (Objects.nonNull(cacheInit)) {
+            return cacheInit.getTypes();
+        }
+        try {
+            refreshInitDataCacheAsync(request, false);
+            return new Type().findAll();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<Map<String, Object>> getTags(HttpRequest request) {
+        if (Objects.nonNull(cacheInit)) {
+            return cacheInit.getTags();
+        }
+        try {
+            refreshInitDataCacheAsync(request, false);
+            return new Tag().findAll();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override
     public Map<String, Object> refreshWebSite() {
-        if (!InstallUtils.isInstalled()) {
+        if (!Constants.zrLogConfig.isInstalled()) {
             return new HashMap<>();
         }
         Map<String, Object> website = new WebSite().getPublicWebSite();
@@ -253,14 +299,40 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
         return website;
     }
 
+
     private HotLogBasicInfoVO convertToBasicVO(Map<String, Object> log) {
-        log.put("releaseTime", ((LocalDateTime) log.get("releaseTime")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-        log.put("last_update_date", ((LocalDateTime) log.get("last_update_date")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        String format = "yyyy-MM-dd";
+        log.put("releaseTime", ResultValueConvertUtils.formatDate(log.get("releaseTime"), format));
+        log.put("lastUpdateDate", ResultValueConvertUtils.formatDate(log.get("last_update_date"), format));
+        log.put("last_update_date", ResultValueConvertUtils.formatDate(log.get("last_update_date"), format));
         return BeanUtil.convert(log, HotLogBasicInfoVO.class);
+    }
+
+
+    @Override
+    public void copyResourceToCacheFolder(String resourceName) {
+        InputStream inputStream = CacheServiceImpl.class.getResourceAsStream(resourceName);
+        if (Objects.isNull(inputStream)) {
+            LOGGER.warning("Missing resource " + resourceName);
+            return;
+        }
+        AdminResource adminResource = Constants.zrLogConfig.getAdminResource();
+        if (Objects.isNull(adminResource)) {
+            return;
+        }
+        if (adminResource.isAdminMainJs(resourceName)) {
+            String stringInputStream = IOUtil.getStringInputStream(inputStream);
+            String adminPath = "admin/";
+            String newStr = stringInputStream.replace("\"/admin/\"", "document.currentScript.baseURI + \"" + adminPath + "\"");
+            saveToCacheFolder(new ByteArrayInputStream(newStr.getBytes()), resourceName);
+            return;
+        }
+        saveToCacheFolder(inputStream, resourceName);
     }
 
     private void faviconHandle(String faviconIconBase64, String saveFilePath, Boolean saveToCache) {
         if (StringUtils.isEmpty(faviconIconBase64)) {
+            copyResourceToCacheFolder(saveFilePath);
             return;
         }
         try {
@@ -284,9 +356,17 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
     private BaseDataInitVO getCacheInit(Executor executor) {
         BaseDataInitVO cacheInit = new BaseDataInitVO();
         //first set website info
-        cacheInit.setWebSite(refreshWebSite());
-
+        Map<String, Object> refreshWebSite = refreshWebSite();
+        cacheInit.setWebSite(refreshWebSite);
+        cacheInit.setWebSiteVersion((long) new Gson().toJson(refreshWebSite).hashCode());
         List<CompletableFuture<Void>> futures = new ArrayList<>();
+        futures.add(CompletableFuture.runAsync(() -> {
+            //缓存静态资源map
+            Map<String, String> tempMap = getCacheFileMap();
+            cacheFileMap.clear();
+            //重新填充Map
+            cacheFileMap.putAll(tempMap);
+        }, executor));
         BaseDataInitVO.Statistics statistics = new BaseDataInitVO.Statistics();
         futures.add(CompletableFuture.runAsync(() -> {
             statistics.setTotalArticleSize(new Log().getVisitorCount());
@@ -304,8 +384,6 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
                 cacheInit.setTypes(new Type().findAll());
                 statistics.setTotalTypeSize((long) cacheInit.getTypes().size());
                 List<Map<String, Object>> types = cacheInit.getTypes();
-                //Last article
-                cacheInit.setHotLogs(new Log().visitorFind(new PageRequestImpl(1L, 6L), "").getRows().stream().map(this::convertToBasicVO).toList());
                 Map<Map<String, Object>, List<HotLogBasicInfoVO>> indexHotLog = new LinkedHashMap<>();
                 cacheInit.setIndexHotLogs(indexHotLog);
                 //设置分类Hot
@@ -315,12 +393,16 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
                         typeMap.put("typeName", type.get("typeName"));
                         String alias = (String) type.get("alias");
                         typeMap.put("alias", alias);
-                        indexHotLog.put(typeMap, new Log().findByTypeAlias(1, 6, alias).getRows().stream().map(this::convertToBasicVO).toList());
+                        indexHotLog.put(typeMap, new Log().findByTypeAlias(1, 6, alias).getRows().stream().map(this::convertToBasicVO).collect(Collectors.toList()));
                     }, executor));
                 }
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
+        }, executor));
+        futures.add(CompletableFuture.runAsync(() -> {
+            //Last article
+            cacheInit.setHotLogs(new Log().visitorFind(new PageRequestImpl(1L, 6L), "").getRows().stream().map(this::convertToBasicVO).collect(Collectors.toList()));
         }, executor));
         futures.add(CompletableFuture.runAsync(() -> {
             try {
@@ -345,17 +427,11 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
         }, executor));
         futures.add(CompletableFuture.runAsync(this::refreshFavicon, executor));
         futures.add(CompletableFuture.runAsync(() -> {
-            List<Map<String, Object>> all;
             try {
-                new Tag().refreshTag();
-                all = new Tag().findAll();
+                cacheInit.setTags(new Tag().refreshTag());
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
-            for (Map<String, Object> kv : all) {
-                kv.put("keycode", kv.get("text").hashCode());
-            }
-            cacheInit.setTags(all);
             statistics.setTotalTagSize((long) cacheInit.getTags().size());
         }, executor));
         try {

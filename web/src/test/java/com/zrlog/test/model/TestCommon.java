@@ -1,6 +1,6 @@
 package com.zrlog.test.model;
 
-import com.zrlog.admin.web.plugin.UpdateVersionPlugin;
+import com.zrlog.admin.web.plugin.UpdateVersionInfoPlugin;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.Version;
 import com.zrlog.util.I18nUtil;
@@ -40,7 +40,7 @@ public class TestCommon {
 
     @Test
     public void testVersionLoad() {
-        Version lastVersion = new UpdateVersionPlugin().getLastVersion(true);
+        Version lastVersion = new UpdateVersionInfoPlugin().getLastVersion(true);
         System.out.println("lastVersion = " + lastVersion);
         assert Objects.nonNull(lastVersion);
     }

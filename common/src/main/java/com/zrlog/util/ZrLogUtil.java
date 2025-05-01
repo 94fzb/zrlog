@@ -2,30 +2,23 @@ package com.zrlog.util;
 
 import com.hibegin.common.util.*;
 import com.hibegin.http.server.api.HttpRequest;
+import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.config.ConfigKit;
-import com.hibegin.http.server.util.PathUtil;
+import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.common.Constants;
-import eu.bitwalker.useragentutils.BrowserType;
-import eu.bitwalker.useragentutils.UserAgent;
-
-import java.io.InputStream;
+import com.zrlog.common.Updater;
+import com.zrlog.common.UpdaterTypeEnum;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * ZrLog特有的一些工具方法
  */
 public class ZrLogUtil {
 
-    private static final Logger LOGGER = LoggerUtil.getLogger(ZrLogUtil.class);
+    //private static final Logger LOGGER = LoggerUtil.getLogger(ZrLogUtil.class);
 
-    public static String STATIC_USER_AGENT = "Static-Blog-Plugin/" + UUID.randomUUID().toString().replace("-", "");
 
     private ZrLogUtil() {
     }
@@ -44,23 +37,12 @@ public class ZrLogUtil {
         return BeanUtil.convert(tempMap, clazz);
     }
 
-    public static boolean isStaticBlogPlugin(HttpRequest request) {
-        if (Objects.isNull(request)) {
-            return false;
-        }
-        String ua = request.getHeader("User-Agent");
-        if (Objects.isNull(ua)) {
-            return false;
-        }
-        return Objects.equals(ua, STATIC_USER_AGENT);
-    }
-
     public static String getHomeUrlWithHost(HttpRequest request) {
         return "//" + getHomeUrlWithHostNotProtocol(request);
     }
 
     public static String getHomeUrlWithHostNotProtocol(HttpRequest request) {
-        return getBlogHost(request) + "/";
+        return getBlogHost(request) + WebTools.getHomeUrl(request);
     }
 
     public static String getBlogHost(HttpRequest request) {
@@ -82,82 +64,20 @@ public class ZrLogUtil {
         return "";
     }
 
-    public static String getAdminStaticResourceBaseUrlByWebSite() {
+    public static String getAdminStaticResourceBaseUrlByWebSite(HttpRequest request) {
+        if (Objects.isNull(Constants.zrLogConfig)) {
+            return "";
+        }
         String websiteHost = (String) Constants.zrLogConfig.getPublicWebSite().get("admin_static_resource_base_url");
         if (Objects.nonNull(websiteHost) && !websiteHost.trim().isEmpty()) {
-            return websiteHost;
+            return websiteHost + request.getContextPath();
         }
-        return "";
+        return request.getContextPath();
     }
 
     public static String getFullUrl(HttpRequest request) {
         return "//" + getBlogHost(request) + request.getUri().substring(1);
     }
-
-    public static String getDatabaseServerVersion(Properties dbConfig) {
-        try (Connection connect = DbConnectUtils.getConnection(dbConfig)) {
-            if (connect != null) {
-                String queryVersionSQL = "select version()";
-                try (PreparedStatement ps = connect.prepareStatement(queryVersionSQL)) {
-                    try (ResultSet resultSet = ps.executeQuery()) {
-                        if (resultSet.next()) {
-                            return resultSet.getString(1);
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "DB connect error ", e);
-        }
-        return "Unknown";
-    }
-
-    public static Long getCurrentSqlVersion(Properties dbConfig) {
-        try (Connection connection = DbConnectUtils.getConnection(dbConfig)) {
-            if (connection != null) {
-                String queryVersionSQL = "select value from website where name = ?";
-                try (PreparedStatement ps = connection.prepareStatement(queryVersionSQL)) {
-                    ps.setString(1, Constants.ZRLOG_SQL_VERSION_KEY);
-                    try (ResultSet resultSet = ps.executeQuery()) {
-                        if (resultSet.next()) {
-                            return Long.parseLong(resultSet.getString(1));
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "DB connect error ", e);
-        }
-        return -1L;
-    }
-
-
-    private static Map<Integer, String> getSqlFileList() {
-        Map<Integer, String> fileList = new LinkedHashMap<>();
-        for (int i = 1; i <= Constants.SQL_VERSION; i++) {
-            InputStream sqlStream = PathUtil.getConfInputStream("/update-sql/" + i + ".sql");
-            if (Objects.nonNull(sqlStream)) {
-                fileList.put(i, IOUtil.getStringInputStream(sqlStream));
-            }
-
-        }
-        return fileList;
-    }
-
-    public static List<Map.Entry<Integer, List<String>>> getExecSqlList(Long dbVersion) {
-        List<Map.Entry<Integer, List<String>>> sqlList = new ArrayList<>();
-
-        for (Map.Entry<Integer, String> f : getSqlFileList().entrySet()) {
-            int fileVersion = f.getKey();
-            if (fileVersion > dbVersion) {
-                Map.Entry<Integer, List<String>> entry = new AbstractMap.SimpleEntry<>(fileVersion, extractExecutableSql(f.getValue()));
-                LOGGER.info("Need update sql " + fileVersion + ".sql \n" + String.join(";\n", entry.getValue()) + ";");
-                sqlList.add(entry);
-            }
-        }
-        return sqlList;
-    }
-
 
     public static boolean greatThenCurrentVersion(String buildId, Date releaseDate, String fetchedVersion) {
         if (buildId.equals(BlogBuildInfoUtil.getBuildId()) || releaseDate.before(BlogBuildInfoUtil.getTime())) {
@@ -209,14 +129,6 @@ public class ZrLogUtil {
         }
     }
 
-    public static boolean isNormalBrowser(String userAgent) {
-        if (StringUtils.isEmpty(userAgent)) {
-            return false;
-        }
-        UserAgent ua = UserAgent.parseUserAgentString(userAgent);
-        BrowserType browserType = ua.getBrowser().getBrowserType();
-        return browserType == BrowserType.MOBILE_BROWSER || browserType == BrowserType.WEB_BROWSER;
-    }
 
     public static Integer getPort(String[] args) {
         if (Objects.nonNull(args)) {
@@ -233,28 +145,54 @@ public class ZrLogUtil {
         return ConfigKit.getInt("server.port", 8080);
     }
 
-    public static List<String> extractExecutableSql(String sql) {
-        String[] sqlArr = sql.split("\n");
-        StringBuilder tempSqlStr = new StringBuilder();
-        List<String> sqlList = new ArrayList<>();
-        for (String sqlSt : sqlArr) {
-            if (sqlSt.startsWith("#") || sqlSt.startsWith("/*")) {
-                continue;
+    public static String getContextPath(String[] args) {
+        if (Objects.nonNull(args)) {
+            for (String arg : args) {
+                if (arg.startsWith("--contextPath=")) {
+                    return arg.split("=")[1];
+                }
             }
-            tempSqlStr.append(sqlSt);
         }
-        String[] cleanSql = tempSqlStr.toString().split(";");
-        for (String sqlSt : cleanSql) {
-            if (StringUtils.isEmpty(sqlSt) || sqlSt.trim().isEmpty()) {
-                continue;
-            }
-            sqlList.add(sqlSt);
+        String contextPath = System.getenv("contextPath");
+        if (Objects.nonNull(contextPath)) {
+            return contextPath;
         }
-        return sqlList;
+        return ConfigKit.get("server.contextPath", "").toString();
     }
+
 
     public static boolean isSystemServiceMode() {
         String value = System.getenv("SYSTEM_SERVICE_MODE");
         return "true".equalsIgnoreCase(value);
     }
+
+    public static boolean isWarMode() {
+        if (EnvKit.isDevMode()) {
+            return false;
+        }
+        Updater updater = Constants.zrLogConfig.getUpdater();
+        if (Objects.isNull(updater)) {
+            return false;
+        }
+        return updater.getType() == UpdaterTypeEnum.WAR;
+    }
+
+    public static boolean isWarMode(Updater updater) {
+        if (EnvKit.isDevMode()) {
+            return false;
+        }
+        if (Objects.isNull(updater)) {
+            return false;
+        }
+        return updater.getType() == UpdaterTypeEnum.WAR;
+    }
+
+    public static void putLongTimeCache(HttpResponse response) {
+        response.addHeader("Cache-Control", "max-age=31536000, immutable"); // 1 年的秒数
+    }
+
+    public static String getLambdaRoot() {
+        return System.getenv("LAMBDA_TASK_ROOT");
+    }
+
 }

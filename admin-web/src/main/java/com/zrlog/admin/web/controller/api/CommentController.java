@@ -1,33 +1,34 @@
 package com.zrlog.admin.web.controller.api;
 
+import com.hibegin.common.dao.dto.PageData;
 import com.hibegin.common.util.BeanUtil;
 import com.hibegin.http.annotation.ResponseBody;
 import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.rest.request.ReadCommentRequest;
 import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
 import com.zrlog.admin.business.service.AdminCommentService;
-import com.zrlog.blog.web.util.ControllerUtil;
 import com.zrlog.admin.web.annotation.RefreshCache;
+import com.zrlog.business.util.ControllerUtil;
+import com.zrlog.common.controller.BaseController;
 import com.zrlog.common.rest.response.ApiStandardResponse;
 import com.zrlog.common.rest.response.StandardResponse;
-import com.zrlog.data.dto.PageData;
 
 import java.sql.SQLException;
 import java.util.Map;
 
-public class CommentController extends Controller {
+public class CommentController extends BaseController {
 
     private final AdminCommentService commentService = new AdminCommentService();
 
     @RefreshCache
     @ResponseBody
     public StandardResponse delete() throws SQLException {
-        return commentService.delete(request.getParaToStr("id").split(","));
+        return commentService.delete(getParamWithEmptyCheck("id").split(","));
     }
 
     @ResponseBody
     public UpdateRecordResponse read() {
-        return commentService.read(BeanUtil.convertWithValid(getRequest().getInputStream(), ReadCommentRequest.class));
+        return commentService.read(getRequestBodyWithNullCheck(ReadCommentRequest.class));
     }
 
     @ResponseBody

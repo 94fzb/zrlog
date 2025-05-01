@@ -5,7 +5,7 @@ import com.hibegin.common.util.IOUtil;
 import com.hibegin.http.annotation.ResponseBody;
 import com.hibegin.http.server.util.PathUtil;
 import com.hibegin.http.server.web.Controller;
-import com.zrlog.admin.business.exception.ArgsException;
+import com.zrlog.common.exception.ArgsException;
 import com.zrlog.admin.business.rest.response.UploadFileResponse;
 import com.zrlog.admin.business.service.UploadService;
 import com.zrlog.admin.web.token.AdminTokenThreadLocal;
@@ -54,7 +54,7 @@ public class UploadController extends Controller {
             //copy file
             IOUtil.writeBytesToFile(bytes, thumbnailFile);
             UploadFileResponse uploadFileResponse = new UploadService().getCloudUrl("", uri, finalFilePath, getRequest(), AdminTokenThreadLocal.getUser());
-            return new ApiStandardResponse<>(new UploadFileResponse(uploadFileResponse.url() + "?h=" + height + "&w=" + width));
+            return new ApiStandardResponse<>(new UploadFileResponse(uploadFileResponse.getUrl() + "?h=" + height + "&w=" + width));
         } finally {
             tempImgFile.delete();
         }

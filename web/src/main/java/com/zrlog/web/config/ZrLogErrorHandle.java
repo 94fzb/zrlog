@@ -1,20 +1,18 @@
 package com.zrlog.web.config;
 
-import com.google.gson.Gson;
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.http.server.api.HttpErrorHandle;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.execption.NotFindResourceException;
 import com.hibegin.http.server.util.PathUtil;
-import com.zrlog.admin.business.exception.NotFindDbEntryException;
-import com.zrlog.blog.web.util.WebTools;
+import com.zrlog.admin.business.AdminConstants;
+import com.zrlog.common.exception.NotFindDbEntryException;
 import com.zrlog.common.Constants;
+import com.zrlog.common.ZrLogConfig;
 import com.zrlog.common.exception.AbstractBusinessException;
 import com.zrlog.common.rest.response.ApiStandardResponse;
-import com.zrlog.util.ZrLogUtil;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -28,9 +26,11 @@ public class ZrLogErrorHandle implements HttpErrorHandle {
     private static final Logger LOGGER = LoggerUtil.getLogger(ZrLogErrorHandle.class);
 
     private final int httpStatueCode;
+    private final ZrLogConfig zrLogConfig;
 
-    public ZrLogErrorHandle(int httpStatueCode) {
+    public ZrLogErrorHandle(int httpStatueCode, ZrLogConfig zrLogConfig) {
         this.httpStatueCode = httpStatueCode;
+        this.zrLogConfig = zrLogConfig;
     }
 
     /**
@@ -43,30 +43,36 @@ public class ZrLogErrorHandle implements HttpErrorHandle {
         if (Constants.debugLoggerPrintAble()) {
             LOGGER.log(Level.SEVERE, "handle " + request.getUri() + " error", e);
         } else {
-            LOGGER.log(Level.WARNING, "handle " + request.getUri() + " error " + e.getMessage());
+            LOGGER.log(Level.WARNING, "handle " + request.getUri() + " error ", e);
         }
-        if (ZrLogUtil.isStaticBlogPlugin(request)) {
+        if (zrLogConfig.isStaticPluginRequest(request)) {
             return;
         }
         if (request.getUri().startsWith("/api")) {
-            if (e instanceof AbstractBusinessException ee) {
+            if (e instanceof AbstractBusinessException) {
+                AbstractBusinessException ee = (AbstractBusinessException) e;
                 ApiStandardResponse<Void> error = new ApiStandardResponse<>();
                 error.setError(ee.getError());
                 error.setMessage(ee.getMessage());
-                response.write(new ByteArrayInputStream(new Gson().toJson(error).getBytes()), 200);
+                response.renderJson(error);
+            } else if (e instanceof NotFindResourceException) {
+                ApiStandardResponse<Void> error = new ApiStandardResponse<>();
+                error.setError(9404);
+                error.setMessage(e.getMessage());
+                response.renderJson(error);
             } else {
                 ApiStandardResponse<Void> error = new ApiStandardResponse<>();
                 error.setError(9999);
                 error.setMessage(e.getMessage());
-                response.write(new ByteArrayInputStream(new Gson().toJson(error).getBytes()), 200);
+                response.renderJson(error);
             }
             return;
         }
-        if (request.getUri().startsWith(Constants.ADMIN_URI_BASE_PATH)) {
+        if (request.getUri().startsWith(AdminConstants.ADMIN_URI_BASE_PATH)) {
             if (e instanceof NotFindResourceException || e instanceof NotFindDbEntryException) {
-                response.redirect(WebTools.encodeUrl(Constants.ADMIN_URI_BASE_PATH + "/404?queryString=" + request.getQueryStr() + "&uriPath=" + request.getUri() + "&message=" + e.getMessage()));
+                response.redirect(AdminConstants.ADMIN_URI_BASE_PATH + "/404?queryString=" + request.getQueryStr() + "&uriPath=" + request.getUri() + "&message=" + e.getMessage());
             }
-            response.redirect(Constants.ADMIN_URI_BASE_PATH + "/500?message=" + e.getMessage());
+            response.redirect(AdminConstants.ADMIN_URI_BASE_PATH + "/500?message=" + e.getMessage());
             return;
         }
         if (Constants.debugLoggerPrintAble()) {

@@ -1,16 +1,17 @@
 import { Tabs } from "antd";
-import Title from "antd/es/typography/Title";
 import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
-import Divider from "antd/es/divider";
 import Index, { TemplateEntry } from "../template";
-import { getColorPrimary, getRes } from "../../utils/constants";
+import { getColorPrimary, getRealRouteUrl, getRes } from "../../utils/constants";
 import BlogForm from "./BlogForm";
 import BasicForm from "./BasicForm";
 import OtherForm from "./OtherForm";
 import UpgradeSettingForm from "./UpgradeSettingForm";
 import { Link } from "react-router-dom";
 import AdminForm from "./AdminForm";
+import { FunctionComponent } from "react";
+import { AdminCommonProps } from "../../type";
+import BaseTitle from "../../base/BaseTitle";
 
 export interface Basic {
     second_title: string;
@@ -48,21 +49,21 @@ export interface Upgrade {
     upgradePreview: boolean;
 }
 
-const WebSite = ({
-    data,
-    offline,
-}: {
-    data: Basic | Admin | Upgrade | Other | Blog | TemplateEntry[];
+export type WebSiteProps = AdminCommonProps<Basic | Admin | Upgrade | Other | Blog | TemplateEntry[]> & {
     offline: boolean;
-}) => {
-    let activeKey = window.location.pathname.replace("/admin/website", "").replace("/", "");
-    if (activeKey === "") {
-        activeKey = "basic";
-    }
+    offlineData: boolean;
+    activeKey: "basic" | "other" | "upgrade" | "admin" | "template" | "blog";
+};
+
+const WebSite: FunctionComponent<WebSiteProps> = ({ data, offline, offlineData, activeKey }) => {
     const buildLink = (key: string, text: string) => {
         const toUrl = key === "basic" ? "/website" : "/website/" + key;
         return (
-            <Link to={toUrl} replace={true} style={{ color: activeKey === key ? getColorPrimary() : "inherit" }}>
+            <Link
+                to={getRealRouteUrl(toUrl)}
+                replace={true}
+                style={{ color: activeKey === key ? getColorPrimary() : "inherit" }}
+            >
                 {text}
             </Link>
         );
@@ -99,7 +100,7 @@ const WebSite = ({
             return (
                 <Row>
                     <Col xs={24} style={{ maxWidth: 600 }}>
-                        <OtherForm offline={offline} data={data as Other} />
+                        <OtherForm offlineData={offlineData} offline={offline} data={data as Other} />
                     </Col>
                 </Row>
             );
@@ -111,10 +112,7 @@ const WebSite = ({
 
     return (
         <>
-            <Title className="page-header" level={3}>
-                {getRes()["admin.setting"]}
-            </Title>
-            <Divider />
+            <BaseTitle title={getRes()["admin.setting"]} />
             <Tabs
                 activeKey={activeKey}
                 items={[

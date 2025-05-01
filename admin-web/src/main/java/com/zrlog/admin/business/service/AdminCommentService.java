@@ -1,10 +1,10 @@
 package com.zrlog.admin.business.service;
 
+import com.hibegin.common.dao.dto.PageData;
+import com.hibegin.common.dao.dto.PageRequest;
 import com.zrlog.admin.business.rest.request.ReadCommentRequest;
 import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
-import com.zrlog.common.rest.request.PageRequest;
 import com.zrlog.common.rest.response.StandardResponse;
-import com.zrlog.data.dto.PageData;
 import com.zrlog.model.Comment;
 
 import java.sql.SQLException;

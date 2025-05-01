@@ -10,6 +10,6 @@ public class BlogApiCacheController extends Controller {
 
     @ResponseBody
     public ApiStandardResponse<BaseDataInitVO> index() {
-        return new ApiStandardResponse<>(Constants.zrLogConfig.getCacheService().refreshInitDataCacheAsync(request, false).join());
+        return new ApiStandardResponse<>((BaseDataInitVO) Constants.zrLogConfig.getCacheService().refreshInitDataCacheAsync(request, false).join());
     }
 }

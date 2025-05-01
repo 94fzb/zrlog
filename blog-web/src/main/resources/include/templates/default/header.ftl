@@ -11,6 +11,8 @@
     <link rel="stylesheet" type="text/css" href="${url}/css/editormd.css"/>
     <link rel="stylesheet" type="text/css" href="${url}/css/style_v3.css"/>
 
+    <#include "_common/auto-hljs.ftl"/>
+
     <script src="${url}/js/bootstrap.bundle.min.js"></script>
     <script src="${url}/js/auto-theme.js"></script>
     <style>
@@ -37,7 +39,8 @@
            href="${rurl}"><#if _res.navBarBrand?has_content>
                 <b>${_res.navBarBrand}</b>
             </#if></a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 

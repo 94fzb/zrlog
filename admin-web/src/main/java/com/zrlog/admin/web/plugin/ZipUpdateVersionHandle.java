@@ -67,18 +67,18 @@ public class ZipUpdateVersionHandle implements Serializable, UpdateVersionHandle
     @Override
     public void doHandle() {
         StringBuilder sb = new StringBuilder();
-        sb.append(backendRes.get("upgradeUnzipping")).append(" ").append(file.getName()).append("<br/>");
+        sb.append("- ").append(backendRes.get("upgradeUnzipping")).append(" ").append(file.getName()).append("\n");
         try {
             ZipUtil.unZip(file.toString(), Constants.zrLogConfig.getUpdater().getUnzipPath());
         } catch (Exception e) {
-            sb.append(backendRes.get("unzipError")).append(" ").append(e.getMessage());
+            sb.append("- ").append(backendRes.get("unzipError")).append(" ").append(e.getMessage());
             message = sb.toString();
             return;
         }
         try {
             changeExecFile(sb);
-            sb.append(backendRes.get("upgradeUnzipped")).append("<br/>");
-            sb.append(backendRes.get("upgradeRestarting")).append("<br/>");
+            sb.append("- ").append(backendRes.get("upgradeUnzipped")).append("\n");
+            sb.append("- ").append(backendRes.get("upgradeRestarting")).append("\n");
             message = sb.toString();
             if (finish) {
                 return;
@@ -87,7 +87,7 @@ public class ZipUpdateVersionHandle implements Serializable, UpdateVersionHandle
             updater.restartProcessAsync(upgradeVersion);
             finish = true;
         } catch (Exception e) {
-            sb.append(backendRes.get("upgradeError")).append(" ").append(e.getMessage());
+            sb.append("- ").append(backendRes.get("upgradeError")).append(" ").append(e.getMessage());
             message = sb.toString();
         } finally {
             file.delete();

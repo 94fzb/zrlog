@@ -9,6 +9,7 @@ import com.zrlog.common.type.RunMode;
 import com.zrlog.common.vo.Version;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.I18nUtil;
+import com.zrlog.business.util.NativeUtils;
 import com.zrlog.util.ZrLogUtil;
 
 import java.io.IOException;
@@ -69,10 +70,10 @@ class UpdateVersionTimerTask extends TimerTask {
     }
 
     private static String getJsonFilename() {
-        if (Constants.runMode == RunMode.JAR || Constants.runMode == RunMode.NATIVE_AGENT || Constants.runMode == RunMode.DEV) {
+        if (Constants.runMode == RunMode.JAVA || Constants.runMode == RunMode.NATIVE_AGENT) {
             return "last.version.json";
         }
-        return "last." + Constants.getRealFileArch() + ".version.json";
+        return "last." + NativeUtils.getRealFileArch() + ".version.json";
     }
 
     public static void main(String[] args) throws IOException, URISyntaxException, ParseException, InterruptedException {
@@ -106,7 +107,7 @@ class UpdateVersionTimerTask extends TimerTask {
             if (Objects.isNull(langRes)) {
                 versionInfo.setChangeLog("");
             } else {
-                versionInfo.setChangeLog(UpdateVersionPlugin.getChangeLog(versionInfo.getVersion(), versionInfo.getBuildDate(), versionInfo.getBuildId(), langRes));
+                versionInfo.setChangeLog(UpdateVersionInfoPlugin.getChangeLog(versionInfo.getVersion(), versionInfo.getBuildDate(), versionInfo.getBuildId(), langRes));
             }
         }
         return versionInfo;

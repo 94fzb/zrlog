@@ -7,9 +7,7 @@ import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.util.FreeMarkerUtil;
 import com.hibegin.http.server.util.MimeTypeUtil;
 import com.hibegin.http.server.web.Controller;
-import com.zrlog.business.plugin.StaticSitePlugin;
-import com.zrlog.business.service.TemplateHelper;
-import com.zrlog.business.util.InstallUtils;
+import com.zrlog.blog.web.util.TemplateRenderUtils;
 import com.zrlog.common.Constants;
 import com.zrlog.util.ZrLogUtil;
 
@@ -25,22 +23,13 @@ import java.util.Objects;
 public class BlogPageInterceptor implements HandleAbleInterceptor {
 
 
-    /**
-     * 处理静态化文件,仅仅缓存文章页(变化较小)
-     */
-    public static boolean catGeneratorHtml(String targetUri) {
-        if (!Constants.isStaticHtmlStatus()) {
-            return false;
-        }
-        return "/".equals(targetUri) || (targetUri.startsWith("/" + Constants.getArticleUri()) && targetUri.endsWith(".html"));
-    }
-
     @Override
     public boolean doInterceptor(HttpRequest request, HttpResponse response) throws Exception {
         if (request.getUri().startsWith(Constants.DEFAULT_TEMPLATE_PATH)) {
             try (InputStream resourceAsStream = BlogPageInterceptor.class.getResourceAsStream(request.getUri())) {
                 if (Objects.nonNull(resourceAsStream)) {
-                    response.getHeader().put("Content-Type", MimeTypeUtil.getMimeStrByExt(FileUtils.getFileExt(request.getUri())));
+                    ZrLogUtil.putLongTimeCache(response);
+                    response.addHeader("Content-Type", MimeTypeUtil.getMimeStrByExt(FileUtils.getFileExt(request.getUri())));
                     response.write(resourceAsStream, 200);
                     return false;
                 }
@@ -49,7 +38,7 @@ public class BlogPageInterceptor implements HandleAbleInterceptor {
             }
         }
         String target = request.getUri();
-        if (InstallUtils.isInstalled()) {
+        if (Constants.zrLogConfig.isInstalled()) {
             Constants.zrLogConfig.getCacheService().refreshInitDataCacheAsync(request, false).join();
         } else {
             response.redirect("/install?ref=" + request.getUri());
@@ -58,9 +47,6 @@ public class BlogPageInterceptor implements HandleAbleInterceptor {
         Method method = request.getServerConfig().getRouter().getRouterMap().get(target);
         if (Objects.isNull(method) && target.endsWith(".html")) {
             method = request.getServerConfig().getRouter().getRouterMap().get(target.substring(0, target.length() - 5));
-        }
-        if (Objects.isNull(method)) {
-            method = request.getServerConfig().getRouter().getRouterMap().get("/detail");
         }
         if (target.startsWith("/all-")) {
             method = request.getServerConfig().getRouter().getRouterMap().get("/index");
@@ -78,13 +64,17 @@ public class BlogPageInterceptor implements HandleAbleInterceptor {
             method = request.getServerConfig().getRouter().getRouterMap().get("/record");
         }
         if (Objects.isNull(method)) {
-            return true;
+            method = request.getServerConfig().getRouter().getRouterMap().get("/detail");
+        }
+        if (Objects.isNull(method)) {
+            response.renderCode(404);
+            return false;
         }
         Object invoke = method.invoke(Controller.buildController(method, request, response));
         if (Objects.nonNull(invoke)) {
-            TemplateHelper.fullTemplateInfo(request);
+            TemplateRenderUtils.fullTemplateInfo(request);
             TemplateUtils.initTemplate();
-            if (TemplateHelper.isArrangeable(request) && TemplateUtils.existsByTemplateName("arrange")) {
+            if (TemplateRenderUtils.isArrangeable(request) && TemplateUtils.existsByTemplateName("arrange")) {
                 invoke = "arrange";
             }
             String htmlStr = FreeMarkerUtil.renderToFM(invoke.toString(), request);
@@ -99,11 +89,11 @@ public class BlogPageInterceptor implements HandleAbleInterceptor {
         try (ResponseRenderPrintWriter responseRenderPrintWriter = new ResponseRenderPrintWriter(byteArrayOutputStream, "/", request, response, null)) {
             responseRenderPrintWriter.write(htmlStr);
             String realHtmlStr = responseRenderPrintWriter.getResponseBody();
-            if (!ZrLogUtil.isStaticBlogPlugin(request)) {
+            if (!Constants.zrLogConfig.isStaticPluginRequest(request)) {
                 response.renderHtmlStr(realHtmlStr);
             }
-            if (BlogPageInterceptor.catGeneratorHtml(target) && responseRenderPrintWriter.isRenderSuccess()) {
-                request.getAttr().put(StaticSitePlugin.HTML_FILE_KEY, Constants.zrLogConfig.getCacheService().saveResponseBodyToHtml(request, realHtmlStr));
+            if (Constants.catGeneratorHtml(target) && responseRenderPrintWriter.isRenderSuccess()) {
+                request.getAttr().put(Constants.STATIC_SITE_PLUGIN_HTML_FILE_KEY, Constants.zrLogConfig.getCacheService().saveResponseBodyToHtml(request, realHtmlStr));
             }
         }
     }

@@ -1,11 +1,8 @@
 package com.hibegin.common.util;
 
 import com.google.gson.Gson;
-import com.zrlog.common.Validator;
-import com.zrlog.common.ValidatorUtils;
 
 import java.io.*;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,15 +20,6 @@ public class BeanUtil {
 
     public static <T> T convert(InputStream inputStream, Class<T> tClass) {
         return new Gson().fromJson(com.hibegin.common.util.IOUtil.getStringInputStream(inputStream), tClass);
-    }
-
-    public static <T extends Validator> T convertWithValid(InputStream inputStream, Class<T> tClass) {
-        T obj = new Gson().fromJson(com.hibegin.common.util.IOUtil.getStringInputStream(inputStream), tClass);
-        ValidatorUtils.doValid(obj);
-        if (Objects.nonNull(obj)) {
-            obj.doClean();
-        }
-        return obj;
     }
 
     public static <T> T cloneObject(T obj) {

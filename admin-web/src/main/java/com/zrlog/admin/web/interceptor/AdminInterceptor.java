@@ -6,17 +6,17 @@ import com.hibegin.http.server.api.HandleAbleInterceptor;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.web.MethodInterceptor;
-import com.zrlog.admin.business.exception.ArgsException;
+import com.zrlog.admin.business.AdminConstants;
+import com.zrlog.common.exception.ArgsException;
+import com.zrlog.admin.util.AdminWebTools;
 import com.zrlog.admin.web.annotation.RefreshCache;
-import com.zrlog.admin.web.plugin.PluginCorePluginImpl;
 import com.zrlog.admin.web.token.AdminTokenThreadLocal;
-import com.zrlog.blog.web.util.WebTools;
+import com.zrlog.business.plugin.PluginCorePlugin;
 import com.zrlog.common.Constants;
+import com.zrlog.common.vo.AdminFullTokenVO;
 import com.zrlog.common.vo.AdminTokenVO;
-import com.zrlog.model.User;
 
 import java.lang.reflect.Method;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -30,13 +30,10 @@ public class AdminInterceptor implements HandleAbleInterceptor {
         if (StringUtils.isEmpty(requestToken)) {
             throw new ArgsException("missing_token");
         }
-        Constants.zrLogConfig.getPlugins().forEach(e -> {
-            if (e instanceof PluginCorePluginImpl plugin) {
-                if (!Objects.equals(plugin.getToken(), requestToken)) {
-                    throw new ArgsException("token");
-                }
-            }
-        });
+        PluginCorePlugin plugin = Constants.zrLogConfig.getPlugin(PluginCorePlugin.class);
+        if (Objects.isNull(plugin) || !Objects.equals(plugin.getToken(), requestToken)) {
+            throw new ArgsException("token");
+        }
     }
 
     /**
@@ -46,16 +43,16 @@ public class AdminInterceptor implements HandleAbleInterceptor {
     public boolean doInterceptor(HttpRequest request, HttpResponse response) throws Exception {
         try {
             String uri = request.getUri();
-            if (Constants.ADMIN_LOGIN_URI_PATH.equals(uri)) {
+            if (AdminConstants.ADMIN_LOGIN_URI_PATH.equals(uri)) {
                 AdminTokenVO adminTokenVO = Constants.zrLogConfig.getTokenService().getAdminTokenVO(request);
                 if (adminTokenVO != null) {
-                    response.redirect(Constants.ADMIN_URI_BASE_PATH + Constants.INDEX_URI_PATH);
+                    response.redirect(AdminConstants.ADMIN_URI_BASE_PATH + AdminConstants.INDEX_URI_PATH);
                 } else {
                     new MethodInterceptor().doInterceptor(request, response);
                 }
                 return false;
             }
-            if (Objects.equals(Constants.ADMIN_REFRESH_CACHE_API_URI_PATH, uri)) {
+            if (Objects.equals(AdminConstants.ADMIN_REFRESH_CACHE_API_URI_PATH, uri)) {
                 AdminTokenVO adminTokenVO = Constants.zrLogConfig.getTokenService().getAdminTokenVO(request);
                 if (Objects.isNull(adminTokenVO)) {
                     validPluginToken(request);
@@ -63,20 +60,20 @@ public class AdminInterceptor implements HandleAbleInterceptor {
                 new MethodInterceptor().doInterceptor(request, response);
                 return false;
             }
-            if ((Constants.ADMIN_URI_BASE_PATH + "/logout").equals(uri) || ("/api" + Constants.ADMIN_LOGIN_URI_PATH).equals(uri)) {
+            if ((AdminConstants.ADMIN_URI_BASE_PATH + "/logout").equals(uri) || ("/api" + AdminConstants.ADMIN_LOGIN_URI_PATH).equals(uri)) {
                 new MethodInterceptor().doInterceptor(request, response);
                 return false;
             }
-            AdminTokenVO adminTokenVO = Constants.zrLogConfig.getTokenService().getAdminTokenVO(request);
-            if (adminTokenVO == null) {
-                WebTools.blockUnLoginRequestHandler(request, response);
-                return false;
-            }
-
-            Map<String, Object> user = new User().loadById(adminTokenVO.getUserId());
-            Constants.zrLogConfig.getTokenService().setAdminToken(user, adminTokenVO.getSessionId(), adminTokenVO.getProtocol(), request, response);
-            new MethodInterceptor().doInterceptor(request, response);
             Method method = request.getServerConfig().getRouter().getMethod(request.getUri());
+            if (Objects.nonNull(method) && !Constants.zrLogConfig.isStaticPluginRequest(request)) {
+                AdminFullTokenVO adminTokenVO = Constants.zrLogConfig.getTokenService().getAdminTokenVO(request);
+                if (adminTokenVO == null) {
+                    AdminWebTools.blockUnLoginRequestHandler(request, response);
+                    return false;
+                }
+                Constants.zrLogConfig.getTokenService().setAdminToken(adminTokenVO.getUserId(), adminTokenVO.getSecretKey(), adminTokenVO.getSessionId(), adminTokenVO.getProtocol(), request, response);
+            }
+            new MethodInterceptor().doInterceptor(request, response);
             if (Objects.nonNull(method)) {
                 RefreshCache annotation = method.getAnnotation(RefreshCache.class);
                 if (Objects.nonNull(annotation)) {

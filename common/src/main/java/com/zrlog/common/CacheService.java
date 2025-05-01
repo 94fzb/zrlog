@@ -1,14 +1,14 @@
 package com.zrlog.common;
 
 import com.hibegin.http.server.api.HttpRequest;
-import com.zrlog.business.cache.vo.BaseDataInitVO;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-public interface CacheService {
+public interface CacheService<T> {
 
     void refreshFavicon();
 
@@ -18,13 +18,21 @@ public interface CacheService {
 
     File getCacheHtmlFolder();
 
+    long getWebSiteVersion();
+
     void saveToCacheFolder(InputStream inputStream, String uri);
 
-    CompletableFuture<BaseDataInitVO> refreshInitDataCacheAsync(HttpRequest servletRequest, boolean cleanAble);
+    CompletableFuture<T> refreshInitDataCacheAsync(HttpRequest servletRequest, boolean cleanAble);
 
     String getFileFlagFirstByCache(String uriPath);
 
     boolean isCacheableByRequest(HttpRequest request);
 
     Map<String, Object> refreshWebSite();
+
+    List<Map<String, Object>> getArticleTypes(HttpRequest request);
+
+    List<Map<String, Object>> getTags(HttpRequest request);
+
+    void copyResourceToCacheFolder(String resourceName);
 }

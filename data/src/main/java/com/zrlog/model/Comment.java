@@ -1,12 +1,12 @@
 package com.zrlog.model;
 
-import com.zrlog.common.rest.request.PageRequest;
-import com.zrlog.data.dto.PageData;
+import com.hibegin.common.dao.BasePageableDAO;
+import com.hibegin.common.dao.ResultValueConvertUtils;
+import com.hibegin.common.dao.dto.PageData;
+import com.hibegin.common.dao.dto.PageRequest;
 
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -26,18 +26,18 @@ public class Comment extends BasePageableDAO {
     public PageData<Map<String, Object>> find(PageRequest page) throws SQLException {
         String sql = "select commentId as id,userComment,header,commTime,userMail,userHome,userIp,userName,hide,logId from " + tableName + " order by commTime desc";
         PageData<Map<String, Object>> data = queryPageData(sql, page, new Object[0]);
-        data.getRows().forEach(e -> e.put("commTime", ((LocalDateTime) e.get("commTime")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
+        data.getRows().forEach(e -> e.put("commTime", ResultValueConvertUtils.formatDate(e.get("commTime"), "yyyy-MM-dd")));
         return data;
     }
 
     public Long count() throws SQLException {
         String sql = "select count(1) from " + tableName;
-        return (Long) queryFirstObj(sql);
+        return ((Number) queryFirstObj(sql)).longValue();
     }
 
     public Long countToDayComment() throws SQLException {
-        String sql = "select count(1) from " + tableName + " where DATE_FORMAT(commTime,'%Y_%m_%d')=?";
-        return (Long) queryFirstObj(sql, new SimpleDateFormat("yyyy_MM_dd").format(new Date()));
+        String sql = "select count(1) from " + tableName + " where commTime>?";
+        return ((Number) queryFirstObj(sql, new SimpleDateFormat("yyyy-MM-dd").format(new Date()))).longValue();
     }
 
     public List<Map<String, Object>> findHaveReadIsFalse() throws SQLException {

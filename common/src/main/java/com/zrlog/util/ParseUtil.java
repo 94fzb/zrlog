@@ -1,5 +1,6 @@
 package com.zrlog.util;
 
+import com.hibegin.common.util.StringUtils;
 import com.zrlog.common.Constants;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -8,9 +9,9 @@ import org.jsoup.nodes.Node;
 import org.jsoup.nodes.TextNode;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 一些常用的转化的工具方法。
@@ -20,6 +21,13 @@ public class ParseUtil {
     public static void main(String[] args) {
         String s = autoDigest("这是一个测试文本。它包含了一些文字和<span style='color:red;'>红色</span>内容。还有更多内容...", 20);
         System.out.println(s);
+    }
+
+    public static String getPlainSearchText(String content) {
+        if (StringUtils.isEmpty(content)) {
+            return "";
+        }
+        return Jsoup.parse(content).body().text();
     }
 
 
@@ -44,6 +52,7 @@ public class ParseUtil {
 
     /**
      * 摘要截断的位置可能仍然不是语义上的完整句子，这取决于文本内容和长度限制。 可以根据需要进行优化，例如寻找最近的标点符号进行截断。
+     *
      * @param node
      * @param remainingLength
      * @param sb
@@ -62,7 +71,8 @@ public class ParseUtil {
                     return remainingLength; // 标记已达到长度限制
                 }
             }
-        } else if (node instanceof Element element) {
+        } else if (node instanceof Element) {
+            Element element = (Element) node;
             int usedLength = 0;
 
             // 添加开始标签 (不计入长度)
@@ -202,5 +212,17 @@ public class ParseUtil {
             return false;
         }
         return str.matches("-?([1-9]\\d*|0)(\\.\\d+)?");
+    }
+
+
+    public static String toNamingDurationString(long milliseconds, boolean en) {
+        long days = TimeUnit.MILLISECONDS.toDays(milliseconds);
+        long hours = TimeUnit.MILLISECONDS.toHours(milliseconds) % 24;
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(milliseconds) % 60;
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(milliseconds) % 60;
+        if (en) {
+            return String.format("%dd %dh %dm %ds", days, hours, minutes, seconds);
+        }
+        return String.format("%d天 %d时 %d分 %d秒", days, hours, minutes, seconds);
     }
 }

@@ -1,6 +1,6 @@
 import React, { CSSProperties, ReactElement, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getColorPrimary, getRes } from "../utils/constants";
+import { getColorPrimary, getRealRouteUrl, getRes } from "../utils/constants";
 import {
     ApiFilled,
     ApiOutlined,
@@ -64,16 +64,24 @@ const SliderMenu = () => {
     const [modal, contextHolder] = Modal.useModal();
 
     const getInfo = (entry: MenuEntry): IconInfo => {
-        if (location.pathname.startsWith("/website") && entry.link.startsWith("/website")) {
+        let realPathName = location.pathname.split(".")[0];
+        if (realPathName === "/") {
+            realPathName = "/index";
+        }
+        if (realPathName.startsWith("/website") && entry.link.startsWith("/website")) {
             return { selected: true, icon: entry.selectIcon };
         }
-        if (location.pathname === entry.link) {
+        if (realPathName === entry.link) {
             return { selected: true, icon: entry.selectIcon };
         }
         if (entry.link !== "#more") {
             return { selected: false, icon: entry.icon };
         }
-        if (location.pathname === "/link" || location.pathname === "/nav" || location.pathname === "/article-type") {
+        if (
+            realPathName.startsWith("/link") ||
+            realPathName.startsWith("/nav") ||
+            realPathName.startsWith("/article-type")
+        ) {
             return { selected: true, icon: entry.selectIcon };
         }
         return { selected: false, icon: entry.icon };
@@ -83,7 +91,7 @@ const SliderMenu = () => {
         const info = getInfo(entry);
         const label = (
             <Link
-                to={entry.link}
+                to={getRealRouteUrl(entry.link)}
                 style={{
                     color: info.selected && EnvUtils.isDarkMode() ? getColorPrimary() : "#FFF",
                 }}

@@ -9,8 +9,7 @@ public class CheckVersionResponse implements Serializable {
 
     private Boolean upgrade;
     private Version version;
-    private Boolean dockerMode;
-    private Boolean systemServiceMode;
+
 
     public Boolean getUpgrade() {
         return upgrade;
@@ -26,21 +25,5 @@ public class CheckVersionResponse implements Serializable {
 
     public void setVersion(Version version) {
         this.version = version;
-    }
-
-    public Boolean getDockerMode() {
-        return dockerMode;
-    }
-
-    public void setDockerMode(Boolean dockerMode) {
-        this.dockerMode = dockerMode;
-    }
-
-    public Boolean getSystemServiceMode() {
-        return systemServiceMode;
-    }
-
-    public void setSystemServiceMode(Boolean systemServiceMode) {
-        this.systemServiceMode = systemServiceMode;
     }
 }

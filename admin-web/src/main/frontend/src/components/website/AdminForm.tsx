@@ -7,12 +7,13 @@ import { getRes, removeRes } from "../../utils/constants";
 import Select from "antd/es/select";
 import Button from "antd/es/button";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { ColorPicker, message } from "antd";
 import { Admin } from "./index";
 import FaviconUpload from "./FaviconUpload";
-import { getItems_per_page } from "index";
 import { colorPickerBgColors } from "../../utils/helpers";
+import { useAxiosBaseInstance } from "../../base/AppBase";
+import zh_CN from "antd/es/locale/zh_CN";
+import en_US from "antd/es/locale/en_US";
 
 const layout = {
     labelCol: { span: 8 },
@@ -25,8 +26,9 @@ const BlogForm = ({ data, offline }: { data: Admin; offline: boolean }) => {
     const [form, setForm] = useState<Admin>(data);
     const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
 
+    const axiosInstance = useAxiosBaseInstance();
     const websiteFormFinish = (changedValues: Admin) => {
-        axios.post("/api/admin/website/admin", { ...form, ...changedValues }).then(async ({ data }) => {
+        axiosInstance.post("/api/admin/website/admin", { ...form, ...changedValues }).then(async ({ data }) => {
             if (data.error) {
                 await messageApi.error(data.message);
                 return;
@@ -37,6 +39,15 @@ const BlogForm = ({ data, offline }: { data: Admin; offline: boolean }) => {
                 window.location.reload();
             }
         });
+    };
+
+    const getItems_per_page = () => {
+        if (getRes()["lang"] === "zh_CN") {
+            // @ts-ignore
+            return zh_CN.Pagination.items_per_page;
+        }
+        // @ts-ignore
+        return en_US.Pagination.items_per_page;
     };
 
     useEffect(() => {

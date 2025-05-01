@@ -1,6 +1,6 @@
 package com.zrlog.admin.business.rest.request;
 
-import com.zrlog.admin.business.exception.ArgsException;
+import com.zrlog.common.exception.ArgsException;
 import com.zrlog.common.Validator;
 
 import java.util.Objects;

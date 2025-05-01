@@ -1,21 +1,18 @@
 import { HomeOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import { Button, Col, FloatButton, Layout, Row } from "antd";
 
-import { getRes } from "../utils/constants";
+import { getColorPrimary, getRes } from "../utils/constants";
 import { FunctionComponent, PropsWithChildren, useEffect, useState } from "react";
 import EnvUtils from "../utils/env-utils";
 import UserInfo from "./user-info";
-import { getColorPrimary } from "../utils/constants";
 import SliderMenu from "./slider";
 import { BasicUserInfo } from "../type";
-import { ssData } from "../index";
-import axios from "axios";
 import MyLoadingComponent from "../components/my-loading-component";
-import PWAHandler from "../PWAHandler";
+import PWAHandler from "../base/PWAHandler";
 import StyledIndexLayout from "./styled-index-layout";
 import type { ScreenMap } from "antd/es/_util/responsiveObserver";
 import useBreakpoint from "antd/es/grid/hooks/useBreakpoint";
-import { addToCache, getCacheByKey } from "../cache";
+import { addToCache, getCacheByKey } from "../utils/cache";
 
 const { Header, Content, Sider } = Layout;
 
@@ -23,10 +20,16 @@ type AdminManageLayoutProps = PropsWithChildren & {
     loading: boolean;
     fullScreen?: boolean;
     offline: boolean;
+    basicUserInfo: BasicUserInfo;
 };
 
-const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ offline, children, loading, fullScreen }) => {
-    const [userInfo, setUser] = useState<BasicUserInfo | undefined>(ssData?.user);
+const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({
+    offline,
+    children,
+    loading,
+    fullScreen,
+    basicUserInfo,
+}) => {
     const screens = useBreakpoint();
 
     const sliderStateKey = "sliderOpen";
@@ -45,18 +48,6 @@ const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ offline,
     const [hiddenSlider, setHiddenSlider] = useState(defaultHiddenSlider);
 
     useEffect(() => {
-        if (userInfo === undefined) {
-            axios.get("/api/admin/user").then(({ data }) => {
-                setUser(data.data);
-            });
-        }
-    }, []);
-
-    const getMainHeight = () => {
-        return "calc(100vh - 64px)";
-    };
-
-    useEffect(() => {
         setHiddenSlider(needCollSlider(screens));
         setShowSliderBtn(screens.xs === true);
     }, [screens]);
@@ -64,6 +55,10 @@ const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ offline,
     if (screens.xs === undefined) {
         return <></>;
     }
+
+    const getMainHeight = () => {
+        return "calc(100vh - 64px)";
+    };
 
     const getMainButton = () => {
         const home = (
@@ -130,7 +125,7 @@ const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ offline,
                             {getRes()["admin.offline.desc"]}
                         </span>
                     )}
-                    {userInfo && <UserInfo offline={offline} data={userInfo} />}
+                    <UserInfo offline={offline} data={basicUserInfo} />
                 </Header>
                 <Row
                     style={{

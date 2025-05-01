@@ -7,10 +7,9 @@ import com.hibegin.common.util.http.handle.CloseResponseHandle;
 import com.hibegin.http.HttpMethod;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
-import com.zrlog.business.util.PluginHelper;
+import com.zrlog.business.plugin.PluginCorePlugin;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.AdminTokenVO;
-import com.zrlog.util.ZrLogUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -37,7 +36,7 @@ class ResponseRenderPrintWriter extends PrintWriter {
 
     private String body;
 
-    private final long startTime = System.currentTimeMillis();
+    private final long startTime;
 
     private final String baseUrl;
 
@@ -68,6 +67,7 @@ class ResponseRenderPrintWriter extends PrintWriter {
         this.request = request;
         this.response = response;
         this.adminTokenVO = adminTokenVO;
+        this.startTime = request.getCreateTime();
     }
 
     private void tryFlush() {
@@ -140,7 +140,7 @@ class ResponseRenderPrintWriter extends PrintWriter {
             html = html.replace(entry.getKey(), entry.getValue());
         }
         String versionInfo = SecurityUtils.md5(html);
-        if (ZrLogUtil.isStaticBlogPlugin(request)) {
+        if (Constants.zrLogConfig.isStaticPluginRequest(request)) {
             return html + "<!--" + versionInfo + "-->";
         }
         return html + "<!--" + (System.currentTimeMillis() - startTime) + "ms(" + versionInfo + ")-->";
@@ -154,7 +154,7 @@ class ResponseRenderPrintWriter extends PrintWriter {
                     url += "?" + element.attr("param");
                 }
                 element.attr("_id", UUID.randomUUID().toString());
-                CloseResponseHandle handle = PluginHelper.getContext(url, HttpMethod.GET, request, adminTokenVO);
+                CloseResponseHandle handle = Constants.zrLogConfig.getPlugin(PluginCorePlugin.class).getContext(url, HttpMethod.GET, request, adminTokenVO);
                 try (InputStream in = handle.getT().body()) {
                     byte[] bytes = IOUtil.getByteByInputStream(in);
                     if (handle.getStatusCode() != 200) {

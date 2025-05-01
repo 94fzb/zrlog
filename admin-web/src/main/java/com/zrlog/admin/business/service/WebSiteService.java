@@ -1,5 +1,7 @@
 package com.zrlog.admin.business.service;
 
+import com.hibegin.http.server.api.HttpRequest;
+import com.zrlog.admin.business.AdminConstants;
 import com.zrlog.admin.business.rest.base.*;
 import com.zrlog.common.Constants;
 import com.zrlog.data.dto.FaviconBase64DTO;
@@ -25,7 +27,7 @@ public class WebSiteService {
         BlogWebSiteInfo blog = new BlogWebSiteInfo();
         blog.setGenerator_html_status(Constants.getBooleanByFromWebSite("generator_html_status"));
         blog.setHost(Objects.requireNonNullElse((String) Constants.zrLogConfig.getPublicWebSite().get("host"), ""));
-        blog.setDisable_comment_status(Constants.getBooleanByFromWebSite("disable_comment_status"));
+        blog.setDisable_comment_status(!Constants.isAllowComment());
         blog.setArticle_thumbnail_status(Constants.getBooleanByFromWebSite("article_thumbnail_status"));
         return blog;
     }
@@ -41,18 +43,18 @@ public class WebSiteService {
         return basic;
     }
 
-    public AdminWebSiteInfo adminWebSiteInfo() {
+    public AdminWebSiteInfo adminWebSiteInfo(HttpRequest request) {
         AdminWebSiteInfo admin = new AdminWebSiteInfo();
         FaviconBase64DTO faviconBase64DTO = new WebSite().faviconBase64DTO();
         admin.setAdmin_darkMode(Constants.getBooleanByFromWebSite("admin_darkMode"));
         admin.setLanguage((String) Constants.zrLogConfig.getPublicWebSite().get("language"));
-        admin.setAdmin_static_resource_base_url(ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite());
+        admin.setAdmin_static_resource_base_url(ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite(request));
         admin.setAdmin_color_primary(Objects.toString(Constants.zrLogConfig.getPublicWebSite().get("admin_color_primary"), "#1677ff"));
         admin.setSession_timeout(Constants.getSessionTimeout() / 60 / 1000);
-        admin.setArticle_auto_digest_length(Constants.getAutoDigestLength());
+        admin.setArticle_auto_digest_length(AdminConstants.getAutoDigestLength());
         admin.setFavicon_png_pwa_512_base64(faviconBase64DTO.getFavicon_png_pwa_512_base64());
         admin.setFavicon_png_pwa_192_base64(faviconBase64DTO.getFavicon_png_pwa_192_base64());
-        admin.setAdmin_article_page_size(Constants.getAdminArticlePageSize());
+        admin.setAdmin_article_page_size(AdminConstants.getAdminArticlePageSize());
         return admin;
     }
 

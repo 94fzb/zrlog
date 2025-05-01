@@ -15,6 +15,9 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Objects;
 
+/**
+ * 对 pwa 需要资源和，数据进行特殊转化和处理
+ */
 public class PwaInterceptor implements HandleAbleInterceptor {
     @Override
     public boolean isHandleAble(HttpRequest request) {
@@ -25,7 +28,7 @@ public class PwaInterceptor implements HandleAbleInterceptor {
     public boolean doInterceptor(HttpRequest request, HttpResponse response) {
         try (InputStream resourceAsStream = BlogPageInterceptor.class.getResourceAsStream(request.getUri())) {
             if (Objects.nonNull(resourceAsStream)) {
-                response.getHeader().put("Content-Type", MimeTypeUtil.getMimeStrByExt(FileUtils.getFileExt(request.getUri())));
+                response.addHeader("Content-Type", MimeTypeUtil.getMimeStrByExt(FileUtils.getFileExt(request.getUri())));
                 File file = PathUtil.getStaticFile(request.getUri());
                 //优先使用外部配置的
                 if (file.exists()) {

@@ -1,1 +1,3 @@
-./mvnw -Pjar clean package && sh bin/run.sh
+export DEV_MODE=true
+./mvnw -Djakarta-scope='provided' -Dlambda-scope='provided' -Dservlet-scope='provided' -Pjar clean package -U
+sh bin/run.sh
