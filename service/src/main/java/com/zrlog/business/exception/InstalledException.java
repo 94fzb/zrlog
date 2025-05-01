@@ -2,6 +2,7 @@ package com.zrlog.business.exception;
 
 import com.zrlog.common.exception.AbstractBusinessException;
 import com.zrlog.util.I18nUtil;
+import com.zrlog.util.ZrLogUtil;
 
 public class InstalledException extends AbstractBusinessException {
     @Override
@@ -11,6 +12,6 @@ public class InstalledException extends AbstractBusinessException {
 
     @Override
     public String getMessage() {
-        return I18nUtil.getInstallStringFromRes("installedTips");
+        return I18nUtil.getInstallStringFromRes(ZrLogUtil.isWarMode() ? "installedWarTips" : "installedTips");
     }
 }

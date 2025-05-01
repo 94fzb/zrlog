@@ -1,21 +1,21 @@
-import { useState } from "react";
-import { Button, Col, Form, Input, InputNumber, message, Modal } from "antd";
+import {useState} from "react";
+import {Button, Col, Form, Input, InputNumber, message, Modal} from "antd";
 import Row from "antd/es/grid/row";
-import axios from "axios";
-import { getRes } from "../../utils/constants";
+import {getRes} from "../../utils/constants";
+import {useAxiosBaseInstance} from "../../base/AppBase";
 
 const layout = {
-    labelCol: { span: 4 },
-    wrapperCol: { span: 20 },
+    labelCol: {span: 4},
+    wrapperCol: {span: 20},
 };
 
-const AddNav = ({ addSuccessCall, offline }: { offline: boolean; addSuccessCall: () => void }) => {
+const AddNav = ({addSuccessCall, offline}: { offline: boolean; addSuccessCall: () => void }) => {
     const [showModel, setShowModel] = useState<boolean>(false);
     const [form, setForm] = useState<any>();
-    const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
-
+    const [messageApi, contextHolder] = message.useMessage({maxCount: 3});
+    const axiosInstance = useAxiosBaseInstance();
     const handleOk = () => {
-        axios.post("/api/admin/nav/add", form).then(async ({ data }) => {
+        axiosInstance.post("/api/admin/nav/add", form).then(async ({data}) => {
             if (data.error) {
                 await messageApi.error(data.message);
                 return;
@@ -35,7 +35,7 @@ const AddNav = ({ addSuccessCall, offline }: { offline: boolean; addSuccessCall:
     return (
         <>
             {contextHolder}
-            <Button type="primary" disabled={offline} onClick={() => setShowModel(true)} style={{ marginBottom: 8 }}>
+            <Button type="primary" disabled={offline} onClick={() => setShowModel(true)} style={{marginBottom: 8}}>
                 {getRes()["add"]}
             </Button>
             <Modal title={getRes()["add"]} open={showModel} onOk={handleOk} onCancel={() => setShowModel(false)}>
@@ -44,11 +44,11 @@ const AddNav = ({ addSuccessCall, offline }: { offline: boolean; addSuccessCall:
                         <Col span={24}>
                             <Form.Item
                                 label={getRes()["admin.link.manage"]}
-                                style={{ marginBottom: 8 }}
+                                style={{marginBottom: 8}}
                                 name="url"
-                                rules={[{ required: true, message: "" }]}
+                                rules={[{required: true, message: ""}]}
                             >
-                                <Input />
+                                <Input/>
                             </Form.Item>
                         </Col>
                     </Row>
@@ -56,11 +56,11 @@ const AddNav = ({ addSuccessCall, offline }: { offline: boolean; addSuccessCall:
                         <Col span={24}>
                             <Form.Item
                                 label="导航名称"
-                                style={{ marginBottom: 8 }}
+                                style={{marginBottom: 8}}
                                 name="navName"
-                                rules={[{ required: true, message: "" }]}
+                                rules={[{required: true, message: ""}]}
                             >
-                                <Input />
+                                <Input/>
                             </Form.Item>
                         </Col>
                     </Row>
@@ -68,11 +68,11 @@ const AddNav = ({ addSuccessCall, offline }: { offline: boolean; addSuccessCall:
                         <Col span={24}>
                             <Form.Item
                                 label={getRes()["order"]}
-                                style={{ marginBottom: 8 }}
+                                style={{marginBottom: 8}}
                                 name="sort"
-                                rules={[{ required: true, message: "" }]}
+                                rules={[{required: true, message: ""}]}
                             >
-                                <InputNumber />
+                                <InputNumber/>
                             </Form.Item>
                         </Col>
                     </Row>

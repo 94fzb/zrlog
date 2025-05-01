@@ -40,7 +40,8 @@ public class BlogPageInterceptor implements HandleAbleInterceptor {
         if (request.getUri().startsWith(Constants.DEFAULT_TEMPLATE_PATH)) {
             try (InputStream resourceAsStream = BlogPageInterceptor.class.getResourceAsStream(request.getUri())) {
                 if (Objects.nonNull(resourceAsStream)) {
-                    response.getHeader().put("Content-Type", MimeTypeUtil.getMimeStrByExt(FileUtils.getFileExt(request.getUri())));
+                    ZrLogUtil.putLongTimeCache(response);
+                    response.addHeader("Content-Type", MimeTypeUtil.getMimeStrByExt(FileUtils.getFileExt(request.getUri())));
                     response.write(resourceAsStream, 200);
                     return false;
                 }
@@ -59,9 +60,6 @@ public class BlogPageInterceptor implements HandleAbleInterceptor {
         if (Objects.isNull(method) && target.endsWith(".html")) {
             method = request.getServerConfig().getRouter().getRouterMap().get(target.substring(0, target.length() - 5));
         }
-        if (Objects.isNull(method)) {
-            method = request.getServerConfig().getRouter().getRouterMap().get("/detail");
-        }
         if (target.startsWith("/all-")) {
             method = request.getServerConfig().getRouter().getRouterMap().get("/index");
         }
@@ -78,7 +76,11 @@ public class BlogPageInterceptor implements HandleAbleInterceptor {
             method = request.getServerConfig().getRouter().getRouterMap().get("/record");
         }
         if (Objects.isNull(method)) {
-            return true;
+            method = request.getServerConfig().getRouter().getRouterMap().get("/detail");
+        }
+        if (Objects.isNull(method)) {
+            response.renderCode(404);
+            return false;
         }
         Object invoke = method.invoke(Controller.buildController(method, request, response));
         if (Objects.nonNull(invoke)) {
@@ -99,7 +101,7 @@ public class BlogPageInterceptor implements HandleAbleInterceptor {
         try (ResponseRenderPrintWriter responseRenderPrintWriter = new ResponseRenderPrintWriter(byteArrayOutputStream, "/", request, response, null)) {
             responseRenderPrintWriter.write(htmlStr);
             String realHtmlStr = responseRenderPrintWriter.getResponseBody();
-            if (!ZrLogUtil.isStaticBlogPlugin(request)) {
+            if (!ZrLogUtil.isStaticPlugin(request)) {
                 response.renderHtmlStr(realHtmlStr);
             }
             if (BlogPageInterceptor.catGeneratorHtml(target) && responseRenderPrintWriter.isRenderSuccess()) {

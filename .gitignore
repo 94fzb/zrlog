@@ -45,3 +45,9 @@ zrlog.bgv
 /zrlog
 /conf/update-temp/
 1
+package-web/src/main/webapp/cache
+package-web/src/main/webapp/WEB-INF/plugins/*
+!package-web/src/main/webapp/WEB-INF/plugins/.gitkeep
+tomcat.*
+package-web/src/main/webapp/static/attached/*
+doc/build_system_info.md

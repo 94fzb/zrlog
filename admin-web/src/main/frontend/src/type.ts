@@ -1,5 +1,12 @@
 import {ActivityDay} from "./components/index/ActivityGraph";
 
+export type AppState = {
+    dark: boolean;
+    lang: string;
+    colorPrimary: string;
+    offline: boolean;
+};
+
 export type StatisticsInfoState = {
     clickCount: number;
     articleCount: number;
@@ -23,16 +30,19 @@ export type LastVersion = {
 export type BasicUserInfo = {
     userName: string;
     header: string;
+    key: string;
     lastVersion?: LastVersion
+    cacheableApiUris?: string[]
 };
 
-export type UserInfoState = {
-    basicInfoLoading: boolean;
-    basicInfo: BasicUserInfo;
-    upgrade: boolean;
-    version: string;
-    type: string;
-};
+export type AdminCommonProps<P> = {
+    data: P,
+    offlineData: boolean,
+    offline: boolean,
+    fullScreen?: boolean,
+    userInfo?: BasicUserInfo;
+    updateCache: () => Promise<void>
+}
 
 export type ServerInfoEntry = {
     name: string;

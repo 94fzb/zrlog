@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Button, Col, Form, Input, message, Modal } from "antd";
 import Row from "antd/es/grid/row";
 import TextArea from "antd/es/input/TextArea";
-import axios from "axios";
 import { getRes } from "../../utils/constants";
+import {useAxiosBaseInstance} from "../../base/AppBase";
 
 const layout = {
     labelCol: { span: 4 },
@@ -15,8 +15,9 @@ const AddType = ({ addSuccessCall, offline }: { addSuccessCall: () => void; offl
     const [form, setForm] = useState<any>();
     const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
 
+    const axiosInstance = useAxiosBaseInstance();
     const handleOk = () => {
-        axios.post("/api/admin/type/add", form).then(async ({ data }) => {
+        axiosInstance.post("/api/admin/type/add", form).then(async ({ data }) => {
             if (data.error) {
                 await messageApi.error(data.message);
                 return;

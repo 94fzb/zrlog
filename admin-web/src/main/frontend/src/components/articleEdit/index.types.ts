@@ -1,3 +1,5 @@
+import {AdminCommonProps} from "../../type";
+
 export type ArticleEntry = ChangedContent &
     ThumbnailChanged &
     TitleChanged &
@@ -75,10 +77,7 @@ export type FullScreenProps = {
     fullScreen: boolean;
 }
 
-export type ArticleEditProps = FullScreenProps & {
-    data: ArticleEditInfo;
-    offline: boolean;
-    deleteStateCacheOnDestroy: () => void;
+export type ArticleEditProps = FullScreenProps & AdminCommonProps<ArticleEditInfo> & {
 };
 
 export type ArticleEditState = {

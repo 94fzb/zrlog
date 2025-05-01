@@ -12,5 +12,5 @@ public interface TokenService {
 
     void removeAdminToken(HttpRequest request, HttpResponse response);
 
-    void setAdminToken(Map<String, Object> user, String sessionId, String protocol, HttpRequest request, HttpResponse response);
+    void setAdminToken(Map<String, Object> user, String sessionId, String protocol, HttpRequest request, HttpResponse response) throws Exception;
 }

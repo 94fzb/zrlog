@@ -35,7 +35,8 @@ public class HttpFileHandle extends HttpHandle<File> {
 
     private String getFileName(String uriPath) {
         if (StringUtils.isEmpty(fileName)) {
-            return Arrays.asList(uriPath.split("/")).getLast();
+            String[] split = uriPath.split("/");
+            return split[split.length - 1];
         }
         return fileName;
     }

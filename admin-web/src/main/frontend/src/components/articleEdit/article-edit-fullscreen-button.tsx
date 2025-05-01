@@ -7,8 +7,6 @@ import { FullScreenProps } from "./index.types";
 
 type ArticleEditFullscreenButton = FullScreenProps & {
     fullScreenElement: HTMLDivElement;
-    editorInstance: { width: (arg0: string) => void };
-    onChange: (full: boolean) => void;
 };
 
 const ArticleEditFullscreenButton: FunctionComponent<ArticleEditFullscreenButton> = ({
@@ -16,8 +14,6 @@ const ArticleEditFullscreenButton: FunctionComponent<ArticleEditFullscreenButton
     onExitFullScreen,
     onFullScreen,
     fullScreen,
-    editorInstance,
-    onChange,
 }) => {
     const toggleFullScreen = () => {
         if (fullScreen) {
@@ -33,40 +29,26 @@ const ArticleEditFullscreenButton: FunctionComponent<ArticleEditFullscreenButton
                 screenfull
                     .request(fullScreenElement)
                     .then(() => {
-                        doFullState();
+                        //ignore
                     })
                     .catch((e) => {
                         console.error(e);
-                        doFullState();
                     });
                 screenfull.on("change", () => {
                     if (screenfull.isEnabled && !screenfull.isFullscreen) {
                         onfullscreenExit();
                     }
                 });
-            } else {
-                doFullState();
             }
         } catch (e) {
             console.error(e);
-            doFullState();
         } finally {
             onFullScreen();
         }
     };
 
-    const doFullState = () => {
-        onChange(true);
-        if (editorInstance) {
-            editorInstance.width("100%");
-        }
-    };
 
     const onfullscreenExit = () => {
-        onChange(false);
-        if (editorInstance) {
-            editorInstance.width("100%");
-        }
         onExitFullScreen();
         if (screenfull.isEnabled) {
             screenfull.exit().catch((e) => {
@@ -91,6 +73,7 @@ const ArticleEditFullscreenButton: FunctionComponent<ArticleEditFullscreenButton
                     <FullscreenOutlined style={{ fontSize: 24 }} />
                 )
             }
+            className={"editor-icon"}
             href={
                 fullScreen
                     ? window.location.pathname + "#exitFullScreen"
@@ -101,10 +84,10 @@ const ArticleEditFullscreenButton: FunctionComponent<ArticleEditFullscreenButton
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
-                width: 46,
-                minWidth: 46,
+                width: 47,
+                minWidth: 47,
                 borderRadius: 8,
-                height: 46,
+                height: 47,
                 fontSize: 24,
                 cursor: "pointer",
                 color: "rgb(102, 102, 102)",

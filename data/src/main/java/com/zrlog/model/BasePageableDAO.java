@@ -9,6 +9,7 @@ import com.zrlog.common.rest.request.PageRequestImpl;
 import com.zrlog.common.rest.request.UnPageRequestImpl;
 import com.zrlog.common.type.RunMode;
 import com.zrlog.data.dto.PageData;
+import com.zrlog.util.ThreadUtils;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -18,8 +19,8 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 class BasePageableDAO extends DAO {
 
@@ -27,7 +28,8 @@ class BasePageableDAO extends DAO {
 
     PageData<Map<String, Object>> queryPageData(String sql, PageRequest pageRequest, Object[] obj) {
         PageData<Map<String, Object>> data = new PageData<>();
-        try (ExecutorService executors = Executors.newVirtualThreadPerTaskExecutor()) {
+        ExecutorService executors = ThreadUtils.newFixedThreadPool(10);
+        try {
             List<CompletableFuture<Void>> tasks = new ArrayList<>();
             tasks.add(CompletableFuture.runAsync(() -> {
                 //无需查询具体数据
@@ -36,7 +38,7 @@ class BasePageableDAO extends DAO {
                     return;
                 }
                 try {
-                    List<Object> params = new ArrayList<>(Arrays.stream(obj).toList());
+                    List<Object> params = new ArrayList<>(Arrays.asList(obj));
                     //需要分页对象
                     if (pageRequest instanceof PageRequestImpl) {
                         params.add(pageRequest.getOffset());
@@ -67,9 +69,11 @@ class BasePageableDAO extends DAO {
                     throw new RuntimeException(e.getCause());
                 }
             }
+        } finally {
+            executors.shutdown();
         }
         if (pageRequest.getSorts() != null) {
-            data.setSort(new ArrayList<>(pageRequest.getSorts().stream().map(OrderBy::toParamString).toList()));
+            data.setSort(new ArrayList<>(pageRequest.getSorts().stream().map(OrderBy::toParamString).collect(Collectors.toList())));
         } else {
             data.setSort(new ArrayList<>());
         }

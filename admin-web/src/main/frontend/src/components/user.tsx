@@ -1,20 +1,18 @@
-import { useState } from "react";
-import Title from "antd/es/typography/Title";
+import {useState} from "react";
 import Divider from "antd/es/divider";
 import Form from "antd/es/form";
-import { Button, Input, message } from "antd";
-import Dragger from "antd/es/upload/Dragger";
+import {Button, Input, message} from "antd";
 import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
 import Image from "antd/es/image";
-import Constants, { getRes } from "../utils/constants";
-import axios from "axios";
-import { UploadChangeParam } from "antd/es/upload";
-import { apiBasePath } from "../index";
+import Constants, {getRes} from "../utils/constants";
+import {useAxiosBaseInstance} from "../base/AppBase";
+import BaseDragger, {DraggerUploadResponse} from "../common/BaseDragger";
+import BaseTitle from "../base/BaseTitle";
 
 const layout = {
-    labelCol: { span: 8 },
-    wrapperCol: { span: 16 },
+    labelCol: {span: 8},
+    wrapperCol: {span: 16},
 };
 
 type BasicUserInfo = {
@@ -23,25 +21,21 @@ type BasicUserInfo = {
     email: string;
 };
 
-const User = ({ data, offline }: { data: BasicUserInfo; offline: boolean }) => {
+const User = ({data, offline}: { data: BasicUserInfo; offline: boolean }) => {
     const [userInfo, setUserInfo] = useState<BasicUserInfo>(data);
-    const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
+    const [messageApi, contextHolder] = message.useMessage({maxCount: 3});
 
     const setValue = (changedValues: BasicUserInfo) => {
-        setUserInfo({ ...userInfo, ...changedValues });
+        setUserInfo({...userInfo, ...changedValues});
     };
 
-    const onUploadChange = (info: UploadChangeParam) => {
-        const { status } = info.file;
-        if (status === "done") {
-            setValue({ ...userInfo, header: info.file.response.data.url });
-        } else if (status === "error") {
-            messageApi.error(`${info.file.name} file upload failed.`);
-        }
+    const onUploadChange = (info: DraggerUploadResponse) => {
+        setValue({...userInfo, header: info.data.url});
     };
 
+    const axiosInstance = useAxiosBaseInstance();
     const onFinish = () => {
-        axios.post("/api/admin/user/update", userInfo).then(async ({ data }) => {
+        axiosInstance.post("/api/admin/user/update", userInfo).then(async ({data}) => {
             if (data.error) {
                 await messageApi.error(data.message);
             } else if (data.error === 0) {
@@ -53,45 +47,41 @@ const User = ({ data, offline }: { data: BasicUserInfo; offline: boolean }) => {
     return (
         <>
             {contextHolder}
-            <Title className="page-header" level={3}>
-                {getRes()["admin.user.info"]}
-            </Title>
-            <Divider />
+            <BaseTitle title={getRes()["admin.user.info"]}/>
             <Row>
-                <Col style={{ maxWidth: 600 }} xs={24}>
+                <Col style={{maxWidth: 600}} xs={24}>
                     <Form
                         onFinish={() => onFinish()}
                         initialValues={userInfo}
                         onValuesChange={(_k, v) => setValue(v)}
                         {...layout}
                     >
-                        <Form.Item label={getRes().userName} name="userName" rules={[{ required: true }]}>
-                            <Input />
+                        <Form.Item label={getRes().userName} name="userName" rules={[{required: true}]}>
+                            <Input/>
                         </Form.Item>
 
                         <Form.Item name="email" label={getRes().email}>
-                            <Input type={"email"} />
+                            <Input type={"email"}/>
                         </Form.Item>
 
-                        <Form.Item label={getRes().headPortrait} rules={[{ required: true }]}>
-                            <Dragger
-                                style={{ width: "128px", height: "128px" }}
-                                multiple={false}
-                                onChange={(e) => onUploadChange(e)}
+                        <Form.Item label={getRes().headPortrait} rules={[{required: true}]}>
+                            <BaseDragger
+                                style={{width: "128px", height: "128px"}}
+                                onSuccess={(e) => onUploadChange(e)}
                                 name="imgFile"
-                                action={apiBasePath + "upload?dir=image"}
+                                action={"/api/admin/upload?dir=image"}
                             >
                                 <Image
                                     fallback={Constants.getFillBackImg()}
                                     preview={false}
                                     height={128}
                                     width={128}
-                                    style={{ borderRadius: 8, objectFit: "cover" }}
+                                    style={{borderRadius: 8, objectFit: "cover"}}
                                     src={userInfo.header}
                                 />
-                            </Dragger>
+                            </BaseDragger>
                         </Form.Item>
-                        <Divider />
+                        <Divider/>
                         <Form.Item>
                             <Button disabled={offline} type="primary" htmlType="submit">
                                 {getRes().submit}

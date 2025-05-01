@@ -4,8 +4,6 @@ import com.hibegin.common.util.BeanUtil;
 import com.hibegin.common.util.FileUtils;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.annotation.ResponseBody;
-import com.hibegin.http.server.api.HttpRequest;
-import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.util.PathUtil;
 import com.hibegin.http.server.web.Controller;
 import com.hibegin.http.server.web.cookie.Cookie;
@@ -41,7 +39,7 @@ public class TemplateController extends Controller {
     @RefreshCache
     @ResponseBody
     public ApiStandardResponse<Void> apply() throws SQLException {
-        String template = Constants.TEMPLATE_BASE_PATH + request.getParaToStr("shortTemplate");
+        String template = Constants.TEMPLATE_BASE_PATH + request.getParaToStr("shortTemplate", "");
         new WebSite().updateByKV("template", template);
         ApiStandardResponse<Void> apiStandardResponse = new ApiStandardResponse<>();
         apiStandardResponse.setError(0);
@@ -58,7 +56,7 @@ public class TemplateController extends Controller {
     @RefreshCache
     @ResponseBody
     public ApiStandardResponse<Void> preview() {
-        String template = Constants.TEMPLATE_BASE_PATH + request.getParaToStr("shortTemplate");
+        String template = Constants.TEMPLATE_BASE_PATH + request.getParaToStr("shortTemplate", "");
         if (StringUtils.isEmpty(template)) {
             throw new TemplatePathNotNullException();
         }
@@ -73,7 +71,7 @@ public class TemplateController extends Controller {
 
     @ResponseBody
     public ApiStandardResponse<Void> delete() {
-        String template = checkByWhiteList(Constants.TEMPLATE_BASE_PATH + request.getParaToStr("shortTemplate"));
+        String template = checkByWhiteList(Constants.TEMPLATE_BASE_PATH + request.getParaToStr("shortTemplate", ""));
         File file = new File(PathUtil.getStaticPath() + template);
         if (file.exists()) {
             FileUtils.deleteFile(file.toString());
@@ -125,7 +123,7 @@ public class TemplateController extends Controller {
 
     @ResponseBody
     public ApiStandardResponse<TemplateVO> configParams() {
-        String template = Constants.TEMPLATE_BASE_PATH + request.getParaToStr("shortTemplate");
+        String template = Constants.TEMPLATE_BASE_PATH + request.getParaToStr("shortTemplate", "");
         if (StringUtils.isEmpty(template)) {
             return new ApiStandardResponse<>();
         }
@@ -139,7 +137,7 @@ public class TemplateController extends Controller {
 
     @ResponseBody
     public ApiStandardResponse<TemplateDownloadResponse> templateCenter() {
-        String host = request.getParaToStr("host");
+        String host = request.getParaToStr("host", "");
         if (StringUtils.isEmpty(host)) {
             String referer = request.getHeader("referer");
             if (StringUtils.isNotEmpty(referer)) {

@@ -1,6 +1,7 @@
 package com.zrlog.util;
 
 import com.hibegin.common.util.BeanUtil;
+import com.hibegin.common.util.EnvKit;
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.server.api.HttpRequest;
@@ -61,13 +62,23 @@ public class I18nUtil {
         if (!name.endsWith(".properties")) {
             return;
         }
-        Map<String, Map<String, Object>> resMap = switch (resourceName) {
-            case I18N_BLOG_KEY -> i18nVOCache.getBlog();
-            case I18N_ADMIN_KEY -> i18nVOCache.getAdmin();
-            case I18N_INSTALL_KEY -> i18nVOCache.getInstall();
-            case I18N_BACKEND_KEY -> i18nVOCache.getBackend();
-            default -> throw new NotImplementException();
-        };
+        Map<String, Map<String, Object>> resMap;
+        switch (resourceName) {
+            case I18N_BLOG_KEY:
+                resMap = i18nVOCache.getBlog();
+                break;
+            case I18N_ADMIN_KEY:
+                resMap = i18nVOCache.getAdmin();
+                break;
+            case I18N_INSTALL_KEY:
+                resMap = i18nVOCache.getInstall();
+                break;
+            case I18N_BACKEND_KEY:
+                resMap = i18nVOCache.getBackend();
+                break;
+            default:
+                throw new NotImplementException();
+        }
         try {
             String key = name.replace(".properties", "").replace("i18n_", "").replace(resourceName + "_", "");
             Map<String, Object> map = resMap.computeIfAbsent(key, k -> new HashMap<>());
@@ -89,7 +100,7 @@ public class I18nUtil {
     }
 
     public static void addToRequest(String templatePath, HttpRequest request) {
-        if (Constants.devEnabled) {
+        if (EnvKit.isDevMode()) {
             reloadSystemI18N();
         }
         if (templatePath != null) {
@@ -114,14 +125,17 @@ public class I18nUtil {
         }
         String locale = null;
         if (Objects.nonNull(request)) {
-            if (request.getUri().contains(Constants.ADMIN_URI_BASE_PATH + "/") || request.getUri().contains("/api" + Constants.ADMIN_URI_BASE_PATH + "/")) {
+            if (request.getUri().contains(Constants.ADMIN_URI_BASE_PATH + "/")
+                    || request.getUri().contains("/api" + Constants.ADMIN_URI_BASE_PATH + "/")
+                    || request.getUri().contains("/api/public/adminResource")
+            ) {
                 locale = (String) Constants.zrLogConfig.getPublicWebSite().get("language");
             } else {
                 String referer = request.getHeader("referer");
                 if (StringUtils.isNotEmpty(referer) && referer.contains(Constants.ADMIN_URI_BASE_PATH + "/")) {
                     locale = (String) Constants.zrLogConfig.getPublicWebSite().get("language");
                 } else {
-                    //try get locale info from HTTP header
+                    //try to get locale info from HTTP header
                     locale = getAcceptLocal(request);
                 }
             }
@@ -163,14 +177,19 @@ public class I18nUtil {
     }
 
     public static Map<String, Object> getBackend() {
-        return threadLocal.get().getBackend().get(threadLocal.get().getLocale());
+        I18nVO i18nVO = threadLocal.get();
+        if (Objects.isNull(i18nVO)) {
+            return new HashMap<>();
+        }
+        return i18nVO.getBackend().get(threadLocal.get().getLocale());
     }
 
     public static Map<String, Map<String, Object>> getAdmin() {
-        if (Objects.isNull(threadLocal.get())) {
+        I18nVO i18nVO = threadLocal.get();
+        if (Objects.isNull(i18nVO)) {
             return new HashMap<>();
         }
-        Map<String, Map<String, Object>> admin = threadLocal.get().getAdmin();
+        Map<String, Map<String, Object>> admin = i18nVO.getAdmin();
         if (Objects.isNull(admin)) {
             return new HashMap<>();
         }
@@ -178,10 +197,11 @@ public class I18nUtil {
     }
 
     public static String getBlogStringFromRes(String key) {
-        if (Objects.isNull(threadLocal.get())) {
+        I18nVO i18nVO = threadLocal.get();
+        if (Objects.isNull(i18nVO)) {
             return "";
         }
-        Object obj = threadLocal.get().getBlog().get(threadLocal.get().getLocale()).get(key);
+        Object obj = i18nVO.getBlog().get(i18nVO.getLocale()).get(key);
         if (obj != null) {
             return obj.toString();
         }
@@ -189,17 +209,19 @@ public class I18nUtil {
     }
 
     public static String getAdminStringFromRes(String key) {
-        if (Objects.isNull(threadLocal.get())) {
+        I18nVO i18nVO = threadLocal.get();
+        if (Objects.isNull(i18nVO)) {
             return "";
         }
-        return Objects.requireNonNullElse(getAdmin().get(threadLocal.get().getLocale()).get(key), "").toString();
+        return Objects.requireNonNullElse(getAdmin().get(i18nVO.getLocale()).get(key), "").toString();
     }
 
     public static String getBackendStringFromRes(String key) {
-        if (Objects.isNull(threadLocal.get())) {
+        I18nVO i18nVO = threadLocal.get();
+        if (Objects.isNull(i18nVO)) {
             return "";
         }
-        Object obj = threadLocal.get().getBackend().get(threadLocal.get().getLocale()).get(key);
+        Object obj = i18nVO.getBackend().get(i18nVO.getLocale()).get(key);
         if (obj != null) {
             return obj.toString();
         }
@@ -207,10 +229,11 @@ public class I18nUtil {
     }
 
     public static Map<String, Map<String, Object>> getInstall() {
-        if (Objects.isNull(threadLocal.get())) {
+        I18nVO i18nVO = threadLocal.get();
+        if (Objects.isNull(i18nVO)) {
             return new HashMap<>();
         }
-        Map<String, Map<String, Object>> install = threadLocal.get().getInstall();
+        Map<String, Map<String, Object>> install = i18nVO.getInstall();
         if (Objects.isNull(install)) {
             return new HashMap<>();
         }
@@ -218,10 +241,11 @@ public class I18nUtil {
     }
 
     public static Map<String, Map<String, Object>> getBlog() {
-        if (Objects.isNull(threadLocal.get())) {
+        I18nVO i18nVO = threadLocal.get();
+        if (Objects.isNull(i18nVO)) {
             return new HashMap<>();
         }
-        Map<String, Map<String, Object>> install = threadLocal.get().getBlog();
+        Map<String, Map<String, Object>> install = i18nVO.getBlog();
         if (Objects.isNull(install)) {
             return new HashMap<>();
         }
@@ -229,10 +253,12 @@ public class I18nUtil {
     }
 
     public static String getInstallStringFromRes(String key) {
-        if (Objects.isNull(threadLocal.get())) {
+        I18nVO i18nVO = threadLocal.get();
+
+        if (Objects.isNull(i18nVO)) {
             return "";
         }
-        Object obj = threadLocal.get().getInstall().get(threadLocal.get().getLocale()).get(key);
+        Object obj = i18nVO.getInstall().get(i18nVO.getLocale()).get(key);
         if (obj != null) {
             return obj.toString();
         }
@@ -240,9 +266,10 @@ public class I18nUtil {
     }
 
     public static String getCurrentLocale() {
+        I18nVO i18nVO = threadLocal.get();
         String locale = null;
-        if (threadLocal.get() != null) {
-            locale = threadLocal.get().getLocale();
+        if (i18nVO != null) {
+            locale = i18nVO.getLocale();
         } else {
             if (Objects.nonNull(Constants.zrLogConfig) && Constants.zrLogConfig.getPublicWebSite().get("language") != null) {
                 locale = (String) Constants.zrLogConfig.getPublicWebSite().get("language");

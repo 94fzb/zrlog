@@ -1,5 +1,5 @@
 import { ArticleEditInfo, ArticleEditState, ArticleEntry } from "../components/articleEdit/index.types";
-import { addToCache, removeCacheDataByKey, getCacheByKey, removePageCacheByLocation } from "../cache";
+import { addToCache, removeCacheDataByKey, getCacheByKey, removePageCacheByLocation } from "./cache";
 import * as H from "history";
 
 const buildCacheKey = (logId: number | undefined | null) => {

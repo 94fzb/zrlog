@@ -1,11 +1,13 @@
 package com.zrlog.business.cache;
 
+import com.google.gson.Gson;
 import com.hibegin.common.BaseLockObject;
 import com.hibegin.common.util.*;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.business.cache.vo.BaseDataInitVO;
 import com.zrlog.business.cache.vo.HotLogBasicInfoVO;
+import com.zrlog.business.plugin.StaticSitePlugin;
 import com.zrlog.business.util.InstallUtils;
 import com.zrlog.business.util.PluginUtils;
 import com.zrlog.common.CacheService;
@@ -24,17 +26,40 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * 对缓存数据的操作
  */
 public class CacheServiceImpl extends BaseLockObject implements CacheService {
     private static final Logger LOGGER = LoggerUtil.getLogger(CacheServiceImpl.class);
-    private final String CACHE_HTML_PATH = PathUtil.getCachePath();
+    private final String cacheStaticPath;
 
     private final AtomicLong version = new AtomicLong();
     private final Map<String, String> cacheFileMap = new ConcurrentHashMap<>();
+    private final String contextPath;
     private BaseDataInitVO cacheInit;
+
+    public CacheServiceImpl(String contextPath) {
+        this.contextPath = contextPath;
+        this.cacheStaticPath = PathUtil.getCachePath();
+    }
+
+    private static String getStreamTag(InputStream inputStream) {
+        return Math.abs(SecurityUtils.md5(inputStream).hashCode()) + "";
+    }
+
+    private static void setToRequest(HttpRequest servletRequest, BaseDataInitVO cacheInit) {
+        if (Objects.isNull(servletRequest)) {
+            return;
+        }
+        servletRequest.getAttr().put("init", cacheInit);
+        servletRequest.getAttr().put("website", cacheInit.getWebSite());
+        //website alias
+        servletRequest.getAttr().put("webSite", cacheInit.getWebSite());
+        servletRequest.getAttr().put("webs", cacheInit.getWebSite());
+        servletRequest.getAttr().put("WEB_SITE", cacheInit.getWebSite());
+    }
 
     @Override
     public boolean isCacheableByRequest(HttpRequest request) {
@@ -44,7 +69,6 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
         }
         return cacheFileMap.containsKey(request.getUri().substring(1));
     }
-
 
     @Override
     public String getFileFlagFirstByCache(String uri) {
@@ -81,10 +105,6 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
         return null;
     }
 
-    private static String getStreamTag(InputStream inputStream) {
-        return Math.abs(SecurityUtils.md5(inputStream).hashCode()) + "";
-    }
-
     @Override
     public void refreshFavicon() {
         FaviconBase64DTO faviconBase64DTO = new WebSite().faviconBase64DTO();
@@ -100,7 +120,7 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
         if (Objects.equals(cacheKey, "/")) {
             cacheKey = "/index.html";
         }
-        return new File(CACHE_HTML_PATH + lang + "/" + cacheKey);
+        return new File(cacheStaticPath + lang + contextPath + "/" + cacheKey);
     }
 
     /**
@@ -116,13 +136,24 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
         if (!htmlFile.exists()) {
             htmlFile.getParentFile().mkdirs();
         }
+        if (httpRequest.getUri().startsWith("/admin") && !httpRequest.getUri().contains(".")) {
+            htmlFile = new File(htmlFile + ".html");
+        }
         IOUtil.writeBytesToFile(bytes, htmlFile);
         return htmlFile;
     }
 
     @Override
     public File getCacheHtmlFolder() {
-        return new File(CACHE_HTML_PATH + "/zh_CN/");
+        return new File(cacheStaticPath + "/zh_CN/" + contextPath + "/");
+    }
+
+    @Override
+    public long getWebSiteVersion() {
+        if (Objects.isNull(cacheInit)) {
+            return 0;
+        }
+        return Objects.requireNonNullElse(cacheInit.getWebSiteVersion(), 0L);
     }
 
     @Override
@@ -172,25 +203,16 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
     @Override
     public CompletableFuture<BaseDataInitVO> refreshInitDataCacheAsync(HttpRequest servletRequest, boolean cleanAble) {
         long expectVersion = getUpdateVersion(cleanAble);
-        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+        ExecutorService executor = Executors.newFixedThreadPool(10);
+        try {
             return CompletableFuture.supplyAsync(() -> {
                 BaseDataInitVO cache = refreshInitDataCache(cleanAble, expectVersion);
                 setToRequest(servletRequest, cache);
                 return cache;
             }, executor);
+        } finally {
+            executor.shutdown();
         }
-    }
-
-    private static void setToRequest(HttpRequest servletRequest, BaseDataInitVO cacheInit) {
-        if (Objects.isNull(servletRequest)) {
-            return;
-        }
-        servletRequest.getAttr().put("init", cacheInit);
-        servletRequest.getAttr().put("website", cacheInit.getWebSite());
-        //website alias
-        servletRequest.getAttr().put("webSite", cacheInit.getWebSite());
-        servletRequest.getAttr().put("webs", cacheInit.getWebSite());
-        servletRequest.getAttr().put("WEB_SITE", cacheInit.getWebSite());
     }
 
     private BaseDataInitVO refreshInitDataCache(boolean cleanAble, long expectVersion) {
@@ -205,7 +227,8 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
                 return cacheInit;
             } else {
                 long start = System.currentTimeMillis();
-                try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+                ExecutorService executor = Executors.newFixedThreadPool(10);
+                try {
                     cacheInit = getCacheInit(executor);
                     //缓存静态资源map
                     Map<String, String> tempMap = getCacheFileMap();
@@ -216,6 +239,7 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
                     WebSite.clearTemplateConfigMap();
                     PluginUtils.refreshPluginCacheData();
                 } finally {
+                    executor.shutdown();
                     LOGGER.info("RefreshInitDataCache used time " + (System.currentTimeMillis() - start) + "ms");
                 }
             }
@@ -261,6 +285,7 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
 
     private void faviconHandle(String faviconIconBase64, String saveFilePath, Boolean saveToCache) {
         if (StringUtils.isEmpty(faviconIconBase64)) {
+            StaticSitePlugin.copyResourceToCacheFolder(saveFilePath);
             return;
         }
         try {
@@ -284,7 +309,9 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
     private BaseDataInitVO getCacheInit(Executor executor) {
         BaseDataInitVO cacheInit = new BaseDataInitVO();
         //first set website info
-        cacheInit.setWebSite(refreshWebSite());
+        Map<String, Object> refreshWebSite = refreshWebSite();
+        cacheInit.setWebSite(refreshWebSite);
+        cacheInit.setWebSiteVersion((long) new Gson().toJson(refreshWebSite).hashCode());
 
         List<CompletableFuture<Void>> futures = new ArrayList<>();
         BaseDataInitVO.Statistics statistics = new BaseDataInitVO.Statistics();
@@ -305,7 +332,7 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
                 statistics.setTotalTypeSize((long) cacheInit.getTypes().size());
                 List<Map<String, Object>> types = cacheInit.getTypes();
                 //Last article
-                cacheInit.setHotLogs(new Log().visitorFind(new PageRequestImpl(1L, 6L), "").getRows().stream().map(this::convertToBasicVO).toList());
+                cacheInit.setHotLogs(new Log().visitorFind(new PageRequestImpl(1L, 6L), "").getRows().stream().map(this::convertToBasicVO).collect(Collectors.toList()));
                 Map<Map<String, Object>, List<HotLogBasicInfoVO>> indexHotLog = new LinkedHashMap<>();
                 cacheInit.setIndexHotLogs(indexHotLog);
                 //设置分类Hot
@@ -315,7 +342,7 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
                         typeMap.put("typeName", type.get("typeName"));
                         String alias = (String) type.get("alias");
                         typeMap.put("alias", alias);
-                        indexHotLog.put(typeMap, new Log().findByTypeAlias(1, 6, alias).getRows().stream().map(this::convertToBasicVO).toList());
+                        indexHotLog.put(typeMap, new Log().findByTypeAlias(1, 6, alias).getRows().stream().map(this::convertToBasicVO).collect(Collectors.toList()));
                     }, executor));
                 }
             } catch (SQLException e) {

@@ -42,10 +42,10 @@ const ArticleEditSettingButton = ({
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    width: 46,
-                    minWidth: 46,
+                    width: 47,
+                    minWidth: 47,
                     borderRadius: 8,
-                    height: 46,
+                    height: 47,
                     cursor: "pointer",
                     background: EnvUtils.isDarkMode() ? "#141414" : "white",
                     color: "rgb(102, 102, 102)",
@@ -57,6 +57,7 @@ const ArticleEditSettingButton = ({
                         <SettingOutlined style={{ fontSize: 24 }} />
                     )
                 }
+                className={"editor-icon"}
                 onClick={(e) => {
                     e.stopPropagation();
                     e.preventDefault();

@@ -140,7 +140,7 @@ class ResponseRenderPrintWriter extends PrintWriter {
             html = html.replace(entry.getKey(), entry.getValue());
         }
         String versionInfo = SecurityUtils.md5(html);
-        if (ZrLogUtil.isStaticBlogPlugin(request)) {
+        if (ZrLogUtil.isStaticPlugin(request)) {
             return html + "<!--" + versionInfo + "-->";
         }
         return html + "<!--" + (System.currentTimeMillis() - startTime) + "ms(" + versionInfo + ")-->";

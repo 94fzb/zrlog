@@ -3,6 +3,7 @@ package com.zrlog.blog.web.controller.page;
 import com.google.gson.Gson;
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.http.server.web.Controller;
+import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.business.service.CommonService;
 import com.zrlog.business.util.InstallUtils;
 import com.zrlog.common.Constants;
@@ -33,7 +34,7 @@ public class InstallController extends Controller {
         //clean history
         document.body().removeClass("dark");
         document.body().removeClass("light");
-        Objects.requireNonNull(document.selectFirst("base")).attr("href", "/");
+        Objects.requireNonNull(document.selectFirst("base")).attr("href", WebTools.getHomeUrl(request));
         Map<String, Object> stringObjectMap = new CommonService().installResourceInfo(getRequest());
         Objects.requireNonNull(document.getElementById("resourceInfo")).text(new Gson().toJson(stringObjectMap));
         if (InstallUtils.isInstalled()) {

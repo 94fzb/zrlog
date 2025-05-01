@@ -1,21 +1,20 @@
-import { useEffect, useState } from "react";
-import { ColorPicker, Form, Input, message, Row } from "antd";
-import Title from "antd/es/typography/Title";
+import {useEffect, useState} from "react";
+import {ColorPicker, Form, Input, message, Row} from "antd";
 import Divider from "antd/es/divider";
 import Button from "antd/es/button";
 import Image from "antd/es/image";
-import Dragger from "antd/es/upload/Dragger";
 import TextArea from "antd/es/input/TextArea";
 import Col from "antd/es/grid/col";
-import axios from "axios";
-import { getRes } from "../../utils/constants";
-import { UploadChangeParam } from "antd/es/upload";
+import {getRes} from "../../utils/constants";
 import Switch from "antd/es/switch";
-import { colorPickerBgColors } from "../../utils/helpers";
+import {colorPickerBgColors} from "../../utils/helpers";
+import {useAxiosBaseInstance} from "../../base/AppBase";
+import BaseDragger, {DraggerUploadResponse} from "../../common/BaseDragger";
+import BaseTitle from "../../base/BaseTitle";
 
 const layout = {
-    labelCol: { span: 8 },
-    wrapperCol: { span: 16 },
+    labelCol: {span: 8},
+    wrapperCol: {span: 16},
 };
 
 type TemplateConfigState = {
@@ -39,14 +38,14 @@ const convertToDataMap = (data: TemplateConfigState) => {
     return dataMap;
 };
 
-const TemplateConfig = ({ data, offline }: { data: TemplateConfigState; offline: boolean }) => {
+const TemplateConfig = ({data, offline}: { data: TemplateConfigState; offline: boolean }) => {
     const dataMap = convertToDataMap(data);
     const [state, setState] = useState<TemplateConfigState>({
         config: data.config,
         dataMap: dataMap,
     });
 
-    const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
+    const [messageApi, contextHolder] = message.useMessage({maxCount: 3});
 
     const setValue = (changedValues: any) => {
         setState({
@@ -55,51 +54,46 @@ const TemplateConfig = ({ data, offline }: { data: TemplateConfigState; offline:
         });
     };
 
-    const onUploadChange = (info: UploadChangeParam, key: string) => {
-        const { status } = info.file;
-        if (status === "done") {
-            state.dataMap[key] = info.file.response.data.url;
-            setState({
-                ...state,
-                dataMap: state.dataMap,
-            });
-        } else if (status === "error") {
-            messageApi.error(`${info.file.name} file upload failed.`);
-        }
+    const onUploadChange = (data: DraggerUploadResponse, key: string) => {
+        state.dataMap[key] = data.data.url;
+        setState({
+            ...state,
+            dataMap: state.dataMap,
+        });
+
     };
 
     const getInput = (key: string, value: ConfigParam) => {
         if (value.type === "file") {
             return (
                 <>
-                    <Dragger
-                        style={{ width: "128px", height: "128px" }}
-                        multiple={false}
-                        onChange={(e) => onUploadChange(e, key)}
+                    <BaseDragger
+                        style={{width: "128px", height: "128px"}}
+                        onSuccess={(e) => onUploadChange(e, key)}
                         name="imgFile"
                         action="/api/admin/upload?dir=image"
                     >
                         <Image
-                            style={{ borderRadius: 8 }}
+                            style={{borderRadius: 8}}
                             preview={false}
                             height={128}
                             width={128}
                             src={state.dataMap[key]}
                         />
-                    </Dragger>
+                    </BaseDragger>
                 </>
             );
         } else if (value.htmlElementType === "switch") {
-            return <Switch size={"small"} />;
+            return <Switch size={"small"}/>;
         } else if (value.htmlElementType === "textarea" || value.htmlElementType === "large-textarea") {
             return (
-                <TextArea rows={value.htmlElementType === "large-textarea" ? 20 : 5} placeholder={value.placeholder} />
+                <TextArea rows={value.htmlElementType === "large-textarea" ? 20 : 5} placeholder={value.placeholder}/>
             );
         } else if (value.type === "hidden") {
-            return <Input hidden={true} />;
+            return <Input hidden={true}/>;
         } else if (value.htmlElementType === "colorPicker") {
             return (
-                <div style={{ display: "flex", justifyContent: "flex-start", alignItems: "center" }}>
+                <div style={{display: "flex", justifyContent: "flex-start", alignItems: "center"}}>
                     <ColorPicker
                         value={state.dataMap[key]}
                         onChange={(color) => {
@@ -117,11 +111,11 @@ const TemplateConfig = ({ data, offline }: { data: TemplateConfigState; offline:
                             },
                         ]}
                     />
-                    <span style={{ paddingLeft: 8 }}>{state.dataMap[key]}</span>
+                    <span style={{paddingLeft: 8}}>{state.dataMap[key]}</span>
                 </div>
             );
         }
-        return <Input type={value.type} placeholder={value.placeholder} />;
+        return <Input type={value.type} placeholder={value.placeholder}/>;
     };
 
     const getFormItems = () => {
@@ -132,7 +126,7 @@ const TemplateConfig = ({ data, offline }: { data: TemplateConfigState; offline:
                     label={value.label}
                     name={key}
                     key={key}
-                    style={{ display: value.type === "hidden" ? "none" : "" }}
+                    style={{display: value.type === "hidden" ? "none" : ""}}
                 >
                     {getInput(key, value)}
                 </Form.Item>
@@ -142,8 +136,9 @@ const TemplateConfig = ({ data, offline }: { data: TemplateConfigState; offline:
         return formInputs;
     };
 
+    const axiosInstance = useAxiosBaseInstance();
     const onFinish = () => {
-        axios.post("/api/admin/template/config", state.dataMap).then(async ({ data }) => {
+        axiosInstance.post("/api/admin/template/config", state.dataMap).then(async ({data}) => {
             if (data.error) {
                 await messageApi.error(data.message);
             } else if (data.error === 0) {
@@ -162,12 +157,9 @@ const TemplateConfig = ({ data, offline }: { data: TemplateConfigState; offline:
     return (
         <>
             {contextHolder}
-            <Title className="page-header" level={3}>
-                {getRes()["templateConfig"]}
-            </Title>
-            <Divider />
+            <BaseTitle title={getRes()["templateConfig"]}/>
             <Row>
-                <Col xs={24} style={{ maxWidth: 600 }}>
+                <Col xs={24} style={{maxWidth: 600}}>
                     <Form
                         onFinish={() => onFinish()}
                         initialValues={state.dataMap}
@@ -175,7 +167,7 @@ const TemplateConfig = ({ data, offline }: { data: TemplateConfigState; offline:
                         {...layout}
                     >
                         {getFormItems()}
-                        <Divider />
+                        <Divider/>
                         <Button disabled={offline} type="primary" htmlType="submit">
                             {getRes()["submit"]}
                         </Button>

@@ -553,4 +553,13 @@ li.page-item {
     .markdown-body table tr:nth-child(2n) {
         background-color: #212529 !important;
     }
+
+    .markdown-body pre {
+        background: #0c0b0b;
+    }
+}
+
+.markdown-body pre {
+    padding: 0!important;
+    border-radius: 4px!important;
 }
