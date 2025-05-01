@@ -1,4 +1,4 @@
-## ZrLog ![build-preview](https://github.com/94fzb/zrlog/actions/workflows/build-preview-packge.yml/badge.svg) ![build-release](https://github.com/94fzb/zrlog/actions/workflows/build-release-packge.yml/badge.svg) [![Apache License](http://img.shields.io/badge/license-apache2-orange.svg?style=flat)](http://www.apache.org/licenses/LICENSE-2.0)
+## ZrLog ![build-preview](https://github.com/94fzb/zrlog/actions/workflows/java-build-preview-package-zip.yml/badge.svg) ![build-release](https://github.com/94fzb/zrlog/actions/workflows/java-build-release-package-zip.yml/badge.svg) [![Apache License](http://img.shields.io/badge/license-apache2-orange.svg?style=flat)](http://www.apache.org/licenses/LICENSE-2.0)
 
 [Chinese](README.md) | [English](README.en-us.md)
 
@@ -22,7 +22,7 @@ program.
 2. Support plugin mode [How to write a plugin](https://blog.zrlog.com/zrlog-plugin-dev.html)
 3. Highly customizable theme features [How to make a set of themes](https://blog.zrlog.com/ake-theme-for-zrlog.html)
 4. Support third party comment plugin
-5. Provide `editormd` mainstream rich text editor, basically meet the editing needs of administrators
+5. Provide `markdown` mainstream rich text editor, basically meet the editing needs of administrators
 6. Page static, cache public data, faster access
 7. Support for extending third-party cloud storage (default seven cattle)
 8. Support database scheduled backup
@@ -40,10 +40,10 @@ program.
 
 - Deployment environment prerequisites
     - 1.jdk version >= 21
-    - 2.mysql
+    - 2.mysql/cloudflare d1
 - Data initialization
-    - 1.Download [latest zip](https://dl.zrlog.com/release/zrlog.zip) unzip, and run sh bin/run.sh or bin\run.bat (for windows)
-    - 2.Visit http://host:port/install
+    - 1.Download [latest zip](https://www.zrlog.com/download) unzip, and run sh bin/run.sh or bin\run.bat (for windows)
+    - 2.Visit `http://host:port/install`
     - 3.Fill in the database, administrator information, complete the installation
 
 ### ChangeLog
@@ -61,8 +61,7 @@ program.
 
 * QQ group 6399942
 * Mail support@zrlog.com
-* Have any questions about the program, welcome
-  feedback [http://blog.zrlog.com/feedback.html](https://blog.zrlog.com/feedback.html)
+* Have any questions about the program, welcome feedback [http://blog.zrlog.com/feedback.html](https://blog.zrlog.com/feedback.html)
 
 ### FAQ
 

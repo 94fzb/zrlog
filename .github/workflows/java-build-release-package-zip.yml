@@ -1,0 +1,25 @@
+name: build release zip & war
+on:
+  push:
+    branches:
+      - release
+jobs:
+  build:
+    name: ZrLog package ${{ matrix.os }} ${{ matrix.architecture }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+        architecture: [ amd64 ]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+          cache: 'maven'
+      - name: Build with Maven
+        run: |
+          mkdir -p /tmp/download
+          bash -e shell/java/build-final-java.sh release 正式版本 /tmp/download
+          bash shell/upload-bin.sh ${{ secrets.SECRET_ID }} ${{ secrets.SECRET_KEY }} ${{ secrets.BUCKET }} /tmp/download release ${{ secrets.HOST }}

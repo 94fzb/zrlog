@@ -1,1 +1,0 @@
-alter table `log` CHANGE COLUMN `search_content` `plain_content` longtext DEFAULT NULL;

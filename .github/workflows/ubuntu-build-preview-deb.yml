@@ -1,0 +1,32 @@
+name: build preview deb
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    name: ZrLog on ${{ matrix.os }}
+    #    runs-on: [self-hosted, Linux, X64]
+    #    runs-on: buildjet-4vcpu-ubuntu-2204-arm
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ ubuntu-22.04,ubuntu-24.04-arm ]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '21'
+          distribution: 'graalvm' # See 'Options' for all available distributions
+          cache: 'maven'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          native-image-job-reports: 'true'
+
+      - name: Build and upload binary
+        run: |
+          mkdir -p /tmp/download
+          bash -e shell/native/build-final-native.sh preview 预览版 /tmp/download deb
+          bash -e shell/upload-bin.sh ${{ secrets.SECRET_ID }} ${{ secrets.SECRET_KEY }} ${{ secrets.BUCKET }} /tmp/download preview ${{ secrets.HOST }}

@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkadmin_web_frontend=self.webpackChunkadmin_web_frontend||[]).push([[700],{76700:function(e,n,t){t.r(n);var a=t(58467),r=t(82294),s=t(46417);n.default=function(){var e=(0,a.TH)(),n=(0,r.eN)(e.search),t="admin/plugins/"+(n.get("page")?n.get("page"):"");return(0,s.jsx)("iframe",{width:"100%",style:{border:0},height:1200,src:document.baseURI+t})}}}]);

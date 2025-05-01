@@ -1,4 +1,4 @@
-## ZrLog ![build-preview](https://github.com/94fzb/zrlog/actions/workflows/build-preview-package-jar.yml/badge.svg) ![build-release](https://github.com/94fzb/zrlog/actions/workflows/build-release-package-jar.yml/badge.svg) [![Apache License](http://img.shields.io/badge/license-apache2-orange.svg?style=flat)](http://www.apache.org/licenses/LICENSE-2.0)
+## ZrLog ![build-preview](https://github.com/94fzb/zrlog/actions/workflows/java-build-preview-package-zip.yml/badge.svg) ![build-release](https://github.com/94fzb/zrlog/actions/workflows/java-build-release-package-zip.yml/badge.svg) [![Apache License](http://img.shields.io/badge/license-apache2-orange.svg?style=flat)](http://www.apache.org/licenses/LICENSE-2.0)
 
 [中文](README.md) | [English](README.en-us.md)
 
@@ -37,11 +37,11 @@ ZrLog是使用 Java 开发的博客/CMS程序，具有简约，易用，组件�
 2. 支持插件模式 [如何编写一个插件](https://blog.zrlog.com/zrlog-plugin-dev.html)
 3. 高度可定制的主题功能 [如何制作一套主题](https://blog.zrlog.com/make-theme-for-zrlog.html)
 4. 支持第三方评论插件
-5. 提供 `editormd` 主流的富文本编辑器，基本上满足了管理员的编辑需求
+5. 提供 `markdown` 富文本编辑器，基本上满足了管理员的编辑需求
 6. 页面静态化，缓存公共数据，访问速度更快
 7. 支持扩展第三方云存储（默认七牛）
 8. 支持数据库定时备份
-9. 在线更新升级<br/>
+9. 在线更新升级
 10. ...
 
 ### 快速开始
@@ -55,11 +55,11 @@ ZrLog是使用 Java 开发的博客/CMS程序，具有简约，易用，组件�
 
 * 部署环境前提
     * JDK 版本 >= 21（若选择 GraalVM Native Image 包，可以不安装 JDK）
-    * MySQL >= 5.7
+    * MySQL >= 5.7 或者 Cloudflare D1（webapi 方式访问）
 
 * 数据初始化
-    * 下载 [最新 zip](https://dl.zrlog.com/release/zrlog.zip) 解压，运行 bin/start.sh 或者是 bin/start.bat
-    * 访问 http://host:port/install
+    * 下载 [最新 zip](https://www.zrlog.com/download) 解压，运行 bin/start.sh 或者是 bin/start.bat
+    * 访问 `http://host:port/install`
     * 填写数据库，管理员信息，完成安装
 
 ### 变更日志
@@ -69,7 +69,7 @@ ZrLog是使用 Java 开发的博客/CMS程序，具有简约，易用，组件�
 ### 示例网站
 
 * 网址 [https://demo.zrlog.com](https://demo.zrlog.com)
-* 管理地址 [admin/login](http://demo.zrlog.com/admin/login)
+* 管理地址 [admin/login](https://demo.zrlog.com/admin/login)
 * 用户名 admin
 * 密码 123456
 

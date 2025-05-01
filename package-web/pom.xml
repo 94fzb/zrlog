@@ -5,15 +5,13 @@
     <parent>
         <groupId>com.zrlog</groupId>
         <artifactId>zrlog</artifactId>
-        <version>3.1.6</version>
+        <version>3.2.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>package-web</artifactId>
-    <version>3.1.6</version>
+    <packaging>${packageType}</packaging>
 
     <properties>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <imageName>zrlog</imageName>
         <native.maven.plugin.version>0.10.2</native.maven.plugin.version>
@@ -21,6 +19,7 @@
         <native.target>../</native.target>
         <packageName>zrlog</packageName>
         <architecture>all</architecture>
+        <packageType>jar</packageType>
         <gitCommitId>0000000</gitCommitId>
     </properties>
 
@@ -28,6 +27,23 @@
         <dependency>
             <groupId>com.zrlog</groupId>
             <artifactId>web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.hibegin</groupId>
+            <artifactId>simplewebserver-lambda-function-impl</artifactId>
+            <scope>${lambda-scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-core</artifactId>
+            <version>10.1.42</version>
+            <scope>${jakarta-scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-jasper</artifactId>
+            <version>10.1.42</version>
+            <scope>${jakarta-scope}</scope>
         </dependency>
     </dependencies>
 
@@ -66,11 +82,103 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
 
     <profiles>
+        <profile>
+            <id>war</id>
+            <build>
+                <finalName>${finalName}-${project.version}</finalName>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-war-plugin</artifactId>
+                        <version>3.4.0</version>
+                        <configuration>
+                            <resourceEncoding>${project.build.sourceEncoding}</resourceEncoding>
+                            <warSourceDirectory>src/main/webapp</warSourceDirectory>
+                            <failOnMissingWebXml>false</failOnMissingWebXml>
+                            <packagingExcludes>
+                                cache/**,
+                                static/**,
+                                WEB-INF/classes/**,
+                                WEB-INF/plugins/**,
+                                WEB-INF/update-temp/**,
+                                WEB-INF/db.properties,
+                                WEB-INF/install.lock,
+                            </packagingExcludes>
+                            <outputDirectory>${project.build.directory}/../../target</outputDirectory>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>package-native-zip</id>
+            <build>
+                <finalName>${finalName}-${project.version}-native</finalName>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <configuration>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <outputDirectory>../target</outputDirectory>
+                            <descriptors>
+                                <descriptor>src/assembly/native-zip.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>make-zip</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>package-faas-zip</id>
+            <build>
+                <finalName>${finalName}-${project.version}-faas</finalName>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <configuration>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <outputDirectory>../target</outputDirectory>
+                            <descriptors>
+                                <descriptor>src/assembly/faas-zip.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>make-zip</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>native</id>
             <build>
@@ -108,19 +216,19 @@
                                 <arg>
                                     -Ob
                                     -H:+UnlockExperimentalVMOptions
-                                    --enable-sbom
-                                    -H:+BuildReport
-                                    -H:+AddAllCharsets
                                     --no-fallback
+                                    -H:+BuildReport
                                     --strict-image-heap
-                                    --initialize-at-build-time=sun.security.krb5.SCDynamicStoreConfig
-                                    --initialize-at-build-time=java.util.ImmutableCollections$ListN
-                                    --trace-class-initialization=sun.security.krb5.SCDynamicStoreConfig
-                                    -march=compatibility --enable-preview -H:DashboardDump=${imageName}
-                                    -H:+DashboardAll -H:IncludeResources= --enable-url-protocols=http --enable-url-protocols=https --enable-monitoring=heapdump
+                                    --allow-incomplete-classpath
+                                    -march=compatibility
+                                    --enable-preview
+                                    -H:DashboardDump=${imageName}
+                                    -H:+DashboardAll -H:IncludeResources=
+                                    --enable-url-protocols=http
+                                    --enable-url-protocols=https
                                 </arg>
                             </buildArgs>
-                            <mainClass>com.zrlog.web.GraalvmNativeImageApplication</mainClass>
+                            <mainClass>com.zrlog.web.Application</mainClass>
                             <agent>
                                 <enabled>true</enabled>
                             </agent>
@@ -132,7 +240,21 @@
         <profile>
             <id>jar</id>
             <build>
+                <finalName>${finalName}-${project.version}</finalName>
                 <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>3.11.0</version>
+                        <configuration>
+                            <source>${java.version}</source>
+                            <target>${java.version}</target>
+                            <release>${java.version}</release>
+                            <excludes>
+                                <exclude>com/zrlog/web/*</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
                     <plugin>
                         <artifactId>maven-clean-plugin</artifactId>
                         <version>3.1.0</version>
@@ -156,6 +278,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-dependency-plugin</artifactId>
+                        <version>3.8.1</version>
                         <executions>
                             <execution>
                                 <id>copy-dependencies</id>
@@ -166,28 +289,47 @@
                                 <configuration>
                                     <outputDirectory>../${libOutputPath}</outputDirectory>
                                     <overWriteReleases>false</overWriteReleases>
-                                    <overWriteSnapshots>false</overWriteSnapshots>
                                     <overWriteIfNewer>true</overWriteIfNewer>
-                                    <includeScope>compile</includeScope>
+                                    <useBaseVersion>false</useBaseVersion>
+                                    <excludeScope>${jakarta-scope}</excludeScope>
+                                    <excludeArtifactIds>
+                                        junit,hamcrest-core
+                                    </excludeArtifactIds>
                                 </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <configuration>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <outputDirectory>../target</outputDirectory>
+                            <descriptors>
+                                <descriptor>src/assembly/java-zip.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>make-zip</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
                             </execution>
                         </executions>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-jar-plugin</artifactId>
-                        <version>3.2.0</version>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
+                        <version>3.4.2</version>
                         <configuration>
                             <finalName>${finalName}</finalName>
                             <classifier>starter</classifier>
+                            <excludes>
+                                <exclude>com/**</exclude>
+                                <exclude>lambda.json</exclude>
+                            </excludes>
                             <archive>
                                 <manifest>
                                     <addClasspath>true</addClasspath>
@@ -223,10 +365,10 @@
                                     <snapshotEnv>USER</snapshotEnv>
                                     <skipPOMs>false</skipPOMs>
                                     <deb>
-                                        [[buildDir]]/[[artifactId]]_[[version]]+[[gitCommitId]]_[[architecture]].[[extension]]
+                                        target/${packageName}-${project.version}-native.[[extension]]
                                     </deb>
                                     <changesOut>
-                                        [[buildDir]]/[[artifactId]]_[[version]]+[[gitCommitId]]_[[architecture]].changes
+                                        target/${packageName}-${project.version}-native.changes
                                     </changesOut>
                                     <controlDir>${basedir}/src/deb/control</controlDir>
                                     <dataSet>
@@ -260,7 +402,16 @@
                                                 <prefix>/etc/zrlog</prefix>
                                                 <user>zrlog</user>
                                                 <group>zrlog</group>
-                                                <filemode>777</filemode>
+                                            </mapper>
+                                        </data>
+                                        <data>
+                                            <src>../README.en-us.md</src>
+                                            <type>file</type>
+                                            <mapper>
+                                                <type>perm</type>
+                                                <prefix>/etc/zrlog</prefix>
+                                                <user>zrlog</user>
+                                                <group>zrlog</group>
                                             </mapper>
                                         </data>
                                         <data>
@@ -271,7 +422,6 @@
                                                 <prefix>/etc/zrlog</prefix>
                                                 <user>zrlog</user>
                                                 <group>zrlog</group>
-                                                <filemode>777</filemode>
                                             </mapper>
                                         </data>
                                     </dataSet>

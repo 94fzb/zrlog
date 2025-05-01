@@ -4,15 +4,9 @@
     <groupId>com.zrlog</groupId>
     <artifactId>zrlog</artifactId>
     <packaging>pom</packaging>
-    <version>3.1.6</version>
+    <version>3.2.0-SNAPSHOT</version>
     <modules>
         <module>web</module>
-        <module>service</module>
-        <module>common</module>
-        <module>data</module>
-        <module>blog-web</module>
-        <module>admin-web</module>
-        <module>admin-token</module>
         <module>package-web</module>
     </modules>
     <name>zrlog</name>
@@ -21,11 +15,23 @@
     <url>https://www.zrlog.com</url>
 
     <properties>
-        <java.version>21</java.version>
+        <java.version>11</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.test.skip>true</maven.test.skip>
         <finalName>zrlog</finalName>
-        <disableNodePackage>false</disableNodePackage>
+        <jakarta-scope>compile</jakarta-scope>
+        <servlet-scope>compile</servlet-scope>
+        <lambda-scope>compile</lambda-scope>
+        <servlet-api.version>6.1.0</servlet-api.version>
+        <zrlog-install-web.version>3.2.27</zrlog-install-web.version>
+        <common-dao.version>1.1.6</common-dao.version>
+        <sws.version>4.0.107</sws.version>
+        <!--version 0-->
+        <zrlog-base.version>3.2.110-SNAPSHOT</zrlog-base.version>
+        <zrlog-blog-web.version>3.2.110-SNAPSHOT</zrlog-blog-web.version>
+        <zrlog-admin-web.version>3.2.105-SNAPSHOT</zrlog-admin-web.version>
     </properties>
 
     <developers>
@@ -69,59 +75,90 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.freemarker</groupId>
-            <artifactId>freemarker</artifactId>
-            <version>2.3.32</version>
-        </dependency>
-        <dependency>
             <groupId>com.hibegin</groupId>
             <artifactId>simplewebserver</artifactId>
-            <version>0.3.175</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.1</version>
-            <scope>test</scope>
+            <version>${sws.version}</version>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>central-snapshots</id>
+            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>central-center</id>
+            <url>https://repo1.maven.org/maven2/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+    </repositories>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>com.zrlog</groupId>
-                <artifactId>common</artifactId>
-                <version>3.1.6</version>
+                <groupId>com.hibegin</groupId>
+                <artifactId>zrlog-admin-token</artifactId>
+                <version>${zrlog-base.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.zrlog</groupId>
-                <artifactId>data</artifactId>
-                <version>3.1.6</version>
+                <groupId>com.hibegin</groupId>
+                <artifactId>zrlog-service</artifactId>
+                <version>${zrlog-base.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.zrlog</groupId>
-                <artifactId>admin-token</artifactId>
-                <version>3.1.6</version>
+                <groupId>com.hibegin</groupId>
+                <artifactId>zrlog-admin-web</artifactId>
+                <version>${zrlog-admin-web.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.zrlog</groupId>
-                <artifactId>blog-web</artifactId>
-                <version>3.1.6</version>
+                <groupId>com.hibegin</groupId>
+                <artifactId>simplewebserver-servlet-api-impl</artifactId>
+                <version>${sws.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.zrlog</groupId>
-                <artifactId>service</artifactId>
-                <version>3.1.6</version>
+                <groupId>com.hibegin</groupId>
+                <artifactId>simplewebserver-lambda-function-impl</artifactId>
+                <version>${sws.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.zrlog</groupId>
-                <artifactId>admin-web</artifactId>
-                <version>3.1.6</version>
+                <groupId>com.hibegin</groupId>
+                <artifactId>common-dao</artifactId>
+                <version>${common-dao.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.hibegin</groupId>
+                <artifactId>zrlog-install-web</artifactId>
+                <version>${zrlog-install-web.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.hibegin</groupId>
+                <artifactId>zrlog-blog-web</artifactId>
+                <version>${zrlog-blog-web.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>web</artifactId>
-                <version>3.1.6</version>
+                <version>3.2.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>2.13.1</version>
+            </dependency>
+            <dependency>
+                <groupId>com.mysql</groupId>
+                <artifactId>mysql-connector-j</artifactId>
+                <version>9.3.0</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.servlet</groupId>
+                <artifactId>jakarta.servlet-api</artifactId>
+                <version>${servlet-api.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -131,40 +168,37 @@
         <testSourceDirectory>src/test/java</testSourceDirectory>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
-                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <release>${java.version}</release>
                 </configuration>
-                <version>3.11.0</version>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>
                 <version>2.7</version>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.0</version>
+            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>com.github.eirslett</groupId>
-                    <artifactId>frontend-maven-plugin</artifactId>
-                    <version>1.15.0</version>
-                    <configuration>
-                        <nodeVersion>v18.20.3</nodeVersion>
-                        <yarnVersion>v1.22.22</yarnVersion>
-                        <workingDirectory>src/main/frontend</workingDirectory>
-                        <installDirectory>target</installDirectory>
-                        <nodeDownloadRoot>https://npmmirror.com/mirrors/node/</nodeDownloadRoot>
-                        <yarnDownloadRoot>https://repo.huaweicloud.com/yarn/</yarnDownloadRoot>
-                        <npmRegistryURL>https://registry.npmmirror.com</npmRegistryURL>
-                    </configuration>
-                </plugin>
-                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
                     <version>3.6.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <version>3.4.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>

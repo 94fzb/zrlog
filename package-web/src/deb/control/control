@@ -3,7 +3,7 @@ Section: build-web-system
 Priority: optional
 Maintainer: "zrlog" support@zrlog.com
 Package: [[packageName]]
-Architecture: all
+Architecture: [[architecture]]
 Depends:
 Homepage: https://www.zrlog.com
 Description: ZrLog is a blog/CMS program developed in Java. It is simple, easy to use, componentized, and has low memory footprint. Bring your own Markdown editor and let more focus on writing, rather than spending a lot of time learning the use of the program.

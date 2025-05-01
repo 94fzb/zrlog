@@ -5,41 +5,38 @@
     <parent>
         <artifactId>zrlog</artifactId>
         <groupId>com.zrlog</groupId>
-        <version>3.1.6</version>
+        <version>3.2.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>web</artifactId>
-    <version>3.1.6</version>
 
     <dependencies>
         <dependency>
-            <groupId>com.zrlog</groupId>
-            <artifactId>blog-web</artifactId>
+            <groupId>com.hibegin</groupId>
+            <artifactId>zrlog-blog-web</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.zrlog</groupId>
-            <artifactId>admin-web</artifactId>
+            <groupId>com.hibegin</groupId>
+            <artifactId>zrlog-admin-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.hibegin</groupId>
+            <artifactId>simplewebserver-servlet-api-impl</artifactId>
+            <scope>${servlet-scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.hibegin</groupId>
+            <artifactId>simplewebserver-lambda-function-impl</artifactId>
+            <scope>${lambda-scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.hibegin</groupId>
+            <artifactId>zrlog-install-web</artifactId>
         </dependency>
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>jar</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <version>3.10.1</version>
-                        <configuration>
-                            <excludes>
-                                <exclude>com/zrlog/web/GraalvmAgentApplication.java</exclude>
-                                <exclude>com/zrlog/web/GraalvmNativeImageApplication.java</exclude>
-                            </excludes>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>
