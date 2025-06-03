@@ -96,7 +96,7 @@ public class Application {
             return null;
         });
         //启动成功，更新一次缓存数据
-        builder.addStartedSuccessHandle(() -> {
+        builder.addCreateSuccessHandle(() -> {
             Constants.zrLogConfig.startPluginsAsync();
             return null;
         });
