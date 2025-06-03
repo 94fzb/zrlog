@@ -29,9 +29,11 @@ import org.jsoup.select.Elements;
 import java.io.*;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
 
 public class StaticSitePlugin extends BaseLockObject implements IPlugin {
@@ -42,6 +44,7 @@ public class StaticSitePlugin extends BaseLockObject implements IPlugin {
     private final AbstractServerConfig serverConfig;
     private final ApplicationContext applicationContext;
     private final Map<String, HandleState> handleStatusPageMap = new ConcurrentHashMap<>();
+    private final ReentrantLock parseLock = new ReentrantLock();
 
     public StaticSitePlugin(AbstractServerConfig abstractServerConfig) {
         this.applicationContext = new ApplicationContext(abstractServerConfig.getServerConfig());
@@ -53,52 +56,69 @@ public class StaticSitePlugin extends BaseLockObject implements IPlugin {
         NEW, HANDING, RE_FETCH, HANDLED
     }
 
+    private void doParse(File file) throws IOException {
+        parseLock.lock();
+        try {
+            Document document = Jsoup.parse(file);
+            Elements links = document.select("a");
+            links.forEach(element -> {
+                String href = element.attr("href");
+                if (href.startsWith("//")) {
+                    return;
+                }
+                //exists jobs
+                if (handleStatusPageMap.containsKey(href)) {
+                    return;
+                }
+                if (href.startsWith("/") && href.endsWith(".html")) {
+                    handleStatusPageMap.put(href, HandleState.NEW);
+                }
+            });
+        } finally {
+            parseLock.unlock();
+        }
+    }
 
-    private void doFetch() {
-        handleStatusPageMap.entrySet().stream().filter(e -> Arrays.asList(HandleState.NEW, HandleState.RE_FETCH).contains(e.getValue())).forEach((e) -> {
-            handleStatusPageMap.put(e.getKey(), HandleState.HANDING);
+    private CompletableFuture<Void> doAsyncFetch(String key, Executor executor) {
+        handleStatusPageMap.put(key, HandleState.HANDING);
+        return CompletableFuture.runAsync(() -> {
             boolean error = false;
             try {
                 ResponseConfig responseConfig = serverConfig.getResponseConfig();
                 responseConfig.setEnableGzip(false);
-                HttpRequest httpRequest = WebTools.buildMockRequest(HttpMethod.GET, e.getKey(), serverConfig.getRequestConfig(), applicationContext);
+                HttpRequest httpRequest = WebTools.buildMockRequest(HttpMethod.GET, key, serverConfig.getRequestConfig(), applicationContext);
                 new HttpRequestHandlerRunnable(httpRequest, new SimpleHttpResponse(httpRequest, serverConfig.getResponseConfig())).run();
                 File file = (File) httpRequest.getAttr().get(HTML_FILE_KEY);
                 if (Objects.isNull(file) || !file.exists()) {
-                    LOGGER.warning("Generator " + e.getKey() + " error: missing static file");
+                    LOGGER.warning("Generator " + key + " error: missing static file");
                     error = true;
                     return;
                 }
-                Document document = Jsoup.parse(file);
-                Elements links = document.select("a");
-                links.forEach(element -> {
-                    String href = element.attr("href");
-                    if (href.startsWith("//")) {
-                        return;
-                    }
-                    //exists jobs
-                    if (handleStatusPageMap.containsKey(href)) {
-                        return;
-                    }
-                    if (href.startsWith("/") && href.endsWith(".html")) {
-                        handleStatusPageMap.put(href, HandleState.NEW);
-                    }
-                });
+                doParse(file);
             } catch (Exception ex) {
-                LOGGER.warning("Generator " + e.getKey() + " error: " + ex.getMessage());
+                LOGGER.warning("Generator " + key + " error: " + ex.getMessage());
             } finally {
                 if (error) {
                     //如果抓取错误了，需要暂停一下，避免重新获取过快
                     try {
                         Thread.sleep(2000);
                     } catch (InterruptedException ex) {
-                        LOGGER.warning("Generator " + e.getKey() + " error: " + ex.getMessage());
+                        LOGGER.warning("Generator " + key + " error: " + ex.getMessage());
                     }
                 }
-                handleStatusPageMap.put(e.getKey(), error ? HandleState.RE_FETCH : HandleState.HANDLED);
+                handleStatusPageMap.put(key, error ? HandleState.RE_FETCH : HandleState.HANDLED);
             }
-        });
+        }, executor);
+    }
 
+
+    private void doFetch() {
+        try (ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor()) {
+            List<CompletableFuture<Void>> list = handleStatusPageMap.entrySet().stream().filter(e -> Arrays.asList(HandleState.NEW, HandleState.RE_FETCH).contains(e.getValue())).map(e -> {
+                return doAsyncFetch(e.getKey(), executorService);
+            }).toList();
+            CompletableFuture.allOf(list.toArray(new CompletableFuture[0])).join();
+        }
     }
 
     private void doGeneratorAllAsync() {
@@ -132,7 +152,7 @@ public class StaticSitePlugin extends BaseLockObject implements IPlugin {
             long usedTime = (System.currentTimeMillis() - start);
             if (Constants.debugLoggerPrintAble()) {
                 LOGGER.info("Generator " + ZrLogUtil.getBlogHostByWebSite() + " size " + handleStatusPageMap.size() + " finished in " + usedTime + "ms");
-            } else if (usedTime > Duration.ofMinutes(1).toMillis()) {
+            } else if (usedTime > Duration.ofSeconds(10).toMillis()) {
                 LOGGER.warning("Generator slow size " + handleStatusPageMap.size() + " finish in " + usedTime);
             }
         }
