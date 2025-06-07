@@ -2,7 +2,7 @@ package com.zrlog.admin.business.rest.response;
 
 import com.zrlog.common.rest.response.ApiStandardResponse;
 
-public class AdminApiPageDataStandardResponse<T> extends ApiStandardResponse {
+public class AdminApiPageDataStandardResponse<T> extends ApiStandardResponse<T> {
 
     private String documentTitle;
 

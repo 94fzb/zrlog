@@ -42,7 +42,7 @@ program.
     - 1.jdk version >= 21
     - 2.mysql
 - Data initialization
-    - 1.Download [latest zip](https://dl.zrlog.com/release/zrlog.zip) unzip, and run sh bin/run.sh or bin\run.bat (for windows)
+    - 1.Download [latest zip](https://www.zrlog.com/download) unzip, and run sh bin/run.sh or bin\run.bat (for windows)
     - 2.Visit http://host:port/install
     - 3.Fill in the database, administrator information, complete the installation
 
