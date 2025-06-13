@@ -1,4 +1,4 @@
-name: build release jar
+name: build release zip & war
 on:
   push:
     branches:

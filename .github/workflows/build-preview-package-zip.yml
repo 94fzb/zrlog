@@ -1,4 +1,4 @@
-name: build preview jar
+name: build preview zip & war
 on:
   push:
     branches:

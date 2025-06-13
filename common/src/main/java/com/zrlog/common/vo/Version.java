@@ -12,6 +12,15 @@ public class Version implements Serializable {
     private String releaseDate;
     private String version;
     private Date buildDate;
+    private long fileSize;
+
+    public long getFileSize() {
+        return fileSize;
+    }
+
+    public void setFileSize(long fileSize) {
+        this.fileSize = fileSize;
+    }
 
     public long getZipFileSize() {
         return zipFileSize;

@@ -5,6 +5,7 @@ import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.config.ConfigKit;
 import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.common.Constants;
+import com.zrlog.common.type.RunMode;
 import eu.bitwalker.useragentutils.BrowserType;
 import eu.bitwalker.useragentutils.UserAgent;
 
@@ -256,5 +257,9 @@ public class ZrLogUtil {
     public static boolean isSystemServiceMode() {
         String value = System.getenv("SYSTEM_SERVICE_MODE");
         return "true".equalsIgnoreCase(value);
+    }
+
+    public static boolean isWarMode() {
+        return Constants.runMode == RunMode.WAR;
     }
 }

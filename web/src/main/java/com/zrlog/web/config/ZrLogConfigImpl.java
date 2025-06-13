@@ -42,6 +42,7 @@ import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.DbConnectUtils;
 import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ZrLogUtil;
+import com.zrlog.web.Application;
 import com.zrlog.web.inteceptor.GlobalBaseInterceptor;
 import com.zrlog.web.inteceptor.MyI18nInterceptor;
 import com.zrlog.web.inteceptor.PluginInterceptor;
@@ -50,6 +51,7 @@ import com.zrlog.web.inteceptor.StaticResourceInterceptor;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.SQLRecoverableException;
 import java.sql.Statement;
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -74,8 +76,9 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     private final Map<String, Object> website = new TreeMap<>();
     private final long uptime;
     private HikariDataSource dataSource;
+    private final String contextPath;
 
-    public ZrLogConfigImpl(Integer port, Updater updater) {
+    public ZrLogConfigImpl(Integer port, Updater updater, String contextPath) {
         this.port = port;
         this.plugins = new Plugins();
         this.updater = updater;
@@ -83,6 +86,12 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         this.pluginCoreProcess = new PluginCoreProcessImpl(port);
         this.serverConfig = initServerConfig();
         this.uptime = System.currentTimeMillis();
+        try {
+            this.configDatabaseWithRetry(20);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        this.contextPath = contextPath;
     }
 
     public static boolean isTest() {
@@ -175,6 +184,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         RequestConfig requestConfig = new RequestConfig();
         //最大的提交的body的大小
         requestConfig.setDisableSession(true);
+        requestConfig.setRouter(serverConfig.getRouter());
         requestConfig.setMaxRequestBodySize(1024 * 1024 * 1024);
         return requestConfig;
     }
@@ -370,6 +380,23 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         });
     }
 
+    private void configDatabaseWithRetry(int timeoutInSeconds) throws InterruptedException {
+        try {
+            configDatabase();
+        } catch (Exception e) {
+            if (timeoutInSeconds > 0 && e instanceof SQLRecoverableException) {
+                int seekSeconds = 5;
+                Thread.sleep(seekSeconds * 1000);
+                configDatabaseWithRetry(timeoutInSeconds - seekSeconds);
+                return;
+            }
+            LoggerUtil.getLogger(Application.class).warning("Config database error " + e.getMessage());
+            if (!Constants.zrLogConfig.getServerConfig().isNativeImageAgent()) {
+                System.exit(-1);
+            }
+        }
+    }
+
     @Override
     public Map<String, Object> getPublicWebSite() {
         return website;
@@ -378,6 +405,11 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     @Override
     public String getProgramUptime() {
         return toNamingDurationString(System.currentTimeMillis() - uptime, I18nUtil.getCurrentLocale().contains("en"));
+    }
+
+    @Override
+    public String getContextPath() {
+        return contextPath;
     }
 
     @Override

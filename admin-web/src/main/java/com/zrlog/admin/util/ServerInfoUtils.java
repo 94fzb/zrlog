@@ -13,8 +13,6 @@ import com.zrlog.util.I18nUtil;
 
 import java.io.File;
 import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryMXBean;
-import java.lang.management.MemoryUsage;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -57,7 +55,10 @@ public class ServerInfoUtils {
                     PathUtil.getRootPath() + "/lib"
             ));
             if (Objects.nonNull(Constants.zrLogConfig.getUpdater())) {
-                allFileList.add(Constants.zrLogConfig.getUpdater().execFile());
+                File file = Constants.zrLogConfig.getUpdater().execFile();
+                if (Objects.nonNull(file)) {
+                    allFileList.add(file);
+                }
             }
             for (String folder : baseFolders) {
                 FileUtils.getAllFiles(folder, allFileList);
@@ -67,9 +68,6 @@ public class ServerInfoUtils {
             allFileList.addAll(cacheFileList);
             // 获取堆内存的使用情况
             OperatingSystemMXBean osMXBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-            MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
-            MemoryUsage heapMemoryUsage = memoryMXBean.getHeapMemoryUsage();
-
             systemInfo.add(new ServerInfo(I18nUtil.getBackendStringFromRes("serverInfo.usedCacheSpace"), formatFileSize(cacheFileList.stream().mapToLong(File::length).sum()), "usedCacheSpace"));
             systemInfo.add(new ServerInfo(I18nUtil.getBackendStringFromRes("serverInfo.usedDiskSpace"), formatFileSize(allFileList.stream().mapToLong(File::length).sum()), "usedDiskSpace"));
             systemInfo.add(new ServerInfo(I18nUtil.getBackendStringFromRes("serverInfo.usedMemorySpace"), formatFileSize(getUsedMemory()), "usedMemorySpace"));
@@ -81,6 +79,7 @@ public class ServerInfoUtils {
             systemInfo.add(new ServerInfo(I18nUtil.getBackendStringFromRes("serverInfo.uptime"), Constants.zrLogConfig.getProgramUptime(), "uptime"));
             return systemInfo;
         } catch (Exception e) {
+            e.printStackTrace();
             LoggerUtil.getLogger(AdminController.class).warning("Load server info error " + e.getMessage());
         }
         return systemInfo;

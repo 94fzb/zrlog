@@ -27,5 +27,7 @@ public abstract class ZrLogConfig extends AbstractServerConfig {
 
     public abstract String getProgramUptime();
 
+    public abstract String getContextPath();
+
     public abstract DatabaseConnectPoolInfo getDatabaseConnectPoolInfo();
 }

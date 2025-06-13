@@ -9,7 +9,6 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>package-web</artifactId>
-    <version>3.1.7-SNAPSHOT</version>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -169,6 +168,9 @@
                                     <overWriteSnapshots>false</overWriteSnapshots>
                                     <overWriteIfNewer>true</overWriteIfNewer>
                                     <includeScope>compile</includeScope>
+                                    <excludeGroupIds>
+                                        org.apache.tomcat.embed,org.eclipse,jakarta.servlet,org.apache.tomcat
+                                    </excludeGroupIds>
                                 </configuration>
                             </execution>
                         </executions>

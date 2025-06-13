@@ -24,7 +24,6 @@ import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class UpgradeService {
@@ -64,23 +63,23 @@ public class UpgradeService {
         return preCheckVersionResponse;
     }
 
-    private static boolean isMatch(File file, long length, String md5sum) {
+    private static boolean isErrorFile(File file, long length, String md5sum) {
         try {
             //先比较文件大小
             if (length > 0 && length != file.length()) {
-                return false;
+                return true;
             }
             if (StringUtils.isNotEmpty(md5sum)) {
-                return file.exists() && SecurityUtils.md5ByFile(file).equals(md5sum);
+                return !file.exists() || !SecurityUtils.md5ByFile(file).equals(md5sum);
             } else {
                 //如何md5sum没有传的情况，认为文件长度相同就行
                 if (length > 0) {
-                    return file.length() == length;
+                    return file.length() != length;
                 }
             }
-            return false;
+            return true;
         } catch (Exception e) {
-            return false;
+            return true;
         }
     }
 
@@ -102,7 +101,8 @@ public class UpgradeService {
             HttpFileHandle fileHandle = createFileHandle();
             Thread.ofVirtual().start(() -> {
                 try {
-                    HttpUtil.getInstance().sendGetRequest(version.getZipDownloadUrl(), fileHandle, new HashMap<>());
+                    String downloadUrl = ZrLogUtil.isWarMode() ? version.getDownloadUrl() : version.getZipDownloadUrl();
+                    HttpUtil.getInstance().sendGetRequest(downloadUrl, fileHandle, new HashMap<>());
                 } catch (IOException | InterruptedException | URISyntaxException e) {
                     LoggerUtil.getLogger(UpgradeService.class).severe("Download file error " + e.getMessage());
                 }
@@ -112,7 +112,11 @@ public class UpgradeService {
         if (Objects.nonNull(handle.getT())) {
             int process = (int) (handle.getT().length() * 100 / version.getZipFileSize());
             if (process >= 100) {
-                if (!isMatch(handle.getT(), version.getZipFileSize(), version.getZipMd5sum())) {
+                if (ZrLogUtil.isWarMode()) {
+                    if (isErrorFile(handle.getT(), version.getFileSize(), version.getMd5sum())) {
+                        throw new DownloadUpgradeFileException();
+                    }
+                } else if (isErrorFile(handle.getT(), version.getZipFileSize(), version.getZipMd5sum())) {
                     throw new DownloadUpgradeFileException();
                 }
             }
@@ -129,14 +133,18 @@ public class UpgradeService {
         }
         if (ZrLogUtil.isDockerMode()) {
             updateVersionHandler = new DockerUpdateVersionHandle(I18nUtil.getBackend());
-        } else if(ZrLogUtil.isSystemServiceMode()) {
+        } else if (ZrLogUtil.isSystemServiceMode()) {
             updateVersionHandler = new SystemServiceUpdateVersionHandle(I18nUtil.getBackend());
         } else {
             HttpFileHandle handle = downloadProcessHandleMap.get(preUpgradeKey);
             if (handle == null) {
                 return new UpgradeProcessResponse(false, "");
             }
-            updateVersionHandler = new ZipUpdateVersionHandle(handle.getT(), I18nUtil.getBackend(), versionMap.get(preUpgradeKey));
+            if (ZrLogUtil.isWarMode()) {
+                updateVersionHandler = new WarUpdateVersionHandle(handle.getT(), I18nUtil.getBackend(), versionMap.get(preUpgradeKey));
+            } else {
+                updateVersionHandler = new ZipUpdateVersionHandle(handle.getT(), I18nUtil.getBackend(), versionMap.get(preUpgradeKey));
+            }
         }
         updateVersionHandler.doHandle();
         updateVersionThreadMap.put(preUpgradeKey, updateVersionHandler);

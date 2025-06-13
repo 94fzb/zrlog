@@ -19,11 +19,11 @@ public class ControllerUtil {
 
     public static PageRequest toPageRequest(Controller controller, int defaultPageSize) {
         PageRequestImpl pageRequest = new PageRequestImpl();
-        pageRequest.setSize((long) controller.getRequest().getParaToInt("size"));
+        pageRequest.setSize((long) controller.getRequest().getParaToInt("size", defaultPageSize));
         if (pageRequest.getSize() <= 0) {
             pageRequest.setSize((long) defaultPageSize);
         }
-        pageRequest.setPage((long) controller.getRequest().getParaToInt("page"));
+        pageRequest.setPage((long) controller.getRequest().getParaToInt("page", 1));
         if (pageRequest.getPage() <= 0) {
             pageRequest.setPage(1L);
         }
