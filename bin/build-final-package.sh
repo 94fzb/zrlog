@@ -12,7 +12,7 @@ commitId=$(git log --format="%H" -n 1)
 buildId=$(expr substr ${commitId} 1 ${length})
 mkdir -p data/src/main/resources
 echo -e "version=${version}\nrunMode=${runMode}\nbuildId=${buildId}\nbuildTime=${Date}" > data/src/main/resources/build.properties
-#sh bin/package-zip.sh
+sh bin/package-zip.sh
 mv target/zrlog-${version}.war zrlog.war
 #mv target/zrlog-${version}.zip  zrlog.zip
 zip zrlog.war -d WEB-INF/install.lock WEB-INF/db.properties
