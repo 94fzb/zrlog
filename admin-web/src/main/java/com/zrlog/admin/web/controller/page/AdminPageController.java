@@ -8,6 +8,7 @@ import com.jfinal.render.HtmlRender;
 import com.zrlog.admin.web.token.AdminTokenService;
 import com.zrlog.business.service.CommonService;
 import com.zrlog.common.Constants;
+import com.zrlog.util.I18nUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -40,7 +41,7 @@ public class AdminPageController extends Controller {
         document.body().removeClass("light");
         document.selectFirst("base").attr("href", getRequest().getContextPath() + "/");
         document.body().addClass(Constants.getBooleanByFromWebSite("admin_darkMode") ? "dark" : "light");
-        document.title(Constants.WEB_SITE.get("title") + "");
+        document.title(Constants.WEB_SITE.get("title") + " | " + I18nUtil.getBlogStringFromRes("admin.management"));
         document.getElementById("resourceInfo").text(new Gson().toJson(new CommonService().blogResourceInfo()));
         render(new HtmlRender(document.html()));
     }

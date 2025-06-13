@@ -1,5 +1,6 @@
 package com.zrlog.business.service;
 
+import com.zrlog.business.util.InstallUtils;
 import com.zrlog.common.Constants;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.I18nUtil;
@@ -8,6 +9,7 @@ import com.zrlog.util.ZrLogUtil;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class CommonService {
 
@@ -23,6 +25,7 @@ public class CommonService {
             defaultLoginInfo.put("password", System.getenv("DEFAULT_PASSWORD"));
             stringObjectMap.put("defaultLoginInfo", defaultLoginInfo);
         }
+        stringObjectMap.put("admin_color_primary", Objects.toString(Constants.WEB_SITE.get("admin_color_primary"), "#1677ff"));
         return stringObjectMap;
     }
 
@@ -34,6 +37,7 @@ public class CommonService {
         if (System.getProperty("file.encoding").toLowerCase().contains("utf")) {
             stringObjectMap.put("utfTips", "");
         }
+        stringObjectMap.put("installed", InstallUtils.isInstalled());
         return stringObjectMap;
     }
 }

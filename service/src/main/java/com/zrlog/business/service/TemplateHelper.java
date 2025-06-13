@@ -208,6 +208,7 @@ public class TemplateHelper {
                         log.put("thumbnailAlt", null);
                         log.put("thumbnail", null);
                     }
+                    log.put("canComment",Objects.equals(log.getBoolean("canComment"),true) && Constants.isAllowComment());
                     log.put("url",
                             WebTools.getHomeUrl(request) + Constants.getArticleUri() + log.get("alias") + suffix);
                     log.put("typeUrl", WebTools.getHomeUrl(request) + Constants.getArticleUri() + "sort/" + log.get(
@@ -219,28 +220,26 @@ public class TemplateHelper {
         }
     }
 
-    public static void fillArticleInfo(Log data, HttpServletRequest request, String suffix) {
-        data.put("alias", data.get("alias") + suffix);
-        data.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + data.get("alias"));
-        data.put("noSchemeUrl", WebTools.getHomeUrlWithHost(request) + Constants.getArticleUri() + data.get("alias"));
-        data.put("typeUrl",
-                WebTools.getHomeUrl(request) + Constants.getArticleUri() + "sort/" + data.get("typeAlias") + suffix);
-        Log lastLog = data.get("lastLog");
-        Log nextLog = data.get("nextLog");
+    public static void fillArticleInfo(Log log, HttpServletRequest request, String suffix) {
+        log.put("alias", log.get("alias") + suffix);
+        log.put("canComment",Objects.equals(log.getBoolean("canComment"),true) && Constants.isAllowComment());
+        log.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + log.get("alias"));
+        log.put("noSchemeUrl", WebTools.getHomeUrlWithHost(request) + Constants.getArticleUri() + log.get("alias"));
+        log.put("typeUrl",
+                WebTools.getHomeUrl(request) + Constants.getArticleUri() + "sort/" + log.get("typeAlias") + suffix);
+        Log lastLog = log.get("lastLog");
+        Log nextLog = log.get("nextLog");
         nextLog.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + nextLog.get("alias") + suffix);
         lastLog.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + lastLog.get("alias") + suffix);
+
         //没有使用md的toc目录的文章才尝试使用系统提取的目录
-        if (data.getStr("markdown") != null && !data.getStr("markdown").toLowerCase().contains("[toc]") && !data.getStr("markdown").toLowerCase().contains("[tocm]")) {
+        if (log.getStr("markdown") != null && !log.getStr("markdown").toLowerCase().contains("[toc]") && !log.getStr("markdown").toLowerCase().contains("[tocm]")) {
             //最基础的实现方式，若需要更强大的实现方式建议使用JavaScript完成（页面输入toc对象）
-            OutlineVO outlineVO = OutlineUtil.extractOutline(data.getStr("content"));
-            if (outlineVO.size() > 0) {
-                data.put("tocHtml", OutlineUtil.buildTocHtml(outlineVO, ""));
+            OutlineVO outlineVO = OutlineUtil.extractOutline(log.getStr("content"));
+            if (!outlineVO.isEmpty()) {
+                log.put("tocHtml", OutlineUtil.buildTocHtml(outlineVO, ""));
             }
-            data.put("toc", outlineVO);
-        }
-        //系统关闭评论
-        if (!Constants.isAllowComment()) {
-            data.set("canComment", false);
+            log.put("toc", outlineVO);
         }
     }
 

@@ -12,9 +12,9 @@ commitId=$(git log --format="%H" -n 1)
 buildId=$(expr substr ${commitId} 1 ${length})
 mkdir -p data/src/main/resources
 echo -e "version=${version}\nrunMode=${runMode}\nbuildId=${buildId}\nbuildTime=${Date}" > data/src/main/resources/build.properties
-sh bin/package-zip.sh
+#sh bin/package-zip.sh
 mv target/zrlog-${version}.war zrlog.war
-mv target/zrlog-${version}.zip  zrlog.zip
+#mv target/zrlog-${version}.zip  zrlog.zip
 zip zrlog.war -d WEB-INF/install.lock WEB-INF/db.properties
 
 #finnally workPath, https://dl.zrlog.com mirror folder
@@ -27,10 +27,10 @@ finalFileName=${syncPath}/${runMode}/zrlog.war
 zipFinalFileName=${syncPath}/${runMode}/zrlog.zip
 cp zrlog.war ${finalFileName}
 cp zrlog.war ${syncPath}/${relativeFileName}
-cp zrlog.zip ${zipFinalFileName}
-cp zrlog.zip ${syncPath}/${zipFileName}
+#cp zrlog.zip ${zipFinalFileName}
+#cp zrlog.zip ${syncPath}/${zipFileName}
 fileSize=$(ls ${finalFileName} -ls | awk '{print $6}')
-zipFileSize=$(ls ${zipFinalFileName} -ls | awk '{print $6}')
+#zipFileSize=$(ls ${zipFinalFileName} -ls | awk '{print $6}')
 md5sum=$(md5sum ${finalFileName} | awk '{print $1}')
-zipMd5sum=$(md5sum ${zipFinalFileName} | awk '{print $1}')
-echo -e '{"zipMd5sum":"'${zipMd5sum}'","md5sum":"'${md5sum}'","zipDownloadUrl":"'${mirrorWebSite}${zipFileName}'" ,"downloadUrl":"'${mirrorWebSite}${relativeFileName}'","type":"'${runModeDesc}'","version":"'${version}'","buildId":"'${buildId}'","fileSize":'${fileSize}',"zipFileSize":'${zipFileSize}',"releaseDate":"'${Date}'"}' > ${syncPath}/${runMode}/last.version.json
+#zipMd5sum=$(md5sum ${zipFinalFileName} | awk '{print $1}')
+#echo -e '{"zipMd5sum":"'${zipMd5sum}'","md5sum":"'${md5sum}'","zipDownloadUrl":"'${mirrorWebSite}${zipFileName}'" ,"downloadUrl":"'${mirrorWebSite}${relativeFileName}'","type":"'${runModeDesc}'","version":"'${version}'","buildId":"'${buildId}'","fileSize":'${fileSize}',"zipFileSize":'${zipFileSize}',"releaseDate":"'${Date}'"}' > ${syncPath}/${runMode}/last.version.json

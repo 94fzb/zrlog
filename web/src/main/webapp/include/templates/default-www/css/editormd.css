@@ -3132,7 +3132,6 @@
 .markdown-body {
   -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
-  color: #333;
   overflow: hidden;
   font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
   font-size: 16px;
@@ -3219,7 +3218,6 @@
 }
 
 .markdown-body a {
-  color: #4183c4;
   text-decoration: none;
 }
 
@@ -3369,7 +3367,7 @@
   position: relative;
   margin-top: 1em;
   margin-bottom: 16px;
-  font-weight: bold;
+  font-weight: 500;
   line-height: 1.4;
 }
 
@@ -3419,7 +3417,7 @@
   padding-bottom: 0.3em;
   font-size: 1.75em;
   line-height: 1.225;
-  border-bottom: 1px solid #eee;
+  border-bottom: .5px solid #eee;
 }
 
 .markdown-body h2 .anchor {

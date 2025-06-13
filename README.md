@@ -33,8 +33,8 @@ ZrLog是使用 Java 开发的博客/CMS程序，具有简约，易用，组件�
 
 - 直接通过内嵌入 tomcat 的方式进行启动，找到 `com.zrlog.web.Application` 通过这个 `main()` 进行启动
 - 通过 Maven 命令的方式进行启动（不依赖任何 IDE）
-	- Windows 使用 `bin\mvn-tomcat-run.cmd`
-	- Unix 使用 `sh bin/mvn-tomcat-run.sh`
+    - Windows 使用 `bin\mvn-tomcat-run.cmd`
+    - Unix 使用 `sh bin/mvn-tomcat-run.sh`
 - 配置 server 的方式与其它web程序一致（不建议使用，上面的方式出问题的可能性更小）
 
 ### 程序安装
@@ -68,6 +68,17 @@ ZrLog是使用 Java 开发的博客/CMS程序，具有简约，易用，组件�
 * 对程序有任何问题，欢迎反馈 [https://blog.zrlog.com/post/feedback](https://blog.zrlog.com/post/feedback)
 
 ### 常见问题
+
+#### 开发工具打开后没有 web/src/main/webapp 里面没有 admin 目录，或访问 admin 提示页面没有找到
+
+[解决办法](https://blog.zrlog.com/post/faq-collect#%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7%E6%89%93%E5%BC%80%E5%90%8E%E6%B2%A1%E6%9C%89%20web/src/main/webapp%20%E9%87%8C%E9%9D%A2%E6%B2%A1%E6%9C%89%20admin%20%E7%9B%AE%E5%BD%95%EF%BC%8C%E6%88%96%E8%AE%BF%E9%97%AE%20admin%20%E6%8F%90%E7%A4%BA%E9%A1%B5%E9%9D%A2%E6%B2%A1%E6%9C%89%E6%89%BE%E5%88%B0)
+
+### docker模式下，输入正确的数据库信息，仍无法完成安装
+
+
+- https://blog.zrlog.com/post/faq-collect
+
+#### 其它问题
 
 如何你遇到了一些问题，可以先去这里找下 [常见问题](https://blog.zrlog.com/post/faq-collect)
 

@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.zrlog</groupId>
     <artifactId>zrlog</artifactId>
-    <version>2.2.1</version>
+    <version>2.2.6-SNAPSHOT</version>
     <modules>
         <module>web</module>
         <module>service</module>
@@ -32,7 +32,7 @@
         <developer>
             <name>xiaochun</name>
             <email>xchun90@163.com</email>
-            <url>http://xiaochun.zrlog.com</url>
+            <url>https://xiaochun.zrlog.com</url>
             <roles>
                 <role>owner</role>
             </roles>
@@ -57,13 +57,13 @@
 
     <issueManagement>
         <system>Github Issue</system>
-        <url>http://github.com/94fzb/zrlog</url>
+        <url>https://github.com/94fzb/zrlog</url>
     </issueManagement>
 
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
-            <url>http://apache.org/licenses/LICENSE-2.0.txt</url>
+            <url>https://apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>
 
@@ -96,32 +96,32 @@
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>common</artifactId>
-                <version>2.2.1</version>
+                <version>2.2.6-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>data</artifactId>
-                <version>2.2.1</version>
+                <version>2.2.6-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>admin-token</artifactId>
-                <version>2.2.1</version>
+                <version>2.2.6-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>blog-web</artifactId>
-                <version>2.2.1</version>
+                <version>2.2.6-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>service</artifactId>
-                <version>2.2.1</version>
+                <version>2.2.6-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.zrlog</groupId>
                 <artifactId>admin-web</artifactId>
-                <version>2.2.1</version>
+                <version>2.2.6-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>javax.servlet</groupId>
@@ -155,7 +155,17 @@
                 <plugin>
                     <groupId>com.github.eirslett</groupId>
                     <artifactId>frontend-maven-plugin</artifactId>
-                    <version>1.11.0</version>
+                    <version>1.12.1</version>
+                    <configuration>
+                        <nodeVersion>v16.15.1</nodeVersion>
+                        <yarnVersion>v1.22.18</yarnVersion>
+                        <npmVersion>8.11.0</npmVersion>
+                        <workingDirectory>src/main/frontend</workingDirectory>
+                        <installDirectory>target</installDirectory>
+                        <nodeDownloadRoot>https://npmmirror.com/mirrors/node/</nodeDownloadRoot>
+                        <yarnDownloadRoot>https://dl.zrlog.com/yarnpkg/yarn/releases/download/</yarnDownloadRoot>
+                        <npmRegistryURL>https://registry.npmmirror.com</npmRegistryURL>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>

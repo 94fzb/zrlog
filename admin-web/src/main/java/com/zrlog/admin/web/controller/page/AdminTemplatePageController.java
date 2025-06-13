@@ -6,6 +6,7 @@ import com.hibegin.common.util.http.HttpUtil;
 import com.hibegin.common.util.http.handle.HttpFileHandle;
 import com.jfinal.core.Controller;
 import com.jfinal.kit.PathKit;
+import com.zrlog.admin.business.exception.ArgsException;
 import com.zrlog.admin.business.exception.TemplateExistsException;
 import com.zrlog.common.Constants;
 
@@ -22,12 +23,16 @@ public class AdminTemplatePageController extends Controller {
         if (path.exists()) {
             throw new TemplateExistsException();
         }
-        HttpFileHandle fileHandle = (HttpFileHandle) HttpUtil.getInstance().sendGetRequest(getPara("host") +
+        String downloadHost = getPara("host");
+        if (!Constants.TEMPLATE_REPO_HOSTS.contains(downloadHost)) {
+            throw new ArgsException();
+        }
+        HttpFileHandle fileHandle = (HttpFileHandle) HttpUtil.getInstance().sendGetRequest(downloadHost +
                         "/template/download?id=" + getParaToInt("id"),
                 new HttpFileHandle(PathKit.getWebRootPath() + Constants.TEMPLATE_BASE_PATH), new HashMap<>());
         String target = fileHandle.getT().getParent() + "/" + fileName;
         FileUtils.moveOrCopyFile(fileHandle.getT().toString(), target, true);
-        ZipUtil.unZip(target, path.toString() + "/");
+        ZipUtil.unZip(target, path + "/");
         redirect(Constants.ADMIN_URI_BASE_PATH + "/website#template");
     }
 

@@ -22,6 +22,7 @@ import com.zrlog.data.dto.PageData;
 import com.zrlog.model.Log;
 import com.zrlog.util.ParseUtil;
 import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
 import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
@@ -179,6 +180,8 @@ public class AdminArticleService {
         } else {
             log.set("digest", createArticleRequest.getDigest());
         }
+        //fix digest xss
+        Jsoup.clean(log.get("digest",""), Safelist.basicWithImages());
         log.set("plain_content", VisitorArticleService.getPlainSearchText(log.get("content")));
         log.set("editor_type", createArticleRequest.getEditorType());
         String alias;

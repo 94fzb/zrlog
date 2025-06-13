@@ -49,3 +49,4 @@ web/src/main/webapp/WEB-INF/update-temp/zrlog.zip
 zrlog.zip
 release
 /data/src/main/resources/build.properties
+node_modules

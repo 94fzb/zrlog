@@ -15,23 +15,27 @@
         </c:if>
         <c:if test="${not empty requestScope.data}">
             <c:forEach var="log" items="${requestScope.data.rows}">
-                <article class="entry">
+                <article class="entry markdown-body">
                     <c:if test="${not empty log.thumbnail}">
                         <img width="760px" alt="${log.title}" src="${log.thumbnail}"/>
                     </c:if>
                     <h2 class="post-title"><a rel="bookmark" href="${log.url}">${log.title}</a></h2>
                     <div class="content"><p>${log.digest}</p></div>
-                    <div class="meta">
-                        <p class="category">
+                    <div class="meta" style="display: flex;justify-content: space-between">
+                        <div>
+                        <span class="category">
                             <a href="${log.typeUrl}">${log.typeName}</a>
-                        </p>
-                        /<p class="published">
+                        </span>
+                        /<span class="published">
                             ${log.releaseTime.year+1900}-${log.releaseTime.month+1}-${log.releaseTime.date}
-                    </p>
+                        </span>
+                    </div>
                         <p class="commentlink">
+                            <c:if test="${log.canComment}">
                             <a href="${log.url}#comment" class="comments_invite">
-                                    ${_res.commentView} <c:if test="${not staticBlog}"> [${log.commentSize}] </c:if>
+                                ${_res.commentView} <c:if test="${not staticBlog}"> [${log.commentSize}] </c:if>
                             </a>
+                            </c:if>
                         </p>
                     </div>
                 </article>

@@ -1,239 +1,234 @@
-section h2,
-section .post-title {
-    padding-top: 16px
+/*
+  Threme Name: Robinu Threme
+  URI: http://sheshui.me/
+  Version: 2.0
+  Author: Robin L. info@sheshui.net
+  Description: Responsive Web Design
+*/
+
+aside li {
+    list-style: none;
 }
 
-section .category-title {
-    color: #666666;
-    background: rgba(255, 255, 255, 1);
-    box-shadow: 0 1px 3px rgba(198, 198, 198, 0.5);
-    padding: 10px 20px;
-    margin-bottom: 10px;
+li strong, blockquote strong {
+    font-weight: bold;
 }
 
-section h3,
-section h4 {
-    color: #333333;
-    margin-bottom: 0.6em;
+a {
+    text-decoration: none;
+    cursor: pointer;
+    outline: none;
 }
 
-section h3, section h3 span {
-    font-size: 18px;
+a img {
+    outline: none;
 }
 
-section h4, section h4 span {
-    font-size: 16px;
+.entry .meta {
+    clear: both;
+    padding-top: .5rem;
+    border-top: 1px dotted #E9E9E9;
 }
 
-section h5, section h5 span {
-    font-size: 14px;
+a:hover span,
+a:hover, a:focus {
+    text-decoration: underline
 }
 
-section p {
-    margin-bottom: 1em;
-    text-align: left;
-}
-
-section p em {
-    font-style: italic;
-}
-
-section p a,
-section article li a,
-section .content a {
-    text-decoration: underline;
-    color: #3366cc;
-}
-
-section p sub a,
-section p sup a,
-section article li sub a, section .content sub a,
-section article li sup a, section .content sup a {
+a:focus, a:active {
     text-decoration: none;
 }
 
-section .content table {
-    border-left: 1px solid #CCCCCC;
-    border-top: 1px solid #CCCCCC;
+.clearfix {
+    clear: both;
+    float: none;
+    font-size: 1px;
+    height: 0;
+    line-height: 0;
 }
 
-section .content th,
-section .content td {
-    padding: 5px 8px;
-    font-size: 16px;
-    border: 1px solid #DDDDDD;
+.clearfloat:after {
+    content: '';
+    display: block;
+    clear: both;
 }
 
-section .content th {
-    font-weight: bold;
-    background-color: #f2f2f2;
-    text-align: center;
+input[type=text], textarea {
+    border-width: 1px;
+    border-style: solid;
+    border-color: #DDDDDD #E4E4E4 #E4E4E4 #DDDDDD;
+    height: auto;
+    padding: .5rem;
+    vertical-align: middle;
+    outline: none;
+    resize: none;
 }
 
-section .content h1 {
-    color: #333333;
-    margin-bottom: 0.6em;
-    font-size: 22px;
+.hidden {
+    display: none;
 }
 
-section .content h2 {
-    color: #333333;
-    margin-bottom: 0.6em;
-    font-size: 20px;
+
+.top, .main, .bottom {
+    clear: both;
+    padding-top: 20px
+
 }
 
-section .content h2, section .content h3, section .content h4, section .content h5, section .content h6 {
-    margin-top: 1.5em;
+.main section {
+    float: left;
+    width: 800px;
 }
 
-section .content h2:first-child, section .content h3:first-child, section .content h4:first-child {
+.main aside {
+    float: right;
+    width: 290px;
+    padding: 20px 0px 0;
+    margin-bottom: 20px;
+    box-shadow: 0 0 2px rgba(198, 198, 198, 0.5)
+}
+
+p.lead {
+    font-weight: 400
+}
+
+hr.small {
+    max-width: 100px;
+    margin: 50px auto;
+    border-color: rgba(0, 0, 0, .2)
+}
+
+.text-yellow {
+    color: #f1c40f
+}
+
+p.dm-promo-lead {
+    margin-bottom: 10px
+}
+
+p.dm-promo-deal {
+    margin-bottom: 30px
+}
+
+p.hosting-offer {
+    margin-bottom: 10px
+}
+
+.resource-name {
+    width: 200px
+}
+
+.resource-link {
+    width: 140px
+}
+
+.cta-mail h2 {
+    margin-top: 0
+}
+
+.cta-mail .input-group {
+    max-width: 500px;
+    margin: 30px auto 0
+}
+
+.post-image-link p {
+    margin: 0 !important
+}
+
+.resources h2,
+.resources h3 {
     margin-top: 0;
+    padding-top: 60px
 }
 
-section .entry {
-    position: relative
+.submit-box {
+    margin-top: 60px
 }
 
-section .entry .post-title {
-    margin-bottom: 16px;
+.submit-box h3 {
+    padding-top: 0
 }
 
-section .entry h3 {
+.taglist a {
+    padding: 0px;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+a.size1 {
+    font-size: 14px;
+    padding: 2px;
+    color: #804D40;
+}
+
+a.size1:hover {
+    color: #E13728;
+}
+
+a.size2 {
+    padding: 2px;
+    font-size: 14px;
+    color: #B9251A;
+}
+
+a.size2:hover {
+    color: #E13728;
+}
+
+a.size3 {
+    padding: 3px;
     font-size: 16px;
-    font-weight: normal;
-    margin-bottom: 0.6em;
+    color: #C4876A;
 }
 
-section .entry .article-image {
-    line-height: 1;
-    overflow: hidden;
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    margin-right: 15px;
-    margin-bottom: 10px;
-    padding-right: 0; /*border:6px solid #f8f8f8; box-shadow: 0px 1px 6px 1px rgba(0, 0, 0, 0.25)*/
+a.size3:hover {
+    color: #E13728;
 }
 
-section .entry .article-image img {
-    width: auto;
-    max-width: none;
+a.size4 {
+    padding: 1px;
+    font-size: 18px;
+    color: #B46A47;
 }
 
-section .entry li { /*padding: 5px 10px; margin-bottom: 10px;*/
-    line-height: 180%;
+a.size4:hover {
+    color: #E13728;
 }
 
-section .entry li a {
-    text-decoration: underline;
+a.size5 {
+    padding: 3px;
+    font-size: 20px;
+    color: #E13728;
 }
 
-section .entry li strong {
-    font-weight: bold;
-    padding: 0 2px;
+a.size5:hover {
+    color: #B46A47;
+}
+
+a.size6 {
+    padding: 2px;
+    font-size: 22px;
+    color: #77625E
+}
+
+a.size6:hover {
+    color: #E13728;
+}
+
+aside ul {
+    margin-bottom: 0;
 }
 
 article {
     margin-bottom: 20px;
-    padding: 20px;
-    background: rgba(255, 255, 255, .9333333);
-    line-height: 1;
-    box-shadow: 0 0 2px rgba(198, 198, 198, 0.5);
+    padding: 10px;
+    box-shadow: 0 0 2px rgba(198, 198, 198, 0.3);
     -webkit-transition: top 1s ease, left 1s ease;
     -moz-transition: top 1s ease, left 1s ease;
     -o-transition: top 1s ease, left 1s ease;
     -ms-transition: top 1s ease, left 1s ease;
 }
 
-article p, article p span, article p strong, article li, article blockquote {
-    color: #333;
-    font: normal 16px/175%  sans-serif;
-}
-
-article p {
-    margin-bottom: 1em;
-}
-
-article p strong {
-    font-weight: bold;
-}
-
-article > p:last-child {
-    margin-bottom: 0;
-}
-
-article h1.post-title {
-    padding: 0 20px 10px;
-    margin: 0 -20px 10px;
-    border-bottom: 1px dotted #e4e4e4;
-}
-
-article .post-title a:hover {
-    text-decoration: none;
-}
-
-article pre {
-    background-color: #F8F8F8;
-    overflow: auto;
-    margin-bottom: 1em;
-    word-wrap: break-word;
-    border: 1px dashed #EDEDED;
-    border-radius: 2px;
-}
-
-article pre p {
-    margin: 0;
-}
-
-article blockquote {
-    position: relative;
-    border-left: 2px solid #DDDDDD;
-    padding-left: 0.5em;
-    margin-bottom: 0.8em;
-    text-align: justify;
-}
-
-article blockquote:before { /*content:"“"; position:absolute; left:-25px; top:5px;font-family:'\5b8b\4f53';font-size:36px;*/
-}
-
-article blockquote, article blockquote p, article blockquote span {
-    color: #999999;
-}
-
-article img {
-    max-width: 100% /*680px*/;
-    height: auto;
-}
-
-article p img.img660 {
-    margin: 0 auto;
-    padding: 10px;
-    background-color: #F8F8F8;
-}
-
-article ul {
-    margin-bottom: 10px;
-    margin-left: 10px;
-}
-
-article ul ul {
-    margin: 0 0 0 10px
-}
-
-article li { /*padding: 2px 0 2px 10px; background:url(../images/dot.gif) no-repeat scroll 2px 11px transparent;*/
-}
-
-article li:before {
-    content: "•";
-    padding-right: 5px;
-    margin-left: -10px;
-}
-
-article li a:hover {
-    text-decoration: underline;
-}
-
-/* Aside */
 aside a:hover {
     text-decoration: underline
 }
@@ -243,19 +238,15 @@ aside h2, aside h3 {
     margin-bottom: 5px;
 }
 
-aside h2 {
-    font-size: 18px;
-}
-
 aside h3 {
     font-size: 16px;
-    margin: 0 -15px;
-    padding: 5px 15px;
+    margin: 0 -8px;
+    padding: 5px 8px;
     background-color: rgba(233, 233, 233, .3);
 }
 
 aside .widget {
-    padding: 0 15px 5px;
+    padding: 0 8px 8px;
 }
 
 aside .widget p {
@@ -267,7 +258,6 @@ aside .search input[type=text] {
     height: 40px;
     padding: 0;
     border: 0 none;
-    border-bottom: 1px solid #E4E4E4;
 }
 
 aside .search input[type=text]:focus {
@@ -280,7 +270,6 @@ aside .search input.btn {
     border: 0 none;
     vertical-align: middle;
     outline: none;
-    background-color: #E4E4E4;
     border-radius: 0;
 }
 
@@ -316,23 +305,27 @@ aside nav a:hover {
 }
 
 aside nav li {
-    padding: 0.2em 0 0.2em 10px;
+    padding: 0.2rem 0 0.2rem 10px;
 }
 
 aside li {
-    margin: 0 -15px;
+    margin: 0 -16px;
+}
+
+aside ol, ul {
+    padding-left: 1rem;
 }
 
 aside li a {
     display: block;
-    padding: 0.5em 15px;
+    padding: 0.5rem 0;
     text-decoration: none;
 }
 
 aside li a .time {
     float: right;
-    font-size: .8em;
-    line-height: 1.8em;
+    font-size: .8rem;
+    line-height: 1.8rem;
     color: #999
 }
 
@@ -357,7 +350,6 @@ aside li.active a {
 }
 
 aside li a:hover {
-    background-color: #FFFFFF;
     text-decoration: none
 }
 
@@ -365,12 +357,11 @@ aside li a:hover {
 .comment {
     margin-bottom: 10px;
     background-color: rgba(255, 255, 255, 1);
-    padding: 15px 20px;
+    padding: 16px 20px;
     box-shadow: 0 0 2px rgba(198, 198, 198, 0.5)
 }
 
 .comment h2 {
-    color: #666666;
     font-weight: normal;
     margin-bottom: 10px;
     font-size: 18px
@@ -379,7 +370,7 @@ aside li a:hover {
 .comment label {
     width: 42px;
     height: auto;
-    padding: .5em;
+    padding: .5rem;
 }
 
 .comment input[type=text],
@@ -398,7 +389,7 @@ aside li a:hover {
 .comment li {
     border-bottom: 1px dotted #F2F2f2;
     padding: 10px;
-    margin-bottom: 1.2em;
+    margin-bottom: 1.2rem;
     background-color: #f8f8f8;
 }
 
@@ -432,7 +423,7 @@ aside li a:hover {
     box-shadow: 0 0 5px #DDDDDD;
 }
 
-.comment .remember label {
+.comment .remrember label {
     float: none;
     padding: 0;
     margin: 0;
@@ -440,50 +431,6 @@ aside li a:hover {
     color: #333333;
 }
 
-.pager-nav {
-    clear: both;
-    margin-bottom: 20px;
-}
-
-.pager-nav strong {
-    font-weight: bold;
-    color: #666666;
-}
-
-.pager-nav p {
-    margin: 5px 0;
-    width: 100%;
-    font-size: 16px;
-    line-height: 1.5em;
-    background-color: #FFFFFF;
-    padding: 10px 15px;
-    box-shadow: 0 0 2px rgba(198, 198, 198, 0.5);
-    -webkit-transition: top 1s ease, left 1s ease;
-    -moz-transition: top 1s ease, left 1s ease;
-    -o-transition: top 1s ease, left 1s ease;
-    -ms-transition: top 1s ease, left 1s ease;
-}
-
-.pager-nav p:before {
-    vertical-align: -1px;
-    margin-right: 2px;
-}
-
-.pager-nav p.prev:before {
-    content: "\e619";
-}
-
-.pager-nav p.next:before {
-    content: "\e61a";
-}
-
-.pager-nav a:hover {
-    text-decoration: none;
-}
-
-.pager-nav a:hover p {
-    text-decoration: none;
-}
 
 @media screen and (max-width: 1280px) {
     body {
@@ -495,7 +442,7 @@ aside li a:hover {
     .main aside { /*display:none;*/
     }
 
-    .main, .top header, .bottom footer {
+    .main, .top header, .bottom {
         width: auto;
     }
 
@@ -515,11 +462,8 @@ aside li a:hover {
 }
 
 @media screen and (max-width: 960px) {
-    .footer-left, .footer-left .box {
-        width: auto;
-    }
 
-    .top header, .main, .bottom footer {
+    .top header, .main, .bottom  {
         width: auto;
     }
 
@@ -594,16 +538,6 @@ aside li a:hover {
         width: auto;
         text-align: left;
     }
-
-    .footer-left {
-        padding: 0 15px;
-        float: none;
-    }
-
-    .footer-right {
-        float: none;
-        margin-left: 15px;
-    }
 }
 
 @media screen and (max-width: 640px) {
@@ -625,14 +559,6 @@ aside li a:hover {
 }
 
 @media screen and (max-width: 480px) {
-    .footer-left {
-        border-bottom: 1px solid #E4E4E4;
-        margin-bottom: 10px;
-    }
-
-    .footer-left .box {
-        width: auto;
-    }
 
     .main article .float-left {
         float: none;
@@ -655,25 +581,42 @@ aside li a:hover {
 }
 
 
-.h2, h2 {
-    font-size: 1.6rem;
-}
-
-.bg-light {
-    font-size: 18px;
-}
-
 .nav-item {
     padding-right: 20px;
 }
 
-ul, ol {
-    margin: 0;
-    padding: 0;
-    border: 0;
-    font: inherit;
-}
-
 .pagination {
     margin-bottom: 20px;
+    overflow-x: auto;
+}
+
+a {
+    text-decoration: unset;
+}
+
+a:hover {
+    text-decoration: unset;
+}
+
+.container {
+    max-width: 1140px;
+}
+
+.active {
+    font-weight: 500;
+}
+.navbar {
+    background-color:var(--bs-body-bg);
+}
+.sticky-top {
+    border-bottom: 1px solid rgba(232, 233, 233, .5);
+    -webkit-background-clip: padding-box; /* for Safari */
+    background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
+}
+.marquee {
+    color: white;
+}
+
+footer {
+    padding: 50px 0;
 }

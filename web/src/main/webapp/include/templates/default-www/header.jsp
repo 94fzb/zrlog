@@ -18,15 +18,15 @@
         </c:otherwise>
     </c:choose>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
-    <link rel="stylesheet" type="text/css" media="screen" href="${url}/css/common.css"/>
     <link rel="stylesheet" type="text/css" media="screen" href="${url}/css/bootstrap.min.css"/>
     <link rel="stylesheet" type="text/css" media="screen" href="${url}/css/style.css"/>
     <link rel="stylesheet" type="text/css" media="screen" href="${url}/css/editormd.css"/>
     <script src="${url}/js/jquery-1.10.2.min.js"></script>
     <script src="${url}/js/bootstrap.min.js"></script>
+    <script src="${url}/js/auto-theme.js"></script>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg sticky-top">
     <div class="container">
         <a <c:if test="${not empty _res.navBarBrand}">class='navbar-brand'</c:if> href="${rurl}"><c:if test="${not empty _res.navBarBrand}">
             <b>${_res.navBarBrand}</b>

@@ -7,7 +7,6 @@
     <jsp:include page="404.jsp"/>
 </c:when>
 <c:otherwise>
-<div style="background:rgba(255,255,255,1);">
 <jsp:include page="article.jsp"/>
 <jsp:include page="comment.jsp"/>
 </c:otherwise></c:choose>

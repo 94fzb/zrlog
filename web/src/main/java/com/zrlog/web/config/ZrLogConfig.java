@@ -193,9 +193,11 @@ public class ZrLogConfig extends JFinalConfig implements InstallAction {
      */
     private void tryUpgradeDbPropertiesFile(String dbFile, Properties properties) throws IOException {
         if (!"com.mysql.cj.jdbc.Driver".equals(properties.get("driverClass"))) {
-            properties.put("driverClass", "com.mysql.cj.jdbc.Driver");
-            properties.put("jdbcUrl", properties.get("jdbcUrl") + "&" + ApiInstallController.JDBC_URL_BASE_QUERY_PARAM);
-            properties.store(new FileOutputStream(dbFile), "Support mysql8");
+            try (FileOutputStream fileOutputStream = new FileOutputStream(dbFile)) {
+                properties.put("driverClass", "com.mysql.cj.jdbc.Driver");
+                properties.put("jdbcUrl", properties.get("jdbcUrl") + "&" + ApiInstallController.JDBC_URL_BASE_QUERY_PARAM);
+                properties.store(fileOutputStream, "Support mysql8");
+            }
         }
     }
 

@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.net.ConnectException;
 import java.sql.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -46,6 +45,13 @@ public class InstallService {
     public InstallService(String basePath, Map<String, String> dbConn) {
         this.basePath = basePath;
         this.dbConn = dbConn;
+    }
+
+    public static String renderMd(String md) {
+        Parser parser = Parser.builder().build();
+        Node document = parser.parse(md);
+        HtmlRenderer renderer = HtmlRenderer.builder().build();
+        return renderer.render(document);
     }
 
     /**
@@ -78,16 +84,18 @@ public class InstallService {
         } catch (ClassNotFoundException e) {
             LOGGER.error("", e);
             testConnectDbResult = TestConnectDbResult.MISSING_MYSQL_DRIVER;
+        } catch (SQLRecoverableException e) {
+            LOGGER.error("", e);
+            testConnectDbResult = TestConnectDbResult.CREATE_CONNECT_ERROR;
+        } catch (SQLSyntaxErrorException e) {
+            LOGGER.error("", e);
+            testConnectDbResult = TestConnectDbResult.DB_NOT_EXISTS;
         } catch (SQLException e) {
             LOGGER.error("", e);
-            if (e.getCause() instanceof ConnectException) {
-                testConnectDbResult = TestConnectDbResult.CREATE_CONNECT_ERROR;
+            if (e.getMessage().contains("Access denied for user") && e.getMessage().contains("using password")) {
+                testConnectDbResult = TestConnectDbResult.USERNAME_OR_PASSWORD_ERROR;
             } else {
-                if (e.getMessage().contains("Access denied for user") || e.getMessage().contains("Unknown database")) {
-                    testConnectDbResult = TestConnectDbResult.DB_NOT_EXISTS;
-                } else {
-                    testConnectDbResult = TestConnectDbResult.USERNAME_OR_PASSWORD_ERROR;
-                }
+                testConnectDbResult = TestConnectDbResult.SQL_EXCEPTION_UNKNOWN;
             }
         } catch (Exception e) {
             LOGGER.error("", e);
@@ -98,6 +106,7 @@ public class InstallService {
 
     private Connection getConnection() throws ClassNotFoundException, SQLException {
         Class.forName(dbConn.get("driverClass"));
+        DriverManager.setLoginTimeout(20);
         return DriverManager.getConnection(dbConn.get("jdbcUrl"), dbConn.get("user"), dbConn.get("password"));
     }
 
@@ -179,13 +188,6 @@ public class InstallService {
             }
         }
         return false;
-    }
-
-    public static String renderMd(String md) {
-        Parser parser = Parser.builder().build();
-        Node document = parser.parse(md);
-        HtmlRenderer renderer = HtmlRenderer.builder().build();
-        return renderer.render(document);
     }
 
     private void insertFirstArticle(Connection connect) throws SQLException {

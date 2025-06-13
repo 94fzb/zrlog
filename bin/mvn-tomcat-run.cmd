@@ -1,2 +1,1 @@
-mvnw.cmd clean install -Dmaven.test.skip=true && mvnw.cmd -f web/pom.xml tomcat7:run -Dtomcat-scope=provided
-
+.\mvnw clean package -Dmaven.war.skip -DfinalName=zrlog && cd web\src\main\ && bin\start.bat
