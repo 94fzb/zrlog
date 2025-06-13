@@ -2,7 +2,7 @@ name: ZrLog build release package
 on:
   push:
     branches:
-      - release
+      - v2
 jobs:
   build:
     name: ZrLog package ${{ matrix.os }} ${{ matrix.architecture }}
