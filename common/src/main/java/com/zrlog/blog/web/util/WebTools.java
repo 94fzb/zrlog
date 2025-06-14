@@ -49,7 +49,7 @@ public class WebTools {
 
 
     public static String getHomeUrl(HttpRequest request) {
-        return "/" + request.getContextPath();
+        return request.getContextPath() + "/";
     }
 
     public static String htmlEncode(String source) {
@@ -109,7 +109,7 @@ public class WebTools {
             throw new AdminAuthException();
         } else {
             try {
-                String url = Constants.ADMIN_LOGIN_URI_PATH + "?redirectFrom="
+                String url = WebTools.getHomeUrl(request) + Constants.ADMIN_LOGIN_URI_PATH + "?redirectFrom="
                         + URLEncoder.encode(getRequestUriWithQueryString(request), StandardCharsets.UTF_8);
                 response.redirect(url);
             } catch (Exception e) {
@@ -119,7 +119,7 @@ public class WebTools {
     }
 
     private static String getRequestUriWithQueryString(HttpRequest request) {
-        String realUri = request.getUri();
+        String realUri = request.getContextPath() + request.getUri();
         if (request.getUri().endsWith(Constants.ADMIN_URI_BASE_PATH)) {
             realUri = realUri + Constants.INDEX_URI_PATH;
         }

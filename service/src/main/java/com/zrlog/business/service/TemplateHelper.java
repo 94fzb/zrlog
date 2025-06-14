@@ -70,7 +70,7 @@ public class TemplateHelper {
             pager.setPageEndUrl(baseUrl + pager.getPageEndUrl() + suffix);
         }
         fillTags(suffix, baseUrl, baseDataInitVO.getTags());
-        fillType(suffix, baseUrl, baseDataInitVO.getTypes(),request);
+        fillType(suffix, baseUrl, baseDataInitVO.getTypes(), request);
         fullNavBar(request, suffix, baseDataInitVO);
         baseDataInitVO.setArchiveList(getConvertedArchives(suffix, baseUrl, baseDataInitVO.getArchives()));
     }
@@ -95,11 +95,11 @@ public class TemplateHelper {
         }
     }
 
-    private static void fillType(String suffix, String baseUrl, List<Map<String, Object>> types,HttpRequest request) {
+    private static void fillType(String suffix, String baseUrl, List<Map<String, Object>> types, HttpRequest request) {
         for (Map<String, Object> type : types) {
-            String typeUri = baseUrl + Constants.getArticleUri() + "sort/" +  type.get("alias");
-            if(request.getUri().startsWith(typeUri)){
-                tryEnableArrangePlugin((String) type.get("arrange_plugin"),request);
+            String typeUri = baseUrl + Constants.getArticleUri() + "sort/" + type.get("alias");
+            if (request.getUri().startsWith(typeUri)) {
+                tryEnableArrangePlugin((String) type.get("arrange_plugin"), request);
             }
             type.put("url", WebTools.encodeUrl(typeUri) + suffix);
         }
@@ -175,6 +175,7 @@ public class TemplateHelper {
                 baseUrl = WebTools.getHomeUrl(request);
             }
         }
+        templateUrl = request.getContextPath() + templateUrl;
         request.getAttr().put("url", templateUrl);
         request.getAttr().put("templateUrl", templateUrl);
         request.getAttr().put("rurl", baseUrl);
@@ -272,19 +273,19 @@ public class TemplateHelper {
             }
             log.put("toc", outlineVO);
         }
-        tryEnableArrangePlugin((String) log.get("arrange_plugin"),request);
+        tryEnableArrangePlugin((String) log.get("arrange_plugin"), request);
         if (Objects.isNull(log.get("content"))) {
             log.put("content", "");
         }
     }
 
-    private static void tryEnableArrangePlugin(String pluginName,HttpRequest request){
-        if(Objects.nonNull(pluginName) && StringUtils.isNotEmpty(pluginName)) {
+    private static void tryEnableArrangePlugin(String pluginName, HttpRequest request) {
+        if (Objects.nonNull(pluginName) && StringUtils.isNotEmpty(pluginName)) {
             request.getAttr().put("arrangePlugin", pluginName);
         }
     }
 
-    public static boolean isArrangeable(HttpRequest request){
+    public static boolean isArrangeable(HttpRequest request) {
         return Objects.nonNull(request.getAttr().get("arrangePlugin"));
     }
 

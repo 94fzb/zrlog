@@ -9,6 +9,7 @@ import com.zrlog.admin.business.rest.response.ServerSideDataResponse;
 import com.zrlog.admin.business.rest.response.UserBasicInfoResponse;
 import com.zrlog.admin.web.controller.api.AdminUserController;
 import com.zrlog.admin.web.token.AdminTokenThreadLocal;
+import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.business.rest.response.PublicInfoVO;
 import com.zrlog.business.service.CommonService;
 import com.zrlog.common.Constants;
@@ -63,18 +64,23 @@ public class AdminPageController extends Controller {
             }
         }
         String adminStaticResourceHostByWebSite = ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite();
-        if (StringUtils.isNotEmpty(adminStaticResourceHostByWebSite)) {
-            Elements scripts = document.head().select("script");
-            if (!scripts.isEmpty()) {
-                scripts.forEach(script -> {
+        Elements scripts = document.head().select("script");
+        if (!scripts.isEmpty()) {
+            scripts.forEach(script -> {
+                if (StringUtils.isNotEmpty(adminStaticResourceHostByWebSite)) {
                     script.attr("src", script.attr("src").replace("./", adminStaticResourceHostByWebSite + "/"));
-                });
-            }
+                } else {
+                    script.attr("src", script.attr("src").replace("./", WebTools.getHomeUrl(request)));
+                }
+            });
         }
+
+        Elements base = document.head().select("base");
 
         ServerSideDataResponse serverSideDataResponse = serverSide(request.getUri());
         document.getElementById("__SS_DATA__").text(new Gson().toJson(serverSideDataResponse));
         document.title(serverSideDataResponse.documentTitle());
+        base.attr("href", WebTools.getHomeUrl(request));
         response.renderHtmlStr(document.html());
     }
 

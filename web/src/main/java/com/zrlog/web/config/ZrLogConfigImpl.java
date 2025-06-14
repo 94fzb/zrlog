@@ -79,6 +79,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     private final String contextPath;
 
     public ZrLogConfigImpl(Integer port, Updater updater, String contextPath) {
+        this.contextPath = contextPath;
         this.port = port;
         this.plugins = new Plugins();
         this.updater = updater;
@@ -86,12 +87,12 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         this.pluginCoreProcess = new PluginCoreProcessImpl(port);
         this.serverConfig = initServerConfig();
         this.uptime = System.currentTimeMillis();
+        this.configRouter();
         try {
             this.configDatabaseWithRetry(20);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        this.contextPath = contextPath;
     }
 
     public static boolean isTest() {
@@ -140,6 +141,11 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         return serverConfig;
     }
 
+    private void configRouter() {
+        AdminRouters.configAdminRoute(serverConfig.getRouter());
+        BlogRouters.configBlogRouter(serverConfig.getRouter());
+    }
+
     private ServerConfig initServerConfig() {
         ServerConfig serverConfig = new ServerConfig().setApplicationName("zrlog")
                 .setApplicationVersion(BlogBuildInfoUtil.getVersionInfo())
@@ -171,8 +177,6 @@ public class ZrLogConfigImpl extends ZrLogConfig {
             }
         });
         StaticResourceInterceptor.staticResourcePath.forEach(e -> serverConfig.addStaticResourceMapper(e, e, ZrLogConfigImpl.class::getResourceAsStream));
-        AdminRouters.configAdminRoute(serverConfig.getRouter());
-        BlogRouters.configBlogRouter(serverConfig.getRouter());
         configInterceptor(serverConfig.getInterceptors());
         Runtime rt = Runtime.getRuntime();
         rt.addShutdownHook(new Thread(this::onStop));

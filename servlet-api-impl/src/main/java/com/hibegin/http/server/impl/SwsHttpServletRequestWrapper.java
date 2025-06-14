@@ -51,7 +51,7 @@ public class SwsHttpServletRequestWrapper extends SimpleHttpRequest {
 
     @Override
     public String getUri() {
-        return rawServletRequest.getRequestURI();
+        return rawServletRequest.getRequestURI().substring(rawServletRequest.getContextPath().length());
     }
 
     @Override
