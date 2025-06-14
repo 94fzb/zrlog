@@ -61,7 +61,7 @@ public class ZrLogUtil {
     }
 
     public static String getHomeUrlWithHostNotProtocol(HttpRequest request) {
-        return getBlogHost(request) + "/";
+        return getBlogHost(request) + request.getContextPath() + "/";
     }
 
     public static String getBlogHost(HttpRequest request) {

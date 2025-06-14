@@ -86,7 +86,7 @@
         <dependency>
             <groupId>com.hibegin</groupId>
             <artifactId>simplewebserver</artifactId>
-            <version>4.0.8</version>
+            <version>4.0.9-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

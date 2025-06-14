@@ -6,7 +6,6 @@ import com.hibegin.http.annotation.ResponseBody;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.web.Controller;
-import com.zrlog.admin.business.rest.request.CreateLinkRequest;
 import com.zrlog.admin.business.rest.request.UpdateAdminRequest;
 import com.zrlog.admin.business.rest.request.UpdatePasswordRequest;
 import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
@@ -16,14 +15,12 @@ import com.zrlog.admin.business.service.UserService;
 import com.zrlog.admin.web.annotation.RefreshCache;
 import com.zrlog.admin.web.plugin.UpdateVersionPlugin;
 import com.zrlog.admin.web.token.AdminTokenThreadLocal;
+import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.common.Constants;
 import com.zrlog.common.rest.response.ApiStandardResponse;
 import com.zrlog.model.User;
 import com.zrlog.util.I18nUtil;
-import org.jsoup.Jsoup;
-import org.jsoup.safety.Safelist;
 
-import java.net.URI;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.Objects;
@@ -49,7 +46,7 @@ public class AdminUserController extends Controller {
         Map<String, Object> byId = new User().loadById(AdminTokenThreadLocal.getUserId());
         UserBasicInfoResponse basicInfoResponse = Objects.requireNonNullElse(BeanUtil.convert(byId, UserBasicInfoResponse.class), new UserBasicInfoResponse());
         if (StringUtils.isEmpty(basicInfoResponse.getHeader())) {
-            basicInfoResponse.setHeader("/assets/images/default-portrait.gif");
+            basicInfoResponse.setHeader(WebTools.buildUrl(request, "assets/images/default-portrait.gif"));
         }
         UpdateVersionPlugin plugin = (UpdateVersionPlugin) Constants.zrLogConfig.getPlugins().stream().filter(x -> x instanceof UpdateVersionPlugin).findFirst().orElse(null);
         basicInfoResponse.setLastVersion(upgradeService.getCheckVersionResponse(false, plugin));

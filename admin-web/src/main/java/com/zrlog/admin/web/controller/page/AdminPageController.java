@@ -76,11 +76,10 @@ public class AdminPageController extends Controller {
         }
 
         Elements base = document.head().select("base");
-
+        base.attr("href", WebTools.getHomeUrl(request));
         ServerSideDataResponse serverSideDataResponse = serverSide(request.getUri());
         document.getElementById("__SS_DATA__").text(new Gson().toJson(serverSideDataResponse));
         document.title(serverSideDataResponse.documentTitle());
-        base.attr("href", WebTools.getHomeUrl(request));
         response.renderHtmlStr(document.html());
     }
 

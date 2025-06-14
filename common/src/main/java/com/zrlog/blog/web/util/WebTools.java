@@ -14,6 +14,7 @@ import com.zrlog.util.ZrLogUtil;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 /**
  * 存放与Web相关的工具代码
@@ -49,7 +50,20 @@ public class WebTools {
 
 
     public static String getHomeUrl(HttpRequest request) {
+        if (Objects.equals("/", request.getContextPath())) {
+            return "/";
+        }
         return request.getContextPath() + "/";
+    }
+
+    public static String buildUrl(HttpRequest request, String url) {
+        if (request == null) {
+            return url;
+        }
+        if (url.startsWith("/")) {
+            return getHomeUrl(request) + url.substring(1);
+        }
+        return url;
     }
 
     public static String htmlEncode(String source) {
@@ -109,7 +123,7 @@ public class WebTools {
             throw new AdminAuthException();
         } else {
             try {
-                String url = WebTools.getHomeUrl(request) + Constants.ADMIN_LOGIN_URI_PATH + "?redirectFrom="
+                String url = Constants.ADMIN_LOGIN_URI_PATH + "?redirectFrom="
                         + URLEncoder.encode(getRequestUriWithQueryString(request), StandardCharsets.UTF_8);
                 response.redirect(url);
             } catch (Exception e) {

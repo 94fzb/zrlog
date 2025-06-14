@@ -63,42 +63,4 @@
             </build>
         </profile>
     </profiles>
-
-    <build>
-        <plugins>
-
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.2.0</version>
-                <executions>
-                    <execution>
-                        <id>copy-resources</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>target/classes/admin</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>src/main/frontend/build</directory>
-                                    <filtering>true</filtering>
-                                </resource>
-                            </resources>
-                            <nonFilteredFileExtensions>
-                                <nonFilteredFileExtension>ico</nonFilteredFileExtension>
-                                <nonFilteredFileExtension>jpg</nonFilteredFileExtension>
-                                <nonFilteredFileExtension>png</nonFilteredFileExtension>
-                                <nonFilteredFileExtension>eot</nonFilteredFileExtension>
-                                <nonFilteredFileExtension>svg</nonFilteredFileExtension>
-                                <nonFilteredFileExtension>woff</nonFilteredFileExtension>
-                                <nonFilteredFileExtension>woff2</nonFilteredFileExtension>
-                                <nonFilteredFileExtension>ttf</nonFilteredFileExtension>
-                            </nonFilteredFileExtensions>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 </project>

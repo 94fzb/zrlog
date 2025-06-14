@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.StringUtils;
+import com.zrlog.common.Constants;
 import com.zrlog.util.ZrLogUtil;
 
 import java.io.ByteArrayInputStream;
@@ -36,18 +37,26 @@ public class ResourceUtils {
         InputStream resourceAsStream = ResourceUtils.class.getResourceAsStream(ADMIN_ASSET_MANIFEST_JSON);
         if (Objects.nonNull(resourceAsStream)) {
             String str = IOUtil.getStringInputStream(resourceAsStream);
-            String strVendors = IOUtil.getStringInputStream(ResourceUtils.class.getResourceAsStream("/admin/vendors-resource.txt"));
+            InputStream textIn = ResourceUtils.class.getResourceAsStream("/admin/pwa-resource.txt");
+            if (Objects.isNull(textIn)) {
+                return cacheUris;
+            }
+            String strVendors = IOUtil.getStringInputStream(textIn);
             if (StringUtils.isNotEmpty(str)) {
                 Map<String, Object> map = new Gson().fromJson(str, new TypeToken<>() {
                 });
                 Map<String, Object> staticFiles = (Map<String, Object>) map.get("files");
                 if (Objects.nonNull(staticFiles)) {
-                    cacheUris.addAll(staticFiles.values().stream().filter(e -> ((String) e).endsWith(".js")).map(e -> ((String) e).replace("./", "/")).toList());
+                    cacheUris.addAll(staticFiles.values().stream().filter(e -> ((String) e).endsWith(".js")).map(e -> Constants.zrLogConfig.getContextPath() +  ((String) e).replace("./", "/")).toList());
                 }
             }
             if (StringUtils.isNotEmpty(strVendors)) {
                 for (String file : strVendors.split("\n")) {
-                    cacheUris.add("/admin/" + file);
+                    if (file.startsWith("/admin") || file.startsWith("api/") || file.startsWith("admin/")) {
+                        cacheUris.add(Constants.zrLogConfig.getContextPath() + "/" + file);
+                    } else {
+                        cacheUris.add(Constants.zrLogConfig.getContextPath() + "/admin/" + file);
+                    }
                 }
             }
         }

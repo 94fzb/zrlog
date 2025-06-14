@@ -130,7 +130,7 @@ public class ArticleController extends Controller {
                 if(StringUtils.isEmpty(tag.trim())){
                     continue;
                 }
-                String tagUrl = WebTools.getHomeUrl(request) + Constants.getArticleUri() + "tag/" + URLEncoder.encode( tag, StandardCharsets.UTF_8) + TemplateHelper.getSuffix(request);;
+                String tagUrl = WebTools.buildUrl(request, Constants.getArticleUri() + "tag/" + URLEncoder.encode( tag, StandardCharsets.UTF_8) + TemplateHelper.getSuffix(request));
                 tags.add(Map.of("name",tag,"url",tagUrl));
             }
             detail.put("tags", tags);

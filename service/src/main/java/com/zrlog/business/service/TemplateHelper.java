@@ -217,8 +217,8 @@ public class TemplateHelper {
                         log.put("thumbnail", null);
                     }
                     log.put("canComment", Objects.equals(log.get("canComment"), true) && Constants.isAllowComment());
-                    log.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + URLEncoder.encode((String) log.get("alias"), StandardCharsets.UTF_8) + suffix);
-                    log.put("typeUrl", WebTools.getHomeUrl(request) + Constants.getArticleUri() + "sort/" + URLEncoder.encode((String) log.get("typeAlias"), StandardCharsets.UTF_8) + suffix);
+                    log.put("url", WebTools.buildUrl(request, Constants.getArticleUri() + URLEncoder.encode((String) log.get("alias"), StandardCharsets.UTF_8) + suffix));
+                    log.put("typeUrl", WebTools.buildUrl(request, Constants.getArticleUri() + "sort/" + URLEncoder.encode((String) log.get("typeAlias"), StandardCharsets.UTF_8) + suffix));
                     if (Objects.isNull(log.get("digest"))) {
                         log.put("digest", "");
                     }
@@ -256,13 +256,13 @@ public class TemplateHelper {
         String aliasUrl = URLEncoder.encode((String) log.get("alias"), StandardCharsets.UTF_8) + suffix;
         log.put("alias", aliasUrl);
         log.put("canComment", Objects.equals(log.get("canComment"), true) && Constants.isAllowComment());
-        log.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + aliasUrl);
+        log.put("url", WebTools.buildUrl(request, Constants.getArticleUri() + aliasUrl));
         log.put("noSchemeUrl", ZrLogUtil.getHomeUrlWithHost(request) + aliasUrl);
-        log.put("typeUrl", WebTools.getHomeUrl(request) + Constants.getArticleUri() + "sort/" + URLEncoder.encode((String) log.get("typeAlias"), StandardCharsets.UTF_8) + suffix);
+        log.put("typeUrl", WebTools.buildUrl(request, Constants.getArticleUri() + "sort/" + URLEncoder.encode((String) log.get("typeAlias"), StandardCharsets.UTF_8) + suffix));
         Map<String, Object> lastLog = (Map<String, Object>) log.get("lastLog");
         Map<String, Object> nextLog = (Map<String, Object>) log.get("nextLog");
-        nextLog.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + URLEncoder.encode((String) nextLog.get("alias"), StandardCharsets.UTF_8) + suffix);
-        lastLog.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + URLEncoder.encode((String) lastLog.get("alias"), StandardCharsets.UTF_8) + suffix);
+        nextLog.put("url", WebTools.buildUrl(request, Constants.getArticleUri() + URLEncoder.encode((String) nextLog.get("alias"), StandardCharsets.UTF_8) + suffix));
+        lastLog.put("url", WebTools.buildUrl(request, Constants.getArticleUri() + URLEncoder.encode((String) lastLog.get("alias"), StandardCharsets.UTF_8) + suffix));
 
         //没有使用md的toc目录的文章才尝试使用系统提取的目录
         if (log.get("markdown") != null && !log.get("markdown").toString().toLowerCase().contains("[toc]") && !log.get("markdown").toString().toLowerCase().contains("[tocm]")) {

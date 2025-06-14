@@ -3,7 +3,7 @@ rm -rf lib
 rm -rf zrlog.*
 rm -rf conf/plugins/*
 version=$(printf 'VER\t${project.version}' | ./mvnw help:evaluate | grep '^VER' | cut -f2)
-./mvnw -Djakarta-scope='provided' -Pjar clean package -pl '!package-war-web'
+./mvnw -Djakarta-scope='provided' -Pjar clean package -pl '!package-war-web' -U
 commonFiles='README.md README.en-us.md LICENSE doc'
 zip -9 -r zrlog-"${version}".zip bin/run.sh bin/start.sh bin/start.bat ${commonFiles} lib zrlog-starter.jar
-./mvnw -Pwar clean package
+./mvnw -Pwar clean package -U

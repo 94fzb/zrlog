@@ -1,15 +1,15 @@
-import { Tabs } from "antd";
+import {Tabs} from "antd";
 import Title from "antd/es/typography/Title";
 import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
 import Divider from "antd/es/divider";
-import Index, { TemplateEntry } from "../template";
-import { getColorPrimary, getRes } from "../../utils/constants";
+import Index, {TemplateEntry} from "../template";
+import {getColorPrimary, getRes} from "../../utils/constants";
 import BlogForm from "./BlogForm";
 import BasicForm from "./BasicForm";
 import OtherForm from "./OtherForm";
 import UpgradeSettingForm from "./UpgradeSettingForm";
-import { Link } from "react-router-dom";
+import {Link} from "react-router-dom";
 import AdminForm from "./AdminForm";
 
 export interface Basic {
@@ -49,20 +49,18 @@ export interface Upgrade {
 }
 
 const WebSite = ({
-    data,
-    offline,
-}: {
+                     data,
+                     offline,
+                     activeKey
+                 }: {
     data: Basic | Admin | Upgrade | Other | Blog | TemplateEntry[];
     offline: boolean;
+    activeKey: "basic" | "other" | "upgrade" | "admin" | "template" | "blog";
 }) => {
-    let activeKey = window.location.pathname.replace("/admin/website", "").replace("/", "");
-    if (activeKey === "") {
-        activeKey = "basic";
-    }
     const buildLink = (key: string, text: string) => {
         const toUrl = key === "basic" ? "/website" : "/website/" + key;
         return (
-            <Link to={toUrl} replace={true} style={{ color: activeKey === key ? getColorPrimary() : "inherit" }}>
+            <Link to={toUrl} replace={true} style={{color: activeKey === key ? getColorPrimary() : "inherit"}}>
                 {text}
             </Link>
         );
@@ -72,39 +70,39 @@ const WebSite = ({
         if (activeKey === "basic") {
             return (
                 <Row>
-                    <Col xs={24} style={{ maxWidth: 600 }}>
-                        <BasicForm offline={offline} data={data as Basic} />
+                    <Col xs={24} style={{maxWidth: 600}}>
+                        <BasicForm offline={offline} data={data as Basic}/>
                     </Col>
                 </Row>
             );
         } else if (activeKey === "blog") {
             return (
                 <Row>
-                    <Col xs={24} style={{ maxWidth: 600 }}>
-                        <BlogForm offline={offline} data={data as Blog} />
+                    <Col xs={24} style={{maxWidth: 600}}>
+                        <BlogForm offline={offline} data={data as Blog}/>
                     </Col>
                 </Row>
             );
         } else if (activeKey === "admin") {
             return (
                 <Row>
-                    <Col xs={24} style={{ maxWidth: 600 }}>
-                        <AdminForm offline={offline} data={data as Admin} />
+                    <Col xs={24} style={{maxWidth: 600}}>
+                        <AdminForm offline={offline} data={data as Admin}/>
                     </Col>
                 </Row>
             );
         } else if (activeKey === "template") {
-            return <Index data={data as TemplateEntry[]} />;
+            return <Index data={data as TemplateEntry[]}/>;
         } else if (activeKey === "other") {
             return (
                 <Row>
-                    <Col xs={24} style={{ maxWidth: 600 }}>
-                        <OtherForm offline={offline} data={data as Other} />
+                    <Col xs={24} style={{maxWidth: 600}}>
+                        <OtherForm offline={offline} data={data as Other}/>
                     </Col>
                 </Row>
             );
         } else if (activeKey === "upgrade") {
-            return <UpgradeSettingForm offline={offline} data={data as Upgrade} />;
+            return <UpgradeSettingForm offline={offline} data={data as Upgrade}/>;
         }
         return <></>;
     };
@@ -114,7 +112,7 @@ const WebSite = ({
             <Title className="page-header" level={3}>
                 {getRes()["admin.setting"]}
             </Title>
-            <Divider />
+            <Divider/>
             <Tabs
                 activeKey={activeKey}
                 items={[

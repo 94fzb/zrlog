@@ -11,6 +11,7 @@ import {ssData} from "../../index";
 import PWAHandler from "../../PWAHandler";
 import {removeAllCaches} from "../../cache";
 import styled from "styled-components";
+import {getContextPath} from "../../utils/helpers";
 
 const md5 = require("md5");
 
@@ -121,10 +122,10 @@ const Index = ({offline}: { offline: boolean }) => {
                 if (redirectFrom !== null && redirectFrom !== "") {
                     const jumpTo = decodeURIComponent(redirectFrom);
                     //处理非 https iframe 跳转登录问题
-                    if (jumpTo.startsWith("/admin/plugins/")) {
+                    if (jumpTo.startsWith(getContextPath() + "admin/plugins/")) {
                         window.location.href = window.location.protocol + "//" + window.location.host + jumpTo;
                     } else {
-                        navigate(jumpTo.replace("/admin", ""), {replace: true});
+                        navigate(jumpTo.replace(getContextPath() + "admin", ""), {replace: true});
                     }
                 } else {
                     navigate("/index", {replace: true});

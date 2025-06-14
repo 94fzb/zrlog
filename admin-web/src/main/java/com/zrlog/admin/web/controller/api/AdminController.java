@@ -7,11 +7,14 @@ import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.annotation.ResponseBody;
 import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.rest.request.LoginRequest;
-import com.zrlog.admin.business.rest.response.*;
+import com.zrlog.admin.business.rest.response.IndexResponse;
+import com.zrlog.admin.business.rest.response.LoginResponse;
+import com.zrlog.admin.business.rest.response.StatisticsInfoResponse;
+import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
 import com.zrlog.admin.business.service.AdminArticleService;
 import com.zrlog.admin.business.service.UserService;
-import com.zrlog.admin.util.SystemInfoUtils;
 import com.zrlog.admin.web.controller.page.AdminPageController;
+import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.business.exception.MissingInstallException;
 import com.zrlog.business.rest.response.PublicInfoVO;
 import com.zrlog.business.service.CommonService;
@@ -61,6 +64,10 @@ public class AdminController extends Controller {
             map.put("description", Objects.requireNonNullElse(Constants.zrLogConfig.getPublicWebSite().get("description"), ""));
             map.put("id", Constants.getAppId());
             map.put("background_color", publicInfoVO.admin_darkMode() ? "#000000" : "#FFFFFF");
+            List<Map<String, Object>> list = (List<Map<String, Object>>) map.get("icons");
+            for (Map<String, Object> icon : list) {
+                icon.put("src", WebTools.buildUrl(request, (String) icon.get("src")));
+            }
             return map;
         }
     }
