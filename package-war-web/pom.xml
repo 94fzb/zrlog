@@ -31,8 +31,8 @@
             <scope>${jakarta-scope}</scope>
         </dependency>
         <dependency>
-            <groupId>com.zrlog</groupId>
-            <artifactId>servlet-api-impl</artifactId>
+            <groupId>com.hibegin</groupId>
+            <artifactId>simplewebserver-servlet-api-impl</artifactId>
         </dependency>
     </dependencies>
 

@@ -15,7 +15,6 @@
         <module>admin-token</module>
         <module>package-web</module>
         <module>package-war-web</module>
-        <module>servlet-api-impl</module>
     </modules>
     <name>zrlog</name>
     <description>ZrLog是使用Java开发的博客/CMS程序，具有简约，易用，组件化，内存占用低等特点。自带Markdown编辑器，让更多的精力放在写作上，而不是花费大量时间在学习程序的使用上。
@@ -29,6 +28,7 @@
         <finalName>zrlog</finalName>
         <disableNodePackage>false</disableNodePackage>
         <jakarta-scope>compile</jakarta-scope>
+        <sws.version>4.0.32</sws.version>
     </properties>
 
     <developers>
@@ -86,7 +86,7 @@
         <dependency>
             <groupId>com.hibegin</groupId>
             <artifactId>simplewebserver</artifactId>
-            <version>4.0.9</version>
+            <version>${sws.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -134,9 +134,9 @@
                 <version>3.1.7-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>com.zrlog</groupId>
-                <artifactId>servlet-api-impl</artifactId>
-                <version>3.1.7-SNAPSHOT</version>
+                <groupId>com.hibegin</groupId>
+                <artifactId>simplewebserver-servlet-api-impl</artifactId>
+                <version>${sws.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
