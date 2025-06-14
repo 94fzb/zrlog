@@ -49,7 +49,7 @@ public class WebTools {
 
 
     public static String getHomeUrl(HttpRequest request) {
-        return "/";
+        return "/" + request.getContextPath();
     }
 
     public static String htmlEncode(String source) {

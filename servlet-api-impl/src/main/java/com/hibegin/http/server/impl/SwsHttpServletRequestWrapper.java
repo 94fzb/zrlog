@@ -131,6 +131,11 @@ public class SwsHttpServletRequestWrapper extends SimpleHttpRequest {
     }
 
     @Override
+    public String getContextPath() {
+        return rawServletRequest.getServletContext().getContextPath();
+    }
+
+    @Override
     public HttpVersion getHttpVersion() {
         return HttpVersion.HTTP_1_1;
     }
