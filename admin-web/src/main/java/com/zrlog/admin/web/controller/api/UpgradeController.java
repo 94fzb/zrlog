@@ -20,7 +20,7 @@ public class UpgradeController extends Controller {
     private final UpgradeService upgradeService = new UpgradeService();
 
     @ResponseBody
-    public ApiStandardResponse<DownloadUpdatePackageResponse> download() throws IOException, URISyntaxException, InterruptedException, ParseException {
+    public ApiStandardResponse<DownloadUpdatePackageResponse> download() {
         return new ApiStandardResponse<>(upgradeService.download(Objects.requireNonNullElse(request.getParaToStr("preUpgradeKey"),""), (UpdateVersionPlugin) Constants.zrLogConfig.getPlugins()
                 .stream().filter(x -> x instanceof UpdateVersionPlugin).findFirst().orElse(null)));
     }

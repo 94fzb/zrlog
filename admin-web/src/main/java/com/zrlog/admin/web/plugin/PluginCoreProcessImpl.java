@@ -9,6 +9,7 @@ import com.zrlog.common.Constants;
 import com.zrlog.common.PluginCoreProcess;
 import com.zrlog.common.type.RunMode;
 import com.zrlog.util.BlogBuildInfoUtil;
+import com.zrlog.util.ThreadUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,7 +65,7 @@ public class PluginCoreProcessImpl implements PluginCoreProcess {
             return null;
         }
         List<String> args = new ArrayList<>();
-        if (Constants.runMode == RunMode.DEV || Constants.runMode == RunMode.JAR) {
+        if (Constants.runMode == RunMode.JAVA) {
             args.addAll(Arrays.asList(pluginJvmArgs.split(" ")));
             args.add("-jar");
             args.add(pluginCoreFile.toString());
@@ -158,7 +159,8 @@ public class PluginCoreProcessImpl implements PluginCoreProcess {
                     }
                 }
             };
-            Thread.ofVirtual().uncaughtExceptionHandler((t, ex) -> pluginCoreProcessHandle.close()).start(pluginCoreProcessHandle);
+            Thread thread = ThreadUtils.start(pluginCoreProcessHandle);
+            thread.setUncaughtExceptionHandler((t, ex) -> pluginCoreProcessHandle.close());
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "start plugin exception ", e);
         }
@@ -176,8 +178,10 @@ public class PluginCoreProcessImpl implements PluginCoreProcess {
         String withoutCacheDownloadUrl = BlogBuildInfoUtil.getResourceDownloadUrl() + "/plugin/core/" + pluginCoreFile.getName() + "?_t=" + System.currentTimeMillis();
         LOGGER.info(pluginCoreFile.getName() + " not exists will download from " + withoutCacheDownloadUrl);
         try {
+            Map<String, String> map = new HashMap<>();
+            map.put("Cache-Control", "no-cache");
             HttpUtil.getInstance().sendGetRequest(withoutCacheDownloadUrl,
-                    new HashMap<>(), new HttpFileHandle(filePath), Map.of("Cache-Control", "no-cache"));
+                    new HashMap<>(), new HttpFileHandle(filePath), map);
         } catch (IOException | URISyntaxException | InterruptedException e) {
             LOGGER.log(Level.WARNING, "download plugin core error", e);
         }

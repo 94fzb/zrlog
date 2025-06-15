@@ -31,7 +31,8 @@ public class AdminInterceptor implements HandleAbleInterceptor {
             throw new ArgsException("missing_token");
         }
         Constants.zrLogConfig.getPlugins().forEach(e -> {
-            if (e instanceof PluginCorePluginImpl plugin) {
+            if (e instanceof PluginCorePluginImpl) {
+                PluginCorePluginImpl plugin = (PluginCorePluginImpl) e;
                 if (!Objects.equals(plugin.getToken(), requestToken)) {
                     throw new ArgsException("token");
                 }

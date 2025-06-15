@@ -9,6 +9,7 @@ import com.zrlog.admin.business.rest.response.ServerSideDataResponse;
 import com.zrlog.admin.business.rest.response.UserBasicInfoResponse;
 import com.zrlog.admin.web.controller.api.AdminUserController;
 import com.zrlog.admin.web.token.AdminTokenThreadLocal;
+import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.business.rest.response.PublicInfoVO;
 import com.zrlog.business.service.CommonService;
 import com.zrlog.common.Constants;
@@ -59,22 +60,26 @@ public class AdminPageController extends Controller {
             Element first = select.first();
             if (Objects.nonNull(first)) {
                 PublicInfoVO publicInfo = new CommonService().getPublicInfo(request);
-                first.attr("content", publicInfo.pwaThemeColor());
+                first.attr("content", publicInfo.getPwaThemeColor());
             }
         }
         String adminStaticResourceHostByWebSite = ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite();
-        if (StringUtils.isNotEmpty(adminStaticResourceHostByWebSite)) {
-            Elements scripts = document.head().select("script");
-            if (!scripts.isEmpty()) {
-                scripts.forEach(script -> {
+        Elements scripts = document.head().select("script");
+        if (!scripts.isEmpty()) {
+            scripts.forEach(script -> {
+                if (StringUtils.isNotEmpty(adminStaticResourceHostByWebSite)) {
                     script.attr("src", script.attr("src").replace("./", adminStaticResourceHostByWebSite + "/"));
-                });
-            }
+                } else {
+                    script.attr("src", script.attr("src").replace("./", WebTools.getHomeUrl(request)));
+                }
+            });
         }
 
+        Elements base = document.head().select("base");
+        base.attr("href", WebTools.getHomeUrl(request));
         ServerSideDataResponse serverSideDataResponse = serverSide(request.getUri());
         document.getElementById("__SS_DATA__").text(new Gson().toJson(serverSideDataResponse));
-        document.title(serverSideDataResponse.documentTitle());
+        document.title(serverSideDataResponse.getDocumentTitle());
         response.renderHtmlStr(document.html());
     }
 
@@ -94,7 +99,8 @@ public class AdminPageController extends Controller {
                 Controller controller = Controller.buildController(method, request, response);
                 ApiStandardResponse<Object> result = (ApiStandardResponse<Object>) method.invoke(controller);
                 if (Objects.nonNull(result)) {
-                    if (result instanceof AdminApiPageDataStandardResponse<?> data) {
+                    if (result instanceof AdminApiPageDataStandardResponse<?>) {
+                        AdminApiPageDataStandardResponse<?> data = (AdminApiPageDataStandardResponse<?>) result;
                         return new ServerSideDataResponse(basicInfoResponse, resourceInfo, result.getData(), AdminTokenThreadLocal.getUser().getSessionId(), data.getDocumentTitle());
                     }
                     return new ServerSideDataResponse(basicInfoResponse, resourceInfo, result.getData(), AdminTokenThreadLocal.getUser().getSessionId(), Constants.getAdminTitle(""));

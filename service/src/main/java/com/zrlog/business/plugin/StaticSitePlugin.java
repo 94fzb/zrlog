@@ -35,6 +35,7 @@ import java.util.Objects;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class StaticSitePlugin extends BaseLockObject implements IPlugin {
     public static final String HTML_FILE_KEY = "_htmlFile";
@@ -113,11 +114,13 @@ public class StaticSitePlugin extends BaseLockObject implements IPlugin {
 
 
     private void doFetch() {
-        try (ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor()) {
-            List<CompletableFuture<Void>> list = handleStatusPageMap.entrySet().stream().filter(e -> Arrays.asList(HandleState.NEW, HandleState.RE_FETCH).contains(e.getValue())).map(e -> {
+        ExecutorService executorService = Executors.newFixedThreadPool(20);
+        try {
+            CompletableFuture.allOf(handleStatusPageMap.entrySet().stream().filter(e -> Arrays.asList(HandleState.NEW, HandleState.RE_FETCH).contains(e.getValue())).map(e -> {
                 return doAsyncFetch(e.getKey(), executorService);
-            }).toList();
-            CompletableFuture.allOf(list.toArray(new CompletableFuture[0])).join();
+            }).toArray(CompletableFuture[]::new)).join();
+        } finally {
+            executorService.shutdown();
         }
     }
 

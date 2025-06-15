@@ -12,6 +12,7 @@ import com.zrlog.common.rest.response.StandardResponse;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 与安装向导相关的路由进行控制
@@ -50,7 +51,7 @@ public class ApiInstallController extends Controller {
         dbConn.put("jdbcUrl", "jdbc:mysql://" + getRequest().getParaToStr("dbHost") + ":" + getRequest().getParaToStr("dbPort") + "/" + getRequest().getParaToStr("dbName")
                 + "?" + JDBC_URL_BASE_QUERY_PARAM);
         dbConn.put("user", getRequest().getParaToStr("dbUserName"));
-        dbConn.put("password", getRequest().getParaToStr("dbPassword"));
+        dbConn.put("password", Objects.requireNonNullElse(getRequest().getParaToStr("dbPassword"), ""));
         dbConn.put("driverClass", "com.mysql.cj.jdbc.Driver");
 
         return dbConn;

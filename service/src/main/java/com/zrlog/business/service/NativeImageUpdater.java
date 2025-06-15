@@ -6,7 +6,9 @@ import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.common.Constants;
 import com.zrlog.common.Updater;
+import com.zrlog.common.UpdaterTypeEnum;
 import com.zrlog.common.vo.Version;
+import com.zrlog.util.ThreadUtils;
 import com.zrlog.util.ZrLogUtil;
 
 import java.io.File;
@@ -14,12 +16,28 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.StringJoiner;
-import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
-public record NativeImageUpdater(String[] args, File execFile) implements Updater {
+public class NativeImageUpdater implements Updater {
+
+    private final String[] args;
+    private final File execFile;
 
     private static final Logger LOGGER = LoggerUtil.getLogger(NativeImageUpdater.class);
+
+    public NativeImageUpdater(String[] args, File execFile) {
+        this.args = args;
+        this.execFile = execFile;
+    }
+
+    public File execFile() {
+        return execFile;
+    }
+
+    @Override
+    public UpdaterTypeEnum getType() {
+        return UpdaterTypeEnum.NATIVE_IMAGE;
+    }
 
     private String buildExec() {
         StringJoiner shells = new StringJoiner("\n");
@@ -92,7 +110,7 @@ public record NativeImageUpdater(String[] args, File execFile) implements Update
 
     @Override
     public void restartProcessAsync(Version upgradeVersion) {
-        Thread.ofVirtual().start(() -> {
+        ThreadUtils.start(() -> {
             try {
                 String cmd = buildUpgradeCmd(upgradeVersion);
                 // 构造完整的命令启动

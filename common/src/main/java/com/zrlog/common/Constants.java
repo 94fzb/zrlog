@@ -1,6 +1,7 @@
 package com.zrlog.common;
 
 import com.hibegin.common.util.BooleanUtils;
+import com.hibegin.common.util.EnvKit;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.common.type.AutoUpgradeVersionType;
@@ -8,12 +9,19 @@ import com.zrlog.common.type.RunMode;
 import com.zrlog.util.I18nUtil;
 
 import java.io.File;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.StringJoiner;
 
 /**
  * 存放全局的静态变量，有多个地方使用一个key时，存放在这里，方便代码的维护。
  */
 public class Constants {
+
+    static {
+        init();
+    }
 
     private static volatile long lastAccessTime = System.currentTimeMillis();
 
@@ -21,12 +29,10 @@ public class Constants {
         return lastAccessTime;
     }
 
-    public static RunMode runMode = RunMode.DEV;
-
-    public static Boolean devEnabled = Boolean.FALSE;
+    public static RunMode runMode = RunMode.JAVA;
 
     public static boolean debugLoggerPrintAble() {
-        return runMode == RunMode.DEV || devEnabled;
+        return EnvKit.isDevMode();
     }
 
     public static String getRealFileArch() {
@@ -207,5 +213,9 @@ public class Constants {
 
     public static String getAppId() {
         return String.valueOf(zrLogConfig.getPublicWebSite().get("appId"));
+    }
+
+    public static void init() {
+        System.getProperties().put("java.util.logging.SimpleFormatter.format", "%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %4$s %5$s%6$s%n");
     }
 }

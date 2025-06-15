@@ -1,5 +1,6 @@
 package com.zrlog.business.service;
 
+import com.hibegin.common.util.ObjectHelpers;
 import com.hibegin.http.server.api.HttpRequest;
 import com.zrlog.business.rest.response.PublicInfoVO;
 import com.zrlog.business.util.InstallUtils;
@@ -19,12 +20,12 @@ public class CommonService {
         if (Objects.isNull(I18nUtil.threadLocal.get())) {
             return new HashMap<>();
         }
-        Map<String, Object> stringObjectMap = Objects.requireNonNullElse(I18nUtil.getBlog().get(I18nUtil.getCurrentLocale()), new HashMap<>());
+        Map<String, Object> stringObjectMap = ObjectHelpers.requireNonNullElse(I18nUtil.getBlog().get(I18nUtil.getCurrentLocale()), new HashMap<>());
         PublicInfoVO publicInfoVO = getPublicInfo(request);
-        stringObjectMap.put("websiteTitle", publicInfoVO.websiteTitle());
-        stringObjectMap.put("homeUrl", publicInfoVO.homeUrl());
+        stringObjectMap.put("websiteTitle", publicInfoVO.getWebsiteTitle());
+        stringObjectMap.put("homeUrl", publicInfoVO.getHomeUrl());
         stringObjectMap.put("articleRoute", "");
-        stringObjectMap.put("admin_darkMode", publicInfoVO.admin_darkMode());
+        stringObjectMap.put("admin_darkMode", publicInfoVO.getAdmin_darkMode());
         stringObjectMap.put("buildId", BlogBuildInfoUtil.getBuildId());
         return stringObjectMap;
     }
@@ -33,13 +34,13 @@ public class CommonService {
         if (Objects.isNull(I18nUtil.threadLocal.get())) {
             return new HashMap<>();
         }
-        Map<String, Object> stringObjectMap = Objects.requireNonNullElse(I18nUtil.getAdmin().get(I18nUtil.getCurrentLocale()), new HashMap<>());
+        Map<String, Object> stringObjectMap = ObjectHelpers.requireNonNullElse(I18nUtil.getAdmin().get(I18nUtil.getCurrentLocale()), new HashMap<>());
         PublicInfoVO publicInfoVO = getPublicInfo(request);
-        stringObjectMap.put("currentVersion", publicInfoVO.currentVersion());
-        stringObjectMap.put("websiteTitle", publicInfoVO.websiteTitle());
-        stringObjectMap.put("homeUrl", publicInfoVO.homeUrl());
+        stringObjectMap.put("currentVersion", publicInfoVO.getCurrentVersion());
+        stringObjectMap.put("websiteTitle", publicInfoVO.getWebsiteTitle());
+        stringObjectMap.put("homeUrl", publicInfoVO.getHomeUrl());
         stringObjectMap.put("articleRoute", "");
-        stringObjectMap.put("admin_darkMode", publicInfoVO.admin_darkMode());
+        stringObjectMap.put("admin_darkMode", publicInfoVO.getAdmin_darkMode());
         if (ZrLogUtil.isPreviewMode()) {
             Map<String, String> defaultLoginInfo = new HashMap<>();
             defaultLoginInfo.put("userName", System.getenv("DEFAULT_USERNAME"));
@@ -48,7 +49,7 @@ public class CommonService {
         }
         stringObjectMap.put("buildId", BlogBuildInfoUtil.getBuildId());
         stringObjectMap.put("appId", Constants.getAppId());
-        stringObjectMap.put("admin_color_primary", publicInfoVO.admin_color_primary());
+        stringObjectMap.put("admin_color_primary", publicInfoVO.getAdmin_color_primary());
         stringObjectMap.put("lang", I18nUtil.getCurrentLocale());
         stringObjectMap.put("admin_static_resource_base_url", ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite());
         return stringObjectMap;
@@ -67,7 +68,7 @@ public class CommonService {
     }
 
     public Map<String, Object> installResourceInfo(HttpRequest request) {
-        Map<String, Object> stringObjectMap = Objects.requireNonNullElse(I18nUtil.getInstall().get(I18nUtil.getAcceptLocal(request)), new HashMap<>());
+        Map<String, Object> stringObjectMap = ObjectHelpers.requireNonNullElse(I18nUtil.getInstall().get(I18nUtil.getAcceptLocal(request)), new HashMap<>());
         stringObjectMap.put("currentVersion", BlogBuildInfoUtil.getVersion());
         //encoding ok, remove utfTips
         if (Charset.defaultCharset().displayName().toLowerCase().contains("utf")) {

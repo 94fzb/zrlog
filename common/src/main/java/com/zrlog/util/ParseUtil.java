@@ -62,7 +62,8 @@ public class ParseUtil {
                     return remainingLength; // 标记已达到长度限制
                 }
             }
-        } else if (node instanceof Element element) {
+        } else if (node instanceof Element) {
+            Element element = (Element) node;
             int usedLength = 0;
 
             // 添加开始标签 (不计入长度)

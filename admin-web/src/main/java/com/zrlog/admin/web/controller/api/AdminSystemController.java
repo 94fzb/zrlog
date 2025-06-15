@@ -17,6 +17,6 @@ public class AdminSystemController extends Controller {
 
     @ResponseBody
     public ApiStandardResponse<SystemResponse> index() {
-        return new ApiStandardResponse<>(new SystemResponse(systemIOInfoVO(), serverInfo(), ZrLogUtil.isDockerMode(), Objects.equals(Constants.runMode, RunMode.NATIVE)));
+        return new ApiStandardResponse<>(new SystemResponse(systemIOInfoVO(), serverInfo(getRequest()), ZrLogUtil.isDockerMode(), Objects.equals(Constants.runMode, RunMode.NATIVE)));
     }
 }

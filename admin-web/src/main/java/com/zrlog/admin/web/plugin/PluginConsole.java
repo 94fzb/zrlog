@@ -1,6 +1,7 @@
 package com.zrlog.admin.web.plugin;
 
 import com.hibegin.common.util.LoggerUtil;
+import com.zrlog.util.ThreadUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,7 +26,7 @@ public class PluginConsole implements AutoCloseable {
         this.serverFileName = serverFileName;
         this.errorStream = errorStream;
         this.scheduler = Executors.newSingleThreadScheduledExecutor(runnable -> {
-            Thread thread = Thread.ofVirtual().unstarted(runnable);
+            Thread thread = ThreadUtils.unstarted(runnable);
             thread.setName("plugin-console-print-thread");
             return thread;
         });

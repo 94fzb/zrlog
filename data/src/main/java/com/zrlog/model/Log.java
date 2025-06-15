@@ -79,7 +79,11 @@ public class Log extends BasePageableDAO implements Serializable {
     }
 
     public long findMaxId() throws SQLException {
-        return Objects.requireNonNullElse((Number) queryFirstObj("select max(logId) max from " + tableName), 0).longValue();
+        Number number = (Number) queryFirstObj("select max(logId) max from " + tableName);
+        if (Objects.isNull(number)) {
+            return 0;
+        }
+        return number.longValue();
 
     }
 
@@ -123,6 +127,18 @@ public class Log extends BasePageableDAO implements Serializable {
                 searchParam.toArray());
     }
 
+    private static final Map<String, String> sortKeyMap = new HashMap<>();
+
+    static {
+        sortKeyMap.put("typeName", "l.typeId");
+        sortKeyMap.put("releaseTime", "l.releaseTime");
+        sortKeyMap.put("commentSize", "commentSize");
+        sortKeyMap.put("privacy", "l.privacy");
+        sortKeyMap.put("click", "l.click");
+        sortKeyMap.put("lastUpdateDate", "l.last_update_date");
+    }
+
+
     private static String getPageSort(PageRequest pageRequest) {
         List<OrderBy> orders = pageRequest.getSorts();
         if (orders == null || orders.isEmpty()) {
@@ -130,15 +146,8 @@ public class Log extends BasePageableDAO implements Serializable {
         }
         StringBuilder orderSort = new StringBuilder();
         for (OrderBy orderBy : orders) {
-            orderSort.append(switch (orderBy.sortKey()) {
-                case "typeName" -> "l.typeId";
-                case "releaseTime" -> "l.releaseTime";
-                case "commentSize" -> "commentSize";
-                case "privacy" -> "l.privacy";
-                case "click" -> "l.click";
-                case "lastUpdateDate" -> "l.last_update_date";
-                default -> "l.logId";
-            }).append(" ").append(orderBy.direction().name().toLowerCase());
+            orderSort.append(sortKeyMap.getOrDefault(orderBy.getSortKey(), "l.logId"));
+            orderSort.append(" ").append(orderBy.getDirection().name().toLowerCase());
         }
         return orderSort.toString();
     }

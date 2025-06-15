@@ -10,6 +10,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ArticleTypeService {
 
@@ -21,6 +22,6 @@ public class ArticleTypeService {
             response.setAmount(response.getTypeamount());
             response.setUrl(homeUrl + "sort/" + URLEncoder.encode(response.getAlias(), StandardCharsets.UTF_8) + (staticHtml ? ".html" : ""));
             return response;
-        }).toList(), mapPageData.getPage(), mapPageData.getSize());
+        }).collect(Collectors.toList()), mapPageData.getPage(), mapPageData.getSize());
     }
 }

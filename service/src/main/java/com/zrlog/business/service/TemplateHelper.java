@@ -70,7 +70,7 @@ public class TemplateHelper {
             pager.setPageEndUrl(baseUrl + pager.getPageEndUrl() + suffix);
         }
         fillTags(suffix, baseUrl, baseDataInitVO.getTags());
-        fillType(suffix, baseUrl, baseDataInitVO.getTypes(),request);
+        fillType(suffix, baseUrl, baseDataInitVO.getTypes(), request);
         fullNavBar(request, suffix, baseDataInitVO);
         baseDataInitVO.setArchiveList(getConvertedArchives(suffix, baseUrl, baseDataInitVO.getArchives()));
     }
@@ -95,11 +95,11 @@ public class TemplateHelper {
         }
     }
 
-    private static void fillType(String suffix, String baseUrl, List<Map<String, Object>> types,HttpRequest request) {
+    private static void fillType(String suffix, String baseUrl, List<Map<String, Object>> types, HttpRequest request) {
         for (Map<String, Object> type : types) {
-            String typeUri = baseUrl + Constants.getArticleUri() + "sort/" +  type.get("alias");
-            if(request.getUri().startsWith(typeUri)){
-                tryEnableArrangePlugin((String) type.get("arrange_plugin"),request);
+            String typeUri = baseUrl + Constants.getArticleUri() + "sort/" + type.get("alias");
+            if (request.getUri().startsWith(typeUri)) {
+                tryEnableArrangePlugin((String) type.get("arrange_plugin"), request);
             }
             type.put("url", WebTools.encodeUrl(typeUri) + suffix);
         }
@@ -175,6 +175,7 @@ public class TemplateHelper {
                 baseUrl = WebTools.getHomeUrl(request);
             }
         }
+        templateUrl = request.getContextPath() + templateUrl;
         request.getAttr().put("url", templateUrl);
         request.getAttr().put("templateUrl", templateUrl);
         request.getAttr().put("rurl", baseUrl);
@@ -216,8 +217,8 @@ public class TemplateHelper {
                         log.put("thumbnail", null);
                     }
                     log.put("canComment", Objects.equals(log.get("canComment"), true) && Constants.isAllowComment());
-                    log.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + URLEncoder.encode((String) log.get("alias"), StandardCharsets.UTF_8) + suffix);
-                    log.put("typeUrl", WebTools.getHomeUrl(request) + Constants.getArticleUri() + "sort/" + URLEncoder.encode((String) log.get("typeAlias"), StandardCharsets.UTF_8) + suffix);
+                    log.put("url", WebTools.buildUrl(request, Constants.getArticleUri() + URLEncoder.encode((String) log.get("alias"), StandardCharsets.UTF_8) + suffix));
+                    log.put("typeUrl", WebTools.buildUrl(request, Constants.getArticleUri() + "sort/" + URLEncoder.encode((String) log.get("typeAlias"), StandardCharsets.UTF_8) + suffix));
                     if (Objects.isNull(log.get("digest"))) {
                         log.put("digest", "");
                     }
@@ -255,13 +256,13 @@ public class TemplateHelper {
         String aliasUrl = URLEncoder.encode((String) log.get("alias"), StandardCharsets.UTF_8) + suffix;
         log.put("alias", aliasUrl);
         log.put("canComment", Objects.equals(log.get("canComment"), true) && Constants.isAllowComment());
-        log.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + aliasUrl);
+        log.put("url", WebTools.buildUrl(request, Constants.getArticleUri() + aliasUrl));
         log.put("noSchemeUrl", ZrLogUtil.getHomeUrlWithHost(request) + aliasUrl);
-        log.put("typeUrl", WebTools.getHomeUrl(request) + Constants.getArticleUri() + "sort/" + URLEncoder.encode((String) log.get("typeAlias"), StandardCharsets.UTF_8) + suffix);
+        log.put("typeUrl", WebTools.buildUrl(request, Constants.getArticleUri() + "sort/" + URLEncoder.encode((String) log.get("typeAlias"), StandardCharsets.UTF_8) + suffix));
         Map<String, Object> lastLog = (Map<String, Object>) log.get("lastLog");
         Map<String, Object> nextLog = (Map<String, Object>) log.get("nextLog");
-        nextLog.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + URLEncoder.encode((String) nextLog.get("alias"), StandardCharsets.UTF_8) + suffix);
-        lastLog.put("url", WebTools.getHomeUrl(request) + Constants.getArticleUri() + URLEncoder.encode((String) lastLog.get("alias"), StandardCharsets.UTF_8) + suffix);
+        nextLog.put("url", WebTools.buildUrl(request, Constants.getArticleUri() + URLEncoder.encode((String) nextLog.get("alias"), StandardCharsets.UTF_8) + suffix));
+        lastLog.put("url", WebTools.buildUrl(request, Constants.getArticleUri() + URLEncoder.encode((String) lastLog.get("alias"), StandardCharsets.UTF_8) + suffix));
 
         //没有使用md的toc目录的文章才尝试使用系统提取的目录
         if (log.get("markdown") != null && !log.get("markdown").toString().toLowerCase().contains("[toc]") && !log.get("markdown").toString().toLowerCase().contains("[tocm]")) {
@@ -272,19 +273,19 @@ public class TemplateHelper {
             }
             log.put("toc", outlineVO);
         }
-        tryEnableArrangePlugin((String) log.get("arrange_plugin"),request);
+        tryEnableArrangePlugin((String) log.get("arrange_plugin"), request);
         if (Objects.isNull(log.get("content"))) {
             log.put("content", "");
         }
     }
 
-    private static void tryEnableArrangePlugin(String pluginName,HttpRequest request){
-        if(Objects.nonNull(pluginName) && StringUtils.isNotEmpty(pluginName)) {
+    private static void tryEnableArrangePlugin(String pluginName, HttpRequest request) {
+        if (Objects.nonNull(pluginName) && StringUtils.isNotEmpty(pluginName)) {
             request.getAttr().put("arrangePlugin", pluginName);
         }
     }
 
-    public static boolean isArrangeable(HttpRequest request){
+    public static boolean isArrangeable(HttpRequest request) {
         return Objects.nonNull(request.getAttr().get("arrangePlugin"));
     }
 

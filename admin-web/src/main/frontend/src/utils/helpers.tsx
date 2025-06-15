@@ -132,3 +132,8 @@ export const colorPickerBgColors = [
     "rgb(160, 217, 17)",
     "rgb(0, 0, 0)",
 ];
+
+
+export const getContextPath = () => {
+    return new URL(document.baseURI).pathname
+}

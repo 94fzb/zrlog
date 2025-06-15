@@ -5,9 +5,13 @@ import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.config.ConfigKit;
 import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.common.Constants;
+import com.zrlog.common.Updater;
+import com.zrlog.common.UpdaterTypeEnum;
+import com.zrlog.common.type.RunMode;
 import eu.bitwalker.useragentutils.BrowserType;
 import eu.bitwalker.useragentutils.UserAgent;
 
+import java.io.File;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -60,7 +64,7 @@ public class ZrLogUtil {
     }
 
     public static String getHomeUrlWithHostNotProtocol(HttpRequest request) {
-        return getBlogHost(request) + "/";
+        return getBlogHost(request) + request.getContextPath() + "/";
     }
 
     public static String getBlogHost(HttpRequest request) {
@@ -256,5 +260,16 @@ public class ZrLogUtil {
     public static boolean isSystemServiceMode() {
         String value = System.getenv("SYSTEM_SERVICE_MODE");
         return "true".equalsIgnoreCase(value);
+    }
+
+    public static boolean isWarMode() {
+        if (EnvKit.isDevMode()) {
+            return false;
+        }
+        Updater updater = Constants.zrLogConfig.getUpdater();
+        if (Objects.isNull(updater)) {
+            return false;
+        }
+        return updater.getType() == UpdaterTypeEnum.WAR;
     }
 }

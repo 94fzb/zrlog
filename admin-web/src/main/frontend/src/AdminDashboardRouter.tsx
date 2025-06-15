@@ -241,7 +241,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({ of
                     <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncWebSite offline={state.offline} data={getDataFromState()} />
+                                <AsyncWebSite activeKey={"basic"} offline={state.offline} data={getDataFromState()} />
                             </Suspense>
                         )}
                     </AdminManageLayout>
@@ -253,7 +253,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({ of
                     <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncWebSite offline={state.offline} data={getDataFromState()} />
+                                <AsyncWebSite activeKey={"admin"} offline={state.offline} data={getDataFromState()} />
                             </Suspense>
                         )}
                     </AdminManageLayout>
@@ -265,7 +265,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({ of
                     <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncWebSite offline={state.offline} data={getDataFromState()} />
+                                <AsyncWebSite activeKey={"template"} offline={state.offline} data={getDataFromState()} />
                             </Suspense>
                         )}
                     </AdminManageLayout>
@@ -277,7 +277,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({ of
                     <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncWebSite offline={state.offline} data={getDataFromState()} />
+                                <AsyncWebSite activeKey={"other"} offline={state.offline} data={getDataFromState()} />
                             </Suspense>
                         )}
                     </AdminManageLayout>
@@ -289,7 +289,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({ of
                     <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncWebSite offline={state.offline} data={getDataFromState()} />
+                                <AsyncWebSite activeKey={"blog"} offline={state.offline} data={getDataFromState()} />
                             </Suspense>
                         )}
                     </AdminManageLayout>
@@ -301,7 +301,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({ of
                     <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
                         {getDataFromState() && (
                             <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncWebSite offline={state.offline} data={getDataFromState()} />
+                                <AsyncWebSite activeKey={"upgrade"} offline={state.offline} data={getDataFromState()} />
                             </Suspense>
                         )}
                     </AdminManageLayout>

@@ -1,17 +1,18 @@
 package com.zrlog.admin.web.controller.api;
 
 import com.google.gson.Gson;
-import com.hibegin.common.util.BeanUtil;
-import com.hibegin.common.util.IOUtil;
-import com.hibegin.common.util.StringUtils;
+import com.hibegin.common.util.*;
 import com.hibegin.http.annotation.ResponseBody;
 import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.rest.request.LoginRequest;
-import com.zrlog.admin.business.rest.response.*;
+import com.zrlog.admin.business.rest.response.IndexResponse;
+import com.zrlog.admin.business.rest.response.LoginResponse;
+import com.zrlog.admin.business.rest.response.StatisticsInfoResponse;
+import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
 import com.zrlog.admin.business.service.AdminArticleService;
 import com.zrlog.admin.business.service.UserService;
-import com.zrlog.admin.util.SystemInfoUtils;
 import com.zrlog.admin.web.controller.page.AdminPageController;
+import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.business.exception.MissingInstallException;
 import com.zrlog.business.rest.response.PublicInfoVO;
 import com.zrlog.business.service.CommonService;
@@ -53,14 +54,18 @@ public class AdminController extends Controller {
             }
             Map map = new Gson().fromJson(IOUtil.getStringInputStream(inputStream), Map.class);
             PublicInfoVO publicInfoVO = new CommonService().getPublicInfo(request);
-            if (StringUtils.isNotEmpty(publicInfoVO.websiteTitle())) {
-                map.put("short_name", publicInfoVO.websiteTitle());
+            if (StringUtils.isNotEmpty(publicInfoVO.getWebsiteTitle())) {
+                map.put("short_name", publicInfoVO.getWebsiteTitle());
             }
             map.put("name", Constants.getAdminTitle(""));
-            map.put("theme_color", publicInfoVO.pwaThemeColor());
-            map.put("description", Objects.requireNonNullElse(Constants.zrLogConfig.getPublicWebSite().get("description"), ""));
+            map.put("theme_color", publicInfoVO.getPwaThemeColor());
+            map.put("description", ObjectHelpers.requireNonNullElse(Constants.zrLogConfig.getPublicWebSite().get("description"), ""));
             map.put("id", Constants.getAppId());
-            map.put("background_color", publicInfoVO.admin_darkMode() ? "#000000" : "#FFFFFF");
+            map.put("background_color", publicInfoVO.getAdmin_darkMode() ? "#000000" : "#FFFFFF");
+            List<Map<String, Object>> list = (List<Map<String, Object>>) map.get("icons");
+            for (Map<String, Object> icon : list) {
+                icon.put("src", WebTools.buildUrl(request, (String) icon.get("src")));
+            }
             return map;
         }
     }
@@ -85,7 +90,9 @@ public class AdminController extends Controller {
 
     @ResponseBody
     public ApiStandardResponse<Map<String, Object>> error() {
-        return new ApiStandardResponse<>(Map.of("message", Objects.requireNonNullElse(request.getParaToStr("message"), "")));
+        Map<String, Object> map = new HashMap<>();
+        map.put("message", ObjectHelpers.requireNonNullElse(request.getParaToStr("message"), ""));
+        return new ApiStandardResponse<>(map);
     }
 
     @ResponseBody
@@ -95,7 +102,7 @@ public class AdminController extends Controller {
 
     @ResponseBody
     public ApiStandardResponse<Void> dev() {
-        Constants.devEnabled = true;
+        System.getProperties().put("sws.run.mode", "dev");
         return new ApiStandardResponse<>();
     }
 
@@ -108,7 +115,7 @@ public class AdminController extends Controller {
         Collections.shuffle(tips);
         return new ApiStandardResponse<>(new IndexResponse(statisticsInfo(),
                 I18nUtil.getBackendStringFromRes("admin.index.welcomeTip"),
-                new ArrayList<>(Collections.singletonList(tips.getFirst())),
+                new ArrayList<>(Collections.singletonList(tips.get(0))),
                 new AdminArticleService().activityDataList(), BlogBuildInfoUtil.getVersionInfo()));
     }
 }

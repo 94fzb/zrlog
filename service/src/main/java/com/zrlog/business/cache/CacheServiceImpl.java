@@ -24,6 +24,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * 对缓存数据的操作
@@ -172,12 +173,15 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
     @Override
     public CompletableFuture<BaseDataInitVO> refreshInitDataCacheAsync(HttpRequest servletRequest, boolean cleanAble) {
         long expectVersion = getUpdateVersion(cleanAble);
-        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+        ExecutorService executor = Executors.newFixedThreadPool(10);
+        try {
             return CompletableFuture.supplyAsync(() -> {
                 BaseDataInitVO cache = refreshInitDataCache(cleanAble, expectVersion);
                 setToRequest(servletRequest, cache);
                 return cache;
             }, executor);
+        } finally {
+            executor.shutdown();
         }
     }
 
@@ -205,7 +209,8 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
                 return cacheInit;
             } else {
                 long start = System.currentTimeMillis();
-                try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+                ExecutorService executor = Executors.newFixedThreadPool(10);
+                try {
                     cacheInit = getCacheInit(executor);
                     //缓存静态资源map
                     Map<String, String> tempMap = getCacheFileMap();
@@ -216,6 +221,7 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
                     WebSite.clearTemplateConfigMap();
                     PluginUtils.refreshPluginCacheData();
                 } finally {
+                    executor.shutdown();
                     LOGGER.info("RefreshInitDataCache used time " + (System.currentTimeMillis() - start) + "ms");
                 }
             }
@@ -305,7 +311,7 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
                 statistics.setTotalTypeSize((long) cacheInit.getTypes().size());
                 List<Map<String, Object>> types = cacheInit.getTypes();
                 //Last article
-                cacheInit.setHotLogs(new Log().visitorFind(new PageRequestImpl(1L, 6L), "").getRows().stream().map(this::convertToBasicVO).toList());
+                cacheInit.setHotLogs(new Log().visitorFind(new PageRequestImpl(1L, 6L), "").getRows().stream().map(this::convertToBasicVO).collect(Collectors.toList()));
                 Map<Map<String, Object>, List<HotLogBasicInfoVO>> indexHotLog = new LinkedHashMap<>();
                 cacheInit.setIndexHotLogs(indexHotLog);
                 //设置分类Hot
@@ -315,7 +321,7 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
                         typeMap.put("typeName", type.get("typeName"));
                         String alias = (String) type.get("alias");
                         typeMap.put("alias", alias);
-                        indexHotLog.put(typeMap, new Log().findByTypeAlias(1, 6, alias).getRows().stream().map(this::convertToBasicVO).toList());
+                        indexHotLog.put(typeMap, new Log().findByTypeAlias(1, 6, alias).getRows().stream().map(this::convertToBasicVO).collect(Collectors.toList()));
                     }, executor));
                 }
             } catch (SQLException e) {

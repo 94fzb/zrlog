@@ -2,6 +2,7 @@ package com.zrlog.blog.web.plugin;
 
 import com.zrlog.common.Constants;
 import com.zrlog.plugin.IPlugin;
+import com.zrlog.util.ThreadUtils;
 
 import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
@@ -22,7 +23,7 @@ public class CacheManagerPlugin implements IPlugin {
         if (started) {
             return true;
         }
-        scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1, Thread.ofVirtual().factory());
+        scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1, ThreadUtils.getThreadFactory());
         scheduledThreadPoolExecutor.scheduleAtFixedRate(new CacheManageRunnable(), 1, 1, TimeUnit.HOURS);
         this.started = true;
         return true;

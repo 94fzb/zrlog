@@ -105,11 +105,15 @@ const ServerInfo = ({
         return <>{e}</>;
     };
 
-    const externalUrl = (key: string) => {
+    const externalUrl = (key: string, value: string) => {
         if (key === "programInfo") {
             return "https://www.zrlog.com/changelog/?ref=systemInfo";
         } else if (key === "webServer") {
-            return "https://github.com/94fzb/simplewebserver";
+            if (value.startsWith("simplewebserver/")) {
+                return "https://github.com/94fzb/simplewebserver";
+            } else if (value.startsWith("Apache Tomcat/")) {
+                return "https://tomcat.apache.org/";
+            }
         } else if (key === "runtime") {
             if (nativeImageMode) {
                 return "https://www.graalvm.org";
@@ -143,10 +147,10 @@ const ServerInfo = ({
         <Card size={"small"} title={title} styles={{body: {padding: 8, overflow: "hidden"}}}>
             <Row gutter={[8, 8]}>
                 {data.map((e) => {
-                    const url = externalUrl(e.key);
+                    const url = externalUrl(e.key,e.value);
                     return (
                         <Col xs={24} md={12} key={e.key}>
-                            {url.length > 0 ? <Link target={"_blank"} to={externalUrl(e.key)}>
+                            {url.length > 0 ? <Link target={"_blank"} to={externalUrl(e.key,e.value)}>
                                 {buildItem(e)}
                             </Link> : buildItem(e)}
                         </Col>

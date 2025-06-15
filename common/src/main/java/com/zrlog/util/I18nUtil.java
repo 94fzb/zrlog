@@ -1,6 +1,7 @@
 package com.zrlog.util;
 
 import com.hibegin.common.util.BeanUtil;
+import com.hibegin.common.util.EnvKit;
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.server.api.HttpRequest;
@@ -61,13 +62,23 @@ public class I18nUtil {
         if (!name.endsWith(".properties")) {
             return;
         }
-        Map<String, Map<String, Object>> resMap = switch (resourceName) {
-            case I18N_BLOG_KEY -> i18nVOCache.getBlog();
-            case I18N_ADMIN_KEY -> i18nVOCache.getAdmin();
-            case I18N_INSTALL_KEY -> i18nVOCache.getInstall();
-            case I18N_BACKEND_KEY -> i18nVOCache.getBackend();
-            default -> throw new NotImplementException();
-        };
+        Map<String, Map<String, Object>> resMap;
+        switch (resourceName) {
+            case I18N_BLOG_KEY:
+                resMap = i18nVOCache.getBlog();
+                break;
+            case I18N_ADMIN_KEY:
+                resMap = i18nVOCache.getAdmin();
+                break;
+            case I18N_INSTALL_KEY:
+                resMap = i18nVOCache.getInstall();
+                break;
+            case I18N_BACKEND_KEY:
+                resMap = i18nVOCache.getBackend();
+                break;
+            default:
+                throw new NotImplementException();
+        }
         try {
             String key = name.replace(".properties", "").replace("i18n_", "").replace(resourceName + "_", "");
             Map<String, Object> map = resMap.computeIfAbsent(key, k -> new HashMap<>());
@@ -89,7 +100,7 @@ public class I18nUtil {
     }
 
     public static void addToRequest(String templatePath, HttpRequest request) {
-        if (Constants.devEnabled) {
+        if (EnvKit.isDevMode()) {
             reloadSystemI18N();
         }
         if (templatePath != null) {

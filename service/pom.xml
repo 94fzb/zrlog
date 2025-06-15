@@ -10,7 +10,6 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>service</artifactId>
-    <version>3.1.7-SNAPSHOT</version>
 
     <dependencies>
         <dependency>

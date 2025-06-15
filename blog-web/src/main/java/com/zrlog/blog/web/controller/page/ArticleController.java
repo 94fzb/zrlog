@@ -1,6 +1,7 @@
 package com.zrlog.blog.web.controller.page;
 
 import com.hibegin.common.util.LoggerUtil;
+import com.hibegin.common.util.ObjectHelpers;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.server.web.Controller;
 import com.zrlog.blog.web.util.WebTools;
@@ -55,7 +56,7 @@ public class ArticleController extends Controller {
     }
 
     public String index() throws SQLException {
-        PageRequest pageRequest = new PageRequestImpl(parseUriInfo(request.getUri()).page(), Constants.getDefaultRows());
+        PageRequest pageRequest = new PageRequestImpl(parseUriInfo(request.getUri()).getPage(), Constants.getDefaultRows());
         PageData<Map<String, Object>> data = new Log().visitorFind(pageRequest, null);
         setPageDataInfo(Constants.getArticleUri() + "all-", data, pageRequest);
         return "index";
@@ -72,7 +73,7 @@ public class ArticleController extends Controller {
             }
         } else {
             try {
-                key = uriInfoVO.key();
+                key = uriInfoVO.getKey();
             } catch (Exception e) {
                 LOGGER.warning("Parse " + request.getUri() + " error " + e.getMessage());
             }
@@ -87,17 +88,17 @@ public class ArticleController extends Controller {
         request.getAttr().put("tipsType", I18nUtil.getBlogStringFromRes("search"));
         request.getAttr().put("tipsName", WebTools.htmlEncode(key));
 
-        setPageDataInfo(Constants.getArticleUri() + "search/" + key + "-", data, new PageRequestImpl(uriInfoVO.page(), Constants.getDefaultRows()));
+        setPageDataInfo(Constants.getArticleUri() + "search/" + key + "-", data, new PageRequestImpl(uriInfoVO.getPage(), Constants.getDefaultRows()));
         return "page";
     }
 
     public String record() {
         ArticleUriInfoVO uriInfoVO = parseUriInfo(request.getUri());
         request.getAttr().put("tipsType", I18nUtil.getBlogStringFromRes("archive"));
-        request.getAttr().put("tipsName", uriInfoVO.key());
+        request.getAttr().put("tipsName", uriInfoVO.getKey());
 
-        setPageDataInfo(Constants.getArticleUri() + "record/" + uriInfoVO.key() + "-", new Log().findByDate(uriInfoVO.page(), Constants.getDefaultRows(),
-                uriInfoVO.key()), new PageRequestImpl(uriInfoVO.page(),
+        setPageDataInfo(Constants.getArticleUri() + "record/" + uriInfoVO.getKey() + "-", new Log().findByDate(uriInfoVO.getPage(), Constants.getDefaultRows(),
+                uriInfoVO.getKey()), new PageRequestImpl(uriInfoVO.getPage(),
                 Constants.getDefaultRows()));
         return "page";
     }
@@ -124,14 +125,17 @@ public class ArticleController extends Controller {
         String uri = getRequest().getUri();
         Map<String, Object> detail = articleService.detail(uri.replace("/", "").replace(".html", ""));
         if (Objects.nonNull(detail)) {
-            List<Map<String,Object>> tags = new ArrayList<>();
-            String keywords = Objects.requireNonNullElse(detail.get("keywords"),"").toString();
+            List<Map<String, Object>> tags = new ArrayList<>();
+            String keywords = ObjectHelpers.requireNonNullElse(detail.get("keywords"), "").toString();
             for (String tag : keywords.split(",")) {
-                if(StringUtils.isEmpty(tag.trim())){
+                if (StringUtils.isEmpty(tag.trim())) {
                     continue;
                 }
-                String tagUrl = WebTools.getHomeUrl(request) + Constants.getArticleUri() + "tag/" + URLEncoder.encode( tag, StandardCharsets.UTF_8) + TemplateHelper.getSuffix(request);;
-                tags.add(Map.of("name",tag,"url",tagUrl));
+                String tagUrl = WebTools.buildUrl(request, Constants.getArticleUri() + "tag/" + URLEncoder.encode(tag) + TemplateHelper.getSuffix(request));
+                Map<String, Object> map = new HashMap<>();
+                map.put("name", tag);
+                map.put("url", tagUrl);
+                tags.add(map);
             }
             detail.put("tags", tags);
             request.getAttr().put("log", detail);
@@ -147,11 +151,11 @@ public class ArticleController extends Controller {
         }
         String rawArgs = rawUrl.substring(rawUrl.lastIndexOf("/") + 1);
         List<String> list = Arrays.asList(rawArgs.split("-"));
-        boolean numeric = ParseUtil.isNumeric(list.getLast());
+        boolean numeric = ParseUtil.isNumeric(list.get(list.size() - 1));
         StringJoiner sj = new StringJoiner("-");
         int page = 1;
         if (numeric) {
-            page = ParseUtil.strToInt(list.getLast(), 1);
+            page = ParseUtil.strToInt(list.get(list.size() - 1), 1);
             for (int i = 0; i < list.size() - 1; i++) {
                 sj.add(list.get(i));
             }
@@ -171,11 +175,11 @@ public class ArticleController extends Controller {
 
     public String sort() throws SQLException {
         ArticleUriInfoVO uriInfoVO = parseUriInfo(request.getUri());
-        setPageDataInfo(Constants.getArticleUri() + "sort/" + uriInfoVO.key() + "-", new Log().findByTypeAlias(uriInfoVO.page(), Constants.getDefaultRows(),
-                uriInfoVO.key()), new PageRequestImpl(uriInfoVO.page(),
+        setPageDataInfo(Constants.getArticleUri() + "sort/" + uriInfoVO.getKey() + "-", new Log().findByTypeAlias(uriInfoVO.getPage(), Constants.getDefaultRows(),
+                uriInfoVO.getKey()), new PageRequestImpl(uriInfoVO.getPage(),
                 Constants.getDefaultRows()));
 
-        Map<String, Object> type = new Type().findByAlias(uriInfoVO.key());
+        Map<String, Object> type = new Type().findByAlias(uriInfoVO.getKey());
         request.getAttr().put("type", type);
         request.getAttr().put("tipsType", I18nUtil.getBlogStringFromRes("category"));
         if (type != null) {
@@ -187,9 +191,9 @@ public class ArticleController extends Controller {
     public String tag() throws SQLException {
         ArticleUriInfoVO uriInfoVO = parseUriInfo(request.getUri());
 
-        String tag = WebTools.convertRequestParam(uriInfoVO.key());
-        setPageDataInfo(Constants.getArticleUri() + "tag/" + tag + "-", new Log().findByTag(uriInfoVO.page(), Constants.getDefaultRows(), tag),
-                new PageRequestImpl(uriInfoVO.page(),
+        String tag = WebTools.convertRequestParam(uriInfoVO.getKey());
+        setPageDataInfo(Constants.getArticleUri() + "tag/" + tag + "-", new Log().findByTag(uriInfoVO.getPage(), Constants.getDefaultRows(), tag),
+                new PageRequestImpl(uriInfoVO.getPage(),
                         Constants.getDefaultRows()));
         getRequest().getAttr().put("tipsType", I18nUtil.getBlogStringFromRes("tag"));
         getRequest().getAttr().put("tipsName", tag);
