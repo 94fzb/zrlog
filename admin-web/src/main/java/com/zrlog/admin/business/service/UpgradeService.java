@@ -21,7 +21,6 @@ import com.zrlog.util.ZrLogUtil;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -108,7 +107,7 @@ public class UpgradeService {
             HttpFileHandle fileHandle = createFileHandle();
             ThreadUtils.start(() -> {
                 try {
-                    String downloadUrl = ZrLogUtil.isWarMode() ? version.getDownloadUrl() : version.getZipDownloadUrl();
+                    String downloadUrl = ZrLogUtil.isWarMode() ? version.getWarDownloadUrl() : version.getZipDownloadUrl();
                     HttpUtil.getInstance().sendGetRequest(downloadUrl, fileHandle, new HashMap<>());
                 } catch (IOException | InterruptedException | URISyntaxException e) {
                     LoggerUtil.getLogger(UpgradeService.class).severe("Download file error " + e.getMessage());
@@ -120,7 +119,7 @@ public class UpgradeService {
             int process = (int) (handle.getT().length() * 100 / version.getZipFileSize());
             if (process >= 100) {
                 if (ZrLogUtil.isWarMode()) {
-                    if (isErrorFile(handle.getT(), version.getFileSize(), version.getMd5sum())) {
+                    if (isErrorFile(handle.getT(), version.getWarFileSize(), version.getWarMd5sum())) {
                         throw new DownloadUpgradeFileException();
                     }
                 } else if (isErrorFile(handle.getT(), version.getZipFileSize(), version.getZipMd5sum())) {

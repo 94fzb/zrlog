@@ -29,4 +29,4 @@ fileSize=$(ls ${finalFileName} -ls | awk '{print $6}')
 md5sum=$(md5sum ${finalFileName} | awk '{print $1}')
 zipFileSize=$(ls ${zipFinalFileName} -ls | awk '{print $6}')
 zipMd5sum=$(md5sum ${zipFinalFileName} | awk '{print $1}')
-echo -e '{"zipMd5sum":"'${zipMd5sum}'","md5sum":"'${md5sum}'","zipDownloadUrl":"'${mirrorWebSite}${zipFileName}'" ,"downloadUrl":"'${mirrorWebSite}${relativeFileName}'","type":"'${runModeDesc}'","version":"'${version}'","buildId":"'${buildId}'","fileSize":'${fileSize}',"zipFileSize":'${zipFileSize}',"releaseDate":"'${Date}'"}' > ${syncPath}/${runMode}/last.version.json
+echo -e '{"md5sum":"54db99172e53542a152c505f0c23a845","zipMd5sum":"'${zipMd5sum}'","warMd5sum":"'${md5sum}'","downloadUrl":"'${mirrorWebSite}release/javax-war/zrlog.war'","zipDownloadUrl":"'${mirrorWebSite}${zipFileName}'" ,"warDownloadUrl":"'${mirrorWebSite}${relativeFileName}'","type":"'${runModeDesc}'","version":"'${version}'","buildId":"'${buildId}'","fileSize":10794045,"warFileSize":'${fileSize}',"zipFileSize":'${zipFileSize}',"releaseDate":"'${Date}'"}' > ${syncPath}/${runMode}/last.version.json

@@ -12,14 +12,14 @@ public class Version implements Serializable {
     private String releaseDate;
     private String version;
     private Date buildDate;
-    private long fileSize;
+    private long warFileSize;
 
-    public long getFileSize() {
-        return fileSize;
+    public long getWarFileSize() {
+        return warFileSize;
     }
 
-    public void setFileSize(long fileSize) {
-        this.fileSize = fileSize;
+    public void setWarFileSize(long warFileSize) {
+        this.warFileSize = warFileSize;
     }
 
     public long getZipFileSize() {
@@ -33,7 +33,7 @@ public class Version implements Serializable {
     private long zipFileSize;
     private String changeLog;
     private String type;
-    private String downloadUrl;
+    private String warDownloadUrl;
 
     public String getZipDownloadUrl() {
         return zipDownloadUrl;
@@ -44,7 +44,7 @@ public class Version implements Serializable {
     }
 
     private String zipDownloadUrl;
-    private String md5sum;
+    private String warMd5sum;
 
     public String getZipMd5sum() {
         return zipMd5sum;
@@ -96,20 +96,20 @@ public class Version implements Serializable {
         this.type = type;
     }
 
-    public String getDownloadUrl() {
-        return downloadUrl;
+    public String getWarDownloadUrl() {
+        return warDownloadUrl;
     }
 
-    public void setDownloadUrl(String downloadUrl) {
-        this.downloadUrl = downloadUrl;
+    public void setWarDownloadUrl(String warDownloadUrl) {
+        this.warDownloadUrl = warDownloadUrl;
     }
 
-    public String getMd5sum() {
-        return md5sum;
+    public String getWarMd5sum() {
+        return warMd5sum;
     }
 
-    public void setMd5sum(String md5sum) {
-        this.md5sum = md5sum;
+    public void setWarMd5sum(String warMd5sum) {
+        this.warMd5sum = warMd5sum;
     }
 
     public Date getBuildDate() {
