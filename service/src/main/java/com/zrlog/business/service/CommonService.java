@@ -70,11 +70,16 @@ public class CommonService {
     public Map<String, Object> installResourceInfo(HttpRequest request) {
         Map<String, Object> stringObjectMap = ObjectHelpers.requireNonNullElse(I18nUtil.getInstall().get(I18nUtil.getAcceptLocal(request)), new HashMap<>());
         stringObjectMap.put("currentVersion", BlogBuildInfoUtil.getVersion());
+        if (ZrLogUtil.isWarMode()) {
+            stringObjectMap.put("installedTips", stringObjectMap.get("installedWebTips"));
+        }
         //encoding ok, remove utfTips
         if (Charset.defaultCharset().displayName().toLowerCase().contains("utf")) {
             stringObjectMap.put("utfTips", "");
         }
         stringObjectMap.put("installed", InstallUtils.isInstalled());
+        //这个是不需要的
+        stringObjectMap.remove("installedWebTips");
         return stringObjectMap;
     }
 }
