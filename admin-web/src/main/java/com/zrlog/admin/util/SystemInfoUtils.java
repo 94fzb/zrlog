@@ -16,7 +16,12 @@ public class SystemInfoUtils {
         Map<String, Object> info = new HashMap<>();
         InstallUtils.getSystemProp().forEach((key, value) -> info.put(key.toString(), value));
         BlogBuildInfoUtil.getBlogProp().forEach((key, value) -> info.put("zrlog." + key.toString(), value));
-        info.put("server.info", httpRequest.getServerConfig().getApplicationName() + "/" + httpRequest.getServerConfig().getApplicationVersion());
+        String applicationName = httpRequest.getServerConfig().getApplicationName();
+        if (applicationName.startsWith("zrlog")) {
+            info.put("server.info", com.hibegin.http.server.util.ServerInfo.getName() + "/" + com.hibegin.http.server.util.ServerInfo.getVersion());
+        } else {
+            info.put("server.info", applicationName + "/" + httpRequest.getServerConfig().getApplicationVersion());
+        }
         return ServerInfoUtils.convertToServerInfos(info);
     }
 
