@@ -1,9 +1,9 @@
-import { Route, Routes } from "react-router-dom";
-import { FunctionComponent, lazy, Suspense, useEffect, useRef, useState } from "react";
-import { useLocation } from "react-router";
-import { getCsrData } from "./api";
+import {Route, Routes} from "react-router-dom";
+import {ComponentType, FunctionComponent, lazy, ReactElement, Suspense, useEffect, useRef, useState} from "react";
+import {useLocation} from "react-router";
+import {getCsrData} from "./api";
 import MyLoadingComponent from "./components/my-loading-component";
-import { ssData } from "./index";
+import {ssData} from "./index";
 import {
     getCachedData,
     getLastOpenedPage,
@@ -12,11 +12,26 @@ import {
     putCache,
     savePageFullState,
 } from "./cache";
-import { deepEqualWithSpecialJSON, getFullPath } from "./utils/helpers";
-import { UpgradeData } from "./components/upgrade";
-import { getRes } from "./utils/constants";
-import { isPWA } from "./utils/env-utils";
+import {deepEqualWithSpecialJSON, getFullPath} from "./utils/helpers";
+import Upgrade, {UpgradeData} from "./components/upgrade";
+import {getRes} from "./utils/constants";
+import {isPWA} from "./utils/env-utils";
 import * as H from "history";
+import Index from "./components/index";
+import Comment from "./components/comment";
+import Plugin from "./components/plugin";
+import WebSite from "./components/website";
+import TemplateConfig from "./components/template/template-config";
+import UserUpdatePassword from "./components/user-update-password";
+import TemplateCenter from "./components/template/template-center";
+import User from "./components/user";
+import ArticleEdit from "./components/articleEdit";
+import {ArticleEditProps} from "./components/articleEdit/index.types";
+import System from "./components/system";
+import Link from "./components/link";
+import Nav from "./components/nav";
+import Article from "./components/article";
+import Type from "./components/type";
 
 const AsyncArticleEdit = lazy(() => import("components/articleEdit"));
 const AsyncOffline = lazy(() => import("common/Offline"));
@@ -78,12 +93,61 @@ type AdminDashboardRouterProps = {
     offline: boolean;
 };
 
-const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({ offline }) => {
+type AdminPageProps<P> = {
+    offline: boolean,
+    axiosRequesting: boolean,
+    data: any,
+    LazyComponent: ComponentType<P>;
+    FallbackComponent: ComponentType<P>;
+    fullScreen?: boolean,
+    props: P;
+}
+
+interface LazyWithFallbackElementProps<P> {
+    LazyComponent: ComponentType<P>;
+    FallbackComponent: ComponentType<P>;
+    props: P;
+}
+
+export function LazyWithFallbackElement<P>({
+                                               LazyComponent,
+                                               FallbackComponent,
+                                               props,
+                                           }: LazyWithFallbackElementProps<P>) {
+
+    return (
+        <Suspense fallback={<FallbackComponent {...props} />}>
+            <LazyComponent {...props} />
+        </Suspense>
+    );
+}
+
+
+export function AdminPage(props: AdminPageProps<ArticleEditProps | any>): ReactElement<AdminPageProps<ArticleEditProps | any>> {
+    const {
+        offline,
+        axiosRequesting,
+        data,
+        FallbackComponent,
+        LazyComponent,
+        fullScreen,
+        props: componentProps,
+    } = props;
+
+    return <AdminManageLayout offline={offline} loading={axiosRequesting} fullScreen={fullScreen}>
+        {data && (
+            <LazyWithFallbackElement LazyComponent={LazyComponent} FallbackComponent={FallbackComponent}
+                                     props={componentProps}/>
+        )}
+    </AdminManageLayout>
+}
+
+const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({offline}) => {
     const location = useLocation();
     const pwaLastOpenedPage = isPWA() ? getLastOpenedPage() : null;
     const defaultFullScreen = getPageFullState(pwaLastOpenedPage ? pwaLastOpenedPage : getFullPath(location));
     const initUri = location.pathname + location.search;
-    const defaultData = { ...getCachedData(), [initUri]: ssData?.pageData };
+    const defaultData = {...getCachedData(), [initUri]: ssData?.pageData};
 
     const firstRender = useRef<boolean>(ssData && ssData.pageData);
     const [state, setState] = useState<AdminDashboardRouterState>({
@@ -112,7 +176,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({ of
 
     const loadData = async (uri: string, location: H.Location) => {
         const responseData = await getCsrData(uri);
-        const { data, documentTitle } = responseData;
+        const {data, documentTitle} = responseData;
         const mergeData = state.data;
         updateDocumentTitle(documentTitle);
         //如果请求回来的和请求回来的一致的情况就跳过 setState
@@ -192,278 +256,296 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({ of
             <Route
                 path="index"
                 element={
-                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
-                        {getDataFromState() && (
-                            <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncIndex data={getDataFromState()} />
-                            </Suspense>
-                        )}
-                    </AdminManageLayout>
+                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
+                               LazyComponent={AsyncIndex}
+                               FallbackComponent={Index}
+                               props={{
+                                   data: getDataFromState()
+                               }}/>
                 }
             />
             <Route
                 path=""
                 element={
-                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
-                        {getDataFromState() && (
-                            <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncIndex data={getDataFromState()} />
-                            </Suspense>
-                        )}
-                    </AdminManageLayout>
+                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
+                               LazyComponent={AsyncIndex}
+                               FallbackComponent={Index}
+                               props={{
+                                   data: getDataFromState()
+                               }}/>
                 }
             />
             <Route
                 path="comment"
                 element={
-                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
-                        {getDataFromState() && (
-                            <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncComment offline={offline} data={getDataFromState()} />
-                            </Suspense>
-                        )}
-                    </AdminManageLayout>
+                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
+                               LazyComponent={AsyncComment}
+                               FallbackComponent={Comment}
+                               props={{
+                                   offline: state.offline,
+                                   data: getDataFromState()
+                               }}
+                    />
+
                 }
             />
             <Route
                 path="plugin"
                 element={
-                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
-                        <Suspense fallback={<MyLoadingComponent />}>
-                            <AsyncPlugin />
-                        </Suspense>
-                    </AdminManageLayout>
+                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
+                               LazyComponent={AsyncPlugin}
+                               FallbackComponent={Plugin}
+                               props={{}}
+                    />
                 }
             />
             <Route
                 path={"website"}
                 element={
-                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
-                        {getDataFromState() && (
-                            <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncWebSite activeKey={"basic"} offline={state.offline} data={getDataFromState()} />
-                            </Suspense>
-                        )}
-                    </AdminManageLayout>
+                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
+                               LazyComponent={AsyncWebSite}
+                               FallbackComponent={WebSite}
+                               props={{
+                                   activeKey: "basic",
+                                   offline: state.offline,
+                                   data: getDataFromState(),
+                               }}
+                    />
+
                 }
             />
             <Route
                 path={"website/admin"}
                 element={
-                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
-                        {getDataFromState() && (
-                            <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncWebSite activeKey={"admin"} offline={state.offline} data={getDataFromState()} />
-                            </Suspense>
-                        )}
-                    </AdminManageLayout>
+                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
+                               LazyComponent={AsyncWebSite}
+                               FallbackComponent={WebSite}
+                               props={{
+                                   activeKey: "admin",
+                                   offline: state.offline,
+                                   data: getDataFromState(),
+                               }}
+                    />
                 }
             />
             <Route
                 path={"website/template"}
                 element={
-                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
-                        {getDataFromState() && (
-                            <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncWebSite activeKey={"template"} offline={state.offline} data={getDataFromState()} />
-                            </Suspense>
-                        )}
-                    </AdminManageLayout>
+                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
+                               LazyComponent={AsyncWebSite}
+                               FallbackComponent={WebSite}
+                               props={{
+                                   activeKey: "template",
+                                   offline: state.offline,
+                                   data: getDataFromState(),
+                               }}
+                    />
                 }
             />
             <Route
                 path={"website/other"}
                 element={
-                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
-                        {getDataFromState() && (
-                            <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncWebSite activeKey={"other"} offline={state.offline} data={getDataFromState()} />
-                            </Suspense>
-                        )}
-                    </AdminManageLayout>
+                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
+                               LazyComponent={AsyncWebSite}
+                               FallbackComponent={WebSite}
+                               props={{
+                                   activeKey: "other",
+                                   offline: state.offline,
+                                   data: getDataFromState(),
+                               }}
+                    />
                 }
             />
             <Route
                 path={"website/blog"}
                 element={
-                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
-                        {getDataFromState() && (
-                            <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncWebSite activeKey={"blog"} offline={state.offline} data={getDataFromState()} />
-                            </Suspense>
-                        )}
-                    </AdminManageLayout>
+                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
+                               LazyComponent={AsyncWebSite}
+                               FallbackComponent={WebSite}
+                               props={{
+                                   activeKey: "blog",
+                                   offline: state.offline,
+                                   data: getDataFromState(),
+                               }}
+                    />
                 }
             />
             <Route
                 path={"website/upgrade"}
                 element={
-                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
-                        {getDataFromState() && (
-                            <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncWebSite activeKey={"upgrade"} offline={state.offline} data={getDataFromState()} />
-                            </Suspense>
-                        )}
-                    </AdminManageLayout>
+                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
+                               LazyComponent={AsyncWebSite}
+                               FallbackComponent={WebSite}
+                               props={{
+                                   activeKey: "upgrade",
+                                   offline: state.offline,
+                                   data: getDataFromState(),
+                               }}
+                    />
                 }
             />
             <Route
                 path="article-type"
                 element={
-                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
-                        {getDataFromState() && (
-                            <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncType offline={state.offline} data={getDataFromState()} />
-                            </Suspense>
-                        )}
-                    </AdminManageLayout>
+                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
+                               LazyComponent={AsyncType}
+                               FallbackComponent={Type}
+                               props={{
+                                   offline: state.offline,
+                                   data: getDataFromState()
+                               }}
+                    />
                 }
             />
             <Route
                 path="link"
                 element={
-                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
-                        {getDataFromState() && (
-                            <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncLink offline={state.offline} data={getDataFromState()} />
-                            </Suspense>
-                        )}
-                    </AdminManageLayout>
+                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
+                               LazyComponent={AsyncLink}
+                               FallbackComponent={Link}
+                               props={{
+                                   offline: state.offline,
+                                   data: getDataFromState()
+                               }}
+                    />
                 }
             />
             <Route
                 path="nav"
                 element={
-                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
-                        {getDataFromState() && (
-                            <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncNav offline={state.offline} data={getDataFromState()} />
-                            </Suspense>
-                        )}
-                    </AdminManageLayout>
+                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
+                               LazyComponent={AsyncNav}
+                               FallbackComponent={Nav}
+                               props={{
+                                   offline: state.offline,
+                                   data: getDataFromState()
+                               }}
+                    />
                 }
             />
             <Route
                 path="article"
                 element={
-                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
-                        {getDataFromState() && (
-                            <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncArticle offline={state.offline} data={getDataFromState()} />
-                            </Suspense>
-                        )}
-                    </AdminManageLayout>
+                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
+                               LazyComponent={AsyncArticle}
+                               FallbackComponent={Article}
+                               props={{
+                                   offline: state.offline,
+                                   data: getDataFromState()
+                               }}
+                    />
                 }
             />
             <Route
                 path="article-edit"
                 element={
-                    <AdminManageLayout
-                        offline={state.offline}
-                        loading={state.axiosRequesting}
-                        fullScreen={state.fullScreen}
-                    >
-                        {getDataFromState() && (
-                            <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncArticleEdit
-                                    fullScreen={state.fullScreen}
-                                    deleteStateCacheOnDestroy={() => {
-                                        deleteThisPageStateCache();
-                                    }}
-                                    offline={state.offline}
-                                    onFullScreen={() => {
-                                        setState((prevState) => {
-                                            savePageFullState(getFullPath(location), true);
-                                            return {
-                                                ...prevState,
-                                                fullScreen: true,
-                                            };
-                                        });
-                                    }}
-                                    data={getDataFromState()}
-                                    onExitFullScreen={() => {
-                                        setState((prevState) => {
-                                            savePageFullState(getFullPath(location), false);
-                                            return {
-                                                ...prevState,
-                                                fullScreen: false,
-                                            };
-                                        });
-                                    }}
-                                />
-                            </Suspense>
-                        )}
-                    </AdminManageLayout>
+
+                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
+                               LazyComponent={AsyncArticleEdit}
+                               fullScreen={state.fullScreen}
+                               FallbackComponent={ArticleEdit}
+                               props={{
+                                   fullScreen: state.fullScreen,
+                                   offline: state.offline,
+                                   deleteStateCacheOnDestroy: () => {
+                                       deleteThisPageStateCache();
+                                   },
+                                   data: getDataFromState(),
+                                   onFullScreen: () => {
+                                       setState((prevState) => {
+                                           savePageFullState(getFullPath(location), true);
+                                           return {
+                                               ...prevState,
+                                               fullScreen: true,
+                                           };
+                                       })
+                                   },
+                                   onExitFullScreen: () => {
+                                       setState((prevState) => {
+                                           savePageFullState(getFullPath(location), false);
+                                           return {
+                                               ...prevState,
+                                               fullScreen: false,
+                                           };
+                                       });
+                                   }
+
+                               }}
+                    />
                 }
             />
             <Route
                 path="user"
                 element={
-                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
-                        {getDataFromState() && (
-                            <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncUser offline={state.offline} data={getDataFromState()} />
-                            </Suspense>
-                        )}
-                    </AdminManageLayout>
+                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
+                               LazyComponent={AsyncUser}
+                               FallbackComponent={User}
+                               props={{
+                                   offline: state.offline,
+                                   data: getDataFromState(),
+                               }}
+                    />
                 }
             />
             <Route
                 path="template-center"
                 element={
-                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
-                        {getDataFromState() && (
-                            <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncTemplateCenter data={getDataFromState()} />
-                            </Suspense>
-                        )}
-                    </AdminManageLayout>
+                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
+                               LazyComponent={AsyncTemplateCenter}
+                               FallbackComponent={TemplateCenter}
+                               props={{
+                                   offline: state.offline,
+                                   data: getDataFromState(),
+                               }}
+                    />
                 }
             />
             <Route
                 path="user-update-password"
                 element={
-                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
-                        <Suspense fallback={<MyLoadingComponent />}>
-                            <AsyncUserUpdatePassword offline={state.offline} />
-                        </Suspense>
-                    </AdminManageLayout>
+                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
+                               LazyComponent={AsyncUserUpdatePassword}
+                               FallbackComponent={UserUpdatePassword}
+                               props={{
+                                   offline: state.offline,
+                                   data: getDataFromState(),
+                               }}
+                    />
                 }
             />
             <Route
                 path="upgrade"
                 element={
-                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
-                        {getDataFromState() && (
-                            <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncUpgrade
-                                    offline={state.offline}
-                                    key={(getDataFromState() as UpgradeData).preUpgradeKey}
-                                    data={getDataFromState()}
-                                />
-                            </Suspense>
-                        )}
-                    </AdminManageLayout>
+                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
+                               LazyComponent={AsyncUpgrade}
+                               FallbackComponent={Upgrade}
+                               props={{
+                                   offline: state.offline,
+                                   key: (getDataFromState() as UpgradeData) ? getDataFromState().preUpgradeKey : "",
+                                   data: getDataFromState(),
+                               }}
+                    />
                 }
             />
             <Route
                 path="template-config"
                 element={
-                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
-                        {getDataFromState() && (
-                            <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncTemplateConfig offline={state.offline} data={getDataFromState()} />
-                            </Suspense>
-                        )}
-                    </AdminManageLayout>
+                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
+                               LazyComponent={AsyncTemplateConfig}
+                               FallbackComponent={TemplateConfig}
+                               props={{
+                                   offline: state.offline,
+                                   data: getDataFromState(),
+                               }}
+                    />
                 }
             />
             <Route
                 path="403"
                 element={
                     getDataFromState() && (
-                        <Suspense fallback={<MyLoadingComponent />}>
-                            <AsyncError data={getDataFromState()} code={403} />
+                        <Suspense fallback={<MyLoadingComponent/>}>
+                            <AsyncError data={getDataFromState()} code={403}/>
                         </Suspense>
                     )
                 }
@@ -472,8 +554,8 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({ of
                 path="500"
                 element={
                     getDataFromState() && (
-                        <Suspense fallback={<MyLoadingComponent />}>
-                            <AsyncError data={getDataFromState()} code={500} />
+                        <Suspense fallback={<MyLoadingComponent/>}>
+                            <AsyncError data={getDataFromState()} code={500}/>
                         </Suspense>
                     )
                 }
@@ -481,28 +563,29 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({ of
             <Route
                 path={"offline"}
                 element={
-                    <Suspense fallback={<MyLoadingComponent />}>
-                        <AsyncOffline />
+                    <Suspense fallback={<MyLoadingComponent/>}>
+                        <AsyncOffline/>
                     </Suspense>
                 }
             />
             <Route
                 path={"system"}
                 element={
-                    <AdminManageLayout offline={state.offline} loading={state.axiosRequesting}>
-                        {getDataFromState() && (
-                            <Suspense fallback={<MyLoadingComponent />}>
-                                <AsyncSystem offline={state.offline} data={getDataFromState()} />
-                            </Suspense>
-                        )}
-                    </AdminManageLayout>
+                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
+                               LazyComponent={AsyncSystem}
+                               FallbackComponent={System}
+                               props={{
+                                   offline: state.offline,
+                                   data: getDataFromState(),
+                               }}
+                    />
                 }
             />
             <Route
                 path={"*"}
                 element={
-                    <Suspense fallback={<MyLoadingComponent />}>
-                        <AsyncNotFoundPage />
+                    <Suspense fallback={<MyLoadingComponent/>}>
+                        <AsyncNotFoundPage/>
                     </Suspense>
                 }
             />
