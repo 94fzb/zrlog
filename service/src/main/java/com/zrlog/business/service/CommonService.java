@@ -71,7 +71,7 @@ public class CommonService {
         Map<String, Object> stringObjectMap = ObjectHelpers.requireNonNullElse(I18nUtil.getInstall().get(I18nUtil.getAcceptLocal(request)), new HashMap<>());
         stringObjectMap.put("currentVersion", BlogBuildInfoUtil.getVersion());
         if (ZrLogUtil.isWarMode()) {
-            stringObjectMap.put("installedTips", stringObjectMap.get("installedWebTips"));
+            stringObjectMap.put("installedTips", stringObjectMap.get("installedWarTips"));
         }
         //encoding ok, remove utfTips
         if (Charset.defaultCharset().displayName().toLowerCase().contains("utf")) {
@@ -79,7 +79,7 @@ public class CommonService {
         }
         stringObjectMap.put("installed", InstallUtils.isInstalled());
         //这个是不需要的
-        stringObjectMap.remove("installedWebTips");
+        stringObjectMap.remove("installedWarTips");
         return stringObjectMap;
     }
 }
