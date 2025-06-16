@@ -20,16 +20,40 @@ public class AdminResourceImpl implements AdminResource {
     public static final String ADMIN_ASSET_MANIFEST_JSON = "/admin/asset-manifest.json";
     public static final String ADMIN_SERVICE_WORKER_JS = "/admin/service-worker.js";
 
+    private final Set<String> pageUris;
+    private final Set<String> staticUris;
+
     @Override
     public boolean isAdminMainJs(String uri) {
         return uri.startsWith("/admin/static/js/main.") && uri.endsWith(".js");
+    }
+
+    public AdminResourceImpl() {
+        this.pageUris = wrapperUris(getUris("/admin/pwa-page.txt"));
+        InputStream resourceAsStream = ResourceUtils.class.getResourceAsStream(ADMIN_ASSET_MANIFEST_JSON);
+        Set<String> cacheUris = new LinkedHashSet<>();
+        if (Objects.nonNull(resourceAsStream)) {
+
+            String str = IOUtil.getStringInputStream(resourceAsStream);
+            if (StringUtils.isNotEmpty(str)) {
+                Map<String, Object> map = new Gson().fromJson(str, new TypeToken<>() {
+                });
+                Map<String, Object> staticFiles = (Map<String, Object>) map.get("files");
+                if (Objects.nonNull(staticFiles)) {
+                    cacheUris.addAll(staticFiles.values().stream().filter(e -> ((String) e).endsWith(".js")).map(String::valueOf).collect(Collectors.toList()));
+                    cacheUris = new LinkedHashSet<>(wrapperUris(cacheUris));
+                }
+            }
+            cacheUris.addAll(wrapperUris(getUris("/admin/pwa-resource.txt")));
+        }
+        this.staticUris = cacheUris;
     }
 
     @Override
     public ByteArrayInputStream renderServiceWorker() {
         StringJoiner sb = new StringJoiner(",\n    ");
         getAdminResourceUris(false).forEach(e -> {
-            if (StringUtils.isNotEmpty(ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite())) {
+            if (StringUtils.isNotEmpty(ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite()) && !pageUris.contains(e)) {
                 sb.add("\"" + ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite() + e + "\"");
             } else {
                 sb.add("\"" + e + "\"");
@@ -69,23 +93,11 @@ public class AdminResourceImpl implements AdminResource {
     @Override
     public Set<String> getAdminResourceUris(boolean requiredStaticFiles) {
         Set<String> cacheUris = new LinkedHashSet<>();
-        InputStream resourceAsStream = ResourceUtils.class.getResourceAsStream(ADMIN_ASSET_MANIFEST_JSON);
-        if (Objects.nonNull(resourceAsStream)) {
-            String str = IOUtil.getStringInputStream(resourceAsStream);
-            if (StringUtils.isNotEmpty(str)) {
-                Map<String, Object> map = new Gson().fromJson(str, new TypeToken<>() {
-                });
-                Map<String, Object> staticFiles = (Map<String, Object>) map.get("files");
-                if (Objects.nonNull(staticFiles)) {
-                    cacheUris.addAll(staticFiles.values().stream().filter(e -> ((String) e).endsWith(".js")).map(String::valueOf).collect(Collectors.toList()));
-                }
-            }
-            if (!requiredStaticFiles) {
-                cacheUris.addAll(getUris("/admin/pwa-page.txt"));
-            }
-            cacheUris.addAll(getUris("/admin/pwa-resource.txt"));
+        if (!requiredStaticFiles) {
+            cacheUris.addAll(pageUris);
         }
-        return wrapperUris(cacheUris);
+        cacheUris.addAll(staticUris);
+        return cacheUris;
     }
 
     public static void main(String[] args) {
