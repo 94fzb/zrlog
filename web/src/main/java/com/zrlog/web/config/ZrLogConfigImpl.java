@@ -12,6 +12,7 @@ import com.hibegin.http.server.config.RequestConfig;
 import com.hibegin.http.server.config.ResponseConfig;
 import com.hibegin.http.server.config.ServerConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import com.zrlog.admin.business.service.AdminResourceImpl;
 import com.zrlog.admin.web.config.AdminRouters;
 import com.zrlog.admin.web.interceptor.AdminInterceptor;
 import com.zrlog.admin.web.interceptor.AdminPwaInterceptor;
@@ -74,6 +75,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     private final Map<String, Object> website = new TreeMap<>();
     private final long uptime;
     private HikariDataSource dataSource;
+    private final AdminResource adminResource;
     private final String contextPath;
 
     public ZrLogConfigImpl(Integer port, Updater updater, String contextPath) {
@@ -90,6 +92,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         if (ThreadUtils.isEnableLoom() && Constants.debugLoggerPrintAble()) {
             LOGGER.info("Java VirtualThread(loom) enabled");
         }
+        this.adminResource = new AdminResourceImpl();
     }
 
     public static boolean isTest() {
@@ -424,5 +427,10 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         if (Objects.nonNull(dataSource)) {
             dataSource.close();
         }
+    }
+
+    @Override
+    public AdminResource getAdminResource() {
+        return adminResource;
     }
 }

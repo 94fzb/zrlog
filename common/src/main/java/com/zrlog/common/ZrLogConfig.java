@@ -32,4 +32,6 @@ public abstract class ZrLogConfig extends AbstractServerConfig {
     public abstract DatabaseConnectPoolInfo getDatabaseConnectPoolInfo();
 
     public abstract void stop();
+
+    public abstract AdminResource getAdminResource();
 }

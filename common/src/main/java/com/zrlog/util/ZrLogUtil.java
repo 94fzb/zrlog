@@ -8,11 +8,9 @@ import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.common.Constants;
 import com.zrlog.common.Updater;
 import com.zrlog.common.UpdaterTypeEnum;
-import com.zrlog.common.type.RunMode;
 import eu.bitwalker.useragentutils.BrowserType;
 import eu.bitwalker.useragentutils.UserAgent;
 
-import java.io.File;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -88,6 +86,9 @@ public class ZrLogUtil {
     }
 
     public static String getAdminStaticResourceBaseUrlByWebSite() {
+        if (Objects.isNull(Constants.zrLogConfig)) {
+            return "";
+        }
         String websiteHost = (String) Constants.zrLogConfig.getPublicWebSite().get("admin_static_resource_base_url");
         if (Objects.nonNull(websiteHost) && !websiteHost.trim().isEmpty()) {
             return websiteHost;

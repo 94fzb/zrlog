@@ -1,6 +1,4 @@
-cd admin-web/src/main/frontend/public/
-find vendors -type f > pwa-resource.txt
-echo  "admin/index
+admin/index
 api/admin/index
 admin/article-edit
 api/admin/article-edit
@@ -41,4 +39,4 @@ api/admin/plugin
 admin/upgrade
 api/admin/upgrade
 admin/system
-api/admin/system" > pwa-page.txt
+api/admin/system
