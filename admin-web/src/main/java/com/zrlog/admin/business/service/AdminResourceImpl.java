@@ -25,7 +25,7 @@ public class AdminResourceImpl implements AdminResource {
 
     @Override
     public boolean isAdminMainJs(String uri) {
-        return uri.startsWith("/admin/static/js/main.") && uri.endsWith(".js");
+        return uri.contains("/admin/static/js/main.") && uri.endsWith(".js");
     }
 
     public AdminResourceImpl() {
