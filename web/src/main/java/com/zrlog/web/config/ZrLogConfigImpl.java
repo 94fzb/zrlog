@@ -87,7 +87,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         this.uptime = System.currentTimeMillis();
         this.configRouter();
         this.configDatabaseWithRetry(20);
-        if (ThreadUtils.isEnableLoom()) {
+        if (ThreadUtils.isEnableLoom() && Constants.debugLoggerPrintAble()) {
             LOGGER.info("Java VirtualThread(loom) enabled");
         }
     }
