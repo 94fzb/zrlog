@@ -96,7 +96,6 @@ public class PluginHelper {
                 }
                 response.addHeader(header.getKey(), header.getValue().get(0));
             }
-            response.addHeader("Connection", "close");
             //将插件服务的HTTP的body返回给调用者
             response.write(inputStream, handle.getT().statusCode());
             return true;

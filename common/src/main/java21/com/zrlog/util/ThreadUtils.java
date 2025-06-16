@@ -8,12 +8,12 @@ import java.util.concurrent.ThreadFactory;
 
 public class ThreadUtils {
 
-    static {
-        LoggerUtil.getLogger(ThreadUtils.class).info("Java VirtualThread(loom) enabled");
-    }
-
     public static Thread start(Runnable runnable) {
         return Thread.ofVirtual().start(runnable);
+    }
+
+    public static boolean isEnableLoom() {
+        return true;
     }
 
     public static Thread unstarted(Runnable runnable) {

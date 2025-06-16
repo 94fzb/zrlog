@@ -1,7 +1,7 @@
 package com.zrlog.web;
 
 import com.zrlog.common.Constants;
-import com.zrlog.common.type.RunMode;
+import com.zrlog.util.ZrLogUtil;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
 
@@ -23,14 +23,9 @@ public class JakartaServletApplication {
         File additionWebInfClasses = new File("target/classes");
         String webappDirLocation = "src/main/webapp/";
         Tomcat tomcat = new Tomcat();
+        tomcat.setPort(ZrLogUtil.getPort(args));
+        //创建服务
         tomcat.getConnector();
-
-        String webPort = System.getenv("PORT");
-        if (webPort == null || webPort.isEmpty()) {
-            webPort = "8080";
-        }
-
-        tomcat.setPort(Integer.parseInt(webPort));
         tomcat.setBaseDir(additionWebInfClasses.toString());
         //idea的路径eclipse启动的路径有区别
         if (!new File("").getAbsolutePath().endsWith(File.separator + "package-web")) {

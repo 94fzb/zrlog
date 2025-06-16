@@ -9,9 +9,11 @@ import com.zrlog.business.service.WarUpdater;
 import com.zrlog.business.util.UpdaterUtils;
 import com.zrlog.common.Constants;
 import com.zrlog.common.Updater;
+import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.config.ZrLogConfigImpl;
 
 import java.io.File;
+import java.lang.management.ManagementFactory;
 
 /**
  * 适配标准 Servlet 容器
@@ -31,7 +33,7 @@ public class ZrLogSwsServletFilter extends SwsServletFilter {
 
     @Override
     protected AbstractServerConfig getServerConfig() {
-        Constants.zrLogConfig = new ZrLogConfigImpl(ObjectUtil.requireNonNullElse(PortDetector.detectHttpPort(), 8080),
+        Constants.zrLogConfig = new ZrLogConfigImpl(ObjectUtil.requireNonNullElse(PortDetector.detectHttpPort(), ZrLogUtil.getPort(ManagementFactory.getRuntimeMXBean().getInputArguments().toArray(new String[0]))),
                 getUpdater(), getFilterConfig().getServletContext().getContextPath());
         return Constants.zrLogConfig;
     }

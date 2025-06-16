@@ -28,12 +28,12 @@ public class PluginCoreProcessImpl implements PluginCoreProcess {
     private final File infoLogFile;
     private final File errorLogFile;
 
-    public PluginCoreProcessImpl(int port) {
-        infoLogFile = new File(PathUtil.getLogPath() + "/plugin-core-info." + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + "." + port + ".log");
+    public PluginCoreProcessImpl() {
+        infoLogFile = new File(PathUtil.getLogPath() + "/plugin-core-info." + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + ".log");
         if (infoLogFile.exists()) {
             infoLogFile.delete();
         }
-        errorLogFile = new File(PathUtil.getLogPath() + "/plugin-core-error." + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + "." + port + ".log");
+        errorLogFile = new File(PathUtil.getLogPath() + "/plugin-core-error." + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + ".log");
         if (errorLogFile.exists()) {
             errorLogFile.delete();
         }

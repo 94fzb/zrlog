@@ -523,6 +523,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
                                    offline: state.offline,
                                    key: (getDataFromState() as UpgradeData) ? getDataFromState().preUpgradeKey : "",
                                    data: getDataFromState(),
+                                   axiosRequesting: state.axiosRequesting
                                }}
                     />
                 }

@@ -109,7 +109,7 @@ const ServerInfo = ({
         if (key === "programInfo") {
             return "https://www.zrlog.com/changelog/?ref=systemInfo";
         } else if (key === "webServer") {
-            if (value.startsWith("simplewebserver/")) {
+            if (value.toLowerCase().startsWith("simplewebserver/")) {
                 return "https://github.com/94fzb/simplewebserver";
             } else if (value.startsWith("Apache Tomcat/")) {
                 return "https://tomcat.apache.org/";

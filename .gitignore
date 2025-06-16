@@ -48,3 +48,4 @@ zrlog.bgv
 package-web/src/main/webapp/cache
 package-web/src/main/webapp/WEB-INF/plugins/*
 !package-web/src/main/webapp/WEB-INF/plugins/.gitkeep
+tomcat.*

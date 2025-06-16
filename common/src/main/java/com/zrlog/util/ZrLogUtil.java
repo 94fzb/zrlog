@@ -2,6 +2,7 @@ package com.zrlog.util;
 
 import com.hibegin.common.util.*;
 import com.hibegin.http.server.api.HttpRequest;
+import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.config.ConfigKit;
 import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.common.Constants;
@@ -272,4 +273,10 @@ public class ZrLogUtil {
         }
         return updater.getType() == UpdaterTypeEnum.WAR;
     }
+
+
+    public static void putLongTimeCache(HttpResponse response) {
+        response.addHeader("Cache-Control", "max-age=31536000, immutable"); // 1 年的秒数
+    }
+
 }

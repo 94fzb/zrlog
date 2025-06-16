@@ -15,12 +15,9 @@ import com.zrlog.admin.web.annotation.RefreshCache;
 import com.zrlog.admin.web.token.AdminTokenThreadLocal;
 import com.zrlog.blog.web.util.ControllerUtil;
 import com.zrlog.blog.web.util.WebTools;
-import com.zrlog.business.rest.response.ArticleResponseEntry;
 import com.zrlog.business.service.TemplateHelper;
 import com.zrlog.common.Constants;
-import com.zrlog.common.ZrLogConfig;
 import com.zrlog.common.rest.response.ApiStandardResponse;
-import com.zrlog.data.dto.PageData;
 import com.zrlog.model.Log;
 import com.zrlog.model.Tag;
 import com.zrlog.model.Type;
@@ -43,7 +40,7 @@ public class AdminArticleController extends Controller {
         if (ZrLogUtil.isPreviewMode()) {
             throw new PermissionErrorException();
         }
-        String[] ids = getRequest().getParaToStr("id").split(",");
+        String[] ids = getRequest().getParaToStr("id", "").split(",");
         for (String id : ids) {
             articleService.delete(Long.valueOf(id));
         }

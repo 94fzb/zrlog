@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
-import { App, Button, Col, message, Progress, Row, Steps } from "antd";
+import {useEffect, useState} from "react";
+import {App, Button, Col, message, Progress, Row, Steps} from "antd";
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
-import { getRes } from "../utils/constants";
-import axios, { AxiosError } from "axios";
+import {getRes} from "../utils/constants";
+import axios, {AxiosError} from "axios";
 
-const { Step } = Steps;
+const {Step} = Steps;
 export const API_VERSION_PATH = "/api/admin/website/version";
 
 type UpgradeState = {
@@ -33,7 +33,7 @@ type StepInfo = {
 
 let upgradeTimer: NodeJS.Timeout;
 
-const Upgrade = ({ data, offline }: { data: UpgradeData; offline: boolean }) => {
+const Upgrade = ({data, offline,axiosRequesting}: { data: UpgradeData; offline: boolean,axiosRequesting: boolean }) => {
     const preUpgradeKey = data.preUpgradeKey;
     const steps: StepInfo[] = [
         {
@@ -56,14 +56,14 @@ const Upgrade = ({ data, offline }: { data: UpgradeData; offline: boolean }) => 
         upgradeMessage: "",
     });
 
-    const { modal } = App.useApp();
+    const {modal} = App.useApp();
 
-    const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
+    const [messageApi, contextHolder] = message.useMessage({maxCount: 3});
 
     const checkRestartSuccess = (newBuildId: string) => {
         axios
             .get(API_VERSION_PATH + "?buildId=" + newBuildId)
-            .then(({ data }) => {
+            .then(({data}) => {
                 if (newBuildId === data.data.buildId) {
                     modal.success({
                         title: data.data.message,
@@ -94,7 +94,7 @@ const Upgrade = ({ data, offline }: { data: UpgradeData; offline: boolean }) => 
             };
         });
         try {
-            const { data } = await axios.get("/api/admin/upgrade/download?preUpgradeKey=" + preUpgradeKey);
+            const {data} = await axios.get("/api/admin/upgrade/download?preUpgradeKey=" + preUpgradeKey);
             setState((prevState) => {
                 return {
                     ...prevState,
@@ -124,7 +124,7 @@ const Upgrade = ({ data, offline }: { data: UpgradeData; offline: boolean }) => 
                 current: current,
             };
         });
-        const { data } = await axios.get("/api/admin/upgrade/doUpgrade?preUpgradeKey=" + preUpgradeKey);
+        const {data} = await axios.get("/api/admin/upgrade/doUpgrade?preUpgradeKey=" + preUpgradeKey);
         if (data.data) {
             setState((prevState) => {
                 return {
@@ -158,6 +158,9 @@ const Upgrade = ({ data, offline }: { data: UpgradeData; offline: boolean }) => 
     };
 
     const nextDisabled = (): boolean => {
+        if (axiosRequesting) {
+            return true;
+        }
         if (offline) {
             return true;
         }
@@ -181,51 +184,51 @@ const Upgrade = ({ data, offline }: { data: UpgradeData; offline: boolean }) => 
     return (
         <Row>
             {contextHolder}
-            <Col style={{ maxWidth: 600 }} xs={24}>
+            <Col style={{maxWidth: 600}} xs={24}>
                 <Title className="page-header" level={3}>
                     {getRes()["upgradeWizard"]}
                 </Title>
-                <Divider />
+                <Divider/>
 
-                <Steps current={state.current} style={{ paddingTop: 16 }}>
+                <Steps current={state.current} style={{paddingTop: 16}}>
                     {steps.map((item) => {
                         if (item.alias === "downloadProcess") {
                             if (data.systemServiceMode || data.dockerMode) {
                                 return <></>;
                             }
                         }
-                        return <Step key={item.alias} title={item.title} />;
+                        return <Step key={item.alias} title={item.title}/>;
                     })}
                 </Steps>
-                <div className="steps-content" style={{ marginTop: "20px" }}>
+                <div className="steps-content" style={{marginTop: "20px"}}>
                     {state.current === 0 && (
                         <>
                             <Title level={4}>{getRes().changeLog}</Title>
                             <div
-                                style={{ overflowWrap: "break-word" }}
-                                dangerouslySetInnerHTML={{ __html: data.version ? data.version.changeLog : "" }}
+                                style={{overflowWrap: "break-word"}}
+                                dangerouslySetInnerHTML={{__html: data.version ? data.version.changeLog : ""}}
                             />
                         </>
                     )}
                     {state.current === 1 && (
                         <>
                             <Title level={4}>下载更新包</Title>
-                            <Progress strokeLinecap="round" percent={state.downloadProcess} />
+                            <Progress strokeLinecap="round" percent={state.downloadProcess}/>
                         </>
                     )}
                     {state.current === 2 && (
                         <>
                             <Title level={4}>正在执行更新...</Title>
                             <div
-                                style={{ overflowWrap: "break-word" }}
-                                dangerouslySetInnerHTML={{ __html: state.upgradeMessage }}
+                                style={{overflowWrap: "break-word"}}
+                                dangerouslySetInnerHTML={{__html: state.upgradeMessage}}
                             />
                         </>
                     )}
                 </div>
-                <div className="steps-action" style={{ paddingTop: "20px" }}>
+                <div className="steps-action" style={{paddingTop: "20px"}}>
                     {state.current < steps.length - 1 && (
-                        <Button type="primary" disabled={nextDisabled()} onClick={() => next()}>
+                        <Button type="primary" loading={axiosRequesting} disabled={nextDisabled()} onClick={() => next()}>
                             {getRes().nextStep}
                         </Button>
                     )}

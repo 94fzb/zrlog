@@ -82,14 +82,13 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         this.plugins = new Plugins();
         this.updater = updater;
         this.cacheService = new CacheServiceImpl();
-        this.pluginCoreProcess = new PluginCoreProcessImpl(port);
+        this.pluginCoreProcess = new PluginCoreProcessImpl();
         this.serverConfig = initServerConfig();
         this.uptime = System.currentTimeMillis();
         this.configRouter();
-        try {
-            this.configDatabaseWithRetry(20);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+        this.configDatabaseWithRetry(20);
+        if (ThreadUtils.isEnableLoom()) {
+            LOGGER.info("Java VirtualThread(loom) enabled");
         }
     }
 
@@ -375,13 +374,17 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         });
     }
 
-    private void configDatabaseWithRetry(int timeoutInSeconds) throws InterruptedException {
+    private void configDatabaseWithRetry(int timeoutInSeconds) {
         try {
             configDatabase();
         } catch (Exception e) {
             if (timeoutInSeconds > 0 && e instanceof SQLRecoverableException) {
                 int seekSeconds = 5;
-                Thread.sleep(seekSeconds * 1000);
+                try {
+                    Thread.sleep(seekSeconds * 1000);
+                } catch (InterruptedException ex) {
+                    //ignore
+                }
                 configDatabaseWithRetry(timeoutInSeconds - seekSeconds);
                 return;
             }

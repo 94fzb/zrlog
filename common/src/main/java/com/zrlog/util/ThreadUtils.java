@@ -12,6 +12,10 @@ public class ThreadUtils {
         return thread;
     }
 
+    public static boolean isEnableLoom() {
+        return false;
+    }
+
     public static Thread unstarted(Runnable runnable) {
         return new Thread(runnable);
     }

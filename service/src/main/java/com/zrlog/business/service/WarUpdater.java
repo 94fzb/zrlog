@@ -27,6 +27,7 @@ public class WarUpdater implements Updater {
         Map<String, String> copyFileMap = new LinkedHashMap<>();
         copyFileMap.put(PathUtil.getRootPath() + "/WEB-INF/db.properties", tempFilePath + "/WEB-INF/");
         copyFileMap.put(PathUtil.getRootPath() + "/WEB-INF/install.lock", tempFilePath + "/WEB-INF/");
+        copyFileMap.put(PathUtil.getRootPath() + "/WEB-INF/conf.properties", tempFilePath + "/WEB-INF/");
         copyFileMap.put(PathUtil.getRootPath() + Constants.ATTACHED_FOLDER, tempFilePath.toString());
         copyFileMap.put(PathUtil.getRootPath() + "/favicon.ico", tempFilePath.toString());
         copyFileMap.put(PathUtil.getRootPath() + "/error", tempFilePath.toString());

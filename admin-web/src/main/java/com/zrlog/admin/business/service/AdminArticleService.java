@@ -101,7 +101,7 @@ public class AdminArticleService {
     }
 
     private CreateOrUpdateArticleResponse save(AdminTokenVO adminTokenVO, CreateArticleRequest createArticleRequest) {
-        if (StringUtils.isEmpty(createArticleRequest.getTitle())) {
+        if (Objects.isNull(createArticleRequest) || StringUtils.isEmpty(createArticleRequest.getTitle())) {
             throw new ArticleMissingTitleException();
         }
         if (Objects.isNull(createArticleRequest.getTypeId()) || createArticleRequest.getTypeId() < 1) {
@@ -207,8 +207,8 @@ public class AdminArticleService {
         return log;
     }
 
-    public ArticlePageData adminPage(PageRequest pageRequest, String keywords,String typeAlias, HttpRequest request) {
-        PageData<Map<String, Object>> data = new Log().adminFind(pageRequest, keywords,typeAlias);
+    public ArticlePageData adminPage(PageRequest pageRequest, String keywords, String typeAlias, HttpRequest request) {
+        PageData<Map<String, Object>> data = new Log().adminFind(pageRequest, keywords, typeAlias);
         VisitorArticleService.wrapperSearchKeyword(data, keywords);
         PageData<ArticleResponseEntry> articleResponseEntryPageData = VisitorArticleService.convertPageable(data, request);
         return BeanUtil.convert(articleResponseEntryPageData, ArticlePageData.class);

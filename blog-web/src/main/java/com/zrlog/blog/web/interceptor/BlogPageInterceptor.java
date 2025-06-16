@@ -40,7 +40,8 @@ public class BlogPageInterceptor implements HandleAbleInterceptor {
         if (request.getUri().startsWith(Constants.DEFAULT_TEMPLATE_PATH)) {
             try (InputStream resourceAsStream = BlogPageInterceptor.class.getResourceAsStream(request.getUri())) {
                 if (Objects.nonNull(resourceAsStream)) {
-                    response.getHeader().put("Content-Type", MimeTypeUtil.getMimeStrByExt(FileUtils.getFileExt(request.getUri())));
+                    ZrLogUtil.putLongTimeCache(response);
+                    response.addHeader("Content-Type", MimeTypeUtil.getMimeStrByExt(FileUtils.getFileExt(request.getUri())));
                     response.write(resourceAsStream, 200);
                     return false;
                 }
