@@ -30,9 +30,9 @@ public class AdminResourceImpl implements AdminResource {
         StringJoiner sb = new StringJoiner(",\n    ");
         getAdminResourceUris(false).forEach(e -> {
             if (StringUtils.isNotEmpty(ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite())) {
-                sb.add("'" + ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite() + e + "'");
+                sb.add("\"" + ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite() + e + "\"");
             } else {
-                sb.add("'" + e + "'");
+                sb.add("\"" + e + "\"");
             }
         });
         return new ByteArrayInputStream(IOUtil.getStringInputStream(ResourceUtils.class.getResourceAsStream(ADMIN_SERVICE_WORKER_JS)).replace("'___FILES___'", sb.toString()).getBytes());
