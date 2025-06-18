@@ -56,7 +56,7 @@ public class ArticleController extends Controller {
     public String index() {
         PageRequest pageRequest = new PageRequestImpl(parseUriInfo(request.getUri()).getPage(), Constants.getDefaultRows());
         PageData<Map<String, Object>> data = new Log().visitorFind(pageRequest, null);
-        setPageDataInfo(Constants.getArticleUri() + "all-", data, pageRequest);
+        setPageDataInfo("all-", data, pageRequest);
         return "index";
     }
 
@@ -82,7 +82,7 @@ public class ArticleController extends Controller {
         request.getAttr().put("tipsType", I18nUtil.getBlogStringFromRes("search"));
         request.getAttr().put("tipsName", WebTools.htmlEncode(key));
 
-        setPageDataInfo(Constants.getArticleUri() + "search/" + key + "-", data, new PageRequestImpl(uriInfoVO.getPage(), Constants.getDefaultRows()));
+        setPageDataInfo("search/" + key + "-", data, new PageRequestImpl(uriInfoVO.getPage(), Constants.getDefaultRows()));
         return "page";
     }
 
@@ -91,7 +91,7 @@ public class ArticleController extends Controller {
         request.getAttr().put("tipsType", I18nUtil.getBlogStringFromRes("archive"));
         request.getAttr().put("tipsName", uriInfoVO.getKey());
 
-        setPageDataInfo(Constants.getArticleUri() + "record/" + uriInfoVO.getKey() + "-", new Log().findByDate(uriInfoVO.getPage(), Constants.getDefaultRows(),
+        setPageDataInfo("record/" + uriInfoVO.getKey() + "-", new Log().findByDate(uriInfoVO.getPage(), Constants.getDefaultRows(),
                 uriInfoVO.getKey()), new PageRequestImpl(uriInfoVO.getPage(),
                 Constants.getDefaultRows()));
         return "page";
@@ -127,7 +127,7 @@ public class ArticleController extends Controller {
                 }
                 Map<String, Object> map = new HashMap<>();
                 map.put("name", tag);
-                map.put("url", WebTools.buildEncodedUrl(request, Constants.getArticleUri() + "tag/" + tag + TemplateHelper.getSuffix(request)));
+                map.put("url", WebTools.buildEncodedUrl(request, "tag/" + tag + TemplateHelper.getSuffix(request)));
                 tags.add(map);
             }
             detail.put("tags", tags);
@@ -168,7 +168,7 @@ public class ArticleController extends Controller {
 
     public String sort() throws SQLException {
         ArticleUriInfoVO uriInfoVO = parseUriInfo(request.getUri());
-        setPageDataInfo(Constants.getArticleUri() + "sort/" + uriInfoVO.getKey() + "-", new Log().findByTypeAlias(uriInfoVO.getPage(), Constants.getDefaultRows(),
+        setPageDataInfo("sort/" + uriInfoVO.getKey() + "-", new Log().findByTypeAlias(uriInfoVO.getPage(), Constants.getDefaultRows(),
                 uriInfoVO.getKey()), new PageRequestImpl(uriInfoVO.getPage(),
                 Constants.getDefaultRows()));
 
@@ -184,7 +184,7 @@ public class ArticleController extends Controller {
     public String tag() throws SQLException {
         ArticleUriInfoVO uriInfoVO = parseUriInfo(request.getUri());
         String tag = uriInfoVO.getKey();
-        setPageDataInfo(Constants.getArticleUri() + "tag/" + tag + "-", new Log().findByTag(uriInfoVO.getPage(), Constants.getDefaultRows(), tag),
+        setPageDataInfo("tag/" + tag + "-", new Log().findByTag(uriInfoVO.getPage(), Constants.getDefaultRows(), tag),
                 new PageRequestImpl(uriInfoVO.getPage(),
                         Constants.getDefaultRows()));
         getRequest().getAttr().put("tipsType", I18nUtil.getBlogStringFromRes("tag"));

@@ -62,11 +62,11 @@ public class TemplateHelper {
         if (pager != null && !pager.getPageList().isEmpty()) {
             List<PagerVO.PageEntry> pageList = pager.getPageList();
             for (PagerVO.PageEntry pageMap : pageList) {
-                pageMap.setUrl(WebTools.buildEncodedUrl(request, pageMap.getUrl()) + suffix);
+                pageMap.setUrl(WebTools.buildEncodedUrl(request, Constants.getArticleUri() + pageMap.getUrl()) + suffix);
             }
 
-            pager.setPageStartUrl(WebTools.buildEncodedUrl(request, pager.getPageStartUrl() + suffix));
-            pager.setPageEndUrl(WebTools.buildEncodedUrl(request, pager.getPageEndUrl() + suffix));
+            pager.setPageStartUrl(WebTools.buildEncodedUrl(request, Constants.getArticleUri() + pager.getPageStartUrl() + suffix));
+            pager.setPageEndUrl(WebTools.buildEncodedUrl(request, Constants.getArticleUri() + pager.getPageEndUrl() + suffix));
         }
         fillTags(suffix, request, baseDataInitVO.getTags());
         fillType(suffix, baseDataInitVO.getTypes(), request);
