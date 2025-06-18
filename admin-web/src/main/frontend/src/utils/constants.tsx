@@ -41,8 +41,8 @@ export const removeRes = () => {
 };
 
 export const isStaticPage = () => {
-    //return true;
-    return getRes()['staticPlugin'];
+    return true;
+    //return getRes()['staticPlugin'];
 }
 
 export const setBackendServerUrl = (url: string) => {

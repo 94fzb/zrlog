@@ -8,7 +8,7 @@ import AppBase from "./AppBase";
 import {legacyLogicalPropertiesTransformer, StyleProvider} from "@ant-design/cssinjs";
 import {useEffect, useState} from "react";
 import {createRoot} from "react-dom/client";
-import {getBackendServerUrl, getColorPrimary, getRes, setRes} from "./utils/constants";
+import {getBackendServerUrl, getColorPrimary, getRes, isStaticPage, setRes} from "./utils/constants";
 
 import axios from "axios";
 import {BasicUserInfo} from "./type";
@@ -20,6 +20,9 @@ export let apiBasePath: string;
 
 export const refreshPathInfo = () => {
     apiBasePath = getBackendServerUrl() + "api/admin/";
+    if (isStaticPage()) {
+        axios.defaults.withCredentials = true;
+    }
     axios.defaults.baseURL = getBackendServerUrl();
 }
 

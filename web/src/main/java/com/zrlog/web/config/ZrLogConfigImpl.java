@@ -14,6 +14,7 @@ import com.hibegin.http.server.config.ServerConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import com.zrlog.admin.business.service.AdminResourceImpl;
 import com.zrlog.admin.web.config.AdminRouters;
+import com.zrlog.admin.web.interceptor.AdminCrossOriginInterceptor;
 import com.zrlog.admin.web.interceptor.AdminInterceptor;
 import com.zrlog.admin.web.interceptor.AdminPwaInterceptor;
 import com.zrlog.admin.web.plugin.PluginCorePluginImpl;
@@ -74,9 +75,9 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     private final PluginCoreProcess pluginCoreProcess;
     private final Map<String, Object> website = new TreeMap<>();
     private final long uptime;
-    private HikariDataSource dataSource;
     private final AdminResource adminResource;
     private final String contextPath;
+    private HikariDataSource dataSource;
 
     public ZrLogConfigImpl(Integer port, Updater updater, String contextPath) {
         this.contextPath = contextPath;
@@ -142,7 +143,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     }
 
     private void configRouter() {
-        AdminRouters.configAdminRoute(serverConfig.getRouter(),adminResource);
+        AdminRouters.configAdminRoute(serverConfig.getRouter(), adminResource);
         BlogRouters.configBlogRouter(serverConfig.getRouter());
     }
 
@@ -171,9 +172,9 @@ public class ZrLogConfigImpl extends ZrLogConfig {
                 } finally {
                     long used = System.currentTimeMillis() - request.getCreateTime();
                     if (used > 5000) {
-                        LOGGER.info("Slow request " + request.getUri() + " used time " + used + "ms");
+                        LOGGER.info("Slow request [" + request.getMethod() + "] " + request.getUri() + " used time " + used + "ms");
                     } else if (Constants.debugLoggerPrintAble()) {
-                        LOGGER.info("Request " + request.getUri() + " used time " + used + "ms");
+                        LOGGER.info("Request [" + request.getMethod() + "] " + request.getUri() + " used time " + used + "ms");
                     }
                 }
             }
@@ -216,6 +217,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         interceptors.add(PluginInterceptor.class);
         //admin
         interceptors.add(AdminPwaInterceptor.class);
+        interceptors.add(AdminCrossOriginInterceptor.class);
         interceptors.add(AdminInterceptor.class);
         //blog
         interceptors.add(PwaInterceptor.class);

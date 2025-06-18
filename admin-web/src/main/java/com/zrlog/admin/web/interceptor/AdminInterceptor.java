@@ -46,9 +46,6 @@ public class AdminInterceptor implements HandleAbleInterceptor {
      * 具体方式看 AdminRouters，这里用到了 ThreadLocal
      */
     public boolean doInterceptor(HttpRequest request, HttpResponse response) throws Exception {
-        if (Objects.nonNull(ZrLogUtil.getBlogHostByWebSite())) {
-            response.addHeader("Access-Control-Allow-Origin", "*");
-        }
         try {
             String uri = request.getUri();
             if (Constants.ADMIN_LOGIN_URI_PATH.equals(uri)) {
