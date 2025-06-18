@@ -64,16 +64,17 @@ const SliderMenu = () => {
     const [modal, contextHolder] = Modal.useModal();
 
     const getInfo = (entry: MenuEntry): IconInfo => {
-        if (location.pathname.startsWith("/website") && entry.link.startsWith("/website")) {
+        const realPathName = location.pathname.split(".")[0];
+        if (realPathName.startsWith("/website") && entry.link.startsWith("/website")) {
             return {selected: true, icon: entry.selectIcon};
         }
-        if (location.pathname === entry.link) {
+        if (realPathName === entry.link) {
             return {selected: true, icon: entry.selectIcon};
         }
         if (entry.link !== "#more") {
             return {selected: false, icon: entry.icon};
         }
-        if (location.pathname.startsWith("/link") || location.pathname.startsWith("/nav") || location.pathname.startsWith("/article-type")) {
+        if (realPathName.startsWith("/link") || realPathName.startsWith("/nav") || realPathName.startsWith("/article-type")) {
             return {selected: true, icon: entry.selectIcon};
         }
         return {selected: false, icon: entry.icon};
