@@ -41,7 +41,7 @@ public class ArticleController extends Controller {
      * add page info for template more easy
      */
     private void setPageDataInfo(String currentUri, PageData<Map<String, Object>> data, PageRequest pageRequest) {
-        getRequest().getAttr().put("yurl", currentUri);
+        getRequest().getAttr().put("yurl", Constants.getArticleUri() + currentUri);
         long totalPage =
                 BigDecimal.valueOf(Math.ceil(data.getTotalElements() * 1.0 / pageRequest.getSize())).longValue();
         if (totalPage > 0) {
