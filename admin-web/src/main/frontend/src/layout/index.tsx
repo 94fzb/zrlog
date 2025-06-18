@@ -66,7 +66,7 @@ const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({offline, 
     }
 
     if (userInfo === undefined) {
-        return <Spin fullscreen={true}/>
+        return <Spin fullscreen={true} delay={500}/>
     }
 
     const getMainButton = () => {
