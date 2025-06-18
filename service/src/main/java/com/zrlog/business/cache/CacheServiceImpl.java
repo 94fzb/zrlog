@@ -6,6 +6,7 @@ import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.business.cache.vo.BaseDataInitVO;
 import com.zrlog.business.cache.vo.HotLogBasicInfoVO;
+import com.zrlog.business.plugin.StaticSitePlugin;
 import com.zrlog.business.util.InstallUtils;
 import com.zrlog.business.util.PluginUtils;
 import com.zrlog.common.CacheService;
@@ -274,6 +275,7 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
 
     private void faviconHandle(String faviconIconBase64, String saveFilePath, Boolean saveToCache) {
         if (StringUtils.isEmpty(faviconIconBase64)) {
+            StaticSitePlugin.copyResourceToCacheFolder(saveFilePath);
             return;
         }
         try {

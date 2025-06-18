@@ -132,6 +132,7 @@ public class StaticSitePlugin extends BaseLockObject implements IPlugin {
         if (cacheFolder.exists()) {
             FileUtils.deleteFile(cacheFolder.toString());
         }
+        Constants.zrLogConfig.getCacheService().refreshFavicon();
         copyCommonAssert();
         copyDefaultTemplateAssets();
         handleStatusPageMap.clear();
@@ -189,7 +190,7 @@ public class StaticSitePlugin extends BaseLockObject implements IPlugin {
         }
     }
 
-    private static void copyResourceToCacheFolder(String resourceName) {
+    public static void copyResourceToCacheFolder(String resourceName) {
         InputStream inputStream = StaticSitePlugin.class.getResourceAsStream(resourceName);
         if (Objects.isNull(inputStream)) {
             LOGGER.warning("Missing resource " + resourceName);
