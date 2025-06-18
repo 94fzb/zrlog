@@ -46,7 +46,7 @@ public class AdminUserController extends Controller {
         Map<String, Object> byId = new User().loadById(AdminTokenThreadLocal.getUserId());
         UserBasicInfoResponse basicInfoResponse = Objects.requireNonNullElse(BeanUtil.convert(byId, UserBasicInfoResponse.class), new UserBasicInfoResponse());
         if (StringUtils.isEmpty(basicInfoResponse.getHeader())) {
-            basicInfoResponse.setHeader(WebTools.buildUrl(request, "assets/images/default-portrait.gif"));
+            basicInfoResponse.setHeader(WebTools.buildEncodedUrl(request, "assets/images/default-portrait.gif"));
         }
         UpdateVersionPlugin plugin = (UpdateVersionPlugin) Constants.zrLogConfig.getPlugins().stream().filter(x -> x instanceof UpdateVersionPlugin).findFirst().orElse(null);
         basicInfoResponse.setLastVersion(upgradeService.getCheckVersionResponse(false, plugin));

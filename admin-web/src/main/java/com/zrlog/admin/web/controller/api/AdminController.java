@@ -64,7 +64,7 @@ public class AdminController extends Controller {
             map.put("background_color", publicInfoVO.getAdmin_darkMode() ? "#000000" : "#FFFFFF");
             List<Map<String, Object>> list = (List<Map<String, Object>>) map.get("icons");
             for (Map<String, Object> icon : list) {
-                icon.put("src", WebTools.buildUrl(request, (String) icon.get("src")));
+                icon.put("src", WebTools.buildEncodedUrl(request, (String) icon.get("src")));
             }
             return map;
         }

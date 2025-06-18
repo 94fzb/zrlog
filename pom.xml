@@ -27,7 +27,7 @@
         <finalName>zrlog</finalName>
         <disableNodePackage>false</disableNodePackage>
         <jakarta-scope>compile</jakarta-scope>
-        <sws.version>4.0.42</sws.version>
+        <sws.version>4.0.53</sws.version>
         <disableJava21>false</disableJava21>
     </properties>
 

@@ -75,8 +75,8 @@ public class AdminArticleController extends Controller {
 
     @ResponseBody
     public AdminApiPageDataStandardResponse<ArticlePageData> index() throws SQLException, ExecutionException, InterruptedException {
-        String key = WebTools.convertRequestParam(request.getParaToStr("key"));
-        String types = WebTools.convertRequestParam(request.getParaToStr("types"));
+        String key = request.getParaToStr("key");
+        String types = request.getParaToStr("types");
         int articlePageSize = Constants.getAdminArticlePageSize();
         ArticlePageData pageData = articleService.adminPage(ControllerUtil.toPageRequest(this, articlePageSize), key, types, request);
         pageData.setKey(key);

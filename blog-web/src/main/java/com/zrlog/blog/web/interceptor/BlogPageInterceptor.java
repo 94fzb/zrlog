@@ -60,9 +60,6 @@ public class BlogPageInterceptor implements HandleAbleInterceptor {
         if (Objects.isNull(method) && target.endsWith(".html")) {
             method = request.getServerConfig().getRouter().getRouterMap().get(target.substring(0, target.length() - 5));
         }
-        if (Objects.isNull(method)) {
-            method = request.getServerConfig().getRouter().getRouterMap().get("/detail");
-        }
         if (target.startsWith("/all-")) {
             method = request.getServerConfig().getRouter().getRouterMap().get("/index");
         }
@@ -79,7 +76,11 @@ public class BlogPageInterceptor implements HandleAbleInterceptor {
             method = request.getServerConfig().getRouter().getRouterMap().get("/record");
         }
         if (Objects.isNull(method)) {
-            return true;
+            method = request.getServerConfig().getRouter().getRouterMap().get("/detail");
+        }
+        if (Objects.isNull(method)) {
+            response.renderCode(404);
+            return false;
         }
         Object invoke = method.invoke(Controller.buildController(method, request, response));
         if (Objects.nonNull(invoke)) {

@@ -25,8 +25,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
 
 import java.math.BigDecimal;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.logging.Logger;
@@ -55,7 +53,7 @@ public class ArticleController extends Controller {
         }
     }
 
-    public String index() throws SQLException {
+    public String index() {
         PageRequest pageRequest = new PageRequestImpl(parseUriInfo(request.getUri()).getPage(), Constants.getDefaultRows());
         PageData<Map<String, Object>> data = new Log().visitorFind(pageRequest, null);
         setPageDataInfo(Constants.getArticleUri() + "all-", data, pageRequest);
@@ -63,15 +61,11 @@ public class ArticleController extends Controller {
     }
 
 
-    public String search() throws SQLException {
+    public String search() {
         String key = request.getParaToStr("key");
         ArticleUriInfoVO uriInfoVO = parseUriInfo(request.getUri());
         PageData<Map<String, Object>> data;
-        if (StringUtils.isNotEmpty(key)) {
-            if ("GET".equals(getRequest().getMethod().name())) {
-                key = WebTools.convertRequestParam(key);
-            }
-        } else {
+        if (StringUtils.isEmpty(key)) {
             try {
                 key = uriInfoVO.getKey();
             } catch (Exception e) {
@@ -131,10 +125,9 @@ public class ArticleController extends Controller {
                 if (StringUtils.isEmpty(tag.trim())) {
                     continue;
                 }
-                String tagUrl = WebTools.buildUrl(request, Constants.getArticleUri() + "tag/" + URLEncoder.encode(tag) + TemplateHelper.getSuffix(request));
                 Map<String, Object> map = new HashMap<>();
                 map.put("name", tag);
-                map.put("url", tagUrl);
+                map.put("url", WebTools.buildEncodedUrl(request, Constants.getArticleUri() + "tag/" + tag + TemplateHelper.getSuffix(request)));
                 tags.add(map);
             }
             detail.put("tags", tags);
@@ -165,7 +158,7 @@ public class ArticleController extends Controller {
             }
         }
         String key = sj.toString();
-        return new ArticleUriInfoVO(WebTools.convertRequestParam(key), page);
+        return new ArticleUriInfoVO(key, page);
     }
 
     public static void main(String[] args) {
@@ -191,7 +184,7 @@ public class ArticleController extends Controller {
     public String tag() throws SQLException {
         ArticleUriInfoVO uriInfoVO = parseUriInfo(request.getUri());
 
-        String tag = WebTools.convertRequestParam(uriInfoVO.getKey());
+        String tag = uriInfoVO.getKey();
         setPageDataInfo(Constants.getArticleUri() + "tag/" + tag + "-", new Log().findByTag(uriInfoVO.getPage(), Constants.getDefaultRows(), tag),
                 new PageRequestImpl(uriInfoVO.getPage(),
                         Constants.getDefaultRows()));

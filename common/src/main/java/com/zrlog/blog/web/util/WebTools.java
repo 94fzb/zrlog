@@ -56,14 +56,14 @@ public class WebTools {
         return request.getContextPath() + "/";
     }
 
-    public static String buildUrl(HttpRequest request, String url) {
+    public static String buildEncodedUrl(HttpRequest request, String url) {
         if (request == null) {
-            return url;
+            return encodeUrl(url);
         }
         if (url.startsWith("/")) {
-            return getHomeUrl(request) + url.substring(1);
+            return encodeUrl(getHomeUrl(request) + url.substring(1));
         }
-        return url;
+        return encodeUrl(getHomeUrl(request) + url);
     }
 
     public static String htmlEncode(String source) {
@@ -97,25 +97,6 @@ public class WebTools {
         html = buffer.toString();
         return html;
     }
-
-    private static boolean containsHanScript(String s) {
-        return s.codePoints().anyMatch(codepoint -> Character.UnicodeScript.of(codepoint) == Character.UnicodeScript.HAN);
-    }
-
-    /**
-     * 用于转化 GET 的中文乱码
-     */
-    public static String convertRequestParam(String param) {
-        if (param == null) {
-            return "";
-        }
-        //如果可以正常读取到中文的情况，直接跳过转换
-        if (containsHanScript(param)) {
-            return param;
-        }
-        return URLDecoder.decode(new String(param.getBytes(StandardCharsets.ISO_8859_1)), StandardCharsets.UTF_8);
-    }
-
 
     public static void blockUnLoginRequestHandler(HttpRequest request, HttpResponse response) {
         String actionKey = request.getUri();

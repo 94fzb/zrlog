@@ -5,6 +5,7 @@ import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.config.ConfigKit;
 import com.hibegin.http.server.util.PathUtil;
+import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.common.Constants;
 import com.zrlog.common.Updater;
 import com.zrlog.common.UpdaterTypeEnum;
@@ -63,7 +64,7 @@ public class ZrLogUtil {
     }
 
     public static String getHomeUrlWithHostNotProtocol(HttpRequest request) {
-        return getBlogHost(request) + request.getContextPath() + "/";
+        return getBlogHost(request) + WebTools.getHomeUrl(request);
     }
 
     public static String getBlogHost(HttpRequest request) {

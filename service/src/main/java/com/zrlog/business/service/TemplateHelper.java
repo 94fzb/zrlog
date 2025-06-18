@@ -22,8 +22,6 @@ import com.zrlog.util.ZrLogUtil;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -49,7 +47,7 @@ public class TemplateHelper {
         BaseDataInitVO baseDataInitVO = BeanUtil.cloneObject((BaseDataInitVO) request.getAttr().get("init"));
         request.getAttr().put("init", baseDataInitVO);
         Map<String, Object> webSite = baseDataInitVO.getWebSite();
-        String baseUrl = setBaseUrl(request, staticBlog, webSite);
+        setUrlInfo(request, staticBlog, webSite);
         //过期
         request.getAttr().put("webs", webSite);
         String title = webSite.get("title") + " - " + webSite.get("second_title");
@@ -63,45 +61,44 @@ public class TemplateHelper {
         if (pager != null && !pager.getPageList().isEmpty()) {
             List<PagerVO.PageEntry> pageList = pager.getPageList();
             for (PagerVO.PageEntry pageMap : pageList) {
-                pageMap.setUrl(baseUrl + WebTools.encodeUrl(pageMap.getUrl()) + suffix);
+                pageMap.setUrl(WebTools.buildEncodedUrl(request, pageMap.getUrl()) + suffix);
             }
 
-            pager.setPageStartUrl(baseUrl + pager.getPageStartUrl() + suffix);
-            pager.setPageEndUrl(baseUrl + pager.getPageEndUrl() + suffix);
+            pager.setPageStartUrl(WebTools.buildEncodedUrl(request, pager.getPageStartUrl() + suffix));
+            pager.setPageEndUrl(WebTools.buildEncodedUrl(request, pager.getPageEndUrl() + suffix));
         }
-        fillTags(suffix, baseUrl, baseDataInitVO.getTags());
-        fillType(suffix, baseUrl, baseDataInitVO.getTypes(), request);
+        fillTags(suffix, request, baseDataInitVO.getTags());
+        fillType(suffix, baseDataInitVO.getTypes(), request);
         fullNavBar(request, suffix, baseDataInitVO);
-        baseDataInitVO.setArchiveList(getConvertedArchives(suffix, baseUrl, baseDataInitVO.getArchives()));
+        baseDataInitVO.setArchiveList(getConvertedArchives(suffix, request, baseDataInitVO.getArchives()));
     }
 
-    private static List<Archive> getConvertedArchives(String suffix, String baseUrl, Map<String, Long> archiveMap) {
+    private static List<Archive> getConvertedArchives(String suffix, HttpRequest request, Map<String, Long> archiveMap) {
         List<Archive> archives = new ArrayList<>();
         for (Map.Entry<String, Long> entry : archiveMap.entrySet()) {
             Archive archive = new Archive();
             archive.setCount(entry.getValue());
             archive.setText(entry.getKey());
-            String tagUri = baseUrl + Constants.getArticleUri() + "record/" + entry.getKey() + suffix;
+            String tagUri = WebTools.buildEncodedUrl(request, Constants.getArticleUri() + "record/" + entry.getKey() + suffix);
             archive.setUrl(tagUri);
             archives.add(archive);
         }
         return archives;
     }
 
-    private static void fillTags(String suffix, String baseUrl, List<Map<String, Object>> tags) {
+    private static void fillTags(String suffix, HttpRequest request, List<Map<String, Object>> tags) {
         for (Map<String, Object> tag : tags) {
-            String tagUri = baseUrl + Constants.getArticleUri() + "tag/" + URLEncoder.encode((String) tag.get("text"), StandardCharsets.UTF_8) + suffix;
-            tag.put("url", tagUri);
+            tag.put("url", WebTools.buildEncodedUrl(request, Constants.getArticleUri() + "tag/" + tag.get("text") + suffix));
         }
     }
 
-    private static void fillType(String suffix, String baseUrl, List<Map<String, Object>> types, HttpRequest request) {
+    private static void fillType(String suffix, List<Map<String, Object>> types, HttpRequest request) {
         for (Map<String, Object> type : types) {
-            String typeUri = baseUrl + Constants.getArticleUri() + "sort/" + type.get("alias");
+            String typeUri = "/" + Constants.getArticleUri() + "sort/" + type.get("alias");
             if (request.getUri().startsWith(typeUri)) {
                 tryEnableArrangePlugin((String) type.get("arrange_plugin"), request);
             }
-            type.put("url", WebTools.encodeUrl(typeUri) + suffix);
+            type.put("url", WebTools.buildEncodedUrl(request, typeUri + suffix));
         }
     }
 
@@ -158,12 +155,10 @@ public class TemplateHelper {
         return url;
     }
 
-    public static String setBaseUrl(HttpRequest request, boolean staticBlog, Map<String, Object> webSite) {
+    private static void setUrlInfo(HttpRequest request, boolean staticBlog, Map<String, Object> webSite) {
         String templateUrl;
-        String baseUrl = WebTools.getHomeUrl(request);
         String templatePath = request.getAttr().get("template").toString();
         if (staticBlog) {
-            baseUrl = "/";
             templateUrl = templatePath;
         } else {
             if (isCdnResourceAble(webSite, templatePath)) {
@@ -172,17 +167,15 @@ public class TemplateHelper {
                         "//" + webSite.get("staticResourceHost").toString() + "/");
             } else {
                 templateUrl = (String) request.getAttr().get("template");
-                baseUrl = WebTools.getHomeUrl(request);
             }
         }
-        templateUrl = request.getContextPath() + templateUrl;
-        request.getAttr().put("url", templateUrl);
-        request.getAttr().put("templateUrl", templateUrl);
+        String baseUrl = WebTools.getHomeUrl(request);
+        request.getAttr().put("url", WebTools.buildEncodedUrl(request, templateUrl));
+        request.getAttr().put("templateUrl", WebTools.buildEncodedUrl(request, templateUrl));
         request.getAttr().put("rurl", baseUrl);
         request.getAttr().put("baseUrl", baseUrl);
         request.getAttr().put("host", ZrLogUtil.getBlogHost(request));
-        request.getAttr().put("searchUrl", baseUrl + Constants.getArticleUri() + "search");
-        return baseUrl;
+        request.getAttr().put("searchUrl", WebTools.buildEncodedUrl(request, Constants.getArticleUri() + "search"));
     }
 
     private static boolean isCdnResourceAble(Map<String, Object> webSite, String templatePath) {
@@ -217,8 +210,8 @@ public class TemplateHelper {
                         log.put("thumbnail", null);
                     }
                     log.put("canComment", Objects.equals(log.get("canComment"), true) && Constants.isAllowComment());
-                    log.put("url", WebTools.buildUrl(request, Constants.getArticleUri() + URLEncoder.encode((String) log.get("alias"), StandardCharsets.UTF_8) + suffix));
-                    log.put("typeUrl", WebTools.buildUrl(request, Constants.getArticleUri() + "sort/" + URLEncoder.encode((String) log.get("typeAlias"), StandardCharsets.UTF_8) + suffix));
+                    log.put("url", WebTools.buildEncodedUrl(request, Constants.getArticleUri() + log.get("alias") + suffix));
+                    log.put("typeUrl", WebTools.buildEncodedUrl(request, Constants.getArticleUri() + "sort/" + log.get("typeAlias") + suffix));
                     if (Objects.isNull(log.get("digest"))) {
                         log.put("digest", "");
                     }
@@ -253,16 +246,16 @@ public class TemplateHelper {
     }
 
     private static void fillArticleInfo(Map<String, Object> log, HttpRequest request, String suffix) {
-        String aliasUrl = URLEncoder.encode((String) log.get("alias"), StandardCharsets.UTF_8) + suffix;
+        String aliasUrl = WebTools.encodeUrl((String) log.get("alias")) + suffix;
         log.put("alias", aliasUrl);
         log.put("canComment", Objects.equals(log.get("canComment"), true) && Constants.isAllowComment());
-        log.put("url", WebTools.buildUrl(request, Constants.getArticleUri() + aliasUrl));
+        log.put("url", WebTools.buildEncodedUrl(request, Constants.getArticleUri() + aliasUrl));
         log.put("noSchemeUrl", ZrLogUtil.getHomeUrlWithHost(request) + aliasUrl);
-        log.put("typeUrl", WebTools.buildUrl(request, Constants.getArticleUri() + "sort/" + URLEncoder.encode((String) log.get("typeAlias"), StandardCharsets.UTF_8) + suffix));
+        log.put("typeUrl", WebTools.buildEncodedUrl(request, Constants.getArticleUri() + "sort/" + log.get("typeAlias") + suffix));
         Map<String, Object> lastLog = (Map<String, Object>) log.get("lastLog");
         Map<String, Object> nextLog = (Map<String, Object>) log.get("nextLog");
-        nextLog.put("url", WebTools.buildUrl(request, Constants.getArticleUri() + URLEncoder.encode((String) nextLog.get("alias"), StandardCharsets.UTF_8) + suffix));
-        lastLog.put("url", WebTools.buildUrl(request, Constants.getArticleUri() + URLEncoder.encode((String) lastLog.get("alias"), StandardCharsets.UTF_8) + suffix));
+        nextLog.put("url", WebTools.buildEncodedUrl(request, Constants.getArticleUri() + nextLog.get("alias") + suffix));
+        lastLog.put("url", WebTools.buildEncodedUrl(request, Constants.getArticleUri() + lastLog.get("alias") + suffix));
 
         //没有使用md的toc目录的文章才尝试使用系统提取的目录
         if (log.get("markdown") != null && !log.get("markdown").toString().toLowerCase().contains("[toc]") && !log.get("markdown").toString().toLowerCase().contains("[tocm]")) {

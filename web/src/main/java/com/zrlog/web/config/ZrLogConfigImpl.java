@@ -166,7 +166,16 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         serverConfig.addRequestListener(new HttpRequestListener() {
             @Override
             public void onHandled(HttpRequest request, HttpResponse httpResponse) {
-                I18nUtil.removeI18n();
+                try {
+                    I18nUtil.removeI18n();
+                } finally {
+                    long used = System.currentTimeMillis() - request.getCreateTime();
+                    if (used > 5000) {
+                        LOGGER.info("Slow request " + request.getUri() + " used time " + used + "ms");
+                    } else if (Constants.debugLoggerPrintAble()) {
+                        LOGGER.info("Request " + request.getUri() + " used time " + used + "ms");
+                    }
+                }
             }
         });
         StaticResourceInterceptor.staticResourcePath.forEach(e -> serverConfig.addStaticResourceMapper(e, e, ZrLogConfigImpl.class::getResourceAsStream));

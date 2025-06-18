@@ -68,16 +68,17 @@ public class AdminInterceptor implements HandleAbleInterceptor {
                 new MethodInterceptor().doInterceptor(request, response);
                 return false;
             }
-            AdminTokenVO adminTokenVO = Constants.zrLogConfig.getTokenService().getAdminTokenVO(request);
-            if (adminTokenVO == null) {
-                WebTools.blockUnLoginRequestHandler(request, response);
-                return false;
-            }
-
-            Map<String, Object> user = new User().loadById(adminTokenVO.getUserId());
-            Constants.zrLogConfig.getTokenService().setAdminToken(user, adminTokenVO.getSessionId(), adminTokenVO.getProtocol(), request, response);
-            new MethodInterceptor().doInterceptor(request, response);
             Method method = request.getServerConfig().getRouter().getMethod(request.getUri());
+            if (Objects.nonNull(method)) {
+                AdminTokenVO adminTokenVO = Constants.zrLogConfig.getTokenService().getAdminTokenVO(request);
+                if (adminTokenVO == null) {
+                    WebTools.blockUnLoginRequestHandler(request, response);
+                    return false;
+                }
+                Map<String, Object> user = new User().loadById(adminTokenVO.getUserId());
+                Constants.zrLogConfig.getTokenService().setAdminToken(user, adminTokenVO.getSessionId(), adminTokenVO.getProtocol(), request, response);
+            }
+            new MethodInterceptor().doInterceptor(request, response);
             if (Objects.nonNull(method)) {
                 RefreshCache annotation = method.getAnnotation(RefreshCache.class);
                 if (Objects.nonNull(annotation)) {
