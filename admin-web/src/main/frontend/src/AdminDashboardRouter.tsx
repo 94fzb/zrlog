@@ -17,8 +17,6 @@ import Upgrade, {UpgradeData} from "./components/upgrade";
 import {getRes} from "./utils/constants";
 import {isPWA} from "./utils/env-utils";
 import * as H from "history";
-import Index from "./components/index";
-import Comment from "./components/comment";
 import Plugin from "./components/plugin";
 import WebSite from "./components/website";
 import TemplateConfig from "./components/template/template-config";
@@ -32,7 +30,10 @@ import Link from "./components/link";
 import Nav from "./components/nav";
 import Article from "./components/article";
 import Type from "./components/type";
-import MultiplePathRoute from "./MultiplePathRoute";
+import UnknownErrorPage from "./components/unknown-error-page";
+import Offline from "./common/Offline";
+import Index from "./components/index";
+import Comment from "./components/comment";
 
 const AsyncArticleEdit = lazy(() => import("components/articleEdit"));
 const AsyncOffline = lazy(() => import("common/Offline"));
@@ -250,328 +251,184 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
         });
     }, [offline]);
 
+    const routes = [
+        {
+            paths: ["index", "index.html"],
+            lazy: AsyncIndex,
+            fallback: Index
+        },
+        {
+            paths: ["comment", "comment.html"],
+            lazy: AsyncComment,
+            fallback: Comment
+        },
+        {
+            paths: ["plugin", "plugin.html"],
+            lazy: AsyncPlugin,
+            fallback: Plugin
+        },
+        {
+            paths: ["website", "website.html"],
+            lazy: AsyncWebSite,
+            fallback: WebSite,
+            props: {activeKey: "basic"}
+        },
+        {
+            paths: ["website/admin", "website/admin.html"],
+            lazy: AsyncWebSite,
+            fallback: WebSite,
+            props: {activeKey: "admin"}
+        },
+        {
+            paths: ["website/template", "website/template.html"],
+            lazy: AsyncWebSite,
+            fallback: WebSite,
+            props: {activeKey: "template"}
+        },
+        {
+            paths: ["website/other", "website/other.html"],
+            lazy: AsyncWebSite,
+            fallback: WebSite,
+            props: {activeKey: "other"}
+        },
+        {
+            paths: ["website/blog", "website/blog.html"],
+            lazy: AsyncWebSite,
+            fallback: WebSite,
+            props: {activeKey: "blog"}
+        },
+        {
+            paths: ["website/upgrade", "website/upgrade.html"],
+            lazy: AsyncWebSite,
+            fallback: WebSite,
+            props: {activeKey: "upgrade"}
+        },
+        {
+            paths: ["article-type", "article-type.html"],
+            lazy: AsyncType,
+            fallback: Type
+        },
+        {
+            paths: ["link", "link.html"],
+            lazy: AsyncLink,
+            fallback: Link
+        },
+        {
+            paths: ["nav", "nav.html"],
+            lazy: AsyncNav,
+            fallback: Nav
+        },
+        {
+            paths: ["article", "article.html"],
+            lazy: AsyncArticle,
+            fallback: Article
+        },
+        {
+            paths: ["article-edit", "article-edit.html"],
+            lazy: AsyncArticleEdit,
+            fallback: ArticleEdit,
+            fullScreen: true,
+            props: {
+                deleteStateCacheOnDestroy: () => deleteThisPageStateCache(),
+                onFullScreen: () => {
+                    setState((prevState) => {
+                        savePageFullState(getFullPath(location), true);
+                        return {...prevState, fullScreen: true};
+                    });
+                },
+                onExitFullScreen: () => {
+                    setState((prevState) => {
+                        savePageFullState(getFullPath(location), false);
+                        return {...prevState, fullScreen: false};
+                    });
+                }
+            }
+        },
+        {
+            paths: ["user", "user.html"],
+            lazy: AsyncUser,
+            fallback: User
+        },
+        {
+            paths: ["template-center", "template-center.html"],
+            lazy: AsyncTemplateCenter,
+            fallback: TemplateCenter
+        },
+        {
+            paths: ["user-update-password", "user-update-password.html"],
+            lazy: AsyncUserUpdatePassword,
+            fallback: UserUpdatePassword
+        },
+        {
+            paths: ["upgrade", "upgrade.html"],
+            lazy: AsyncUpgrade,
+            fallback: Upgrade,
+            props: {
+                key: (getDataFromState() as UpgradeData)?.preUpgradeKey || "",
+                axiosRequesting: state.axiosRequesting
+            }
+        },
+        {
+            paths: ["template-config", "template-config.html"],
+            lazy: AsyncTemplateConfig,
+            fallback: TemplateConfig
+        },
+        {
+            paths: ["403", "403.html"],
+            lazy: AsyncError,
+            fallback: UnknownErrorPage,
+            props: {
+                code: 403,
+            }
+        },
+        {
+            paths: ["500", "500.html"],
+            lazy: AsyncError,
+            fallback: UnknownErrorPage,
+            props: {
+                code: 500,
+            }
+        },
+        {
+            paths: ["offline", "offline.html"],
+            lazy: AsyncOffline,
+            fallback: Offline,
+            props: {}
+        },
+        {
+            paths: ["system", "system.html"],
+            lazy: AsyncSystem,
+            fallback: System
+        }
+    ];
+
     //console.info(location.pathname + "," + JSON.stringify(state));
 
     return (
         <Routes>
-            <MultiplePathRoute
-                path={["index", "index.html", ""]}
-                element={
-                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting}
-                               offline={state.offline}
-                               LazyComponent={AsyncIndex}
-                               FallbackComponent={Index}
-                               props={{
-                                   data: getDataFromState()
-                               }}/>
-                }
-            />
-            <MultiplePathRoute
-                path={["comment", "comment.html"]}
-                element={
-                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting}
-                               offline={state.offline}
-                               LazyComponent={AsyncComment}
-                               FallbackComponent={Comment}
-                               props={{
-                                   offline: state.offline,
-                                   data: getDataFromState()
-                               }}
+            {routes.flatMap(({paths, lazy, fallback, props = {}, fullScreen}, i) =>
+                paths.map((path, j) => (
+                    <Route
+                        key={`${i}-${j}`}
+                        path={path}
+                        element={
+                            <AdminPage
+                                data={getDataFromState()}
+                                axiosRequesting={state.axiosRequesting}
+                                offline={state.offline}
+                                fullScreen={fullScreen ? state.fullScreen : undefined}
+                                LazyComponent={lazy}
+                                FallbackComponent={fallback}
+                                props={{
+                                    ...props,
+                                    data: getDataFromState(),
+                                    offline: state.offline
+                                }}
+                            />
+                        }
                     />
-                }
-            />
-            <MultiplePathRoute
-                path={["plugin", "plugin.html"]}
-                element={
-                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
-                               LazyComponent={AsyncPlugin}
-                               FallbackComponent={Plugin}
-                               props={{}}
-                    />
-                }
-            />
-            <MultiplePathRoute
-                path={["website", "website.html"]}
-                element={
-                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
-                               LazyComponent={AsyncWebSite}
-                               FallbackComponent={WebSite}
-                               props={{
-                                   activeKey: "basic",
-                                   offline: state.offline,
-                                   data: getDataFromState(),
-                               }}
-                    />
-
-                }
-            />
-            <MultiplePathRoute
-                path={["website/admin", "website/admin.html"]}
-                element={
-                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
-                               LazyComponent={AsyncWebSite}
-                               FallbackComponent={WebSite}
-                               props={{
-                                   activeKey: "admin",
-                                   offline: state.offline,
-                                   data: getDataFromState(),
-                               }}
-                    />
-                }
-            />
-            <MultiplePathRoute
-                path={["website/template", "website/template.html"]}
-                element={
-                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
-                               LazyComponent={AsyncWebSite}
-                               FallbackComponent={WebSite}
-                               props={{
-                                   activeKey: "template",
-                                   offline: state.offline,
-                                   data: getDataFromState(),
-                               }}
-                    />
-                }
-            />
-            <MultiplePathRoute
-                path={["website/other", "website/other.html"]}
-                element={
-                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
-                               LazyComponent={AsyncWebSite}
-                               FallbackComponent={WebSite}
-                               props={{
-                                   activeKey: "other",
-                                   offline: state.offline,
-                                   data: getDataFromState(),
-                               }}
-                    />
-                }
-            />
-            <MultiplePathRoute
-                path={["website/blog", "website/blog.html"]}
-                element={
-                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
-                               LazyComponent={AsyncWebSite}
-                               FallbackComponent={WebSite}
-                               props={{
-                                   activeKey: "blog",
-                                   offline: state.offline,
-                                   data: getDataFromState(),
-                               }}
-                    />
-                }
-            />
-            <MultiplePathRoute
-                path={["website/upgrade", "website/upgrade.html"]}
-                element={
-                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
-                               LazyComponent={AsyncWebSite}
-                               FallbackComponent={WebSite}
-                               props={{
-                                   activeKey: "upgrade",
-                                   offline: state.offline,
-                                   data: getDataFromState(),
-                               }}
-                    />
-                }
-            />
-            <MultiplePathRoute
-                path={["article-type", "article-type.html"]}
-                element={
-                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
-                               LazyComponent={AsyncType}
-                               FallbackComponent={Type}
-                               props={{
-                                   offline: state.offline,
-                                   data: getDataFromState()
-                               }}
-                    />
-                }
-            />
-            <MultiplePathRoute
-                path={["link", "link.html"]}
-                element={
-                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
-                               LazyComponent={AsyncLink}
-                               FallbackComponent={Link}
-                               props={{
-                                   offline: state.offline,
-                                   data: getDataFromState()
-                               }}
-                    />
-                }
-            />
-            <MultiplePathRoute
-                path={["nav", "nav.html"]}
-                element={
-                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
-                               LazyComponent={AsyncNav}
-                               FallbackComponent={Nav}
-                               props={{
-                                   offline: state.offline,
-                                   data: getDataFromState()
-                               }}
-                    />
-                }
-            />
-            <MultiplePathRoute
-                path={["article", "article.html"]}
-                element={
-                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
-                               LazyComponent={AsyncArticle}
-                               FallbackComponent={Article}
-                               props={{
-                                   offline: state.offline,
-                                   data: getDataFromState()
-                               }}
-                    />
-                }
-            />
-            <MultiplePathRoute
-                path={["article-edit", "article-edit.html"]}
-                element={
-                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
-                               LazyComponent={AsyncArticleEdit}
-                               fullScreen={state.fullScreen}
-                               FallbackComponent={ArticleEdit}
-                               props={{
-                                   fullScreen: state.fullScreen,
-                                   offline: state.offline,
-                                   deleteStateCacheOnDestroy: () => {
-                                       deleteThisPageStateCache();
-                                   },
-                                   data: getDataFromState(),
-                                   onFullScreen: () => {
-                                       setState((prevState) => {
-                                           savePageFullState(getFullPath(location), true);
-                                           return {
-                                               ...prevState,
-                                               fullScreen: true,
-                                           };
-                                       })
-                                   },
-                                   onExitFullScreen: () => {
-                                       setState((prevState) => {
-                                           savePageFullState(getFullPath(location), false);
-                                           return {
-                                               ...prevState,
-                                               fullScreen: false,
-                                           };
-                                       });
-                                   }
-
-                               }}
-                    />
-                }
-            />
-            <MultiplePathRoute
-                path={["user", "user.html"]}
-                element={
-                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
-                               LazyComponent={AsyncUser}
-                               FallbackComponent={User}
-                               props={{
-                                   offline: state.offline,
-                                   data: getDataFromState(),
-                               }}
-                    />
-                }
-            />
-            <MultiplePathRoute
-                path={["template-center", "template-center.html"]}
-                element={
-                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
-                               LazyComponent={AsyncTemplateCenter}
-                               FallbackComponent={TemplateCenter}
-                               props={{
-                                   offline: state.offline,
-                                   data: getDataFromState(),
-                               }}
-                    />
-                }
-            />
-            <MultiplePathRoute
-                path={["user-update-password", "user-update-password.html"]}
-                element={
-                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
-                               LazyComponent={AsyncUserUpdatePassword}
-                               FallbackComponent={UserUpdatePassword}
-                               props={{
-                                   offline: state.offline,
-                                   data: getDataFromState(),
-                               }}
-                    />
-                }
-            />
-            <MultiplePathRoute
-                path={["upgrade", "upgrade.html"]}
-                element={
-                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
-                               LazyComponent={AsyncUpgrade}
-                               FallbackComponent={Upgrade}
-                               props={{
-                                   offline: state.offline,
-                                   key: (getDataFromState() as UpgradeData) ? getDataFromState().preUpgradeKey : "",
-                                   data: getDataFromState(),
-                                   axiosRequesting: state.axiosRequesting
-                               }}
-                    />
-                }
-            />
-            <MultiplePathRoute
-                path={["template-config", "template-config.html"]}
-                element={
-                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
-                               LazyComponent={AsyncTemplateConfig}
-                               FallbackComponent={TemplateConfig}
-                               props={{
-                                   offline: state.offline,
-                                   data: getDataFromState(),
-                               }}
-                    />
-                }
-            />
-            <MultiplePathRoute
-                path={["403", "403.html"]}
-                element={
-                    getDataFromState() && (
-                        <Suspense fallback={<MyLoadingComponent/>}>
-                            <AsyncError data={getDataFromState()} code={403}/>
-                        </Suspense>
-                    )
-                }
-            />
-            <MultiplePathRoute
-                path={["500", "500.html"]}
-                element={
-                    getDataFromState() && (
-                        <Suspense fallback={<MyLoadingComponent/>}>
-                            <AsyncError data={getDataFromState()} code={500}/>
-                        </Suspense>
-                    )
-                }
-            />
-            <MultiplePathRoute
-                path={["offline", "offline.html"]}
-                element={
-                    <Suspense fallback={<MyLoadingComponent/>}>
-                        <AsyncOffline/>
-                    </Suspense>
-                }
-            />
-            <MultiplePathRoute
-                path={["system", "system.html"]}
-                element={
-                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
-                               LazyComponent={AsyncSystem}
-                               FallbackComponent={System}
-                               props={{
-                                   offline: state.offline,
-                                   data: getDataFromState(),
-                               }}
-                    />
-                }
-            />
+                ))
+            )}
             <Route
                 path={"*"}
                 element={

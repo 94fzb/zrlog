@@ -1,3 +1,4 @@
+import React from "react";
 import {FunctionComponent, ReactNode} from "react";
 import {Route} from "react-router-dom";
 
@@ -8,11 +9,11 @@ export type MultiplePathRouterProps = {
 
 const MultiplePathRoute: FunctionComponent<MultiplePathRouterProps> = ({path, element}) => {
 
-    return <>
-        {path.map((e) => {
-            return <Route key={e} path={e} element={element}/>
+    return <React.Fragment>
+        {path.map((e, i) => {
+            return <Route key={e + "" + i} path={e} element={<div key={i}>{element}</div>}/>
         })}
-    </>
+    </React.Fragment>
 }
 
 export default MultiplePathRoute;
