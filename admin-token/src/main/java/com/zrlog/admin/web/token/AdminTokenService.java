@@ -129,7 +129,7 @@ public class AdminTokenService implements TokenService {
             return;
         }
         URI uri = URI.create(referer);
-        response.redirect(uri.getScheme() + ":" + uri.getRawSchemeSpecificPart() + WebTools.buildEncodedUrl(request, Constants.ADMIN_LOGIN_URI_PATH));
+        response.redirect(uri.getScheme() + "://" + uri.getRawAuthority() + WebTools.buildEncodedUrl(request, Constants.ADMIN_LOGIN_URI_PATH));
 
     }
 
