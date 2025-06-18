@@ -45,7 +45,7 @@ const UserInfo = ({ data, offline }: { data: BasicUserInfo; offline: boolean }) 
             base.push({
                 key: "3",
                 label: (
-                    <a href={getBackendServerUrl() + "/admin/logout"}>
+                    <a href={getBackendServerUrl() + "admin/logout"}>
                         <LogoutOutlined />
                         <Text style={{ paddingLeft: "5px", paddingRight: 16 }}>{res["admin.user.logout"]}</Text>
                     </a>

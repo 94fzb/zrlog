@@ -1,4 +1,4 @@
-import {Route, Routes} from "react-router-dom";
+import {Route, Routes, useNavigate} from "react-router-dom";
 import {lazy, Suspense} from "react";
 import {App, Spin} from "antd";
 import axios, {AxiosError, AxiosInstance} from "axios";
@@ -6,6 +6,7 @@ import {API_VERSION_PATH} from "./components/upgrade";
 import ErrorBoundary from "./common/ErrorBoundary";
 import type {HookAPI as ModalHookAPI} from "antd/es/modal/useModal";
 import type {MessageInstance} from "antd/es/message/interface";
+import {getRealRouteUrl, isStaticPage} from "./utils/constants";
 
 const AsyncLogin = lazy(() => import("components/login"));
 const AsyncAdminDashboardRouter = lazy(() => import("AdminDashboardRouter"));
@@ -55,6 +56,8 @@ export const createAxiosBaseInstance = (): AxiosInstance => {
 const AppBase = ({offline}: { offline: boolean }) => {
     const {modal, message} = App.useApp();
 
+    const navigate = useNavigate();
+
     const initAxios = () => {
         //@ts-ignore
         if (window.axiosConfiged) {
@@ -69,6 +72,11 @@ const AppBase = ({offline}: { offline: boolean }) => {
                         title: response.data.error,
                         content: response.data.message,
                     });
+                    if (isStaticPage()) {
+                        if (!window.location.search.includes("redirectFrom")) {
+                            navigate(getRealRouteUrl(`/login`) + `?redirectFrom=${encodeURI(window.location.pathname.split(".html")[0])}${encodeURI(window.location.search)}`, {replace: true});
+                        }
+                    }
                     return Promise.reject(response.data);
                 }
                 return response;

@@ -117,9 +117,6 @@ public class AdminTokenService implements TokenService {
                 cookie.setValue("");
                 cookie.setExpireDate(new Date(0));
                 cookie.setPath("/");
-                if (CrossUtils.isEnableOrigin(request)) {
-                    cookie.setSameSite("None");
-                }
                 cookie.setHttpOnly(true);
                 response.addCookie(cookie);
             }
@@ -145,6 +142,9 @@ public class AdminTokenService implements TokenService {
             cookie.setName(ADMIN_TOKEN_KEY_IN_COOKIE);
             cookie.setValue(finalTokenString);
             cookie.setExpireDate(new Date(System.currentTimeMillis() + Constants.getSessionTimeout()));
+            if (CrossUtils.isEnableOrigin(request) && Objects.equals(protocol, "https")) {
+                cookie.setSameSite("None");
+            }
             cookie.setHttpOnly(true);
             cookie.setPath("/");
             response.addCookie(cookie);

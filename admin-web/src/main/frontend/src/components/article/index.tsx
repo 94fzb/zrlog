@@ -239,8 +239,6 @@ const Index = ({data, offline}: { data: ArticlePageDataSource; offline: boolean 
 
     const [searchKey, setSearchKey] = useState<string>(data.key ? data.key : "");
 
-    if()
-
     return (
         <>
             <Row gutter={[8, 8]} style={{paddingTop: 20}}>
