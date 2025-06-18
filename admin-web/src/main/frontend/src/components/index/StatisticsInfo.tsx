@@ -1,5 +1,5 @@
 import {Card, Statistic, Typography} from "antd";
-import {getRes} from "../../utils/constants";
+import {getRealRouteUrl, getRes} from "../../utils/constants";
 import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
 import {CommentOutlined, ContainerOutlined, InfoCircleOutlined} from "@ant-design/icons";
@@ -54,7 +54,7 @@ const StatisticsInfo = ({data, versionInfo}: { data: StatisticsInfoState, versio
                     </Card>
                 </Col>
                 <Col xs={24} md={12}>
-                    <Link to={"/system"}>
+                    <Link to={getRealRouteUrl("/system")}>
                         <Card styles={{body: {padding: 16}}}>
                             <Statistic
                                 title={getRes()["systemInfo"]}

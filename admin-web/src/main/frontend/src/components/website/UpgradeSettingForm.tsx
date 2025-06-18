@@ -1,7 +1,7 @@
 import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
 import Button from "antd/es/button";
-import { getRes } from "../../utils/constants";
+import {getRealRouteUrl, getRes} from "../../utils/constants";
 import Form from "antd/es/form";
 import Select from "antd/es/select";
 import Switch from "antd/es/switch";
@@ -64,7 +64,7 @@ const UpgradeSettingForm = ({ data, offline }: { data: Upgrade; offline: boolean
                     closable: true,
                     okText: getRes()["doUpgrade"],
                     onOk: function () {
-                        navigate("/upgrade");
+                        navigate(getRealRouteUrl("/upgrade"));
                     },
                 });
             } else {

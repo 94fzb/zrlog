@@ -41,6 +41,7 @@ export const removeRes = () => {
 };
 
 export const isStaticPage = () => {
+    //return true;
     return getRes()['staticPlugin'];
 }
 
@@ -55,6 +56,13 @@ export const getBackendServerUrl = (): string => {
         return val
     }
     return getContextPath();
+}
+
+export const getRealRouteUrl = (url: string) => {
+    if(isStaticPage()) {
+        return url + ".html";
+    }
+    return url;
 }
 
 export const createUri = "/api/admin/article/create";

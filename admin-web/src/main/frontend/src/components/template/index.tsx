@@ -7,7 +7,7 @@ import { CheckOutlined, CloudDownloadOutlined, DeleteOutlined, EyeOutlined, Sett
 import Meta from "antd/es/card/Meta";
 import Button from "antd/es/button";
 import { useEffect, useState } from "react";
-import { getRes } from "../../utils/constants";
+import {getRealRouteUrl, getRes} from "../../utils/constants";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import Popconfirm from "antd/es/popconfirm";
@@ -62,7 +62,7 @@ const Template = ({ data }: { data: TemplateEntry[] }) => {
             <div onClick={() => preview(template.shortTemplate)}>
                 <EyeOutlined key="preview" />
             </div>,
-            <Link to={"/template-config?shortTemplate=" + template.shortTemplate}>
+            <Link to={getRealRouteUrl("/template-config") + "?shortTemplate=" + template.shortTemplate}>
                 <SettingOutlined key="setting" />
             </Link>,
             <div onClick={() => apply(template.shortTemplate)}>

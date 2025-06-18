@@ -4,7 +4,7 @@ import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
 import Divider from "antd/es/divider";
 import Index, {TemplateEntry} from "../template";
-import {getColorPrimary, getRes} from "../../utils/constants";
+import {getColorPrimary, getRealRouteUrl, getRes} from "../../utils/constants";
 import BlogForm from "./BlogForm";
 import BasicForm from "./BasicForm";
 import OtherForm from "./OtherForm";
@@ -60,7 +60,7 @@ const WebSite = ({
     const buildLink = (key: string, text: string) => {
         const toUrl = key === "basic" ? "/website" : "/website/" + key;
         return (
-            <Link to={toUrl} replace={true} style={{color: activeKey === key ? getColorPrimary() : "inherit"}}>
+            <Link to={getRealRouteUrl(toUrl)} replace={true} style={{color: activeKey === key ? getColorPrimary() : "inherit"}}>
                 {text}
             </Link>
         );

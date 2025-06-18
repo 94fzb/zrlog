@@ -3,7 +3,14 @@ import {LoginOutlined} from "@ant-design/icons";
 import {Button, Col, Form, Input, Layout, message} from "antd";
 import Card from "antd/es/card";
 import Row from "antd/es/grid/row";
-import {getBackendServerUrl, getColorPrimary, getRes, isStaticPage, setBackendServerUrl} from "../../utils/constants";
+import {
+    getBackendServerUrl,
+    getColorPrimary,
+    getRealRouteUrl,
+    getRes,
+    isStaticPage,
+    setBackendServerUrl
+} from "../../utils/constants";
 import axios from "axios";
 import {useNavigate} from "react-router-dom";
 import Title from "antd/es/typography/Title";
@@ -130,10 +137,10 @@ const Index = ({offline}: { offline: boolean }) => {
                     if (jumpTo.startsWith(getContextPath() + "admin/plugins/")) {
                         window.location.href = window.location.protocol + "//" + window.location.host + jumpTo;
                     } else {
-                        navigate(jumpTo.replace(getContextPath() + "admin", ""), {replace: true});
+                        navigate(getRealRouteUrl(jumpTo.replace(getContextPath() + "admin", "")), {replace: true});
                     }
                 } else {
-                    navigate("/index", {replace: true});
+                    navigate(getRealRouteUrl("/index"), {replace: true});
                 }
             } else {
                 await messageApi.error("未知错误");
