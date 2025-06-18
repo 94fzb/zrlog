@@ -253,7 +253,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
 
     const routes = [
         {
-            paths: ["index", "index.html"],
+            paths: ["index", "index.html",""],
             lazy: AsyncIndex,
             fallback: Index
         },
