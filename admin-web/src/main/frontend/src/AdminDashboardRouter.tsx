@@ -32,6 +32,7 @@ import Link from "./components/link";
 import Nav from "./components/nav";
 import Article from "./components/article";
 import Type from "./components/type";
+import MultiplePathRoute from "./MultiplePathRoute";
 
 const AsyncArticleEdit = lazy(() => import("components/articleEdit"));
 const AsyncOffline = lazy(() => import("common/Offline"));
@@ -253,47 +254,34 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
 
     return (
         <Routes>
-            {
-                ["index", "index.html", ""].map(e => {
-                    return <Route
-                        path={e}
-                        key={e}
-                        element={
-                            <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting}
-                                       offline={state.offline}
-                                       LazyComponent={AsyncIndex}
-                                       FallbackComponent={Index}
-                                       props={{
-                                           data: getDataFromState()
-                                       }}/>
-                        }
+            <MultiplePathRoute
+                path={["index", "index.html", ""]}
+                element={
+                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting}
+                               offline={state.offline}
+                               LazyComponent={AsyncIndex}
+                               FallbackComponent={Index}
+                               props={{
+                                   data: getDataFromState()
+                               }}/>
+                }
+            />
+            <MultiplePathRoute
+                path={["comment", "comment.html"]}
+                element={
+                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting}
+                               offline={state.offline}
+                               LazyComponent={AsyncComment}
+                               FallbackComponent={Comment}
+                               props={{
+                                   offline: state.offline,
+                                   data: getDataFromState()
+                               }}
                     />
-                })
-            }
-            {
-                [
-                    "comment", "comment.html"
-                ].map(e => {
-                    return <Route
-                        key={e}
-                        path={e}
-                        element={
-                            <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting}
-                                       offline={state.offline}
-                                       LazyComponent={AsyncComment}
-                                       FallbackComponent={Comment}
-                                       props={{
-                                           offline: state.offline,
-                                           data: getDataFromState()
-                                       }}
-                            />
-                        }
-                    />
-                })
-            }
-
-            <Route
-                path="plugin"
+                }
+            />
+            <MultiplePathRoute
+                path={["plugin", "plugin.html"]}
                 element={
                     <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
                                LazyComponent={AsyncPlugin}
@@ -302,8 +290,8 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
                     />
                 }
             />
-            <Route
-                path={"website"}
+            <MultiplePathRoute
+                path={["website", "website.html"]}
                 element={
                     <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
                                LazyComponent={AsyncWebSite}
@@ -317,8 +305,8 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
 
                 }
             />
-            <Route
-                path={"website/admin"}
+            <MultiplePathRoute
+                path={["website/admin", "website/admin.html"]}
                 element={
                     <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
                                LazyComponent={AsyncWebSite}
@@ -331,8 +319,8 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
                     />
                 }
             />
-            <Route
-                path={"website/template"}
+            <MultiplePathRoute
+                path={["website/template", "website/template.html"]}
                 element={
                     <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
                                LazyComponent={AsyncWebSite}
@@ -345,8 +333,8 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
                     />
                 }
             />
-            <Route
-                path={"website/other"}
+            <MultiplePathRoute
+                path={["website/other", "website/other.html"]}
                 element={
                     <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
                                LazyComponent={AsyncWebSite}
@@ -359,8 +347,8 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
                     />
                 }
             />
-            <Route
-                path={"website/blog"}
+            <MultiplePathRoute
+                path={["website/blog", "website/blog.html"]}
                 element={
                     <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
                                LazyComponent={AsyncWebSite}
@@ -373,8 +361,8 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
                     />
                 }
             />
-            <Route
-                path={"website/upgrade"}
+            <MultiplePathRoute
+                path={["website/upgrade", "website/upgrade.html"]}
                 element={
                     <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
                                LazyComponent={AsyncWebSite}
@@ -387,8 +375,8 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
                     />
                 }
             />
-            <Route
-                path="article-type"
+            <MultiplePathRoute
+                path={["article-type", "article-type.html"]}
                 element={
                     <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
                                LazyComponent={AsyncType}
@@ -400,8 +388,8 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
                     />
                 }
             />
-            <Route
-                path="link"
+            <MultiplePathRoute
+                path={["link", "link.html"]}
                 element={
                     <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
                                LazyComponent={AsyncLink}
@@ -413,8 +401,8 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
                     />
                 }
             />
-            <Route
-                path="nav"
+            <MultiplePathRoute
+                path={["nav", "nav.html"]}
                 element={
                     <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
                                LazyComponent={AsyncNav}
@@ -426,8 +414,8 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
                     />
                 }
             />
-            <Route
-                path="article"
+            <MultiplePathRoute
+                path={["article", "article.html"]}
                 element={
                     <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
                                LazyComponent={AsyncArticle}
@@ -439,10 +427,9 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
                     />
                 }
             />
-            <Route
-                path="article-edit"
+            <MultiplePathRoute
+                path={["article-edit", "article-edit.html"]}
                 element={
-
                     <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
                                LazyComponent={AsyncArticleEdit}
                                fullScreen={state.fullScreen}
@@ -477,8 +464,8 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
                     />
                 }
             />
-            <Route
-                path="user"
+            <MultiplePathRoute
+                path={["user", "user.html"]}
                 element={
                     <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
                                LazyComponent={AsyncUser}
@@ -490,8 +477,8 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
                     />
                 }
             />
-            <Route
-                path="template-center"
+            <MultiplePathRoute
+                path={["template-center", "template-center.html"]}
                 element={
                     <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
                                LazyComponent={AsyncTemplateCenter}
@@ -503,8 +490,8 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
                     />
                 }
             />
-            <Route
-                path="user-update-password"
+            <MultiplePathRoute
+                path={["user-update-password", "user-update-password.html"]}
                 element={
                     <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
                                LazyComponent={AsyncUserUpdatePassword}
@@ -516,8 +503,8 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
                     />
                 }
             />
-            <Route
-                path="upgrade"
+            <MultiplePathRoute
+                path={["upgrade", "upgrade.html"]}
                 element={
                     <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
                                LazyComponent={AsyncUpgrade}
@@ -531,8 +518,8 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
                     />
                 }
             />
-            <Route
-                path="template-config"
+            <MultiplePathRoute
+                path={["template-config", "template-config.html"]}
                 element={
                     <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
                                LazyComponent={AsyncTemplateConfig}
@@ -544,8 +531,8 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
                     />
                 }
             />
-            <Route
-                path="403"
+            <MultiplePathRoute
+                path={["403", "403.html"]}
                 element={
                     getDataFromState() && (
                         <Suspense fallback={<MyLoadingComponent/>}>
@@ -554,8 +541,8 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
                     )
                 }
             />
-            <Route
-                path="500"
+            <MultiplePathRoute
+                path={["500", "500.html"]}
                 element={
                     getDataFromState() && (
                         <Suspense fallback={<MyLoadingComponent/>}>
@@ -564,16 +551,16 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
                     )
                 }
             />
-            <Route
-                path={"offline"}
+            <MultiplePathRoute
+                path={["offline", "offline.html"]}
                 element={
                     <Suspense fallback={<MyLoadingComponent/>}>
                         <AsyncOffline/>
                     </Suspense>
                 }
             />
-            <Route
-                path={"system"}
+            <MultiplePathRoute
+                path={["system", "system.html"]}
                 element={
                     <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
                                LazyComponent={AsyncSystem}
