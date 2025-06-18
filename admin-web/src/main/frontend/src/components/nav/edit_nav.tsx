@@ -59,7 +59,7 @@ const EditNav: FunctionComponent<EditNavProps> = ({ record, editSuccessCall, off
                     setShowModel(true);
                 }}
             >
-                <EditOutlined style={{ marginBottom: 8, color: getColorPrimary() }} />
+                <EditOutlined style={{ color: getColorPrimary() }} />
             </Link>
             <Modal title={getRes()["edit"]} open={showModel} onOk={handleOk} onCancel={() => setShowModel(false)}>
                 <Form initialValues={updateForm} onValuesChange={(_k, v) => setValue(v)} {...layout}>
