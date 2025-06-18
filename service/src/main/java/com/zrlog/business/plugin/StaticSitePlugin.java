@@ -137,6 +137,8 @@ public class StaticSitePlugin extends BaseLockObject implements IPlugin {
         handleStatusPageMap.clear();
         //从首页开始查找
         handleStatusPageMap.put("/", HandleState.NEW);
+        handleStatusPageMap.put(Constants.ADMIN_PWA_MANIFEST_JSON, HandleState.NEW);
+        handleStatusPageMap.put(Constants.ADMIN_SERVICE_WORKER_JS, HandleState.NEW);
         Constants.zrLogConfig.getAdminResource().getAdminPageUris().forEach(uri -> {
             handleStatusPageMap.put(uri, HandleState.NEW);
         });

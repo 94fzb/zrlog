@@ -121,6 +121,10 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
             htmlFile.getParentFile().mkdirs();
         }
         IOUtil.writeBytesToFile(bytes, htmlFile);
+        //增量存储
+        if (httpRequest.getUri().startsWith("/admin") && !httpRequest.getUri().contains(".")) {
+            IOUtil.writeBytesToFile(bytes, new File(htmlFile + ".html"));
+        }
         return htmlFile;
     }
 

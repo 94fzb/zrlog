@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 public class AdminResourceImpl implements AdminResource {
 
     public static final String ADMIN_ASSET_MANIFEST_JSON = "/admin/asset-manifest.json";
-    public static final String ADMIN_SERVICE_WORKER_JS = "/admin/service-worker.js";
 
     private final Set<String> pageUris;
     private final Set<String> staticUris;
@@ -59,7 +58,7 @@ public class AdminResourceImpl implements AdminResource {
                 sb.add("\"" + e + "\"");
             }
         });
-        return new ByteArrayInputStream(IOUtil.getStringInputStream(ResourceUtils.class.getResourceAsStream(ADMIN_SERVICE_WORKER_JS)).replace("'___FILES___'", sb.toString()).getBytes());
+        return new ByteArrayInputStream(IOUtil.getStringInputStream(ResourceUtils.class.getResourceAsStream(Constants.ADMIN_SERVICE_WORKER_JS)).replace("'___FILES___'", sb.toString()).getBytes());
     }
 
     private Set<String> getUris(String resourceName) {
