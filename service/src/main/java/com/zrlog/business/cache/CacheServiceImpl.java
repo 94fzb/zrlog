@@ -38,6 +38,22 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
     private final Map<String, String> cacheFileMap = new ConcurrentHashMap<>();
     private BaseDataInitVO cacheInit;
 
+    private static String getStreamTag(InputStream inputStream) {
+        return Math.abs(SecurityUtils.md5(inputStream).hashCode()) + "";
+    }
+
+    private static void setToRequest(HttpRequest servletRequest, BaseDataInitVO cacheInit) {
+        if (Objects.isNull(servletRequest)) {
+            return;
+        }
+        servletRequest.getAttr().put("init", cacheInit);
+        servletRequest.getAttr().put("website", cacheInit.getWebSite());
+        //website alias
+        servletRequest.getAttr().put("webSite", cacheInit.getWebSite());
+        servletRequest.getAttr().put("webs", cacheInit.getWebSite());
+        servletRequest.getAttr().put("WEB_SITE", cacheInit.getWebSite());
+    }
+
     @Override
     public boolean isCacheableByRequest(HttpRequest request) {
         //disable html client cache
@@ -46,7 +62,6 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
         }
         return cacheFileMap.containsKey(request.getUri().substring(1));
     }
-
 
     @Override
     public String getFileFlagFirstByCache(String uri) {
@@ -83,10 +98,6 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
         return null;
     }
 
-    private static String getStreamTag(InputStream inputStream) {
-        return Math.abs(SecurityUtils.md5(inputStream).hashCode()) + "";
-    }
-
     @Override
     public void refreshFavicon() {
         FaviconBase64DTO faviconBase64DTO = new WebSite().faviconBase64DTO();
@@ -121,11 +132,10 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
         if (!htmlFile.exists()) {
             htmlFile.getParentFile().mkdirs();
         }
-        IOUtil.writeBytesToFile(bytes, htmlFile);
-        //增量存储
         if (httpRequest.getUri().startsWith("/admin") && !httpRequest.getUri().contains(".")) {
-            IOUtil.writeBytesToFile(bytes, new File(htmlFile + ".html"));
+            htmlFile = new File(htmlFile + ".html");
         }
+        IOUtil.writeBytesToFile(bytes, htmlFile);
         return htmlFile;
     }
 
@@ -191,18 +201,6 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
         } finally {
             executor.shutdown();
         }
-    }
-
-    private static void setToRequest(HttpRequest servletRequest, BaseDataInitVO cacheInit) {
-        if (Objects.isNull(servletRequest)) {
-            return;
-        }
-        servletRequest.getAttr().put("init", cacheInit);
-        servletRequest.getAttr().put("website", cacheInit.getWebSite());
-        //website alias
-        servletRequest.getAttr().put("webSite", cacheInit.getWebSite());
-        servletRequest.getAttr().put("webs", cacheInit.getWebSite());
-        servletRequest.getAttr().put("WEB_SITE", cacheInit.getWebSite());
     }
 
     private BaseDataInitVO refreshInitDataCache(boolean cleanAble, long expectVersion) {
