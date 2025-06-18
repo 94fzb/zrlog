@@ -8,6 +8,7 @@ import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.web.cookie.Cookie;
+import com.zrlog.admin.cross.CrossUtils;
 import com.zrlog.business.util.InstallUtils;
 import com.zrlog.common.Constants;
 import com.zrlog.common.TokenService;
@@ -116,7 +117,7 @@ public class AdminTokenService implements TokenService {
                 cookie.setValue("");
                 cookie.setExpireDate(new Date(0));
                 cookie.setPath("/");
-                if (Constants.isStaticHtmlStatus()) {
+                if (CrossUtils.isEnableOrigin(request)) {
                     cookie.setSameSite("None");
                 }
                 cookie.setHttpOnly(true);
