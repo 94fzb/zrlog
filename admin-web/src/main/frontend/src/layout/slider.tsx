@@ -64,7 +64,10 @@ const SliderMenu = () => {
     const [modal, contextHolder] = Modal.useModal();
 
     const getInfo = (entry: MenuEntry): IconInfo => {
-        const realPathName = location.pathname.split(".")[0];
+        let realPathName = location.pathname.split(".")[0];
+        if (realPathName === "/") {
+            realPathName = "/index"
+        }
         if (realPathName.startsWith("/website") && entry.link.startsWith("/website")) {
             return {selected: true, icon: entry.selectIcon};
         }
