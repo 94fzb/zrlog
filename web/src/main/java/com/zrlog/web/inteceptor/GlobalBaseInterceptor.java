@@ -19,7 +19,6 @@ public class GlobalBaseInterceptor implements Interceptor {
 
 
     private final Set<String> forbiddenUriExtSet = new HashSet<>();
-    private final Set<String> forbiddenUriSet = new HashSet<>();
 
     public GlobalBaseInterceptor() {
         //不希望部分技术人走后门，拦截一些不合法的请求
@@ -28,11 +27,21 @@ public class GlobalBaseInterceptor implements Interceptor {
         //这主要用在主题目录下面的配置文件。
         forbiddenUriExtSet.add(".properties");
         if (ZrLogUtil.isWarMode()) {
-            forbiddenUriSet.add(".jsp");
+            forbiddenUriExtSet.add(".jsp");
         }
-        //静态文件
-        forbiddenUriSet.add(Constants.INSTALL_HTML_PAGE);
-        forbiddenUriSet.add(Constants.ADMIN_HTML_PAGE);
+    }
+
+    private boolean isForbiddenUri(HttpRequest request) {
+        String target = request.getUri();
+        if (forbiddenUriExtSet.stream().anyMatch(target::endsWith)) {
+            //非法请求, 返回403
+            return true;
+        }
+        if (Objects.equals(target, Constants.INSTALL_HTML_PAGE)) {
+            return true;
+        }
+        //非法请求, 返回403
+        return Objects.equals(Constants.ADMIN_HTML_PAGE, target) && !ZrLogUtil.isStaticBlogPlugin(request);
     }
 
     @Override
@@ -44,7 +53,7 @@ public class GlobalBaseInterceptor implements Interceptor {
         Constants.setLastAccessTime(System.currentTimeMillis());
         //便于Wappalyzer读取
         response.addHeader("X-ZrLog", BlogBuildInfoUtil.getVersion());
-        if (forbiddenUriExtSet.stream().anyMatch(target::endsWith) || forbiddenUriSet.contains(target)) {
+        if (isForbiddenUri(request)) {
             //非法请求, 返回403
             response.renderCode(403);
             return false;
