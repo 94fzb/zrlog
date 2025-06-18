@@ -7,6 +7,8 @@ public interface AdminResource  {
 
     Set<String> getAdminResourceUris(boolean requiredStaticFiles);
 
+    Set<String> getAdminPageUris();
+
     boolean isAdminMainJs(String uri);
 
     InputStream renderServiceWorker();

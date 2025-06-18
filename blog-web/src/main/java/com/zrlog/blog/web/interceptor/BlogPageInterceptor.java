@@ -101,7 +101,7 @@ public class BlogPageInterceptor implements HandleAbleInterceptor {
         try (ResponseRenderPrintWriter responseRenderPrintWriter = new ResponseRenderPrintWriter(byteArrayOutputStream, "/", request, response, null)) {
             responseRenderPrintWriter.write(htmlStr);
             String realHtmlStr = responseRenderPrintWriter.getResponseBody();
-            if (!ZrLogUtil.isStaticBlogPlugin(request)) {
+            if (!ZrLogUtil.isStaticPlugin(request)) {
                 response.renderHtmlStr(realHtmlStr);
             }
             if (BlogPageInterceptor.catGeneratorHtml(target) && responseRenderPrintWriter.isRenderSuccess()) {

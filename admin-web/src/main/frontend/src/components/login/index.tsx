@@ -3,7 +3,7 @@ import {LoginOutlined} from "@ant-design/icons";
 import {Button, Col, Form, Input, Layout, message} from "antd";
 import Card from "antd/es/card";
 import Row from "antd/es/grid/row";
-import {getColorPrimary, getRes} from "../../utils/constants";
+import {getBackendServerUrl, getColorPrimary, getRes, isStaticPage, setBackendServerUrl} from "../../utils/constants";
 import axios from "axios";
 import {useNavigate} from "react-router-dom";
 import Title from "antd/es/typography/Title";
@@ -85,6 +85,7 @@ const {Content, Footer} = Layout;
 type LoginState = {
     userName: string;
     password: string;
+    backendServerUrl: string;
 };
 
 const Index = ({offline}: { offline: boolean }) => {
@@ -92,6 +93,7 @@ const Index = ({offline}: { offline: boolean }) => {
     const [loginState, setLoginState] = useState<LoginState>({
         userName: "",
         password: "",
+        backendServerUrl: "",
     });
 
     const [messageApi, contextHolder] = message.useMessage({maxCount: 3});
@@ -100,6 +102,9 @@ const Index = ({offline}: { offline: boolean }) => {
 
     const setValue = (value: LoginState) => {
         setLoginState(value);
+        if (value.backendServerUrl) {
+            setBackendServerUrl(value.backendServerUrl)
+        }
     };
 
     const onFinish = async (allValues: any) => {
@@ -142,6 +147,8 @@ const Index = ({offline}: { offline: boolean }) => {
         removeAllCaches();
     }, []);
 
+    // @ts-ignore
+    // @ts-ignore
     return (
         <PWAHandler>
             {contextHolder}
@@ -169,10 +176,17 @@ const Index = ({offline}: { offline: boolean }) => {
                     >
                         <Form
                             {...layout}
-                            initialValues={getRes().defaultLoginInfo}
+                            initialValues={{
+                                ...getRes().defaultLoginInfo as LoginState,
+                                backendServerUrl: getBackendServerUrl()
+                            }}
                             onFinish={(values) => onFinish(values)}
                             onValuesChange={(_k, v) => setValue(v)}
                         >
+                            {isStaticPage() && <Form.Item label={getRes().backendServerUrl} name={"backendServerUrl"}
+                                                          rules={[{required: true}]}>
+                                <Input value={loginState.backendServerUrl}/>
+                            </Form.Item>}
                             <Form.Item label={getRes().userName} name="userName" rules={[{required: true}]}>
                                 <Input value={loginState.userName}/>
                             </Form.Item>

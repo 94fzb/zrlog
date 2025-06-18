@@ -33,14 +33,14 @@ public class TemplateHelper {
 
 
     public static String getSuffix(HttpRequest request) {
-        if (ZrLogUtil.isStaticBlogPlugin(request) || Constants.isStaticHtmlStatus()) {
+        if (ZrLogUtil.isStaticPlugin(request) || Constants.isStaticHtmlStatus()) {
             return ".html";
         }
         return "";
     }
 
     private static void fullInfo(HttpRequest request) {
-        boolean staticBlog = ZrLogUtil.isStaticBlogPlugin(request);
+        boolean staticBlog = ZrLogUtil.isStaticPlugin(request);
         String suffix = getSuffix(request);
         request.getAttr().put("staticBlog", staticBlog);
         request.getAttr().put("suffix", suffix);

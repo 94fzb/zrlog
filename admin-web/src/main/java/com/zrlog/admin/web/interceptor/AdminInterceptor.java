@@ -14,6 +14,7 @@ import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.AdminTokenVO;
 import com.zrlog.model.User;
+import com.zrlog.util.ZrLogUtil;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -45,6 +46,9 @@ public class AdminInterceptor implements HandleAbleInterceptor {
      * 具体方式看 AdminRouters，这里用到了 ThreadLocal
      */
     public boolean doInterceptor(HttpRequest request, HttpResponse response) throws Exception {
+        if (Objects.nonNull(ZrLogUtil.getBlogHostByWebSite())) {
+            response.addHeader("Access-Control-Allow-Origin", "*");
+        }
         try {
             String uri = request.getUri();
             if (Constants.ADMIN_LOGIN_URI_PATH.equals(uri)) {
@@ -69,7 +73,7 @@ public class AdminInterceptor implements HandleAbleInterceptor {
                 return false;
             }
             Method method = request.getServerConfig().getRouter().getMethod(request.getUri());
-            if (Objects.nonNull(method)) {
+            if (Objects.nonNull(method) && !ZrLogUtil.isStaticPlugin(request)) {
                 AdminTokenVO adminTokenVO = Constants.zrLogConfig.getTokenService().getAdminTokenVO(request);
                 if (adminTokenVO == null) {
                     WebTools.blockUnLoginRequestHandler(request, response);

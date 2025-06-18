@@ -26,7 +26,7 @@ public class StaticResourceInterceptor implements Interceptor {
 
     @Override
     public boolean doInterceptor(HttpRequest request, HttpResponse response) throws Exception {
-        if (ZrLogUtil.isStaticBlogPlugin(request)) {
+        if (ZrLogUtil.isStaticPlugin(request)) {
             return true;
         }
         String actionKey = request.getUri();
@@ -49,7 +49,7 @@ public class StaticResourceInterceptor implements Interceptor {
             }
             if (BlogPageInterceptor.catGeneratorHtml(actionKey)) {
                 File cacheFile = Constants.zrLogConfig.getCacheService().loadCacheFile(request);
-                if (cacheFile.exists() && !ZrLogUtil.isStaticBlogPlugin(request)) {
+                if (cacheFile.exists() && !ZrLogUtil.isStaticPlugin(request)) {
                     response.writeFile(cacheFile);
                     return false;
                 }

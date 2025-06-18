@@ -101,6 +101,9 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
         if (Objects.equals(cacheKey, "/")) {
             cacheKey = "/index.html";
         }
+        if (cacheKey.equals("/admin/website")) {
+            cacheKey = "/admin/website/index";
+        }
         return new File(CACHE_HTML_PATH + lang + "/" + cacheKey);
     }
 

@@ -10,6 +10,7 @@ import com.zrlog.admin.business.rest.response.UserBasicInfoResponse;
 import com.zrlog.admin.web.controller.api.AdminUserController;
 import com.zrlog.admin.web.token.AdminTokenThreadLocal;
 import com.zrlog.blog.web.util.WebTools;
+import com.zrlog.business.plugin.StaticSitePlugin;
 import com.zrlog.business.rest.response.PublicInfoVO;
 import com.zrlog.business.service.CommonService;
 import com.zrlog.common.Constants;
@@ -80,7 +81,11 @@ public class AdminPageController extends Controller {
         ServerSideDataResponse serverSideDataResponse = serverSide(request.getUri());
         document.getElementById("__SS_DATA__").text(new Gson().toJson(serverSideDataResponse));
         document.title(serverSideDataResponse.getDocumentTitle());
-        response.renderHtmlStr(document.html());
+        String html = document.html();
+        response.renderHtmlStr(html);
+        if (ZrLogUtil.isStaticPlugin(request)) {
+            request.getAttr().put(StaticSitePlugin.HTML_FILE_KEY, Constants.zrLogConfig.getCacheService().saveResponseBodyToHtml(request, html));
+        }
     }
 
 

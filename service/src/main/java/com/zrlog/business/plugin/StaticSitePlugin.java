@@ -137,6 +137,9 @@ public class StaticSitePlugin extends BaseLockObject implements IPlugin {
         handleStatusPageMap.clear();
         //从首页开始查找
         handleStatusPageMap.put("/", HandleState.NEW);
+        Constants.zrLogConfig.getAdminResource().getAdminPageUris().forEach(uri -> {
+            handleStatusPageMap.put(uri, HandleState.NEW);
+        });
         //生成 404 页面，用于配置第三方 cdn，或者云存储的错误页面
         String notFindFile = "/error/404.html";
         handleStatusPageMap.put(notFindFile, HandleState.NEW);

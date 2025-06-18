@@ -41,4 +41,8 @@ api/admin/plugin
 admin/upgrade
 api/admin/upgrade
 admin/system
+admin/403
+admin/404
+admin/500
+admin/login
 api/admin/system" > pwa-page.txt

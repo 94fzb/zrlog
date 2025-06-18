@@ -48,7 +48,7 @@ public class ZrLogUtil {
         return BeanUtil.convert(tempMap, clazz);
     }
 
-    public static boolean isStaticBlogPlugin(HttpRequest request) {
+    public static boolean isStaticPlugin(HttpRequest request) {
         if (Objects.isNull(request)) {
             return false;
         }

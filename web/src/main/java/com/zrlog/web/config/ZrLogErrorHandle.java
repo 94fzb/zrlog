@@ -1,7 +1,6 @@
 package com.zrlog.web.config;
 
 import com.hibegin.common.util.LoggerUtil;
-import com.hibegin.common.util.UrlEncodeUtils;
 import com.hibegin.http.server.api.HttpErrorHandle;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
@@ -43,7 +42,7 @@ public class ZrLogErrorHandle implements HttpErrorHandle {
         } else {
             LOGGER.log(Level.WARNING, "handle " + request.getUri() + " error " + e.getMessage());
         }
-        if (ZrLogUtil.isStaticBlogPlugin(request)) {
+        if (ZrLogUtil.isStaticPlugin(request)) {
             return;
         }
         if (request.getUri().startsWith("/api")) {

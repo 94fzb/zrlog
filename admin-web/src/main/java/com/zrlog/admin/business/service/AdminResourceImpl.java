@@ -100,8 +100,15 @@ public class AdminResourceImpl implements AdminResource {
         return cacheUris;
     }
 
+    @Override
+    public Set<String> getAdminPageUris() {
+        return pageUris.stream().filter(e -> e.startsWith("/admin/")).map(e -> e.split("\\?")[0]).collect(Collectors.toSet());
+    }
+
     public static void main(String[] args) {
-        System.out.println("js = " + IOUtil.getStringInputStream(new AdminResourceImpl().renderServiceWorker()));
+        //System.out.println("js = " + IOUtil.getStringInputStream(new AdminResourceImpl().renderServiceWorker()));
+        Set<String> adminPageUris = new AdminResourceImpl().getAdminPageUris();
+        System.out.println(adminPageUris);
     }
 
 }

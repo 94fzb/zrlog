@@ -85,6 +85,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         this.updater = updater;
         this.cacheService = new CacheServiceImpl();
         this.pluginCoreProcess = new PluginCoreProcessImpl();
+        this.adminResource = new AdminResourceImpl();
         this.serverConfig = initServerConfig();
         this.uptime = System.currentTimeMillis();
         this.configRouter();
@@ -92,7 +93,6 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         if (ThreadUtils.isEnableLoom() && Constants.debugLoggerPrintAble()) {
             LOGGER.info("Java VirtualThread(loom) enabled");
         }
-        this.adminResource = new AdminResourceImpl();
     }
 
     public static boolean isTest() {
@@ -142,7 +142,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     }
 
     private void configRouter() {
-        AdminRouters.configAdminRoute(serverConfig.getRouter());
+        AdminRouters.configAdminRoute(serverConfig.getRouter(),adminResource);
         BlogRouters.configBlogRouter(serverConfig.getRouter());
     }
 

@@ -8,17 +8,23 @@ import AppBase from "./AppBase";
 import {legacyLogicalPropertiesTransformer, StyleProvider} from "@ant-design/cssinjs";
 import {useEffect, useState} from "react";
 import {createRoot} from "react-dom/client";
-import {getColorPrimary, getRes, setRes} from "./utils/constants";
+import {getBackendServerUrl, getColorPrimary, getRes, setRes} from "./utils/constants";
 
 import axios from "axios";
 import {BasicUserInfo} from "./type";
 import UnknownErrorPage from "./components/unknown-error-page";
+import {getContextPath} from "./utils/helpers";
 
-const url = new URL(document.baseURI);
-export const basePath = url.pathname + "admin/";
-export const apiBasePath = url.pathname + "api/admin/";
+export const basePath = getContextPath() + "admin/"
+export let apiBasePath: string;
 
-axios.defaults.baseURL = document.baseURI;
+export const refreshPathInfo = () => {
+    apiBasePath = getBackendServerUrl() + "api/admin/";
+    axios.defaults.baseURL = getBackendServerUrl();
+}
+
+refreshPathInfo()
+
 const {darkAlgorithm, defaultAlgorithm} = theme;
 
 type AppState = {

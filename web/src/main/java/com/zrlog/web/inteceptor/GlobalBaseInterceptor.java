@@ -41,7 +41,7 @@ public class GlobalBaseInterceptor implements Interceptor {
             return true;
         }
         //非法请求, 返回403
-        return Objects.equals(Constants.ADMIN_HTML_PAGE, target) && !ZrLogUtil.isStaticBlogPlugin(request);
+        return Objects.equals(Constants.ADMIN_HTML_PAGE, target) && !ZrLogUtil.isStaticPlugin(request);
     }
 
     @Override
