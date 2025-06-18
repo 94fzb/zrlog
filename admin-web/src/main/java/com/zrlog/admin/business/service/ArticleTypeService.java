@@ -1,8 +1,8 @@
 package com.zrlog.admin.business.service;
 
 import com.hibegin.common.util.BeanUtil;
+import com.hibegin.common.util.UrlEncodeUtils;
 import com.zrlog.admin.business.rest.response.ArticleTypeResponseEntry;
-import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.common.rest.request.PageRequest;
 import com.zrlog.data.dto.PageData;
 import com.zrlog.model.Type;
@@ -19,7 +19,7 @@ public class ArticleTypeService {
         return new PageData<>(mapPageData.getTotalElements(), mapPageData.getRows().stream().map(e -> {
             ArticleTypeResponseEntry response = BeanUtil.convert(e, ArticleTypeResponseEntry.class);
             response.setAmount(response.getTypeamount());
-            response.setUrl(homeUrl + WebTools.encodeUrl("sort/" + response.getAlias()) + (staticHtml ? ".html" : ""));
+            response.setUrl(homeUrl + UrlEncodeUtils.encodeUrl("sort/" + response.getAlias()) + (staticHtml ? ".html" : ""));
             return response;
         }).collect(Collectors.toList()), mapPageData.getPage(), mapPageData.getSize());
     }

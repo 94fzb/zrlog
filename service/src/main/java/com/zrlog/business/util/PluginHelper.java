@@ -2,6 +2,7 @@ package com.zrlog.business.util;
 
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.StringUtils;
+import com.hibegin.common.util.UrlEncodeUtils;
 import com.hibegin.common.util.http.HttpUtil;
 import com.hibegin.common.util.http.handle.CloseResponseHandle;
 import com.hibegin.http.HttpMethod;
@@ -44,11 +45,11 @@ public class PluginHelper {
             }
             String fullUrl;
             if (Objects.nonNull(adminTokenVO)) {
-                fullUrl = request.getFullUrl().replaceAll("http://", adminTokenVO.getProtocol() + "://");
+                fullUrl = request.getFullUrl().replaceFirst("http://", adminTokenVO.getProtocol() + "://");
             } else {
                 fullUrl = request.getFullUrl();
             }
-            map.put("Full-Url", WebTools.encodeUrl(fullUrl));
+            map.put("Full-Url", UrlEncodeUtils.encodeUrl(fullUrl));
         }
         return map;
     }

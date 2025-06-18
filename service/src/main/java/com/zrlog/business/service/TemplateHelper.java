@@ -3,6 +3,7 @@ package com.zrlog.business.service;
 import com.hibegin.common.util.BeanUtil;
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.StringUtils;
+import com.hibegin.common.util.UrlEncodeUtils;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.util.PathUtil;
 import com.hibegin.http.server.web.cookie.Cookie;
@@ -246,7 +247,7 @@ public class TemplateHelper {
     }
 
     private static void fillArticleInfo(Map<String, Object> log, HttpRequest request, String suffix) {
-        String aliasUrl = WebTools.encodeUrl((String) log.get("alias")) + suffix;
+        String aliasUrl = UrlEncodeUtils.encodeUrl((String) log.get("alias")) + suffix;
         log.put("alias", aliasUrl);
         log.put("canComment", Objects.equals(log.get("canComment"), true) && Constants.isAllowComment());
         log.put("url", WebTools.buildEncodedUrl(request, Constants.getArticleUri() + aliasUrl));

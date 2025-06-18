@@ -1,13 +1,13 @@
 package com.zrlog.web.config;
 
 import com.hibegin.common.util.LoggerUtil;
+import com.hibegin.common.util.UrlEncodeUtils;
 import com.hibegin.http.server.api.HttpErrorHandle;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.execption.NotFindResourceException;
 import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.admin.business.exception.NotFindDbEntryException;
-import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.common.Constants;
 import com.zrlog.common.exception.AbstractBusinessException;
 import com.zrlog.common.rest.response.ApiStandardResponse;
@@ -63,7 +63,7 @@ public class ZrLogErrorHandle implements HttpErrorHandle {
         }
         if (request.getUri().startsWith(Constants.ADMIN_URI_BASE_PATH)) {
             if (e instanceof NotFindResourceException || e instanceof NotFindDbEntryException) {
-                response.redirect(WebTools.encodeUrl(Constants.ADMIN_URI_BASE_PATH + "/404?queryString=" + request.getQueryStr() + "&uriPath=" + request.getUri() + "&message=" + e.getMessage()));
+                response.redirect(Constants.ADMIN_URI_BASE_PATH + "/404?queryString=" + request.getQueryStr() + "&uriPath=" + request.getUri() + "&message=" + e.getMessage());
             }
             response.redirect(Constants.ADMIN_URI_BASE_PATH + "/500?message=" + e.getMessage());
             return;

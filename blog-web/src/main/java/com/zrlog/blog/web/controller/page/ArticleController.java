@@ -183,7 +183,6 @@ public class ArticleController extends Controller {
 
     public String tag() throws SQLException {
         ArticleUriInfoVO uriInfoVO = parseUriInfo(request.getUri());
-
         String tag = uriInfoVO.getKey();
         setPageDataInfo(Constants.getArticleUri() + "tag/" + tag + "-", new Log().findByTag(uriInfoVO.getPage(), Constants.getDefaultRows(), tag),
                 new PageRequestImpl(uriInfoVO.getPage(),
