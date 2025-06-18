@@ -9,6 +9,7 @@ import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.web.cookie.Cookie;
 import com.zrlog.admin.cross.CrossUtils;
+import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.business.util.InstallUtils;
 import com.zrlog.common.Constants;
 import com.zrlog.common.TokenService;
@@ -19,6 +20,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Date;
@@ -121,7 +123,14 @@ public class AdminTokenService implements TokenService {
                 response.addCookie(cookie);
             }
         }
-        response.redirect(Constants.ADMIN_LOGIN_URI_PATH);
+        String referer = request.getHeader("Referer");
+        if (Objects.isNull(referer)) {
+            response.redirect(Constants.ADMIN_LOGIN_URI_PATH);
+            return;
+        }
+        URI uri = URI.create(referer);
+        response.redirect(uri.getScheme() + ":" + uri.getRawSchemeSpecificPart() + WebTools.buildEncodedUrl(request, Constants.ADMIN_LOGIN_URI_PATH));
+
     }
 
     @Override
