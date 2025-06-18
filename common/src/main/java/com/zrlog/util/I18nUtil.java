@@ -125,7 +125,6 @@ public class I18nUtil {
         }
         String locale = null;
         if (Objects.nonNull(request)) {
-            System.out.println("request = " + request.getUri());
             if (request.getUri().contains(Constants.ADMIN_URI_BASE_PATH + "/")
                     || request.getUri().contains("/api" + Constants.ADMIN_URI_BASE_PATH + "/")
                     || request.getUri().contains("/api/public/adminResource")
