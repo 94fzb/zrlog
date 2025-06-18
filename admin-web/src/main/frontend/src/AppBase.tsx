@@ -1,13 +1,12 @@
-import { Route, Routes } from "react-router-dom";
-import { lazy } from "react";
-import { Suspense } from "react";
-import { App, Spin } from "antd";
-import axios, { AxiosError } from "axios";
-import { API_VERSION_PATH } from "./components/upgrade";
+import {Route, Routes} from "react-router-dom";
+import {lazy, Suspense} from "react";
+import {App, Spin} from "antd";
+import axios, {AxiosError, AxiosInstance} from "axios";
+import {API_VERSION_PATH} from "./components/upgrade";
 import ErrorBoundary from "./common/ErrorBoundary";
-import type { HookAPI as ModalHookAPI } from "antd/es/modal/useModal";
-import type { MessageInstance } from "antd/es/message/interface";
-import { AxiosInstance } from "axios";
+import type {HookAPI as ModalHookAPI} from "antd/es/modal/useModal";
+import type {MessageInstance} from "antd/es/message/interface";
+
 const AsyncLogin = lazy(() => import("components/login"));
 const AsyncAdminDashboardRouter = lazy(() => import("AdminDashboardRouter"));
 
@@ -27,7 +26,8 @@ export const commonAxiosErrorHandle = (
         if (error.response.status) {
             modal.error({
                 title: "服务异常[" + error.response.status + "]",
-                content: <div style={{ paddingTop: 20,overflow:"auto" }} dangerouslySetInnerHTML={{ __html: error.response.data }} />,
+                content: <div style={{paddingTop: 20, overflow: "auto"}}
+                              dangerouslySetInnerHTML={{__html: error.response.data}}/>,
                 getContainer: modalContainer,
             });
             return Promise.reject(error.response);
@@ -52,8 +52,8 @@ export const createAxiosBaseInstance = (): AxiosInstance => {
     return axios.create({});
 };
 
-const AppBase = ({ offline }: { offline: boolean }) => {
-    const { modal, message } = App.useApp();
+const AppBase = ({offline}: { offline: boolean }) => {
+    const {modal, message} = App.useApp();
 
     const initAxios = () => {
         //@ts-ignore
@@ -84,22 +84,28 @@ const AppBase = ({ offline }: { offline: boolean }) => {
     return (
         <>
             <Routes>
-                <Route
-                    path={"login"}
-                    element={
-                        <ErrorBoundary>
-                            <Suspense fallback={<Spin spinning={true} fullscreen delay={1000} />}>
-                                <AsyncLogin offline={offline} />
-                            </Suspense>
-                        </ErrorBoundary>
-                    }
-                />
+                {
+                    ["login", "login.html"].map(e => {
+                        return <Route
+                            key={e}
+                            path={e}
+                            element={
+                                <ErrorBoundary>
+                                    <Suspense fallback={<Spin spinning={true} fullscreen delay={1000}/>}>
+                                        <AsyncLogin offline={offline}/>
+                                    </Suspense>
+                                </ErrorBoundary>
+                            }
+                        />
+                    })
+                }
+
                 <Route
                     path={"logout"}
                     element={
                         <ErrorBoundary>
-                            <Suspense fallback={<Spin spinning={true} fullscreen delay={1000} />}>
-                                <AsyncLogin offline={offline} />
+                            <Suspense fallback={<Spin spinning={true} fullscreen delay={1000}/>}>
+                                <AsyncLogin offline={offline}/>
                             </Suspense>
                         </ErrorBoundary>
                     }
@@ -108,8 +114,8 @@ const AppBase = ({ offline }: { offline: boolean }) => {
                     path={"*"}
                     element={
                         <ErrorBoundary>
-                            <Suspense fallback={<Spin spinning={true} fullscreen delay={1000} />}>
-                                <AsyncAdminDashboardRouter offline={offline} />
+                            <Suspense fallback={<Spin spinning={true} fullscreen delay={1000}/>}>
+                                <AsyncAdminDashboardRouter offline={offline}/>
                             </Suspense>
                         </ErrorBoundary>
                     }
