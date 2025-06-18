@@ -253,42 +253,45 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
 
     return (
         <Routes>
-            <Route
-                path="index"
-                element={
-                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
-                               LazyComponent={AsyncIndex}
-                               FallbackComponent={Index}
-                               props={{
-                                   data: getDataFromState()
-                               }}/>
-                }
-            />
-            <Route
-                path=""
-                element={
-                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
-                               LazyComponent={AsyncIndex}
-                               FallbackComponent={Index}
-                               props={{
-                                   data: getDataFromState()
-                               }}/>
-                }
-            />
-            <Route
-                path="comment"
-                element={
-                    <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting} offline={state.offline}
-                               LazyComponent={AsyncComment}
-                               FallbackComponent={Comment}
-                               props={{
-                                   offline: state.offline,
-                                   data: getDataFromState()
-                               }}
+            {
+                ["index", "index.html", ""].map(e => {
+                    return <Route
+                        path={e}
+                        key={e}
+                        element={
+                            <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting}
+                                       offline={state.offline}
+                                       LazyComponent={AsyncIndex}
+                                       FallbackComponent={Index}
+                                       props={{
+                                           data: getDataFromState()
+                                       }}/>
+                        }
                     />
+                })
+            }
+            {
+                [
+                    "comment", "comment.html"
+                ].map(e => {
+                    return <Route
+                        key={e}
+                        path={e}
+                        element={
+                            <AdminPage data={getDataFromState()} axiosRequesting={state.axiosRequesting}
+                                       offline={state.offline}
+                                       LazyComponent={AsyncComment}
+                                       FallbackComponent={Comment}
+                                       props={{
+                                           offline: state.offline,
+                                           data: getDataFromState()
+                                       }}
+                            />
+                        }
+                    />
+                })
+            }
 
-                }
-            />
             <Route
                 path="plugin"
                 element={
