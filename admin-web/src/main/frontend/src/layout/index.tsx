@@ -8,7 +8,6 @@ import UserInfo from "./user-info";
 import SliderMenu from "./slider";
 import {BasicUserInfo} from "../type";
 import {ssData} from "../index";
-import axios from "axios";
 import MyLoadingComponent from "../components/my-loading-component";
 import PWAHandler from "../PWAHandler";
 import StyledIndexLayout from "./styled-index-layout";
@@ -16,6 +15,7 @@ import type {ScreenMap} from "antd/es/_util/responsiveObserver";
 import useBreakpoint from "antd/es/grid/hooks/useBreakpoint";
 import {addToCache, getCacheByKey} from "../cache";
 import Spin from "antd/es/spin";
+import {useAxiosBaseInstance} from "../AppBase";
 
 const {Header, Content, Sider} = Layout;
 
@@ -44,9 +44,11 @@ const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({offline, 
     const defaultHiddenSlider = needCollSlider(screens);
     const [hiddenSlider, setHiddenSlider] = useState(defaultHiddenSlider);
 
+    const axiosBaseInstance = useAxiosBaseInstance();
+
     useEffect(() => {
         if (userInfo === undefined) {
-            axios.get(`/api/admin/user?t=${new Date().getTime()}`).then(({data}) => {
+            axiosBaseInstance.get(`/api/admin/user?t=${new Date().getTime()}`).then(({data}) => {
                 setUser(data.data);
             });
         }

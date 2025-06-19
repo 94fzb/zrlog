@@ -1,6 +1,6 @@
-import axios from "axios";
+import {AxiosInstance} from "axios";
 
-export const getCsrData = async (uri: string) => {
-    const {data} = await axios.get("/api/admin" + uri.replace(".html",""));
+export const getCsrData = async (uri: string, axiosInstance: AxiosInstance) => {
+    const {data} = await axiosInstance.get("/api/admin" + uri.replace(".html", ""));
     return data;
 }

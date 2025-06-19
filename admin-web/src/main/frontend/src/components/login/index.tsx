@@ -11,7 +11,6 @@ import {
     isStaticPage,
     setBackendServerUrl
 } from "../../utils/constants";
-import axios from "axios";
 import {useNavigate} from "react-router-dom";
 import Title from "antd/es/typography/Title";
 import {ssData} from "../../index";
@@ -19,6 +18,7 @@ import PWAHandler from "../../PWAHandler";
 import {removeAllCaches} from "../../cache";
 import styled from "styled-components";
 import {getContextPath} from "../../utils/helpers";
+import {useAxiosBaseInstance} from "../../AppBase";
 
 const md5 = require("md5");
 
@@ -124,6 +124,8 @@ const Index = ({offline}: { offline: boolean }) => {
         }
     };
 
+    const axiosInstance = useAxiosBaseInstance()
+
     const onFinish = async (allValues: any) => {
         setLogging(true);
         const loginForm = {
@@ -132,7 +134,7 @@ const Index = ({offline}: { offline: boolean }) => {
             https: window.location.protocol === "https:",
         };
         try {
-            const {data} = await axios.post("/api/admin/login", loginForm);
+            const {data} = await axiosInstance.post("/api/admin/login", loginForm);
             if (data.error) {
                 await messageApi.error(data.message);
             } else if (data.error == 0) {

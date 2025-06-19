@@ -8,9 +8,9 @@ import Meta from "antd/es/card/Meta";
 import Button from "antd/es/button";
 import { useEffect, useState } from "react";
 import {getRealRouteUrl, getRes} from "../../utils/constants";
-import axios from "axios";
 import { Link } from "react-router-dom";
 import Popconfirm from "antd/es/popconfirm";
+import {useAxiosBaseInstance} from "../../AppBase";
 
 export type TemplateEntry = {
     template: string;
@@ -27,27 +27,29 @@ export type TemplateEntry = {
 const Template = ({ data }: { data: TemplateEntry[] }) => {
     const [templateState, setTemplateState] = useState<TemplateEntry[]>(data);
 
+    const axiosInstance = useAxiosBaseInstance();
+
     const load = () => {
-        axios.get("/api/admin/template").then(({ data }) => {
+        axiosInstance.get("/api/admin/template").then(({ data }) => {
             setTemplateState(data.data);
         });
     };
 
     const preview = (shortTemplate: string) => {
-        axios.post("/api/admin/template/preview?shortTemplate=" + shortTemplate).then(() => {
+        axiosInstance.post("/api/admin/template/preview?shortTemplate=" + shortTemplate).then(() => {
             window.open(document.baseURI, "_blank");
             load();
         });
     };
 
     const apply = (shortTemplate: string) => {
-        axios.post("/api/admin/template/apply?shortTemplate=" + shortTemplate).then(() => {
+        axiosInstance.post("/api/admin/template/apply?shortTemplate=" + shortTemplate).then(() => {
             load();
         });
     };
 
     const deleteTemplate = (shortTemplate: string) => {
-        axios.post("/api/admin/template/delete?shortTemplate=" + shortTemplate).then(() => {
+        axiosInstance.post("/api/admin/template/delete?shortTemplate=" + shortTemplate).then(() => {
             load();
         });
     };

@@ -3,8 +3,9 @@ import {App, Button, Col, message, Progress, Row, Steps} from "antd";
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
 import {getRealRouteUrl, getRes} from "../utils/constants";
-import axios, {AxiosError} from "axios";
+import {AxiosError} from "axios";
 import {getContextPath} from "../utils/helpers";
+import {useAxiosBaseInstance} from "../AppBase";
 
 const {Step} = Steps;
 export const API_VERSION_PATH = "/api/admin/website/version";
@@ -66,7 +67,7 @@ const Upgrade = ({data, offline, axiosRequesting}: {
     const [messageApi, contextHolder] = message.useMessage({maxCount: 3});
 
     const checkRestartSuccess = (newBuildId: string) => {
-        axios
+        axiosInstance
             .get(API_VERSION_PATH + "?buildId=" + newBuildId)
             .then(({data}) => {
                 if (newBuildId === data.data.buildId) {
@@ -90,6 +91,8 @@ const Upgrade = ({data, offline, axiosRequesting}: {
             });
     };
 
+    const axiosInstance = useAxiosBaseInstance();
+
     const downloadProcess = async () => {
         const current = 1;
         setState((prevState) => {
@@ -99,7 +102,7 @@ const Upgrade = ({data, offline, axiosRequesting}: {
             };
         });
         try {
-            const {data} = await axios.get("/api/admin/upgrade/download?preUpgradeKey=" + preUpgradeKey);
+            const {data} = await axiosInstance.get("/api/admin/upgrade/download?preUpgradeKey=" + preUpgradeKey);
             setState((prevState) => {
                 return {
                     ...prevState,
@@ -129,7 +132,7 @@ const Upgrade = ({data, offline, axiosRequesting}: {
                 current: current,
             };
         });
-        const {data} = await axios.get("/api/admin/upgrade/doUpgrade?preUpgradeKey=" + preUpgradeKey);
+        const {data} = await axiosInstance.get("/api/admin/upgrade/doUpgrade?preUpgradeKey=" + preUpgradeKey);
         if (data.data) {
             setState((prevState) => {
                 return {

@@ -3,8 +3,8 @@ import { Col, Form, Input, InputNumber, message, Modal } from "antd";
 import Row from "antd/es/grid/row";
 import { EditOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
-import axios from "axios";
 import { getColorPrimary, getRes } from "../../utils/constants";
+import {useAxiosBaseInstance} from "../../AppBase";
 
 const layout = {
     labelCol: { span: 4 },
@@ -22,8 +22,9 @@ const EditNav: FunctionComponent<EditNavProps> = ({ record, editSuccessCall, off
     const [updateForm, setUpdateForm] = useState<any>(record);
     const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
 
+    const axiosInstance = useAxiosBaseInstance();
     const handleOk = () => {
-        axios.post("/api/admin/nav/update", updateForm).then(async ({ data }) => {
+        axiosInstance.post("/api/admin/nav/update", updateForm).then(async ({ data }) => {
             if (data.error) {
                 await messageApi.error(data.message);
                 return;

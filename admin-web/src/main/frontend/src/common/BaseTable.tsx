@@ -1,6 +1,5 @@
 import { message, PaginationProps, Space, Table, TableColumnsType } from "antd";
 import { FunctionComponent, useEffect, useState } from "react";
-import axios from "axios";
 import { mapToQueryString } from "../utils/helpers";
 import Popconfirm from "antd/es/popconfirm";
 import { cacheIgnoreReloadKey, getRes } from "../utils/constants";
@@ -8,6 +7,7 @@ import { DeleteOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import { useLocation } from "react-router";
 import { SorterResult } from "antd/es/table/interface";
+import {useAxiosBaseInstance} from "../AppBase";
 
 type BaseTableProps = {
     deleteApi: string;
@@ -125,8 +125,9 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
     });
 
     const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
+    const axiosInstance = useAxiosBaseInstance();
     const handleDelete = async (pagination: MyPagination, deleteApiUri: string, key: string): Promise<boolean> => {
-        const response = await axios.post(deleteApiUri + "?id=" + key);
+        const response = await axiosInstance.post(deleteApiUri + "?id=" + key);
         if (response.data.error) {
             messageApi.error(response.data.message);
             return false;

@@ -1,42 +1,38 @@
 import * as serviceWorker from "./serviceWorker";
 import zh_CN from "antd/es/locale/zh_CN";
 import en_US from "antd/es/locale/en_US";
-import {App, ConfigProvider, message, Spin, theme} from "antd";
-import {BrowserRouter} from "react-router-dom";
-import EnvUtils, {isOffline} from "./utils/env-utils";
-import AppBase from "./AppBase";
+import {App, ConfigProvider, theme} from "antd";
+import {BrowserRouter, Route, Routes} from "react-router-dom";
 import {legacyLogicalPropertiesTransformer, StyleProvider} from "@ant-design/cssinjs";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {createRoot} from "react-dom/client";
-import {getBackendServerUrl, getColorPrimary, getRes, isStaticPage, setRes} from "./utils/constants";
+import {getBackendServerUrl, getColorPrimary, getRes} from "./utils/constants";
 
-import axios from "axios";
 import {BasicUserInfo} from "./type";
-import UnknownErrorPage from "./components/unknown-error-page";
 import {getContextPath} from "./utils/helpers";
-import Init from "./components/init";
+import AppInit from "./AppInit";
+import EnvUtils from "./utils/env-utils";
 
 export const basePath = getContextPath() + "admin/"
 export let apiBasePath: string;
 
 export const refreshPathInfo = () => {
     apiBasePath = getBackendServerUrl() + "api/admin/";
-    if (isStaticPage()) {
-        axios.defaults.withCredentials = true;
-    }
-    axios.defaults.baseURL = getBackendServerUrl();
 }
 
 const {darkAlgorithm, defaultAlgorithm} = theme;
 
-type AppState = {
+export type AppInitState = {
     resLoaded: boolean;
     resLoadErrorMsg: string;
-    dark: boolean;
     offline: boolean;
+    requiredBackendServerUrl: boolean;
+};
+
+export type AppState = {
+    dark: boolean;
     lang: string;
     colorPrimary: string;
-    requiredBackendServerUrl: boolean;
 };
 
 type SsDate = {
@@ -65,130 +61,15 @@ export const getItems_per_page = () => {
 };
 
 const Index = () => {
-    const [appState, setAppState] = useState<AppState>({
-        resLoaded: false,
-        resLoadErrorMsg: "",
+    const [appState, setState] = useState<AppState>({
         lang: "zh_CN",
-        offline: isOffline(),
         dark: EnvUtils.isDarkMode(),
         colorPrimary: getColorPrimary(),
-        requiredBackendServerUrl: false,
     });
-
-    const [messageApi, contextHolder] = message.useMessage({maxCount: 3});
-
-    const loadResourceFromServer = (first: boolean) => {
-        const resourceApi = "/api/public/adminResource";
-        axios
-            .get(resourceApi)
-            .then(({data}: { data: Record<string, any> }) => {
-                handleRes(data.data);
-            })
-            .catch((e) => {
-                const errorMsg = "Request " + axios.defaults.baseURL + resourceApi.substring(1) + " error -> " + e.message;
-                if (!first) {
-                    messageApi.error(errorMsg)
-                }
-                if (isStaticPage()) {
-                    setAppState((prevState) => {
-                        return {
-                            ...prevState,
-                            dark: document.body.className.includes("dark"),
-                            resLoaded: true,
-                            lang: "zh_CN",
-                            requiredBackendServerUrl: true,
-                            offline: prevState.offline,
-                            colorPrimary: getColorPrimary(),
-                        };
-                    });
-                    return;
-                }
-                setAppState((prevState) => {
-                    return {
-                        ...prevState,
-                        dark: document.body.className.includes("dark"),
-                        resLoadErrorMsg: errorMsg,
-                        resLoaded: false,
-                        lang: "zh_CN",
-                        offline: prevState.offline,
-                        colorPrimary: getColorPrimary(),
-                    };
-                });
-            });
-    };
-    const handleRes = (data: Record<string, never>) => {
-        // @ts-ignore
-        data.copyrightTips =
-            data.copyright + ' <a target="_blank" href="https://blog.zrlog.com/about.html?footer">ZrLog</a>';
-        setRes(data);
-        setAppState((prevState) => {
-            return {
-                ...prevState,
-                lang: data.lang,
-                offline: prevState.offline,
-                dark: EnvUtils.isDarkMode(),
-                resLoadErrorMsg: "",
-                resLoaded: true,
-                requiredBackendServerUrl: false,
-                colorPrimary: getColorPrimary(),
-            };
-        });
-    };
-
-    const initRes = () => {
-        const resourceData = getRes();
-        if (resourceData === null || Object.keys(resourceData).length === 0) {
-            if (ssData && ssData.resourceInfo) {
-                handleRes(ssData.resourceInfo);
-            } else {
-                loadResourceFromServer(true);
-            }
-        } else {
-            handleRes(resourceData);
-        }
-    };
-
-    const updateOnlineStatus = () => {
-        setAppState((prevState) => {
-            return {
-                ...prevState,
-                offline: isOffline(),
-            };
-        });
-    };
-
-    useEffect(() => {
-        refreshPathInfo();
-        window.addEventListener("online", updateOnlineStatus);
-        window.addEventListener("offline", updateOnlineStatus);
-        initRes();
-        // Cleanup event listeners on component unmount
-        return () => {
-            window.removeEventListener("online", updateOnlineStatus);
-            window.removeEventListener("offline", updateOnlineStatus);
-        };
-    }, []);
-
-    const getBody = () => {
-        if (appState.requiredBackendServerUrl) {
-            return <Init onSubmit={() => {
-                loadResourceFromServer(false);
-            }}/>
-        }
-        if (appState.resLoaded) {
-            return <AppBase offline={appState.offline}/>
-        } else if (appState.resLoadErrorMsg.length === 0) {
-            return <Spin delay={1000} fullscreen={true}/>;
-        }
-        return <UnknownErrorPage
-            code={500}
-            data={{message: appState.resLoadErrorMsg}}
-            style={{width: "100vw", height: "100vh"}}
-        />
-    }
 
     return (
         <ConfigProvider
+            key={JSON.stringify(appState)}
             locale={appState.lang.startsWith("zh") ? zh_CN : en_US}
             theme={{
                 algorithm: appState.dark ? darkAlgorithm : defaultAlgorithm,
@@ -223,8 +104,16 @@ const Index = () => {
                             v7_startTransition: true,
                         }}
                     >
-                        {contextHolder}
-                        {getBody()}
+                        <Routes>
+                            <Route path={"*"} element={<AppInit onInit={(newState) => {
+                                setState((prevState) => {
+                                    return {
+                                        ...prevState,
+                                        ...newState
+                                    }
+                                })
+                            }}/>}/>
+                        </Routes>
                     </BrowserRouter>
                 </StyleProvider>
             </App>

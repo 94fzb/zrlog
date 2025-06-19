@@ -6,7 +6,7 @@ import {API_VERSION_PATH} from "./components/upgrade";
 import ErrorBoundary from "./common/ErrorBoundary";
 import type {HookAPI as ModalHookAPI} from "antd/es/modal/useModal";
 import type {MessageInstance} from "antd/es/message/interface";
-import {getRealRouteUrl, isStaticPage} from "./utils/constants";
+import {getBackendServerUrl, getRealRouteUrl, isStaticPage} from "./utils/constants";
 
 const AsyncLogin = lazy(() => import("components/login"));
 const AsyncAdminDashboardRouter = lazy(() => import("AdminDashboardRouter"));
@@ -49,47 +49,42 @@ export const commonAxiosErrorHandle = (
     return Promise.reject(error);
 };
 
-export const createAxiosBaseInstance = (): AxiosInstance => {
-    return axios.create({
-        withCredentials: true
-    });
-};
-
-const AppBase = ({offline}: { offline: boolean }) => {
+export const useAxiosBaseInstance = (): AxiosInstance => {
     const {modal, message} = App.useApp();
 
     const navigate = useNavigate();
 
-    const initAxios = () => {
-        //@ts-ignore
-        if (window.axiosConfiged) {
-            return;
-        }
-        //@ts-ignore
-        window.axiosConfiged = true;
-        axios.interceptors.response.use(
-            (response) => {
-                if (response.data.error === 9001) {
-                    modal.error({
-                        title: response.data.error,
-                        content: response.data.message,
-                    });
-                    if (isStaticPage()) {
-                        if (!window.location.search.includes("redirectFrom")) {
-                            navigate(getRealRouteUrl(`/login`) + `?redirectFrom=${encodeURI(window.location.pathname.split(".html")[0])}${encodeURI(window.location.search)}`, {replace: true});
-                        }
-                    }
-                    return Promise.reject(response.data);
-                }
-                return response;
-            },
-            (error) => {
-                return commonAxiosErrorHandle(error, modal, message);
-            }
-        );
-    };
+    const axiosInstance = axios.create();
+    if (isStaticPage()) {
+        axiosInstance.defaults.withCredentials = true;
+    }
 
-    initAxios();
+    axiosInstance.defaults.baseURL = getBackendServerUrl();
+
+    axiosInstance.interceptors.response.use(
+        (response) => {
+            if (response.data.error === 9001) {
+                modal.error({
+                    title: response.data.error,
+                    content: response.data.message,
+                });
+                if (isStaticPage()) {
+                    if (!window.location.search.includes("redirectFrom")) {
+                        navigate(getRealRouteUrl(`/login`) + `?redirectFrom=${encodeURI(window.location.pathname.split(".html")[0])}${encodeURI(window.location.search)}`, {replace: true});
+                    }
+                }
+                return Promise.reject(response.data);
+            }
+            return response;
+        },
+        (error) => {
+            return commonAxiosErrorHandle(error, modal, message);
+        }
+    );
+    return axiosInstance;
+};
+
+const AppBase = ({offline}: { offline: boolean }) => {
 
     return (
         <>

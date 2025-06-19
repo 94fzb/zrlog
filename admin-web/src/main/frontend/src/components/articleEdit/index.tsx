@@ -13,7 +13,7 @@ import BaseInput from "../../common/BaseInput";
 import { useLocation } from "react-router";
 import EnvUtils, { isOffline } from "../../utils/env-utils";
 import EditorStatistics, { toStatisticsByMarkdown } from "./editor/editor-statistics-info";
-import { commonAxiosErrorHandle, createAxiosBaseInstance } from "../../AppBase";
+import {commonAxiosErrorHandle, useAxiosBaseInstance} from "../../AppBase";
 import ArticleEditSettingButton from "./article-edit-setting-button";
 import { ArticleChangeableValue, ArticleEditProps, ArticleEditState, ArticleEntry } from "./index.types";
 import ArticleEditActionBar from "./article-edit-action-bar";
@@ -208,7 +208,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({
         try {
             let responseData;
             try {
-                const { data } = await createAxiosBaseInstance().post(uri, newArticle);
+                const { data } = await useAxiosBaseInstance().post(uri, newArticle);
                 responseData = data;
                 if (data.error) {
                     modal.error({

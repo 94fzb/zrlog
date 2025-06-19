@@ -34,6 +34,7 @@ import UnknownErrorPage from "./components/unknown-error-page";
 import Offline from "./common/Offline";
 import Index from "./components/index";
 import Comment from "./components/comment";
+import {useAxiosBaseInstance} from "./AppBase";
 
 const AsyncArticleEdit = lazy(() => import("components/articleEdit"));
 const AsyncOffline = lazy(() => import("common/Offline"));
@@ -176,8 +177,10 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
         });
     };
 
+    const axiosBaseInstance = useAxiosBaseInstance();
+
     const loadData = async (uri: string, location: H.Location) => {
-        const responseData = await getCsrData(uri);
+        const responseData = await getCsrData(uri,axiosBaseInstance);
         const {data, documentTitle} = responseData;
         const mergeData = state.data;
         updateDocumentTitle(documentTitle);

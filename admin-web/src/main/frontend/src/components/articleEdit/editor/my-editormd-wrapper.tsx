@@ -39,8 +39,8 @@ import {
     faTable,
 } from "@fortawesome/free-solid-svg-icons";
 import {StyledEditormd} from "./styled-editormd";
-import axios from "axios";
 import {ChangedContent} from "../index.types";
+import {useAxiosBaseInstance} from "../../../AppBase";
 // Add the icons to the library so you can use it in your page
 const icons = [
     faBold,
@@ -112,6 +112,8 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({height, markdown
     const [content, setContent] = useState<ChangedContent>({content: "", markdown: markdown});
 
     const [messageApi, contextHolder] = message.useMessage({maxCount: 3});
+
+    const axiosInstance = useAxiosBaseInstance();
 
     function setDarkMode(editor: any, dark: boolean) {
         editor.setTheme(dark ? "dark" : "default");
@@ -213,7 +215,7 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({height, markdown
                     const formData = new FormData();
                     if (file) {
                         formData.append("imgFile", file, fileName);
-                        axios.post("/api/admin/upload?dir=image", formData).then(({data}) => {
+                        axiosInstance.post("/api/admin/upload?dir=image", formData).then(({data}) => {
                             const url = data.data.url;
                             editor.insertValue("![x](" + url + ")");
                         });
