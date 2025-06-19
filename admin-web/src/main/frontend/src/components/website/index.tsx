@@ -11,6 +11,7 @@ import OtherForm from "./OtherForm";
 import UpgradeSettingForm from "./UpgradeSettingForm";
 import {Link} from "react-router-dom";
 import AdminForm from "./AdminForm";
+import {FunctionComponent} from "react";
 
 export interface Basic {
     second_title: string;
@@ -48,15 +49,17 @@ export interface Upgrade {
     upgradePreview: boolean;
 }
 
-const WebSite = ({
-                     data,
-                     offline,
-                     activeKey
-                 }: {
+export type WebSiteProps = {
     data: Basic | Admin | Upgrade | Other | Blog | TemplateEntry[];
     offline: boolean;
     activeKey: "basic" | "other" | "upgrade" | "admin" | "template" | "blog";
-}) => {
+}
+
+const WebSite:FunctionComponent<WebSiteProps> = ({
+                     data,
+                     offline,
+                     activeKey
+                 }) => {
     const buildLink = (key: string, text: string) => {
         const toUrl = key === "basic" ? "/website" : "/website/" + key;
         return (

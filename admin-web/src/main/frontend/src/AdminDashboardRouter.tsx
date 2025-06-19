@@ -13,12 +13,12 @@ import {
     savePageFullState,
 } from "./cache";
 import {deepEqualWithSpecialJSON, getFullPath} from "./utils/helpers";
-import Upgrade, {UpgradeData} from "./components/upgrade";
+import Upgrade, {UpgradeData, UpgradeProps} from "./components/upgrade";
 import {getRes} from "./utils/constants";
 import {isPWA} from "./utils/env-utils";
 import * as H from "history";
 import Plugin from "./components/plugin";
-import WebSite from "./components/website";
+import WebSite, {WebSiteProps} from "./components/website";
 import TemplateConfig from "./components/template/template-config";
 import UserUpdatePassword from "./components/user-update-password";
 import TemplateCenter from "./components/template/template-center";
@@ -30,11 +30,13 @@ import Link from "./components/link";
 import Nav from "./components/nav";
 import Article from "./components/article";
 import Type from "./components/type";
-import UnknownErrorPage from "./components/unknown-error-page";
+import UnknownErrorPage, {ErrorPageProps} from "./components/unknown-error-page";
 import Offline from "./common/Offline";
 import Index from "./components/index";
 import Comment from "./components/comment";
 import {useAxiosBaseInstance} from "./AppBase";
+import Spin from "antd/es/spin";
+import {BasicUserInfo} from "./type";
 
 const AsyncArticleEdit = lazy(() => import("components/articleEdit"));
 const AsyncOffline = lazy(() => import("common/Offline"));
@@ -137,7 +139,32 @@ export function AdminPage(props: AdminPageProps<ArticleEditProps | any>): ReactE
         props: componentProps,
     } = props;
 
-    return <AdminManageLayout offline={offline} loading={axiosRequesting} fullScreen={fullScreen}>
+    const axiosBaseInstance = useAxiosBaseInstance();
+
+    const [userInfo, setUserInfo] = useState<BasicUserInfo | undefined>(ssData?.user);
+
+    useEffect(() => {
+        if (userInfo === undefined) {
+            axiosBaseInstance.get(`/api/admin/user?t=${new Date().getTime()}`).then(({data}) => {
+                if (ssData) {
+                    if (data.data.key) {
+                        ssData.key = data.data.key
+                    }
+                    ssData.user = data.data
+                }
+                setUserInfo(data.data);
+            });
+        }
+    }, []);
+
+
+    if (userInfo === undefined || userInfo === null) {
+        return <Spin fullscreen={true} delay={500}/>
+    }
+
+
+    return <AdminManageLayout basicUserInfo={userInfo} offline={offline} loading={axiosRequesting}
+                              fullScreen={fullScreen}>
         {data && (
             <LazyWithFallbackElement LazyComponent={LazyComponent} FallbackComponent={FallbackComponent}
                                      props={componentProps}/>
@@ -180,7 +207,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
     const axiosBaseInstance = useAxiosBaseInstance();
 
     const loadData = async (uri: string, location: H.Location) => {
-        const responseData = await getCsrData(uri,axiosBaseInstance);
+        const responseData = await getCsrData(uri, axiosBaseInstance);
         const {data, documentTitle} = responseData;
         const mergeData = state.data;
         updateDocumentTitle(documentTitle);
@@ -256,7 +283,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
 
     const routes = [
         {
-            paths: ["index", "index.html",""],
+            paths: ["index", "index.html", ".html", ""],
             lazy: AsyncIndex,
             fallback: Index
         },
@@ -274,37 +301,37 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
             paths: ["website", "website.html"],
             lazy: AsyncWebSite,
             fallback: WebSite,
-            props: {activeKey: "basic"}
+            props: {activeKey: "basic"} as WebSiteProps
         },
         {
             paths: ["website/admin", "website/admin.html"],
             lazy: AsyncWebSite,
             fallback: WebSite,
-            props: {activeKey: "admin"}
+            props: {activeKey: "admin"} as WebSiteProps
         },
         {
             paths: ["website/template", "website/template.html"],
             lazy: AsyncWebSite,
             fallback: WebSite,
-            props: {activeKey: "template"}
+            props: {activeKey: "template"} as WebSiteProps
         },
         {
             paths: ["website/other", "website/other.html"],
             lazy: AsyncWebSite,
             fallback: WebSite,
-            props: {activeKey: "other"}
+            props: {activeKey: "other"} as WebSiteProps
         },
         {
             paths: ["website/blog", "website/blog.html"],
             lazy: AsyncWebSite,
             fallback: WebSite,
-            props: {activeKey: "blog"}
+            props: {activeKey: "blog"} as WebSiteProps
         },
         {
             paths: ["website/upgrade", "website/upgrade.html"],
             lazy: AsyncWebSite,
             fallback: WebSite,
-            props: {activeKey: "upgrade"}
+            props: {activeKey: "upgrade"} as WebSiteProps
         },
         {
             paths: ["article-type", "article-type.html"],
@@ -345,7 +372,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
                         return {...prevState, fullScreen: false};
                     });
                 }
-            }
+            } as ArticleEditProps
         },
         {
             paths: ["user", "user.html"],
@@ -368,8 +395,8 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
             fallback: Upgrade,
             props: {
                 key: (getDataFromState() as UpgradeData)?.preUpgradeKey || "",
-                axiosRequesting: state.axiosRequesting
-            }
+                axiosRequesting: state.axiosRequesting,
+            } as UpgradeProps
         },
         {
             paths: ["template-config", "template-config.html"],
@@ -382,7 +409,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
             fallback: UnknownErrorPage,
             props: {
                 code: 403,
-            }
+            } as ErrorPageProps
         },
         {
             paths: ["500", "500.html"],
@@ -390,13 +417,12 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
             fallback: UnknownErrorPage,
             props: {
                 code: 500,
-            }
+            } as ErrorPageProps
         },
         {
             paths: ["offline", "offline.html"],
             lazy: AsyncOffline,
             fallback: Offline,
-            props: {}
         },
         {
             paths: ["system", "system.html"],

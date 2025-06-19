@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {FunctionComponent, useEffect, useState} from "react";
 import {App, Button, Col, message, Progress, Row, Steps} from "antd";
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
@@ -35,11 +35,14 @@ type StepInfo = {
 
 let upgradeTimer: NodeJS.Timeout;
 
-const Upgrade = ({data, offline, axiosRequesting}: {
+export type UpgradeProps = {
     data: UpgradeData;
+    key?: string;
     offline: boolean,
     axiosRequesting: boolean
-}) => {
+}
+
+const Upgrade: FunctionComponent<UpgradeProps> = ({data, offline, axiosRequesting}) => {
     const preUpgradeKey = data.preUpgradeKey;
     const steps: StepInfo[] = [
         {
