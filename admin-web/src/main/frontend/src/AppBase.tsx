@@ -50,7 +50,9 @@ export const commonAxiosErrorHandle = (
 };
 
 export const createAxiosBaseInstance = (): AxiosInstance => {
-    return axios.create({});
+    return axios.create({
+        withCredentials: true
+    });
 };
 
 const AppBase = ({offline}: { offline: boolean }) => {

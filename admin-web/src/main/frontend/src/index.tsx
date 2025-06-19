@@ -27,8 +27,6 @@ export const refreshPathInfo = () => {
     axios.defaults.baseURL = getBackendServerUrl();
 }
 
-refreshPathInfo()
-
 const {darkAlgorithm, defaultAlgorithm} = theme;
 
 type AppState = {
@@ -160,6 +158,7 @@ const Index = () => {
     };
 
     useEffect(() => {
+        refreshPathInfo();
         window.addEventListener("online", updateOnlineStatus);
         window.addEventListener("offline", updateOnlineStatus);
         initRes();
