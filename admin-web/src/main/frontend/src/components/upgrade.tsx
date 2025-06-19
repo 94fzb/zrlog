@@ -2,8 +2,9 @@ import {useEffect, useState} from "react";
 import {App, Button, Col, message, Progress, Row, Steps} from "antd";
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
-import {getRes} from "../utils/constants";
+import {getRealRouteUrl, getRes} from "../utils/constants";
 import axios, {AxiosError} from "axios";
+import {getContextPath} from "../utils/helpers";
 
 const {Step} = Steps;
 export const API_VERSION_PATH = "/api/admin/website/version";
@@ -33,7 +34,11 @@ type StepInfo = {
 
 let upgradeTimer: NodeJS.Timeout;
 
-const Upgrade = ({data, offline,axiosRequesting}: { data: UpgradeData; offline: boolean,axiosRequesting: boolean }) => {
+const Upgrade = ({data, offline, axiosRequesting}: {
+    data: UpgradeData;
+    offline: boolean,
+    axiosRequesting: boolean
+}) => {
     const preUpgradeKey = data.preUpgradeKey;
     const steps: StepInfo[] = [
         {
@@ -69,7 +74,7 @@ const Upgrade = ({data, offline,axiosRequesting}: { data: UpgradeData; offline: 
                         title: data.data.message,
                         content: "",
                         onOk: function () {
-                            window.location.href = "/admin/index?buildId=" + newBuildId;
+                            window.location.href = getRealRouteUrl(getContextPath() + "admin/index") + "?buildId=" + newBuildId;
                         },
                     });
                     return;
@@ -228,7 +233,8 @@ const Upgrade = ({data, offline,axiosRequesting}: { data: UpgradeData; offline: 
                 </div>
                 <div className="steps-action" style={{paddingTop: "20px"}}>
                     {state.current < steps.length - 1 && (
-                        <Button type="primary" loading={axiosRequesting} disabled={nextDisabled()} onClick={() => next()}>
+                        <Button type="primary" loading={axiosRequesting} disabled={nextDisabled()}
+                                onClick={() => next()}>
                             {getRes().nextStep}
                         </Button>
                     )}

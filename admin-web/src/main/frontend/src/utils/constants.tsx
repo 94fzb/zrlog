@@ -53,13 +53,16 @@ export const setBackendServerUrl = (url: string) => {
 export const getBackendServerUrl = (): string => {
     const val = window.localStorage.getItem('_backend_server_url');
     if (val) {
-        return val
+        if (val.endsWith("/")) {
+            return val
+        }
+        return val + "/"
     }
     return getContextPath();
 }
 
 export const getRealRouteUrl = (url: string) => {
-    if(isStaticPage()) {
+    if (isStaticPage()) {
         return url + ".html";
     }
     return url;
