@@ -40,11 +40,15 @@ export const removeRes = () => {
     window[resourceKey] = undefined;
 };
 
+export const isDev = () => {
+    return process.env.NODE_ENV != "production"
+}
+
 export const isStaticPage = () => {
-    if (process.env.NODE_ENV === "production") {
-        return getRes()['staticPlugin'];
+    if (isDev()) {
+        return true;
     }
-    return true;
+    return getRes()['staticPlugin'];
 }
 
 export const setBackendServerUrl = (url: string) => {

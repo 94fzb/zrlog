@@ -105,7 +105,7 @@ const Index = () => {
                         }}
                     >
                         <Routes>
-                            <Route path={"*"} element={<AppInit onInit={(newState) => {
+                            <Route path={"/*"} element={<AppInit onInit={(newState) => {
                                 setState((prevState) => {
                                     return {
                                         ...prevState,
