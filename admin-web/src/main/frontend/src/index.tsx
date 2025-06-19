@@ -14,6 +14,7 @@ import axios from "axios";
 import {BasicUserInfo} from "./type";
 import UnknownErrorPage from "./components/unknown-error-page";
 import {getContextPath} from "./utils/helpers";
+import Init from "./components/init";
 
 export const basePath = getContextPath() + "admin/"
 export let apiBasePath: string;
@@ -37,6 +38,7 @@ type AppState = {
     offline: boolean;
     lang: string;
     colorPrimary: string;
+    requiredBackendServerUrl: boolean;
 };
 
 type SsDate = {
@@ -72,9 +74,10 @@ const Index = () => {
         offline: isOffline(),
         dark: EnvUtils.isDarkMode(),
         colorPrimary: getColorPrimary(),
+        requiredBackendServerUrl: false,
     });
 
-    const loadResourceFromServer = () => {
+    const loadResourceFromServer = (first: boolean) => {
         const resourceApi = "/api/public/adminResource";
         axios
             .get(resourceApi)
@@ -82,8 +85,27 @@ const Index = () => {
                 handleRes(data.data);
             })
             .catch((e) => {
+                if (!first) {
+                    alert("Request " + axios.defaults.baseURL + resourceApi + " error -> " + e.message)
+                }
+                if (isStaticPage()) {
+                    setAppState((prevState) => {
+                        return {
+                            ...prevState,
+                            dark: document.body.className.includes("dark"),
+                            //resLoadErrorMsg: "Request " + resourceApi + " error -> " + e.message,
+                            resLoaded: true,
+                            lang: "zh_CN",
+                            requiredBackendServerUrl: true,
+                            offline: prevState.offline,
+                            colorPrimary: getColorPrimary(),
+                        };
+                    });
+                    return;
+                }
                 setAppState((prevState) => {
                     return {
+                        ...prevState,
                         dark: document.body.className.includes("dark"),
                         resLoadErrorMsg: "Request " + resourceApi + " error -> " + e.message,
                         resLoaded: false,
@@ -101,11 +123,13 @@ const Index = () => {
         setRes(data);
         setAppState((prevState) => {
             return {
+                ...prevState,
                 lang: data.lang,
                 offline: prevState.offline,
                 dark: EnvUtils.isDarkMode(),
                 resLoadErrorMsg: "",
                 resLoaded: true,
+                requiredBackendServerUrl: false,
                 colorPrimary: getColorPrimary(),
             };
         });
@@ -117,7 +141,7 @@ const Index = () => {
             if (ssData && ssData.resourceInfo) {
                 handleRes(ssData.resourceInfo);
             } else {
-                loadResourceFromServer();
+                loadResourceFromServer(true);
             }
         } else {
             handleRes(resourceData);
@@ -145,6 +169,11 @@ const Index = () => {
     }, []);
 
     const getBody = () => {
+        if (appState.requiredBackendServerUrl) {
+            return <Init onSubmit={() => {
+                loadResourceFromServer(false);
+            }}/>
+        }
         if (appState.resLoaded) {
             return <AppBase offline={appState.offline}/>
         } else if (appState.resLoadErrorMsg.length === 0) {

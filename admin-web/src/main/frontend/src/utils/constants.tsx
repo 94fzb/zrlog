@@ -41,8 +41,10 @@ export const removeRes = () => {
 };
 
 export const isStaticPage = () => {
+    if (process.env.NODE_ENV === "production") {
+        return getRes()['staticPlugin'];
+    }
     return true;
-    //return getRes()['staticPlugin'];
 }
 
 export const setBackendServerUrl = (url: string) => {
