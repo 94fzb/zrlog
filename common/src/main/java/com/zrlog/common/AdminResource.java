@@ -11,6 +11,8 @@ public interface AdminResource  {
 
     Set<String> getAdminPageUris();
 
+    Set<String> getAdminCacheableApiUris();
+
     boolean isAdminMainJs(String uri);
 
     InputStream renderServiceWorker(HttpRequest request);

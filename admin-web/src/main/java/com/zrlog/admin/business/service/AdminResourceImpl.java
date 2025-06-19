@@ -45,9 +45,9 @@ public class AdminResourceImpl implements AdminResource {
     }
 
     public static void main(String[] args) {
-        //System.out.println("js = " + IOUtil.getStringInputStream(new AdminResourceImpl().renderServiceWorker()));
-        Set<String> adminPageUris = new AdminResourceImpl().getAdminPageUris();
-        System.out.println(adminPageUris);
+        System.out.println("js = " + IOUtil.getStringInputStream(new AdminResourceImpl().renderServiceWorker(null)));
+        //Set<String> adminPageUris = new AdminResourceImpl().getAdminPageUris();
+        // System.out.println(adminPageUris);
     }
 
     @Override
@@ -60,8 +60,10 @@ public class AdminResourceImpl implements AdminResource {
         StringJoiner sb = new StringJoiner(",\n    ");
         String adminResourceUrl = ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite();
         getAdminResourceUris(false).forEach(e -> {
+            if (e.startsWith("/api")) {
+                return;
+            }
             if (pageUris.contains(e)) {
-                System.out.println("e = " + e);
                 if (ZrLogUtil.isStaticPlugin(request)) {
                     String[] split = e.split("\\?");
                     if (split.length == 1) {
@@ -124,6 +126,11 @@ public class AdminResourceImpl implements AdminResource {
     @Override
     public Set<String> getAdminPageUris() {
         return pageUris.stream().filter(e -> e.startsWith("/admin/")).map(e -> e.split("\\?")[0]).collect(Collectors.toSet());
+    }
+
+    @Override
+    public Set<String> getAdminCacheableApiUris() {
+        return pageUris.stream().filter(e -> e.startsWith("/api")).collect(Collectors.toSet());
     }
 
 }

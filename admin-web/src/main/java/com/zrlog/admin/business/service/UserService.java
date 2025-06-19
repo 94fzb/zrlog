@@ -63,6 +63,7 @@ public class UserService {
         UpdateVersionPlugin plugin = (UpdateVersionPlugin) Constants.zrLogConfig.getPlugins().stream().filter(x -> x instanceof UpdateVersionPlugin).findFirst().orElse(null);
         basicInfoResponse.setLastVersion(upgradeService.getCheckVersionResponse(false, plugin));
         basicInfoResponse.setKey(sessionId);
+        basicInfoResponse.setCacheableApiUris(Constants.zrLogConfig.getAdminResource().getAdminCacheableApiUris());
         return basicInfoResponse;
     }
 
