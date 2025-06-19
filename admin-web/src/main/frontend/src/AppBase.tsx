@@ -5,9 +5,9 @@ import axios, {AxiosError, AxiosInstance} from "axios";
 import {API_VERSION_PATH} from "./components/upgrade";
 import ErrorBoundary from "./common/ErrorBoundary";
 import {getBackendServerUrl, getRealRouteUrl, isStaticPage} from "./utils/constants";
+import AdminDashboardPage from "./components/admin-dashboard-page";
 
 const AsyncLogin = lazy(() => import("components/login"));
-const AsyncAdminDashboardRouter = lazy(() => import("AdminDashboardRouter"));
 
 const errorCountMap = new Map<number, number>();
 
@@ -130,8 +130,8 @@ const AppBase = ({offline}: { offline: boolean }) => {
                     path={"*"}
                     element={
                         <ErrorBoundary>
-                            <Suspense fallback={<Spin spinning={true} fullscreen delay={1000}/>}>
-                                <AsyncAdminDashboardRouter offline={offline}/>
+                            <Suspense>
+                                <AdminDashboardPage offline={offline}/>
                             </Suspense>
                         </ErrorBoundary>
                     }

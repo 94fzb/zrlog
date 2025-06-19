@@ -1,9 +1,9 @@
 import {Route, Routes} from "react-router-dom";
 import {ComponentType, FunctionComponent, lazy, ReactElement, Suspense, useEffect, useRef, useState} from "react";
 import {useLocation} from "react-router";
-import {getCsrData} from "./api";
-import MyLoadingComponent from "./components/my-loading-component";
-import {ssData} from "./index";
+import {getCsrData} from "../api";
+import MyLoadingComponent from "./my-loading-component";
+import {ssData} from "../index";
 import {
     getCachedData,
     getLastOpenedPage,
@@ -11,32 +11,31 @@ import {
     getPageFullState,
     putCache,
     savePageFullState,
-} from "./cache";
-import {deepEqualWithSpecialJSON, getFullPath} from "./utils/helpers";
-import Upgrade, {UpgradeData, UpgradeProps} from "./components/upgrade";
-import {getRes} from "./utils/constants";
-import {isPWA} from "./utils/env-utils";
+} from "../cache";
+import {deepEqualWithSpecialJSON, getFullPath} from "../utils/helpers";
+import Upgrade, {UpgradeData, UpgradeProps} from "./upgrade";
+import {getRes} from "../utils/constants";
+import {isPWA} from "../utils/env-utils";
 import * as H from "history";
-import Plugin from "./components/plugin";
-import WebSite, {WebSiteProps} from "./components/website";
-import TemplateConfig from "./components/template/template-config";
-import UserUpdatePassword from "./components/user-update-password";
-import TemplateCenter from "./components/template/template-center";
-import User from "./components/user";
-import ArticleEdit from "./components/articleEdit";
-import {ArticleEditProps} from "./components/articleEdit/index.types";
-import System from "./components/system";
-import Link from "./components/link";
-import Nav from "./components/nav";
-import Article from "./components/article";
-import Type from "./components/type";
-import UnknownErrorPage, {ErrorPageProps} from "./components/unknown-error-page";
-import Offline from "./common/Offline";
-import Index from "./components/index";
-import Comment from "./components/comment";
-import {useAxiosBaseInstance} from "./AppBase";
-import Spin from "antd/es/spin";
-import {BasicUserInfo} from "./type";
+import Plugin from "./plugin";
+import WebSite, {WebSiteProps} from "./website";
+import TemplateConfig from "./template/template-config";
+import UserUpdatePassword from "./user-update-password";
+import TemplateCenter from "./template/template-center";
+import User from "./user";
+import ArticleEdit from "./articleEdit";
+import {ArticleEditProps} from "./articleEdit/index.types";
+import System from "./system";
+import Link from "./link";
+import Nav from "./nav";
+import Article from "./article";
+import Type from "./type";
+import UnknownErrorPage, {ErrorPageProps} from "./unknown-error-page";
+import Offline from "../common/Offline";
+import Index from "./index";
+import Comment from "./comment";
+import {useAxiosBaseInstance} from "../AppBase";
+import {BasicUserInfo} from "../type";
 
 const AsyncArticleEdit = lazy(() => import("components/articleEdit"));
 const AsyncOffline = lazy(() => import("common/Offline"));
@@ -71,7 +70,7 @@ const AsyncUser = lazy(() => import("components/user"));
 const AsyncError = lazy(() => import("components/unknown-error-page"));
 const AsyncSystem = lazy(() => import("components/system"));
 
-const AdminManageLayout = lazy(() => import("layout/index"));
+const AdminManageLayout = lazy(() => import("layout"));
 
 type AdminDashboardRouterState = {
     currentUri: string;
@@ -96,6 +95,7 @@ const updateDocumentTitle = (newDocumentTitle: string) => {
 
 type AdminDashboardRouterProps = {
     offline: boolean;
+    userInfo: BasicUserInfo;
 };
 
 type AdminPageProps<P> = {
@@ -106,6 +106,7 @@ type AdminPageProps<P> = {
     FallbackComponent: ComponentType<P>;
     fullScreen?: boolean,
     props: P;
+    userInfo: BasicUserInfo;
 }
 
 interface LazyWithFallbackElementProps<P> {
@@ -127,7 +128,6 @@ export function LazyWithFallbackElement<P>({
     );
 }
 
-
 export function AdminPage(props: AdminPageProps<ArticleEditProps | any>): ReactElement<AdminPageProps<ArticleEditProps | any>> {
     const {
         offline,
@@ -136,31 +136,9 @@ export function AdminPage(props: AdminPageProps<ArticleEditProps | any>): ReactE
         FallbackComponent,
         LazyComponent,
         fullScreen,
+        userInfo,
         props: componentProps,
     } = props;
-
-    const axiosBaseInstance = useAxiosBaseInstance();
-
-    const [userInfo, setUserInfo] = useState<BasicUserInfo | undefined>(ssData?.user);
-
-    useEffect(() => {
-        if (userInfo === undefined) {
-            axiosBaseInstance.get(`/api/admin/user?t=${new Date().getTime()}`).then(({data}) => {
-                if (ssData) {
-                    if (data.data.key) {
-                        ssData.key = data.data.key
-                    }
-                    ssData.user = data.data
-                }
-                setUserInfo(data.data);
-            });
-        }
-    }, []);
-
-
-    if (userInfo === undefined || userInfo === null) {
-        return <Spin fullscreen={true} delay={500}/>
-    }
 
 
     return <AdminManageLayout basicUserInfo={userInfo} offline={offline} loading={axiosRequesting}
@@ -172,7 +150,7 @@ export function AdminPage(props: AdminPageProps<ArticleEditProps | any>): ReactE
     </AdminManageLayout>
 }
 
-const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({offline}) => {
+const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({offline, userInfo}) => {
     const location = useLocation();
     const pwaLastOpenedPage = isPWA() ? getLastOpenedPage() : null;
     const defaultFullScreen = getPageFullState(pwaLastOpenedPage ? pwaLastOpenedPage : getFullPath(location));
@@ -442,6 +420,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
                         path={path}
                         element={
                             <AdminPage
+                                userInfo={userInfo}
                                 data={getDataFromState()}
                                 axiosRequesting={state.axiosRequesting}
                                 offline={state.offline}

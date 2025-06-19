@@ -141,6 +141,7 @@ const Index = ({offline}: { offline: boolean }) => {
                 const query = new URLSearchParams(window.location.search);
                 if (ssData) {
                     ssData.key = data.data.key;
+                    ssData.user = data.data;
                 }
                 const redirectFrom = query.get("redirectFrom") as string;
                 if (redirectFrom !== null && redirectFrom !== "") {
