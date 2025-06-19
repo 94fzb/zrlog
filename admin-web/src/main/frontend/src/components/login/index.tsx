@@ -19,8 +19,8 @@ import PWAHandler from "../../PWAHandler";
 import {removeAllCaches} from "../../cache";
 import styled from "styled-components";
 import {getContextPath} from "../../utils/helpers";
-import {DataType} from "csstype";
-import Color = DataType.Color;
+import {Property} from "csstype";
+import Color = Property.Color;
 
 const md5 = require("md5");
 
