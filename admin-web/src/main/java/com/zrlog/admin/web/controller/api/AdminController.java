@@ -97,7 +97,7 @@ public class AdminController extends Controller {
     @ResponseBody
     public ApiStandardResponse<Map<String, Object>> error() {
         Map<String, Object> map = new HashMap<>();
-        map.put("message", ObjectHelpers.requireNonNullElse(request.getParaToStr("message"), ""));
+        map.put("message", request.getParaToStr("message",""));
         return new ApiStandardResponse<>(map);
     }
 

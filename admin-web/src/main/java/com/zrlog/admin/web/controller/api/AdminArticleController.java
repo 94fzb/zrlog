@@ -14,7 +14,6 @@ import com.zrlog.admin.business.service.AdminArticleService;
 import com.zrlog.admin.web.annotation.RefreshCache;
 import com.zrlog.admin.web.token.AdminTokenThreadLocal;
 import com.zrlog.blog.web.util.ControllerUtil;
-import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.business.service.TemplateHelper;
 import com.zrlog.common.Constants;
 import com.zrlog.common.rest.response.ApiStandardResponse;
@@ -75,8 +74,8 @@ public class AdminArticleController extends Controller {
 
     @ResponseBody
     public AdminApiPageDataStandardResponse<ArticlePageData> index() throws SQLException, ExecutionException, InterruptedException {
-        String key = request.getParaToStr("key");
-        String types = request.getParaToStr("types");
+        String key = request.getParaToStr("key", "");
+        String types = request.getParaToStr("types", "");
         int articlePageSize = Constants.getAdminArticlePageSize();
         ArticlePageData pageData = articleService.adminPage(ControllerUtil.toPageRequest(this, articlePageSize), key, types, request);
         pageData.setKey(key);
@@ -104,7 +103,7 @@ public class AdminArticleController extends Controller {
         ArticleGlobalResponse response = new ArticleGlobalResponse();
         response.setTags(new Tag().findAll());
         response.setTypes(new Type().findAll());
-        String id = request.getParaToStr("id");
+        String id = request.getParaToStr("id", "");
         if (StringUtils.isNotEmpty(id)) {
             response.setArticle(detail().getData());
         } else {
@@ -128,7 +127,7 @@ public class AdminArticleController extends Controller {
      */
     @ResponseBody
     public ApiStandardResponse<LoadEditArticleResponse> detail() throws SQLException {
-        String id = getRequest().getParaToStr("id");
+        String id = getRequest().getParaToStr("id", "");
         if (StringUtils.isEmpty(id)) {
             throw new ArgsException("id");
         }

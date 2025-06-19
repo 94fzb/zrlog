@@ -23,7 +23,7 @@ public class BlogNavController extends Controller {
     @RefreshCache(async = true)
     @ResponseBody
     public UpdateRecordResponse delete() throws SQLException {
-        String[] ids = Objects.requireNonNullElse(request.getParaToStr("id"), "").split(",");
+        String[] ids = request.getParaToStr("id","").split(",");
         for (String id : ids) {
             new LogNav().deleteById(Integer.parseInt(id));
         }

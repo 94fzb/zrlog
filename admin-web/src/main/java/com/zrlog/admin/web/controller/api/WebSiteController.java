@@ -34,7 +34,7 @@ public class WebSiteController extends Controller {
         versionResponse.setVersion(BlogBuildInfoUtil.getVersion());
         versionResponse.setChangelog(UpdateVersionPlugin.getChangeLog(BlogBuildInfoUtil.getVersion(), BlogBuildInfoUtil.getTime(),
                 BlogBuildInfoUtil.getBuildId(), I18nUtil.getBackend()));
-        String requestBuildId = request.getParaToStr("buildId");
+        String requestBuildId = request.getParaToStr("buildId","");
         if (StringUtils.isNotEmpty(requestBuildId) && Objects.equals(versionResponse.getBuildId(), requestBuildId)) {
             versionResponse.setMessage(I18nUtil.getBackendStringFromRes("upgradeSuccess"));
         }

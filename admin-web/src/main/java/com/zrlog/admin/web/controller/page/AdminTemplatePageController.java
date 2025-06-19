@@ -20,13 +20,13 @@ public class AdminTemplatePageController extends Controller {
 
     @RefreshCache
     public void download() throws IOException, URISyntaxException, InterruptedException {
-        String downloadUrl = request.getParaToStr("downloadUrl");
+        String downloadUrl = request.getParaToStr("downloadUrl", "");
         TemplateDownloadPlugin.installByUrl(downloadUrl);
         response.redirect(Constants.ADMIN_URI_BASE_PATH + "/website/template");
     }
 
     public void previewImage() {
-        String templateName = Constants.TEMPLATE_BASE_PATH + request.getParaToStr("shortTemplate");
+        String templateName = Constants.TEMPLATE_BASE_PATH + request.getParaToStr("shortTemplate", "");
         TemplateVO templateVO = new TemplateService().loadTemplateConfig(templateName);
         if (Objects.isNull(templateVO)) {
             response.renderCode(404);

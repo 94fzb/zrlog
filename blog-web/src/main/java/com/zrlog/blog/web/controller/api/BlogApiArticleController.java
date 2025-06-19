@@ -19,13 +19,13 @@ public class BlogApiArticleController extends Controller {
 
     @ResponseBody
     public ApiStandardResponse<Map<String, Object>> detail() throws SQLException {
-        Map<String, Object> log = articleService.detail(request.getParaToStr("id"));
+        Map<String, Object> log = articleService.detail(request.getParaToStr("id", ""));
         return new ApiStandardResponse<>(log);
     }
 
     @ResponseBody
     public ApiStandardResponse<PageData<ArticleResponseEntry>> index() {
-        String key = getRequest().getParaToStr("key");
+        String key = getRequest().getParaToStr("key", "");
         PageData<Map<String, Object>> data = new Log().visitorFind(ControllerUtil.getPageRequest(this), key);
         PageData<ArticleResponseEntry> articleResponseEntryPageData = VisitorArticleService.convertPageable(data, request);
         articleResponseEntryPageData.setKey(key);

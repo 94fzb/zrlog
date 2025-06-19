@@ -62,7 +62,7 @@ public class ArticleController extends Controller {
 
 
     public String search() {
-        String key = request.getParaToStr("key");
+        String key = request.getParaToStr("key", "");
         ArticleUriInfoVO uriInfoVO = parseUriInfo(request.getUri());
         PageData<Map<String, Object>> data;
         if (StringUtils.isEmpty(key)) {
