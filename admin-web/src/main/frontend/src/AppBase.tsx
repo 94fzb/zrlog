@@ -74,7 +74,7 @@ export const useAxiosBaseInstance = (getContainer?: () => HTMLElement): AxiosIns
                         content: response.data.message,
                         getContainer: getContainer ? getContainer() : undefined,
                         onOk: () => {
-                            errorCountMap.set(response.data.error, 0);
+                            errorCountMap.set(errorCode, 0);
                         }
                     });
                 }

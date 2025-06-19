@@ -9,9 +9,9 @@ import com.hibegin.http.annotation.ResponseBody;
 import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.rest.request.LoginRequest;
 import com.zrlog.admin.business.rest.response.IndexResponse;
-import com.zrlog.admin.business.rest.response.LoginResponse;
 import com.zrlog.admin.business.rest.response.StatisticsInfoResponse;
 import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
+import com.zrlog.admin.business.rest.response.UserBasicInfoResponse;
 import com.zrlog.admin.business.service.AdminArticleService;
 import com.zrlog.admin.business.service.UserService;
 import com.zrlog.admin.web.controller.page.AdminPageController;
@@ -39,15 +39,14 @@ public class AdminController extends Controller {
     private final UserService userService = new UserService();
 
     @ResponseBody
-    public ApiStandardResponse<LoginResponse> login() throws SQLException {
+    public ApiStandardResponse<UserBasicInfoResponse> login() throws SQLException {
         if (!InstallUtils.isInstalled()) {
             throw new MissingInstallException();
         }
         LoginRequest loginRequest = BeanUtil.convertWithValid(getRequest().getInputStream(), LoginRequest.class);
-        userService.login(loginRequest);
-        String key = UUID.randomUUID().toString();
-        Constants.zrLogConfig.getTokenService().setAdminToken(new User().getUserByUserName(loginRequest.getUserName().toLowerCase()), key, Objects.equals(loginRequest.getHttps(), true) ? "https" : "http", getRequest(), getResponse());
-        return new ApiStandardResponse<>(new LoginResponse(key));
+        UserBasicInfoResponse resp = userService.login(loginRequest, request);
+        Constants.zrLogConfig.getTokenService().setAdminToken(new User().getUserByUserName(resp.getUserName().toLowerCase()), resp.getKey(), Objects.equals(loginRequest.getHttps(), true) ? "https" : "http", getRequest(), getResponse());
+        return new ApiStandardResponse<>(resp);
     }
 
     @ResponseBody
