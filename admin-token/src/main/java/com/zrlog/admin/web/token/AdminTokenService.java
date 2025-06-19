@@ -157,9 +157,9 @@ public class AdminTokenService implements TokenService {
             cookie.setExpireDate(new Date(System.currentTimeMillis() + Constants.getSessionTimeout()));
             if (Objects.equals(protocol, "https")) {
                 cookie.setSecure(true);
-                if (CrossUtils.isEnableOrigin(request)) {
-                    cookie.setSameSite("None");
-                }
+            }
+            if (CrossUtils.isEnableOrigin(request)) {
+                cookie.setSameSite("None");
             }
             cookie.setHttpOnly(true);
             cookie.setPath("/");
