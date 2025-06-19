@@ -61,8 +61,14 @@ public class AdminResourceImpl implements AdminResource {
         String adminResourceUrl = ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite();
         getAdminResourceUris(false).forEach(e -> {
             if (pageUris.contains(e)) {
+                System.out.println("e = " + e);
                 if (ZrLogUtil.isStaticPlugin(request)) {
-                    sb.add("\"" + e + "\".html");
+                    String[] split = e.split("\\?");
+                    if (split.length == 1) {
+                        sb.add("\"" + e + ".html\"");
+                    } else {
+                        sb.add("\"" + split[0] + ".html?" + split[1] + "\"");
+                    }
                 } else {
                     sb.add("\"" + e + "\"");
                 }
