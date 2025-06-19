@@ -1,5 +1,5 @@
 import {Route, Routes, useNavigate} from "react-router-dom";
-import {lazy, Suspense, useState} from "react";
+import {lazy, Suspense} from "react";
 import {App, Spin} from "antd";
 import axios, {AxiosError, AxiosInstance} from "axios";
 import {API_VERSION_PATH} from "./components/upgrade";
@@ -9,11 +9,12 @@ import {getBackendServerUrl, getRealRouteUrl, isStaticPage} from "./utils/consta
 const AsyncLogin = lazy(() => import("components/login"));
 const AsyncAdminDashboardRouter = lazy(() => import("AdminDashboardRouter"));
 
+const errorCountMap = new Map<number, number>();
+
 export const useAxiosBaseInstance = (getContainer?: () => HTMLElement): AxiosInstance => {
     const {modal, message} = App.useApp();
 
     const navigate = useNavigate();
-    const [errorCount, setErrorCount] = useState<number>(0);
 
     const axiosInstance = axios.create();
     if (isStaticPage()) {
@@ -60,17 +61,24 @@ export const useAxiosBaseInstance = (getContainer?: () => HTMLElement): AxiosIns
 
     axiosInstance.interceptors.response.use(
         (response) => {
-            if (response.data.error === 9001) {
-                if (errorCount == 0) {
+            const errorCode = response.data.error;
+            if (errorCode === 9001) {
+                let count = errorCountMap.get(errorCode);
+                if (count === null || count === undefined) {
+                    count = 0;
+                }
+                if (count === 0) {
+                    errorCountMap.set(errorCode, count + 1);
                     modal.error({
                         title: response.data.error,
                         content: response.data.message,
+                        getContainer: getContainer ? getContainer() : undefined,
                         onOk: () => {
-                            setErrorCount(0);
+                            errorCountMap.set(response.data.error, 0);
                         }
                     });
                 }
-                setErrorCount((prevState) => prevState + 1);
+
                 if (isStaticPage()) {
                     if (!window.location.search.includes("redirectFrom")) {
                         navigate(getRealRouteUrl(`/login`) + `?redirectFrom=${encodeURI(window.location.pathname.split(".html")[0])}${encodeURI(window.location.search)}`, {replace: true});
