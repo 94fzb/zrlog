@@ -13,13 +13,12 @@ import {
 } from "../../utils/constants";
 import {useNavigate} from "react-router-dom";
 import Title from "antd/es/typography/Title";
-import {ssData} from "../../index";
+import {asyncSaveApiCache, ssData} from "../../index";
 import PWAHandler from "../../PWAHandler";
-import {addToCache, removeAllCaches} from "../../cache";
+import {removeAllCaches} from "../../cache";
 import styled from "styled-components";
 import {getContextPath} from "../../utils/helpers";
 import {useAxiosBaseInstance} from "../../AppBase";
-import {getCsrData} from "../../api";
 
 const md5 = require("md5");
 
@@ -143,12 +142,7 @@ const Index = ({offline}: { offline: boolean }) => {
                 if (ssData) {
                     ssData.key = data.data.key;
                     ssData.user = data.data;
-                    ssData.user?.cacheableApiUris?.map(e => {
-                        const key = e.split("/api/admin")[1];
-                        getCsrData(key, axiosInstance).then(({data}) => {
-                            addToCache(key, data)
-                        });
-                    })
+                    asyncSaveApiCache(axiosInstance)
                 }
                 const redirectFrom = query.get("redirectFrom") as string;
                 if (redirectFrom !== null && redirectFrom !== "") {

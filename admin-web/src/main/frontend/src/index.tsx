@@ -12,6 +12,9 @@ import {BasicUserInfo} from "./type";
 import {getContextPath} from "./utils/helpers";
 import AppInit from "./AppInit";
 import EnvUtils from "./utils/env-utils";
+import {addToCache} from "./cache";
+import {getCsrData} from "./api";
+import {AxiosInstance} from "axios";
 
 export const basePath = getContextPath() + "admin/"
 export let apiBasePath: string;
@@ -49,6 +52,19 @@ if (ssDataStr?.length > 0) {
     ssData = JSON.parse(ssDataStr as string);
 } else {
     ssData = {};
+}
+
+export const asyncSaveApiCache = (axiosInstance: AxiosInstance) => {
+    setTimeout(() => {
+        if (ssData) {
+            ssData.user?.cacheableApiUris?.map(e => {
+                const key = e.split("/api/admin")[1];
+                getCsrData(key, axiosInstance).then(({data}) => {
+                    addToCache(key, data)
+                });
+            })
+        }
+    }, 200)
 }
 
 export const getItems_per_page = () => {
