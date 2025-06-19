@@ -83,7 +83,7 @@ public class AdminArticleController extends Controller {
         pageData.setDefaultPageSize(Long.parseLong(articlePageSize + ""));
         pageData.setTypes(Constants.zrLogConfig.getCacheService().refreshInitDataCacheAsync(request, false).get().getTypes());
         AdminApiPageDataStandardResponse<ArticlePageData> standardResponse = new AdminApiPageDataStandardResponse<>(pageData);
-        standardResponse.setDocumentTitle(Constants.getAdminTitle(I18nUtil.getAdminStringFromRes("blogManage")));
+        standardResponse.setDocumentTitle(Constants.getAdminDocumentTitleByUri(request.getUri()));
         return standardResponse;
     }
 
@@ -115,8 +115,8 @@ public class AdminArticleController extends Controller {
         if (Objects.nonNull(response.getArticle().getTitle())) {
             sj.add(response.getArticle().getTitle());
         }
-        sj.add(I18nUtil.getAdminStringFromRes("admin.log.edit"));
-        standardResponse.setDocumentTitle(Constants.getAdminTitle(sj.toString()));
+        sj.add(Constants.getAdminDocumentTitleByUri(request.getUri()));
+        standardResponse.setDocumentTitle(sj.toString());
         return standardResponse;
     }
 

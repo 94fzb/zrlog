@@ -108,15 +108,15 @@ public class AdminPageController extends Controller {
                         AdminApiPageDataStandardResponse<?> data = (AdminApiPageDataStandardResponse<?>) result;
                         return new ServerSideDataResponse(basicInfoResponse, resourceInfo, result.getData(), AdminTokenThreadLocal.getUser().getSessionId(), data.getDocumentTitle());
                     }
-                    return new ServerSideDataResponse(basicInfoResponse, resourceInfo, result.getData(), AdminTokenThreadLocal.getUser().getSessionId(), Constants.getAdminTitle(""));
+                    return new ServerSideDataResponse(basicInfoResponse, resourceInfo, result.getData(), AdminTokenThreadLocal.getUser().getSessionId(), Constants.getAdminDocumentTitleByUri(request.getUri()));
                 } else {
-                    return new ServerSideDataResponse(basicInfoResponse, resourceInfo, new Object(), AdminTokenThreadLocal.getUser().getSessionId(), Constants.getAdminTitle(""));
+                    return new ServerSideDataResponse(basicInfoResponse, resourceInfo, new Object(), AdminTokenThreadLocal.getUser().getSessionId(), Constants.getAdminDocumentTitleByUri(request.getUri()));
                 }
             } catch (InvocationTargetException e) {
                 throw e.getTargetException();
             }
         } else {
-            return new ServerSideDataResponse(null, resourceInfo, null, null, Constants.getAdminTitle(Constants.getAdminDocumentTitleByUri(request.getUri())));
+            return new ServerSideDataResponse(null, resourceInfo, null, null, Constants.getAdminDocumentTitleByUri(request.getUri()));
         }
     }
 

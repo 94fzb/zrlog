@@ -9,10 +9,7 @@ import com.zrlog.common.type.RunMode;
 import com.zrlog.util.I18nUtil;
 
 import java.io.File;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.StringJoiner;
+import java.util.*;
 
 /**
  * 存放全局的静态变量，有多个地方使用一个key时，存放在这里，方便代码的维护。
@@ -184,11 +181,21 @@ public class Constants {
         return sj.toString();
     }
 
+    public static Map<String, String> titleMap = new HashMap<>();
+
+    static {
+        titleMap.put(Constants.ADMIN_LOGIN_URI_PATH, "login");
+        titleMap.put("/admin/article-edit", "admin.log.edit");
+        titleMap.put("/admin/article", "blogManage");
+    }
+
     public static String getAdminDocumentTitleByUri(String uri) {
-        if (Objects.equals(uri, Constants.ADMIN_LOGIN_URI_PATH)) {
-            return I18nUtil.getAdminStringFromRes("login");
+        String realUri = uri.replaceFirst("/api", "");
+        String key = titleMap.get(realUri);
+        if (Objects.isNull(key)) {
+            return getAdminTitle("");
         }
-        return "";
+        return getAdminTitle(I18nUtil.getAdminStringFromRes(key));
     }
 
     public static String getAppId() {

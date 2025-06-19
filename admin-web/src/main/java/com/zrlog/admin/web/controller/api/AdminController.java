@@ -60,7 +60,7 @@ public class AdminController extends Controller {
             if (StringUtils.isNotEmpty(publicInfoVO.getWebsiteTitle())) {
                 map.put("short_name", publicInfoVO.getWebsiteTitle());
             }
-            map.put("name", Constants.getAdminTitle(""));
+            map.put("name", Constants.getAdminDocumentTitleByUri("/"));
             map.put("theme_color", publicInfoVO.getPwaThemeColor());
             map.put("description", ObjectHelpers.requireNonNullElse(Constants.zrLogConfig.getPublicWebSite().get("description"), ""));
             map.put("id", Constants.getAppId());
