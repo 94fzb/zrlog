@@ -15,7 +15,7 @@ self.addEventListener('fetch', event => {
     if (!request.url.startsWith('http')) {
         return;
     }
-    if(request.method !== "GET") {
+    if (request.method !== "GET") {
         return;
     }
 
@@ -24,6 +24,13 @@ self.addEventListener('fetch', event => {
             .then(response => {
                 // 请求成功，将响应添加到缓存中
                 if (response && response.status === 200) {
+                    if (response.contentType === 'application/json') {
+                        const data = JSON.parse(response.text());
+                        // error, not cache
+                        if (data.error) {
+                            return response;
+                        }
+                    }
                     const responseToCache = response.clone();
                     caches.open(CACHE_NAME)
                         .then(cache => cache.put(request, responseToCache));
