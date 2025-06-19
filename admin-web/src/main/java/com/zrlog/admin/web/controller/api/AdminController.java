@@ -1,7 +1,10 @@
 package com.zrlog.admin.web.controller.api;
 
 import com.google.gson.Gson;
-import com.hibegin.common.util.*;
+import com.hibegin.common.util.BeanUtil;
+import com.hibegin.common.util.IOUtil;
+import com.hibegin.common.util.ObjectHelpers;
+import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.annotation.ResponseBody;
 import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.rest.request.LoginRequest;
@@ -24,6 +27,7 @@ import com.zrlog.model.Log;
 import com.zrlog.model.User;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.I18nUtil;
+import com.zrlog.util.ZrLogUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -65,6 +69,9 @@ public class AdminController extends Controller {
             List<Map<String, Object>> list = (List<Map<String, Object>>) map.get("icons");
             for (Map<String, Object> icon : list) {
                 icon.put("src", WebTools.buildEncodedUrl(request, (String) icon.get("src")));
+            }
+            if (ZrLogUtil.isStaticPlugin(request)) {
+                map.put("start_url", ((String) map.get("start_url")).replace("./index", "./index.html"));
             }
             return map;
         }
