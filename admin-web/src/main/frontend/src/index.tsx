@@ -1,7 +1,7 @@
 import * as serviceWorker from "./serviceWorker";
 import zh_CN from "antd/es/locale/zh_CN";
 import en_US from "antd/es/locale/en_US";
-import {App, ConfigProvider, Spin, theme} from "antd";
+import {App, ConfigProvider, message, Spin, theme} from "antd";
 import {BrowserRouter} from "react-router-dom";
 import EnvUtils, {isOffline} from "./utils/env-utils";
 import AppBase from "./AppBase";
@@ -77,6 +77,8 @@ const Index = () => {
         requiredBackendServerUrl: false,
     });
 
+    const [messageApi, contextHolder] = message.useMessage({maxCount: 3});
+
     const loadResourceFromServer = (first: boolean) => {
         const resourceApi = "/api/public/adminResource";
         axios
@@ -85,15 +87,15 @@ const Index = () => {
                 handleRes(data.data);
             })
             .catch((e) => {
+                const errorMsg = "Request " + axios.defaults.baseURL + resourceApi.substring(1) + " error -> " + e.message;
                 if (!first) {
-                    alert("Request " + axios.defaults.baseURL + resourceApi + " error -> " + e.message)
+                    messageApi.error(errorMsg)
                 }
                 if (isStaticPage()) {
                     setAppState((prevState) => {
                         return {
                             ...prevState,
                             dark: document.body.className.includes("dark"),
-                            //resLoadErrorMsg: "Request " + resourceApi + " error -> " + e.message,
                             resLoaded: true,
                             lang: "zh_CN",
                             requiredBackendServerUrl: true,
@@ -107,7 +109,7 @@ const Index = () => {
                     return {
                         ...prevState,
                         dark: document.body.className.includes("dark"),
-                        resLoadErrorMsg: "Request " + resourceApi + " error -> " + e.message,
+                        resLoadErrorMsg: errorMsg,
                         resLoaded: false,
                         lang: "zh_CN",
                         offline: prevState.offline,
@@ -222,6 +224,7 @@ const Index = () => {
                             v7_startTransition: true,
                         }}
                     >
+                        {contextHolder}
                         {getBody()}
                     </BrowserRouter>
                 </StyleProvider>
