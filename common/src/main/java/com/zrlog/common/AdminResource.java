@@ -1,5 +1,7 @@
 package com.zrlog.common;
 
+import com.hibegin.http.server.api.HttpRequest;
+
 import java.io.InputStream;
 import java.util.Set;
 
@@ -11,5 +13,5 @@ public interface AdminResource  {
 
     boolean isAdminMainJs(String uri);
 
-    InputStream renderServiceWorker();
+    InputStream renderServiceWorker(HttpRequest request);
 }

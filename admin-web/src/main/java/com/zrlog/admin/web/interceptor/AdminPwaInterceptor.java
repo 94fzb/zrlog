@@ -46,7 +46,7 @@ public class AdminPwaInterceptor implements HandleAbleInterceptor {
         try {
             if (Objects.equals(Constants.ADMIN_SERVICE_WORKER_JS, request.getUri())) {
                 response.addHeader("Content-Type", MimeTypeUtil.getMimeStrByExt(request.getUri().substring(request.getUri().lastIndexOf(".") + 1)));
-                try (InputStream inputStream = Constants.zrLogConfig.getAdminResource().renderServiceWorker()) {
+                try (InputStream inputStream = Constants.zrLogConfig.getAdminResource().renderServiceWorker(request)) {
                     bytes = inputStream.readAllBytes();
                     response.write(new ByteArrayInputStream(bytes));
                     return false;

@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.StringUtils;
+import com.hibegin.http.server.api.HttpRequest;
 import com.zrlog.business.util.ResourceUtils;
 import com.zrlog.common.AdminResource;
 import com.zrlog.common.Constants;
@@ -21,11 +22,6 @@ public class AdminResourceImpl implements AdminResource {
 
     private final Set<String> pageUris;
     private final Set<String> staticUris;
-
-    @Override
-    public boolean isAdminMainJs(String uri) {
-        return uri.contains("/admin/static/js/main.") && uri.endsWith(".js");
-    }
 
     public AdminResourceImpl() {
         this.pageUris = wrapperUris(getUris("/admin/pwa-page.txt"));
@@ -48,14 +44,34 @@ public class AdminResourceImpl implements AdminResource {
         this.staticUris = cacheUris;
     }
 
+    public static void main(String[] args) {
+        //System.out.println("js = " + IOUtil.getStringInputStream(new AdminResourceImpl().renderServiceWorker()));
+        Set<String> adminPageUris = new AdminResourceImpl().getAdminPageUris();
+        System.out.println(adminPageUris);
+    }
+
     @Override
-    public ByteArrayInputStream renderServiceWorker() {
+    public boolean isAdminMainJs(String uri) {
+        return uri.contains("/admin/static/js/main.") && uri.endsWith(".js");
+    }
+
+    @Override
+    public ByteArrayInputStream renderServiceWorker(HttpRequest request) {
         StringJoiner sb = new StringJoiner(",\n    ");
+        String adminResourceUrl = ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite();
         getAdminResourceUris(false).forEach(e -> {
-            if (StringUtils.isNotEmpty(ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite()) && !pageUris.contains(e)) {
-                sb.add("\"" + ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite() + e + "\"");
+            if (pageUris.contains(e)) {
+                if (ZrLogUtil.isStaticPlugin(request)) {
+                    sb.add("\"" + e + "\".html");
+                } else {
+                    sb.add("\"" + e + "\"");
+                }
             } else {
-                sb.add("\"" + e + "\"");
+                if (StringUtils.isNotEmpty(adminResourceUrl)) {
+                    sb.add("\"" + adminResourceUrl + e + "\"");
+                } else {
+                    sb.add("\"" + e + "\"");
+                }
             }
         });
         return new ByteArrayInputStream(IOUtil.getStringInputStream(ResourceUtils.class.getResourceAsStream(Constants.ADMIN_SERVICE_WORKER_JS)).replace("'___FILES___'", sb.toString()).getBytes());
@@ -102,12 +118,6 @@ public class AdminResourceImpl implements AdminResource {
     @Override
     public Set<String> getAdminPageUris() {
         return pageUris.stream().filter(e -> e.startsWith("/admin/")).map(e -> e.split("\\?")[0]).collect(Collectors.toSet());
-    }
-
-    public static void main(String[] args) {
-        //System.out.println("js = " + IOUtil.getStringInputStream(new AdminResourceImpl().renderServiceWorker()));
-        Set<String> adminPageUris = new AdminResourceImpl().getAdminPageUris();
-        System.out.println(adminPageUris);
     }
 
 }
