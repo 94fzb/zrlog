@@ -1,7 +1,7 @@
 import {Content} from "antd/es/layout/layout";
 import Card from "antd/es/card";
 import {Button, Col, Form, Input} from "antd";
-import {getBackendServerUrl, isStaticPage, setBackendServerUrl} from "../../utils/constants";
+import {getBackendServerUrl, getColorPrimary, isStaticPage, setBackendServerUrl} from "../../utils/constants";
 import Row from "antd/es/grid/row";
 import {LoginOutlined} from "@ant-design/icons";
 import {classes, LoginBg, StyledLoginPage} from "../login";
@@ -21,7 +21,7 @@ const Init: FunctionComponent<InitProps> = ({onSubmit}) => {
     //const navigate = useNavigate();
 
     return (
-        <StyledLoginPage>
+        <StyledLoginPage mainColor={getColorPrimary()}>
             <Content className={classes.content}>
                 <Card className={classes.card} cover={<LoginBg/>} styles={{
                     body: {

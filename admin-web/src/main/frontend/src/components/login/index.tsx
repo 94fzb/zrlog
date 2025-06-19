@@ -19,6 +19,8 @@ import PWAHandler from "../../PWAHandler";
 import {removeAllCaches} from "../../cache";
 import styled from "styled-components";
 import {getContextPath} from "../../utils/helpers";
+import {DataType} from "csstype";
+import Color = DataType.Color;
 
 const md5 = require("md5");
 
@@ -32,53 +34,55 @@ export const classes = {
     copyrightTips: `${PREFIX}-copyrightTips`
 }
 
-export const StyledLoginPage = styled(Layout)({
-    height: "100vh",
-    [`& .${classes.bg}`]: {
-        objectFit: "cover",
-        opacity: 0.6,
-        filter: "blur(1px)",
-        width: "100%",
-        display: "flex",
-        flexDirection: "column",
-        borderRadius: "8px 8px 0 0",
-        alignItems: "center",
-        textAlign: "center",
-        backgroundSize: "cover",
-        height: "180px",
-    },
-    [`& .${classes.title}`]: {
-        color: "#fff",
-        background: getColorPrimary(),
-        margin: 0,
-        width: "100%",
-        position: "absolute",
-        bottom: 0,
-        whiteSpace: "nowrap",
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-        paddingLeft: 12,
-        paddingRight: 12,
-    },
-    [`& .${classes.card}`]: {
-        textAlign: "center",
-        width: "100%",
-        marginRight: "auto",
-        marginLeft: "auto",
-        maxWidth: "660px",
-    },
-    [`& .${classes.content}`]: {
-        minWidth: "100%",
-        display: "flex",
-        alignItems: "center",
-        paddingRight: 24,
-        paddingLeft: 24,
-    },
-    [`& .${classes.copyrightTips}`]: {
-        textAlign: "center",
-        whiteSpace: "nowrap",
-        overflow: "hidden",
-        textOverflow: "ellipsis",
+export const StyledLoginPage = styled(Layout)<{ mainColor: Color }>((props) => {
+    return {
+        height: "100vh",
+        [`& .${classes.bg}`]: {
+            objectFit: "cover",
+            opacity: 0.6,
+            filter: "blur(1px)",
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
+            borderRadius: "8px 8px 0 0",
+            alignItems: "center",
+            textAlign: "center",
+            backgroundSize: "cover",
+            height: "180px",
+        },
+        [`& .${classes.title}`]: {
+            color: "#fff",
+            background: props.mainColor,
+            margin: 0,
+            width: "100%",
+            position: "absolute",
+            bottom: 0,
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            paddingLeft: 12,
+            paddingRight: 12,
+        },
+        [`& .${classes.card}`]: {
+            textAlign: "center",
+            width: "100%",
+            marginRight: "auto",
+            marginLeft: "auto",
+            maxWidth: "660px",
+        },
+        [`& .${classes.content}`]: {
+            minWidth: "100%",
+            display: "flex",
+            alignItems: "center",
+            paddingRight: 24,
+            paddingLeft: 24,
+        },
+        [`& .${classes.copyrightTips}`]: {
+            textAlign: "center",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+        }
     }
 })
 
@@ -167,7 +171,7 @@ const Index = ({offline}: { offline: boolean }) => {
     return (
         <PWAHandler>
             {contextHolder}
-            <StyledLoginPage>
+            <StyledLoginPage mainColor={getColorPrimary()}>
                 <Content className={classes.content}>
                     <Card
                         cover={
