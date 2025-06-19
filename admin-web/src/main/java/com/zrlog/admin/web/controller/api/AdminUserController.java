@@ -18,6 +18,7 @@ import com.zrlog.admin.web.token.AdminTokenThreadLocal;
 import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.common.Constants;
 import com.zrlog.common.rest.response.ApiStandardResponse;
+import com.zrlog.common.vo.AdminTokenVO;
 import com.zrlog.model.User;
 import com.zrlog.util.I18nUtil;
 
@@ -43,13 +44,15 @@ public class AdminUserController extends Controller {
 
     @ResponseBody
     public ApiStandardResponse<UserBasicInfoResponse> index() {
-        Map<String, Object> byId = new User().loadById(AdminTokenThreadLocal.getUserId());
+        AdminTokenVO adminTokenVO = AdminTokenThreadLocal.getUser();
+        Map<String, Object> byId = new User().loadById(adminTokenVO.getUserId());
         UserBasicInfoResponse basicInfoResponse = Objects.requireNonNullElse(BeanUtil.convert(byId, UserBasicInfoResponse.class), new UserBasicInfoResponse());
         if (StringUtils.isEmpty(basicInfoResponse.getHeader())) {
             basicInfoResponse.setHeader(WebTools.buildEncodedUrl(request, "assets/images/default-portrait.gif"));
         }
         UpdateVersionPlugin plugin = (UpdateVersionPlugin) Constants.zrLogConfig.getPlugins().stream().filter(x -> x instanceof UpdateVersionPlugin).findFirst().orElse(null);
         basicInfoResponse.setLastVersion(upgradeService.getCheckVersionResponse(false, plugin));
+        basicInfoResponse.setKey(adminTokenVO.getSessionId());
         return new ApiStandardResponse<>(basicInfoResponse);
     }
 
