@@ -143,10 +143,10 @@ export function AdminPage(props: AdminPageProps<ArticleEditProps | any>): ReactE
 
     return <AdminManageLayout basicUserInfo={userInfo} offline={offline} loading={axiosRequesting}
                               fullScreen={fullScreen}>
-        {data && (
+        {data ? (
             <LazyWithFallbackElement LazyComponent={LazyComponent} FallbackComponent={FallbackComponent}
                                      props={componentProps}/>
-        )}
+        ) : <MyLoadingComponent/>}
     </AdminManageLayout>
 }
 
