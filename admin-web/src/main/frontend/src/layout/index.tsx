@@ -46,7 +46,7 @@ const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({offline, 
 
     useEffect(() => {
         if (userInfo === undefined) {
-            axios.get("/api/admin/user").then(({data}) => {
+            axios.get(`/api/admin/user?t=${new Date().getTime()}`).then(({data}) => {
                 setUser(data.data);
             });
         }
