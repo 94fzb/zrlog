@@ -9,6 +9,6 @@ public class CrossUtils {
 
     public static boolean isEnableOrigin(HttpRequest request) {
         String origin = request.getHeader("Origin");
-        return Constants.isStaticHtmlStatus() && Objects.nonNull(origin);
+        return Constants.isStaticHtmlStatus() || Objects.nonNull(origin);
     }
 }
