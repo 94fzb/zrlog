@@ -24,14 +24,7 @@ export type BasicUserInfo = {
     userName: string;
     header: string;
     lastVersion?: LastVersion
-};
-
-export type UserInfoState = {
-    basicInfoLoading: boolean;
-    basicInfo: BasicUserInfo;
-    upgrade: boolean;
-    version: string;
-    type: string;
+    cacheableApiUris?: string[]
 };
 
 export type ServerInfoEntry = {

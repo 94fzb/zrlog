@@ -1,10 +1,7 @@
 package com.zrlog.admin.web.token;
 
 import com.google.gson.Gson;
-import com.hibegin.common.util.ByteUtils;
-import com.hibegin.common.util.LoggerUtil;
-import com.hibegin.common.util.SecurityUtils;
-import com.hibegin.common.util.StringUtils;
+import com.hibegin.common.util.*;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.web.cookie.Cookie;
@@ -158,7 +155,7 @@ public class AdminTokenService implements TokenService {
             if (Objects.equals(protocol, "https")) {
                 cookie.setSecure(true);
             }
-            if (CrossUtils.isEnableOrigin(request)) {
+            if (CrossUtils.isEnableOrigin(request) && !EnvKit.isDevMode()) {
                 cookie.setSameSite("None");
             }
             cookie.setHttpOnly(true);

@@ -88,7 +88,7 @@ export const removePageCacheByLocation = (location: H.Location) => {
 };
 
 export const getPageDataCacheKey = (location: H.Location) => {
-    return location.pathname + removeQueryParam(location.search, cacheIgnoreReloadKey);
+    return location.pathname.replace(".html", "") + removeQueryParam(location.search, cacheIgnoreReloadKey);
 };
 
 export const getCachedData = (): Record<string, any> => {
