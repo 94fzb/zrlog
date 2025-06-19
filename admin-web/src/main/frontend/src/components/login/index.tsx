@@ -19,8 +19,6 @@ import PWAHandler from "../../PWAHandler";
 import {removeAllCaches} from "../../cache";
 import styled from "styled-components";
 import {getContextPath} from "../../utils/helpers";
-import {Property} from "csstype";
-import Color = Property.Color;
 
 const md5 = require("md5");
 
@@ -34,7 +32,7 @@ export const classes = {
     copyrightTips: `${PREFIX}-copyrightTips`
 }
 
-export const StyledLoginPage = styled(Layout)<{ mainColor: Color }>((props) => {
+export const StyledLoginPage = styled(Layout)<{ mainColor: string }>(({mainColor}) => {
     return {
         height: "100vh",
         [`& .${classes.bg}`]: {
@@ -52,7 +50,7 @@ export const StyledLoginPage = styled(Layout)<{ mainColor: Color }>((props) => {
         },
         [`& .${classes.title}`]: {
             color: "#fff",
-            background: props.mainColor,
+            background: mainColor,
             margin: 0,
             width: "100%",
             position: "absolute",
