@@ -157,9 +157,9 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
     const initUri = location.pathname + location.search;
     const defaultData = {...getCachedData(), [initUri]: ssData?.pageData};
 
-    const firstRender = useRef<boolean>(ssData && ssData.pageData);
+    const ssrRender = useRef<boolean>(ssData && ssData.pageData);
     const [state, setState] = useState<AdminDashboardRouterState>({
-        currentUri: initUri,
+        currentUri: initUri.replace(".html", ""),
         axiosRequesting: false,
         offline: offline,
         fullScreen: defaultFullScreen,
@@ -216,21 +216,21 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
 
     useEffect(() => {
         const uri = getPageDataCacheKey(location);
-        if (getDataFromState()) {
-            if (firstRender.current) {
-                firstRender.current = false;
-                return;
+        const stateCache = getDataFromState();
+        if (stateCache) {
+            if (ssrRender.current) {
+                ssrRender.current = false;
+            } else {
+                //使用缓存先显示
+                setState((prevState) => {
+                    return {
+                        ...prevState,
+                        currentUri: uri,
+                        axiosRequesting: true,
+                        fullScreen: getPageFullState(getFullPath(location)),
+                    };
+                });
             }
-            //使用缓存显示一次
-            setState((prevState) => {
-                return {
-                    currentUri: uri,
-                    axiosRequesting: true,
-                    fullScreen: getPageFullState(getFullPath(location)),
-                    data: prevState.data,
-                    offline: prevState.offline,
-                };
-            });
         }
         loadData(uri, location)
             .then(() => {
@@ -424,7 +424,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
                                 data={getDataFromState()}
                                 axiosRequesting={state.axiosRequesting}
                                 offline={state.offline}
-                                fullScreen={fullScreen ? state.fullScreen : undefined}
+                                fullScreen={fullScreen ? state.fullScreen : false}
                                 LazyComponent={lazy}
                                 FallbackComponent={fallback}
                                 props={{
