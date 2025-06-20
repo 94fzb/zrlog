@@ -7,10 +7,11 @@ import {CheckOutlined, CloudDownloadOutlined, DeleteOutlined, EyeOutlined, Setti
 import Meta from "antd/es/card/Meta";
 import Button from "antd/es/button";
 import {useEffect, useState} from "react";
-import {getRealRouteUrl, getRes} from "../../utils/constants";
+import {getBackendServerUrl, getRealRouteUrl, getRes} from "../../utils/constants";
 import {Link} from "react-router-dom";
 import Popconfirm from "antd/es/popconfirm";
 import {useAxiosBaseInstance} from "../../AppBase";
+import {getCsrData} from "../../api";
 
 export type TemplateEntry = {
     template: string;
@@ -30,8 +31,8 @@ const Template = ({data}: { data: TemplateEntry[] }) => {
     const axiosInstance = useAxiosBaseInstance();
 
     const load = () => {
-        axiosInstance.get("/api/admin/template").then(({data}) => {
-            setTemplateState(data.data);
+        getCsrData("/template", axiosInstance).then(({data}) => {
+            setTemplateState(data);
         });
     };
 
@@ -113,7 +114,7 @@ const Template = ({data}: { data: TemplateEntry[] }) => {
                                             style={{width: "100%", minHeight: 250}}
                                             alt={template.name}
                                             title={template.name}
-                                            src={template.adminPreviewImage}
+                                            src={getBackendServerUrl() + template.adminPreviewImage.substring(1)}
                                         />
                                     }
                                     actions={getActions(template)}
@@ -126,7 +127,7 @@ const Template = ({data}: { data: TemplateEntry[] }) => {
                 })}
             </Row>
             <Divider/>
-            <Link to={`/template-center?host=${window.location.host}`}>
+            <Link to={getRealRouteUrl(`/template-center?host=${window.location.host}`)}>
                 <Button icon={<CloudDownloadOutlined/>} type={"primary"}>
                     {getRes()["admin.theme.download"]}
                 </Button>

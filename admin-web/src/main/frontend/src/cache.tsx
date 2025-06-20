@@ -122,6 +122,7 @@ export const removeAllCaches = () => {
 
 export const putCache = (cache: Record<string, any>) => {
     try {
+        //console.info(cache);
         localStorage.setItem(getCacheKey(), aesEncrypt(JSON.stringify(cache), padStringToLength(getKey(), 24)));
     } catch (e) {
         console.error(e);

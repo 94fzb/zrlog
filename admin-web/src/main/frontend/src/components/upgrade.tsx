@@ -6,6 +6,7 @@ import {getRealRouteUrl, getRes} from "../utils/constants";
 import {AxiosError} from "axios";
 import {getContextPath} from "../utils/helpers";
 import {useAxiosBaseInstance} from "../AppBase";
+import {getCsrData} from "../api";
 
 const {Step} = Steps;
 export const API_VERSION_PATH = "/api/admin/website/version";
@@ -104,7 +105,11 @@ const Upgrade: FunctionComponent<UpgradeProps> = ({data, offline, offlineData}) 
             };
         });
         try {
-            const {data} = await axiosInstance.get("/api/admin/upgrade/download?preUpgradeKey=" + preUpgradeKey);
+            const data = await getCsrData("/upgrade/download?preUpgradeKey=" + preUpgradeKey, axiosInstance);
+            if (data.error) {
+                messageApi.error(data.message);
+                return;
+            }
             setState((prevState) => {
                 return {
                     ...prevState,
@@ -134,16 +139,16 @@ const Upgrade: FunctionComponent<UpgradeProps> = ({data, offline, offlineData}) 
                 current: current,
             };
         });
-        const {data} = await axiosInstance.get("/api/admin/upgrade/doUpgrade?preUpgradeKey=" + preUpgradeKey);
-        if (data.data) {
+        const data = await getCsrData("/upgrade/doUpgrade?preUpgradeKey=" + preUpgradeKey, axiosInstance);
+        if (data) {
             setState((prevState) => {
                 return {
                     ...prevState,
-                    upgradeMessage: data.data.message,
+                    upgradeMessage: data.message,
                     current: current,
                 };
             });
-            if (data.data.finish) {
+            if (data.finish) {
                 checkRestartSuccess(newBuildId);
                 return;
             }

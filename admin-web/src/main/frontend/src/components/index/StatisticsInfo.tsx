@@ -20,7 +20,7 @@ const StatisticsInfo = ({data, versionInfo}: { data: StatisticsInfoState, versio
                     </Card>
                 </Col>
                 <Col xs={24} md={12}>
-                    <Link to={"/comment"}>
+                    <Link to={getRealRouteUrl("/comment")}>
                         <Card styles={{body: {padding: 16}}}>
 
                             <Statistic
@@ -34,7 +34,7 @@ const StatisticsInfo = ({data, versionInfo}: { data: StatisticsInfoState, versio
             </Row>
             <Row gutter={[8, 8]} style={{paddingTop: 8}}>
                 <Col xs={24} md={12}>
-                    <Link to={"/article"}>
+                    <Link to={getRealRouteUrl("/article")}>
                         <Card styles={{body: {padding: 16}}}>
                             <Statistic
                                 title={getRes()["totalArticle"]}

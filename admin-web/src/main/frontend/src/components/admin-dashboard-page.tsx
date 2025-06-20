@@ -3,7 +3,8 @@ import {useAxiosBaseInstance} from "../AppBase";
 import {BasicUserInfo} from "../type";
 import {ssData} from "../index";
 import {Spin} from "antd";
-import {getCacheByKey} from "../cache";
+import {addToCache} from "../cache";
+import {getCsrData} from "../api";
 
 type AdminDashBroadPageProps = {
     offline: boolean,
@@ -16,28 +17,22 @@ const AdminDashboardPage: FunctionComponent<AdminDashBroadPageProps> = ({offline
 
     const axiosBaseInstance = useAxiosBaseInstance();
 
-    let initUserInfo = ssData?.user;
-
-    if (offline) {
-        initUserInfo = getCacheByKey("/user");
-    }
-
-    const [userInfo, setUserInfo] = useState<BasicUserInfo | undefined>(initUserInfo);
-
-    const needFetch = userInfo === undefined || userInfo === null;
+    const [userInfo, setUserInfo] = useState<BasicUserInfo | undefined>(ssData?.user);
 
     useEffect(() => {
-        if (needFetch) {
-            axiosBaseInstance.get(`/api/admin/user?t=${new Date().getTime()}`).then(({data}) => {
-                if (ssData) {
-                    if (data.data.key) {
-                        ssData.key = data.data.key
-                    }
-                    ssData.user = data.data
-                }
-                setUserInfo(data.data);
-            });
+        if (offline) {
+            return;
         }
+        getCsrData(`/user?_t=${new Date().getTime()}`, axiosBaseInstance).then(({data}) => {
+            if (ssData) {
+                if (data.key) {
+                    ssData.key = data.key
+                }
+                ssData.user = data
+            }
+            setUserInfo(data);
+            addToCache("/user", data);
+        });
     }, []);
 
 

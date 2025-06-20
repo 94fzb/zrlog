@@ -12,6 +12,7 @@ import {BasicUserInfo} from "./type";
 import {getContextPath} from "./utils/helpers";
 import AppInit from "./AppInit";
 import EnvUtils, {isOffline} from "./utils/env-utils";
+import {getCacheByKey} from "./cache";
 
 export const basePath = getContextPath() + "admin/"
 export let apiBasePath: string;
@@ -41,23 +42,6 @@ export let ssData: SsDate | undefined;
 
 export const ssKeyStorageKey = "ss_key";
 
-const initSsData = () => {
-    const ssDataStr = document.getElementById("__SS_DATA__")?.innerText;
-    // @ts-ignore
-    if (ssDataStr?.length > 0) {
-        ssData = JSON.parse(ssDataStr as string);
-    } else {
-        const ssKey = localStorage.getItem(ssKeyStorageKey);
-        if (ssKey) {
-            ssData = {key: ssKey};
-        } else {
-            ssData = {key: ""}
-        }
-    }
-}
-
-initSsData();
-
 
 export const getItems_per_page = () => {
     if (getRes()["lang"] === "zh_CN") {
@@ -76,6 +60,23 @@ const Index = () => {
         offline: isOffline(),
     });
 
+    const initSsData = () => {
+        const ssDataStr = document.getElementById("__SS_DATA__")?.innerText;
+        // @ts-ignore
+        if (ssDataStr?.length > 0) {
+            ssData = JSON.parse(ssDataStr as string);
+        } else {
+            const ssKey = localStorage.getItem(ssKeyStorageKey);
+            if (ssKey) {
+                ssData = {key: ssKey};
+                ssData.user = getCacheByKey("/user");
+            } else {
+                ssData = {key: ""}
+            }
+        }
+    }
+
+    initSsData();
 
     const updateOnlineStatus = () => {
         setState((prevState) => {
