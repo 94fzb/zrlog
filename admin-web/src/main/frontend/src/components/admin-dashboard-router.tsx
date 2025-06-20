@@ -207,7 +207,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
         }
         //使用缓存先显示
         const cacheData = getCacheByKey(currentPageDataKey);
-        console.info(currentPageDataKey + "=> " + JSON.stringify(cacheData))
+        //console.info(currentPageDataKey + "=> " + JSON.stringify(cacheData))
         setState((prevState) => {
             return {
                 ...prevState,
