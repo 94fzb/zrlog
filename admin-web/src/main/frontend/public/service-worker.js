@@ -18,36 +18,32 @@ self.addEventListener('fetch', event => {
     if (request.method !== "GET") {
         return;
     }
+    // ✅ 不缓存 /api 接口，直接走网络
+    if (new URL(request.url).pathname.startsWith('/api')) {
+        return;
+    }
 
     event.respondWith(
-        fetch(request)
-            .then(response => {
-                // 请求成功，将响应添加到缓存中
-                if (response && response.status === 200) {
-                    if (response.contentType === 'application/json') {
-                        const data = JSON.parse(response.text());
-                        // error, not cache
-                        if (data.error) {
-                            return response;
-                        }
-                    }
-                    const responseToCache = response.clone();
-                    caches.open(CACHE_NAME)
-                        .then(cache => cache.put(request, responseToCache));
+        caches.open(CACHE_NAME).then(async cache => {
+            const cachedResponse = await cache.match(request);
+
+            // 触发后台更新
+            const fetchPromise = fetch(request).then(networkResponse => {
+                // 只有有效响应才更新缓存
+                if (networkResponse && networkResponse.status === 200) {
+                    cache.put(request, networkResponse.clone());
                 }
-                return response;
-            })
-            .catch(() => {
-                // 请求失败，尝试从缓存中获取响应
-                return caches.match(request)
-                    .then(cachedResponse => {
-                        if (cachedResponse) {
-                            return cachedResponse;
-                        }
-                        // 如果没有缓存的响应，返回离线页面
-                        return caches.match('/admin/offline');
-                    });
-            })
+                return networkResponse;
+            }).catch(() => {
+                // 网络失败也不抛错
+                return null;
+            });
+
+            // 返回缓存内容（如果有），否则等网络返回
+            return cachedResponse || fetchPromise.then(response => {
+                return response || caches.match('/admin/offline');
+            });
+        })
     );
 });
 
