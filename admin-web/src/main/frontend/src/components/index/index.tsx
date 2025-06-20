@@ -58,7 +58,13 @@ const Index: FunctionComponent<IndexProps> = ({data}) => {
                     >
                         <IndexTipBg style={{position: "absolute", height: "100%", width: "100%", zIndex: 2}}/>
                         <div style={{padding: 12}}>
-                            <div style={{fontSize: 20, fontWeight: 500,textOverflow: "ellipsis", whiteSpace: "nowrap",overflow:"hidden"}}>{data.welcomeTip}</div>
+                            <div style={{
+                                fontSize: 20,
+                                fontWeight: 500,
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                                overflow: "hidden"
+                            }}>{data.welcomeTip}</div>
                             <div style={{overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap"}}>
                                 {data.tips.map((e) => {
                                     return e;

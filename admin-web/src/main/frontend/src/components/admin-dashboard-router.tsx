@@ -5,15 +5,17 @@ import {getCsrData} from "../api";
 import MyLoadingComponent from "./my-loading-component";
 import {ssData} from "../index";
 import {
-    getCachedData,
+    addToCache,
+    getCacheByKey,
     getLastOpenedPage,
     getPageDataCacheKey,
+    getPageDataCacheKeyByPath,
     getPageFullState,
-    putCache,
+    removeCacheDataByKey,
     savePageFullState,
 } from "../cache";
 import {deepEqualWithSpecialJSON, getFullPath} from "../utils/helpers";
-import Upgrade, {UpgradeData, UpgradeProps} from "./upgrade";
+import Upgrade from "./upgrade";
 import {getRes} from "../utils/constants";
 import {isPWA} from "../utils/env-utils";
 import * as H from "history";
@@ -73,11 +75,9 @@ const AsyncSystem = lazy(() => import("components/system"));
 const AdminManageLayout = lazy(() => import("layout"));
 
 type AdminDashboardRouterState = {
-    currentPageDataKey: string;
     axiosRequesting: boolean;
     fullScreen: boolean;
-    offline: boolean;
-    data: Record<string, any>;
+    lastAxiosRequestedCacheKey: string;
 };
 
 const updateDocumentTitle = (newDocumentTitle: string) => {
@@ -99,14 +99,9 @@ type AdminDashboardRouterProps = {
 };
 
 type AdminPageProps<P> = {
-    offline: boolean,
-    axiosRequesting: boolean,
-    data: any,
     LazyComponent: ComponentType<P>;
     FallbackComponent: ComponentType<P>;
-    fullScreen?: boolean,
     props: P;
-    userInfo: BasicUserInfo;
 }
 
 interface LazyWithFallbackElementProps<P> {
@@ -128,21 +123,25 @@ export function LazyWithFallbackElement<P>({
     );
 }
 
-export function AdminPage(props: AdminPageProps<ArticleEditProps | any>): ReactElement<AdminPageProps<ArticleEditProps | any>> {
+type AdminCommonProps = {
+    data: any,
+    offlineData: boolean,
+    offline: boolean,
+    fullScreen?: boolean,
+    userInfo: BasicUserInfo;
+}
+
+export function AdminPage(props: AdminPageProps<any>): ReactElement<AdminPageProps<AdminCommonProps>> {
     const {
-        offline,
-        axiosRequesting,
-        data,
         FallbackComponent,
         LazyComponent,
-        fullScreen,
-        userInfo,
         props: componentProps,
     } = props;
 
-    return <AdminManageLayout basicUserInfo={userInfo} offline={offline} loading={axiosRequesting}
-                              fullScreen={fullScreen}>
-        {data ? (
+    return <AdminManageLayout basicUserInfo={props.props.userInfo} offline={props.props.offline}
+                              loading={props.props.offlineData && !props.props.offline}
+                              fullScreen={props.props.fullScreen}>
+        {props.props.data ? (
             <LazyWithFallbackElement LazyComponent={LazyComponent} FallbackComponent={FallbackComponent}
                                      props={componentProps}/>
         ) : <MyLoadingComponent/>}
@@ -155,87 +154,71 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
     const defaultFullScreen = getPageFullState(pwaLastOpenedPage ? pwaLastOpenedPage : getFullPath(location));
     const initCurrentPageDataKey = getPageDataCacheKey(location);
     const serverSideData = useRef<boolean>(ssData && ssData.pageData);
-    const defaultData = serverSideData.current ? {
-        ...getCachedData(),
-        [initCurrentPageDataKey]: ssData?.pageData
-    } : getCachedData();
-
 
     const [state, setState] = useState<AdminDashboardRouterState>({
-        currentPageDataKey: initCurrentPageDataKey,
         axiosRequesting: false,
-        offline: offline,
+        lastAxiosRequestedCacheKey: serverSideData.current ? initCurrentPageDataKey : "",
         fullScreen: defaultFullScreen,
-        data: defaultData,
     });
 
-    const getDataFromState = () => {
+    const getDataFromCache = () => {
         const pageDataCacheKey = getPageDataCacheKey(location);
-        return state.data[pageDataCacheKey] !== undefined && state.data[pageDataCacheKey] !== null ? state.data[pageDataCacheKey] : undefined;
+        return getCacheByKey(pageDataCacheKey);
     };
 
     const deleteThisPageStateCache = () => {
-        const mergeData = state.data;
-        mergeData[getPageDataCacheKey(location)] = undefined;
-        setState((prevState) => {
-            return {
-                ...prevState,
-                data: mergeData,
-            };
-        });
+        removeCacheDataByKey(getPageDataCacheKey(location));
     };
 
     const axiosBaseInstance = useAxiosBaseInstance();
 
-    const loadData = async (currentPageDataKey: string, location: H.Location) => {
+    const loadData = async (currentPageDataKey: string, cacheData: any, location: H.Location) => {
         const responseData = await getCsrData(currentPageDataKey, axiosBaseInstance);
         const {data, documentTitle} = responseData;
-        const mergeData = state.data;
         updateDocumentTitle(documentTitle);
-        //如果请求回来的和请求回来的一致的情况就跳过 setState
-        if (deepEqualWithSpecialJSON(mergeData[currentPageDataKey], data)) {
+        //如果请求回来的和请求回来的一致的情况
+        if (deepEqualWithSpecialJSON(cacheData, data)) {
             console.info(currentPageDataKey + " cache hits");
             setState((prevState) => {
                 return {
                     ...prevState,
                     axiosRequesting: false,
+                    lastAxiosRequestedCacheKey: currentPageDataKey,
                 };
             });
             return;
         }
-        mergeData[currentPageDataKey] = data;
-        putCache(mergeData);
-        setState((prevState) => {
+        addToCache(currentPageDataKey, data);
+        setState(() => {
             return {
-                offline: prevState.offline,
-                firstRender: false,
                 axiosRequesting: false,
-                currentPageDataKey: currentPageDataKey,
-                data: mergeData,
+                lastAxiosRequestedCacheKey: currentPageDataKey,
                 fullScreen: getPageFullState(getFullPath(location)),
             };
         });
     };
 
     useEffect(() => {
-        const currentPageDataKey = getPageDataCacheKey(location);
-        const stateCache = getDataFromState();
-        if (stateCache) {
-            if (serverSideData.current) {
-                serverSideData.current = false;
-                return;
-            }
-            //使用缓存先显示
-            setState((prevState) => {
-                return {
-                    ...prevState,
-                    currentPageDataKey: currentPageDataKey,
-                    axiosRequesting: true,
-                    fullScreen: getPageFullState(getFullPath(location)),
-                };
-            });
+        const currentPageDataKey = getPageDataCacheKeyByPath(location.pathname, location.search);
+        if (serverSideData.current) {
+            addToCache(currentPageDataKey, ssData?.pageData)
+            serverSideData.current = false;
+            return;
         }
-        loadData(currentPageDataKey, location)
+        //使用缓存先显示
+        const cacheData = getCacheByKey(currentPageDataKey);
+        console.info(currentPageDataKey + "=> " + JSON.stringify(cacheData))
+        setState((prevState) => {
+            return {
+                ...prevState,
+                axiosRequesting: !offline,
+                fullScreen: getPageFullState(getFullPath(location)),
+            };
+        });
+        if (offline) {
+            return;
+        }
+        loadData(currentPageDataKey, cacheData, location)
             .then(() => {
                 //ignore
             })
@@ -243,24 +226,13 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
                 //标记未没有请求了
                 setState((prevState) => {
                     return {
-                        offline: prevState.offline,
-                        currentPageDataKey: currentPageDataKey,
+                        ...prevState,
                         axiosRequesting: false,
-                        data: prevState.data,
                         fullScreen: getPageFullState(getFullPath(location)),
                     };
                 });
             });
     }, [location.pathname, location.search]);
-
-    useEffect(() => {
-        setState((prevState) => {
-            return {
-                ...prevState,
-                offline: offline,
-            };
-        });
-    }, [offline]);
 
     const routes = [
         {
@@ -340,7 +312,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
             fallback: ArticleEdit,
             fullScreen: true,
             props: {
-                deleteStateCacheOnDestroy: () => deleteThisPageStateCache(),
+                deleteCacheOnDestroy: () => deleteThisPageStateCache(),
                 onFullScreen: () => {
                     setState((prevState) => {
                         savePageFullState(getFullPath(location), true);
@@ -374,10 +346,6 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
             paths: ["upgrade", "upgrade.html"],
             lazy: AsyncUpgrade,
             fallback: Upgrade,
-            props: {
-                key: (getDataFromState() as UpgradeData)?.preUpgradeKey || "",
-                axiosRequesting: state.axiosRequesting,
-            } as UpgradeProps
         },
         {
             paths: ["template-config", "template-config.html"],
@@ -412,6 +380,16 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
         }
     ];
 
+    const isOfflineData = () => {
+        if (serverSideData.current) {
+            return false;
+        }
+        if (state.axiosRequesting) {
+            return true;
+        }
+        return state.lastAxiosRequestedCacheKey !== getPageDataCacheKey(location);
+    }
+
     //console.info(location.pathname + "," + JSON.stringify(state));
 
     return (
@@ -423,17 +401,15 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
                         path={path}
                         element={
                             <AdminPage
-                                userInfo={userInfo}
-                                data={getDataFromState()}
-                                axiosRequesting={state.axiosRequesting}
-                                offline={state.offline}
-                                fullScreen={fullScreen ? state.fullScreen : false}
                                 LazyComponent={lazy}
                                 FallbackComponent={fallback}
                                 props={{
                                     ...props,
-                                    data: getDataFromState(),
-                                    offline: state.offline
+                                    userInfo: userInfo,
+                                    fullScreen: fullScreen ? state.fullScreen : false,
+                                    data: getDataFromCache(),
+                                    offline: offline,
+                                    offlineData: isOfflineData(),
                                 }}
                             />
                         }

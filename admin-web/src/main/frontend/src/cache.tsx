@@ -88,12 +88,16 @@ export const removePageCacheByLocation = (location: H.Location) => {
 };
 
 export const getPageDataCacheKey = (location: H.Location) => {
-    let realApiKey = location.pathname.replace(".html", "");
+    return getPageDataCacheKeyByPath(location.pathname, location.search);
+};
+
+export const getPageDataCacheKeyByPath = (pathname: string, search: string) => {
+    let realApiKey = pathname.replace(".html", "");
     // / = /index page
     if (realApiKey === "/") {
         realApiKey = "/index";
     }
-    return realApiKey + removeQueryParam(location.search, cacheIgnoreReloadKey);
+    return realApiKey + removeQueryParam(search, cacheIgnoreReloadKey);
 };
 
 export const getCachedData = (): Record<string, any> => {

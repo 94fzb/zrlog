@@ -75,7 +75,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                                                         onExitFullScreen,
                                                         onFullScreen,
                                                         fullScreen,
-                                                        deleteStateCacheOnDestroy,
+                                                        deleteCacheOnDestroy,
                                                     }) => {
     const location = useLocation();
     const editCardRef = useRef<HTMLDivElement>(null);
@@ -374,7 +374,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                 subRef.current.unsubscribe();
             }
             if (deletePageStateRef.current) {
-                deleteStateCacheOnDestroy();
+                deleteCacheOnDestroy();
             }
         };
     }, []);

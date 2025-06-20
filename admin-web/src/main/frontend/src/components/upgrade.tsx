@@ -37,12 +37,11 @@ let upgradeTimer: NodeJS.Timeout;
 
 export type UpgradeProps = {
     data: UpgradeData;
-    key?: string;
     offline: boolean,
-    axiosRequesting: boolean
+    offlineData: boolean
 }
 
-const Upgrade: FunctionComponent<UpgradeProps> = ({data, offline, axiosRequesting}) => {
+const Upgrade: FunctionComponent<UpgradeProps> = ({data, offline, offlineData}) => {
     const preUpgradeKey = data.preUpgradeKey;
     const steps: StepInfo[] = [
         {
@@ -169,7 +168,7 @@ const Upgrade: FunctionComponent<UpgradeProps> = ({data, offline, axiosRequestin
     };
 
     const nextDisabled = (): boolean => {
-        if (axiosRequesting) {
+        if (offlineData) {
             return true;
         }
         if (offline) {
@@ -193,7 +192,7 @@ const Upgrade: FunctionComponent<UpgradeProps> = ({data, offline, axiosRequestin
     }, []);
 
     return (
-        <Row>
+        <Row key={data.preUpgradeKey}>
             {contextHolder}
             <Col style={{maxWidth: 600}} xs={24}>
                 <Title className="page-header" level={3}>
@@ -239,7 +238,7 @@ const Upgrade: FunctionComponent<UpgradeProps> = ({data, offline, axiosRequestin
                 </div>
                 <div className="steps-action" style={{paddingTop: "20px"}}>
                     {state.current < steps.length - 1 && (
-                        <Button type="primary" loading={axiosRequesting} disabled={nextDisabled()}
+                        <Button type="primary" loading={offlineData} disabled={nextDisabled()}
                                 onClick={() => next()}>
                             {getRes().nextStep}
                         </Button>
