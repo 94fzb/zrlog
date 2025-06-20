@@ -1,6 +1,9 @@
 package com.zrlog.common.rest.response;
 
 import com.zrlog.common.Constants;
+import com.zrlog.common.ZrLogConfig;
+
+import java.util.Objects;
 
 public class ApiStandardResponse<T> extends StandardResponse {
 
@@ -19,7 +22,12 @@ public class ApiStandardResponse<T> extends StandardResponse {
     public ApiStandardResponse(T data, String message) {
         this.data = data;
         super.setMessage(message);
-        this.pageBuildId = Constants.zrLogConfig.getAdminResource().getStaticResourceBuildId();
+        ZrLogConfig zrLogConfig = Constants.zrLogConfig;
+        if (Objects.nonNull(zrLogConfig)) {
+            this.pageBuildId = zrLogConfig.getAdminResource().getStaticResourceBuildId();
+        } else {
+            this.pageBuildId = "";
+        }
     }
 
     public String getPageBuildId() {
