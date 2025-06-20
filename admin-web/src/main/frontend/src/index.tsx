@@ -37,19 +37,32 @@ type SsDate = {
     pageData?: any;
     resourceInfo?: Record<string, never>;
     user?: BasicUserInfo;
-    key?: string;
+    key: string;
 };
 
 export let ssData: SsDate | undefined;
-const ssDataStr = document.getElementById("__SS_DATA__")?.innerText;
-// @ts-ignore
-if (ssDataStr?.length > 0) {
-    ssData = JSON.parse(ssDataStr as string);
-} else {
-    ssData = {};
+
+const ssKeyStroageKey = "ss_key";
+
+const initSsData = () => {
+    const ssDataStr = document.getElementById("__SS_DATA__")?.innerText;
+    // @ts-ignore
+    if (ssDataStr?.length > 0) {
+        ssData = JSON.parse(ssDataStr as string);
+    } else {
+        const ssKey = localStorage.getItem(ssKeyStroageKey);
+        if (ssKey) {
+            ssData = {key: ssKey};
+        } else {
+            ssData = {key: ""}
+        }
+    }
 }
 
-export const asyncSaveApiCache = (axiosInstance: AxiosInstance) => {
+initSsData();
+
+export const asyncSaveApiCache = (axiosInstance: AxiosInstance, ssKey: string) => {
+    localStorage.setItem(ssKeyStroageKey, ssKey);
     setTimeout(() => {
         if (ssData) {
             ssData.user?.cacheableApiUris?.map(e => {

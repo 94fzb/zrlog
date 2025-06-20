@@ -142,7 +142,7 @@ const Index = ({offline}: { offline: boolean }) => {
                 if (ssData) {
                     ssData.key = data.data.key;
                     ssData.user = data.data;
-                    asyncSaveApiCache(axiosInstance)
+                    asyncSaveApiCache(axiosInstance,ssData.key)
                 }
                 const redirectFrom = query.get("redirectFrom") as string;
                 if (redirectFrom !== null && redirectFrom !== "") {
