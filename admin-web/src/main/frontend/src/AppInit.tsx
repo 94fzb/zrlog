@@ -1,7 +1,7 @@
 import AppBase, {useAxiosBaseInstance} from "AppBase";
 import {AppState, refreshPathInfo, ssData} from "index";
 import {FunctionComponent, useEffect, useState} from "react";
-import {getColorPrimary, getRes, isStaticPage, setRes} from "./utils/constants";
+import {getColorPrimary, getRes, isStaticPage, setBackendServerUrl, setRes} from "./utils/constants";
 import EnvUtils, {isOffline} from "./utils/env-utils";
 import Init from "./components/init";
 import Spin from "antd/es/spin";
@@ -33,10 +33,16 @@ const AppInit: FunctionComponent<AppInitProps> = ({onInit, lang, offline}) => {
 
     const axiosInstance = useAxiosBaseInstance();
 
-    const loadResourceFromServer = () => {
+    const loadResourceFromServer = (baseUrl: string) => {
         const resourceApi = "/api/public/adminResource";
+        if (baseUrl.length > 0) {
+            axiosInstance.defaults.baseURL = baseUrl;
+        }
         axiosInstance.get(resourceApi)
             .then(({data}: { data: Record<string, any> }) => {
+                if (baseUrl.length > 0) {
+                    setBackendServerUrl(baseUrl);
+                }
                 handleRes(data.data);
             })
             .catch((e) => {
@@ -87,7 +93,7 @@ const AppInit: FunctionComponent<AppInitProps> = ({onInit, lang, offline}) => {
             if (ssData && ssData.resourceInfo) {
                 handleRes(ssData.resourceInfo);
             } else {
-                loadResourceFromServer();
+                loadResourceFromServer("");
             }
         } else {
             handleRes(resourceData);
@@ -101,8 +107,8 @@ const AppInit: FunctionComponent<AppInitProps> = ({onInit, lang, offline}) => {
 
 
     if (appState.requiredBackendServerUrl) {
-        return <Init lang={lang} onSubmit={() => {
-            loadResourceFromServer();
+        return <Init lang={lang} onSubmit={(backendServerUrl) => {
+            loadResourceFromServer(backendServerUrl);
         }}/>
     }
     if (appState.resLoaded) {

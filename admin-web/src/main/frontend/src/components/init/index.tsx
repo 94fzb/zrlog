@@ -1,11 +1,11 @@
 import {Content} from "antd/es/layout/layout";
 import Card from "antd/es/card";
 import {Button, Col, Form, Input} from "antd";
-import {getBackendServerUrl, getColorPrimary, isStaticPage, setBackendServerUrl} from "../../utils/constants";
+import {getBackendServerUrl, getColorPrimary} from "../../utils/constants";
 import Row from "antd/es/grid/row";
 import {LoginOutlined} from "@ant-design/icons";
 import {classes, LoginBg, StyledLoginPage} from "../login";
-import {FunctionComponent} from "react";
+import {FunctionComponent, useState} from "react";
 import zh_CN from "antd/es/locale/zh_CN";
 import en_US from "antd/es/locale/en_US";
 
@@ -16,7 +16,7 @@ const layout = {
 
 type InitProps = {
     lang: string;
-    onSubmit: () => void;
+    onSubmit: (backendServerUrl: string) => void;
 }
 
 const Init: FunctionComponent<InitProps> = ({onSubmit, lang}) => {
@@ -28,8 +28,19 @@ const Init: FunctionComponent<InitProps> = ({onSubmit, lang}) => {
         return en_US.Tour?.Next;
     };
 
+    const getGetaWayUrlDesc = () => {
+        if (lang === "zh_CN") {
+            return "网关 URL";
+        }
+        return "Getaway URL";
+    };
 
-    //const navigate = useNavigate();
+    const defaultUrl = getBackendServerUrl() != "/" ? getBackendServerUrl() : window.location.origin;
+    const [url, setUrl] = useState<string>(defaultUrl)
+
+    const onOk = () => {
+        onSubmit(url)
+    }
 
     return (
         <StyledLoginPage mainColor={getColorPrimary()}>
@@ -42,21 +53,23 @@ const Init: FunctionComponent<InitProps> = ({onSubmit, lang}) => {
                     <Form
                         {...layout}
                         initialValues={{
-                            "backendServerUrl": getBackendServerUrl()
+                            "backendServerUrl": url
+                        }}
+                        onFinish={() => {
+                            onOk()
+                        }}
+                        onValuesChange={(e) => {
+                            setUrl(e['backendServerUrl'])
                         }}
                     >
-                        {isStaticPage() && <Form.Item label={"Getaway URL"}
-                                                      name={"backendServerUrl"}
-                                                      rules={[{required: true}]}>
-                            <Input onChange={(e) => setBackendServerUrl(e.target.value)}/>
-                        </Form.Item>}
+                        <Form.Item label={getGetaWayUrlDesc()}
+                                   name={"backendServerUrl"}
+                                   rules={[{required: true}]}>
+                            <Input/>
+                        </Form.Item>
                         <Row style={{alignItems: "center", display: "flex"}}>
                             <Col xxl={24} xs={24}>
-                                <Button disabled={false} onClick={() => {
-                                    onSubmit()
-                                }} onSubmit={() => {
-                                    onSubmit();
-                                }} type="primary" style={{minWidth: 108}}
+                                <Button type="primary" style={{minWidth: 108}}
                                         htmlType="submit">
                                     <LoginOutlined/> {getNextDesc()}
                                 </Button>
