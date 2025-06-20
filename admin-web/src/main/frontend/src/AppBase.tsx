@@ -6,10 +6,17 @@ import {API_VERSION_PATH} from "./components/upgrade";
 import ErrorBoundary from "./common/ErrorBoundary";
 import {getBackendServerUrl, getRealRouteUrl, isStaticPage} from "./utils/constants";
 import AdminDashboardPage from "./components/admin-dashboard-page";
+import {NavigateFunction} from "react-router";
 
 const AsyncLogin = lazy(() => import("components/login"));
 
 const errorCountMap = new Map<number, number>();
+
+export const jumpToLoginPage = (navigate: NavigateFunction): void => {
+    if (!window.location.search.includes("redirectFrom")) {
+        navigate(getRealRouteUrl(`/login?redirectFrom=${encodeURI(window.location.pathname.split(".html")[0])}${encodeURI(window.location.search)}`), {replace: true});
+    }
+}
 
 export const useAxiosBaseInstance = (getContainer?: () => HTMLElement): AxiosInstance => {
     const {modal, message} = App.useApp();
@@ -80,9 +87,7 @@ export const useAxiosBaseInstance = (getContainer?: () => HTMLElement): AxiosIns
                 }
 
                 if (isStaticPage()) {
-                    if (!window.location.search.includes("redirectFrom")) {
-                        navigate(getRealRouteUrl(`/login?redirectFrom=${encodeURI(window.location.pathname.split(".html")[0])}${encodeURI(window.location.search)}`), {replace: true});
-                    }
+                    jumpToLoginPage(navigate);
                 }
                 return Promise.reject(response.data);
             }

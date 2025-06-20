@@ -1,10 +1,11 @@
 import {FunctionComponent, lazy, useEffect, useState} from "react";
-import {useAxiosBaseInstance} from "../AppBase";
+import {jumpToLoginPage, useAxiosBaseInstance} from "../AppBase";
 import {BasicUserInfo} from "../type";
 import {ssData} from "../index";
 import {Spin} from "antd";
 import {addToCache} from "../cache";
 import {getCsrData} from "../api";
+import {useNavigate} from "react-router-dom";
 
 type AdminDashBroadPageProps = {
     offline: boolean,
@@ -17,6 +18,8 @@ const AdminDashboardPage: FunctionComponent<AdminDashBroadPageProps> = ({offline
 
     const axiosBaseInstance = useAxiosBaseInstance();
 
+    const navigate = useNavigate();
+
     const [userInfo, setUserInfo] = useState<BasicUserInfo | undefined>(ssData?.user);
 
     useEffect(() => {
@@ -24,14 +27,18 @@ const AdminDashboardPage: FunctionComponent<AdminDashBroadPageProps> = ({offline
             return;
         }
         getCsrData(`/user?_t=${new Date().getTime()}`, axiosBaseInstance).then(({data}) => {
-            if (ssData) {
-                if (data.key) {
-                    ssData.key = data.key
+            if (data && data.error === 0) {
+                if (ssData) {
+                    if (data.key) {
+                        ssData.key = data.key
+                    }
+                    ssData.user = data
                 }
-                ssData.user = data
+                setUserInfo(data);
+                addToCache("/user", data);
+            } else {
+                jumpToLoginPage(navigate)
             }
-            setUserInfo(data);
-            addToCache("/user", data);
         });
     }, []);
 
