@@ -1,7 +1,14 @@
 import AppBase, {useAxiosBaseInstance} from "AppBase";
 import {AppState, refreshPathInfo, ssData} from "index";
 import {FunctionComponent, useEffect, useState} from "react";
-import {getColorPrimary, getRes, isStaticPage, setBackendServerUrl, setRes} from "./utils/constants";
+import {
+    getBackendServerUrl,
+    getColorPrimary,
+    getRes,
+    isStaticPage,
+    setBackendServerUrl,
+    setRes
+} from "./utils/constants";
 import EnvUtils, {isOffline} from "./utils/env-utils";
 import Init from "./components/init";
 import Spin from "antd/es/spin";
@@ -27,7 +34,7 @@ const AppInit: FunctionComponent<AppInitProps> = ({onInit, lang, offline}) => {
     const [appState, setAppState] = useState<AppInitState>({
         resLoaded: false,
         resLoadErrorMsg: "",
-        requiredBackendServerUrl: false,
+        requiredBackendServerUrl: isStaticPage() && getBackendServerUrl() === "/",
     });
 
 
@@ -111,8 +118,7 @@ const AppInit: FunctionComponent<AppInitProps> = ({onInit, lang, offline}) => {
         return <Init lang={lang} onSubmit={(backendServerUrl) => {
             loadResourceFromServer(backendServerUrl);
         }}/>
-    }
-    if (appState.resLoaded) {
+    } else if (appState.resLoaded) {
         return <AppBase offline={offline}/>
     } else if (appState.resLoadErrorMsg.length === 0) {
         return <Spin delay={1000} fullscreen={true}/>;
