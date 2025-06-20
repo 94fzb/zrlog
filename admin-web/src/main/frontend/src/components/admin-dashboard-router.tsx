@@ -73,7 +73,7 @@ const AsyncSystem = lazy(() => import("components/system"));
 const AdminManageLayout = lazy(() => import("layout"));
 
 type AdminDashboardRouterState = {
-    currentUri: string;
+    currentPageDataKey: string;
     axiosRequesting: boolean;
     fullScreen: boolean;
     offline: boolean;
@@ -140,7 +140,6 @@ export function AdminPage(props: AdminPageProps<ArticleEditProps | any>): ReactE
         props: componentProps,
     } = props;
 
-
     return <AdminManageLayout basicUserInfo={userInfo} offline={offline} loading={axiosRequesting}
                               fullScreen={fullScreen}>
         {data ? (
@@ -154,12 +153,16 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
     const location = useLocation();
     const pwaLastOpenedPage = isPWA() ? getLastOpenedPage() : null;
     const defaultFullScreen = getPageFullState(pwaLastOpenedPage ? pwaLastOpenedPage : getFullPath(location));
-    const initUri = location.pathname + location.search;
-    const defaultData = {...getCachedData(), [initUri]: ssData?.pageData};
+    const initCurrentPageDataKey = getPageDataCacheKey(location);
+    const serverSideData = useRef<boolean>(ssData && ssData.pageData);
+    const defaultData = serverSideData.current ? {
+        ...getCachedData(),
+        [initCurrentPageDataKey]: ssData?.pageData
+    } : getCachedData();
 
-    const ssrRender = useRef<boolean>(ssData && ssData.pageData);
+
     const [state, setState] = useState<AdminDashboardRouterState>({
-        currentUri: initUri.replace(".html", ""),
+        currentPageDataKey: initCurrentPageDataKey,
         axiosRequesting: false,
         offline: offline,
         fullScreen: defaultFullScreen,
@@ -167,8 +170,8 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
     });
 
     const getDataFromState = () => {
-        const uri = getPageDataCacheKey(location);
-        return state.data[uri] !== undefined && state.data[uri] !== null ? state.data[uri] : undefined;
+        const pageDataCacheKey = getPageDataCacheKey(location);
+        return state.data[pageDataCacheKey] !== undefined && state.data[pageDataCacheKey] !== null ? state.data[pageDataCacheKey] : undefined;
     };
 
     const deleteThisPageStateCache = () => {
@@ -184,14 +187,14 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
 
     const axiosBaseInstance = useAxiosBaseInstance();
 
-    const loadData = async (uri: string, location: H.Location) => {
-        const responseData = await getCsrData(uri, axiosBaseInstance);
+    const loadData = async (currentPageDataKey: string, location: H.Location) => {
+        const responseData = await getCsrData(currentPageDataKey, axiosBaseInstance);
         const {data, documentTitle} = responseData;
         const mergeData = state.data;
         updateDocumentTitle(documentTitle);
         //如果请求回来的和请求回来的一致的情况就跳过 setState
-        if (deepEqualWithSpecialJSON(mergeData[uri], data)) {
-            console.info(uri + " cache hits");
+        if (deepEqualWithSpecialJSON(mergeData[currentPageDataKey], data)) {
+            console.info(currentPageDataKey + " cache hits");
             setState((prevState) => {
                 return {
                     ...prevState,
@@ -200,14 +203,14 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
             });
             return;
         }
-        mergeData[uri] = data;
+        mergeData[currentPageDataKey] = data;
         putCache(mergeData);
         setState((prevState) => {
             return {
                 offline: prevState.offline,
                 firstRender: false,
                 axiosRequesting: false,
-                currentUri: uri,
+                currentPageDataKey: currentPageDataKey,
                 data: mergeData,
                 fullScreen: getPageFullState(getFullPath(location)),
             };
@@ -215,24 +218,24 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
     };
 
     useEffect(() => {
-        const uri = getPageDataCacheKey(location);
+        const currentPageDataKey = getPageDataCacheKey(location);
         const stateCache = getDataFromState();
         if (stateCache) {
-            if (ssrRender.current) {
-                ssrRender.current = false;
-            } else {
-                //使用缓存先显示
-                setState((prevState) => {
-                    return {
-                        ...prevState,
-                        currentUri: uri,
-                        axiosRequesting: true,
-                        fullScreen: getPageFullState(getFullPath(location)),
-                    };
-                });
+            if (serverSideData.current) {
+                serverSideData.current = false;
+                return;
             }
+            //使用缓存先显示
+            setState((prevState) => {
+                return {
+                    ...prevState,
+                    currentPageDataKey: currentPageDataKey,
+                    axiosRequesting: true,
+                    fullScreen: getPageFullState(getFullPath(location)),
+                };
+            });
         }
-        loadData(uri, location)
+        loadData(currentPageDataKey, location)
             .then(() => {
                 //ignore
             })
@@ -241,7 +244,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
                 setState((prevState) => {
                     return {
                         offline: prevState.offline,
-                        currentUri: uri,
+                        currentPageDataKey: currentPageDataKey,
                         axiosRequesting: false,
                         data: prevState.data,
                         fullScreen: getPageFullState(getFullPath(location)),
