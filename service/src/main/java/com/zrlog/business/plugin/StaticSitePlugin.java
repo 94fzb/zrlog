@@ -50,8 +50,58 @@ public class StaticSitePlugin extends BaseLockObject implements IPlugin {
         this.serverConfig = abstractServerConfig;
     }
 
-    enum HandleState {
-        NEW, HANDING, RE_FETCH, HANDLED
+    private static void copyCommonAssert() {
+        //admin resource
+        Constants.zrLogConfig.getAdminResource().getAdminResourceUris(true).forEach(StaticSitePlugin::copyResourceToCacheFolder);
+        //video.js
+        copyResourceToCacheFolder("/assets/css/font/vjs.eot");
+        copyResourceToCacheFolder("/assets/css/font/vjs.svg");
+        copyResourceToCacheFolder("/assets/css/font/vjs.ttf");
+        copyResourceToCacheFolder("/assets/css/font/vjs.woff");
+        copyResourceToCacheFolder("/assets/css/video-js.css");
+        copyResourceToCacheFolder("/assets/css/katex.min.css");
+        copyResourceToCacheFolder("/assets/js/video.js");
+        //default avatar url
+        copyResourceToCacheFolder("/assets/images/default-portrait.gif");
+        File faviconFile = new File(PathUtil.getStaticPath() + "/favicon.ico");
+        if (faviconFile.exists()) {
+            try {
+                Constants.zrLogConfig.getCacheService().saveToCacheFolder(new FileInputStream(faviconFile), "/" + faviconFile.getName());
+            } catch (FileNotFoundException e) {
+                LOGGER.warning("Missing resource " + faviconFile);
+            }
+        } else {
+            //favicon
+            copyResourceToCacheFolder("/favicon.ico");
+        }
+    }
+
+    public static void copyResourceToCacheFolder(String resourceName) {
+        InputStream inputStream = StaticSitePlugin.class.getResourceAsStream(resourceName);
+        if (Objects.isNull(inputStream)) {
+            LOGGER.warning("Missing resource " + resourceName);
+            return;
+        }
+        if (Constants.zrLogConfig.getAdminResource().isAdminMainJs(resourceName)) {
+            String stringInputStream = IOUtil.getStringInputStream(inputStream);
+            String adminPath = Constants.zrLogConfig.getAdminResource().getContextPath().substring(1) + "admin/";
+            String newStr = stringInputStream.replace("\"./admin/\"", "document.currentScript.baseURI + \"" + adminPath + "\"");
+            Constants.zrLogConfig.getCacheService().saveToCacheFolder(new ByteArrayInputStream(newStr.getBytes()), resourceName);
+            return;
+        }
+        Constants.zrLogConfig.getCacheService().saveToCacheFolder(inputStream, resourceName);
+    }
+
+    private static void copyDefaultTemplateAssets() {
+        String templatePath = TemplateHelper.getTemplatePath(null);
+        if (!Objects.equals(templatePath, Constants.DEFAULT_TEMPLATE_PATH)) {
+            return;
+        }
+        TemplateVO templateVO = TemplateInfoHelper.getDefaultTemplateVO();
+        templateVO.getStaticResources().forEach(e -> {
+            String resourceUri = Constants.DEFAULT_TEMPLATE_PATH + "/" + e;
+            copyResourceToCacheFolder(resourceUri);
+        });
     }
 
     private void doParse(File file) throws IOException {
@@ -87,6 +137,12 @@ public class StaticSitePlugin extends BaseLockObject implements IPlugin {
                 HttpRequest httpRequest = WebTools.buildMockRequest(HttpMethod.GET, key, serverConfig.getRequestConfig(), applicationContext);
                 new HttpRequestHandlerRunnable(httpRequest, new SimpleHttpResponse(httpRequest, serverConfig.getResponseConfig())).run();
                 File file = (File) httpRequest.getAttr().get(HTML_FILE_KEY);
+                if (Objects.equals(key, Constants.ADMIN_PWA_MANIFEST_JSON)) {
+                    return;
+                }
+                if (Objects.equals(key, Constants.ADMIN_SERVICE_WORKER_JS)) {
+                    return;
+                }
                 if (Objects.isNull(file) || !file.exists()) {
                     LOGGER.warning("Generator " + key + " error: missing static file");
                     error = true;
@@ -108,7 +164,6 @@ public class StaticSitePlugin extends BaseLockObject implements IPlugin {
             }
         }, executor);
     }
-
 
     private void doFetch() {
         ExecutorService executorService = Executors.newFixedThreadPool(20);
@@ -164,60 +219,6 @@ public class StaticSitePlugin extends BaseLockObject implements IPlugin {
         }
     }
 
-    private static void copyCommonAssert() {
-        //admin resource
-        Constants.zrLogConfig.getAdminResource().getAdminResourceUris(true).forEach(StaticSitePlugin::copyResourceToCacheFolder);
-        //video.js
-        copyResourceToCacheFolder("/assets/css/font/vjs.eot");
-        copyResourceToCacheFolder("/assets/css/font/vjs.svg");
-        copyResourceToCacheFolder("/assets/css/font/vjs.ttf");
-        copyResourceToCacheFolder("/assets/css/font/vjs.woff");
-        copyResourceToCacheFolder("/assets/css/video-js.css");
-        copyResourceToCacheFolder("/assets/css/katex.min.css");
-        copyResourceToCacheFolder("/assets/js/video.js");
-        //default avatar url
-        copyResourceToCacheFolder("/assets/images/default-portrait.gif");
-        File faviconFile = new File(PathUtil.getStaticPath() + "/favicon.ico");
-        if (faviconFile.exists()) {
-            try {
-                Constants.zrLogConfig.getCacheService().saveToCacheFolder(new FileInputStream(faviconFile), "/" + faviconFile.getName());
-            } catch (FileNotFoundException e) {
-                LOGGER.warning("Missing resource " + faviconFile);
-            }
-        } else {
-            //favicon
-            copyResourceToCacheFolder("/favicon.ico");
-        }
-    }
-
-    public static void copyResourceToCacheFolder(String resourceName) {
-        InputStream inputStream = StaticSitePlugin.class.getResourceAsStream(resourceName);
-        if (Objects.isNull(inputStream)) {
-            LOGGER.warning("Missing resource " + resourceName);
-            return;
-        }
-        if (Constants.zrLogConfig.getAdminResource().isAdminMainJs(resourceName)) {
-            String stringInputStream = IOUtil.getStringInputStream(inputStream);
-            String adminPath = Constants.zrLogConfig.getAdminResource().getContextPath().substring(1) + "admin/";
-            String newStr = stringInputStream.replace("\"./admin/\"", "document.currentScript.baseURI + \"" + adminPath + "\"");
-            Constants.zrLogConfig.getCacheService().saveToCacheFolder(new ByteArrayInputStream(newStr.getBytes()), resourceName);
-            return;
-        }
-        Constants.zrLogConfig.getCacheService().saveToCacheFolder(inputStream, resourceName);
-    }
-
-    private static void copyDefaultTemplateAssets() {
-        String templatePath = TemplateHelper.getTemplatePath(null);
-        if (!Objects.equals(templatePath, Constants.DEFAULT_TEMPLATE_PATH)) {
-            return;
-        }
-        TemplateVO templateVO = TemplateInfoHelper.getDefaultTemplateVO();
-        templateVO.getStaticResources().forEach(e -> {
-            String resourceUri = Constants.DEFAULT_TEMPLATE_PATH + "/" + e;
-            copyResourceToCacheFolder(resourceUri);
-        });
-    }
-
     @Override
     public boolean start() {
         doGeneratorAllAsync();
@@ -232,5 +233,9 @@ public class StaticSitePlugin extends BaseLockObject implements IPlugin {
     @Override
     public boolean stop() {
         return true;
+    }
+
+    enum HandleState {
+        NEW, HANDING, RE_FETCH, HANDLED
     }
 }
