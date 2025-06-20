@@ -39,20 +39,20 @@ public class AdminResourceImpl implements AdminResource {
     private Set<String> getStaticUri() {
         InputStream resourceAsStream = ResourceUtils.class.getResourceAsStream(ADMIN_ASSET_MANIFEST_JSON);
         Set<String> cacheUris = new LinkedHashSet<>();
-        if (Objects.nonNull(resourceAsStream)) {
-
-            String str = IOUtil.getStringInputStream(resourceAsStream);
-            if (StringUtils.isNotEmpty(str)) {
-                Map<String, Object> map = new Gson().fromJson(str, new TypeToken<>() {
-                });
-                Map<String, Object> staticFiles = (Map<String, Object>) map.get("files");
-                if (Objects.nonNull(staticFiles)) {
-                    cacheUris.addAll(staticFiles.values().stream().filter(e -> ((String) e).endsWith(".js")).map(String::valueOf).collect(Collectors.toList()));
-                    cacheUris = new LinkedHashSet<>(wrapperUris(cacheUris));
-                }
-            }
-            cacheUris.addAll(wrapperUris(getUris("/admin/pwa-resource.txt")));
+        if (Objects.isNull(resourceAsStream)) {
+            return cacheUris;
         }
+        String str = IOUtil.getStringInputStream(resourceAsStream);
+        if (StringUtils.isNotEmpty(str)) {
+            Map<String, Object> map = new Gson().fromJson(str, new TypeToken<>() {
+            });
+            Map<String, Object> staticFiles = (Map<String, Object>) map.get("files");
+            if (Objects.nonNull(staticFiles)) {
+                cacheUris.addAll(staticFiles.values().stream().filter(e -> ((String) e).endsWith(".js")).map(String::valueOf).collect(Collectors.toList()));
+                cacheUris = new LinkedHashSet<>(wrapperUris(cacheUris));
+            }
+        }
+        cacheUris.addAll(wrapperUris(getUris("/admin/pwa-resource.txt")));
         return cacheUris;
     }
 
@@ -71,31 +71,29 @@ public class AdminResourceImpl implements AdminResource {
     public ByteArrayInputStream renderServiceWorker(HttpRequest request) {
         StringJoiner sj = new StringJoiner(",\n    ");
         String adminResourceUrl = ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite();
+        boolean staticPlugin = ZrLogUtil.isStaticPlugin(request);
         getAdminResourceUris(false).forEach(e -> {
             if (e.startsWith("/api")) {
                 return;
             }
             if (pageUris.contains(e)) {
-                if (!ZrLogUtil.isStaticPlugin(request)) {
-                    StringBuilder sb = new StringBuilder();
-                    String[] split = e.split("\\?");
-                    if (split.length == 1) {
-                        sb.append("\"").append(e).append(".html?");
-                    } else {
-                        sb.append("\"").append(split[0]).append(".html?");
-                    }
-                    sb.append("v=").append(buildId);
-                    if (split.length > 1) {
-                        sb.append("&");
-                        sb.append(split[1]);
-                    }
-                    sb.append("\"");
-                    sj.add(sb.toString());
+                StringBuilder sb = new StringBuilder();
+                String[] split = e.split("\\?");
+                if (split.length == 1) {
+                    sb.append("\"").append(e);
                 } else {
-                    sj.add("\"" + e + "\"");
+                    sb.append("\"").append(split[0]);
                 }
+                sb.append(ZrLogUtil.isStaticPlugin(request) ? ".html?" : "?");
+                sb.append("v=").append(buildId);
+                if (split.length > 1) {
+                    sb.append("&");
+                    sb.append(split[1]);
+                }
+                sb.append("\"");
+                sj.add(sb.toString());
             } else {
-                if (StringUtils.isNotEmpty(adminResourceUrl) && !ZrLogUtil.isStaticPlugin(request)) {
+                if (StringUtils.isNotEmpty(adminResourceUrl) && !staticPlugin) {
                     sj.add("\"" + adminResourceUrl + e + "\"");
                 } else {
                     sj.add("\"" + e + "\"");

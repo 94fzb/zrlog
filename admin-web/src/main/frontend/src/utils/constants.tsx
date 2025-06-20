@@ -68,15 +68,12 @@ export const getBackendServerUrl = (): string => {
 }
 
 export const getRealRouteUrl = (url: string) => {
-    /*if (!isStaticPage()) {
-        return url;
-    }*/
-
+    const ext = isStaticPage() ? ".html" : "";
     const buildId = getRes()['pageBuildId']
     if (url.includes("?")) {
-        return url.replace("?", ".html?v=" + buildId + "&")
+        return url.replace("?", ext + "?v=" + buildId + "&")
     }
-    return url + ".html?v=" + buildId;
+    return url + ext + "?v=" + buildId;
 }
 
 export const createUri = "/api/admin/article/create";
