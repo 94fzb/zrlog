@@ -70,7 +70,7 @@ public class AdminPageController extends Controller {
         if (!manifest.isEmpty()) {
             Element manifestElement = manifest.first();
             if (Objects.nonNull(manifestElement)) {
-                if (StringUtils.isNotEmpty(adminStaticResourceHostByWebSite)) {
+                if (StringUtils.isNotEmpty(adminStaticResourceHostByWebSite) && !ZrLogUtil.isStaticPlugin(request)) {
                     manifestElement.attr("href", manifestElement.attr("href").replace("./", adminStaticResourceHostByWebSite + "/"));
                 } else {
                     manifestElement.attr("href", manifestElement.attr("href").replace("./", WebTools.getHomeUrl(request)));
@@ -80,7 +80,7 @@ public class AdminPageController extends Controller {
         Elements scripts = document.head().select("script");
         if (!scripts.isEmpty()) {
             scripts.forEach(script -> {
-                if (StringUtils.isNotEmpty(adminStaticResourceHostByWebSite)) {
+                if (StringUtils.isNotEmpty(adminStaticResourceHostByWebSite) && !ZrLogUtil.isStaticPlugin(request)) {
                     script.attr("src", script.attr("src").replace("./", adminStaticResourceHostByWebSite + "/"));
                 } else {
                     script.attr("src", script.attr("src").replace("./", WebTools.getHomeUrl(request)));

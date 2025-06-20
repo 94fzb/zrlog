@@ -75,7 +75,7 @@ public class AdminResourceImpl implements AdminResource {
                     sb.add("\"" + e + "\"");
                 }
             } else {
-                if (StringUtils.isNotEmpty(adminResourceUrl)) {
+                if (StringUtils.isNotEmpty(adminResourceUrl) && !ZrLogUtil.isStaticPlugin(request)) {
                     sb.add("\"" + adminResourceUrl + e + "\"");
                 } else {
                     sb.add("\"" + e + "\"");
