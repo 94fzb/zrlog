@@ -21,7 +21,6 @@ public class GlobalBaseInterceptor implements Interceptor {
     private final Set<String> forbiddenUriExtSet = new HashSet<>();
 
     public GlobalBaseInterceptor() {
-        //不希望部分技术人走后门，拦截一些不合法的请求
         //由于程序的.flt文件没有存放在conf目录，为了防止访问.ftl页面获得的没有数据的页面，或则是错误的页面。
         forbiddenUriExtSet.add(".ftl");
         //这主要用在主题目录下面的配置文件。
@@ -31,6 +30,11 @@ public class GlobalBaseInterceptor implements Interceptor {
         }
     }
 
+    /**
+     * 不希望部分技术人走后门，拦截一些不合法的请求
+     * @param request
+     * @return
+     */
     private boolean isForbiddenUri(HttpRequest request) {
         String target = request.getUri();
         if (forbiddenUriExtSet.stream().anyMatch(target::endsWith)) {
@@ -40,8 +44,11 @@ public class GlobalBaseInterceptor implements Interceptor {
         if (Objects.equals(target, Constants.INSTALL_HTML_PAGE)) {
             return true;
         }
-        //非法请求, 返回403
-        return Objects.equals(Constants.ADMIN_HTML_PAGE, target) && !ZrLogUtil.isStaticPlugin(request);
+        if (target.startsWith(Constants.ADMIN_URI_BASE_PATH) && target.endsWith(".html")) {
+            //非法请求, 返回403
+            return !ZrLogUtil.isStaticPlugin(request);
+        }
+        return false;
     }
 
     @Override

@@ -113,9 +113,6 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
         if (Objects.equals(cacheKey, "/")) {
             cacheKey = "/index.html";
         }
-        if (cacheKey.equals("/admin/website")) {
-            cacheKey = "/admin/website/index";
-        }
         return new File(CACHE_HTML_PATH + lang + "/" + cacheKey);
     }
 
@@ -131,6 +128,11 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
         File htmlFile = loadCacheFile(httpRequest);
         if (!htmlFile.exists()) {
             htmlFile.getParentFile().mkdirs();
+        }
+        if (Objects.equals(httpRequest.getUri(), "/admin/website")) {
+            //冗余存储
+            File websiteIndexFile = new File(htmlFile + "/index.html");
+            IOUtil.writeBytesToFile(bytes, websiteIndexFile);
         }
         if (httpRequest.getUri().startsWith("/admin") && !httpRequest.getUri().contains(".")) {
             htmlFile = new File(htmlFile + ".html");
