@@ -94,7 +94,8 @@ public class AdminResourceImpl implements AdminResource {
         return new HashSet<>(Arrays.asList(strVendors.split("\n")));
     }
 
-    private String getContextPath() {
+    @Override
+    public String getContextPath() {
         return Objects.nonNull(Constants.zrLogConfig) ? Constants.zrLogConfig.getContextPath() + "/" : "/";
     }
 

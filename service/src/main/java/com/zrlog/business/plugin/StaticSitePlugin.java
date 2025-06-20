@@ -198,7 +198,8 @@ public class StaticSitePlugin extends BaseLockObject implements IPlugin {
         }
         if (Constants.zrLogConfig.getAdminResource().isAdminMainJs(resourceName) && StringUtils.isNotEmpty(ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite())) {
             String stringInputStream = IOUtil.getStringInputStream(inputStream);
-            String newStr = stringInputStream.replace("./admin/", ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite() + "/admin/");
+            String adminPath = Constants.zrLogConfig.getAdminResource().getContextPath().substring(1) + "admin/";
+            String newStr = stringInputStream.replace("\"./admin/\"", "document.currentScript.baseURI + \"" + adminPath + "\"");
             Constants.zrLogConfig.getCacheService().saveToCacheFolder(new ByteArrayInputStream(newStr.getBytes()), resourceName);
             return;
         }
