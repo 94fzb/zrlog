@@ -39,7 +39,11 @@ const Init: FunctionComponent<InitProps> = ({onSubmit, lang}) => {
     const [url, setUrl] = useState<string>(defaultUrl)
 
     const onOk = () => {
-        onSubmit(url)
+        if (url.endsWith("/")) {
+            onSubmit(url)
+            return;
+        }
+        onSubmit(url + "/")
     }
 
     return (

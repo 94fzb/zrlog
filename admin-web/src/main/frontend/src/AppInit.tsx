@@ -47,6 +47,7 @@ const AppInit: FunctionComponent<AppInitProps> = ({onInit, lang, offline}) => {
             })
             .catch((e) => {
                 const errorMsg = "Request " + axiosInstance.defaults.baseURL + resourceApi.substring(1) + " error -> " + e.message;
+                //console.info(errorMsg);
                 if (isStaticPage()) {
                     setAppState((prevState) => {
                         return {
