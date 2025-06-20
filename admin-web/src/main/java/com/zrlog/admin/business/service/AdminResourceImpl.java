@@ -28,6 +28,15 @@ public class AdminResourceImpl implements AdminResource {
 
     public AdminResourceImpl() {
         this.pageUris = wrapperUris(getUris("/admin/pwa-page.txt"));
+        this.staticUris = getStaticUri();
+        Map<String, Object> resourceMap = new TreeMap<>();
+        resourceMap.put("uris", pageUris);
+        resourceMap.put("static", staticUris);
+        resourceMap.put("i18n", I18nUtil.getAdmin());
+        this.buildId = Math.abs(SecurityUtils.md5(new Gson().toJson(resourceMap)).hashCode());
+    }
+
+    private Set<String> getStaticUri() {
         InputStream resourceAsStream = ResourceUtils.class.getResourceAsStream(ADMIN_ASSET_MANIFEST_JSON);
         Set<String> cacheUris = new LinkedHashSet<>();
         if (Objects.nonNull(resourceAsStream)) {
@@ -44,12 +53,7 @@ public class AdminResourceImpl implements AdminResource {
             }
             cacheUris.addAll(wrapperUris(getUris("/admin/pwa-resource.txt")));
         }
-        this.staticUris = cacheUris;
-        Map<String, Object> resourceMap = new TreeMap<>();
-        resourceMap.put("uris", pageUris);
-        resourceMap.put("static", staticUris);
-        resourceMap.put("i18n", I18nUtil.getAdmin());
-        this.buildId = Math.abs(SecurityUtils.md5(new Gson().toJson(resourceMap)).hashCode());
+        return cacheUris;
     }
 
     public static void main(String[] args) {
