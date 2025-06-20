@@ -1,6 +1,6 @@
 import React, {CSSProperties, ReactElement, useEffect, useState} from "react";
 import {Link} from "react-router-dom";
-import {getColorPrimary, getRes, isStaticPage} from "../utils/constants";
+import {getColorPrimary, getRealRouteUrl, getRes} from "../utils/constants";
 import {
     ApiFilled,
     ApiOutlined,
@@ -87,7 +87,7 @@ const SliderMenu = () => {
         const info = getInfo(entry);
         const label = (
             <Link
-                to={entry.link + (isStaticPage() ? ".html" : "")}
+                to={getRealRouteUrl(entry.link)}
                 style={{
                     color: info.selected && EnvUtils.isDarkMode() ? getColorPrimary() : "#FFF",
                 }}

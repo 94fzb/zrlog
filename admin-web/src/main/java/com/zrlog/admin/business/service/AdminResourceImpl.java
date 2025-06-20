@@ -3,6 +3,7 @@ package com.zrlog.admin.business.service;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.hibegin.common.util.IOUtil;
+import com.hibegin.common.util.SecurityUtils;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.server.api.HttpRequest;
 import com.zrlog.business.util.ResourceUtils;
@@ -22,6 +23,7 @@ public class AdminResourceImpl implements AdminResource {
 
     private final Set<String> pageUris;
     private final Set<String> staticUris;
+    private final long buildId;
 
     public AdminResourceImpl() {
         this.pageUris = wrapperUris(getUris("/admin/pwa-page.txt"));
@@ -42,6 +44,10 @@ public class AdminResourceImpl implements AdminResource {
             cacheUris.addAll(wrapperUris(getUris("/admin/pwa-resource.txt")));
         }
         this.staticUris = cacheUris;
+        Map<String, Object> resourceMap = new TreeMap<>();
+        resourceMap.put("uris", pageUris);
+        resourceMap.put("static", staticUris);
+        this.buildId = Math.abs(SecurityUtils.md5(new Gson().toJson(resourceMap)).hashCode());
     }
 
     public static void main(String[] args) {
@@ -57,32 +63,45 @@ public class AdminResourceImpl implements AdminResource {
 
     @Override
     public ByteArrayInputStream renderServiceWorker(HttpRequest request) {
-        StringJoiner sb = new StringJoiner(",\n    ");
+        StringJoiner sj = new StringJoiner(",\n    ");
         String adminResourceUrl = ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite();
         getAdminResourceUris(false).forEach(e -> {
             if (e.startsWith("/api")) {
                 return;
             }
             if (pageUris.contains(e)) {
-                if (ZrLogUtil.isStaticPlugin(request)) {
+                if (!ZrLogUtil.isStaticPlugin(request)) {
+                    StringBuilder sb = new StringBuilder();
                     String[] split = e.split("\\?");
                     if (split.length == 1) {
-                        sb.add("\"" + e + ".html\"");
+                        sb.append("\"").append(e).append(".html?");
                     } else {
-                        sb.add("\"" + split[0] + ".html?" + split[1] + "\"");
+                        sb.append("\"").append(split[0]).append(".html?");
                     }
+                    sb.append("v=").append(buildId);
+                    if(split.length > 1) {
+                        sb.append("&");
+                        sb.append(split[1]);
+                    }
+                    sb.append("\"");
+                    sj.add(sb.toString());
                 } else {
-                    sb.add("\"" + e + "\"");
+                    sj.add("\"" + e + "\"");
                 }
             } else {
                 if (StringUtils.isNotEmpty(adminResourceUrl) && !ZrLogUtil.isStaticPlugin(request)) {
-                    sb.add("\"" + adminResourceUrl + e + "\"");
+                    sj.add("\"" + adminResourceUrl + e + "\"");
                 } else {
-                    sb.add("\"" + e + "\"");
+                    sj.add("\"" + e + "\"");
                 }
             }
         });
-        return new ByteArrayInputStream(IOUtil.getStringInputStream(ResourceUtils.class.getResourceAsStream(Constants.ADMIN_SERVICE_WORKER_JS)).replace("'___FILES___'", sb.toString()).getBytes());
+        return new ByteArrayInputStream(IOUtil.getStringInputStream(ResourceUtils.class.getResourceAsStream(Constants.ADMIN_SERVICE_WORKER_JS)).replace("'___FILES___'", sj.toString()).getBytes());
+    }
+
+    @Override
+    public String getStaticResourceBuildId() {
+        return buildId + "";
     }
 
     private Set<String> getUris(String resourceName) {

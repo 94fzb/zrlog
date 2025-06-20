@@ -266,12 +266,12 @@ const Index = ({data, offline}: { data: ArticlePageDataSource; offline: boolean 
                 datasource={data}
                 columns={getColumns()}
                 editBtnRender={(id) => (
-                    <Link to={getRealRouteUrl("/article-edit") + "?id=" + id}>
+                    <Link to={getRealRouteUrl("/article-edit?id=" + id)}>
                         <EditOutlined style={{color: getColorPrimary()}}/>
                     </Link>
                 )}
                 deleteSuccessCallback={(id) => {
-                    removeCacheDataByKey(getRealRouteUrl("/article-edit") + "?id=" + id);
+                    removeCacheDataByKey(getRealRouteUrl("/article-edit?id=" + id));
                 }}
                 deleteApi={getDeleteApiUri()}
                 searchKey={searchKey}

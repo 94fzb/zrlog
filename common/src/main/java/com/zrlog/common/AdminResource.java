@@ -18,4 +18,6 @@ public interface AdminResource  {
     boolean isAdminMainJs(String uri);
 
     InputStream renderServiceWorker(HttpRequest request);
+
+    String getStaticResourceBuildId();
 }

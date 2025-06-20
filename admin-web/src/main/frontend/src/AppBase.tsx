@@ -81,7 +81,7 @@ export const useAxiosBaseInstance = (getContainer?: () => HTMLElement): AxiosIns
 
                 if (isStaticPage()) {
                     if (!window.location.search.includes("redirectFrom")) {
-                        navigate(getRealRouteUrl(`/login`) + `?redirectFrom=${encodeURI(window.location.pathname.split(".html")[0])}${encodeURI(window.location.search)}`, {replace: true});
+                        navigate(getRealRouteUrl(`/login?redirectFrom=${encodeURI(window.location.pathname.split(".html")[0])}${encodeURI(window.location.search)}`), {replace: true});
                     }
                 }
                 return Promise.reject(response.data);

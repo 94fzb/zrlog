@@ -127,7 +127,7 @@ const Index: FunctionComponent<IndexProps> = ({data}) => {
                                 </Link>
                             </Col>
                             <Col xs={12} md={12}>
-                                <Link to={getRealRouteUrl("/plugin") + "?page=backup-sql-file/files"}>
+                                <Link to={getRealRouteUrl("/plugin?page=backup-sql-file/files")}>
                                     <div style={{
                                         display: "flex",
                                         flexFlow: "column",

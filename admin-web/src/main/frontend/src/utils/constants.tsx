@@ -33,7 +33,7 @@ export const setRes = (r: Record<string, never>) => {
     window[resourceKey] = JSON.stringify(r);
 };
 
-export const cacheIgnoreReloadKey = "_t";
+export const cacheIgnoreReloadKey = "_t,v";
 
 export const removeRes = () => {
     // @ts-ignore
@@ -68,10 +68,15 @@ export const getBackendServerUrl = (): string => {
 }
 
 export const getRealRouteUrl = (url: string) => {
-    if (isStaticPage()) {
-        return url + ".html";
+    /*if (!isStaticPage()) {
+        return url;
+    }*/
+
+    const buildId = getRes()['pageBuildId']
+    if (url.includes("?")) {
+        return url.replace("?", ".html?v=" + buildId + "&")
     }
-    return url;
+    return url + ".html?v=" + buildId;
 }
 
 export const createUri = "/api/admin/article/create";
