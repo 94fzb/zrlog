@@ -123,7 +123,7 @@ export function LazyWithFallbackElement<P>({
     );
 }
 
-type AdminCommonProps = {
+export type AdminCommonProps = {
     data: any,
     offlineData: boolean,
     offline: boolean,

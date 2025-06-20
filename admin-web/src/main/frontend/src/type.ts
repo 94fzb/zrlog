@@ -27,6 +27,14 @@ export type BasicUserInfo = {
     cacheableApiUris?: string[]
 };
 
+export type AdminCommonProps<P> = {
+    data: P,
+    offlineData: boolean,
+    offline: boolean,
+    fullScreen?: boolean,
+    userInfo?: BasicUserInfo;
+}
+
 export type ServerInfoEntry = {
     name: string;
     key: string;

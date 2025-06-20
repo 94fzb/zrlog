@@ -12,6 +12,7 @@ import UpgradeSettingForm from "./UpgradeSettingForm";
 import {Link} from "react-router-dom";
 import AdminForm from "./AdminForm";
 import {FunctionComponent} from "react";
+import {AdminCommonProps} from "../../type";
 
 export interface Basic {
     second_title: string;
@@ -49,21 +50,23 @@ export interface Upgrade {
     upgradePreview: boolean;
 }
 
-export type WebSiteProps = {
-    data: Basic | Admin | Upgrade | Other | Blog | TemplateEntry[];
+export type WebSiteProps = AdminCommonProps<Basic | Admin | Upgrade | Other | Blog | TemplateEntry[]> & {
     offline: boolean;
+    offlineData: boolean;
     activeKey: "basic" | "other" | "upgrade" | "admin" | "template" | "blog";
 }
 
-const WebSite:FunctionComponent<WebSiteProps> = ({
-                     data,
-                     offline,
-                     activeKey
-                 }) => {
+const WebSite: FunctionComponent<WebSiteProps> = ({
+                                                      data,
+                                                      offline,
+                                                      offlineData,
+                                                      activeKey,
+                                                  }) => {
     const buildLink = (key: string, text: string) => {
         const toUrl = key === "basic" ? "/website" : "/website/" + key;
         return (
-            <Link to={getRealRouteUrl(toUrl)} replace={true} style={{color: activeKey === key ? getColorPrimary() : "inherit"}}>
+            <Link to={getRealRouteUrl(toUrl)} replace={true}
+                  style={{color: activeKey === key ? getColorPrimary() : "inherit"}}>
                 {text}
             </Link>
         );
@@ -100,7 +103,7 @@ const WebSite:FunctionComponent<WebSiteProps> = ({
             return (
                 <Row>
                     <Col xs={24} style={{maxWidth: 600}}>
-                        <OtherForm offline={offline} data={data as Other}/>
+                        <OtherForm offlineData={offlineData} offline={offline} data={data as Other}/>
                     </Col>
                 </Row>
             );
