@@ -4,14 +4,14 @@ import en_US from "antd/es/locale/en_US";
 import {App, ConfigProvider, theme} from "antd";
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import {legacyLogicalPropertiesTransformer, StyleProvider} from "@ant-design/cssinjs";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {createRoot} from "react-dom/client";
 import {getBackendServerUrl, getColorPrimary, getRes} from "./utils/constants";
 
 import {BasicUserInfo} from "./type";
 import {getContextPath} from "./utils/helpers";
 import AppInit from "./AppInit";
-import EnvUtils from "./utils/env-utils";
+import EnvUtils, {isOffline} from "./utils/env-utils";
 import {addToCache} from "./cache";
 import {getCsrData} from "./api";
 import {AxiosInstance} from "axios";
@@ -25,17 +25,12 @@ export const refreshPathInfo = () => {
 
 const {darkAlgorithm, defaultAlgorithm} = theme;
 
-export type AppInitState = {
-    resLoaded: boolean;
-    resLoadErrorMsg: string;
-    offline: boolean;
-    requiredBackendServerUrl: boolean;
-};
 
 export type AppState = {
     dark: boolean;
     lang: string;
     colorPrimary: string;
+    offline: boolean;
 };
 
 type SsDate = {
@@ -78,14 +73,36 @@ export const getItems_per_page = () => {
 
 const Index = () => {
     const [appState, setState] = useState<AppState>({
-        lang: "zh_CN",
+        lang: document.documentElement.lang ? document.documentElement.lang : "zh_CN",
         dark: EnvUtils.isDarkMode(),
         colorPrimary: getColorPrimary(),
+        offline: isOffline(),
     });
+
+
+    const updateOnlineStatus = () => {
+        setState((prevState) => {
+            return {
+                ...prevState,
+                offline: isOffline(),
+            };
+        });
+    };
+
+
+    useEffect(() => {
+        window.addEventListener("online", updateOnlineStatus);
+        window.addEventListener("offline", updateOnlineStatus);
+        // Cleanup event listeners on component unmount
+        return () => {
+            window.removeEventListener("online", updateOnlineStatus);
+            window.removeEventListener("offline", updateOnlineStatus);
+        };
+    }, []);
 
     return (
         <ConfigProvider
-            key={JSON.stringify(appState)}
+            key={appState.lang + "_" + appState.dark + "_" + appState.colorPrimary}
             locale={appState.lang.startsWith("zh") ? zh_CN : en_US}
             theme={{
                 algorithm: appState.dark ? darkAlgorithm : defaultAlgorithm,
@@ -121,14 +138,15 @@ const Index = () => {
                         }}
                     >
                         <Routes>
-                            <Route path={"/*"} element={<AppInit onInit={(newState) => {
-                                setState((prevState) => {
-                                    return {
-                                        ...prevState,
-                                        ...newState
-                                    }
-                                })
-                            }}/>}/>
+                            <Route path={"/*"} element={<AppInit lang={appState.lang} offline={appState.offline}
+                                                                 onInit={(newState) => {
+                                                                     setState((prevState) => {
+                                                                         return {
+                                                                             ...prevState,
+                                                                             ...newState
+                                                                         }
+                                                                     })
+                                                                 }}/>}/>
                         </Routes>
                     </BrowserRouter>
                 </StyleProvider>

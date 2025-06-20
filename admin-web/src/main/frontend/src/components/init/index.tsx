@@ -6,6 +6,8 @@ import Row from "antd/es/grid/row";
 import {LoginOutlined} from "@ant-design/icons";
 import {classes, LoginBg, StyledLoginPage} from "../login";
 import {FunctionComponent} from "react";
+import zh_CN from "antd/es/locale/zh_CN";
+import en_US from "antd/es/locale/en_US";
 
 const layout = {
     labelCol: {span: 8},
@@ -13,10 +15,19 @@ const layout = {
 };
 
 type InitProps = {
+    lang: string;
     onSubmit: () => void;
 }
 
-const Init: FunctionComponent<InitProps> = ({onSubmit}) => {
+const Init: FunctionComponent<InitProps> = ({onSubmit, lang}) => {
+
+    const getNextDesc = () => {
+        if (lang === "zh_CN") {
+            return zh_CN.Tour?.Next;
+        }
+        return en_US.Tour?.Next;
+    };
+
 
     //const navigate = useNavigate();
 
@@ -47,7 +58,7 @@ const Init: FunctionComponent<InitProps> = ({onSubmit}) => {
                                     onSubmit();
                                 }} type="primary" style={{minWidth: 108}}
                                         htmlType="submit">
-                                    <LoginOutlined/> {"Next"}
+                                    <LoginOutlined/> {getNextDesc()}
                                 </Button>
                             </Col>
                         </Row>
