@@ -2,7 +2,6 @@ import AppBase, {useAxiosBaseInstance} from "AppBase";
 import {AppState, refreshPathInfo, ssData} from "index";
 import {FunctionComponent, useEffect, useState} from "react";
 import {
-    getBackendServerUrl,
     getColorPrimary,
     getRes,
     isStaticPage,
@@ -34,7 +33,7 @@ const AppInit: FunctionComponent<AppInitProps> = ({onInit, lang, offline}) => {
     const [appState, setAppState] = useState<AppInitState>({
         resLoaded: false,
         resLoadErrorMsg: "",
-        requiredBackendServerUrl: isStaticPage() && getBackendServerUrl() === "/",
+        requiredBackendServerUrl: false,
     });
 
 
