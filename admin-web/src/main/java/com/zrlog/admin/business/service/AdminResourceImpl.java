@@ -9,6 +9,7 @@ import com.hibegin.http.server.api.HttpRequest;
 import com.zrlog.business.util.ResourceUtils;
 import com.zrlog.common.AdminResource;
 import com.zrlog.common.Constants;
+import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ZrLogUtil;
 
 import java.io.ByteArrayInputStream;
@@ -47,6 +48,7 @@ public class AdminResourceImpl implements AdminResource {
         Map<String, Object> resourceMap = new TreeMap<>();
         resourceMap.put("uris", pageUris);
         resourceMap.put("static", staticUris);
+        resourceMap.put("i18n", I18nUtil.getAdmin());
         this.buildId = Math.abs(SecurityUtils.md5(new Gson().toJson(resourceMap)).hashCode());
     }
 
@@ -79,7 +81,7 @@ public class AdminResourceImpl implements AdminResource {
                         sb.append("\"").append(split[0]).append(".html?");
                     }
                     sb.append("v=").append(buildId);
-                    if(split.length > 1) {
+                    if (split.length > 1) {
                         sb.append("&");
                         sb.append(split[1]);
                     }
