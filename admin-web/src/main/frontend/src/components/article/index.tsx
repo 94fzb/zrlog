@@ -237,7 +237,7 @@ const Index = ({data, offline}: { data: ArticlePageDataSource; offline: boolean 
         return "/api/admin/article/delete";
     };
 
-    const [searchKey, setSearchKey] = useState<string>(data.key);
+    const [searchKey, setSearchKey] = useState<string>(data.key ? data.key : "");
 
     return (
         <>
