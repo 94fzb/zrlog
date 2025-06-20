@@ -23,6 +23,7 @@ export type LastVersion = {
 export type BasicUserInfo = {
     userName: string;
     header: string;
+    key: string;
     lastVersion?: LastVersion
     cacheableApiUris?: string[]
 };

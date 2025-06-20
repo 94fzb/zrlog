@@ -12,9 +12,6 @@ import {BasicUserInfo} from "./type";
 import {getContextPath} from "./utils/helpers";
 import AppInit from "./AppInit";
 import EnvUtils, {isOffline} from "./utils/env-utils";
-import {addToCache} from "./cache";
-import {getCsrData} from "./api";
-import {AxiosInstance} from "axios";
 
 export const basePath = getContextPath() + "admin/"
 export let apiBasePath: string;
@@ -42,7 +39,7 @@ type SsDate = {
 
 export let ssData: SsDate | undefined;
 
-const ssKeyStroageKey = "ss_key";
+export const ssKeyStorageKey = "ss_key";
 
 const initSsData = () => {
     const ssDataStr = document.getElementById("__SS_DATA__")?.innerText;
@@ -50,7 +47,7 @@ const initSsData = () => {
     if (ssDataStr?.length > 0) {
         ssData = JSON.parse(ssDataStr as string);
     } else {
-        const ssKey = localStorage.getItem(ssKeyStroageKey);
+        const ssKey = localStorage.getItem(ssKeyStorageKey);
         if (ssKey) {
             ssData = {key: ssKey};
         } else {
@@ -61,19 +58,6 @@ const initSsData = () => {
 
 initSsData();
 
-export const asyncSaveApiCache = (axiosInstance: AxiosInstance, ssKey: string) => {
-    localStorage.setItem(ssKeyStroageKey, ssKey);
-    setTimeout(() => {
-        if (ssData) {
-            ssData.user?.cacheableApiUris?.map(e => {
-                const key = e.split("/api/admin")[1];
-                getCsrData(key, axiosInstance).then(({data}) => {
-                    addToCache(key, data)
-                });
-            })
-        }
-    }, 200)
-}
 
 export const getItems_per_page = () => {
     if (getRes()["lang"] === "zh_CN") {

@@ -13,12 +13,15 @@ import {
 } from "../../utils/constants";
 import {useNavigate} from "react-router-dom";
 import Title from "antd/es/typography/Title";
-import {asyncSaveApiCache, ssData} from "../../index";
+import {ssData, ssKeyStorageKey} from "../../index";
 import PWAHandler from "../../PWAHandler";
-import {removeAllCaches} from "../../cache";
+import {addToCache, removeAllCaches} from "../../cache";
 import styled from "styled-components";
 import {getContextPath} from "../../utils/helpers";
 import {useAxiosBaseInstance} from "../../AppBase";
+import {getCsrData} from "../../api";
+import {BasicUserInfo} from "../../type";
+import {AxiosInstance} from "axios";
 
 const md5 = require("md5");
 
@@ -105,6 +108,21 @@ export const LoginBg = (): ReactElement => {
     />
 }
 
+const asyncSaveApiCache = (axiosInstance: AxiosInstance, userData: BasicUserInfo) => {
+    addToCache("/user", userData)
+    localStorage.setItem(ssKeyStorageKey, userData.key);
+    setTimeout(() => {
+        if (ssData) {
+            ssData.user?.cacheableApiUris?.map(e => {
+                const key = e.split("/api/admin")[1];
+                getCsrData(key, axiosInstance).then(({data}) => {
+                    addToCache(key, data)
+                });
+            })
+        }
+    }, 200)
+}
+
 const Index = ({offline}: { offline: boolean }) => {
     const [logging, setLogging] = useState<boolean>(false);
     const [loginState, setLoginState] = useState<LoginState>({
@@ -142,7 +160,7 @@ const Index = ({offline}: { offline: boolean }) => {
                 if (ssData) {
                     ssData.key = data.data.key;
                     ssData.user = data.data;
-                    asyncSaveApiCache(axiosInstance,ssData.key)
+                    asyncSaveApiCache(axiosInstance, data.data);
                 }
                 const redirectFrom = query.get("redirectFrom") as string;
                 if (redirectFrom !== null && redirectFrom !== "") {
