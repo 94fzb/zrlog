@@ -86,7 +86,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         this.updater = updater;
         this.cacheService = new CacheServiceImpl();
         this.pluginCoreProcess = new PluginCoreProcessImpl();
-        this.adminResource = new AdminResourceImpl();
+        this.adminResource = new AdminResourceImpl(cacheService);
         this.serverConfig = initServerConfig();
         this.uptime = System.currentTimeMillis();
         this.configRouter();

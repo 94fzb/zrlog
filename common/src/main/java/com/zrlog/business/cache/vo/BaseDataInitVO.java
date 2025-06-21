@@ -14,6 +14,7 @@ public class BaseDataInitVO implements Serializable {
     public BaseDataInitVO() {
     }
 
+    private Long webSiteVersion;
     private List<Map<String, Object>> tags = new ArrayList<>();
     private List<Map<String, Object>> types = new ArrayList<>();
     private List<Map<String, Object>> links = new ArrayList<>();
@@ -146,5 +147,13 @@ public class BaseDataInitVO implements Serializable {
         public void setTotalTypeSize(Long totalTypeSize) {
             this.totalTypeSize = totalTypeSize;
         }
+    }
+
+    public Long getWebSiteVersion() {
+        return webSiteVersion;
+    }
+
+    public void setWebSiteVersion(Long webSiteVersion) {
+        this.webSiteVersion = webSiteVersion;
     }
 }

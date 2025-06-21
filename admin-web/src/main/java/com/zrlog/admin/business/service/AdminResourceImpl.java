@@ -8,6 +8,7 @@ import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.server.api.HttpRequest;
 import com.zrlog.business.util.ResourceUtils;
 import com.zrlog.common.AdminResource;
+import com.zrlog.common.CacheService;
 import com.zrlog.common.Constants;
 import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ZrLogUtil;
@@ -24,16 +25,25 @@ public class AdminResourceImpl implements AdminResource {
 
     private final Set<String> pageUris;
     private final Set<String> staticUris;
-    private final long buildId;
+    private final long fileBuildId;
+    private final CacheService cacheService;
+    private long siteInfoVersion;
 
-    public AdminResourceImpl() {
+    public AdminResourceImpl(CacheService cacheService) {
+        this.cacheService = cacheService;
         this.pageUris = wrapperUris(getUris("/admin/pwa-page.txt"));
         this.staticUris = getStaticUri();
         Map<String, Object> resourceMap = new TreeMap<>();
         resourceMap.put("uris", pageUris);
         resourceMap.put("static", staticUris);
         resourceMap.put("i18n", I18nUtil.getAdmin());
-        this.buildId = Math.abs(SecurityUtils.md5(new Gson().toJson(resourceMap)).hashCode());
+        this.fileBuildId = Math.abs(SecurityUtils.md5(new Gson().toJson(resourceMap)).hashCode());
+    }
+
+    public static void main(String[] args) {
+        System.out.println("js = " + IOUtil.getStringInputStream(new AdminResourceImpl(null).renderServiceWorker(null)));
+        //Set<String> adminPageUris = new AdminResourceImpl().getAdminPageUris();
+        // System.out.println(adminPageUris);
     }
 
     private Set<String> getStaticUri() {
@@ -54,12 +64,6 @@ public class AdminResourceImpl implements AdminResource {
         }
         cacheUris.addAll(wrapperUris(getUris("/admin/pwa-resource.txt")));
         return cacheUris;
-    }
-
-    public static void main(String[] args) {
-        System.out.println("js = " + IOUtil.getStringInputStream(new AdminResourceImpl().renderServiceWorker(null)));
-        //Set<String> adminPageUris = new AdminResourceImpl().getAdminPageUris();
-        // System.out.println(adminPageUris);
     }
 
     @Override
@@ -85,7 +89,7 @@ public class AdminResourceImpl implements AdminResource {
                     sb.append("\"").append(split[0]);
                 }
                 sb.append(ZrLogUtil.isStaticPlugin(request) ? ".html?" : "?");
-                sb.append("v=").append(buildId);
+                sb.append("v=").append(fileBuildId);
                 if (split.length > 1) {
                     sb.append("&");
                     sb.append(split[1]);
@@ -105,7 +109,10 @@ public class AdminResourceImpl implements AdminResource {
 
     @Override
     public String getStaticResourceBuildId() {
-        return buildId + "";
+        if (Objects.isNull(cacheService)) {
+            return Math.abs(fileBuildId) + "";
+        }
+        return Math.abs(fileBuildId + cacheService.getWebSiteVersion()) + "";
     }
 
     private Set<String> getUris(String resourceName) {

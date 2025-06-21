@@ -1,5 +1,6 @@
 package com.zrlog.business.cache;
 
+import com.google.gson.Gson;
 import com.hibegin.common.BaseLockObject;
 import com.hibegin.common.util.*;
 import com.hibegin.http.server.api.HttpRequest;
@@ -139,6 +140,14 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
     @Override
     public File getCacheHtmlFolder() {
         return new File(CACHE_HTML_PATH + "/zh_CN/");
+    }
+
+    @Override
+    public long getWebSiteVersion() {
+        if (Objects.isNull(cacheInit)) {
+            return 0;
+        }
+        return Objects.requireNonNullElse(cacheInit.getWebSiteVersion(), 0L);
     }
 
     @Override
@@ -294,7 +303,9 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
     private BaseDataInitVO getCacheInit(Executor executor) {
         BaseDataInitVO cacheInit = new BaseDataInitVO();
         //first set website info
-        cacheInit.setWebSite(refreshWebSite());
+        Map<String, Object> refreshWebSite = refreshWebSite();
+        cacheInit.setWebSite(refreshWebSite);
+        cacheInit.setWebSiteVersion((long) new Gson().toJson(refreshWebSite).hashCode());
 
         List<CompletableFuture<Void>> futures = new ArrayList<>();
         BaseDataInitVO.Statistics statistics = new BaseDataInitVO.Statistics();
