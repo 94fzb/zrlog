@@ -70,11 +70,13 @@ public class AdminPageController extends Controller {
         if (!manifest.isEmpty()) {
             Element manifestElement = manifest.first();
             if (Objects.nonNull(manifestElement)) {
+                String newUrl;
                 if (StringUtils.isNotEmpty(adminStaticResourceHostByWebSite) && !ZrLogUtil.isStaticPlugin(request)) {
-                    manifestElement.attr("href", manifestElement.attr("href").replace("./", adminStaticResourceHostByWebSite + "/"));
+                    newUrl = manifestElement.attr("href").replace("./", adminStaticResourceHostByWebSite + "/");
                 } else {
-                    manifestElement.attr("href", manifestElement.attr("href").replace("./", WebTools.getHomeUrl(request)));
+                    newUrl = manifestElement.attr("href").replace("./", WebTools.getHomeUrl(request));
                 }
+                manifestElement.attr("href", newUrl + "?v=" + Constants.zrLogConfig.getAdminResource().getStaticResourceBuildId());
             }
         }
         Elements scripts = document.head().select("script");
