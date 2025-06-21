@@ -76,6 +76,6 @@ public class CPUInfo {
 
     public String getCpuLoad() {
         OperatingSystemMXBean osMXBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-        return BigDecimal.valueOf(osMXBean.getCpuLoad()).setScale(2, RoundingMode.HALF_UP).toString();
+        return BigDecimal.valueOf(osMXBean.getSystemCpuLoad()).setScale(2, RoundingMode.HALF_UP).toString();
     }
 }

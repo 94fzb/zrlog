@@ -1,6 +1,7 @@
 package com.zrlog.common;
 
 import com.hibegin.common.util.BooleanUtils;
+import com.hibegin.common.util.EnvKit;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.common.type.AutoUpgradeVersionType;
@@ -15,18 +16,52 @@ import java.util.*;
  */
 public class Constants {
 
+    public static final String ZRLOG_SQL_VERSION_KEY = "zrlogSqlVersion";
+    public static final String INSTALL_HTML_PAGE = "/install/index.html";
+    public static final String ADMIN_URI_BASE_PATH = "/admin";
+    public static final String ADMIN_HTML_PAGE = ADMIN_URI_BASE_PATH + "/index.html";
+    public static final String TEMPLATE_BASE_PATH = "/include/templates/";
+    public static final String DEFAULT_TEMPLATE_PATH = TEMPLATE_BASE_PATH + "default";
+    public static final String AUTO_UPGRADE_VERSION_KEY = "autoUpgradeVersion";
+    public static final int DEFAULT_ARTICLE_DIGEST_LENGTH = 200;
+    public static final String FAVICON_ICO_URI_PATH = "/favicon.ico";
+    public static final String FAVICON_PNG_PWA_192_URI_PATH = "/pwa/icon/favicon-192.png";
+    public static final String FAVICON_PNG_PWA_512_URI_PATH = "/pwa/icon/favicon-512.png";
+    public static final String ADMIN_LOGIN_URI_PATH = ADMIN_URI_BASE_PATH + "/login";
+    public static final String ADMIN_PWA_MANIFEST_JSON = ADMIN_URI_BASE_PATH + "/manifest.json";
+    public static final String ADMIN_SERVICE_WORKER_JS = "/admin/service-worker.js";
+    public static final String ADMIN_PWA_MANIFEST_API_URI_PATH = "/api" + ADMIN_URI_BASE_PATH + "/manifest";
+    public static final String ADMIN_REFRESH_CACHE_API_URI_PATH = "/api" + ADMIN_URI_BASE_PATH + "/refreshCache";
+    public static final String INDEX_URI_PATH = "/index";
+    public static final String ATTACHED_FOLDER = "/attached/";
+    public static final AutoUpgradeVersionType DEFAULT_AUTO_UPGRADE_VERSION_TYPE = AutoUpgradeVersionType.ONE_DAY;
+    public static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ssXXX";
+    public static final Integer SQL_VERSION = 19;
+    public static final String ADMIN_TITLE_CHAR = " - ";
+    /**
+     * 1天
+     */
+    private static final long DEFAULT_SESSION_TIMEOUT = 1000 * 60 * 60 * 24L;
+    private static final String SESSION_TIMEOUT_KEY = "session_timeout";
+    public static RunMode runMode = RunMode.JAVA;
+    public static ZrLogConfig zrLogConfig;
+    public static String pluginServer;
     private static volatile long lastAccessTime = System.currentTimeMillis();
+
+    static {
+        init();
+    }
 
     public static long getLastAccessTime() {
         return lastAccessTime;
     }
 
-    public static RunMode runMode = RunMode.DEV;
-
-    public static Boolean devEnabled = Boolean.FALSE;
+    public static void setLastAccessTime(long lastAccessTime) {
+        Constants.lastAccessTime = lastAccessTime;
+    }
 
     public static boolean debugLoggerPrintAble() {
-        return runMode == RunMode.DEV || devEnabled;
+        return EnvKit.isDevMode();
     }
 
     public static String getRealFileArch() {
@@ -43,7 +78,6 @@ public class Constants {
         return System.getenv().get("ZRLOG_HOME");
     }
 
-
     public static String getZrLogHome() {
         if (Constants.getZrLogHomeByEnv() == null) {
             return System.getProperty("user.dir");
@@ -51,60 +85,6 @@ public class Constants {
             return Constants.getZrLogHomeByEnv();
         }
     }
-
-    public static void setLastAccessTime(long lastAccessTime) {
-        Constants.lastAccessTime = lastAccessTime;
-    }
-
-    public static ZrLogConfig zrLogConfig;
-
-    public static final String ZRLOG_SQL_VERSION_KEY = "zrlogSqlVersion";
-
-    public static final String INSTALL_HTML_PAGE = "/install/index.html";
-
-    public static final String ADMIN_URI_BASE_PATH = "/admin";
-
-    public static final String ADMIN_HTML_PAGE = ADMIN_URI_BASE_PATH + "/index.html";
-
-    public static final String TEMPLATE_BASE_PATH = "/include/templates/";
-
-    public static final String DEFAULT_TEMPLATE_PATH = TEMPLATE_BASE_PATH + "default";
-
-    public static final String AUTO_UPGRADE_VERSION_KEY = "autoUpgradeVersion";
-
-    public static final int DEFAULT_ARTICLE_DIGEST_LENGTH = 200;
-
-    public static final String FAVICON_ICO_URI_PATH = "/favicon.ico";
-    public static final String FAVICON_PNG_PWA_192_URI_PATH = "/pwa/icon/favicon-192.png";
-    public static final String FAVICON_PNG_PWA_512_URI_PATH = "/pwa/icon/favicon-512.png";
-
-
-    public static final String ADMIN_LOGIN_URI_PATH = ADMIN_URI_BASE_PATH + "/login";
-    public static final String ADMIN_PWA_MANIFEST_JSON = ADMIN_URI_BASE_PATH + "/manifest.json";
-    public static final String ADMIN_PWA_MANIFEST_API_URI_PATH = "/api" + ADMIN_URI_BASE_PATH + "/manifest";
-    public static final String ADMIN_REFRESH_CACHE_API_URI_PATH = "/api" + ADMIN_URI_BASE_PATH + "/refreshCache";
-
-    public static final String INDEX_URI_PATH = "/index";
-
-    public static final String ATTACHED_FOLDER = "/attached/";
-
-
-    public static final AutoUpgradeVersionType DEFAULT_AUTO_UPGRADE_VERSION_TYPE = AutoUpgradeVersionType.ONE_DAY;
-
-    public static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ssXXX";
-
-
-    public static final Integer SQL_VERSION = 19;
-
-    /**
-     * 1天
-     */
-    private static final long DEFAULT_SESSION_TIMEOUT = 1000 * 60 * 60 * 24L;
-
-    private static final String SESSION_TIMEOUT_KEY = "session_timeout";
-
-
-    public static String pluginServer;
 
     public static boolean isStaticHtmlStatus() {
         return getBooleanByFromWebSite("generator_html_status");
@@ -153,7 +133,6 @@ public class Constants {
         return dbSetting instanceof String && ("1".equals(dbSetting) || "on".equals(dbSetting) || BooleanUtils.isTrue((String) dbSetting));
     }
 
-
     public static Long getSessionTimeout() {
         String sessionTimeoutString = (String) Constants.zrLogConfig.getPublicWebSite().get(SESSION_TIMEOUT_KEY);
         if (StringUtils.isEmpty(sessionTimeoutString)) {
@@ -183,14 +162,11 @@ public class Constants {
         return (int) Double.parseDouble((String) Objects.requireNonNullElse(Constants.zrLogConfig.getPublicWebSite().get("admin_article_page_size"), "10"));
     }
 
-
     public static File getDbPropertiesFile() {
         File file = new File(PathUtil.getConfPath() + "/db.properties");
         new File(PathUtil.getConfPath()).mkdirs();
         return file;
     }
-
-    public static final String ADMIN_TITLE_CHAR = " - ";
 
     public static String getAdminTitle(String startTitle) {
         String title = (String) Constants.zrLogConfig.getPublicWebSite().get("title");
@@ -205,7 +181,28 @@ public class Constants {
         return sj.toString();
     }
 
+    public static Map<String, String> titleMap = new HashMap<>();
+
+    static {
+        titleMap.put(Constants.ADMIN_LOGIN_URI_PATH, "login");
+        titleMap.put("/admin/article-edit", "admin.log.edit");
+        titleMap.put("/admin/article", "blogManage");
+    }
+
+    public static String getAdminDocumentTitleByUri(String uri) {
+        String realUri = uri.replaceFirst("/api", "");
+        String key = titleMap.get(realUri);
+        if (Objects.isNull(key)) {
+            return getAdminTitle("");
+        }
+        return getAdminTitle(I18nUtil.getAdminStringFromRes(key));
+    }
+
     public static String getAppId() {
         return String.valueOf(zrLogConfig.getPublicWebSite().get("appId"));
+    }
+
+    public static void init() {
+        System.getProperties().put("java.util.logging.SimpleFormatter.format", "%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %4$s %5$s%6$s%n");
     }
 }

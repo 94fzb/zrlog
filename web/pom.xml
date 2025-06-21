@@ -9,7 +9,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>web</artifactId>
-    <version>3.1.7-SNAPSHOT</version>
+
+    <properties>
+        <tomcat-scope>compile</tomcat-scope>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -19,6 +22,24 @@
         <dependency>
             <groupId>com.zrlog</groupId>
             <artifactId>admin-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>6.1.0</version>
+            <scope>${tomcat-scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-core</artifactId>
+            <version>10.1.42</version>
+            <scope>${tomcat-scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-jasper</artifactId>
+            <version>10.1.42</version>
+            <scope>${tomcat-scope}</scope>
         </dependency>
     </dependencies>
 

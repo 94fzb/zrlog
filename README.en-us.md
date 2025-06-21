@@ -1,4 +1,4 @@
-## ZrLog ![build-preview](https://github.com/94fzb/zrlog/actions/workflows/build-preview-packge.yml/badge.svg) ![build-release](https://github.com/94fzb/zrlog/actions/workflows/build-release-packge.yml/badge.svg) [![Apache License](http://img.shields.io/badge/license-apache2-orange.svg?style=flat)](http://www.apache.org/licenses/LICENSE-2.0)
+## ZrLog ![build-preview](https://github.com/94fzb/zrlog/actions/workflows/build-preview-packge-zip.yml/badge.svg) ![build-release](https://github.com/94fzb/zrlog/actions/workflows/build-release-packge-zip.yml/badge.svg) [![Apache License](http://img.shields.io/badge/license-apache2-orange.svg?style=flat)](http://www.apache.org/licenses/LICENSE-2.0)
 
 [Chinese](README.md) | [English](README.en-us.md)
 
@@ -42,7 +42,7 @@ program.
     - 1.jdk version >= 21
     - 2.mysql
 - Data initialization
-    - 1.Download [latest zip](https://dl.zrlog.com/release/zrlog.zip) unzip, and run sh bin/run.sh or bin\run.bat (for windows)
+    - 1.Download [latest zip](https://www.zrlog.com/download) unzip, and run sh bin/run.sh or bin\run.bat (for windows)
     - 2.Visit http://host:port/install
     - 3.Fill in the database, administrator information, complete the installation
 

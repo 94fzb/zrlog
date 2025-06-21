@@ -69,7 +69,7 @@ class UpdateVersionTimerTask extends TimerTask {
     }
 
     private static String getJsonFilename() {
-        if (Constants.runMode == RunMode.JAR || Constants.runMode == RunMode.NATIVE_AGENT || Constants.runMode == RunMode.DEV) {
+        if (Constants.runMode == RunMode.JAVA || Constants.runMode == RunMode.NATIVE_AGENT) {
             return "last.version.json";
         }
         return "last." + Constants.getRealFileArch() + ".version.json";

@@ -5,7 +5,7 @@ import {message} from "antd";
 import makeAsyncScriptLoader from "react-async-script";
 import MyLoadingComponent from "../../my-loading-component";
 import EnvUtils from "../../../utils/env-utils";
-import {getRes} from "../../../utils/constants";
+import {getRes, isDev} from "../../../utils/constants";
 import {dom, library} from "@fortawesome/fontawesome-svg-core";
 import {
     fa2,
@@ -39,8 +39,9 @@ import {
     faTable,
 } from "@fortawesome/free-solid-svg-icons";
 import {StyledEditormd} from "./styled-editormd";
-import axios from "axios";
 import {ChangedContent} from "../index.types";
+import {useAxiosBaseInstance} from "../../../AppBase";
+import {getContextPath} from "../../../utils/helpers";
 // Add the icons to the library so you can use it in your page
 const icons = [
     faBold,
@@ -93,11 +94,14 @@ export type ScriptLoaderProps = {
 };
 
 const getResourceBaseUrl = () => {
+    if (isDev()) {
+        return "/"
+    }
     const url = getRes()["admin_static_resource_base_url"] as string;
     if (url && url.trim().length > 0) {
-        return url + "/";
+        return url + "/admin/";
     }
-    return document.baseURI;
+    return getContextPath() + "admin/";
 };
 
 let editor: any;
@@ -112,6 +116,8 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({height, markdown
     const [content, setContent] = useState<ChangedContent>({content: "", markdown: markdown});
 
     const [messageApi, contextHolder] = message.useMessage({maxCount: 3});
+
+    const axiosInstance = useAxiosBaseInstance();
 
     function setDarkMode(editor: any, dark: boolean) {
         editor.setTheme(dark ? "dark" : "default");
@@ -179,7 +185,7 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({height, markdown
                 ];
             },
             imageUploadURL: document.baseURI + "api/admin/upload",
-            path: getResourceBaseUrl() + "admin/vendors/markdown/lib/",
+            path: getResourceBaseUrl() + "vendors/markdown/lib/",
             placeholder: getRes()["editorPlaceholder"],
             markdown: content.markdown,
             onload: function () {
@@ -213,7 +219,7 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({height, markdown
                     const formData = new FormData();
                     if (file) {
                         formData.append("imgFile", file, fileName);
-                        axios.post("/api/admin/upload?dir=image", formData).then(({data}) => {
+                        axiosInstance.post("/api/admin/upload?dir=image", formData).then(({data}) => {
                             const url = data.data.url;
                             editor.insertValue("![x](" + url + ")");
                         });
@@ -302,7 +308,7 @@ const MyEditorMdWrapper: FunctionComponent<MyEditorMdWrapperProps> = ({height, m
     const [mdEditorScriptLoaded, setMdEditorScriptLoaded] = useState<boolean>(false);
 
     const EditMdAsyncScriptLoader = makeAsyncScriptLoader(
-        getResourceBaseUrl() + "admin/vendors/markdown/js/editormd-1.5.6.js"
+        getResourceBaseUrl() + "vendors/markdown/js/editormd-1.5.6.js"
     )(MyLoadingComponent) as unknown as FunctionComponent<ScriptLoaderProps>;
     if (mdEditorScriptLoaded) {
         return <MyEditorMd height={height} markdown={markdown} loadSuccess={loadSuccess} onChange={onChange}/>;

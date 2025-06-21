@@ -56,7 +56,7 @@ public class GraalvmNativeImageApplication {
             return;
         }
         int port = ZrLogUtil.getPort(args);
-        WebServerBuilder webServerBuilder = Application.webServerBuilder(port, new NativeImageUpdater(args, new File(execFile)));
+        WebServerBuilder webServerBuilder = Application.webServerBuilder(port, ZrLogUtil.getContextPath(args), new NativeImageUpdater(args, new File(execFile)));
         webServerBuilder.start();
     }
 }

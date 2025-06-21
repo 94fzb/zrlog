@@ -2,7 +2,7 @@ import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
-import {getColorPrimary, getRes} from "../../utils/constants";
+import {getColorPrimary, getRealRouteUrl, getRes} from "../../utils/constants";
 
 import {FunctionComponent} from "react";
 import {IndexData} from "../../type";
@@ -58,7 +58,13 @@ const Index: FunctionComponent<IndexProps> = ({data}) => {
                     >
                         <IndexTipBg style={{position: "absolute", height: "100%", width: "100%", zIndex: 2}}/>
                         <div style={{padding: 12}}>
-                            <div style={{fontSize: 20, fontWeight: 500,textOverflow: "ellipsis", whiteSpace: "nowrap",overflow:"hidden"}}>{data.welcomeTip}</div>
+                            <div style={{
+                                fontSize: 20,
+                                fontWeight: 500,
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                                overflow: "hidden"
+                            }}>{data.welcomeTip}</div>
                             <div style={{overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap"}}>
                                 {data.tips.map((e) => {
                                     return e;
@@ -93,7 +99,7 @@ const Index: FunctionComponent<IndexProps> = ({data}) => {
                     >
                         <Row gutter={[8, 8]}>
                             <Col xs={12} md={12}>
-                                <Link to={"/article-edit"}>
+                                <Link to={getRealRouteUrl("/article-edit")}>
                                     <div style={{
                                         display: "flex",
                                         flexFlow: "column",
@@ -107,7 +113,7 @@ const Index: FunctionComponent<IndexProps> = ({data}) => {
                                 </Link>
                             </Col>
                             <Col xs={12} md={12}>
-                                <Link to={"/article-type"}>
+                                <Link to={getRealRouteUrl("/article-type")}>
                                     <div style={{
                                         display: "flex",
                                         flexFlow: "column",
@@ -121,7 +127,7 @@ const Index: FunctionComponent<IndexProps> = ({data}) => {
                                 </Link>
                             </Col>
                             <Col xs={12} md={12}>
-                                <Link to={"/plugin?page=backup-sql-file/files"}>
+                                <Link to={getRealRouteUrl("/plugin?page=backup-sql-file/files")}>
                                     <div style={{
                                         display: "flex",
                                         flexFlow: "column",

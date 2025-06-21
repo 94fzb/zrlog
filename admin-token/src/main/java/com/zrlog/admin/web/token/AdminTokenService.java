@@ -1,13 +1,12 @@
 package com.zrlog.admin.web.token;
 
 import com.google.gson.Gson;
-import com.hibegin.common.util.ByteUtils;
-import com.hibegin.common.util.LoggerUtil;
-import com.hibegin.common.util.SecurityUtils;
-import com.hibegin.common.util.StringUtils;
+import com.hibegin.common.util.*;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.web.cookie.Cookie;
+import com.zrlog.admin.cross.CrossUtils;
+import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.business.util.InstallUtils;
 import com.zrlog.common.Constants;
 import com.zrlog.common.TokenService;
@@ -18,6 +17,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Date;
@@ -120,7 +120,19 @@ public class AdminTokenService implements TokenService {
                 response.addCookie(cookie);
             }
         }
-        response.redirect(Constants.ADMIN_LOGIN_URI_PATH);
+        String referer = request.getHeader("Referer");
+        if (Objects.isNull(referer)) {
+            response.redirect(Constants.ADMIN_LOGIN_URI_PATH);
+            return;
+        }
+        URI uri = URI.create(referer);
+        if (!CrossUtils.isEnableOrigin(request)) {
+            response.redirect(Constants.ADMIN_LOGIN_URI_PATH);
+            return;
+        }
+        String ext = Objects.equals(request.getParaToStr("sp"), "true") ? ".html" : "";
+        response.redirect(uri.getScheme() + "://" + uri.getRawAuthority() + WebTools.buildEncodedUrl(request, Constants.ADMIN_LOGIN_URI_PATH + ext));
+
     }
 
     @Override
@@ -141,6 +153,12 @@ public class AdminTokenService implements TokenService {
             cookie.setName(ADMIN_TOKEN_KEY_IN_COOKIE);
             cookie.setValue(finalTokenString);
             cookie.setExpireDate(new Date(System.currentTimeMillis() + Constants.getSessionTimeout()));
+            if (Objects.equals(protocol, "https")) {
+                cookie.setSecure(true);
+            }
+            if (CrossUtils.isEnableOrigin(request) && !EnvKit.isDevMode()) {
+                cookie.setSameSite("None");
+            }
             cookie.setHttpOnly(true);
             cookie.setPath("/");
             response.addCookie(cookie);

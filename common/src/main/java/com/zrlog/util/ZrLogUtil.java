@@ -2,9 +2,13 @@ package com.zrlog.util;
 
 import com.hibegin.common.util.*;
 import com.hibegin.http.server.api.HttpRequest;
+import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.config.ConfigKit;
 import com.hibegin.http.server.util.PathUtil;
+import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.common.Constants;
+import com.zrlog.common.Updater;
+import com.zrlog.common.UpdaterTypeEnum;
 import eu.bitwalker.useragentutils.BrowserType;
 import eu.bitwalker.useragentutils.UserAgent;
 
@@ -44,7 +48,7 @@ public class ZrLogUtil {
         return BeanUtil.convert(tempMap, clazz);
     }
 
-    public static boolean isStaticBlogPlugin(HttpRequest request) {
+    public static boolean isStaticPlugin(HttpRequest request) {
         if (Objects.isNull(request)) {
             return false;
         }
@@ -60,7 +64,7 @@ public class ZrLogUtil {
     }
 
     public static String getHomeUrlWithHostNotProtocol(HttpRequest request) {
-        return getBlogHost(request) + "/";
+        return getBlogHost(request) + WebTools.getHomeUrl(request);
     }
 
     public static String getBlogHost(HttpRequest request) {
@@ -82,12 +86,15 @@ public class ZrLogUtil {
         return "";
     }
 
-    public static String getAdminStaticResourceBaseUrlByWebSite() {
+    public static String getAdminStaticResourceBaseUrlByWebSite(HttpRequest request) {
+        if (Objects.isNull(Constants.zrLogConfig)) {
+            return "";
+        }
         String websiteHost = (String) Constants.zrLogConfig.getPublicWebSite().get("admin_static_resource_base_url");
         if (Objects.nonNull(websiteHost) && !websiteHost.trim().isEmpty()) {
-            return websiteHost;
+            return websiteHost + request.getContextPath();
         }
-        return "";
+        return request.getContextPath();
     }
 
     public static String getFullUrl(HttpRequest request) {
@@ -233,6 +240,21 @@ public class ZrLogUtil {
         return ConfigKit.getInt("server.port", 8080);
     }
 
+    public static String getContextPath(String[] args) {
+        if (Objects.nonNull(args)) {
+            for (String arg : args) {
+                if (arg.startsWith("--contextPath=")) {
+                    return arg.split("=")[1];
+                }
+            }
+        }
+        String contextPath = System.getenv("contextPath");
+        if (Objects.nonNull(contextPath)) {
+            return contextPath;
+        }
+        return ConfigKit.get("server.contextPath", "").toString();
+    }
+
     public static List<String> extractExecutableSql(String sql) {
         String[] sqlArr = sql.split("\n");
         StringBuilder tempSqlStr = new StringBuilder();
@@ -257,4 +279,21 @@ public class ZrLogUtil {
         String value = System.getenv("SYSTEM_SERVICE_MODE");
         return "true".equalsIgnoreCase(value);
     }
+
+    public static boolean isWarMode() {
+        if (EnvKit.isDevMode()) {
+            return false;
+        }
+        Updater updater = Constants.zrLogConfig.getUpdater();
+        if (Objects.isNull(updater)) {
+            return false;
+        }
+        return updater.getType() == UpdaterTypeEnum.WAR;
+    }
+
+
+    public static void putLongTimeCache(HttpResponse response) {
+        response.addHeader("Cache-Control", "max-age=31536000, immutable"); // 1 年的秒数
+    }
+
 }

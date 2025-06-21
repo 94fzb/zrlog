@@ -10,18 +10,15 @@ import com.zrlog.admin.web.plugin.UpdateVersionPlugin;
 import com.zrlog.common.Constants;
 import com.zrlog.common.rest.response.ApiStandardResponse;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.text.ParseException;
-import java.util.Objects;
 
 public class UpgradeController extends Controller {
 
     private final UpgradeService upgradeService = new UpgradeService();
 
     @ResponseBody
-    public ApiStandardResponse<DownloadUpdatePackageResponse> download() throws IOException, URISyntaxException, InterruptedException, ParseException {
-        return new ApiStandardResponse<>(upgradeService.download(Objects.requireNonNullElse(request.getParaToStr("preUpgradeKey"),""), (UpdateVersionPlugin) Constants.zrLogConfig.getPlugins()
+    public ApiStandardResponse<DownloadUpdatePackageResponse> download() {
+        return new ApiStandardResponse<>(upgradeService.download(request.getParaToStr("preUpgradeKey", ""), (UpdateVersionPlugin) Constants.zrLogConfig.getPlugins()
                 .stream().filter(x -> x instanceof UpdateVersionPlugin).findFirst().orElse(null)));
     }
 
@@ -34,7 +31,7 @@ public class UpgradeController extends Controller {
 
     @ResponseBody
     public ApiStandardResponse<UpgradeProcessResponse> doUpgrade() {
-        return new ApiStandardResponse<>(upgradeService.doUpgrade(Objects.requireNonNullElse(request.getParaToStr("preUpgradeKey"), "")));
+        return new ApiStandardResponse<>(upgradeService.doUpgrade(request.getParaToStr("preUpgradeKey", "")));
     }
 
 }

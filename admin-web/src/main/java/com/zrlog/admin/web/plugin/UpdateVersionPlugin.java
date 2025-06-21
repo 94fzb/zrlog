@@ -36,7 +36,7 @@ public class UpdateVersionPlugin implements IPlugin {
 
     private void initExecutorService() {
         scheduledExecutorService = new ScheduledThreadPoolExecutor(1, r -> {
-            Thread thread = Thread.ofVirtual().unstarted(r);
+            Thread thread = new Thread(r);
             thread.setName("update-version-plugin-thread");
             return thread;
         });

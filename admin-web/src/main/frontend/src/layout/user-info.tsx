@@ -1,17 +1,17 @@
-import { DownOutlined, KeyOutlined, LogoutOutlined, SoundOutlined, UserOutlined } from "@ant-design/icons";
-import { Badge, MenuProps, Modal, Typography } from "antd";
-import { Link } from "react-router-dom";
+import {DownOutlined, KeyOutlined, LogoutOutlined, SoundOutlined, UserOutlined} from "@ant-design/icons";
+import {Badge, MenuProps, Modal, Typography} from "antd";
+import {Link} from "react-router-dom";
 
 import Dropdown from "antd/es/dropdown";
 import Image from "antd/es/image";
-import Constants, { getRes } from "../utils/constants";
+import Constants, {getBackendServerUrl, getRealRouteUrl, getRes, isStaticPage} from "../utils/constants";
 import Divider from "antd/es/divider";
-import { BasicUserInfo } from "../type";
-import { tryBlock } from "../utils/helpers";
+import {BasicUserInfo} from "../type";
+import {tryBlock} from "../utils/helpers";
 
-const { Text } = Typography;
+const {Text} = Typography;
 
-const UserInfo = ({ data, offline }: { data: BasicUserInfo; offline: boolean }) => {
+const UserInfo = ({data, offline}: { data: BasicUserInfo; offline: boolean }) => {
     const [modal, contextHolder] = Modal.useModal();
 
     const adminSettings = (res: Record<string, never>): MenuProps["items"] => {
@@ -19,25 +19,25 @@ const UserInfo = ({ data, offline }: { data: BasicUserInfo; offline: boolean }) 
             {
                 key: "1",
                 label: (
-                    <Link to="/user" onClick={(e) => tryBlock(e, modal)}>
-                        <UserOutlined />
-                        <Text style={{ paddingLeft: "5px", paddingRight: 16 }}>{res["admin.user.info"]}</Text>
+                    <Link to={getRealRouteUrl("/user")} onClick={(e) => tryBlock(e, modal)}>
+                        <UserOutlined/>
+                        <Text style={{paddingLeft: "5px", paddingRight: 16}}>{res["admin.user.info"]}</Text>
                     </Link>
                 ),
             },
             {
                 key: "2",
                 label: (
-                    <Link to="/user-update-password" onClick={(e) => tryBlock(e, modal)}>
-                        <KeyOutlined />
-                        <Text style={{ paddingLeft: "5px", paddingRight: 16 }}>{res["admin.changePwd"]}</Text>
+                    <Link to={getRealRouteUrl("/user-update-password")} onClick={(e) => tryBlock(e, modal)}>
+                        <KeyOutlined/>
+                        <Text style={{paddingLeft: "5px", paddingRight: 16}}>{res["admin.changePwd"]}</Text>
                     </Link>
                 ),
             },
             {
                 key: "-",
                 label: (
-                    <Divider style={{ marginTop: "5px", marginBottom: "5px", userSelect: "none", cursor: "none" }} />
+                    <Divider style={{marginTop: "5px", marginBottom: "5px", userSelect: "none", cursor: "none"}}/>
                 ),
             },
         ];
@@ -45,9 +45,9 @@ const UserInfo = ({ data, offline }: { data: BasicUserInfo; offline: boolean }) 
             base.push({
                 key: "3",
                 label: (
-                    <a href="./admin/logout">
-                        <LogoutOutlined />
-                        <Text style={{ paddingLeft: "5px", paddingRight: 16 }}>{res["admin.user.logout"]}</Text>
+                    <a href={getBackendServerUrl() + "admin/logout" + (isStaticPage() ? "?sp=true" : "")} onClick={(e) => tryBlock(e, modal)}>
+                        <LogoutOutlined/>
+                        <Text style={{paddingLeft: "5px", paddingRight: 16}}>{res["admin.user.logout"]}</Text>
                     </a>
                 ),
             });
@@ -57,10 +57,10 @@ const UserInfo = ({ data, offline }: { data: BasicUserInfo; offline: boolean }) 
                 {
                     key: "0",
                     label: (
-                        <Link to="/upgrade">
+                        <Link to={getRealRouteUrl("/upgrade")} onClick={(e) => tryBlock(e, modal)}>
                             <Badge dot={true}>
-                                <SoundOutlined />
-                                <Text style={{ paddingLeft: "6px" }}>
+                                <SoundOutlined/>
+                                <Text style={{paddingLeft: "6px"}}>
                                     {res["newVersion"]} - ({data.lastVersion.version.version}#
                                     {data.lastVersion.version.type})
                                 </Text>
@@ -79,7 +79,7 @@ const UserInfo = ({ data, offline }: { data: BasicUserInfo; offline: boolean }) 
     return (
         <>
             {contextHolder}
-            <Dropdown menu={{ items }} placement="bottom" arrow={{ pointAtCenter: true }}>
+            <Dropdown menu={{items}} placement="bottom" arrow={{pointAtCenter: true}}>
                 <div
                     style={{
                         color: "#ffffff",
@@ -94,7 +94,7 @@ const UserInfo = ({ data, offline }: { data: BasicUserInfo; offline: boolean }) 
                         fallback={Constants.getFillBackImg()}
                         className={"userAvatarImg"}
                         src={data.header}
-                        style={{ cursor: "pointer", width: 40, height: 40 }}
+                        style={{cursor: "pointer", width: 40, height: 40}}
                     />
                     <Badge dot={data.lastVersion?.upgrade}>
                         <Text
@@ -106,7 +106,7 @@ const UserInfo = ({ data, offline }: { data: BasicUserInfo; offline: boolean }) 
                             {data.userName}
                         </Text>
                     </Badge>
-                    <DownOutlined />
+                    <DownOutlined/>
                 </div>
             </Dropdown>
         </>

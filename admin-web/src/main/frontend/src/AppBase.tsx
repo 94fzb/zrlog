@@ -1,105 +1,132 @@
-import { Route, Routes } from "react-router-dom";
-import { lazy } from "react";
-import { Suspense } from "react";
-import { App, Spin } from "antd";
-import axios, { AxiosError } from "axios";
-import { API_VERSION_PATH } from "./components/upgrade";
+import {Route, Routes, useNavigate} from "react-router-dom";
+import {lazy, Suspense} from "react";
+import {App, Spin} from "antd";
+import axios, {AxiosError, AxiosInstance} from "axios";
+import {API_VERSION_PATH} from "./components/upgrade";
 import ErrorBoundary from "./common/ErrorBoundary";
-import type { HookAPI as ModalHookAPI } from "antd/es/modal/useModal";
-import type { MessageInstance } from "antd/es/message/interface";
-import { AxiosInstance } from "axios";
-const AsyncLogin = lazy(() => import("components/login"));
-const AsyncAdminDashboardRouter = lazy(() => import("AdminDashboardRouter"));
+import {getBackendServerUrl, getRealRouteUrl, isStaticPage} from "./utils/constants";
+import AdminDashboardPage from "./components/admin-dashboard-page";
+import {NavigateFunction} from "react-router";
 
-export const commonAxiosErrorHandle = (
-    error: any,
-    modal: ModalHookAPI,
-    message: MessageInstance,
-    modalContainer?: HTMLElement
-): Promise<any> => {
-    //ignore upgrade api error
-    if ((error as AxiosError) && error.config && error.config.url) {
-        if (error.config.url.includes(API_VERSION_PATH)) {
-            return Promise.reject(error.message);
-        }
+const AsyncLogin = lazy(() => import("components/login"));
+
+const errorCountMap = new Map<number, number>();
+
+export const jumpToLoginPage = (navigate: NavigateFunction): void => {
+    if (!window.location.search.includes("redirectFrom")) {
+        navigate(getRealRouteUrl(`/login?redirectFrom=${encodeURIComponent(window.location.pathname.split(".html")[0])}${encodeURIComponent(window.location.search)}`), {replace: true});
     }
-    if (error && error.response) {
-        if (error.response.status) {
-            modal.error({
-                title: "服务异常[" + error.response.status + "]",
-                content: <div style={{ paddingTop: 20,overflow:"auto" }} dangerouslySetInnerHTML={{ __html: error.response.data }} />,
-                getContainer: modalContainer,
-            });
-            return Promise.reject(error.response);
-        }
-    } else {
+}
+
+export const useAxiosBaseInstance = (getContainer?: () => HTMLElement): AxiosInstance => {
+    const {modal, message} = App.useApp();
+
+    const navigate = useNavigate();
+
+    const axiosInstance = axios.create();
+    if (isStaticPage()) {
+        axiosInstance.defaults.withCredentials = true;
+    }
+
+    const commonAxiosErrorHandle = (
+        error: any,
+    ): Promise<any> => {
+        //ignore upgrade api error
         if ((error as AxiosError) && error.config && error.config.url) {
-            if (navigator.onLine) {
-                modal.error({
-                    title: "请求 " + error.config.url + " 错误",
-                    content: JSON.stringify(error),
-                    getContainer: modalContainer,
-                });
-            } else {
-                message.error("请求 " + error.config.url + " " + error.toString() + " network offline");
+            if (error.config.url.includes(API_VERSION_PATH)) {
+                return Promise.reject(error.message);
             }
         }
-    }
-    return Promise.reject(error);
-};
+        if (error && error.response) {
+            if (error.response.status) {
 
-export const createAxiosBaseInstance = (): AxiosInstance => {
-    return axios.create({});
-};
-
-const AppBase = ({ offline }: { offline: boolean }) => {
-    const { modal, message } = App.useApp();
-
-    const initAxios = () => {
-        //@ts-ignore
-        if (window.axiosConfiged) {
-            return;
+                modal.error({
+                    title: "服务异常[" + error.response.status + "]",
+                    content: <div style={{paddingTop: 20, overflow: "auto"}}
+                                  dangerouslySetInnerHTML={{__html: error.response.data}}/>,
+                    getContainer: getContainer ? getContainer() : undefined,
+                });
+                return Promise.reject(error.response);
+            }
+        } else {
+            if ((error as AxiosError) && error.config && error.config.url) {
+                if (navigator.onLine) {
+                    modal.error({
+                        title: "请求 " + error.config.url + " 错误",
+                        content: JSON.stringify(error),
+                        getContainer: getContainer ? getContainer() : undefined,
+                    });
+                } else {
+                    message.error("请求 " + error.config.url + " " + error.toString() + " network offline");
+                }
+            }
         }
-        //@ts-ignore
-        window.axiosConfiged = true;
-        axios.interceptors.response.use(
-            (response) => {
-                if (response.data.error === 9001) {
+        return Promise.reject(error);
+    };
+
+    axiosInstance.defaults.baseURL = getBackendServerUrl();
+
+    axiosInstance.interceptors.response.use(
+        (response) => {
+            const errorCode = response.data.error;
+            if (errorCode === 9001) {
+                let count = errorCountMap.get(errorCode);
+                if (count === null || count === undefined) {
+                    count = 0;
+                }
+                if (count === 0) {
+                    errorCountMap.set(errorCode, count + 1);
                     modal.error({
                         title: response.data.error,
                         content: response.data.message,
+                        getContainer: getContainer ? getContainer() : undefined,
+                        onOk: () => {
+                            errorCountMap.set(errorCode, 0);
+                        }
                     });
-                    return Promise.reject(response.data);
                 }
-                return response;
-            },
-            (error) => {
-                return commonAxiosErrorHandle(error, modal, message);
-            }
-        );
-    };
 
-    initAxios();
+                if (isStaticPage()) {
+                    jumpToLoginPage(navigate);
+                }
+                return Promise.reject(response.data);
+            }
+            return response;
+        },
+        (error) => {
+            return commonAxiosErrorHandle(error);
+        }
+    );
+    return axiosInstance;
+};
+
+const AppBase = ({offline}: { offline: boolean }) => {
 
     return (
         <>
             <Routes>
-                <Route
-                    path={"login"}
-                    element={
-                        <ErrorBoundary>
-                            <Suspense fallback={<Spin spinning={true} fullscreen delay={1000} />}>
-                                <AsyncLogin offline={offline} />
-                            </Suspense>
-                        </ErrorBoundary>
-                    }
-                />
+                {
+                    ["login", "login.html"].map(e => {
+                        return <Route
+                            key={e}
+                            path={e}
+                            element={
+                                <ErrorBoundary>
+                                    <Suspense fallback={<Spin spinning={true} fullscreen delay={1000}/>}>
+                                        <AsyncLogin offline={offline}/>
+                                    </Suspense>
+                                </ErrorBoundary>
+                            }
+                        />
+                    })
+                }
+
                 <Route
                     path={"logout"}
                     element={
                         <ErrorBoundary>
-                            <Suspense fallback={<Spin spinning={true} fullscreen delay={1000} />}>
-                                <AsyncLogin offline={offline} />
+                            <Suspense fallback={<Spin spinning={true} fullscreen delay={1000}/>}>
+                                <AsyncLogin offline={offline}/>
                             </Suspense>
                         </ErrorBoundary>
                     }
@@ -108,8 +135,8 @@ const AppBase = ({ offline }: { offline: boolean }) => {
                     path={"*"}
                     element={
                         <ErrorBoundary>
-                            <Suspense fallback={<Spin spinning={true} fullscreen delay={1000} />}>
-                                <AsyncAdminDashboardRouter offline={offline} />
+                            <Suspense>
+                                <AdminDashboardPage offline={offline}/>
                             </Suspense>
                         </ErrorBoundary>
                     }

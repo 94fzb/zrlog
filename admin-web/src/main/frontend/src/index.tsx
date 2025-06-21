@@ -1,50 +1,41 @@
 import * as serviceWorker from "./serviceWorker";
 import zh_CN from "antd/es/locale/zh_CN";
 import en_US from "antd/es/locale/en_US";
-import {App, ConfigProvider, Spin, theme} from "antd";
-import {BrowserRouter} from "react-router-dom";
-import EnvUtils, {isOffline} from "./utils/env-utils";
-import AppBase from "./AppBase";
+import {App, ConfigProvider, theme} from "antd";
+import {BrowserRouter, Route, Routes} from "react-router-dom";
 import {legacyLogicalPropertiesTransformer, StyleProvider} from "@ant-design/cssinjs";
 import {useEffect, useState} from "react";
 import {createRoot} from "react-dom/client";
-import {getColorPrimary, getRes, setRes} from "./utils/constants";
+import {getColorPrimary, getRes} from "./utils/constants";
 
-import axios from "axios";
 import {BasicUserInfo} from "./type";
-import UnknownErrorPage from "./components/unknown-error-page";
+import AppInit from "./AppInit";
+import EnvUtils, {isOffline} from "./utils/env-utils";
+import {getCacheByKey} from "./cache";
+import {getContextPath} from "./utils/helpers";
 
-const url = new URL(document.baseURI);
-export const basePath = url.pathname + "admin/";
-export const apiBasePath = url.pathname + "api/admin/";
-
-axios.defaults.baseURL = document.baseURI;
 const {darkAlgorithm, defaultAlgorithm} = theme;
 
-type AppState = {
-    resLoaded: boolean;
-    resLoadErrorMsg: string;
+export type AppState = {
     dark: boolean;
-    offline: boolean;
     lang: string;
     colorPrimary: string;
+    offline: boolean;
 };
 
 type SsDate = {
-    pageData?: any;
+    data?: any;
     resourceInfo?: Record<string, never>;
-    user?: BasicUserInfo;
-    key?: string;
+    user: BasicUserInfo | null;
+    key: string;
+    pageBuildId: string;
 };
 
-export let ssData: SsDate | undefined;
-const ssDataStr = document.getElementById("__SS_DATA__")?.innerText;
-// @ts-ignore
-if (ssDataStr?.length > 0) {
-    ssData = JSON.parse(ssDataStr as string);
-} else {
-    ssData = {};
-}
+export let ssData: SsDate = {key: "", data: undefined, resourceInfo: undefined, user: null, pageBuildId: ""};
+//@ts-ignore
+window['__SS_DATA'] = ssData;
+export const ssKeyStorageKey = "ss_key";
+
 
 export const getItems_per_page = () => {
     if (getRes()["lang"] === "zh_CN") {
@@ -56,67 +47,32 @@ export const getItems_per_page = () => {
 };
 
 const Index = () => {
-    const [appState, setAppState] = useState<AppState>({
-        resLoaded: false,
-        resLoadErrorMsg: "",
-        lang: "zh_CN",
-        offline: isOffline(),
+    const [appState, setState] = useState<AppState>({
+        lang: document.documentElement.lang ? document.documentElement.lang : "zh_CN",
         dark: EnvUtils.isDarkMode(),
         colorPrimary: getColorPrimary(),
+        offline: isOffline(),
     });
 
-    const loadResourceFromServer = () => {
-        const resourceApi = "/api/public/adminResource";
-        axios
-            .get(resourceApi)
-            .then(({data}: { data: Record<string, any> }) => {
-                handleRes(data.data);
-            })
-            .catch((e) => {
-                setAppState((prevState) => {
-                    return {
-                        dark: document.body.className.includes("dark"),
-                        resLoadErrorMsg: "Request " + resourceApi + " error -> " + e.message,
-                        resLoaded: false,
-                        lang: "zh_CN",
-                        offline: prevState.offline,
-                        colorPrimary: getColorPrimary(),
-                    };
-                });
-            });
-    };
-    const handleRes = (data: Record<string, never>) => {
+    const initSsData = () => {
+        const ssDataStr = document.getElementById("__SS_DATA__")?.innerText;
         // @ts-ignore
-        data.copyrightTips =
-            data.copyright + ' <a target="_blank" href="https://blog.zrlog.com/about.html?footer">ZrLog</a>';
-        setRes(data);
-        setAppState((prevState) => {
-            return {
-                lang: data.lang,
-                offline: prevState.offline,
-                dark: EnvUtils.isDarkMode(),
-                resLoadErrorMsg: "",
-                resLoaded: true,
-                colorPrimary: getColorPrimary(),
-            };
-        });
-    };
-
-    const initRes = () => {
-        const resourceData = getRes();
-        if (resourceData === null || Object.keys(resourceData).length === 0) {
-            if (ssData && ssData.resourceInfo) {
-                handleRes(ssData.resourceInfo);
-            } else {
-                loadResourceFromServer();
-            }
-        } else {
-            handleRes(resourceData);
+        if (ssDataStr?.length > 0) {
+            ssData = JSON.parse(ssDataStr as string);
         }
-    };
+        const ssKey = localStorage.getItem(ssKeyStorageKey);
+        if (ssKey) {
+            ssData.key = ssKey;
+            if (ssData.user === undefined || ssData.user === null) {
+                ssData.user = getCacheByKey("/user");
+            }
+        }
+    }
+
+    initSsData();
 
     const updateOnlineStatus = () => {
-        setAppState((prevState) => {
+        setState((prevState) => {
             return {
                 ...prevState,
                 offline: isOffline(),
@@ -124,10 +80,10 @@ const Index = () => {
         });
     };
 
+
     useEffect(() => {
         window.addEventListener("online", updateOnlineStatus);
         window.addEventListener("offline", updateOnlineStatus);
-        initRes();
         // Cleanup event listeners on component unmount
         return () => {
             window.removeEventListener("online", updateOnlineStatus);
@@ -135,21 +91,11 @@ const Index = () => {
         };
     }, []);
 
-    const getBody = () => {
-        if (appState.resLoaded) {
-            return <AppBase offline={appState.offline}/>
-        } else if (appState.resLoadErrorMsg.length === 0) {
-            return <Spin delay={1000} fullscreen={true}/>;
-        }
-        return <UnknownErrorPage
-            code={500}
-            data={{message: appState.resLoadErrorMsg}}
-            style={{width: "100vw", height: "100vh"}}
-        />
-    }
+    const basePath = getContextPath() + "admin/"
 
     return (
         <ConfigProvider
+            key={appState.lang + "_" + appState.dark + "_" + appState.colorPrimary}
             locale={appState.lang.startsWith("zh") ? zh_CN : en_US}
             theme={{
                 algorithm: appState.dark ? darkAlgorithm : defaultAlgorithm,
@@ -184,7 +130,17 @@ const Index = () => {
                             v7_startTransition: true,
                         }}
                     >
-                        {getBody()}
+                        <Routes>
+                            <Route path={"/*"} element={<AppInit lang={appState.lang} offline={appState.offline}
+                                                                 onInit={(newState) => {
+                                                                     setState((prevState) => {
+                                                                         return {
+                                                                             ...prevState,
+                                                                             ...newState
+                                                                         }
+                                                                     })
+                                                                 }}/>}/>
+                        </Routes>
                     </BrowserRouter>
                 </StyleProvider>
             </App>

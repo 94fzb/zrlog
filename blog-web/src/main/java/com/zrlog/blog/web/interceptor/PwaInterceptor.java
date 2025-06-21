@@ -25,7 +25,7 @@ public class PwaInterceptor implements HandleAbleInterceptor {
     public boolean doInterceptor(HttpRequest request, HttpResponse response) {
         try (InputStream resourceAsStream = BlogPageInterceptor.class.getResourceAsStream(request.getUri())) {
             if (Objects.nonNull(resourceAsStream)) {
-                response.getHeader().put("Content-Type", MimeTypeUtil.getMimeStrByExt(FileUtils.getFileExt(request.getUri())));
+                response.addHeader("Content-Type", MimeTypeUtil.getMimeStrByExt(FileUtils.getFileExt(request.getUri())));
                 File file = PathUtil.getStaticFile(request.getUri());
                 //优先使用外部配置的
                 if (file.exists()) {

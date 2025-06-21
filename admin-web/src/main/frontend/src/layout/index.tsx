@@ -1,32 +1,35 @@
-import { HomeOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
-import { Button, Col, FloatButton, Layout, Row } from "antd";
+import {HomeOutlined, MenuFoldOutlined, MenuUnfoldOutlined} from "@ant-design/icons";
+import {Button, Col, FloatButton, Layout, Row} from "antd";
 
-import { getRes } from "../utils/constants";
-import { FunctionComponent, PropsWithChildren, useEffect, useState } from "react";
+import {getColorPrimary, getRes} from "../utils/constants";
+import {FunctionComponent, PropsWithChildren, useEffect, useState} from "react";
 import EnvUtils from "../utils/env-utils";
 import UserInfo from "./user-info";
-import { getColorPrimary } from "../utils/constants";
 import SliderMenu from "./slider";
-import { BasicUserInfo } from "../type";
-import { ssData } from "../index";
-import axios from "axios";
+import {BasicUserInfo} from "../type";
 import MyLoadingComponent from "../components/my-loading-component";
 import PWAHandler from "../PWAHandler";
 import StyledIndexLayout from "./styled-index-layout";
-import type { ScreenMap } from "antd/es/_util/responsiveObserver";
+import type {ScreenMap} from "antd/es/_util/responsiveObserver";
 import useBreakpoint from "antd/es/grid/hooks/useBreakpoint";
-import { addToCache, getCacheByKey } from "../cache";
+import {addToCache, getCacheByKey} from "../cache";
 
-const { Header, Content, Sider } = Layout;
+const {Header, Content, Sider} = Layout;
 
 type AdminManageLayoutProps = PropsWithChildren & {
     loading: boolean;
     fullScreen?: boolean;
     offline: boolean;
+    basicUserInfo: BasicUserInfo;
 };
 
-const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ offline, children, loading, fullScreen }) => {
-    const [userInfo, setUser] = useState<BasicUserInfo | undefined>(ssData?.user);
+const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({
+                                                                          offline,
+                                                                          children,
+                                                                          loading,
+                                                                          fullScreen,
+                                                                          basicUserInfo
+                                                                      }) => {
     const screens = useBreakpoint();
 
     const sliderStateKey = "sliderOpen";
@@ -45,18 +48,6 @@ const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ offline,
     const [hiddenSlider, setHiddenSlider] = useState(defaultHiddenSlider);
 
     useEffect(() => {
-        if (userInfo === undefined) {
-            axios.get("/api/admin/user").then(({ data }) => {
-                setUser(data.data);
-            });
-        }
-    }, []);
-
-    const getMainHeight = () => {
-        return "calc(100vh - 64px)";
-    };
-
-    useEffect(() => {
         setHiddenSlider(needCollSlider(screens));
         setShowSliderBtn(screens.xs === true);
     }, [screens]);
@@ -64,6 +55,11 @@ const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ offline,
     if (screens.xs === undefined) {
         return <></>;
     }
+
+    const getMainHeight = () => {
+        return "calc(100vh - 64px)";
+    };
+
 
     const getMainButton = () => {
         const home = (
@@ -74,12 +70,12 @@ const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ offline,
                 title={getRes()["websiteTitle"]}
                 rel="noopener noreferrer"
             >
-                <HomeOutlined />
+                <HomeOutlined/>
             </a>
         );
         if (showSliderBtn) {
             return (
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-start" }}>
+                <div style={{display: "flex", alignItems: "center", justifyContent: "flex-start"}}>
                     <div
                         style={{
                             textAlign: "center",
@@ -96,7 +92,7 @@ const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ offline,
                             setHiddenSlider(newState);
                         }}
                     >
-                        <Button type="primary">{hiddenSlider ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}</Button>
+                        <Button type="primary">{hiddenSlider ? <MenuUnfoldOutlined/> : <MenuFoldOutlined/>}</Button>
                     </div>
                     {home}
                 </div>
@@ -130,7 +126,7 @@ const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ offline,
                             {getRes()["admin.offline.desc"]}
                         </span>
                     )}
-                    {userInfo && <UserInfo offline={offline} data={userInfo} />}
+                    <UserInfo offline={offline} data={basicUserInfo}/>
                 </Header>
                 <Row
                     style={{
@@ -150,7 +146,7 @@ const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ offline,
                             backgroundColor: EnvUtils.isDarkMode() ? "#1f1f1f" : "#001529",
                         }}
                     >
-                        <SliderMenu />
+                        <SliderMenu/>
                     </Sider>
                     <Col
                         style={{
@@ -161,7 +157,7 @@ const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ offline,
                             marginLeft: hiddenSlider || fullScreen ? 0 : 70,
                         }}
                     >
-                        <Layout style={{ minHeight: getMainHeight(), overflow: fullScreen ? "hidden" : "auto" }}>
+                        <Layout style={{minHeight: getMainHeight(), overflow: fullScreen ? "hidden" : "auto"}}>
                             <Content
                                 style={{
                                     paddingRight: fullScreen ? 0 : 12,
@@ -169,13 +165,13 @@ const AdminManageLayout: FunctionComponent<AdminManageLayoutProps> = ({ offline,
                                     paddingBottom: fullScreen ? 0 : 12,
                                 }}
                             >
-                                {loading && <MyLoadingComponent />}
+                                {loading && <MyLoadingComponent/>}
                                 {children}
                             </Content>
                         </Layout>
                     </Col>
                 </Row>
-                <FloatButton.BackTop />
+                <FloatButton.BackTop/>
             </StyledIndexLayout>
         </PWAHandler>
     );

@@ -5,6 +5,7 @@ import com.zrlog.admin.web.controller.api.*;
 import com.zrlog.admin.web.controller.page.AdminPageController;
 import com.zrlog.admin.web.controller.page.AdminTemplatePageController;
 import com.zrlog.business.service.TemplateInfoHelper;
+import com.zrlog.common.AdminResource;
 import com.zrlog.common.Constants;
 
 public class AdminRouters {
@@ -15,35 +16,12 @@ public class AdminRouters {
      * 1. 添加页面需要响应时，使用 /admin 的路由，及同步操作
      * 2. 浏览数据，变更数据。使用 /api/admin 的路由，以JSON的格式进行响应，及异步操作
      */
-    public static void configAdminRoute(Router router) {
+    public static void configAdminRoute(Router router, AdminResource adminResource) {
         // 后台管理者
         router.addMapper(Constants.ADMIN_URI_BASE_PATH, AdminPageController.class);
         router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/login", AdminPageController.class, "index");
         //error page
-        router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/500", AdminPageController.class, "index");
-        router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/403", AdminPageController.class, "index");
-        router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/404", AdminPageController.class, "index");
-        //
-        router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/upgrade", AdminPageController.class, "index");
-        router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/system", AdminPageController.class, "index");
-        router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/article-edit", AdminPageController.class, "index");
-        router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/offline", AdminPageController.class, "index");
-        router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/article", AdminPageController.class, "index");
-        router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/type", AdminPageController.class, "index");
-        router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/link", AdminPageController.class, "index");
-        router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/comment", AdminPageController.class, "index");
-        router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/plugin", AdminPageController.class, "index");
-        router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/website", AdminPageController.class, "index");
-        router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/website/blog", AdminPageController.class, "index");
-        router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/website/other", AdminPageController.class, "index");
-        router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/website/admin", AdminPageController.class, "index");
-        router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/website/template", AdminPageController.class, "index");
-        router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/website/upgrade", AdminPageController.class, "index");
-        router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/nav", AdminPageController.class, "index");
-        router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/template-config", AdminPageController.class, "index");
-        router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/user", AdminPageController.class, "index");
-        router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/user-update-password", AdminPageController.class, "index");
-        router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/template", AdminPageController.class, "index");
+        adminResource.getAdminPageUris().forEach(uri -> router.addMapper(uri, AdminPageController.class, "index"));
         //template download
         router.addMapper(Constants.ADMIN_URI_BASE_PATH + "/template/download", AdminTemplatePageController.class, "download");
         router.addMapper(TemplateInfoHelper.ADMIN_PREVIEW_IMAGE_URI, AdminTemplatePageController.class, "previewImage");

@@ -8,9 +8,8 @@ import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
 import Image from "antd/es/image";
 import Constants, { getRes } from "../utils/constants";
-import axios from "axios";
 import { UploadChangeParam } from "antd/es/upload";
-import { apiBasePath } from "../index";
+import {useAxiosBaseInstance} from "../AppBase";
 
 const layout = {
     labelCol: { span: 8 },
@@ -40,8 +39,9 @@ const User = ({ data, offline }: { data: BasicUserInfo; offline: boolean }) => {
         }
     };
 
+    const axiosInstance = useAxiosBaseInstance();
     const onFinish = () => {
-        axios.post("/api/admin/user/update", userInfo).then(async ({ data }) => {
+        axiosInstance.post("/api/admin/user/update", userInfo).then(async ({ data }) => {
             if (data.error) {
                 await messageApi.error(data.message);
             } else if (data.error === 0) {
@@ -79,7 +79,7 @@ const User = ({ data, offline }: { data: BasicUserInfo; offline: boolean }) => {
                                 multiple={false}
                                 onChange={(e) => onUploadChange(e)}
                                 name="imgFile"
-                                action={apiBasePath + "upload?dir=image"}
+                                action={"/api/admin/upload?dir=image"}
                             >
                                 <Image
                                     fallback={Constants.getFillBackImg()}

@@ -1,6 +1,6 @@
-import React, { CSSProperties, ReactElement, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { getColorPrimary, getRes } from "../utils/constants";
+import React, {CSSProperties, ReactElement, useEffect, useState} from "react";
+import {Link} from "react-router-dom";
+import {getColorPrimary, getRealRouteUrl, getRes} from "../utils/constants";
 import {
     ApiFilled,
     ApiOutlined,
@@ -16,10 +16,10 @@ import {
     SettingFilled,
     SettingOutlined,
 } from "@ant-design/icons";
-import { Menu, MenuProps, Modal } from "antd";
+import {Menu, MenuProps, Modal} from "antd";
 import EnvUtils from "../utils/env-utils";
-import { useLocation } from "react-router";
-import { tryBlock } from "../utils/helpers";
+import {useLocation} from "react-router";
+import {tryBlock} from "../utils/helpers";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -64,26 +64,30 @@ const SliderMenu = () => {
     const [modal, contextHolder] = Modal.useModal();
 
     const getInfo = (entry: MenuEntry): IconInfo => {
-        if (location.pathname.startsWith("/website") && entry.link.startsWith("/website")) {
-            return { selected: true, icon: entry.selectIcon };
+        let realPathName = location.pathname.split(".")[0];
+        if (realPathName === "/") {
+            realPathName = "/index"
         }
-        if (location.pathname === entry.link) {
-            return { selected: true, icon: entry.selectIcon };
+        if (realPathName.startsWith("/website") && entry.link.startsWith("/website")) {
+            return {selected: true, icon: entry.selectIcon};
+        }
+        if (realPathName === entry.link) {
+            return {selected: true, icon: entry.selectIcon};
         }
         if (entry.link !== "#more") {
-            return { selected: false, icon: entry.icon };
+            return {selected: false, icon: entry.icon};
         }
-        if (location.pathname === "/link" || location.pathname === "/nav" || location.pathname === "/article-type") {
-            return { selected: true, icon: entry.selectIcon };
+        if (realPathName.startsWith("/link") || realPathName.startsWith("/nav") || realPathName.startsWith("/article-type")) {
+            return {selected: true, icon: entry.selectIcon};
         }
-        return { selected: false, icon: entry.icon };
+        return {selected: false, icon: entry.icon};
     };
 
     function getItem(entry: MenuEntry, key: React.Key | null, children: MenuItem[]): MenuItem {
         const info = getInfo(entry);
         const label = (
             <Link
-                to={entry.link}
+                to={getRealRouteUrl(entry.link)}
                 style={{
                     color: info.selected && EnvUtils.isDarkMode() ? getColorPrimary() : "#FFF",
                 }}
@@ -124,8 +128,8 @@ const SliderMenu = () => {
             {
                 text: getRes().dashboard,
                 link: "/index",
-                selectIcon: <DashboardFilled style={{ fontSize: 24 }} />,
-                icon: <DashboardOutlined style={{ fontSize: 24 }} />,
+                selectIcon: <DashboardFilled style={{fontSize: 24}}/>,
+                icon: <DashboardOutlined style={{fontSize: 24}}/>,
             },
             "/index",
             []
@@ -134,8 +138,8 @@ const SliderMenu = () => {
             {
                 text: getRes()["admin.log.edit"],
                 link: "/article-edit",
-                selectIcon: <EditFilled style={{ fontSize: 24 }} />,
-                icon: <EditOutlined style={{ fontSize: 24 }} />,
+                selectIcon: <EditFilled style={{fontSize: 24}}/>,
+                icon: <EditOutlined style={{fontSize: 24}}/>,
             },
             "/article-edit",
             []
@@ -144,8 +148,8 @@ const SliderMenu = () => {
             {
                 text: getRes()["blogManage"],
                 link: "/article",
-                selectIcon: <ContainerFilled style={{ fontSize: 24 }} />,
-                icon: <ContainerOutlined style={{ fontSize: 24 }} />,
+                selectIcon: <ContainerFilled style={{fontSize: 24}}/>,
+                icon: <ContainerOutlined style={{fontSize: 24}}/>,
             },
             "/article",
             []
@@ -154,8 +158,8 @@ const SliderMenu = () => {
             {
                 text: getRes()["admin.comment.manage"],
                 link: "/comment",
-                selectIcon: <CommentOutlined style={{ fontSize: 24 }} />,
-                icon: <CommentOutlined style={{ fontSize: 24 }} />,
+                selectIcon: <CommentOutlined style={{fontSize: 24}}/>,
+                icon: <CommentOutlined style={{fontSize: 24}}/>,
             },
             "/comment",
             []
@@ -164,8 +168,8 @@ const SliderMenu = () => {
             {
                 text: getRes()["admin.plugin.manage"],
                 link: "/plugin",
-                selectIcon: <ApiFilled style={{ fontSize: 24 }} />,
-                icon: <ApiOutlined style={{ fontSize: 24 }} />,
+                selectIcon: <ApiFilled style={{fontSize: 24}}/>,
+                icon: <ApiOutlined style={{fontSize: 24}}/>,
             },
             "/plugin",
             []
@@ -174,8 +178,8 @@ const SliderMenu = () => {
             {
                 text: getRes()["admin.setting"],
                 link: "/website",
-                selectIcon: <SettingFilled style={{ fontSize: 24 }} />,
-                icon: <SettingOutlined style={{ fontSize: 24 }} />,
+                selectIcon: <SettingFilled style={{fontSize: 24}}/>,
+                icon: <SettingOutlined style={{fontSize: 24}}/>,
             },
             "/website",
             []
@@ -184,8 +188,8 @@ const SliderMenu = () => {
             {
                 text: getRes()["admin.more"],
                 link: "#more",
-                selectIcon: <AppstoreFilled style={{ fontSize: 24 }} />,
-                icon: <AppstoreOutlined style={{ fontSize: 24 }} />,
+                selectIcon: <AppstoreFilled style={{fontSize: 24}}/>,
+                icon: <AppstoreOutlined style={{fontSize: 24}}/>,
             },
             "/more",
             [
@@ -193,8 +197,8 @@ const SliderMenu = () => {
                     {
                         text: getRes()["admin.type.manage"],
                         link: "/article-type",
-                        selectIcon: <span />,
-                        icon: <span />,
+                        selectIcon: <span/>,
+                        icon: <span/>,
                     },
                     "/article-type",
                     []
@@ -203,8 +207,8 @@ const SliderMenu = () => {
                     {
                         text: getRes()["admin.link.manage"],
                         link: "/link",
-                        selectIcon: <span />,
-                        icon: <span />,
+                        selectIcon: <span/>,
+                        icon: <span/>,
                     },
                     "/link",
                     []
@@ -213,8 +217,8 @@ const SliderMenu = () => {
                     {
                         text: getRes()["admin.nav.manage"],
                         link: "/nav",
-                        selectIcon: <span />,
-                        icon: <span />,
+                        selectIcon: <span/>,
+                        icon: <span/>,
                     },
                     "/nav",
                     []

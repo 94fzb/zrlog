@@ -9,11 +9,9 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>package-web</artifactId>
-    <version>3.1.7-SNAPSHOT</version>
+    <packaging>${packageType}</packaging>
 
     <properties>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <imageName>zrlog</imageName>
         <native.maven.plugin.version>0.10.2</native.maven.plugin.version>
@@ -21,6 +19,7 @@
         <native.target>../</native.target>
         <packageName>zrlog</packageName>
         <architecture>all</architecture>
+        <packageType>jar</packageType>
         <gitCommitId>0000000</gitCommitId>
     </properties>
 
@@ -28,6 +27,23 @@
         <dependency>
             <groupId>com.zrlog</groupId>
             <artifactId>web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-core</artifactId>
+            <version>10.1.42</version>
+            <scope>${jakarta-scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-jasper</artifactId>
+            <version>10.1.42</version>
+            <scope>${jakarta-scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.hibegin</groupId>
+            <artifactId>simplewebserver-servlet-api-impl</artifactId>
+            <scope>${jakarta-scope}</scope>
         </dependency>
     </dependencies>
 
@@ -70,7 +86,40 @@
     </build>
 
 
+
+
     <profiles>
+        <profile>
+            <id>war</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-war-plugin</artifactId>
+                        <version>3.4.0</version>
+                        <configuration>
+                            <resourceEncoding>${project.build.sourceEncoding}</resourceEncoding>
+                            <warSourceDirectory>src/main/webapp</warSourceDirectory>
+                            <failOnMissingWebXml>false</failOnMissingWebXml>
+                            <recompressZippedFiles>true</recompressZippedFiles>
+                            <packagingExcludes>
+                                WEB-INF/classes/rebel.xml,
+                                WEB-INF/classes/com/zrlog/web/Application.class,
+                                WEB-INF/classes/com/zrlog/web/JakartaServletApplication.class,
+                                WEB-INF/plugins/**,
+                                WEB-INF/update-temp/**,
+                                WEB-INF/db.properties,
+                                WEB-INF/install.lock,
+                                WEB-INF/lib/tomcat*,
+                                WEB-INF/lib/ecj*,
+                            </packagingExcludes>
+                            <warName>${finalName}-${project.version}</warName>
+                            <outputDirectory>${project.build.directory}/../../target</outputDirectory>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>native</id>
             <build>
@@ -169,6 +218,9 @@
                                     <overWriteSnapshots>false</overWriteSnapshots>
                                     <overWriteIfNewer>true</overWriteIfNewer>
                                     <includeScope>compile</includeScope>
+                                    <excludeGroupIds>
+                                        org.apache.tomcat.embed,org.eclipse,jakarta.servlet,org.apache.tomcat
+                                    </excludeGroupIds>
                                 </configuration>
                             </execution>
                         </executions>

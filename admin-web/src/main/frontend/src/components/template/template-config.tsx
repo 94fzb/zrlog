@@ -7,11 +7,11 @@ import Image from "antd/es/image";
 import Dragger from "antd/es/upload/Dragger";
 import TextArea from "antd/es/input/TextArea";
 import Col from "antd/es/grid/col";
-import axios from "axios";
 import { getRes } from "../../utils/constants";
 import { UploadChangeParam } from "antd/es/upload";
 import Switch from "antd/es/switch";
 import { colorPickerBgColors } from "../../utils/helpers";
+import {useAxiosBaseInstance} from "../../AppBase";
 
 const layout = {
     labelCol: { span: 8 },
@@ -142,8 +142,9 @@ const TemplateConfig = ({ data, offline }: { data: TemplateConfigState; offline:
         return formInputs;
     };
 
+    const axiosInstance = useAxiosBaseInstance();
     const onFinish = () => {
-        axios.post("/api/admin/template/config", state.dataMap).then(async ({ data }) => {
+        axiosInstance.post("/api/admin/template/config", state.dataMap).then(async ({ data }) => {
             if (data.error) {
                 await messageApi.error(data.message);
             } else if (data.error === 0) {

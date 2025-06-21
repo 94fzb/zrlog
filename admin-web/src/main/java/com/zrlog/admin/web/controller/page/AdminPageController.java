@@ -9,6 +9,8 @@ import com.zrlog.admin.business.rest.response.ServerSideDataResponse;
 import com.zrlog.admin.business.rest.response.UserBasicInfoResponse;
 import com.zrlog.admin.web.controller.api.AdminUserController;
 import com.zrlog.admin.web.token.AdminTokenThreadLocal;
+import com.zrlog.blog.web.util.WebTools;
+import com.zrlog.business.plugin.StaticSitePlugin;
 import com.zrlog.business.rest.response.PublicInfoVO;
 import com.zrlog.business.service.CommonService;
 import com.zrlog.common.Constants;
@@ -59,23 +61,45 @@ public class AdminPageController extends Controller {
             Element first = select.first();
             if (Objects.nonNull(first)) {
                 PublicInfoVO publicInfo = new CommonService().getPublicInfo(request);
-                first.attr("content", publicInfo.pwaThemeColor());
+                first.attr("content", publicInfo.getPwaThemeColor());
             }
         }
-        String adminStaticResourceHostByWebSite = ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite();
-        if (StringUtils.isNotEmpty(adminStaticResourceHostByWebSite)) {
-            Elements scripts = document.head().select("script");
-            if (!scripts.isEmpty()) {
-                scripts.forEach(script -> {
-                    script.attr("src", script.attr("src").replace("./", adminStaticResourceHostByWebSite + "/"));
-                });
+        String adminStaticResourceHostByWebSite = ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite(request);
+
+        Elements manifest = document.head().select("link[rel=manifest]");
+        if (!manifest.isEmpty()) {
+            Element manifestElement = manifest.first();
+            if (Objects.nonNull(manifestElement)) {
+                String newUrl;
+                if (StringUtils.isNotEmpty(adminStaticResourceHostByWebSite) && !ZrLogUtil.isStaticPlugin(request)) {
+                    newUrl = manifestElement.attr("href").replaceFirst("/", adminStaticResourceHostByWebSite + "/");
+                } else {
+                    newUrl = manifestElement.attr("href").replaceFirst("/", WebTools.getHomeUrl(request));
+                }
+                manifestElement.attr("href", newUrl + "?v=" + Constants.zrLogConfig.getAdminResource().getStaticResourceBuildId());
             }
+        }
+        Elements scripts = document.head().select("script");
+        if (!scripts.isEmpty()) {
+            scripts.forEach(script -> {
+                if (StringUtils.isNotEmpty(adminStaticResourceHostByWebSite) && !ZrLogUtil.isStaticPlugin(request)) {
+                    script.attr("src", script.attr("src").replaceFirst("/", adminStaticResourceHostByWebSite + "/"));
+                } else {
+                    script.attr("src", script.attr("src").replaceFirst("/", WebTools.getHomeUrl(request)));
+                }
+            });
         }
 
-        ServerSideDataResponse serverSideDataResponse = serverSide(request.getUri());
-        document.getElementById("__SS_DATA__").text(new Gson().toJson(serverSideDataResponse));
-        document.title(serverSideDataResponse.documentTitle());
-        response.renderHtmlStr(document.html());
+        Elements base = document.head().select("base");
+        base.attr("href", WebTools.getHomeUrl(request));
+        ServerSideDataResponse<Object> serverSideDataResponse = serverSide(request.getUri());
+        Objects.requireNonNull(document.getElementById("__SS_DATA__")).text(new Gson().toJson(serverSideDataResponse));
+        document.title(serverSideDataResponse.getDocumentTitle());
+        String html = document.html();
+        response.renderHtmlStr(html);
+        if (ZrLogUtil.isStaticPlugin(request)) {
+            request.getAttr().put(StaticSitePlugin.HTML_FILE_KEY, Constants.zrLogConfig.getCacheService().saveResponseBodyToHtml(request, html));
+        }
     }
 
 
@@ -85,7 +109,7 @@ public class AdminPageController extends Controller {
         return new ApiStandardResponse<>(serverSide(request.getParaToStr("uri")));
     }*/
 
-    private ServerSideDataResponse serverSide(String uri) throws Throwable {
+    private ServerSideDataResponse<Object> serverSide(String uri) throws Throwable {
         Map<String, Object> resourceInfo = new CommonService().adminResourceInfo(request);
         if (Objects.nonNull(AdminTokenThreadLocal.getUser())) {
             UserBasicInfoResponse basicInfoResponse = new AdminUserController(request, response).index().getData();
@@ -94,18 +118,19 @@ public class AdminPageController extends Controller {
                 Controller controller = Controller.buildController(method, request, response);
                 ApiStandardResponse<Object> result = (ApiStandardResponse<Object>) method.invoke(controller);
                 if (Objects.nonNull(result)) {
-                    if (result instanceof AdminApiPageDataStandardResponse<?> data) {
-                        return new ServerSideDataResponse(basicInfoResponse, resourceInfo, result.getData(), AdminTokenThreadLocal.getUser().getSessionId(), data.getDocumentTitle());
+                    if (result instanceof AdminApiPageDataStandardResponse<?>) {
+                        AdminApiPageDataStandardResponse<?> data = (AdminApiPageDataStandardResponse<?>) result;
+                        return new ServerSideDataResponse<>(basicInfoResponse, resourceInfo, result.getData(), AdminTokenThreadLocal.getUser().getSessionId(), data.getDocumentTitle());
                     }
-                    return new ServerSideDataResponse(basicInfoResponse, resourceInfo, result.getData(), AdminTokenThreadLocal.getUser().getSessionId(), Constants.getAdminTitle(""));
+                    return new ServerSideDataResponse<>(basicInfoResponse, resourceInfo, result.getData(), AdminTokenThreadLocal.getUser().getSessionId(), Constants.getAdminDocumentTitleByUri(request.getUri()));
                 } else {
-                    return new ServerSideDataResponse(basicInfoResponse, resourceInfo, new Object(), AdminTokenThreadLocal.getUser().getSessionId(), Constants.getAdminTitle(""));
+                    return new ServerSideDataResponse<>(basicInfoResponse, resourceInfo, new Object(), AdminTokenThreadLocal.getUser().getSessionId(), Constants.getAdminDocumentTitleByUri(request.getUri()));
                 }
             } catch (InvocationTargetException e) {
                 throw e.getTargetException();
             }
         } else {
-            return new ServerSideDataResponse(null, resourceInfo, null, null, Constants.getAdminTitle(I18nUtil.getAdminStringFromRes("login")));
+            return new ServerSideDataResponse<>(null, resourceInfo, null, null, Constants.getAdminDocumentTitleByUri(request.getUri()));
         }
     }
 

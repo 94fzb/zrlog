@@ -7,6 +7,7 @@ import Row from "antd/es/grid/row";
 import {Col} from "antd";
 import {getCsrData} from "../../api";
 import Divider from "antd/es/divider";
+import {useAxiosBaseInstance} from "../../AppBase";
 
 type SystemProps = {
     data: SystemData;
@@ -19,9 +20,11 @@ const System: FunctionComponent<SystemProps> = ({data}) => {
 
     const [state, setState] = useState<SystemData>(data);
 
+    const axiosInstance = useAxiosBaseInstance();
+
     const fetchSystemInfo = () => {
         if (document.visibilityState === "visible") {
-            getCsrData("/system").then(({data}) => {
+            getCsrData("/system", axiosInstance).then(({data}) => {
                 setState(data)
                 timer = setTimeout(fetchSystemInfo, 5000);
             });

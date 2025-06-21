@@ -12,7 +12,9 @@ import com.hibegin.http.server.config.RequestConfig;
 import com.hibegin.http.server.config.ResponseConfig;
 import com.hibegin.http.server.config.ServerConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import com.zrlog.admin.business.service.AdminResourceImpl;
 import com.zrlog.admin.web.config.AdminRouters;
+import com.zrlog.admin.web.interceptor.AdminCrossOriginInterceptor;
 import com.zrlog.admin.web.interceptor.AdminInterceptor;
 import com.zrlog.admin.web.interceptor.AdminPwaInterceptor;
 import com.zrlog.admin.web.plugin.PluginCorePluginImpl;
@@ -32,16 +34,15 @@ import com.zrlog.business.cache.CacheServiceImpl;
 import com.zrlog.business.plugin.StaticSitePlugin;
 import com.zrlog.business.plugin.TemplateDownloadPlugin;
 import com.zrlog.business.util.InstallUtils;
+import com.zrlog.business.util.PluginUtils;
 import com.zrlog.common.*;
 import com.zrlog.common.type.RunMode;
 import com.zrlog.common.vo.DatabaseConnectPoolInfo;
 import com.zrlog.model.WebSite;
 import com.zrlog.plugin.IPlugin;
 import com.zrlog.plugin.Plugins;
-import com.zrlog.util.BlogBuildInfoUtil;
-import com.zrlog.util.DbConnectUtils;
-import com.zrlog.util.I18nUtil;
-import com.zrlog.util.ZrLogUtil;
+import com.zrlog.util.*;
+import com.zrlog.web.Application;
 import com.zrlog.web.inteceptor.GlobalBaseInterceptor;
 import com.zrlog.web.inteceptor.MyI18nInterceptor;
 import com.zrlog.web.inteceptor.PluginInterceptor;
@@ -50,6 +51,7 @@ import com.zrlog.web.inteceptor.StaticResourceInterceptor;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.SQLRecoverableException;
 import java.sql.Statement;
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -73,16 +75,25 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     private final PluginCoreProcess pluginCoreProcess;
     private final Map<String, Object> website = new TreeMap<>();
     private final long uptime;
+    private final AdminResource adminResource;
+    private final String contextPath;
     private HikariDataSource dataSource;
 
-    public ZrLogConfigImpl(Integer port, Updater updater) {
+    public ZrLogConfigImpl(Integer port, Updater updater, String contextPath) {
+        this.contextPath = contextPath;
         this.port = port;
         this.plugins = new Plugins();
         this.updater = updater;
-        this.cacheService = new CacheServiceImpl();
-        this.pluginCoreProcess = new PluginCoreProcessImpl(port);
-        this.serverConfig = initServerConfig();
+        this.cacheService = new CacheServiceImpl(contextPath);
+        this.pluginCoreProcess = new PluginCoreProcessImpl();
+        this.adminResource = new AdminResourceImpl(cacheService);
+        this.serverConfig = initServerConfig(contextPath);
         this.uptime = System.currentTimeMillis();
+        this.configRouter();
+        this.configDatabaseWithRetry(20);
+        if (ThreadUtils.isEnableLoom() && Constants.debugLoggerPrintAble()) {
+            LOGGER.info("Java VirtualThread(loom) enabled");
+        }
     }
 
     public static boolean isTest() {
@@ -131,13 +142,19 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         return serverConfig;
     }
 
-    private ServerConfig initServerConfig() {
+    private void configRouter() {
+        AdminRouters.configAdminRoute(serverConfig.getRouter(), adminResource);
+        BlogRouters.configBlogRouter(serverConfig.getRouter());
+    }
+
+    private ServerConfig initServerConfig(String contextPath) {
         ServerConfig serverConfig = new ServerConfig().setApplicationName("zrlog")
                 .setApplicationVersion(BlogBuildInfoUtil.getVersionInfo())
                 .setDisablePrintWebServerInfo(true);
         serverConfig.setNativeImageAgent(Constants.runMode == RunMode.NATIVE_AGENT);
         serverConfig.setDisableSession(true);
         serverConfig.setPort(port);
+        serverConfig.setContextPath(contextPath);
         serverConfig.setPidFilePathEnvKey("ZRLOG_PID_FILE");
         serverConfig.setServerPortFilePathEnvKey("ZRLOG_HTTP_PORT_FILE");
         serverConfig.setHttpJsonMessageConverter(new ZrLogHttpJsonMessageConverter());
@@ -145,25 +162,25 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         serverConfig.addErrorHandle(403, new ZrLogErrorHandle(403));
         serverConfig.addErrorHandle(404, new ZrLogErrorHandle(404));
         serverConfig.addErrorHandle(500, new ZrLogErrorHandle(500));
-        serverConfig.setRequestExecutor(Executors.newVirtualThreadPerTaskExecutor());
-        serverConfig.setDecodeExecutor(Executors.newVirtualThreadPerTaskExecutor());
-        serverConfig.setRequestCheckerExecutor(new ScheduledThreadPoolExecutor(1, r -> {
-            return Thread.ofVirtual().unstarted(r);
-        }));
+        serverConfig.setRequestExecutor(Executors.newFixedThreadPool(200));
+        serverConfig.setDecodeExecutor(Executors.newFixedThreadPool(20));
+        serverConfig.setRequestCheckerExecutor(new ScheduledThreadPoolExecutor(1, ThreadUtils::unstarted));
         serverConfig.addRequestListener(new HttpRequestListener() {
             @Override
-            public void destroy(HttpRequest request, HttpResponse httpResponse) {
-                I18nUtil.removeI18n();
-            }
-
-            @Override
-            public void create(HttpRequest request, HttpResponse httpResponse) {
-
+            public void onHandled(HttpRequest request, HttpResponse httpResponse) {
+                try {
+                    I18nUtil.removeI18n();
+                } finally {
+                    long used = System.currentTimeMillis() - request.getCreateTime();
+                    if (used > 5000) {
+                        LOGGER.info("Slow request [" + request.getMethod() + "] " + request.getUri() + " used time " + used + "ms");
+                    } else if (Constants.debugLoggerPrintAble()) {
+                        LOGGER.info("Request [" + request.getMethod() + "] " + request.getUri() + " used time " + used + "ms");
+                    }
+                }
             }
         });
         StaticResourceInterceptor.staticResourcePath.forEach(e -> serverConfig.addStaticResourceMapper(e, e, ZrLogConfigImpl.class::getResourceAsStream));
-        AdminRouters.configAdminRoute(serverConfig.getRouter());
-        BlogRouters.configBlogRouter(serverConfig.getRouter());
         configInterceptor(serverConfig.getInterceptors());
         Runtime rt = Runtime.getRuntime();
         rt.addShutdownHook(new Thread(this::onStop));
@@ -175,6 +192,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         RequestConfig requestConfig = new RequestConfig();
         //最大的提交的body的大小
         requestConfig.setDisableSession(true);
+        requestConfig.setRouter(serverConfig.getRouter());
         requestConfig.setMaxRequestBodySize(1024 * 1024 * 1024);
         return requestConfig;
     }
@@ -184,7 +202,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         ResponseConfig config = new ResponseConfig();
         config.setCharSet("utf-8");
         config.setEnableGzip(true);
-        config.setGzipMimeTypes(List.of("text/", "application/javascript", "application/json"));
+        config.setGzipMimeTypes(Arrays.asList("text/", "application/javascript", "application/json"));
         return config;
     }
 
@@ -200,6 +218,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         interceptors.add(PluginInterceptor.class);
         //admin
         interceptors.add(AdminPwaInterceptor.class);
+        interceptors.add(AdminCrossOriginInterceptor.class);
         interceptors.add(AdminInterceptor.class);
         //blog
         interceptors.add(PwaInterceptor.class);
@@ -349,7 +368,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         if (!InstallUtils.isInstalled()) {
             return;
         }
-        Thread.ofVirtual().start(() -> {
+        ThreadUtils.start(() -> {
             this.plugins.forEach(IPlugin::stop);
             this.plugins.clear();
             this.plugins.addAll(getPluginList());
@@ -370,6 +389,27 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         });
     }
 
+    private void configDatabaseWithRetry(int timeoutInSeconds) {
+        try {
+            configDatabase();
+        } catch (Exception e) {
+            if (timeoutInSeconds > 0 && e instanceof SQLRecoverableException) {
+                int seekSeconds = 5;
+                try {
+                    Thread.sleep(seekSeconds * 1000);
+                } catch (InterruptedException ex) {
+                    //ignore
+                }
+                configDatabaseWithRetry(timeoutInSeconds - seekSeconds);
+                return;
+            }
+            LoggerUtil.getLogger(Application.class).warning("Config database error " + e.getMessage());
+            if (!Constants.zrLogConfig.getServerConfig().isNativeImageAgent()) {
+                System.exit(-1);
+            }
+        }
+    }
+
     @Override
     public Map<String, Object> getPublicWebSite() {
         return website;
@@ -381,10 +421,28 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     }
 
     @Override
+    public String getContextPath() {
+        return contextPath;
+    }
+
+    @Override
     public DatabaseConnectPoolInfo getDatabaseConnectPoolInfo() {
         if (Objects.isNull(dataSource)) {
             return new DatabaseConnectPoolInfo(0, 0);
         }
         return new DatabaseConnectPoolInfo(dataSource.getHikariPoolMXBean().getActiveConnections(), dataSource.getHikariPoolMXBean().getTotalConnections());
+    }
+
+    @Override
+    public void stop() {
+        PluginUtils.stopAllPlugin();
+        if (Objects.nonNull(dataSource)) {
+            dataSource.close();
+        }
+    }
+
+    @Override
+    public AdminResource getAdminResource() {
+        return adminResource;
     }
 }

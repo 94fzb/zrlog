@@ -1,6 +1,6 @@
 // @ts-ignore
 import {ModeOfOperation} from "aes-js";
-import {ssData} from "./index";
+import {ssData, ssKeyStorageKey} from "./index";
 import {isPWA} from "./utils/env-utils";
 import {removeQueryParam} from "./utils/helpers";
 import {cacheIgnoreReloadKey} from "./utils/constants";
@@ -88,7 +88,16 @@ export const removePageCacheByLocation = (location: H.Location) => {
 };
 
 export const getPageDataCacheKey = (location: H.Location) => {
-    return location.pathname + removeQueryParam(location.search, cacheIgnoreReloadKey);
+    return getPageDataCacheKeyByPath(location.pathname, location.search);
+};
+
+export const getPageDataCacheKeyByPath = (pathname: string, search: string) => {
+    let realApiKey = pathname.replace(".html", "");
+    // / = /index page
+    if (realApiKey === "/") {
+        realApiKey = "/index";
+    }
+    return realApiKey + removeQueryParam(search, cacheIgnoreReloadKey);
 };
 
 export const getCachedData = (): Record<string, any> => {
@@ -106,6 +115,7 @@ export const getCachedData = (): Record<string, any> => {
 export const removeAllCaches = () => {
     try {
         localStorage.removeItem(getCacheKey());
+        localStorage.removeItem(ssKeyStorageKey);
     } catch (e) {
         console.error(e);
     }
@@ -113,6 +123,7 @@ export const removeAllCaches = () => {
 
 export const putCache = (cache: Record<string, any>) => {
     try {
+        //console.info(cache);
         localStorage.setItem(getCacheKey(), aesEncrypt(JSON.stringify(cache), padStringToLength(getKey(), 24)));
     } catch (e) {
         console.error(e);

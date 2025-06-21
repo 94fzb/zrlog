@@ -14,10 +14,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -87,7 +84,9 @@ public class HttpUtil {
         requestBuilder.headers("User-Agent", "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:41.0) Gecko/20100101 Firefox/41.0");
         if (Constants.debugLoggerPrintAble()) {
             if (!headers.isEmpty()) {
-                LOGGER.info("headers = " + headers);
+                TreeMap<String, String> stringStringTreeMap = new TreeMap<>(headers);
+                stringStringTreeMap.put("Cookie", "******");
+                LOGGER.info("headers = " + stringStringTreeMap);
             }
         }
         if (Objects.nonNull(headers)) {

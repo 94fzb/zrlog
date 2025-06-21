@@ -23,16 +23,18 @@ export type LastVersion = {
 export type BasicUserInfo = {
     userName: string;
     header: string;
+    key: string;
     lastVersion?: LastVersion
+    cacheableApiUris?: string[]
 };
 
-export type UserInfoState = {
-    basicInfoLoading: boolean;
-    basicInfo: BasicUserInfo;
-    upgrade: boolean;
-    version: string;
-    type: string;
-};
+export type AdminCommonProps<P> = {
+    data: P,
+    offlineData: boolean,
+    offline: boolean,
+    fullScreen?: boolean,
+    userInfo?: BasicUserInfo;
+}
 
 export type ServerInfoEntry = {
     name: string;

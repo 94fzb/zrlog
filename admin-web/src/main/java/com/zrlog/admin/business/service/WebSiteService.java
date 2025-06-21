@@ -1,5 +1,6 @@
 package com.zrlog.admin.business.service;
 
+import com.hibegin.http.server.api.HttpRequest;
 import com.zrlog.admin.business.rest.base.*;
 import com.zrlog.common.Constants;
 import com.zrlog.data.dto.FaviconBase64DTO;
@@ -41,12 +42,12 @@ public class WebSiteService {
         return basic;
     }
 
-    public AdminWebSiteInfo adminWebSiteInfo() {
+    public AdminWebSiteInfo adminWebSiteInfo(HttpRequest request) {
         AdminWebSiteInfo admin = new AdminWebSiteInfo();
         FaviconBase64DTO faviconBase64DTO = new WebSite().faviconBase64DTO();
         admin.setAdmin_darkMode(Constants.getBooleanByFromWebSite("admin_darkMode"));
         admin.setLanguage((String) Constants.zrLogConfig.getPublicWebSite().get("language"));
-        admin.setAdmin_static_resource_base_url(ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite());
+        admin.setAdmin_static_resource_base_url(ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite(request));
         admin.setAdmin_color_primary(Objects.toString(Constants.zrLogConfig.getPublicWebSite().get("admin_color_primary"), "#1677ff"));
         admin.setSession_timeout(Constants.getSessionTimeout() / 60 / 1000);
         admin.setArticle_auto_digest_length(Constants.getAutoDigestLength());

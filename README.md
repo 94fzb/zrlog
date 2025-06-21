@@ -1,4 +1,4 @@
-## ZrLog ![build-preview](https://github.com/94fzb/zrlog/actions/workflows/build-preview-package-jar.yml/badge.svg) ![build-release](https://github.com/94fzb/zrlog/actions/workflows/build-release-package-jar.yml/badge.svg) [![Apache License](http://img.shields.io/badge/license-apache2-orange.svg?style=flat)](http://www.apache.org/licenses/LICENSE-2.0)
+## ZrLog ![build-preview](https://github.com/94fzb/zrlog/actions/workflows/build-preview-package-zip.yml/badge.svg) ![build-release](https://github.com/94fzb/zrlog/actions/workflows/build-release-package-zip.yml/badge.svg) [![Apache License](http://img.shields.io/badge/license-apache2-orange.svg?style=flat)](http://www.apache.org/licenses/LICENSE-2.0)
 
 [中文](README.md) | [English](README.en-us.md)
 
@@ -58,7 +58,7 @@ ZrLog是使用 Java 开发的博客/CMS程序，具有简约，易用，组件�
     * MySQL >= 5.7
 
 * 数据初始化
-    * 下载 [最新 zip](https://dl.zrlog.com/release/zrlog.zip) 解压，运行 bin/start.sh 或者是 bin/start.bat
+    * 下载 [最新 zip](https://www.zrlog.com/download) 解压，运行 bin/start.sh 或者是 bin/start.bat
     * 访问 http://host:port/install
     * 填写数据库，管理员信息，完成安装
 
