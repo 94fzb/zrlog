@@ -25,6 +25,7 @@ import com.zrlog.common.vo.*;
 import com.zrlog.data.dto.PageData;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.DbConnectUtils;
+import com.zrlog.util.ZrLogUtil;
 import org.apache.commons.dbutils.BasicRowProcessor;
 
 import java.io.File;
@@ -219,7 +220,7 @@ public class GraalvmAgentApplication {
     }
 
     private static void webserver(String[] args) {
-        WebServerBuilder webServerBuilder = Application.webServerBuilder(0, null);
+        WebServerBuilder webServerBuilder = Application.webServerBuilder(0, ZrLogUtil.getContextPath(args), null);
         webServerBuilder.addCreateSuccessHandle(() -> {
             try {
                 FreeMarkerUtil.init(PathUtil.getStaticFile(Constants.DEFAULT_TEMPLATE_PATH).getPath());

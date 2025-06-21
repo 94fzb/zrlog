@@ -17,7 +17,6 @@ import java.net.URISyntaxException;
 import java.util.Objects;
 
 import static com.zrlog.common.Constants.getZrLogHomeByEnv;
-import static com.zrlog.common.Constants.zrLogConfig;
 
 public class Application {
 
@@ -53,11 +52,11 @@ public class Application {
         if (ParseArgsUtil.justTips(args, "zrlog", BlogBuildInfoUtil.getVersionInfoFull())) {
             return;
         }
-        webServerBuilder(ZrLogUtil.getPort(args), UpdaterUtils.getZipUpdater(args)).start();
+        webServerBuilder(ZrLogUtil.getPort(args), ZrLogUtil.getContextPath(args), UpdaterUtils.getZipUpdater(args)).start();
     }
 
-    public static WebServerBuilder webServerBuilder(int port, Updater updater) {
-        Constants.zrLogConfig = new ZrLogConfigImpl(port, updater, zrLogConfig.getContextPath());
+    public static WebServerBuilder webServerBuilder(int port, String contextPath, Updater updater) {
+        Constants.zrLogConfig = new ZrLogConfigImpl(port, updater, contextPath);
         WebServerBuilder builder = new WebServerBuilder.Builder().config(Constants.zrLogConfig).build();
         builder.addCreateErrorHandle(() -> {
             if (updater instanceof ZipUpdater) {
