@@ -28,7 +28,9 @@ self.addEventListener('fetch', event => {
             const cachedResponse = await cache.match(request);
 
             // 触发后台更新
-            const fetchPromise = fetch(request).then(networkResponse => {
+            const fetchPromise = fetch(request, {
+                redirect: 'follow',
+            }).then(networkResponse => {
                 // 只有有效响应才更新缓存
                 if (networkResponse && networkResponse.status === 200) {
                     cache.put(request, networkResponse.clone());
