@@ -43,7 +43,10 @@ export const isStaticPage = () => {
     if (isDev()) {
         return true;
     }
-    return getRes()['staticPlugin'];
+    if (window.location.pathname.endsWith(".html")) {
+        return true;
+    }
+    return getRes()['staticPage'];
 }
 
 export const setBackendServerUrl = (url: string) => {

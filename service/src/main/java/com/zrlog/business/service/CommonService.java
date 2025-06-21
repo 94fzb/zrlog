@@ -51,7 +51,9 @@ public class CommonService {
         stringObjectMap.put("appId", Constants.getAppId());
         stringObjectMap.put("admin_color_primary", publicInfoVO.getAdmin_color_primary());
         stringObjectMap.put("lang", I18nUtil.getCurrentLocale());
-        stringObjectMap.put("staticPlugin", ZrLogUtil.isStaticPlugin(request));
+        stringObjectMap.put("staticHtml", ZrLogUtil.isStaticPlugin(request));
+        //remove
+        stringObjectMap.put("staticPage", ZrLogUtil.isStaticPlugin(request));
         stringObjectMap.put("admin_static_resource_base_url", ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite(request));
         return stringObjectMap;
     }
