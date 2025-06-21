@@ -1,6 +1,6 @@
 // @ts-ignore
 import {ModeOfOperation} from "aes-js";
-import {ssData} from "./index";
+import {ssData, ssKeyStorageKey} from "./index";
 import {isPWA} from "./utils/env-utils";
 import {removeQueryParam} from "./utils/helpers";
 import {cacheIgnoreReloadKey} from "./utils/constants";
@@ -115,6 +115,7 @@ export const getCachedData = (): Record<string, any> => {
 export const removeAllCaches = () => {
     try {
         localStorage.removeItem(getCacheKey());
+        localStorage.removeItem(ssKeyStorageKey);
     } catch (e) {
         console.error(e);
     }

@@ -110,7 +110,9 @@ export const LoginBg = (): ReactElement => {
 
 const asyncSaveApiCache = (axiosInstance: AxiosInstance, userData: BasicUserInfo) => {
     addToCache("/user", userData)
-    localStorage.setItem(ssKeyStorageKey, userData.key);
+    if (isStaticPage()) {
+        localStorage.setItem(ssKeyStorageKey, userData.key);
+    }
     ssData.user?.cacheableApiUris?.map(e => {
         const key = e.split("/api/admin")[1];
         getCsrData(key, axiosInstance).then(({data}) => {
