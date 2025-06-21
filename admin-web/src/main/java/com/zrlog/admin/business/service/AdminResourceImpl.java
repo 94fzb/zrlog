@@ -74,7 +74,7 @@ public class AdminResourceImpl implements AdminResource {
     @Override
     public ByteArrayInputStream renderServiceWorker(HttpRequest request) {
         StringJoiner sj = new StringJoiner(",\n    ");
-        String adminResourceUrl = ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite();
+        String adminResourceUrl = ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite(request);
         boolean staticPlugin = ZrLogUtil.isStaticPlugin(request);
         getAdminResourceUris(false).forEach(e -> {
             if (e.startsWith("/api")) {
@@ -84,7 +84,7 @@ public class AdminResourceImpl implements AdminResource {
                 StringBuilder sb = new StringBuilder();
                 String[] split = e.split("\\?");
                 if (split.length == 1) {
-                    sb.append("\"").append(e);
+                    sb.append("\"").append(adminResourceUrl).append(e);
                 } else {
                     sb.append("\"").append(split[0]);
                 }
@@ -97,11 +97,7 @@ public class AdminResourceImpl implements AdminResource {
                 sb.append("\"");
                 sj.add(sb.toString());
             } else {
-                if (StringUtils.isNotEmpty(adminResourceUrl) && !staticPlugin) {
-                    sj.add("\"" + adminResourceUrl + e + "\"");
-                } else {
-                    sj.add("\"" + e + "\"");
-                }
+                sj.add("\"" + adminResourceUrl + e + "\"");
             }
         });
         return new ByteArrayInputStream(IOUtil.getStringInputStream(ResourceUtils.class.getResourceAsStream(Constants.ADMIN_SERVICE_WORKER_JS)).replace("'___FILES___'", sj.toString()).getBytes());

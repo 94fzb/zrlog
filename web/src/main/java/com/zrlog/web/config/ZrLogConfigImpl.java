@@ -84,10 +84,10 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         this.port = port;
         this.plugins = new Plugins();
         this.updater = updater;
-        this.cacheService = new CacheServiceImpl();
+        this.cacheService = new CacheServiceImpl(contextPath);
         this.pluginCoreProcess = new PluginCoreProcessImpl();
         this.adminResource = new AdminResourceImpl(cacheService);
-        this.serverConfig = initServerConfig();
+        this.serverConfig = initServerConfig(contextPath);
         this.uptime = System.currentTimeMillis();
         this.configRouter();
         this.configDatabaseWithRetry(20);
@@ -147,13 +147,14 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         BlogRouters.configBlogRouter(serverConfig.getRouter());
     }
 
-    private ServerConfig initServerConfig() {
+    private ServerConfig initServerConfig(String contextPath) {
         ServerConfig serverConfig = new ServerConfig().setApplicationName("zrlog")
                 .setApplicationVersion(BlogBuildInfoUtil.getVersionInfo())
                 .setDisablePrintWebServerInfo(true);
         serverConfig.setNativeImageAgent(Constants.runMode == RunMode.NATIVE_AGENT);
         serverConfig.setDisableSession(true);
         serverConfig.setPort(port);
+        serverConfig.setContextPath(contextPath);
         serverConfig.setPidFilePathEnvKey("ZRLOG_PID_FILE");
         serverConfig.setServerPortFilePathEnvKey("ZRLOG_HTTP_PORT_FILE");
         serverConfig.setHttpJsonMessageConverter(new ZrLogHttpJsonMessageConverter());

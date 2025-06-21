@@ -218,7 +218,7 @@ public class GraalvmAgentApplication {
         webserver(args);
     }
 
-    private static void webserver(String[] args) throws Exception {
+    private static void webserver(String[] args) {
         WebServerBuilder webServerBuilder = Application.webServerBuilder(0, null);
         webServerBuilder.addCreateSuccessHandle(() -> {
             try {

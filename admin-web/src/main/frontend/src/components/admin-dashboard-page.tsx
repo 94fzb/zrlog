@@ -38,6 +38,8 @@ const AdminDashboardPage: FunctionComponent<AdminDashBroadPageProps> = ({offline
             } else {
                 jumpToLoginPage(navigate)
             }
+        }).catch(() => {
+            jumpToLoginPage(navigate)
         });
     }, []);
 

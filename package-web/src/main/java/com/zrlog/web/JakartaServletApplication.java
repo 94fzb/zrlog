@@ -31,12 +31,8 @@ public class JakartaServletApplication {
         if (!new File("").getAbsolutePath().endsWith(File.separator + "package-web")) {
             webappDirLocation = "package-web/" + webappDirLocation;
         }
-        String contextPath = System.getenv("contextPath");
-        if (contextPath == null || contextPath.trim().isEmpty()) {
-            contextPath = "";
-        }
         tomcat.setAddDefaultWebXmlToWebapp(true);
-        tomcat.addWebapp(contextPath, new File(webappDirLocation).getAbsolutePath());
+        tomcat.addWebapp(ZrLogUtil.getContextPath(args), new File(webappDirLocation).getAbsolutePath());
         tomcat.start();
         tomcat.getServer().await();
     }

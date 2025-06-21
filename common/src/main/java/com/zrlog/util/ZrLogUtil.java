@@ -86,15 +86,15 @@ public class ZrLogUtil {
         return "";
     }
 
-    public static String getAdminStaticResourceBaseUrlByWebSite() {
+    public static String getAdminStaticResourceBaseUrlByWebSite(HttpRequest request) {
         if (Objects.isNull(Constants.zrLogConfig)) {
             return "";
         }
         String websiteHost = (String) Constants.zrLogConfig.getPublicWebSite().get("admin_static_resource_base_url");
         if (Objects.nonNull(websiteHost) && !websiteHost.trim().isEmpty()) {
-            return websiteHost;
+            return websiteHost + request.getContextPath();
         }
-        return "";
+        return request.getContextPath();
     }
 
     public static String getFullUrl(HttpRequest request) {
@@ -238,6 +238,21 @@ public class ZrLogUtil {
             return Integer.parseInt(webPort);
         }
         return ConfigKit.getInt("server.port", 8080);
+    }
+
+    public static String getContextPath(String[] args) {
+        if (Objects.nonNull(args)) {
+            for (String arg : args) {
+                if (arg.startsWith("--contextPath=")) {
+                    return arg.split("=")[1];
+                }
+            }
+        }
+        String contextPath = System.getenv("contextPath");
+        if (Objects.nonNull(contextPath)) {
+            return contextPath;
+        }
+        return ConfigKit.get("server.contextPath", "").toString();
     }
 
     public static List<String> extractExecutableSql(String sql) {

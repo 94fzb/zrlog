@@ -64,7 +64,7 @@ public class AdminPageController extends Controller {
                 first.attr("content", publicInfo.getPwaThemeColor());
             }
         }
-        String adminStaticResourceHostByWebSite = ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite();
+        String adminStaticResourceHostByWebSite = ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite(request);
 
         Elements manifest = document.head().select("link[rel=manifest]");
         if (!manifest.isEmpty()) {

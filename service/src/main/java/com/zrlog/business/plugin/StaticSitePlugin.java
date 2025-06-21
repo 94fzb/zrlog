@@ -84,7 +84,7 @@ public class StaticSitePlugin extends BaseLockObject implements IPlugin {
         }
         if (Constants.zrLogConfig.getAdminResource().isAdminMainJs(resourceName)) {
             String stringInputStream = IOUtil.getStringInputStream(inputStream);
-            String adminPath = Constants.zrLogConfig.getAdminResource().getContextPath().substring(1) + "admin/";
+            String adminPath = "admin/";
             String newStr = stringInputStream.replace("\"./admin/\"", "document.currentScript.baseURI + \"" + adminPath + "\"");
             Constants.zrLogConfig.getCacheService().saveToCacheFolder(new ByteArrayInputStream(newStr.getBytes()), resourceName);
             return;
@@ -131,33 +131,40 @@ public class StaticSitePlugin extends BaseLockObject implements IPlugin {
         handleStatusPageMap.put(key, HandleState.HANDING);
         return CompletableFuture.runAsync(() -> {
             boolean error = false;
+            ResponseConfig responseConfig = serverConfig.getResponseConfig();
+            responseConfig.setEnableGzip(false);
+            HttpRequest httpRequest;
             try {
-                ResponseConfig responseConfig = serverConfig.getResponseConfig();
-                responseConfig.setEnableGzip(false);
-                HttpRequest httpRequest = WebTools.buildMockRequest(HttpMethod.GET, key, serverConfig.getRequestConfig(), applicationContext);
+                httpRequest = WebTools.buildMockRequest(HttpMethod.GET, key, serverConfig.getRequestConfig(), applicationContext);
+            } catch (Exception e) {
+                LOGGER.warning("Generator " + key + " error: " + e.getMessage());
+                return;
+            }
+            String uri = httpRequest.getUri();
+            try {
                 new HttpRequestHandlerRunnable(httpRequest, new SimpleHttpResponse(httpRequest, serverConfig.getResponseConfig())).run();
                 File file = (File) httpRequest.getAttr().get(HTML_FILE_KEY);
-                if (Objects.equals(key, Constants.ADMIN_PWA_MANIFEST_JSON)) {
+                if (Objects.equals(uri, Constants.ADMIN_PWA_MANIFEST_JSON)) {
                     return;
                 }
-                if (Objects.equals(key, Constants.ADMIN_SERVICE_WORKER_JS)) {
+                if (Objects.equals(uri, Constants.ADMIN_SERVICE_WORKER_JS)) {
                     return;
                 }
                 if (Objects.isNull(file) || !file.exists()) {
-                    LOGGER.warning("Generator " + key + " error: missing static file");
+                    LOGGER.warning("Generator " + uri + " error: missing static file");
                     error = true;
                     return;
                 }
                 doParse(file);
             } catch (Exception ex) {
-                LOGGER.warning("Generator " + key + " error: " + ex.getMessage());
+                LOGGER.warning("Generator " + uri + " error: " + ex.getMessage());
             } finally {
                 if (error) {
                     //如果抓取错误了，需要暂停一下，避免重新获取过快
                     try {
                         Thread.sleep(2000);
                     } catch (InterruptedException ex) {
-                        LOGGER.warning("Generator " + key + " error: " + ex.getMessage());
+                        LOGGER.warning("Generator " + uri + " error: " + ex.getMessage());
                     }
                 }
                 handleStatusPageMap.put(key, error ? HandleState.RE_FETCH : HandleState.HANDLED);
@@ -192,14 +199,14 @@ public class StaticSitePlugin extends BaseLockObject implements IPlugin {
         copyDefaultTemplateAssets();
         handleStatusPageMap.clear();
         //从首页开始查找
-        handleStatusPageMap.put("/", HandleState.NEW);
-        handleStatusPageMap.put(Constants.ADMIN_PWA_MANIFEST_JSON, HandleState.NEW);
-        handleStatusPageMap.put(Constants.ADMIN_SERVICE_WORKER_JS, HandleState.NEW);
+        handleStatusPageMap.put(Constants.zrLogConfig.getContextPath() + "/", HandleState.NEW);
+        handleStatusPageMap.put(Constants.zrLogConfig.getContextPath() + Constants.ADMIN_PWA_MANIFEST_JSON, HandleState.NEW);
+        handleStatusPageMap.put(Constants.zrLogConfig.getContextPath() + Constants.ADMIN_SERVICE_WORKER_JS, HandleState.NEW);
         Constants.zrLogConfig.getAdminResource().getAdminPageUris().forEach(uri -> {
-            handleStatusPageMap.put(uri, HandleState.NEW);
+            handleStatusPageMap.put(Constants.zrLogConfig.getContextPath() + uri, HandleState.NEW);
         });
         //生成 404 页面，用于配置第三方 cdn，或者云存储的错误页面
-        String notFindFile = "/error/404.html";
+        String notFindFile = Constants.zrLogConfig.getContextPath() + "/error/404.html";
         handleStatusPageMap.put(notFindFile, HandleState.NEW);
         PageServiceUtil.saveRedirectRules(notFindFile);
         lock.lock();

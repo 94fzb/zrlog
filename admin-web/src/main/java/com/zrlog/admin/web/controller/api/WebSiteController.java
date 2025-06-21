@@ -101,7 +101,7 @@ public class WebSiteController extends Controller {
             update(BeanUtil.convertWithValid(getRequest().getInputStream(), AdminWebSiteInfo.class));
             Constants.zrLogConfig.getCacheService().refreshWebSite();
         }
-        return new ApiStandardResponse<>(webSiteService.adminWebSiteInfo(), I18nUtil.getBackendStringFromRes("updateSuccess"));
+        return new ApiStandardResponse<>(webSiteService.adminWebSiteInfo(request), I18nUtil.getBackendStringFromRes("updateSuccess"));
     }
 
     @RefreshCache(onlyOnPostMethod = true)

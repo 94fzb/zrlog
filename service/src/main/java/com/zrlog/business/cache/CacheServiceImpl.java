@@ -33,11 +33,17 @@ import java.util.stream.Collectors;
  */
 public class CacheServiceImpl extends BaseLockObject implements CacheService {
     private static final Logger LOGGER = LoggerUtil.getLogger(CacheServiceImpl.class);
-    private final String CACHE_HTML_PATH = PathUtil.getCachePath();
+    private final String cacheStaticPath;
 
     private final AtomicLong version = new AtomicLong();
     private final Map<String, String> cacheFileMap = new ConcurrentHashMap<>();
+    private final String contextPath;
     private BaseDataInitVO cacheInit;
+
+    public CacheServiceImpl(String contextPath) {
+        this.contextPath = contextPath;
+        this.cacheStaticPath = PathUtil.getCachePath();
+    }
 
     private static String getStreamTag(InputStream inputStream) {
         return Math.abs(SecurityUtils.md5(inputStream).hashCode()) + "";
@@ -114,7 +120,7 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
         if (Objects.equals(cacheKey, "/")) {
             cacheKey = "/index.html";
         }
-        return new File(CACHE_HTML_PATH + lang + "/" + cacheKey);
+        return new File(cacheStaticPath + lang + contextPath + "/" + cacheKey);
     }
 
     /**
@@ -139,7 +145,7 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
 
     @Override
     public File getCacheHtmlFolder() {
-        return new File(CACHE_HTML_PATH + "/zh_CN/");
+        return new File(cacheStaticPath + "/zh_CN/" + contextPath + "/");
     }
 
     @Override
