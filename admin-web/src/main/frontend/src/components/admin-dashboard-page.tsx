@@ -20,7 +20,7 @@ const AdminDashboardPage: FunctionComponent<AdminDashBroadPageProps> = ({offline
 
     const navigate = useNavigate();
 
-    const [userInfo, setUserInfo] = useState<BasicUserInfo | undefined>(ssData?.user);
+    const [userInfo, setUserInfo] = useState<BasicUserInfo | undefined>(ssData.user);
 
     useEffect(() => {
         if (offline) {
@@ -31,9 +31,10 @@ const AdminDashboardPage: FunctionComponent<AdminDashBroadPageProps> = ({offline
                 if (data.key) {
                     ssData.key = data.key
                 }
-                ssData.user = data
-                setUserInfo(data);
-                addToCache("/user", data);
+                const userData = data.data;
+                ssData.user = userData
+                setUserInfo(userData);
+                addToCache("/user", userData);
             } else {
                 jumpToLoginPage(navigate)
             }
