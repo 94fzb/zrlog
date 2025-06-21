@@ -9,7 +9,6 @@ import Col from "antd/es/grid/col";
 import Image from "antd/es/image";
 import Constants, { getRes } from "../utils/constants";
 import { UploadChangeParam } from "antd/es/upload";
-import { apiBasePath } from "../index";
 import {useAxiosBaseInstance} from "../AppBase";
 
 const layout = {
@@ -80,7 +79,7 @@ const User = ({ data, offline }: { data: BasicUserInfo; offline: boolean }) => {
                                 multiple={false}
                                 onChange={(e) => onUploadChange(e)}
                                 name="imgFile"
-                                action={apiBasePath + "upload?dir=image"}
+                                action={"/api/admin/upload?dir=image"}
                             >
                                 <Image
                                     fallback={Constants.getFillBackImg()}

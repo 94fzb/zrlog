@@ -6,23 +6,15 @@ import {BrowserRouter, Route, Routes} from "react-router-dom";
 import {legacyLogicalPropertiesTransformer, StyleProvider} from "@ant-design/cssinjs";
 import {useEffect, useState} from "react";
 import {createRoot} from "react-dom/client";
-import {getBackendServerUrl, getColorPrimary, getRes} from "./utils/constants";
+import {getColorPrimary, getRes} from "./utils/constants";
 
 import {BasicUserInfo} from "./type";
-import {getContextPath} from "./utils/helpers";
 import AppInit from "./AppInit";
 import EnvUtils, {isOffline} from "./utils/env-utils";
 import {getCacheByKey} from "./cache";
-
-export const basePath = getContextPath() + "admin/"
-export let apiBasePath: string;
-
-export const refreshPathInfo = () => {
-    apiBasePath = getBackendServerUrl() + "api/admin/";
-}
+import {getContextPath} from "./utils/helpers";
 
 const {darkAlgorithm, defaultAlgorithm} = theme;
-
 
 export type AppState = {
     dark: boolean;
@@ -98,6 +90,8 @@ const Index = () => {
             window.removeEventListener("offline", updateOnlineStatus);
         };
     }, []);
+
+    const basePath = getContextPath() + "admin/"
 
     return (
         <ConfigProvider

@@ -1,5 +1,5 @@
 import AppBase, {useAxiosBaseInstance} from "AppBase";
-import {AppState, refreshPathInfo} from "index";
+import {AppState} from "index";
 import {FunctionComponent, useEffect, useState} from "react";
 import {getColorPrimary, getRes, isStaticPage, setBackendServerUrl, setRes} from "./utils/constants";
 import EnvUtils, {isOffline} from "./utils/env-utils";
@@ -98,7 +98,6 @@ const AppInit: FunctionComponent<AppInitProps> = ({onInit, lang, offline}) => {
     };
 
     useEffect(() => {
-        refreshPathInfo();
         initRes();
     }, []);
 

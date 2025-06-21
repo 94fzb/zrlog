@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 
 import {getContextPath} from "./helpers";
-import {refreshPathInfo, ssData} from "../index";
+import { ssData} from "../index";
 
 class Constants {
     static getFillBackImg() {
@@ -51,7 +51,6 @@ export const isStaticPage = () => {
 
 export const setBackendServerUrl = (url: string) => {
     window.localStorage.setItem("_backend_server_url", url);
-    refreshPathInfo()
 }
 
 export const getBackendServerUrl = (): string => {
