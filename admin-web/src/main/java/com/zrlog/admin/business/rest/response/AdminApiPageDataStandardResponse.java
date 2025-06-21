@@ -4,7 +4,7 @@ import com.zrlog.common.rest.response.ApiStandardResponse;
 
 public class AdminApiPageDataStandardResponse<T> extends ApiStandardResponse<T> {
 
-    private String documentTitle;
+    protected String documentTitle;
 
     public AdminApiPageDataStandardResponse() {
         this(null);

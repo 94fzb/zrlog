@@ -32,13 +32,14 @@ export type AppState = {
 };
 
 type SsDate = {
-    pageData?: any;
+    data?: any;
     resourceInfo?: Record<string, never>;
     user: BasicUserInfo | null;
     key: string;
+    pageBuildId: string;
 };
 
-export let ssData: SsDate = {key: "", pageData: undefined, resourceInfo: undefined, user: null};
+export let ssData: SsDate = {key: "", data: undefined, resourceInfo: undefined, user: null, pageBuildId: ""};
 //@ts-ignore
 window['__SS_DATA'] = ssData;
 export const ssKeyStorageKey = "ss_key";

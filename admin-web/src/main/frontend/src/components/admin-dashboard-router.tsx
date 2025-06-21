@@ -153,7 +153,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
     const pwaLastOpenedPage = isPWA() ? getLastOpenedPage() : null;
     const defaultFullScreen = getPageFullState(pwaLastOpenedPage ? pwaLastOpenedPage : getFullPath(location));
     const initCurrentPageDataKey = getPageDataCacheKey(location);
-    const serverSideData = useRef<boolean>(ssData && ssData.pageData);
+    const serverSideData = useRef<boolean>(ssData && ssData.data);
 
     const [state, setState] = useState<AdminDashboardRouterState>({
         axiosRequesting: false,
@@ -176,6 +176,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
         const responseData = await getCsrData(currentPageDataKey, axiosBaseInstance);
         const {data, documentTitle} = responseData;
         updateDocumentTitle(documentTitle);
+        ssData.data = data;
         //如果请求回来的和请求回来的一致的情况
         if (deepEqualWithSpecialJSON(cacheData, data)) {
             console.info(currentPageDataKey + " cache hits");
@@ -201,7 +202,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
     useEffect(() => {
         const currentPageDataKey = getPageDataCacheKeyByPath(location.pathname, location.search);
         if (serverSideData.current) {
-            addToCache(currentPageDataKey, ssData?.pageData)
+            addToCache(currentPageDataKey, ssData.data)
             serverSideData.current = false;
             return;
         }

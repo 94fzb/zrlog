@@ -108,12 +108,19 @@ export const LoginBg = (): ReactElement => {
     />
 }
 
-const asyncSaveApiCache = (axiosInstance: AxiosInstance, userData: BasicUserInfo) => {
-    addToCache("/user", userData)
+type LoginResponse = {
+    data: BasicUserInfo,
+    pageBuildId: string,
+}
+
+const asyncSaveApiCache = (axiosInstance: AxiosInstance, responseBody: LoginResponse) => {
+    ssData.pageBuildId = responseBody.pageBuildId;
+    ssData.user = responseBody.data;
+    addToCache("/user", responseBody.data)
     if (isStaticPage()) {
-        localStorage.setItem(ssKeyStorageKey, userData.key);
+        localStorage.setItem(ssKeyStorageKey, responseBody.data.key);
     }
-    ssData.user?.cacheableApiUris?.map(e => {
+    responseBody.data.cacheableApiUris?.map(e => {
         const key = e.split("/api/admin")[1];
         getCsrData(key, axiosInstance).then(({data}) => {
             addToCache(key, data)
@@ -154,12 +161,8 @@ const Index = ({offline}: { offline: boolean }) => {
             if (data.error) {
                 await messageApi.error(data.message);
             } else if (data.error == 0) {
+                asyncSaveApiCache(axiosInstance, data);
                 const query = new URLSearchParams(window.location.search);
-                if (ssData) {
-                    ssData.key = data.data.key;
-                    ssData.user = data.data;
-                    asyncSaveApiCache(axiosInstance, data.data);
-                }
                 const redirectFrom = query.get("redirectFrom") as string;
                 if (redirectFrom !== null && redirectFrom !== "") {
                     const jumpTo = decodeURIComponent(redirectFrom);

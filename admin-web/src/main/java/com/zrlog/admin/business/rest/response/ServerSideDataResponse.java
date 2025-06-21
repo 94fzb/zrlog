@@ -2,18 +2,16 @@ package com.zrlog.admin.business.rest.response;
 
 import java.util.Map;
 
-public class ServerSideDataResponse {
+public class ServerSideDataResponse<T> extends AdminApiPageDataStandardResponse<T> {
 
-    private UserBasicInfoResponse user;
-    private Map<String, Object> resourceInfo;
-    private Object pageData;
-    private String key;
-    private String documentTitle;
+    private final UserBasicInfoResponse user;
+    private final Map<String, Object> resourceInfo;
+    private final String key;
 
-    public ServerSideDataResponse(UserBasicInfoResponse user, Map<String, Object> resourceInfo, Object pageData, String key, String documentTitle) {
+    public ServerSideDataResponse(UserBasicInfoResponse user, Map<String, Object> resourceInfo, T pageData, String key, String documentTitle) {
+        super(pageData, "");
         this.user = user;
         this.resourceInfo = resourceInfo;
-        this.pageData = pageData;
         this.key = key;
         this.documentTitle = documentTitle;
     }
@@ -26,15 +24,8 @@ public class ServerSideDataResponse {
         return resourceInfo;
     }
 
-    public Object getPageData() {
-        return pageData;
-    }
-
     public String getKey() {
         return key;
     }
 
-    public String getDocumentTitle() {
-        return documentTitle;
-    }
 }

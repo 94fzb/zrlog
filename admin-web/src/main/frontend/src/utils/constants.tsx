@@ -64,7 +64,7 @@ export const getBackendServerUrl = (): string => {
 
 export const getRealRouteUrl = (url: string) => {
     const ext = isStaticPage() ? ".html" : "";
-    const buildId = getRes()['pageBuildId']
+    const buildId = ssData.pageBuildId;
     if (url.includes("?")) {
         return url.replace("?", ext + "?v=" + buildId + "&")
     }
