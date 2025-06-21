@@ -14,7 +14,7 @@ const errorCountMap = new Map<number, number>();
 
 export const jumpToLoginPage = (navigate: NavigateFunction): void => {
     if (!window.location.search.includes("redirectFrom")) {
-        navigate(getRealRouteUrl(`/login?redirectFrom=${encodeURI(window.location.pathname.split(".html")[0])}${encodeURI(window.location.search)}`), {replace: true});
+        navigate(getRealRouteUrl(`/login?redirectFrom=${encodeURIComponent(window.location.pathname.split(".html")[0])}${encodeURIComponent(window.location.search)}`), {replace: true});
     }
 }
 

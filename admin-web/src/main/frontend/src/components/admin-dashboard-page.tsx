@@ -26,14 +26,12 @@ const AdminDashboardPage: FunctionComponent<AdminDashBroadPageProps> = ({offline
         if (offline) {
             return;
         }
-        getCsrData(`/user?_t=${new Date().getTime()}`, axiosBaseInstance).then(({data}) => {
+        getCsrData(`/user?_t=${new Date().getTime()}`, axiosBaseInstance).then((data) => {
             if (data && data.error === 0) {
-                if (ssData) {
-                    if (data.key) {
-                        ssData.key = data.key
-                    }
-                    ssData.user = data
+                if (data.key) {
+                    ssData.key = data.key
                 }
+                ssData.user = data
                 setUserInfo(data);
                 addToCache("/user", data);
             } else {

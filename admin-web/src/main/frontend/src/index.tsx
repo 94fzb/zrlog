@@ -38,7 +38,7 @@ type SsDate = {
     key: string;
 };
 
-export let ssData: SsDate | undefined;
+export let ssData: SsDate = {key: "", pageData: undefined, resourceInfo: undefined, user: undefined};
 
 export const ssKeyStorageKey = "ss_key";
 
@@ -65,14 +65,11 @@ const Index = () => {
         // @ts-ignore
         if (ssDataStr?.length > 0) {
             ssData = JSON.parse(ssDataStr as string);
-        } else {
-            const ssKey = localStorage.getItem(ssKeyStorageKey);
-            if (ssKey) {
-                ssData = {key: ssKey};
-                ssData.user = getCacheByKey("/user");
-            } else {
-                ssData = {key: ""}
-            }
+        }
+        const ssKey = localStorage.getItem(ssKeyStorageKey);
+        if (ssKey) {
+            ssData = {key: ssKey};
+            ssData.user = getCacheByKey("/user");
         }
     }
 

@@ -111,16 +111,12 @@ export const LoginBg = (): ReactElement => {
 const asyncSaveApiCache = (axiosInstance: AxiosInstance, userData: BasicUserInfo) => {
     addToCache("/user", userData)
     localStorage.setItem(ssKeyStorageKey, userData.key);
-    setTimeout(() => {
-        if (ssData) {
-            ssData.user?.cacheableApiUris?.map(e => {
-                const key = e.split("/api/admin")[1];
-                getCsrData(key, axiosInstance).then(({data}) => {
-                    addToCache(key, data)
-                });
-            })
-        }
-    }, 200)
+    ssData.user?.cacheableApiUris?.map(e => {
+        const key = e.split("/api/admin")[1];
+        getCsrData(key, axiosInstance).then(({data}) => {
+            addToCache(key, data)
+        });
+    })
 }
 
 const Index = ({offline}: { offline: boolean }) => {
