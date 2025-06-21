@@ -92,8 +92,8 @@ public class AdminPageController extends Controller {
 
         Elements base = document.head().select("base");
         base.attr("href", WebTools.getHomeUrl(request));
-        ServerSideDataResponse serverSideDataResponse = serverSide(request.getUri());
-        document.getElementById("__SS_DATA__").text(new Gson().toJson(serverSideDataResponse));
+        ServerSideDataResponse<Object> serverSideDataResponse = serverSide(request.getUri());
+        Objects.requireNonNull(document.getElementById("__SS_DATA__")).text(new Gson().toJson(serverSideDataResponse));
         document.title(serverSideDataResponse.getDocumentTitle());
         String html = document.html();
         response.renderHtmlStr(html);
@@ -109,7 +109,7 @@ public class AdminPageController extends Controller {
         return new ApiStandardResponse<>(serverSide(request.getParaToStr("uri")));
     }*/
 
-    private ServerSideDataResponse serverSide(String uri) throws Throwable {
+    private ServerSideDataResponse<Object> serverSide(String uri) throws Throwable {
         Map<String, Object> resourceInfo = new CommonService().adminResourceInfo(request);
         if (Objects.nonNull(AdminTokenThreadLocal.getUser())) {
             UserBasicInfoResponse basicInfoResponse = new AdminUserController(request, response).index().getData();
@@ -120,17 +120,17 @@ public class AdminPageController extends Controller {
                 if (Objects.nonNull(result)) {
                     if (result instanceof AdminApiPageDataStandardResponse<?>) {
                         AdminApiPageDataStandardResponse<?> data = (AdminApiPageDataStandardResponse<?>) result;
-                        return new ServerSideDataResponse(basicInfoResponse, resourceInfo, result.getData(), AdminTokenThreadLocal.getUser().getSessionId(), data.getDocumentTitle());
+                        return new ServerSideDataResponse<>(basicInfoResponse, resourceInfo, result.getData(), AdminTokenThreadLocal.getUser().getSessionId(), data.getDocumentTitle());
                     }
-                    return new ServerSideDataResponse(basicInfoResponse, resourceInfo, result.getData(), AdminTokenThreadLocal.getUser().getSessionId(), Constants.getAdminDocumentTitleByUri(request.getUri()));
+                    return new ServerSideDataResponse<>(basicInfoResponse, resourceInfo, result.getData(), AdminTokenThreadLocal.getUser().getSessionId(), Constants.getAdminDocumentTitleByUri(request.getUri()));
                 } else {
-                    return new ServerSideDataResponse(basicInfoResponse, resourceInfo, new Object(), AdminTokenThreadLocal.getUser().getSessionId(), Constants.getAdminDocumentTitleByUri(request.getUri()));
+                    return new ServerSideDataResponse<>(basicInfoResponse, resourceInfo, new Object(), AdminTokenThreadLocal.getUser().getSessionId(), Constants.getAdminDocumentTitleByUri(request.getUri()));
                 }
             } catch (InvocationTargetException e) {
                 throw e.getTargetException();
             }
         } else {
-            return new ServerSideDataResponse(null, resourceInfo, null, null, Constants.getAdminDocumentTitleByUri(request.getUri()));
+            return new ServerSideDataResponse<>(null, resourceInfo, null, null, Constants.getAdminDocumentTitleByUri(request.getUri()));
         }
     }
 
