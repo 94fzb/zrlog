@@ -34,12 +34,13 @@ export type AppState = {
 type SsDate = {
     pageData?: any;
     resourceInfo?: Record<string, never>;
-    user?: BasicUserInfo;
+    user: BasicUserInfo | null;
     key: string;
 };
 
-export let ssData: SsDate = {key: "", pageData: undefined, resourceInfo: undefined, user: undefined};
-
+export let ssData: SsDate = {key: "", pageData: undefined, resourceInfo: undefined, user: null};
+//@ts-ignore
+window['__SS_DATA'] = ssData;
 export const ssKeyStorageKey = "ss_key";
 
 
@@ -68,8 +69,10 @@ const Index = () => {
         }
         const ssKey = localStorage.getItem(ssKeyStorageKey);
         if (ssKey) {
-            ssData = {key: ssKey};
-            ssData.user = getCacheByKey("/user");
+            ssData.key = ssKey;
+            if (ssData.user === undefined || ssData.user === null) {
+                ssData.user = getCacheByKey("/user");
+            }
         }
     }
 

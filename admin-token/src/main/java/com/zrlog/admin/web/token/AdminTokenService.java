@@ -130,7 +130,8 @@ public class AdminTokenService implements TokenService {
             response.redirect(Constants.ADMIN_LOGIN_URI_PATH);
             return;
         }
-        response.redirect(uri.getScheme() + "://" + uri.getRawAuthority() + WebTools.buildEncodedUrl(request, Constants.ADMIN_LOGIN_URI_PATH + ".html"));
+        String ext = Objects.equals(request.getParaToStr("sp"), "true") ? ".html" : "";
+        response.redirect(uri.getScheme() + "://" + uri.getRawAuthority() + WebTools.buildEncodedUrl(request, Constants.ADMIN_LOGIN_URI_PATH + ext));
 
     }
 

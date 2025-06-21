@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 
 import {getContextPath} from "./helpers";
-import {refreshPathInfo} from "../index";
+import {refreshPathInfo, ssData} from "../index";
 
 class Constants {
     static getFillBackImg() {
@@ -9,15 +9,12 @@ class Constants {
     }
 }
 
-const resourceKey = "__commonRes";
-
 export const getRes = (): Record<string, never> => {
-    // @ts-ignore
-    const cacheRes = window[resourceKey];
-    if (cacheRes === undefined || cacheRes === null || cacheRes === "") {
+    const cacheRes = ssData.resourceInfo;
+    if (cacheRes === undefined || cacheRes === null) {
         return {};
     }
-    return JSON.parse(cacheRes);
+    return cacheRes;
 };
 
 export const getColorPrimary = (): string => {
@@ -29,15 +26,13 @@ export const getColorPrimary = (): string => {
 };
 
 export const setRes = (r: Record<string, never>) => {
-    // @ts-ignore
-    window[resourceKey] = JSON.stringify(r);
+    ssData.resourceInfo = r;
 };
 
 export const cacheIgnoreReloadKey = "_t,v";
 
 export const removeRes = () => {
-    // @ts-ignore
-    window[resourceKey] = undefined;
+    ssData.resourceInfo = undefined;
 };
 
 export const isDev = () => {

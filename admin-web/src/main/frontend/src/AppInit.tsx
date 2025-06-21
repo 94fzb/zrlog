@@ -1,13 +1,7 @@
 import AppBase, {useAxiosBaseInstance} from "AppBase";
-import {AppState, refreshPathInfo, ssData} from "index";
+import {AppState, refreshPathInfo} from "index";
 import {FunctionComponent, useEffect, useState} from "react";
-import {
-    getColorPrimary,
-    getRes,
-    isStaticPage,
-    setBackendServerUrl,
-    setRes
-} from "./utils/constants";
+import {getColorPrimary, getRes, isStaticPage, setBackendServerUrl, setRes} from "./utils/constants";
 import EnvUtils, {isOffline} from "./utils/env-utils";
 import Init from "./components/init";
 import Spin from "antd/es/spin";
@@ -97,11 +91,7 @@ const AppInit: FunctionComponent<AppInitProps> = ({onInit, lang, offline}) => {
     const initRes = () => {
         const resourceData = getRes();
         if (resourceData === null || Object.keys(resourceData).length === 0) {
-            if (ssData && ssData.resourceInfo) {
-                handleRes(ssData.resourceInfo);
-            } else {
-                loadResourceFromServer("");
-            }
+            loadResourceFromServer("");
         } else {
             handleRes(resourceData);
         }
