@@ -311,7 +311,6 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
             paths: ["article-edit", "article-edit.html"],
             lazy: AsyncArticleEdit,
             fallback: ArticleEdit,
-            fullScreen: true,
             props: {
                 deleteCacheOnDestroy: () => deleteThisPageStateCache(),
                 onFullScreen: () => {
@@ -321,10 +320,12 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
                     });
                 },
                 onExitFullScreen: () => {
-                    setState((prevState) => {
-                        savePageFullState(getFullPath(location), false);
-                        return {...prevState, fullScreen: false};
-                    });
+                    if (state.fullScreen) {
+                        setState((prevState) => {
+                            savePageFullState(getFullPath(location), false);
+                            return {...prevState, fullScreen: false};
+                        });
+                    }
                 }
             } as ArticleEditProps
         },
@@ -395,7 +396,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
 
     return (
         <Routes>
-            {routes.flatMap(({paths, lazy, fallback, props = {}, fullScreen}, i) =>
+            {routes.flatMap(({paths, lazy, fallback, props = {}}, i) =>
                 paths.map((path, j) => (
                     <Route
                         key={`${i}-${j}`}
@@ -407,7 +408,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
                                 props={{
                                     ...props,
                                     userInfo: userInfo,
-                                    fullScreen: fullScreen ? state.fullScreen : false,
+                                    fullScreen: state.fullScreen,
                                     data: getDataFromCache(),
                                     offline: offline,
                                     offlineData: isOfflineData(),

@@ -545,14 +545,6 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                             editorInstance={editorInstance}
                             onExitFullScreen={onExitFullScreen}
                             onFullScreen={onFullScreen}
-                            onChange={(full) => {
-                                setState((prevState) => {
-                                    return {
-                                        ...prevState,
-                                        fullScreen: full,
-                                    };
-                                });
-                            }}
                         />
                     </Col>
                 </Row>
