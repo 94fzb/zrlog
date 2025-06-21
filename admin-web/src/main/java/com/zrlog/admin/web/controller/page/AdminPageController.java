@@ -72,9 +72,9 @@ public class AdminPageController extends Controller {
             if (Objects.nonNull(manifestElement)) {
                 String newUrl;
                 if (StringUtils.isNotEmpty(adminStaticResourceHostByWebSite) && !ZrLogUtil.isStaticPlugin(request)) {
-                    newUrl = manifestElement.attr("href").replace("./", adminStaticResourceHostByWebSite + "/");
+                    newUrl = manifestElement.attr("href").replaceFirst("./", adminStaticResourceHostByWebSite + "/");
                 } else {
-                    newUrl = manifestElement.attr("href").replace("./", WebTools.getHomeUrl(request));
+                    newUrl = manifestElement.attr("href").replaceFirst("./", WebTools.getHomeUrl(request));
                 }
                 manifestElement.attr("href", newUrl + "?v=" + Constants.zrLogConfig.getAdminResource().getStaticResourceBuildId());
             }
@@ -83,9 +83,9 @@ public class AdminPageController extends Controller {
         if (!scripts.isEmpty()) {
             scripts.forEach(script -> {
                 if (StringUtils.isNotEmpty(adminStaticResourceHostByWebSite) && !ZrLogUtil.isStaticPlugin(request)) {
-                    script.attr("src", script.attr("src").replace("./", adminStaticResourceHostByWebSite + "/"));
+                    script.attr("src", script.attr("src").replaceFirst("./", adminStaticResourceHostByWebSite + "/"));
                 } else {
-                    script.attr("src", script.attr("src").replace("./", WebTools.getHomeUrl(request)));
+                    script.attr("src", script.attr("src").replaceFirst("./", WebTools.getHomeUrl(request)));
                 }
             });
         }
