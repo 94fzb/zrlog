@@ -316,10 +316,10 @@
                                     <snapshotEnv>USER</snapshotEnv>
                                     <skipPOMs>false</skipPOMs>
                                     <deb>
-                                        ../target/${packageName}-[[version]]+[[gitCommitId]]_[[architecture]].[[extension]]
+                                        target/${packageName}-[[version]]+[[gitCommitId]]_[[architecture]].[[extension]]
                                     </deb>
                                     <changesOut>
-                                        ../target/${packageName}-[[version]]+[[gitCommitId]]_[[architecture]].changes
+                                        target/${packageName}-[[version]]+[[gitCommitId]]_[[architecture]].changes
                                     </changesOut>
                                     <controlDir>${basedir}/src/deb/control</controlDir>
                                     <dataSet>
