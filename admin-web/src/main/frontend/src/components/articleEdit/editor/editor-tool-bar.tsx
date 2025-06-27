@@ -10,7 +10,7 @@ type EditorToolBarProps = {
 }
 
 const EditorToolBarDivider = () => {
-    return <span style={{border: "1px solid rgb(221, 221, 221)", height: "65%"}}></span>
+    return <span style={{border: getBorder(), height: "65%"}}></span>
 }
 
 const EditorToolBar: FunctionComponent<EditorToolBarProps> = ({onChange, onCopy}) => {
