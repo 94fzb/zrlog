@@ -43,11 +43,13 @@ public class StaticSitePlugin extends BaseLockObject implements IPlugin {
     private final ApplicationContext applicationContext;
     private final Map<String, HandleState> handleStatusPageMap = new ConcurrentHashMap<>();
     private final ReentrantLock parseLock = new ReentrantLock();
+    private final String notFindFile;
 
     public StaticSitePlugin(AbstractServerConfig abstractServerConfig) {
         this.applicationContext = new ApplicationContext(abstractServerConfig.getServerConfig());
         this.applicationContext.init();
         this.serverConfig = abstractServerConfig;
+        this.notFindFile = Constants.zrLogConfig.getContextPath() + "/error/404.html";
     }
 
     private static void copyCommonAssert() {
@@ -150,6 +152,9 @@ public class StaticSitePlugin extends BaseLockObject implements IPlugin {
                 if (Objects.equals(uri, Constants.ADMIN_SERVICE_WORKER_JS)) {
                     return;
                 }
+                if (Objects.equals(uri, notFindFile)) {
+                    return;
+                }
                 if (Objects.isNull(file) || !file.exists()) {
                     LOGGER.warning("Generator " + uri + " error: missing static file");
                     error = true;
@@ -206,7 +211,6 @@ public class StaticSitePlugin extends BaseLockObject implements IPlugin {
             handleStatusPageMap.put(Constants.zrLogConfig.getContextPath() + uri, HandleState.NEW);
         });
         //生成 404 页面，用于配置第三方 cdn，或者云存储的错误页面
-        String notFindFile = Constants.zrLogConfig.getContextPath() + "/error/404.html";
         handleStatusPageMap.put(notFindFile, HandleState.NEW);
         PageServiceUtil.saveRedirectRules(notFindFile);
         lock.lock();
