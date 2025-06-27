@@ -1,6 +1,7 @@
 import {StyledEditormd} from "./styled-editormd";
 import {Content} from "antd/es/layout/layout";
 import EnvUtils from "../../../utils/env-utils";
+import {marked} from "marked";
 
 const helpMd = `
 ### Markdown语法教程 (Markdown syntax tutorial)
@@ -78,8 +79,7 @@ const helpMd = `
 
 const MarkdownHelp = () => {
 
-    //@ts-ignore
-    const helpHtml = marked.parse(helpMd);
+    const helpHtml = marked(helpMd);
     return <StyledEditormd>
         <div className={EnvUtils.isDarkMode() ? "editormd-preview-theme-dark" : "editormd-preview-theme"}
              style={{borderRadius: 8}}>

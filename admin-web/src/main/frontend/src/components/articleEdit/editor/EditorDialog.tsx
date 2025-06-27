@@ -5,6 +5,7 @@ import {LoadingOutlined} from "@ant-design/icons";
 import MarkdownHelp from "./markdown-help";
 import TableBody from "./table-body";
 import CodeBody from "./code-body";
+import {DialogType} from "./editor.types";
 
 type EditorDialogProps = {
     title: string;
@@ -12,9 +13,6 @@ type EditorDialogProps = {
     onOk?: (mdStr: string) => void;
     onClose?: () => void;
 }
-
-export type DialogType = "image" | "video" | "file" | "link" | "code" | "table" | "help"
-
 
 type EditorDialogState = {
     value: string,

@@ -5,7 +5,6 @@ import Col from "antd/es/grid/col";
 import Divider from "antd/es/divider";
 import Title from "antd/es/typography/Title";
 import Card from "antd/es/card";
-import MyEditorMdWrapper from "./editor/my-editormd-wrapper";
 import {createUri, getRes, updateUri} from "../../utils/constants";
 import styled from "styled-components";
 import Select from "antd/es/select";
@@ -27,6 +26,7 @@ import ArticleEditFullscreenButton from "./article-edit-fullscreen-button";
 import {auditTime, concatMap, Subject, tap} from "rxjs";
 import {Subscription} from "rxjs/internal/Subscription";
 import {deepEqualWithSpecialJSON, disableExitTips, enableExitTips} from "../../utils/helpers";
+import CodemirrorMarkedEditor from "./editor/codemirror-marked-editor";
 
 const StyledArticleEdit = styled("div")`
     .ant-btn {
@@ -409,7 +409,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({
         });
     };
 
-    const editorHeight = fullScreen ? window.innerHeight - 51 : `calc(100vh - 236px)`;
+    const editorHeight = fullScreen ? window.innerHeight - 32 : `calc(100vh - 256px)`;
 
     return (
         <StyledArticleEdit>
@@ -557,20 +557,11 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                             paddingRight: 0,
                         }}
                     >
-                        <MyEditorMdWrapper
+                        <CodemirrorMarkedEditor
                             height={editorHeight}
                             loadSuccess={(editor) => {
                                 editorInstance = editor;
                             }}
-                            key={
-                                data.article.logId +
-                                "_" +
-                                fullScreen +
-                                "_" +
-                                state.editorVersion +
-                                "_offline:" +
-                                offline
-                            }
                             markdown={state.article.markdown}
                             onChange={(v) => {
                                 if (

@@ -6,79 +6,13 @@ import makeAsyncScriptLoader from "react-async-script";
 import MyLoadingComponent from "../../my-loading-component";
 import EnvUtils from "../../../utils/env-utils";
 import {getRes, isDev} from "../../../utils/constants";
-import {dom, library} from "@fortawesome/fontawesome-svg-core";
-import {
-    fa2,
-    fa3,
-    fa4,
-    faAlignCenter,
-    faAlignJustify,
-    faAlignLeft,
-    faAlignRight,
-    faBold,
-    faClipboard,
-    faClose,
-    faEye,
-    faEyeSlash,
-    faFileCode,
-    faFileVideo,
-    faImage,
-    faInfoCircle,
-    faItalic,
-    faLink,
-    faListOl,
-    faListUl,
-    faMinus,
-    faNewspaper,
-    faPaperclip,
-    faPhotoFilm,
-    faQuestionCircle,
-    faQuoteLeft,
-    faStrikethrough,
-    faTable,
-} from "@fortawesome/free-solid-svg-icons";
+
 import {StyledEditormd} from "./styled-editormd";
 import {ChangedContent} from "../index.types";
-import {useAxiosBaseInstance} from "../../../base/AppBase";
 import {getContextPath} from "../../../utils/helpers";
-import EditorDialog, {DialogType} from "./EditorDialog";
-// Add the icons to the library so you can use it in your page
-const icons = [
-    faBold,
-    faStrikethrough,
-    fa4,
-    faAlignCenter,
-    faAlignJustify,
-    faAlignLeft,
-    faAlignRight,
-    faItalic,
-    faQuoteLeft,
-    faListUl,
-    faListOl,
-    faMinus,
-    faQuestionCircle,
-    faInfoCircle,
-    faClipboard,
-    faTable,
-    faFileCode,
-    faPaperclip,
-    faNewspaper,
-    faFileVideo,
-    fa3,
-    fa2,
-    faImage,
-    faPhotoFilm,
-    faLink,
-    faClose,
-    faEyeSlash,
-    faEye,
-];
-icons.forEach((e) => {
-    library.add(e);
-});
+import EditorDialog from "./EditorDialog";
+import {EditorDialogState, MyEditorMdWrapperProps} from "./editor.types";
 
-// This will replace any existing `<i>` elements with `<svg>` and set up a MutationObserver to continue doing this as the DOM changes.
-dom.watch();
 
 type MyEditorMdWrapperState = {
     editorLoading: boolean;
@@ -86,11 +20,6 @@ type MyEditorMdWrapperState = {
     id: string;
 };
 
-type EditorDialogState = {
-    open: boolean;
-    title: string;
-    type: DialogType;
-}
 
 export type ScriptLoaderProps = {
     asyncScriptOnLoad?: (() => void) | undefined;
@@ -127,8 +56,6 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({height, markdown
     const [content, setContent] = useState<ChangedContent>({content: "", markdown: markdown});
 
     const [messageApi, contextHolder] = message.useMessage({maxCount: 3});
-
-    const axiosInstance = useAxiosBaseInstance();
 
     function setDarkMode(editor: any, dark: boolean) {
         editor.setTheme(dark ? "dark" : "default");
@@ -261,37 +188,6 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({height, markdown
                     messageApi.info(getRes().copPreviewHtmlToClipboardSuccess);
                 });
 
-                function uploadFile(file: File | null) {
-                    const index = Math.random().toString(10).substr(2, 5) + "-" + Math.random().toString(36).substr(2);
-
-                    const fileName = index + ".png";
-                    const formData = new FormData();
-                    if (file) {
-                        formData.append("imgFile", file, fileName);
-                        axiosInstance.post("/api/admin/upload?dir=image", formData).then(({data}) => {
-                            const url = data.data.url;
-                            editor.insertValue("![x](" + url + ")");
-                        });
-                    }
-                }
-
-                const jqMd = $("#" + state.id);
-                if (jqMd && jqMd[0]) {
-                    jqMd[0].addEventListener("paste", function (e) {
-                        const clipboardData = e.clipboardData;
-                        // @ts-ignore
-                        const items = clipboardData.items;
-                        for (let i = 0; i < items.length; i++) {
-                            if (items[i].kind === "file" && items[i].type.match(/^image/)) {
-                                // 取消默认的粘贴操作
-                                e.preventDefault();
-                                // 上传文件
-                                uploadFile(items[i].getAsFile());
-                                break;
-                            }
-                        }
-                    });
-                }
                 setDarkMode(editor, EnvUtils.isDarkMode());
                 initSuccess(editor);
             },
@@ -360,12 +256,6 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({height, markdown
     );
 };
 
-type MyEditorMdWrapperProps = {
-    height: any;
-    onChange: (content: ChangedContent) => void;
-    markdown?: string;
-    loadSuccess?: (editor: any) => void;
-};
 
 const MyEditorMdWrapper: FunctionComponent<MyEditorMdWrapperProps> = ({height, markdown, onChange, loadSuccess}) => {
     const [mdEditorScriptLoaded, setMdEditorScriptLoaded] = useState<boolean>(false);

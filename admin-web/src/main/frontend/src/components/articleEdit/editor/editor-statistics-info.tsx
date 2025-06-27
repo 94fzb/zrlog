@@ -1,6 +1,7 @@
 import EnvUtils from "../../../utils/env-utils";
-import { getRes } from "../../../utils/constants";
-import { FunctionComponent } from "react";
+import {getRes} from "../../../utils/constants";
+import {FunctionComponent} from "react";
+import {getBorder} from "./editor-helpers";
 
 export type EditorStatisticsInfo = {
     contentWordsLength: number;
@@ -19,12 +20,12 @@ export const toStatisticsByMarkdown = (markdownStr?: string): EditorStatisticsIn
     };
 };
 
-const EditorStatistics: FunctionComponent<EditorStatisticsInfoProps> = ({ data, fullScreen }) => {
+const EditorStatistics: FunctionComponent<EditorStatisticsInfoProps> = ({data, fullScreen}) => {
     return (
         <div
             style={{
                 position: fullScreen ? "fixed" : "absolute",
-                borderTop: EnvUtils.isDarkMode() ? `1px solid rgba(253, 253, 253, 0.12)` : "1px solid #DDD",
+                borderTop: getBorder(),
                 left: 0,
                 width: "100%",
                 height: 30,
@@ -37,15 +38,15 @@ const EditorStatistics: FunctionComponent<EditorStatisticsInfoProps> = ({ data, 
                 background: EnvUtils.isDarkMode() ? "#141414" : "white",
             }}
         >
-            <span style={{ padding: 16, paddingLeft: 40 }}>
+            <span style={{padding: 16, paddingLeft: 40}}>
                 {getRes()["editor.wordsCount"]}
-                <span style={{ paddingRight: 4, paddingLeft: 4 }}>:</span>
-                <b style={{ marginLeft: 18, width: 60 }}>{data.contentWordsLength}</b>
+                <span style={{paddingRight: 4, paddingLeft: 4}}>:</span>
+                <b style={{marginLeft: 18, width: 60}}>{data.contentWordsLength}</b>
             </span>
-            <span style={{ padding: 16, paddingLeft: 20 }}>
+            <span style={{padding: 16, paddingLeft: 20}}>
                 {getRes()["editor.linesCount"]}
-                <span style={{ paddingRight: 4, paddingLeft: 4 }}>:</span>
-                <b style={{ marginLeft: 18, width: 60 }}>{data.contentLinesLength}</b>
+                <span style={{paddingRight: 4, paddingLeft: 4}}>:</span>
+                <b style={{marginLeft: 18, width: 60}}>{data.contentLinesLength}</b>
             </span>
         </div>
     );
