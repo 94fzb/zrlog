@@ -3,7 +3,7 @@ import {ChangedContent} from "../index.types";
 export type MyEditorMdWrapperProps = {
     height: any;
     onChange: (content: ChangedContent) => void;
-    markdown?: string;
+    value?: string;
     loadSuccess?: (editor: any) => void;
 };
 

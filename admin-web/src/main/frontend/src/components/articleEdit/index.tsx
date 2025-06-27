@@ -562,7 +562,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                             loadSuccess={(editor) => {
                                 editorInstance = editor;
                             }}
-                            markdown={state.article.markdown}
+                            value={state.article.markdown}
                             onChange={(v) => {
                                 if (
                                     v.markdown === "" &&

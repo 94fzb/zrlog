@@ -25,7 +25,7 @@ const TableBody = ({onChange}: { onChange: (value: string) => void }) => {
             right: hrLine + ":"
         };
 
-        let table = "";
+        let table = "\n\n";
         if (state.rows > 1 && state.cols > 0) {
             let r = 0;
             const len = state.rows;

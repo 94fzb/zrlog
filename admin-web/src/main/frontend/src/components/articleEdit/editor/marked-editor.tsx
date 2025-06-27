@@ -1,7 +1,6 @@
 import CodeMirror, {EditorSelection, EditorView} from "@uiw/react-codemirror";
 import {FunctionComponent, useEffect, useRef, useState} from "react";
 import {MyEditorMdWrapperProps} from "./editor.types";
-import {markdownLanguage} from "@codemirror/lang-markdown";
 import {marked} from "marked";
 import EnvUtils from "../../../utils/env-utils";
 import {StyledEditormd} from "./styled-editormd";
@@ -11,22 +10,48 @@ import {getRes} from "../../../utils/constants";
 import useMessage from "antd/es/message/useMessage";
 import {getBorder} from "./editor-helpers";
 import {StyledPreview} from "./styled-preview";
+import {languages} from "@codemirror/language-data";
+import {markdown} from "@codemirror/lang-markdown";
+import "highlight.js/styles/default.css"; // 或任意你喜欢的主题
+import hljs from "highlight.js/lib/core";
+import java from 'highlight.js/lib/languages/java';
 
 type MarkdownEditorState = {
     markdownValue: string;
     preview: boolean;
 }
 
+hljs.registerLanguage('java', java);
 
 const MarkedEditor: FunctionComponent<MyEditorMdWrapperProps> = ({
                                                                      height,
-                                                                     markdown,
+                                                                     value,
                                                                      onChange,
                                                                      loadSuccess
                                                                  }) => {
 
+    const renderer = new marked.Renderer();
+
+    renderer.code = function ({text, lang}) {
+        const validLang = lang && hljs.getLanguage(lang) ? lang : '';
+        if (validLang) {
+            const highlighted = hljs.highlight(text, {language: validLang}).value;
+            return `<pre><code class="hljs language-${validLang}">${highlighted}</code></pre>`;
+        } else {
+            const highlighted = hljs.highlightAuto(text).value;
+            return `<pre><code class="hljs language-java">${highlighted}</code></pre>`;
+        }
+    };
+
+
+    marked.setOptions({
+        gfm: true,
+        breaks: true,
+        renderer
+    }); // ✅ 这样确保类型对得上
+
     const [state, setState] = useState<MarkdownEditorState>({
-        markdownValue: markdown ? markdown : "",
+        markdownValue: value ? value : "",
         preview: window.innerWidth > 600,
     });
 
@@ -108,7 +133,7 @@ const MarkedEditor: FunctionComponent<MyEditorMdWrapperProps> = ({
                     }
                     }
                     theme={EnvUtils.isDarkMode() ? "dark" : "light"}
-                    extensions={[markdownLanguage, EditorView.lineWrapping]}
+                    extensions={[markdown({codeLanguages: languages}), EditorView.lineWrapping,]}
                     onCreateEditor={(view) => {
                         viewRef.current = view;
                     }}
