@@ -1,4 +1,4 @@
-vendors/markdown/js/editormd-1.5.7.js
+vendors/markdown/js/editormd-1.5.8.js
 vendors/markdown/languages/en.js
 vendors/markdown/lib/codemirror/addons.min.js
 vendors/markdown/lib/codemirror/codemirror.min.js
