@@ -1,4 +1,9 @@
-##### Markdown语法教程 (Markdown syntax tutorial)
+import {StyledEditormd} from "./styled-editormd";
+import {Content} from "antd/es/layout/layout";
+import EnvUtils from "../../../utils/env-utils";
+
+const helpMd = `
+### Markdown语法教程 (Markdown syntax tutorial)
 
 - [Markdown Syntax](http://daringfireball.net/projects/markdown/syntax/ "Markdown Syntax")
 - [Mastering Markdown](https://guides.github.com/features/mastering-markdown/ "Mastering Markdown")
@@ -7,7 +12,7 @@
 - [Markdown 语法说明（简体中文）](http://www.markdown.cn/ "Markdown 语法说明（简体中文）")
 - [Markdown 語法說明（繁體中文）](http://markdown.tw/ "Markdown 語法說明（繁體中文）")
 
-##### 键盘快捷键 (Keyboard shortcuts)
+### 键盘快捷键 (Keyboard shortcuts)
 
 > If Editor.md code editor is on focus, you can use keyboard shortcuts.
 
@@ -47,7 +52,7 @@
 | Ctrl + Shift + S                                | 插入删除线                      | Insert strikethrough                              |
 | Ctrl + Shift + T                                | 打开插入表格对话框                  | Open table dialog                                 |
 | Ctrl + Shift + U                                | 将所选文字转成大写                  | Selection text convert to uppercase               |
-| Shift + Alt + C                                 | 插入```代码                    | Insert code blocks (```)                          |
+| Shift + Alt + C                                 | 插入\`\`\`代码                    | Insert code blocks (\`\`\`)                          |
 | Shift + Alt + H                                 | 打开使用帮助对话框                  | Open help dialog                                  |
 | Shift + Alt + L                                 | 将所选文本转成小写                  | Selection text convert to lowercase               |
 | Shift + Alt + P                                 | 插入分页符                      | Insert page break                                 |
@@ -58,20 +63,31 @@
 | Ctrl + Shift + Alt + U                          | 将所选文本的第一个首字母转成大写           | Selection text first letter convert to uppercase  |
 | Ctrl + Alt + G                                  | 跳转到指定的行                    | Goto line                                         |
 
-##### Emoji表情参考 (Emoji reference)
-
-- [Github emoji](http://www.emoji-cheat-sheet.com/ "Github emoji")
-- [Twitter Emoji \(Twemoji\)](http://twitter.github.io/twemoji/preview.html "Twitter Emoji \(Twemoji\)")
-- [FontAwesome icons emoji](http://fortawesome.github.io/Font-Awesome/icons/ "FontAwesome icons emoji")
-
-##### 流程图参考 (Flowchart reference)
+### 流程图参考 (Flowchart reference)
 
 [http://adrai.github.io/flowchart.js/](http://adrai.github.io/flowchart.js/)
 
-##### 时序图参考 (SequenceDiagram reference)
+### 时序图参考 (SequenceDiagram reference)
 
 [http://bramp.github.io/js-sequence-diagrams/](http://bramp.github.io/js-sequence-diagrams/)
 
-##### TeX/LaTeX reference
+### TeX/LaTeX reference
 
 [http://meta.wikimedia.org/wiki/Help:Formula](http://meta.wikimedia.org/wiki/Help:Formula)
+`
+
+const MarkdownHelp = () => {
+
+    //@ts-ignore
+    const helpHtml = marked.parse(helpMd);
+    return <StyledEditormd>
+        <div className={EnvUtils.isDarkMode() ? "editormd-preview-theme-dark" : "editormd-preview-theme"}
+             style={{borderRadius: 8}}>
+            <Content className={"editormd-preview-container"}
+                     style={{padding: 0, background: EnvUtils.isDarkMode() ? "#202020" : "#FFFFFF"}}
+                     dangerouslySetInnerHTML={{__html: helpHtml}}/>
+        </div>
+    </StyledEditormd>
+}
+
+export default MarkdownHelp;

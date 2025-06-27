@@ -5,7 +5,7 @@ import {message} from "antd";
 import makeAsyncScriptLoader from "react-async-script";
 import MyLoadingComponent from "../../my-loading-component";
 import EnvUtils from "../../../utils/env-utils";
-import { getRes, isDev} from "../../../utils/constants";
+import {getRes, isDev} from "../../../utils/constants";
 import {dom, library} from "@fortawesome/fontawesome-svg-core";
 import {
     fa2,
@@ -41,7 +41,7 @@ import {StyledEditormd} from "./styled-editormd";
 import {ChangedContent} from "../index.types";
 import {useAxiosBaseInstance} from "../../../base/AppBase";
 import {getContextPath} from "../../../utils/helpers";
-import EditorDialog from "./EditorDialog";
+import EditorDialog, {DialogType} from "./EditorDialog";
 // Add the icons to the library so you can use it in your page
 const icons = [
     faBold,
@@ -89,7 +89,7 @@ type MyEditorMdWrapperState = {
 type EditorDialogState = {
     open: boolean;
     title: string;
-    type: "image" | "video" | "file" | "link";
+    type: DialogType;
 }
 
 export type ScriptLoaderProps = {
@@ -185,8 +185,7 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({height, markdown
                     "file",
                     "video",
                     "|",
-                    "preformatted-text",
-                    "code-block",
+                    "code",
                     "table",
                     "copyPreviewHtml",
                     "watch",
@@ -198,50 +197,69 @@ const MyEditorMd: FunctionComponent<MyEditorMdWrapperProps> = ({height, markdown
             placeholder: getRes()["editorPlaceholder"],
             markdown: content.markdown,
             onload: function () {
-                setTimeout(() => {
-                    $("#fileDialog").on("click", function () {
-                        setDialogState({
-                            open: true,
-                            title: "文件",
-                            type: "file"
-                        })
-                    });
-                    $("#videoDialog").on("click", function () {
-                        setDialogState({
-                            open: true,
-                            title: "视频",
-                            type: "video"
-                        })
-                    });
-                    $("#linkDialog").on("click", function () {
-                        setDialogState({
-                            open: true,
-                            title: "链接",
-                            type: "link"
-                        })
-                    });
-                    $("#imageDialog").on("click", function () {
-                        setDialogState({
-                            open: true,
-                            title: "图片",
-                            type: "image"
-                        })
-                    });
-                    $("#copPreviewHtmlToClipboard").on("click", function () {
-                        function copyToClipboard(html: any) {
-                            const temp = $("<input>");
-                            $("body").append(temp);
-                            temp.val(html).select();
-                            document.execCommand("copy");
-                            temp.remove();
-                        }
+                $("#fileDialog").on("click touchend", function () {
+                    setDialogState({
+                        open: true,
+                        title: "添加文件",
+                        type: "file"
+                    })
+                });
+                $("#videoDialog").on("click touchend", function () {
+                    setDialogState({
+                        open: true,
+                        title: "添加视频",
+                        type: "video"
+                    })
+                });
+                $("#linkDialog").on("click touchend", function () {
+                    setDialogState({
+                        open: true,
+                        title: "添加链接",
+                        type: "link"
+                    })
+                });
+                $("#imageDialog").on("click touchend", function () {
+                    setDialogState({
+                        open: true,
+                        title: "添加图片",
+                        type: "image"
+                    })
+                });
+                $("#codeDialog").on("click touchend", function () {
+                    setDialogState({
+                        open: true,
+                        title: "添加代码块",
+                        type: "code"
+                    })
+                });
+                $("#tableDialog").on("click touchend", function () {
+                    setDialogState({
+                        open: true,
+                        title: "添加表格",
+                        type: "table"
+                    })
+                });
+                $("#helpDialog").on("click touchend", function () {
+                    setDialogState({
+                        open: true,
+                        title: "帮助",
+                        type: "help"
+                    })
+                });
+                $("#copPreviewHtmlToClipboard").on("click touchend", function () {
+                    function copyToClipboard(html: any) {
+                        const temp = $("<input>");
+                        $("body").append(temp);
+                        temp.val(html).select();
+                        document.execCommand("copy");
+                        temp.remove();
+                    }
 
-                        copyToClipboard(
-                            '<div class="markdown-body" style="padding:0">' + editor.getPreviewedHTML() + "</div>"
-                        );
-                        messageApi.info(getRes().copPreviewHtmlToClipboardSuccess);
-                    });
-                }, 100);
+                    copyToClipboard(
+                        '<div class="markdown-body" style="padding:0">' + editor.getPreviewedHTML() + "</div>"
+                    );
+                    messageApi.info(getRes().copPreviewHtmlToClipboardSuccess);
+                });
 
                 function uploadFile(file: File | null) {
                     const index = Math.random().toString(10).substr(2, 5) + "-" + Math.random().toString(36).substr(2);

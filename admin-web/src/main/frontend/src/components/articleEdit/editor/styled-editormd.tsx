@@ -1967,7 +1967,7 @@ export const StyledEditormd = styled("div")`
     }
 
     .editormd-theme-dark .editormd-menu > li.divider {
-        border-right: 1px solid #111;
+        border-right: 1px solid rgba(253, 253, 253, 0.12);
     }
 
     .editormd-theme-dark .CodeMirror {

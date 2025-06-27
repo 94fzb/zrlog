@@ -182,12 +182,13 @@
             }
         },
         toolbarCustomIcons: {               // using html tag create toolbar icon, unused default <a> tag.
-            lowercase: "<a href=\"javascript:;\" title=\"Lowercase\" unselectable=\"on\"><i class=\"fa\" name=\"lowercase\" style=\"font-size:24px;margin-top: -10px;\">a</i></a>",
-            "ucwords": "<a href=\"javascript:;\" title=\"ucwords\" unselectable=\"on\"><i class=\"fa\" name=\"ucwords\" style=\"font-size:20px;margin-top: -3px;\">Aa</i></a>",
             "file": "<a href=\"javascript:;\" id=\"fileDialog\"  unselectable=\"on\"><i class=\"fa fa-paperclip\" unselectable=\"on\"></i></a>",
             "video": "<a href=\"javascript:;\" id=\"videoDialog\"  unselectable=\"on\"><i class=\"fa fa-file-video\" unselectable=\"on\"></i></a>",
             "image": "<a href=\"javascript:;\" id=\"imageDialog\"  unselectable=\"on\"><i class=\"fa fa-image\" unselectable=\"on\"></i></a>",
             "link": "<a href=\"javascript:;\" id=\"linkDialog\"  unselectable=\"on\"><i class=\"fa fa-link\" unselectable=\"on\"></i></a>",
+            "table": "<a href=\"javascript:;\" id=\"tableDialog\"  unselectable=\"on\"><i class=\"fa fa-table\" unselectable=\"on\"></i></a>",
+            "code": "<a href=\"javascript:;\" id=\"codeDialog\"  unselectable=\"on\"><i class=\"fa fa-file-code\" unselectable=\"on\"></i></a>",
+            "help": "<a href=\"javascript:;\" id=\"helpDialog\"  unselectable=\"on\"><i class=\"fa fa-question-circle\" unselectable=\"on\"></i></a>",
             "copyPreviewHtml": "<a href=\"javascript:;\" id=\"copPreviewHtmlToClipboard\"  unselectable=\"on\"><i class=\"fa fa-clipboard\" unselectable=\"on\"></i></a>"
         },
         toolbarIconsClass: {
@@ -2857,30 +2858,6 @@
             var selection = cm.getSelection();
 
             cm.replaceSelection("\r\n[========]\r\n");
-        },
-
-        code: function () {
-            var cm = this.cm;
-            var cursor = cm.getCursor();
-            var selection = cm.getSelection();
-
-            cm.replaceSelection("`" + selection + "`");
-
-            if (selection === "") {
-                cm.setCursor(cursor.line, cursor.ch + 1);
-            }
-        },
-
-        "code-block": function () {
-            this.executePlugin("codeBlockDialog", "code-block-dialog/code-block-dialog");
-        },
-
-        "preformatted-text": function () {
-            this.executePlugin("preformattedTextDialog", "preformatted-text-dialog/preformatted-text-dialog");
-        },
-
-        table: function () {
-            this.executePlugin("tableDialog", "table-dialog/table-dialog");
         },
 
         datetime: function () {

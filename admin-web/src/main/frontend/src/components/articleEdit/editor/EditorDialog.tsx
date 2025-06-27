@@ -2,13 +2,19 @@ import {FunctionComponent, useState} from "react";
 import {Input, message, Modal} from "antd";
 import BaseDragger from "../../../common/BaseDragger";
 import {LoadingOutlined} from "@ant-design/icons";
+import MarkdownHelp from "./markdown-help";
+import TableBody from "./table-body";
+import CodeBody from "./code-body";
 
 type EditorDialogProps = {
     title: string;
-    type: "image" | "video" | "file" | "link"
+    type: DialogType
     onOk?: (mdStr: string) => void;
     onClose?: () => void;
 }
+
+export type DialogType = "image" | "video" | "file" | "link" | "code" | "table" | "help"
+
 
 type EditorDialogState = {
     value: string,
@@ -37,6 +43,29 @@ const EditorDialog: FunctionComponent<EditorDialogProps> = ({title, type, onOk, 
     }
 
     const getBody = () => {
+        if (type === "help") {
+            return <MarkdownHelp/>
+        }
+        if (type === "code") {
+            return <CodeBody onChange={(v) => {
+                setState((prevState) => {
+                    return {
+                        ...prevState,
+                        value: v
+                    }
+                })
+            }}/>
+        }
+        if (type === "table") {
+            return <TableBody onChange={(e) => {
+                setState((prevState) => {
+                    return {
+                        ...prevState,
+                        value: e
+                    }
+                })
+            }}/>
+        }
         if (type === "link") {
             return <div style={{display: "flex", flexFlow: "column", gap: 8}}>
                 <div style={{display: "flex", justifyContent: "flex-start", gap: 12, alignItems: "center"}}>
@@ -130,8 +159,23 @@ const EditorDialog: FunctionComponent<EditorDialogProps> = ({title, type, onOk, 
     }
 
 
-    return <Modal open={true} title={title} onOk={() => {
+    return <Modal open={true} width={{
+        xs: '90%',
+        sm: '80%',
+        md: '70%',
+        lg: '60%',
+        xl: '50%',
+        xxl: '40%',
+    }} title={title} onOk={() => {
         if (onOk) {
+            if (type === "table" || type === "code") {
+                if (state.value === "") {
+                    messageApi.error("不能为空")
+                    return;
+                }
+                onOk(state.value);
+                return;
+            }
             if (state.value === "") {
                 messageApi.error("地址不能为空")
                 return;

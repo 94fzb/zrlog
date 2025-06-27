@@ -1,9 +1,3 @@
-vendors/markdown/plugins/table-dialog/table-dialog.js
-vendors/markdown/plugins/preformatted-text-dialog/preformatted-text-dialog.js
-vendors/markdown/plugins/code-block-dialog/code-block-dialog.js
-vendors/markdown/plugins/goto-line-dialog/goto-line-dialog.js
-vendors/markdown/plugins/help-dialog/help-dialog.js
-vendors/markdown/plugins/help-dialog/help.md
 vendors/markdown/js/editormd-1.5.7.js
 vendors/markdown/languages/en.js
 vendors/markdown/lib/codemirror/addons.min.js
