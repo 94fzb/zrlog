@@ -1,4 +1,6 @@
 import styled from "styled-components";
+import {getColorPrimary} from "../../../utils/constants";
+import {getBorderColor} from "./editor-helpers";
 
 export const StyledEditormd = styled("div")`
 
@@ -21,5 +23,12 @@ export const StyledEditormd = styled("div")`
 
     .editor-dark .preview {
         background-color: #1a1a17;
+    }
+    
+    .editor-icon:hover {
+        color: ${getColorPrimary()} !important;
+        background: ${getBorderColor()} !important;
+        height: 28px !important;
+        border-radius: 2px;
     }
 `;

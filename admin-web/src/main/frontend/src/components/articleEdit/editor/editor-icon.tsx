@@ -69,7 +69,7 @@ icons.forEach((e) => {
 dom.watch();
 
 const EditorIcon = ({name, onClick}: { name: string, onClick?: () => void }) => {
-    return <div onClick={onClick} style={{
+    return <div onClick={onClick} className={"editor-icon"} style={{
         cursor: "pointer",
         minWidth: 24,
         display: "flex",
