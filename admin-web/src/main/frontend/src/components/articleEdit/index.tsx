@@ -409,7 +409,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({
         });
     };
 
-    const editorHeight = fullScreen ? window.innerHeight - 47 : `calc(100vh - 236px)`;
+    const editorHeight = fullScreen ? window.innerHeight - 51 : `calc(100vh - 236px)`;
 
     return (
         <StyledArticleEdit>
