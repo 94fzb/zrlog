@@ -34,7 +34,6 @@ const EditorStatistics: FunctionComponent<EditorStatisticsInfoProps> = ({data, f
                 alignItems: "center",
                 fontSize: 14,
                 bottom: 0,
-                zIndex: 999,
                 background: EnvUtils.isDarkMode() ? "#141414" : "white",
             }}
         >
