@@ -7,19 +7,29 @@ import {getBorder} from "./editor-helpers";
 type EditorToolBarProps = {
     onChange: (val: string, cursorPosition: number) => void;
     onCopy?: () => void;
+    preview: boolean;
+    onEditorModeChange: (preview: boolean) => void;
 }
 
 const EditorToolBarDivider = () => {
-    return <span style={{border: getBorder(), height: "65%"}}></span>
+    return <span style={{
+        borderRight: getBorder(),
+        height: "65%",
+        width: 1,
+        userSelect: "none",
+        display: "inline-block"
+    }}>&nbsp;</span>
 }
 
-const EditorToolBar: FunctionComponent<EditorToolBarProps> = ({onChange, onCopy}) => {
+const EditorToolBar: FunctionComponent<EditorToolBarProps> = ({onChange, onCopy, preview, onEditorModeChange}) => {
 
     const [dialogState, setDialogState] = useState<EditorDialogState>({
         open: false,
         title: "",
         type: "image"
     })
+
+    console.info(preview);
 
     return <>
         {dialogState.open && <EditorDialog title={dialogState.title} type={dialogState.type} onOk={(mdStr) => {
@@ -38,9 +48,11 @@ const EditorToolBar: FunctionComponent<EditorToolBarProps> = ({onChange, onCopy}
         }}/>}
         <div style={{
             display: "flex",
-            gap: 12,
-            height: 38,
+            gap: 8,
             paddingRight: 16,
+            paddingTop: 2,
+            paddingBottom: 1,
+            flexWrap: "wrap",
             paddingLeft: 16,
             alignItems: "center",
             borderBottom: getBorder()
@@ -127,6 +139,11 @@ const EditorToolBar: FunctionComponent<EditorToolBarProps> = ({onChange, onCopy}
                 })
             }}/>
             <EditorIcon name={"clipboard"} onClick={onCopy}/>
+            {preview ? <EditorIcon key={preview + ""} name={"eye-slash"} onClick={() => {
+                onEditorModeChange(false)
+            }}/> : <EditorIcon key={preview + ""} name={"eye"} onClick={() => {
+                onEditorModeChange(true)
+            }}/>}
             <EditorToolBarDivider/>
             <EditorIcon name={"question-circle"} onClick={() => {
                 setDialogState({

@@ -26,7 +26,7 @@ import ArticleEditFullscreenButton from "./article-edit-fullscreen-button";
 import {auditTime, concatMap, Subject, tap} from "rxjs";
 import {Subscription} from "rxjs/internal/Subscription";
 import {deepEqualWithSpecialJSON, disableExitTips, enableExitTips} from "../../utils/helpers";
-import CodemirrorMarkedEditor from "./editor/codemirror-marked-editor";
+import MarkedEditor from "./editor/marked-editor";
 
 const StyledArticleEdit = styled("div")`
     .ant-btn {
@@ -409,7 +409,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({
         });
     };
 
-    const editorHeight = fullScreen ? window.innerHeight - 32 : `calc(100vh - 256px)`;
+    const editorHeight = fullScreen ? window.innerHeight - 120 : `calc(100vh - 256px)`;
 
     return (
         <StyledArticleEdit>
@@ -557,7 +557,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                             paddingRight: 0,
                         }}
                     >
-                        <CodemirrorMarkedEditor
+                        <MarkedEditor
                             height={editorHeight}
                             loadSuccess={(editor) => {
                                 editorInstance = editor;
