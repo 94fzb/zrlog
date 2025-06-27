@@ -10,6 +10,7 @@ import $ from "jquery";
 import {getRes} from "../../../utils/constants";
 import useMessage from "antd/es/message/useMessage";
 import {getBorder} from "./editor-helpers";
+import {StyledPreview} from "./styled-preview";
 
 type MarkdownEditorState = {
     markdownValue: string;
@@ -66,72 +67,77 @@ const MarkedEditor: FunctionComponent<MyEditorMdWrapperProps> = ({
 
 
     return <StyledEditormd>
-        {contextHolder}
-        <EditorToolBar onChange={(mdStr, cursorPosition) => {
-            const oldLength = state.markdownValue.length;
-            setState((prevState) => {
-                return {
-                    ...prevState,
-                    markdownValue: prevState.markdownValue + mdStr,
-                }
-            })
-            setTimeout(() => {
-                setAnchorLocation(oldLength + cursorPosition - 1)
-            }, 100);
-        }} onCopy={() => {
-            doCopy();
-        }} onEditorModeChange={(preview) => {
-            setState((prevState) => {
-                return {
-                    ...prevState,
-                    preview: preview
-                }
-            })
-        }} preview={state.preview}/>
-        <div style={{height: height, display: "flex"}}>
-            <CodeMirror
-                placeholder={getRes()["editorPlaceholder"]}
-                value={state.markdownValue}
-                height="100%"
-                width={"100%"}
-                onUpdate={(viewUpdate) => {
-                    if (viewUpdate.viewportChanged) {
+        <div className={EnvUtils.isDarkMode() ? "editor-dark" : "editor-light"} style={{overflow: "hidden"}}>
+            {contextHolder}
+            <EditorToolBar onChange={(mdStr, cursorPosition) => {
+                const oldLength = state.markdownValue.length;
+                setState((prevState) => {
+                    return {
+                        ...prevState,
+                        markdownValue: prevState.markdownValue + mdStr,
+                    }
+                })
+                setTimeout(() => {
+                    setAnchorLocation(oldLength + cursorPosition - 1)
+                }, 100);
+            }} onCopy={() => {
+                doCopy();
+            }} onEditorModeChange={(preview) => {
+                setState((prevState) => {
+                    return {
+                        ...prevState,
+                        preview: preview
+                    }
+                })
+            }} preview={state.preview}/>
+            <div style={{height: height, display: "flex"}}>
+                <CodeMirror
+                    placeholder={getRes()["editorPlaceholder"]}
+                    value={state.markdownValue}
+                    height={height}
+                    width={"100%"}
+                    onUpdate={(viewUpdate) => {
+                        if (viewUpdate.viewportChanged) {
+                            setState((prevState) => {
+                                return {
+                                    ...prevState,
+                                    preview: window.innerWidth > 600,
+                                }
+                            })
+                        }
+                    }
+                    }
+                    theme={EnvUtils.isDarkMode() ? "dark" : "light"}
+                    extensions={[markdownLanguage, EditorView.lineWrapping]}
+                    onCreateEditor={(view) => {
+                        viewRef.current = view;
+                    }}
+                    onChange={async (val) => {
                         setState((prevState) => {
                             return {
                                 ...prevState,
-                                preview: window.innerWidth > 600,
+                                markdownValue: val,
                             }
                         })
-                    }
-                }
-                }
-                theme={EnvUtils.isDarkMode() ? "dark" : "light"}
-                extensions={[markdownLanguage, EditorView.lineWrapping]}
-                onCreateEditor={(view) => {
-                    viewRef.current = view;
-                }}
-                onChange={async (val) => {
-                    setState((prevState) => {
-                        return {
-                            ...prevState,
-                            markdownValue: val,
-                        }
-                    })
-                    const content = await marked(val);
-                    onChange({
-                        markdown: val,
-                        content: content,
-                    })
+                        const content = await marked(val);
+                        onChange({
+                            markdown: val,
+                            content: content,
+                        })
 
-                }}
-                style={{
-                    minWidth: state.preview ? "50%" : "100%",
-                    width: state.preview ? "50%" : "100%",
-                    borderRight: getBorder()
-                }}
-            />
-            <div dangerouslySetInnerHTML={{__html: marked(state.markdownValue)}}
-                 style={{padding: 2, display: state.preview ? "block" : "none", width: "100%"}}/>
+                    }}
+                    style={{
+                        minWidth: state.preview ? "50%" : "100%",
+                        width: state.preview ? "50%" : "100%",
+                        borderRight: getBorder()
+                    }}
+                />
+                <StyledPreview className={"preview"}
+                               style={{padding: 4, display: state.preview ? "block" : "none", width: "100%"}}>
+                    <div dangerouslySetInnerHTML={{__html: marked(state.markdownValue)}}
+                         className={"markdown-body"}/>
+                </StyledPreview>
+            </div>
         </div>
     </StyledEditormd>
 }
