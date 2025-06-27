@@ -28,3 +28,7 @@
 ### 1.5.7
 
 - ant dialog instance javascript build dialog
+
+### 1.5.8
+
+- fix mobile click error

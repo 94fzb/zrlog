@@ -371,7 +371,7 @@ const MyEditorMdWrapper: FunctionComponent<MyEditorMdWrapperProps> = ({height, m
     const [mdEditorScriptLoaded, setMdEditorScriptLoaded] = useState<boolean>(false);
 
     const EditMdAsyncScriptLoader = makeAsyncScriptLoader(
-        getResourceBaseUrl() + "vendors/markdown/js/editormd-1.5.7.js"
+        getResourceBaseUrl() + "vendors/markdown/js/editormd-1.5.8.js"
     )(MyLoadingComponent) as unknown as FunctionComponent<ScriptLoaderProps>;
     if (mdEditorScriptLoaded) {
         return <MyEditorMd height={height} markdown={markdown} loadSuccess={loadSuccess} onChange={onChange}/>;
