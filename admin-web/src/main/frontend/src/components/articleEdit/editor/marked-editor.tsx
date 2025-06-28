@@ -15,6 +15,9 @@ import {markdown} from "@codemirror/lang-markdown";
 import "highlight.js/styles/default.css"; // 或任意你喜欢的主题
 import hljs from "highlight.js/lib/core";
 import java from 'highlight.js/lib/languages/java';
+import PasteUpload from "./paste-upload";
+import {keymap} from "@codemirror/view";
+import ScrollSync from "./scroll-sync";
 
 type MarkdownEditorState = {
     markdownValue: string;
@@ -22,6 +25,19 @@ type MarkdownEditorState = {
 }
 
 hljs.registerLanguage('java', java);
+
+const disableFindKeys = keymap.of([
+    {
+        key: "Mod-f", // Ctrl+F / Cmd+F
+        preventDefault: true,
+        run: () => true
+    },
+    {
+        key: "Mod-h",
+        preventDefault: true,
+        run: () => true
+    }
+]);
 
 const MarkedEditor: FunctionComponent<MyEditorMdWrapperProps> = ({
                                                                      height,
@@ -56,17 +72,25 @@ const MarkedEditor: FunctionComponent<MyEditorMdWrapperProps> = ({
         preview: window.innerWidth > 600,
     });
 
-    const viewRef = useRef<EditorView | null>(null);
+    const editorRef = useRef<EditorView | null>(null);
+    const previewRef = useRef<HTMLDivElement | null>(null);
 
     const [messageApi, contextHolder] = useMessage();
 
 
-    const setAnchorLocation = (index: number) => {
-        viewRef.current?.dispatch({
-            selection: EditorSelection.cursor(index),
-            scrollIntoView: true
+    const insertTextAtCursor = (text: string, cursorPosition: number) => {
+        const view = editorRef.current;
+        if (!view) return;
+
+        const pos = view.state.selection.main.head; // 当前光标位置
+
+        view.dispatch({
+            changes: {from: pos, insert: text},
+            selection: EditorSelection.cursor(pos + cursorPosition),
+            scrollIntoView: true,
         });
-    }
+        view.focus(); // 确保光标可见
+    };
 
 
     function copyToClipboard(html: any) {
@@ -84,7 +108,6 @@ const MarkedEditor: FunctionComponent<MyEditorMdWrapperProps> = ({
         messageApi.info(getRes().copPreviewHtmlToClipboardSuccess);
     }
 
-
     useEffect(() => {
         if (loadSuccess) {
             loadSuccess(null);
@@ -92,20 +115,16 @@ const MarkedEditor: FunctionComponent<MyEditorMdWrapperProps> = ({
     }, []);
 
 
-    return <StyledEditormd>
-        <div className={EnvUtils.isDarkMode() ? "editor-dark" : "editor-light"} style={{overflow: "hidden"}}>
+    return <StyledEditormd style={{paddingBottom: 30}}>
+        {editorRef.current && <PasteUpload onUploadSuccess={(imgUrl) => {
+            const content = "![](" + imgUrl + ")\n"
+            insertTextAtCursor(content, content.length);
+        }} editorView={editorRef.current.contentDOM as HTMLElement}/>}
+        <div className={EnvUtils.isDarkMode() ? "editor-dark" : "editor-light"}
+             style={{overflow: "hidden"}}>
             {contextHolder}
             <EditorToolBar getContainer={getContainer} onChange={(mdStr, cursorPosition) => {
-                const oldLength = state.markdownValue.length;
-                setState((prevState) => {
-                    return {
-                        ...prevState,
-                        markdownValue: prevState.markdownValue + mdStr,
-                    }
-                })
-                setTimeout(() => {
-                    setAnchorLocation(oldLength + cursorPosition - 1)
-                }, 100);
+                insertTextAtCursor(mdStr, cursorPosition)
             }} onCopy={() => {
                 doCopy();
             }} onEditorModeChange={(preview) => {
@@ -118,6 +137,7 @@ const MarkedEditor: FunctionComponent<MyEditorMdWrapperProps> = ({
             }} preview={state.preview}/>
             <div style={{height: height, display: "flex"}}>
                 <CodeMirror
+                    basicSetup={{searchKeymap: false}}
                     placeholder={getRes()["editorPlaceholder"]}
                     value={state.markdownValue}
                     height={height}
@@ -134,9 +154,9 @@ const MarkedEditor: FunctionComponent<MyEditorMdWrapperProps> = ({
                     }
                     }
                     theme={EnvUtils.isDarkMode() ? "dark" : "light"}
-                    extensions={[markdown({codeLanguages: languages}), EditorView.lineWrapping,]}
+                    extensions={[markdown({codeLanguages: languages}), EditorView.lineWrapping, disableFindKeys]}
                     onCreateEditor={(view) => {
-                        viewRef.current = view;
+                        editorRef.current = view;
                     }}
                     onChange={async (val) => {
                         setState((prevState) => {
@@ -158,13 +178,15 @@ const MarkedEditor: FunctionComponent<MyEditorMdWrapperProps> = ({
                         borderRight: getBorder()
                     }}
                 />
-                <StyledPreview className={"preview"}
+                <StyledPreview ref={previewRef} className={"preview"}
                                style={{padding: 4, display: state.preview ? "block" : "none", width: "100%"}}>
                     <div dangerouslySetInnerHTML={{__html: marked(state.markdownValue)}}
                          className={"markdown-body"}/>
                 </StyledPreview>
             </div>
         </div>
+        {(editorRef.current && previewRef.current && editorRef.current.scrollDOM) &&
+            <ScrollSync editorRef={editorRef} previewRef={previewRef}/>}
     </StyledEditormd>
 }
 

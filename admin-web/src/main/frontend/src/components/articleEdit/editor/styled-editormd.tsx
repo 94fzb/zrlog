@@ -35,4 +35,22 @@ export const StyledEditormd = styled("div")`
         height: 28px !important;
         border-radius: 2px;
     }
+
+    .editor-dark .markdown-body table th,
+    .editor-dark .markdown-body table td {
+        border: 1px solid rgba(198, 198, 198, 0.5);
+    }
+
+    .editor-dark .markdown-body table tr {
+        background-color: #212529 !important;
+        border-top: 1px solid rgba(198, 198, 198, 0.5);
+    }
+
+    .editor-dark .markdown-body table tr:nth-child(2n) {
+        background-color: #212529 !important;
+    }
+
+    .editor-dark .markdown-body pre {
+        background-color: #1f1f1f !important;
+    }
 `;

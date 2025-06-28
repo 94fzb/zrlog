@@ -409,7 +409,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({
         });
     };
 
-    const editorHeight = fullScreen ? "100vh" : `calc(100vh - 256px)`;
+    const editorHeight = fullScreen ? "100vh" : `calc(100vh - 286px)`;
 
     return (
         <StyledArticleEdit>
@@ -558,6 +558,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                         }}
                     >
                         <MarkedEditor
+                            fullscreen={fullScreen}
                             height={editorHeight}
                             loadSuccess={(editor) => {
                                 editorInstance = editor;

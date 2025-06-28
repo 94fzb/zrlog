@@ -6,6 +6,7 @@ export type MyEditorMdWrapperProps = {
     value?: string;
     loadSuccess?: (editor: any) => void;
     getContainer?: () => HTMLElement;
+    fullscreen: boolean;
 };
 
 export type EditorDialogState = {

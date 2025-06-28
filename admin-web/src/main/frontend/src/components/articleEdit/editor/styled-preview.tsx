@@ -649,18 +649,4 @@ export const StyledPreview = styled("div")`
             height: 0;
         }
     }
-
-    .editor-dark .markdown-body table th,
-    .editor-dark .markdown-body table td {
-        border: 1px solid rgba(198, 198, 198, 0.5);
-    }
-
-    .editor-dark .markdown-body table tr {
-        background-color: #212529 !important;
-        border-top: 1px solid rgba(198, 198, 198, 0.5);
-    }
-
-    .editor-dark .markdown-body table tr:nth-child(2n) {
-        background-color: #212529 !important;
-    }
 `;

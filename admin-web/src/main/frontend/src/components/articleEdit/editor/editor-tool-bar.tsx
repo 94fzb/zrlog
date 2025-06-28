@@ -97,9 +97,6 @@ const EditorToolBar: FunctionComponent<EditorToolBarProps> = ({
             <EditorIcon name={"minus"} onClick={() => {
                 onChange("\n ------------ \n\n ", 3)
             }}/>
-            <EditorIcon name={"newspaper"} onClick={() => {
-                onChange("[========]\n", 3)
-            }}/>
             <EditorToolBarDivider/>
             <EditorIcon name={"link"} onClick={() => {
                 setDialogState({
