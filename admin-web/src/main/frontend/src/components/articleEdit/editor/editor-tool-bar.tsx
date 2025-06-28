@@ -45,7 +45,7 @@ const EditorToolBar: FunctionComponent<EditorToolBarProps> = ({
                 type: "image",
                 open: false
             })
-            onChange(mdStr, -1)
+            onChange(mdStr, mdStr.length)
         }} onClose={() => {
             setDialogState({
                 title: "",
