@@ -34,15 +34,16 @@ const EditorStatistics: FunctionComponent<EditorStatisticsInfoProps> = ({data, f
                 alignItems: "center",
                 fontSize: 14,
                 bottom: 0,
+                userSelect: "none",
                 background: EnvUtils.isDarkMode() ? "#141414" : "white",
             }}
         >
-            <span style={{padding: 16, paddingLeft: 40}}>
+            <span style={{padding: 16, paddingLeft: 40, whiteSpace: "nowrap"}}>
                 {getRes()["editor.wordsCount"]}
                 <span style={{paddingRight: 4, paddingLeft: 4}}>:</span>
                 <b style={{marginLeft: 18, width: 60}}>{data.contentWordsLength}</b>
             </span>
-            <span style={{padding: 16, paddingLeft: 20}}>
+            <span style={{padding: 16, whiteSpace: "nowrap"}}>
                 {getRes()["editor.linesCount"]}
                 <span style={{paddingRight: 4, paddingLeft: 4}}>:</span>
                 <b style={{marginLeft: 18, width: 60}}>{data.contentLinesLength}</b>
