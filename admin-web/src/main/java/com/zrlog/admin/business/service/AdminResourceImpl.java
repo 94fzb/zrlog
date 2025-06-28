@@ -59,7 +59,7 @@ public class AdminResourceImpl implements AdminResource {
             });
             Map<String, Object> staticFiles = (Map<String, Object>) map.get("files");
             if (Objects.nonNull(staticFiles)) {
-                cacheUris.addAll(staticFiles.values().stream().filter(e -> ((String) e).endsWith(".js")).map(String::valueOf).collect(Collectors.toList()));
+                cacheUris.addAll(staticFiles.values().stream().filter(e -> ((String) e).endsWith(".js") || ((String) e).endsWith(".css")).map(String::valueOf).collect(Collectors.toList()));
                 cacheUris = new LinkedHashSet<>(wrapperUris(cacheUris));
             }
         }
