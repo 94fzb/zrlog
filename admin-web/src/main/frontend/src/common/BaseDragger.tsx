@@ -14,6 +14,8 @@ type BaseDraggerProps = PropsWithChildren & {
     onProgress?: (percent: number) => void;
     disabled?: boolean;
     onError?: (error: Error) => void;
+    getContainer?: () => HTMLElement;
+
 }
 
 const BaseDragger: FunctionComponent<BaseDraggerProps> = ({
@@ -25,10 +27,11 @@ const BaseDragger: FunctionComponent<BaseDraggerProps> = ({
                                                               onSuccess,
                                                               disabled,
                                                               onProgress,
-                                                              onError
+                                                              onError,
+                                                              getContainer
                                                           }) => {
 
-    const axiosInstance = useAxiosBaseInstance();
+    const axiosInstance = useAxiosBaseInstance(getContainer);
 
     const customRequest = async (options: any) => {
         const {file} = options;

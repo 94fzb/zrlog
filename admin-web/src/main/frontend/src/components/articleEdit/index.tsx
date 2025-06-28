@@ -562,6 +562,9 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                             loadSuccess={(editor) => {
                                 editorInstance = editor;
                             }}
+                            getContainer={() => {
+                                return editCardRef.current as HTMLDivElement;
+                            }}
                             value={state.article.markdown}
                             onChange={(v) => {
                                 if (

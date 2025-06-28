@@ -5,6 +5,7 @@ export type MyEditorMdWrapperProps = {
     onChange: (content: ChangedContent) => void;
     value?: string;
     loadSuccess?: (editor: any) => void;
+    getContainer?: () => HTMLElement;
 };
 
 export type EditorDialogState = {

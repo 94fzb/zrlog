@@ -1,5 +1,5 @@
 import {FunctionComponent, useState} from "react";
-import {Input, message, Modal} from "antd";
+import {Button, Input, message, Modal} from "antd";
 import BaseDragger from "../../../common/BaseDragger";
 import {LoadingOutlined} from "@ant-design/icons";
 import MarkdownHelp from "./markdown-help";
@@ -12,6 +12,7 @@ type EditorDialogProps = {
     type: DialogType
     onOk?: (mdStr: string) => void;
     onClose?: () => void;
+    getContainer?: () => HTMLElement;
 }
 
 type EditorDialogState = {
@@ -20,7 +21,7 @@ type EditorDialogState = {
     uploading: boolean
 }
 
-const EditorDialog: FunctionComponent<EditorDialogProps> = ({title, type, onOk, onClose}) => {
+const EditorDialog: FunctionComponent<EditorDialogProps> = ({title, type, onOk, onClose, getContainer}) => {
 
     const [state, setState] = useState<EditorDialogState>({
         uploading: false,
@@ -28,7 +29,7 @@ const EditorDialog: FunctionComponent<EditorDialogProps> = ({title, type, onOk, 
         desc: "",
     })
 
-    const [messageApi, contextHolder] = message.useMessage({maxCount: 3});
+    const [messageApi, contextHolder] = message.useMessage({maxCount: 3, getContainer: getContainer});
 
     const getAccept = () => {
         if (type === "image") {
@@ -93,10 +94,10 @@ const EditorDialog: FunctionComponent<EditorDialogProps> = ({title, type, onOk, 
             </div>
         }
         return (
-            <>
+            <div style={{display: "flex", flexFlow: "column", gap: 12}}>
                 <div style={{display: "flex", justifyContent: "flex-start", gap: 12, alignItems: "center"}}>
                     <div style={{display: "flex"}}>地址</div>
-                    <Input style={{minHeight: 48, flex: 1, width: "100%", display: "flex"}} value={state.value}
+                    <Input style={{minHeight: 36, flex: 1, width: "100%", display: "flex"}} value={state.value}
                            onChange={(e) => {
                                setState((prevState) => {
                                    return {
@@ -133,15 +134,15 @@ const EditorDialog: FunctionComponent<EditorDialogProps> = ({title, type, onOk, 
                             }
                         })
                     }}>
-                        <div>
+                        <Button type={"text"} style={{background: "inherit", border: "none"}}>
                             {state.uploading && <LoadingOutlined/>} {state.uploading ? "上传中" : "本地上传"}
-                        </div>
+                        </Button>
                     </BaseDragger>
                 </div>
 
                 <div style={{display: "flex", justifyContent: "flex-start", gap: 12, alignItems: "center"}}>
                     <div style={{display: "flex"}}>描述</div>
-                    <Input style={{minHeight: 48, flex: 1, width: "100%", display: "flex"}} value={state.desc}
+                    <Input style={{minHeight: 36, flex: 1, width: "100%", display: "flex"}} value={state.desc}
                            onChange={(e) => {
                                setState((prevState) => {
                                    return {
@@ -152,7 +153,7 @@ const EditorDialog: FunctionComponent<EditorDialogProps> = ({title, type, onOk, 
                            }}></Input>
                     <div style={{minWidth: 96}}></div>
                 </div>
-            </>
+            </div>
         )
     }
 
@@ -164,7 +165,7 @@ const EditorDialog: FunctionComponent<EditorDialogProps> = ({title, type, onOk, 
         lg: '60%',
         xl: '50%',
         xxl: '40%',
-    }} title={title} onOk={() => {
+    }} getContainer={getContainer} title={title} onOk={() => {
         if (onOk) {
             if (type === "table" || type === "code") {
                 if (state.value === "") {

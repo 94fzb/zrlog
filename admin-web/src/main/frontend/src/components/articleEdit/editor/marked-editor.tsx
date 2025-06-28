@@ -27,7 +27,8 @@ const MarkedEditor: FunctionComponent<MyEditorMdWrapperProps> = ({
                                                                      height,
                                                                      value,
                                                                      onChange,
-                                                                     loadSuccess
+                                                                     loadSuccess,
+                                                                     getContainer
                                                                  }) => {
 
     const renderer = new marked.Renderer();
@@ -94,7 +95,7 @@ const MarkedEditor: FunctionComponent<MyEditorMdWrapperProps> = ({
     return <StyledEditormd>
         <div className={EnvUtils.isDarkMode() ? "editor-dark" : "editor-light"} style={{overflow: "hidden"}}>
             {contextHolder}
-            <EditorToolBar onChange={(mdStr, cursorPosition) => {
+            <EditorToolBar getContainer={getContainer} onChange={(mdStr, cursorPosition) => {
                 const oldLength = state.markdownValue.length;
                 setState((prevState) => {
                     return {
@@ -123,12 +124,12 @@ const MarkedEditor: FunctionComponent<MyEditorMdWrapperProps> = ({
                     width={"100%"}
                     onUpdate={(viewUpdate) => {
                         if (viewUpdate.viewportChanged) {
-                            setState((prevState) => {
+                            /*setState((prevState) => {
                                 return {
                                     ...prevState,
                                     preview: window.innerWidth > 600,
                                 }
-                            })
+                            })*/
                         }
                     }
                     }

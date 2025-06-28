@@ -9,6 +9,7 @@ type EditorToolBarProps = {
     onCopy?: () => void;
     preview: boolean;
     onEditorModeChange: (preview: boolean) => void;
+    getContainer?: () => HTMLElement;
 }
 
 const EditorToolBarDivider = () => {
@@ -21,7 +22,13 @@ const EditorToolBarDivider = () => {
     }}>&nbsp;</span>
 }
 
-const EditorToolBar: FunctionComponent<EditorToolBarProps> = ({onChange, onCopy, preview, onEditorModeChange}) => {
+const EditorToolBar: FunctionComponent<EditorToolBarProps> = ({
+                                                                  onChange,
+                                                                  onCopy,
+                                                                  preview,
+                                                                  onEditorModeChange,
+                                                                  getContainer
+                                                              }) => {
 
     const [dialogState, setDialogState] = useState<EditorDialogState>({
         open: false,
@@ -32,7 +39,7 @@ const EditorToolBar: FunctionComponent<EditorToolBarProps> = ({onChange, onCopy,
     console.info(preview);
 
     return <>
-        {dialogState.open && <EditorDialog title={dialogState.title} type={dialogState.type} onOk={(mdStr) => {
+        {dialogState.open && <EditorDialog getContainer={getContainer} title={dialogState.title} type={dialogState.type} onOk={(mdStr) => {
             setDialogState({
                 title: "",
                 type: "image",

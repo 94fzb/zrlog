@@ -10,7 +10,7 @@ export const StyledEditormd = styled("div")`
     }
 
     .preview {
-        overflow: scroll;
+        overflow: auto;
     }
     
     .cm-scroller {
