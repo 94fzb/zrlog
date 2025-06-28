@@ -46,6 +46,8 @@ const codeLanguages: Record<string, string[]> = {
 
 type CodeBodyProps = {
     onChange: (content: string) => void;
+    getContainer?: () => HTMLElement;
+
 }
 
 type CodeBodyState = {
@@ -53,7 +55,7 @@ type CodeBodyState = {
     code: string;
 }
 
-const CodeBody: FunctionComponent<CodeBodyProps> = ({onChange}) => {
+const CodeBody: FunctionComponent<CodeBodyProps> = ({onChange, getContainer}) => {
 
     const [state, setState] = useState<CodeBodyState>({
         language: "",
@@ -75,7 +77,7 @@ const CodeBody: FunctionComponent<CodeBodyProps> = ({onChange}) => {
                         language: k
                     }
                 })
-            }}>
+            }} getPopupContainer={getContainer}>
                 {Object.keys(codeLanguages).map(key => <Option key={key}
                                                                value={key}>{(codeLanguages[key])[0]}</Option>)}
             </Select>

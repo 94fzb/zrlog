@@ -46,7 +46,7 @@ const EditorDialog: FunctionComponent<EditorDialogProps> = ({title, type, onOk, 
             return <MarkdownHelp/>
         }
         if (type === "code") {
-            return <CodeBody onChange={(v) => {
+            return <CodeBody getContainer={getContainer} onChange={(v) => {
                 setState((prevState) => {
                     return {
                         ...prevState,
