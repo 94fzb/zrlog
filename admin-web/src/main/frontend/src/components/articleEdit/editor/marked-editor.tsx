@@ -12,12 +12,13 @@ import {getBorder} from "./editor-helpers";
 import {StyledPreview} from "./styled-preview";
 import {languages} from "@codemirror/language-data";
 import {markdown} from "@codemirror/lang-markdown";
-import "highlight.js/styles/default.css"; // 或任意你喜欢的主题
 import hljs from "highlight.js/lib/core";
 import java from 'highlight.js/lib/languages/java';
 import PasteUpload from "./paste-upload";
 import {keymap} from "@codemirror/view";
 import ScrollSync from "./scroll-sync";
+import {StyledHighlightDark} from "./highlight/styled-highlight-dark";
+import {StyledHighlightDefault} from "./highlight/styled-highlight-default";
 
 type MarkdownEditorState = {
     markdownValue: string;
@@ -108,6 +109,11 @@ const MarkedEditor: FunctionComponent<MyEditorMdWrapperProps> = ({
         messageApi.info(getRes().copPreviewHtmlToClipboardSuccess);
     }
 
+    const getPreviewBody = () => {
+        return <div dangerouslySetInnerHTML={{__html: marked(state.markdownValue)}}
+                    className={"markdown-body"}/>
+    }
+
     useEffect(() => {
         if (loadSuccess) {
             loadSuccess(null);
@@ -180,8 +186,9 @@ const MarkedEditor: FunctionComponent<MyEditorMdWrapperProps> = ({
                 />
                 <StyledPreview ref={previewRef} className={"preview"}
                                style={{padding: 4, display: state.preview ? "block" : "none", width: "100%"}}>
-                    <div dangerouslySetInnerHTML={{__html: marked(state.markdownValue)}}
-                         className={"markdown-body"}/>
+
+                    {EnvUtils.isDarkMode() ? <StyledHighlightDark>{getPreviewBody()}</StyledHighlightDark> :
+                        <StyledHighlightDefault>{getPreviewBody()} </StyledHighlightDefault>}
                 </StyledPreview>
             </div>
         </div>
