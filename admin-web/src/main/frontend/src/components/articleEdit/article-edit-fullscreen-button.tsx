@@ -87,6 +87,7 @@ const ArticleEditFullscreenButton: FunctionComponent<ArticleEditFullscreenButton
                     <FullscreenOutlined style={{ fontSize: 24 }} />
                 )
             }
+            className={"editor-icon"}
             href={
                 fullScreen
                     ? window.location.pathname + "#exitFullScreen"
@@ -97,10 +98,10 @@ const ArticleEditFullscreenButton: FunctionComponent<ArticleEditFullscreenButton
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
-                width: 46,
-                minWidth: 46,
+                width: 47,
+                minWidth: 47,
                 borderRadius: 8,
-                height: 46,
+                height: 47,
                 fontSize: 24,
                 cursor: "pointer",
                 color: "rgb(102, 102, 102)",

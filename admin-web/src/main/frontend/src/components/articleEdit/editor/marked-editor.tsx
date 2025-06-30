@@ -185,7 +185,7 @@ const MarkedEditor: FunctionComponent<MyEditorMdWrapperProps> = ({
                     }}
                 />
                 <StyledPreview ref={previewRef} className={"preview"}
-                               style={{padding: 4, display: state.preview ? "block" : "none", width: "100%"}}>
+                               style={{padding: 4, display: state.preview ? "block" : "none", width: "calc(50% - 4px)"}}>
 
                     {EnvUtils.isDarkMode() ? <StyledHighlightDark>{getPreviewBody()}</StyledHighlightDark> :
                         <StyledHighlightDefault>{getPreviewBody()} </StyledHighlightDefault>}

@@ -76,7 +76,7 @@ const EditorIcon = ({name, onClick}: { name: string, onClick?: () => void }) => 
         alignItems: "center",
         color: "rgb(119, 119, 119)",
         fontSize: 16,
-        height: 34,
+        height: 28,
         justifyContent: "center"
     }}><i className={"fa fa-" + name}></i></div>
 }

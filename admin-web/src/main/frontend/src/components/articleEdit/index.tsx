@@ -5,7 +5,7 @@ import Col from "antd/es/grid/col";
 import Divider from "antd/es/divider";
 import Title from "antd/es/typography/Title";
 import Card from "antd/es/card";
-import {createUri, getRes, updateUri} from "../../utils/constants";
+import {createUri, getColorPrimary, getRes, updateUri} from "../../utils/constants";
 import styled from "styled-components";
 import Select from "antd/es/select";
 import BaseInput from "../../common/BaseInput";
@@ -27,6 +27,7 @@ import {auditTime, concatMap, Subject, tap} from "rxjs";
 import {Subscription} from "rxjs/internal/Subscription";
 import {deepEqualWithSpecialJSON, disableExitTips, enableExitTips} from "../../utils/helpers";
 import MarkedEditor from "./editor/marked-editor";
+import {getBorderColor} from "./editor/editor-helpers";
 
 const StyledArticleEdit = styled("div")`
     .ant-btn {
@@ -50,6 +51,12 @@ const StyledArticleEdit = styled("div")`
 
     .save-text-full-screen {
         right: 300px;
+    }
+
+    .editor-icon:hover {
+        color: ${getColorPrimary()} !important;
+        background: ${getBorderColor()} !important;
+        border-radius: 2px;
     }
 
     @media screen and (max-width: 560px) {

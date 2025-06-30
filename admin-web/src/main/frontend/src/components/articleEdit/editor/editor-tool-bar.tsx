@@ -39,14 +39,15 @@ const EditorToolBar: FunctionComponent<EditorToolBarProps> = ({
     console.info(preview);
 
     return <>
-        {dialogState.open && <EditorDialog getContainer={getContainer} title={dialogState.title} type={dialogState.type} onOk={(mdStr) => {
-            setDialogState({
-                title: "",
-                type: "image",
-                open: false
-            })
-            onChange(mdStr, mdStr.length)
-        }} onClose={() => {
+        {dialogState.open && <EditorDialog getContainer={getContainer} title={dialogState.title} type={dialogState.type}
+                                           onOk={(mdStr) => {
+                                               setDialogState({
+                                                   title: "",
+                                                   type: "image",
+                                                   open: false
+                                               })
+                                               onChange(mdStr, mdStr.length)
+                                           }} onClose={() => {
             setDialogState({
                 title: "",
                 type: "image",
@@ -61,6 +62,7 @@ const EditorToolBar: FunctionComponent<EditorToolBarProps> = ({
             paddingBottom: 1,
             flexWrap: "wrap",
             paddingLeft: 16,
+            height: 38,
             alignItems: "center",
             borderBottom: getBorder()
         }}>

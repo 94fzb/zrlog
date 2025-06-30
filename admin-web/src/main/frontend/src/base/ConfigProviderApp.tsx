@@ -44,6 +44,10 @@ const ConfigProviderApp = () => {
 
     const basePath = getContextPath() + "admin"
 
+    useEffect(() => {
+        window.document.body.setAttribute("class", appState.dark ? "dark" : "light");
+    }, [appState.dark]);
+
     return <ConfigProvider
         key={appState.lang + "_" + appState.dark + "_" + appState.colorPrimary}
         locale={appState.lang.startsWith("zh") ? zh_CN : en_US}
