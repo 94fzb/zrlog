@@ -1,4 +1,4 @@
-### editormd 维护记录
+### editor 维护记录
 
 #### dependency upgraded
 
@@ -32,3 +32,9 @@
 ### 1.5.8
 
 - fix mobile click error
+
+### 2.x
+
+> remove editormd
+
+- base `antd ui` + `codemirror` + `marked`

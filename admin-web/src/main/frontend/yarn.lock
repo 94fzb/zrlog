@@ -3490,14 +3490,6 @@
   resolved "https://registry.npmmirror.com/@types/history/-/history-4.7.11.tgz#56588b17ae8f50c53983a524fc3cc47437969d64"
   integrity sha512-qjDJRrmvBMiTx+jyLxvLfJU7UznFuokDv4f3WRuriHKERccVpFU+8XMQUAbDzoiJCsmexxRExQeMwwCdamSKDA==
 
-"@types/hoist-non-react-statics@^3.3.1":
-  version "3.3.1"
-  resolved "https://registry.npmmirror.com/@types/hoist-non-react-statics/download/@types/hoist-non-react-statics-3.3.1.tgz#1124aafe5118cb591977aeb1ceaaed1070eb039f"
-  integrity sha1-ESSq/lEYy1kZd66xzqrtEHDrA58=
-  dependencies:
-    "@types/react" "*"
-    hoist-non-react-statics "^3.3.0"
-
 "@types/html-minifier-terser@^6.0.0":
   version "6.1.0"
   resolved "https://registry.npmmirror.com/@types/html-minifier-terser/-/html-minifier-terser-6.1.0.tgz#4fc33a00c1d0c16987b1a20cf92d20614c55ac35"
@@ -3528,13 +3520,6 @@
   integrity sha1-kVP+mLuivVZaY63ZQ21vDX+EaP8=
   dependencies:
     "@types/istanbul-lib-report" "*"
-
-"@types/jquery@3.5.11":
-  version "3.5.11"
-  resolved "https://registry.npmmirror.com/@types/jquery/download/@types/jquery-3.5.11.tgz#fb2a255e8376779e89a10ddd04bfc1a93398f861"
-  integrity sha512-lYZGdfOtUa0XFjIATQgiogqeTY5PNNMOmp3Jq48ghmJALL8t/IqABRqlEwdHfuUdA8iIE1uGD1HoI4a7Tiy6OA==
-  dependencies:
-    "@types/sizzle" "*"
 
 "@types/json-schema@*", "@types/json-schema@^7.0.5", "@types/json-schema@^7.0.8":
   version "7.0.9"
@@ -3590,15 +3575,6 @@
   version "1.2.4"
   resolved "https://registry.npmmirror.com/@types/range-parser/-/range-parser-1.2.4.tgz#cd667bcfdd025213aafb7ca5915a932590acdcdc"
   integrity sha512-EEhsLsD6UsDM1yFhAvy0Cjr6VwmpMWqFBCb9w07wVugF7w9nfajxLuVmngTIpgS6svCnm6Vaw+MZhoDCKnOfsw==
-
-"@types/react-async-script@1.2.1":
-  version "1.2.1"
-  resolved "https://registry.npmmirror.com/@types/react-async-script/download/@types/react-async-script-1.2.1.tgz#165648718fa069a794e672b2300ae6276e2fd080"
-  integrity sha1-FlZIcY+gaaeU5nKyMArmJ24v0IA=
-  dependencies:
-    "@types/hoist-non-react-statics" "^3.3.1"
-    "@types/react" "*"
-    hoist-non-react-statics "^3.3.1"
 
 "@types/react-dom@18.3.1":
   version "18.3.1"
@@ -3680,11 +3656,6 @@
   dependencies:
     "@types/mime" "*"
     "@types/node" "*"
-
-"@types/sizzle@*":
-  version "2.3.3"
-  resolved "https://registry.npmmirror.com/@types/sizzle/download/@types/sizzle-2.3.3.tgz#ff5e2f1902969d305225a047c8a0fd5c915cebef"
-  integrity sha1-/14vGQKWnTBSJaBHyKD9XJFc6+8=
 
 "@types/sockjs@^0.3.33":
   version "0.3.33"
@@ -6784,17 +6755,10 @@ he@^1.2.0:
   resolved "https://registry.npmmirror.com/he/download/he-1.2.0.tgz#84ae65fa7eafb165fddb61566ae14baf05664f0f"
   integrity sha1-hK5l+n6vsWX922FWauFLrwVmTw8=
 
-highlight.js@^11.11.1:
+highlight.js@11.11.1:
   version "11.11.1"
   resolved "https://registry.npmmirror.com/highlight.js/-/highlight.js-11.11.1.tgz#fca06fa0e5aeecf6c4d437239135fabc15213585"
   integrity sha512-Xwwo44whKBVCYoliBQwaPvtd/2tYFkRQtXDWj1nackaV2JPXx3L0+Jvd8/qCJ2p+ML0/XVkJ2q+Mr+UVdpJK5w==
-
-hoist-non-react-statics@^3.3.0, hoist-non-react-statics@^3.3.1:
-  version "3.3.2"
-  resolved "https://registry.npmmirror.com/hoist-non-react-statics/download/hoist-non-react-statics-3.3.2.tgz#ece0acaf71d62c2969c2ec59feff42a4b1a85b45"
-  integrity sha1-7OCsr3HWLClpwuxZ/v9CpLGoW0U=
-  dependencies:
-    react-is "^16.7.0"
 
 hoopy@^0.1.4:
   version "0.1.4"
@@ -7810,11 +7774,6 @@ jest@^27.4.3:
     "@jest/core" "^27.5.1"
     import-local "^3.0.2"
     jest-cli "^27.5.1"
-
-jquery@3.7.1:
-  version "3.7.1"
-  resolved "https://registry.npmmirror.com/jquery/-/jquery-3.7.1.tgz#083ef98927c9a6a74d05a6af02806566d16274de"
-  integrity sha512-m4avr8yL8kmFN8psrbFFFmB/If14iN5o9nw/NgnnM+kybDJpRsAynV2BsfpTYrTRysYUdADVD7CkUUizgkpLfg==
 
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"
@@ -9471,15 +9430,6 @@ prompts@^2.0.1, prompts@^2.4.2:
     kleur "^3.0.3"
     sisteransi "^1.0.5"
 
-prop-types@^15.5.0:
-  version "15.8.0"
-  resolved "https://registry.npmmirror.com/prop-types/download/prop-types-15.8.0.tgz#d237e624c45a9846e469f5f31117f970017ff588"
-  integrity sha512-fDGekdaHh65eI3lMi5OnErU6a8Ighg2KjcjQxO7m8VHyWjcPyj5kiOgV1LQDOOOgVy3+5FgjXvdSSX7B8/5/4g==
-  dependencies:
-    loose-envify "^1.4.0"
-    object-assign "^4.1.1"
-    react-is "^16.13.1"
-
 prop-types@^15.8.1:
   version "15.8.1"
   resolved "https://registry.npmmirror.com/prop-types/-/prop-types-15.8.1.tgz#67d87bf1a694f48435cf332c24af10214a3140b5"
@@ -10106,14 +10056,6 @@ react-app-polyfill@^3.0.0:
     regenerator-runtime "^0.13.9"
     whatwg-fetch "^3.6.2"
 
-react-async-script@1.2.0:
-  version "1.2.0"
-  resolved "https://registry.npmmirror.com/react-async-script/download/react-async-script-1.2.0.tgz#ab9412a26f0b83f5e2e00de1d2befc9400834b21"
-  integrity sha1-q5QSom8Lg/Xi4A3h0r78lACDSyE=
-  dependencies:
-    hoist-non-react-statics "^3.3.0"
-    prop-types "^15.5.0"
-
 react-dev-utils@^12.0.1:
   version "12.0.1"
   resolved "https://registry.npmmirror.com/react-dev-utils/-/react-dev-utils-12.0.1.tgz#ba92edb4a1f379bd46ccd6bcd4e7bc398df33e73"
@@ -10157,7 +10099,7 @@ react-error-overlay@^6.0.11:
   resolved "https://registry.npmmirror.com/react-error-overlay/-/react-error-overlay-6.0.11.tgz#92835de5841c5cf08ba00ddd2d677b6d17ff9adb"
   integrity sha512-/6UZ2qgEyH2aqzYZgQPxEnz33NJ2gNsnHA2o5+o4wW9bLM/JYQitNP9xPhsXwC08hMMovfGe/8retsdDsczPRg==
 
-react-is@^16.12.0, react-is@^16.13.1, react-is@^16.7.0:
+react-is@^16.12.0, react-is@^16.13.1:
   version "16.13.1"
   resolved "https://registry.npmmirror.com/react-is/download/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
   integrity sha1-eJcppNw23imZ3BVt1sHZwYzqVqQ=

@@ -5,7 +5,6 @@ import {marked} from "marked";
 import EnvUtils from "../../../utils/env-utils";
 import {StyledEditormd} from "./styled-editormd";
 import EditorToolBar from "./editor-tool-bar";
-import $ from "jquery";
 import {getRes} from "../../../utils/constants";
 import useMessage from "antd/es/message/useMessage";
 import {getBorder} from "./editor-helpers";
@@ -62,7 +61,7 @@ const MarkedEditor: FunctionComponent<MyEditorMdWrapperProps> = ({
     const editorRef = useRef<EditorView | null>(null);
     const previewRef = useRef<HTMLDivElement | null>(null);
 
-    const [messageApi, contextHolder] = useMessage();
+    const [messageApi, contextHolder] = useMessage({maxCount: 3});
 
 
     const insertTextAtCursor = (text: string, cursorPosition: number) => {
@@ -80,11 +79,12 @@ const MarkedEditor: FunctionComponent<MyEditorMdWrapperProps> = ({
     };
 
 
-    function copyToClipboard(html: any) {
-        const temp = $("<input>");
-        $("body").append(temp);
-        temp.val(html).select();
-        document.execCommand("copy");
+    function copyToClipboard(html: string) {
+        const temp = document.createElement("input") as HTMLInputElement;
+        document.body.append(temp);
+        temp.value = html;
+        temp.select();
+        document.execCommand("copy", false);
         temp.remove();
     }
 
@@ -171,7 +171,11 @@ const MarkedEditor: FunctionComponent<MyEditorMdWrapperProps> = ({
                     }}
                 />
                 <StyledPreview ref={previewRef} className={"preview"}
-                               style={{padding: 4, display: state.preview ? "block" : "none", width: "calc(50% - 4px)"}}>
+                               style={{
+                                   padding: 4,
+                                   display: state.preview ? "block" : "none",
+                                   width: "calc(50% - 4px)"
+                               }}>
 
                     {EnvUtils.isDarkMode() ? <StyledHighlightDark>{getPreviewBody()}</StyledHighlightDark> :
                         <StyledHighlightDefault>{getPreviewBody()} </StyledHighlightDefault>}
