@@ -40,7 +40,7 @@ code.hljs {
 /* end baseline CSS */
 
 .hljs {
-    background: #F3F3F3;
+    background: #F3F3F3!important;
     color: #444
 }
 

@@ -15,7 +15,6 @@ import {markdown} from "@codemirror/lang-markdown";
 import hljs from "highlight.js/lib/core";
 import java from 'highlight.js/lib/languages/java';
 import PasteUpload from "./paste-upload";
-import {keymap} from "@codemirror/view";
 import ScrollSync from "./scroll-sync";
 import {StyledHighlightDark} from "./highlight/styled-highlight-dark";
 import {StyledHighlightDefault} from "./highlight/styled-highlight-default";
@@ -26,19 +25,6 @@ type MarkdownEditorState = {
 }
 
 hljs.registerLanguage('java', java);
-
-const disableFindKeys = keymap.of([
-    {
-        key: "Mod-f", // Ctrl+F / Cmd+F
-        preventDefault: true,
-        run: () => true
-    },
-    {
-        key: "Mod-h",
-        preventDefault: true,
-        run: () => true
-    }
-]);
 
 const MarkedEditor: FunctionComponent<MyEditorMdWrapperProps> = ({
                                                                      height,
@@ -160,7 +146,7 @@ const MarkedEditor: FunctionComponent<MyEditorMdWrapperProps> = ({
                     }
                     }
                     theme={EnvUtils.isDarkMode() ? "dark" : "light"}
-                    extensions={[markdown({codeLanguages: languages}), EditorView.lineWrapping, disableFindKeys]}
+                    extensions={[markdown({codeLanguages: languages}), EditorView.lineWrapping]}
                     onCreateEditor={(view) => {
                         editorRef.current = view;
                     }}
