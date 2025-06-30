@@ -1,16 +1,6 @@
 import styled from "styled-components";
 
 export const StyledHighlightDefault = styled("div")`
-pre code.hljs {
-    display: block;
-    overflow-x: auto;
-    padding: 1em
-}
-
-code.hljs {
-    padding: 3px 5px
-}
-
 /*!
   Theme: Default
   Description: Original highlight.js style
