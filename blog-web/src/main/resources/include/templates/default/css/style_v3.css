@@ -554,7 +554,7 @@ li.page-item {
         background-color: #212529 !important;
     }
 
-    .markdown-body pre {
+    .markdown-body code.hljs {
         background: #0c0b0b;
     }
 }
