@@ -49,30 +49,12 @@ self.addEventListener("fetch", (event) => {
         return;
     }
 
-    function normalizedRequest() {
-        const url = new URL(request.url);
-
-        if (url.pathname.endsWith("/index.html")) {
-            url.pathname = url.pathname.replace(/index\.html$/, ""); // 去掉末尾的 index.html
-            return new Request(url.toString(), {
-                method: "GET",
-                headers: request.headers,
-                credentials: request.credentials,
-                redirect: "follow",
-            });
-        }
-
-        return request;
-    }
-
     event.respondWith(
         caches.open(CACHE_NAME).then(async (cache) => {
-            const newRequest = normalizedRequest();
-
-            const cachedResponse = await cache.match(newRequest);
+            const cachedResponse = await cache.match(request);
 
             // 触发后台更新
-            const fetchPromise = fetch(newRequest, {
+            const fetchPromise = fetch(request, {
                 redirect: "follow",
             })
                 .then((networkResponse) => {
