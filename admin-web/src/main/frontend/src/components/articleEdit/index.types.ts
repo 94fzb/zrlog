@@ -1,4 +1,4 @@
-import {AdminCommonProps} from "../../type";
+import { AdminCommonProps} from "../../type";
 
 export type ArticleEntry = ChangedContent &
     ThumbnailChanged &

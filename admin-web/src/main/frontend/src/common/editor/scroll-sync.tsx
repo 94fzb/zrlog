@@ -1,14 +1,13 @@
-import {FunctionComponent, RefObject, useEffect, useRef} from "react";
-import {EditorView} from "@uiw/react-codemirror";
+import { FunctionComponent, RefObject, useEffect, useRef } from "react";
+import { EditorView } from "@uiw/react-codemirror";
 
 type SyncProps = {
     editorRef: RefObject<EditorView>;
     previewRef: RefObject<HTMLElement>;
-}
+};
 
-const ScrollSync: FunctionComponent<SyncProps> = ({editorRef, previewRef}) => {
+const ScrollSync: FunctionComponent<SyncProps> = ({ editorRef, previewRef }) => {
     const syncingRef = useRef(false);
-
 
     // 编辑器滚动同步预览
     useEffect(() => {
@@ -16,7 +15,7 @@ const ScrollSync: FunctionComponent<SyncProps> = ({editorRef, previewRef}) => {
 
         const scrollDOM = editorRef.current.scrollDOM;
 
-        console.info(scrollDOM)
+        console.info(scrollDOM);
 
         function onEditorScroll() {
             if (syncingRef.current) return;
@@ -39,10 +38,10 @@ const ScrollSync: FunctionComponent<SyncProps> = ({editorRef, previewRef}) => {
             }, 10);
         }
 
-        scrollDOM.addEventListener('scroll', onEditorScroll);
+        scrollDOM.addEventListener("scroll", onEditorScroll);
 
         return () => {
-            scrollDOM.removeEventListener('scroll', onEditorScroll);
+            scrollDOM.removeEventListener("scroll", onEditorScroll);
         };
     }, []);
 
@@ -74,18 +73,16 @@ const ScrollSync: FunctionComponent<SyncProps> = ({editorRef, previewRef}) => {
             }, 10);
         }
 
-        previewRef.current.addEventListener('scroll', onPreviewScroll);
+        previewRef.current.addEventListener("scroll", onPreviewScroll);
 
         return () => {
             if (previewRef.current) {
-                previewRef.current.removeEventListener('scroll', onPreviewScroll);
+                previewRef.current.removeEventListener("scroll", onPreviewScroll);
             }
         };
     }, []);
 
-    return <>
-
-    </>
-}
+    return <></>;
+};
 
 export default ScrollSync;

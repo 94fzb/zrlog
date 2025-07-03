@@ -4,7 +4,7 @@ import Row from "antd/es/grid/row";
 import { EditOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import { getColorPrimary, getRes } from "../../utils/constants";
-import {useAxiosBaseInstance} from "../../base/AppBase";
+import { useAxiosBaseInstance } from "../../base/AppBase";
 
 const layout = {
     labelCol: { span: 4 },
@@ -82,7 +82,7 @@ const EditNav: FunctionComponent<EditNavProps> = ({ record, editSuccessCall, off
                     <Row>
                         <Col span={24}>
                             <Form.Item
-                                label="导航名称"
+                                label={getRes()["admin.nav.name"]}
                                 style={{ marginBottom: 8 }}
                                 name="navName"
                                 rules={[{ required: true, message: "" }]}

@@ -1,20 +1,20 @@
 import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
 import Button from "antd/es/button";
-import {getRealRouteUrl, getRes} from "../../utils/constants";
+import { getRealRouteUrl, getRes } from "../../utils/constants";
 import Form from "antd/es/form";
 import Select from "antd/es/select";
 import Switch from "antd/es/switch";
 import Divider from "antd/es/divider";
-import {App, message} from "antd";
-import {useEffect, useState} from "react";
-import {useNavigate} from "react-router-dom";
-import {Upgrade} from "./index";
-import {useAxiosBaseInstance} from "../../base/AppBase";
+import { App, message } from "antd";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Upgrade } from "./index";
+import { useAxiosBaseInstance } from "../../base/AppBase";
 
 const layout = {
-    labelCol: {span: 8},
-    wrapperCol: {span: 16},
+    labelCol: { span: 8 },
+    wrapperCol: { span: 16 },
 };
 
 type UpgradeFormState = {
@@ -22,10 +22,10 @@ type UpgradeFormState = {
     upgradePreview: boolean;
 };
 
-const UpgradeSettingForm = ({data, offline}: { data: Upgrade; offline: boolean }) => {
+const UpgradeSettingForm = ({ data, offline }: { data: Upgrade; offline: boolean }) => {
     const [checking, setChecking] = useState<boolean>(false);
-    const {modal} = App.useApp();
-    const [messageApi, contextHolder] = message.useMessage({maxCount: 3});
+    const { modal } = App.useApp();
+    const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
 
     const [form, setForm] = useState<UpgradeFormState>(data);
 
@@ -34,7 +34,7 @@ const UpgradeSettingForm = ({data, offline}: { data: Upgrade; offline: boolean }
     const axiosBaseInstance = useAxiosBaseInstance();
 
     const websiteFormFinish = (changedValues: any) => {
-        axiosBaseInstance.post("/api/admin/website/upgrade", {...form, ...changedValues}).then(({data}) => {
+        axiosBaseInstance.post("/api/admin/website/upgrade", { ...form, ...changedValues }).then(({ data }) => {
             if (data.error) {
                 messageApi.error(data.message).then();
                 return;
@@ -51,7 +51,7 @@ const UpgradeSettingForm = ({data, offline}: { data: Upgrade; offline: boolean }
         }
         setChecking(true);
         try {
-            const {data} = await axiosBaseInstance.get("/api/admin/upgrade");
+            const { data } = await axiosBaseInstance.get("/api/admin/upgrade");
             if (data.data.upgrade) {
                 const title = `${getRes()["newVersion"]} - #${data.data.version.type}`;
                 modal.info({
@@ -85,7 +85,7 @@ const UpgradeSettingForm = ({data, offline}: { data: Upgrade; offline: boolean }
     }, [data]);
 
     return (
-        <div style={{maxWidth: 600}}>
+        <div style={{ maxWidth: 600 }}>
             {contextHolder}
             <Row>
                 <Col xs={24}>
@@ -94,7 +94,7 @@ const UpgradeSettingForm = ({data, offline}: { data: Upgrade; offline: boolean }
                         disabled={offline}
                         loading={checking}
                         onClick={checkNewVersion}
-                        style={{float: "right"}}
+                        style={{ float: "right" }}
                     >
                         {getRes().checkUpgrade}
                     </Button>
@@ -105,11 +105,11 @@ const UpgradeSettingForm = ({data, offline}: { data: Upgrade; offline: boolean }
                     <Form
                         {...layout}
                         initialValues={form}
-                        onValuesChange={(_k, v) => setForm({...form, ...v})}
+                        onValuesChange={(_k, v) => setForm({ ...form, ...v })}
                         onFinish={(k) => websiteFormFinish(k)}
                     >
                         <Form.Item name="autoUpgradeVersion" label={getRes()["admin.upgrade.autoCheckCycle"]}>
-                            <Select style={{maxWidth: "120px"}}>
+                            <Select style={{ maxWidth: "120px" }}>
                                 <Select.Option key="86400" value={86400}>
                                     {getRes()["admin.upgrade.cycle.oneDay"]}
                                 </Select.Option>
@@ -129,9 +129,9 @@ const UpgradeSettingForm = ({data, offline}: { data: Upgrade; offline: boolean }
                             name="upgradePreview"
                             label={getRes()["admin.upgrade.canPreview"]}
                         >
-                            <Switch size={"small"}/>
+                            <Switch size={"small"} />
                         </Form.Item>
-                        <Divider/>
+                        <Divider />
                         <Button disabled={offline} type="primary" htmlType="submit">
                             {getRes().submit}
                         </Button>

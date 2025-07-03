@@ -1,7 +1,7 @@
-import {Route, Routes} from "react-router-dom";
-import {ComponentType, FunctionComponent, lazy, ReactElement, Suspense, useEffect, useRef, useState} from "react";
-import {useLocation} from "react-router";
-import {getCsrData} from "../api";
+import { Route, Routes } from "react-router-dom";
+import { ComponentType, FunctionComponent, lazy, ReactElement, Suspense, useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router";
+import { getCsrData } from "../api";
 import MyLoadingComponent from "./my-loading-component";
 import {
     addToCache,
@@ -12,31 +12,31 @@ import {
     getPageFullState,
     savePageFullState,
 } from "../utils/cache";
-import {deepEqualWithSpecialJSON, getFullPath} from "../utils/helpers";
+import { deepEqualWithSpecialJSON, getFullPath } from "../utils/helpers";
 import Upgrade from "./upgrade";
-import {getRes} from "../utils/constants";
-import {isPWA} from "../utils/env-utils";
+import { getRes } from "../utils/constants";
+import { isPWA } from "../utils/env-utils";
 import * as H from "history";
 import Plugin from "./plugin";
-import WebSite, {WebSiteProps} from "./website";
+import WebSite, { WebSiteProps } from "./website";
 import TemplateConfig from "./template/template-config";
 import UserUpdatePassword from "./user-update-password";
 import TemplateCenter from "./template/template-center";
 import User from "./user";
 import ArticleEdit from "./articleEdit";
-import {ArticleEditProps} from "./articleEdit/index.types";
+import { ArticleEditProps } from "./articleEdit/index.types";
 import System from "./system";
 import Link from "./link";
 import Nav from "./nav";
 import Article from "./article";
 import Type from "./type";
-import UnknownErrorPage, {ErrorPageProps} from "./unknown-error-page";
+import UnknownErrorPage, { ErrorPageProps } from "./unknown-error-page";
 import Offline from "../common/Offline";
 import Index from "./index";
 import Comment from "./comment";
-import {useAxiosBaseInstance} from "../base/AppBase";
-import {AdminCommonProps, BasicUserInfo} from "../type";
-import {getSsDate} from "../base/SsData";
+import { useAxiosBaseInstance } from "../base/AppBase";
+import { AdminCommonProps, BasicUserInfo } from "../type";
+import { getSsDate } from "../base/SsData";
 import Version from "./website/version";
 
 const AsyncArticleEdit = lazy(() => import("components/articleEdit"));
@@ -102,7 +102,7 @@ type AdminPageProps<P> = {
     LazyComponent: ComponentType<P>;
     FallbackComponent: ComponentType<P>;
     props: P;
-}
+};
 
 interface LazyWithFallbackElementProps<P> {
     LazyComponent: ComponentType<P>;
@@ -111,11 +111,10 @@ interface LazyWithFallbackElementProps<P> {
 }
 
 export function LazyWithFallbackElement<P>({
-                                               LazyComponent,
-                                               FallbackComponent,
-                                               props,
-                                           }: LazyWithFallbackElementProps<P>) {
-
+    LazyComponent,
+    FallbackComponent,
+    props,
+}: LazyWithFallbackElementProps<P>) {
     return (
         <Suspense fallback={<FallbackComponent {...props} />}>
             <LazyComponent {...props} />
@@ -124,23 +123,29 @@ export function LazyWithFallbackElement<P>({
 }
 
 export function AdminPage(props: AdminPageProps<any>): ReactElement<AdminPageProps<AdminCommonProps<any>>> {
-    const {
-        FallbackComponent,
-        LazyComponent,
-        props: componentProps,
-    } = props;
+    const { FallbackComponent, LazyComponent, props: componentProps } = props;
 
-    return <AdminManageLayout basicUserInfo={props.props.userInfo} offline={props.props.offline}
-                              loading={props.props.offlineData && !props.props.offline}
-                              fullScreen={props.props.fullScreen}>
-        {props.props.data ? (
-            <LazyWithFallbackElement LazyComponent={LazyComponent} FallbackComponent={FallbackComponent}
-                                     props={componentProps}/>
-        ) : <MyLoadingComponent/>}
-    </AdminManageLayout>
+    return (
+        <AdminManageLayout
+            basicUserInfo={props.props.userInfo}
+            offline={props.props.offline}
+            loading={props.props.offlineData && !props.props.offline}
+            fullScreen={props.props.fullScreen}
+        >
+            {props.props.data ? (
+                <LazyWithFallbackElement
+                    LazyComponent={LazyComponent}
+                    FallbackComponent={FallbackComponent}
+                    props={componentProps}
+                />
+            ) : (
+                <MyLoadingComponent />
+            )}
+        </AdminManageLayout>
+    );
 }
 
-const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({offline, userInfo}) => {
+const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({ offline, userInfo }) => {
     const location = useLocation();
     const pwaLastOpenedPage = isPWA() ? getLastOpenedPage() : null;
     const defaultFullScreen = getPageFullState(pwaLastOpenedPage ? pwaLastOpenedPage : getFullPath(location));
@@ -159,8 +164,8 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
     };
 
     const updateThisPageStateCache = async () => {
-        const currentPageDataKey = getPageDataCacheKey(location)
-        const {data} = await getCsrData(currentPageDataKey, axiosBaseInstance);
+        const currentPageDataKey = getPageDataCacheKey(location);
+        const { data } = await getCsrData(currentPageDataKey, axiosBaseInstance);
         addToCache(currentPageDataKey, data);
     };
 
@@ -168,7 +173,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
 
     const loadData = async (currentPageDataKey: string, cacheData: any, location: H.Location) => {
         const responseData = await getCsrData(currentPageDataKey, axiosBaseInstance);
-        const {data, documentTitle} = responseData;
+        const { data, documentTitle } = responseData;
         updateDocumentTitle(documentTitle);
         getSsDate().data = data;
         //如果请求回来的和请求回来的一致的情况
@@ -196,7 +201,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
     useEffect(() => {
         const currentPageDataKey = getPageDataCacheKeyByPath(location.pathname, location.search);
         if (serverSideData.current) {
-            addToCache(currentPageDataKey, getSsDate().data)
+            addToCache(currentPageDataKey, getSsDate().data);
             serverSideData.current = false;
             return;
         }
@@ -233,53 +238,53 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
         {
             paths: ["index", "index.html", ".html", ""],
             lazy: AsyncIndex,
-            fallback: Index
+            fallback: Index,
         },
         {
             paths: ["comment", "comment.html"],
             lazy: AsyncComment,
-            fallback: Comment
+            fallback: Comment,
         },
         {
             paths: ["plugin", "plugin.html"],
             lazy: AsyncPlugin,
-            fallback: Plugin
+            fallback: Plugin,
         },
         {
             paths: ["website", "website.html"],
             lazy: AsyncWebSite,
             fallback: WebSite,
-            props: {activeKey: "basic"} as WebSiteProps
+            props: { activeKey: "basic" } as WebSiteProps,
         },
         {
             paths: ["website/admin", "website/admin.html"],
             lazy: AsyncWebSite,
             fallback: WebSite,
-            props: {activeKey: "admin"} as WebSiteProps
+            props: { activeKey: "admin" } as WebSiteProps,
         },
         {
             paths: ["website/template", "website/template.html"],
             lazy: AsyncWebSite,
             fallback: WebSite,
-            props: {activeKey: "template"} as WebSiteProps
+            props: { activeKey: "template" } as WebSiteProps,
         },
         {
             paths: ["website/other", "website/other.html"],
             lazy: AsyncWebSite,
             fallback: WebSite,
-            props: {activeKey: "other"} as WebSiteProps
+            props: { activeKey: "other" } as WebSiteProps,
         },
         {
             paths: ["website/blog", "website/blog.html"],
             lazy: AsyncWebSite,
             fallback: WebSite,
-            props: {activeKey: "blog"} as WebSiteProps
+            props: { activeKey: "blog" } as WebSiteProps,
         },
         {
             paths: ["website/upgrade", "website/upgrade.html"],
             lazy: AsyncWebSite,
             fallback: WebSite,
-            props: {activeKey: "upgrade"} as WebSiteProps
+            props: { activeKey: "upgrade" } as WebSiteProps,
         },
         {
             paths: ["website/version", "website/version.html"],
@@ -289,22 +294,22 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
         {
             paths: ["article-type", "article-type.html"],
             lazy: AsyncType,
-            fallback: Type
+            fallback: Type,
         },
         {
             paths: ["link", "link.html"],
             lazy: AsyncLink,
-            fallback: Link
+            fallback: Link,
         },
         {
             paths: ["nav", "nav.html"],
             lazy: AsyncNav,
-            fallback: Nav
+            fallback: Nav,
         },
         {
             paths: ["article", "article.html"],
             lazy: AsyncArticle,
-            fallback: Article
+            fallback: Article,
         },
         {
             paths: ["article-edit", "article-edit.html"],
@@ -314,33 +319,33 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
                 onFullScreen: () => {
                     setState((prevState) => {
                         savePageFullState(getFullPath(location), true);
-                        return {...prevState, fullScreen: true};
+                        return { ...prevState, fullScreen: true };
                     });
                 },
                 onExitFullScreen: () => {
                     if (state.fullScreen) {
                         setState((prevState) => {
                             savePageFullState(getFullPath(location), false);
-                            return {...prevState, fullScreen: false};
+                            return { ...prevState, fullScreen: false };
                         });
                     }
-                }
-            } as ArticleEditProps
+                },
+            } as ArticleEditProps,
         },
         {
             paths: ["user", "user.html"],
             lazy: AsyncUser,
-            fallback: User
+            fallback: User,
         },
         {
             paths: ["template-center", "template-center.html"],
             lazy: AsyncTemplateCenter,
-            fallback: TemplateCenter
+            fallback: TemplateCenter,
         },
         {
             paths: ["user-update-password", "user-update-password.html"],
             lazy: AsyncUserUpdatePassword,
-            fallback: UserUpdatePassword
+            fallback: UserUpdatePassword,
         },
         {
             paths: ["upgrade", "upgrade.html"],
@@ -350,7 +355,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
         {
             paths: ["template-config", "template-config.html"],
             lazy: AsyncTemplateConfig,
-            fallback: TemplateConfig
+            fallback: TemplateConfig,
         },
         {
             paths: ["403", "403.html"],
@@ -358,7 +363,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
             fallback: UnknownErrorPage,
             props: {
                 code: 403,
-            } as ErrorPageProps
+            } as ErrorPageProps,
         },
         {
             paths: ["500", "500.html"],
@@ -366,7 +371,7 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
             fallback: UnknownErrorPage,
             props: {
                 code: 500,
-            } as ErrorPageProps
+            } as ErrorPageProps,
         },
         {
             paths: ["offline", "offline.html"],
@@ -376,8 +381,8 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
         {
             paths: ["system", "system.html"],
             lazy: AsyncSystem,
-            fallback: System
-        }
+            fallback: System,
+        },
     ];
 
     const isOfflineData = () => {
@@ -388,13 +393,13 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
             return true;
         }
         return state.lastAxiosRequestedCacheKey !== getPageDataCacheKey(location);
-    }
+    };
 
     //console.info(location.pathname + "," + JSON.stringify(state));
 
     return (
         <Routes>
-            {routes.flatMap(({paths, lazy, fallback, props = {}}, i) =>
+            {routes.flatMap(({ paths, lazy, fallback, props = {} }, i) =>
                 paths.map((path, j) => (
                     <Route
                         key={`${i}-${j}`}
@@ -403,15 +408,17 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
                             <AdminPage
                                 LazyComponent={lazy}
                                 FallbackComponent={fallback}
-                                props={{
-                                    ...props,
-                                    userInfo: userInfo,
-                                    fullScreen: state.fullScreen,
-                                    data: getDataFromCache(),
-                                    offline: offline,
-                                    offlineData: isOfflineData(),
-                                    updateCache: async () => await updateThisPageStateCache(),
-                                } as AdminCommonProps<any>}
+                                props={
+                                    {
+                                        ...props,
+                                        userInfo: userInfo,
+                                        fullScreen: state.fullScreen,
+                                        data: getDataFromCache(),
+                                        offline: offline,
+                                        offlineData: isOfflineData(),
+                                        updateCache: async () => await updateThisPageStateCache(),
+                                    } as AdminCommonProps<any>
+                                }
                             />
                         }
                     />
@@ -420,8 +427,8 @@ const AdminDashboardRouter: FunctionComponent<AdminDashboardRouterProps> = ({off
             <Route
                 path={"*"}
                 element={
-                    <Suspense fallback={<MyLoadingComponent/>}>
-                        <AsyncNotFoundPage/>
+                    <Suspense fallback={<MyLoadingComponent />}>
+                        <AsyncNotFoundPage />
                     </Suspense>
                 }
             />

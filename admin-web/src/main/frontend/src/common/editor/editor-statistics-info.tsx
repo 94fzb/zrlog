@@ -1,7 +1,7 @@
 import EnvUtils from "../../utils/env-utils";
-import {getRes} from "../../utils/constants";
-import {FunctionComponent} from "react";
-import {getBorder} from "./editor-helpers";
+import { getRes } from "../../utils/constants";
+import { FunctionComponent } from "react";
+import { getBorder } from "./editor-helpers";
 
 export type EditorStatisticsInfo = {
     contentWordsLength: number;
@@ -20,7 +20,7 @@ export const toStatisticsByMarkdown = (markdownStr?: string): EditorStatisticsIn
     };
 };
 
-const EditorStatistics: FunctionComponent<EditorStatisticsInfoProps> = ({data, fullScreen}) => {
+const EditorStatistics: FunctionComponent<EditorStatisticsInfoProps> = ({ data, fullScreen }) => {
     return (
         <div
             style={{
@@ -38,15 +38,15 @@ const EditorStatistics: FunctionComponent<EditorStatisticsInfoProps> = ({data, f
                 background: EnvUtils.isDarkMode() ? "#141414" : "white",
             }}
         >
-            <span style={{padding: 16, paddingLeft: 40, whiteSpace: "nowrap"}}>
+            <span style={{ padding: 16, paddingLeft: 40, whiteSpace: "nowrap" }}>
                 {getRes()["editor.wordsCount"]}
-                <span style={{paddingRight: 4, paddingLeft: 4}}>:</span>
-                <b style={{marginLeft: 18, width: 60}}>{data.contentWordsLength}</b>
+                <span style={{ paddingRight: 4, paddingLeft: 4 }}>:</span>
+                <b style={{ marginLeft: 18, width: 60 }}>{data.contentWordsLength}</b>
             </span>
-            <span style={{padding: 16, whiteSpace: "nowrap"}}>
+            <span style={{ padding: 16, whiteSpace: "nowrap" }}>
                 {getRes()["editor.linesCount"]}
-                <span style={{paddingRight: 4, paddingLeft: 4}}>:</span>
-                <b style={{marginLeft: 18, width: 60}}>{data.contentLinesLength}</b>
+                <span style={{ paddingRight: 4, paddingLeft: 4 }}>:</span>
+                <b style={{ marginLeft: 18, width: 60 }}>{data.contentLinesLength}</b>
             </span>
         </div>
     );

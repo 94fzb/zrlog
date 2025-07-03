@@ -1,0 +1,6 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+cd admin-web/src/main/frontend/
+yarn pre-commit
+npx --no-install lint-staged

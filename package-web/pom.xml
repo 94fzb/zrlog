@@ -87,6 +87,7 @@
         <profile>
             <id>war</id>
             <build>
+                <finalName>${finalName}-${project.version}</finalName>
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -105,7 +106,6 @@
                                 WEB-INF/db.properties,
                                 WEB-INF/install.lock,
                             </packagingExcludes>
-                            <warName>${finalName}-${project.version}</warName>
                             <outputDirectory>${project.build.directory}/../../target</outputDirectory>
                         </configuration>
                     </plugin>
@@ -115,12 +115,12 @@
         <profile>
             <id>package-native-zip</id>
             <build>
+                <finalName>${finalName}-${project.version}-native</finalName>
                 <plugins>
                     <plugin>
                         <artifactId>maven-assembly-plugin</artifactId>
                         <groupId>org.apache.maven.plugins</groupId>
                         <configuration>
-                            <finalName>${finalName}-${version}-native</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
                             <outputDirectory>../target</outputDirectory>
                             <descriptors>
@@ -201,6 +201,7 @@
         <profile>
             <id>jar</id>
             <build>
+                <finalName>${finalName}-${project.version}</finalName>
                 <plugins>
                     <plugin>
                         <artifactId>maven-clean-plugin</artifactId>
@@ -249,7 +250,6 @@
                         <artifactId>maven-assembly-plugin</artifactId>
                         <groupId>org.apache.maven.plugins</groupId>
                         <configuration>
-                            <finalName>${finalName}-${version}</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
                             <outputDirectory>../target</outputDirectory>
                             <descriptors>
@@ -270,14 +270,6 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-jar-plugin</artifactId>
                         <version>3.2.0</version>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
                         <configuration>
                             <finalName>${finalName}</finalName>
                             <classifier>starter</classifier>

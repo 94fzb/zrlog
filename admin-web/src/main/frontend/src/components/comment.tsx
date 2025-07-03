@@ -54,7 +54,7 @@ const Comment = ({ data, offline }: { data: PageDataSource; offline: boolean }) 
 
     return (
         <>
-            <BaseTitle title={getRes()["admin.comment.manage"]}/>
+            <BaseTitle title={getRes()["admin.comment.manage"]} />
             <BaseTable
                 defaultPageSize={10}
                 offline={offline}

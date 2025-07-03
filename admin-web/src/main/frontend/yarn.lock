@@ -2249,7 +2249,7 @@
     "@lezer/lr" "^1.0.0"
     "@lezer/yaml" "^1.0.0"
 
-"@codemirror/language-data@^6.5.1":
+"@codemirror/language-data@6.5.1":
   version "6.5.1"
   resolved "https://registry.npmmirror.com/@codemirror/language-data/-/language-data-6.5.1.tgz#5cb9413d5225ef27a577c23781bbc0b36c58bb67"
   integrity sha512-0sWxeUSNlBr6OmkqybUTImADFUP0M3P0IiSde4nc24bz/6jIYzqYSgkOSLS+CBIoW1vU8Q9KUWXscBXeoMVC9w==
@@ -10225,7 +10225,7 @@ react-scripts@5.0.1:
   optionalDependencies:
     fsevents "^2.3.2"
 
-react-sequence-diagram@^0.0.12:
+react-sequence-diagram@0.0.12:
   version "0.0.12"
   resolved "https://registry.npmmirror.com/react-sequence-diagram/-/react-sequence-diagram-0.0.12.tgz#b9b02ab84fdf2b102015fcd716083179a711157b"
   integrity sha512-HnCr0rtXNpU+YIN/RlK4LfFE7Hf+0VgD37vmKPuMZdHXskTeNYs4Nn2bms9TFtt8z2K5vMUK8U6xNdhMlw9hew==

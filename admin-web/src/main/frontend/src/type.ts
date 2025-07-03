@@ -1,4 +1,4 @@
-import {ActivityDay} from "./components/index/ActivityGraph";
+import { ActivityDay} from "./components/index/ActivityGraph";
 
 export type AppState = {
     dark: boolean;

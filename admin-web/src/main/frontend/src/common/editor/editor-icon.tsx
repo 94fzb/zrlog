@@ -1,5 +1,5 @@
 // Add the icons to the library so you can use it in your page
-import {dom, library} from "@fortawesome/fontawesome-svg-core";
+import { dom, library } from "@fortawesome/fontawesome-svg-core";
 import {
     fa2,
     fa3,
@@ -58,17 +58,25 @@ icons.forEach((e) => {
 // This will replace any existing `<i>` elements with `<svg>` and set up a MutationObserver to continue doing this as the DOM changes.
 dom.watch();
 
-const EditorIcon = ({name, onClick}: { name: string, onClick?: () => void }) => {
-    return <div onClick={onClick} className={"editor-icon"} style={{
-        cursor: "pointer",
-        minWidth: 34,
-        display: "flex",
-        alignItems: "center",
-        color: "rgb(119, 119, 119)",
-        fontSize: 16,
-        height: 38,
-        borderRadius: 6,
-        justifyContent: "center"
-    }}><i className={"fa fa-" + name}></i></div>
-}
+const EditorIcon = ({ name, onClick }: { name: string; onClick?: () => void }) => {
+    return (
+        <div
+            onClick={onClick}
+            className={"editor-icon"}
+            style={{
+                cursor: "pointer",
+                minWidth: 34,
+                display: "flex",
+                alignItems: "center",
+                color: "rgb(119, 119, 119)",
+                fontSize: 16,
+                height: 38,
+                borderRadius: 6,
+                justifyContent: "center",
+            }}
+        >
+            <i className={"fa fa-" + name}></i>
+        </div>
+    );
+};
 export default EditorIcon;

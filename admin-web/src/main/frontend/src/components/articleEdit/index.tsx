@@ -1,20 +1,20 @@
-import {FunctionComponent, useEffect, useRef, useState} from "react";
-import {App, InputRef, message, Space} from "antd";
+import { FunctionComponent, useEffect, useRef, useState } from "react";
+import { App, InputRef, message, Space } from "antd";
 import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
 import Divider from "antd/es/divider";
 import Title from "antd/es/typography/Title";
 import Card from "antd/es/card";
-import {createUri, getColorPrimary, getRes, updateUri} from "../../utils/constants";
+import { createUri, getColorPrimary, getRes, updateUri } from "../../utils/constants";
 import styled from "styled-components";
 import Select from "antd/es/select";
 import BaseInput from "../../common/BaseInput";
-import {useLocation} from "react-router";
-import EnvUtils, {isOffline} from "../../utils/env-utils";
-import EditorStatistics, {toStatisticsByMarkdown} from "../../common/editor/editor-statistics-info";
-import {useAxiosBaseInstance} from "../../base/AppBase";
+import { useLocation } from "react-router";
+import EnvUtils, { isOffline } from "../../utils/env-utils";
+import EditorStatistics, { toStatisticsByMarkdown } from "../../common/editor/editor-statistics-info";
+import { useAxiosBaseInstance } from "../../base/AppBase";
 import ArticleEditSettingButton from "./article-edit-setting-button";
-import {ArticleChangeableValue, ArticleEditProps, ArticleEditState, ArticleEntry} from "./index.types";
+import { ArticleChangeableValue, ArticleEditProps, ArticleEditState, ArticleEntry } from "./index.types";
 import ArticleEditActionBar from "./article-edit-action-bar";
 import {
     articleDataToState,
@@ -23,11 +23,11 @@ import {
     removeLocalArticleCache,
 } from "../../utils/article-cache";
 import ArticleEditFullscreenButton from "./article-edit-fullscreen-button";
-import {auditTime, concatMap, Subject, tap} from "rxjs";
-import {Subscription} from "rxjs/internal/Subscription";
-import {deepEqualWithSpecialJSON, disableExitTips, enableExitTips} from "../../utils/helpers";
+import { auditTime, concatMap, Subject, tap } from "rxjs";
+import { Subscription } from "rxjs/internal/Subscription";
+import { deepEqualWithSpecialJSON, disableExitTips, enableExitTips } from "../../utils/helpers";
 import MarkedEditor from "../../common/editor/marked-editor";
-import {getBorderColor} from "../../common/editor/editor-helpers";
+import { getBorderColor } from "../../common/editor/editor-helpers";
 import screenfull from "screenfull";
 
 const StyledArticleEdit = styled("div")`
@@ -76,13 +76,13 @@ const StyledArticleEdit = styled("div")`
 `;
 
 const Index: FunctionComponent<ArticleEditProps> = ({
-                                                        offline,
-                                                        data,
-                                                        onExitFullScreen,
-                                                        onFullScreen,
-                                                        fullScreen,
-                                                        updateCache,
-                                                    }) => {
+    offline,
+    data,
+    onExitFullScreen,
+    onFullScreen,
+    fullScreen,
+    updateCache,
+}) => {
     const location = useLocation();
     const editCardRef = useRef<HTMLDivElement>(null);
 
@@ -101,9 +101,8 @@ const Index: FunctionComponent<ArticleEditProps> = ({
         maxCount: 3,
         getContainer: () => editCardRef.current as HTMLElement,
     });
-    const {modal} = App.useApp();
+    const { modal } = App.useApp();
     const axiosInstance = useAxiosBaseInstance(() => editCardRef.current as HTMLElement);
-
 
     const updateRubbishState = (newArticle: ArticleEntry, create: boolean) => {
         setState((prevState) => ({
@@ -168,7 +167,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({
         }
         //do check
         if (isTitleError(article)) {
-            messageApi.error({content: getRes()["article_require_title"]});
+            messageApi.error({ content: getRes()["article_require_title"] });
             return;
         }
         if (isTypeError(article)) {
@@ -215,7 +214,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({
         try {
             let responseData;
             try {
-                const {data} = await axiosInstance.post(uri, newArticle);
+                const { data } = await axiosInstance.post(uri, newArticle);
                 responseData = data;
                 if (data.error) {
                     modal.error({
@@ -249,7 +248,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                     const url = new URL(window.location.href);
                     url.searchParams.set("id", respData.logId);
                     window.history.replaceState(null, "", url.toString());
-                    newArticle = {...newArticle, ...respData};
+                    newArticle = { ...newArticle, ...respData };
                     removeLocalArticleCache();
                 } else {
                     newArticle = {
@@ -397,7 +396,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({
 
     const handleValuesChange = (cv: ArticleChangeableValue) => {
         setState((prev) => {
-            const newArticle = {...prev.article, ...cv};
+            const newArticle = { ...prev.article, ...cv };
             //没有验证通过的情况下，保存本地缓存
             if (!validForm(newArticle)) {
                 persistToCache(newArticle);
@@ -407,7 +406,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                     sub.next(newArticle);
                 }
             }
-            return {...prev, article: newArticle};
+            return { ...prev, article: newArticle };
         });
     };
 
@@ -416,18 +415,18 @@ const Index: FunctionComponent<ArticleEditProps> = ({
             if (screenfull.isEnabled && screenfull.isFullscreen) {
                 return "100vh";
             }
-            return "calc(100vh - 120px)"
+            return "calc(100vh - 120px)";
         }
         return "calc(100vh - 286px)";
-    }
+    };
 
     return (
         <StyledArticleEdit>
-            <Row gutter={[8, 8]} style={{paddingTop: fullScreen ? 0 : 20}}>
+            <Row gutter={[8, 8]} style={{ paddingTop: fullScreen ? 0 : 20 }}>
                 <Col md={12} xxl={15} sm={6} span={24}>
                     <Title
                         className="page-header"
-                        style={{marginTop: 0, marginBottom: 0}}
+                        style={{ marginTop: 0, marginBottom: 0 }}
                         level={3}
                         hidden={fullScreen}
                     >
@@ -444,7 +443,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                     />
                 )}
             </Row>
-            {!fullScreen && <Divider style={{marginTop: 16, marginBottom: 16}}/>}
+            {!fullScreen && <Divider style={{ marginTop: 16, marginBottom: 16 }} />}
             {messageContextHolder}
             <Card
                 title={""}
@@ -475,13 +474,13 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                             placeholder={getRes().inputArticleTitle}
                             defaultValue={state.article.title ? state.article.title : undefined}
                             onChange={(e) => {
-                                handleValuesChange({title: e});
+                                handleValuesChange({ title: e });
                             }}
-                            style={{fontSize: 22, fontWeight: 500, textOverflow: "ellipsis"}}
+                            style={{ fontSize: 22, fontWeight: 500, textOverflow: "ellipsis" }}
                         />
                     </Col>
-                    <Col md={fullScreen ? 6 : 8} xs={24} style={{display: "flex", alignItems: "center"}}>
-                        <Space.Compact style={{display: "flex"}} hidden={fullScreen}>
+                    <Col md={fullScreen ? 6 : 8} xs={24} style={{ display: "flex", alignItems: "center" }}>
+                        <Space.Compact style={{ display: "flex" }} hidden={fullScreen}>
                             <Select
                                 getPopupContainer={(triggerNode) => triggerNode.parentElement}
                                 variant={"borderless"}
@@ -502,7 +501,7 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                                         .localeCompare((optionB?.label ?? "").toLowerCase())
                                 }
                                 onChange={(value) => {
-                                    handleValuesChange({typeId: value});
+                                    handleValuesChange({ typeId: value });
                                 }}
                                 options={state.typeOptions}
                                 placeholder={getRes()["pleaseChoose"] + getRes()["admin.type.manage"]}
@@ -511,14 +510,14 @@ const Index: FunctionComponent<ArticleEditProps> = ({
                                 ref={aliasRef}
                                 defaultValue={state.article.alias}
                                 onChange={(e) => {
-                                    handleValuesChange({alias: e});
+                                    handleValuesChange({ alias: e });
                                 }}
                                 key={data.article.version}
                                 maxLength={256}
                                 size={"large"}
                                 variant={"borderless"}
                                 placeholder={getRes().inputArticleAlias}
-                                style={{fontSize: 16, paddingLeft: 0, textOverflow: "ellipsis"}}
+                                style={{ fontSize: 16, paddingLeft: 0, textOverflow: "ellipsis" }}
                             />
                         </Space.Compact>
                     </Col>

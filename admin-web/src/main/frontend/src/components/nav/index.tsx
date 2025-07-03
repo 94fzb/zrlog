@@ -35,7 +35,7 @@ const Nav = ({ data, offline }: { data: PageDataSource; offline: boolean }) => {
 
     return (
         <>
-            <BaseTitle title={getRes()["admin.nav.manage"]}/>
+            <BaseTitle title={getRes()["admin.nav.manage"]} />
             <BaseTable
                 defaultPageSize={10}
                 offline={offline}

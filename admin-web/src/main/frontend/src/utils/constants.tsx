@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 
-import {getContextPath} from "./helpers";
-import {getSsDate} from "../base/SsData";
+import { getContextPath } from "./helpers";
+import { getSsDate } from "../base/SsData";
 
 class Constants {
     static getFillBackImg() {
@@ -36,8 +36,8 @@ export const removeRes = () => {
 };
 
 export const isDev = () => {
-    return process.env.NODE_ENV != "production"
-}
+    return process.env.NODE_ENV != "production";
+};
 
 export const isStaticPage = () => {
     if (isDev()) {
@@ -46,23 +46,23 @@ export const isStaticPage = () => {
     if (window.location.pathname.endsWith(".html")) {
         return true;
     }
-    return getRes()['staticPage'];
-}
+    return getRes()["staticPage"];
+};
 
 export const setBackendServerUrl = (url: string) => {
     window.localStorage.setItem("_backend_server_url", url);
-}
+};
 
 export const getBackendServerUrl = (): string => {
-    const val = window.localStorage.getItem('_backend_server_url');
+    const val = window.localStorage.getItem("_backend_server_url");
     if (val) {
         if (val.endsWith("/")) {
-            return val
+            return val;
         }
-        return val + "/"
+        return val + "/";
     }
     return getContextPath();
-}
+};
 
 export const getRealRouteUrl = (url: string) => {
     const buildId = getSsDate().pageBuildId;
@@ -80,7 +80,7 @@ export const getRealRouteUrl = (url: string) => {
     const ext = isStaticPage() ? ".html" : "";
     const pathname = uriInfo[0];
     return pathname + ext + "?" + query.toString();
-}
+};
 
 export const createUri = "/api/admin/article/create";
 export const updateUri = "/api/admin/article/update";

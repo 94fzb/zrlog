@@ -9,7 +9,7 @@ import { message } from "antd";
 import { Basic } from "./index";
 import FaviconUpload from "./FaviconUpload";
 import Title from "antd/es/typography/Title";
-import {useAxiosBaseInstance} from "../../base/AppBase";
+import { useAxiosBaseInstance } from "../../base/AppBase";
 
 const layout = {
     labelCol: { span: 8 },

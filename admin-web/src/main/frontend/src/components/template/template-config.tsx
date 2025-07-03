@@ -1,20 +1,20 @@
-import {useEffect, useState} from "react";
-import {ColorPicker, Form, Input, message, Row} from "antd";
+import { useEffect, useState } from "react";
+import { ColorPicker, Form, Input, message, Row } from "antd";
 import Divider from "antd/es/divider";
 import Button from "antd/es/button";
 import Image from "antd/es/image";
 import TextArea from "antd/es/input/TextArea";
 import Col from "antd/es/grid/col";
-import {getRes} from "../../utils/constants";
+import { getRes } from "../../utils/constants";
 import Switch from "antd/es/switch";
-import {colorPickerBgColors} from "../../utils/helpers";
-import {useAxiosBaseInstance} from "../../base/AppBase";
-import BaseDragger, {DraggerUploadResponse} from "../../common/BaseDragger";
+import { colorPickerBgColors } from "../../utils/helpers";
+import { useAxiosBaseInstance } from "../../base/AppBase";
+import BaseDragger, { DraggerUploadResponse } from "../../common/BaseDragger";
 import BaseTitle from "../../base/BaseTitle";
 
 const layout = {
-    labelCol: {span: 8},
-    wrapperCol: {span: 16},
+    labelCol: { span: 8 },
+    wrapperCol: { span: 16 },
 };
 
 type TemplateConfigState = {
@@ -38,14 +38,14 @@ const convertToDataMap = (data: TemplateConfigState) => {
     return dataMap;
 };
 
-const TemplateConfig = ({data, offline}: { data: TemplateConfigState; offline: boolean }) => {
+const TemplateConfig = ({ data, offline }: { data: TemplateConfigState; offline: boolean }) => {
     const dataMap = convertToDataMap(data);
     const [state, setState] = useState<TemplateConfigState>({
         config: data.config,
         dataMap: dataMap,
     });
 
-    const [messageApi, contextHolder] = message.useMessage({maxCount: 3});
+    const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
 
     const setValue = (changedValues: any) => {
         setState({
@@ -60,7 +60,6 @@ const TemplateConfig = ({data, offline}: { data: TemplateConfigState; offline: b
             ...state,
             dataMap: state.dataMap,
         });
-
     };
 
     const getInput = (key: string, value: ConfigParam) => {
@@ -68,13 +67,13 @@ const TemplateConfig = ({data, offline}: { data: TemplateConfigState; offline: b
             return (
                 <>
                     <BaseDragger
-                        style={{width: "128px", height: "128px"}}
+                        style={{ width: "128px", height: "128px" }}
                         onSuccess={(e) => onUploadChange(e, key)}
                         name="imgFile"
                         action="/api/admin/upload?dir=image"
                     >
                         <Image
-                            style={{borderRadius: 8}}
+                            style={{ borderRadius: 8 }}
                             preview={false}
                             height={128}
                             width={128}
@@ -84,16 +83,16 @@ const TemplateConfig = ({data, offline}: { data: TemplateConfigState; offline: b
                 </>
             );
         } else if (value.htmlElementType === "switch") {
-            return <Switch size={"small"}/>;
+            return <Switch size={"small"} />;
         } else if (value.htmlElementType === "textarea" || value.htmlElementType === "large-textarea") {
             return (
-                <TextArea rows={value.htmlElementType === "large-textarea" ? 20 : 5} placeholder={value.placeholder}/>
+                <TextArea rows={value.htmlElementType === "large-textarea" ? 20 : 5} placeholder={value.placeholder} />
             );
         } else if (value.type === "hidden") {
-            return <Input hidden={true}/>;
+            return <Input hidden={true} />;
         } else if (value.htmlElementType === "colorPicker") {
             return (
-                <div style={{display: "flex", justifyContent: "flex-start", alignItems: "center"}}>
+                <div style={{ display: "flex", justifyContent: "flex-start", alignItems: "center" }}>
                     <ColorPicker
                         value={state.dataMap[key]}
                         onChange={(color) => {
@@ -111,11 +110,11 @@ const TemplateConfig = ({data, offline}: { data: TemplateConfigState; offline: b
                             },
                         ]}
                     />
-                    <span style={{paddingLeft: 8}}>{state.dataMap[key]}</span>
+                    <span style={{ paddingLeft: 8 }}>{state.dataMap[key]}</span>
                 </div>
             );
         }
-        return <Input type={value.type} placeholder={value.placeholder}/>;
+        return <Input type={value.type} placeholder={value.placeholder} />;
     };
 
     const getFormItems = () => {
@@ -126,7 +125,7 @@ const TemplateConfig = ({data, offline}: { data: TemplateConfigState; offline: b
                     label={value.label}
                     name={key}
                     key={key}
-                    style={{display: value.type === "hidden" ? "none" : ""}}
+                    style={{ display: value.type === "hidden" ? "none" : "" }}
                 >
                     {getInput(key, value)}
                 </Form.Item>
@@ -138,7 +137,7 @@ const TemplateConfig = ({data, offline}: { data: TemplateConfigState; offline: b
 
     const axiosInstance = useAxiosBaseInstance();
     const onFinish = () => {
-        axiosInstance.post("/api/admin/template/config", state.dataMap).then(async ({data}) => {
+        axiosInstance.post("/api/admin/template/config", state.dataMap).then(async ({ data }) => {
             if (data.error) {
                 await messageApi.error(data.message);
             } else if (data.error === 0) {
@@ -157,9 +156,9 @@ const TemplateConfig = ({data, offline}: { data: TemplateConfigState; offline: b
     return (
         <>
             {contextHolder}
-            <BaseTitle title={getRes()["templateConfig"]}/>
+            <BaseTitle title={getRes()["templateConfig"]} />
             <Row>
-                <Col xs={24} style={{maxWidth: 600}}>
+                <Col xs={24} style={{ maxWidth: 600 }}>
                     <Form
                         onFinish={() => onFinish()}
                         initialValues={state.dataMap}
@@ -167,7 +166,7 @@ const TemplateConfig = ({data, offline}: { data: TemplateConfigState; offline: b
                         {...layout}
                     >
                         {getFormItems()}
-                        <Divider/>
+                        <Divider />
                         <Button disabled={offline} type="primary" htmlType="submit">
                             {getRes()["submit"]}
                         </Button>

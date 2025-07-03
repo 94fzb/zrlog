@@ -1,5 +1,5 @@
-import {AxiosInstance} from "axios";
-import {getSsDate} from "./base/SsData";
+import { AxiosInstance} from "axios";
+import { getSsDate} from "./base/SsData";
 
 export const getCsrData = async (uri: string, axiosInstance: AxiosInstance) => {
     const {data} = await axiosInstance.get("/api/admin" + uri.replace(".html", ""));

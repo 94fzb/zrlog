@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { message } from "antd";
 import { Blog } from "./index";
 import Title from "antd/es/typography/Title";
-import {useAxiosBaseInstance} from "../../base/AppBase";
+import { useAxiosBaseInstance } from "../../base/AppBase";
 
 const layout = {
     labelCol: { span: 8 },

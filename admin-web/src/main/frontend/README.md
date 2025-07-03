@@ -9,15 +9,19 @@ echo fs.inotify.max_user_watches=1048576 | sudo tee -a /etc/sysctl.conf
 sudo sysctl -p
 ```
 
-#### check `yarn.lock`
+### check `yarn.lock`
 
 ```shell
 less yarn.lock |grep "https://" | cut -d '/' -f 3|sort|uniq
 ```
 
-#### fetch too slow
+### fetch too slow
 
 ```
 yarn install --registry=https://registry.npmmirror.com
 ```
 
+
+### Using Prettier as the default formatter
+
+![](dev/webstorm-prettier-settings.png)

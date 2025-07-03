@@ -1,4 +1,4 @@
-import {ChangedContent} from "../../components/articleEdit/index.types";
+import { ChangedContent} from "../../components/articleEdit/index.types";
 
 export type MyEditorMdWrapperProps = {
     height: any;

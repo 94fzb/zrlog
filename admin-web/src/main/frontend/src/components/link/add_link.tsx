@@ -3,7 +3,7 @@ import { Button, Col, Form, Input, InputNumber, message, Modal } from "antd";
 import Row from "antd/es/grid/row";
 import TextArea from "antd/es/input/TextArea";
 import { getRes } from "../../utils/constants";
-import {useAxiosBaseInstance} from "../../base/AppBase";
+import { useAxiosBaseInstance } from "../../base/AppBase";
 
 const layout = {
     labelCol: { span: 4 },
@@ -55,7 +55,7 @@ const AddLink = ({ addSuccessCall, offline }: { addSuccessCall: () => void; offl
                     <Row>
                         <Col span={24}>
                             <Form.Item
-                                label="网站名称"
+                                label={getRes()["admin.link.name"]}
                                 style={{ marginBottom: 8 }}
                                 name="linkName"
                                 rules={[{ required: true, message: "" }]}
@@ -67,7 +67,7 @@ const AddLink = ({ addSuccessCall, offline }: { addSuccessCall: () => void; offl
                     <Row>
                         <Col span={24}>
                             <Form.Item
-                                label="描述"
+                                label={getRes()["introduction"]}
                                 style={{ marginBottom: 8 }}
                                 name="alt"
                                 rules={[{ required: true, message: "" }]}

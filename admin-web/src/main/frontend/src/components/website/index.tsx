@@ -1,16 +1,16 @@
-import {Tabs} from "antd";
+import { Tabs } from "antd";
 import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
-import Index, {TemplateEntry} from "../template";
-import {getColorPrimary, getRealRouteUrl, getRes} from "../../utils/constants";
+import Index, { TemplateEntry } from "../template";
+import { getColorPrimary, getRealRouteUrl, getRes } from "../../utils/constants";
 import BlogForm from "./BlogForm";
 import BasicForm from "./BasicForm";
 import OtherForm from "./OtherForm";
 import UpgradeSettingForm from "./UpgradeSettingForm";
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 import AdminForm from "./AdminForm";
-import {FunctionComponent} from "react";
-import {AdminCommonProps} from "../../type";
+import { FunctionComponent } from "react";
+import { AdminCommonProps } from "../../type";
 import BaseTitle from "../../base/BaseTitle";
 
 export interface Basic {
@@ -53,19 +53,17 @@ export type WebSiteProps = AdminCommonProps<Basic | Admin | Upgrade | Other | Bl
     offline: boolean;
     offlineData: boolean;
     activeKey: "basic" | "other" | "upgrade" | "admin" | "template" | "blog";
-}
+};
 
-const WebSite: FunctionComponent<WebSiteProps> = ({
-                                                      data,
-                                                      offline,
-                                                      offlineData,
-                                                      activeKey,
-                                                  }) => {
+const WebSite: FunctionComponent<WebSiteProps> = ({ data, offline, offlineData, activeKey }) => {
     const buildLink = (key: string, text: string) => {
         const toUrl = key === "basic" ? "/website" : "/website/" + key;
         return (
-            <Link to={getRealRouteUrl(toUrl)} replace={true}
-                  style={{color: activeKey === key ? getColorPrimary() : "inherit"}}>
+            <Link
+                to={getRealRouteUrl(toUrl)}
+                replace={true}
+                style={{ color: activeKey === key ? getColorPrimary() : "inherit" }}
+            >
                 {text}
             </Link>
         );
@@ -75,46 +73,46 @@ const WebSite: FunctionComponent<WebSiteProps> = ({
         if (activeKey === "basic") {
             return (
                 <Row>
-                    <Col xs={24} style={{maxWidth: 600}}>
-                        <BasicForm offline={offline} data={data as Basic}/>
+                    <Col xs={24} style={{ maxWidth: 600 }}>
+                        <BasicForm offline={offline} data={data as Basic} />
                     </Col>
                 </Row>
             );
         } else if (activeKey === "blog") {
             return (
                 <Row>
-                    <Col xs={24} style={{maxWidth: 600}}>
-                        <BlogForm offline={offline} data={data as Blog}/>
+                    <Col xs={24} style={{ maxWidth: 600 }}>
+                        <BlogForm offline={offline} data={data as Blog} />
                     </Col>
                 </Row>
             );
         } else if (activeKey === "admin") {
             return (
                 <Row>
-                    <Col xs={24} style={{maxWidth: 600}}>
-                        <AdminForm offline={offline} data={data as Admin}/>
+                    <Col xs={24} style={{ maxWidth: 600 }}>
+                        <AdminForm offline={offline} data={data as Admin} />
                     </Col>
                 </Row>
             );
         } else if (activeKey === "template") {
-            return <Index data={data as TemplateEntry[]}/>;
+            return <Index data={data as TemplateEntry[]} />;
         } else if (activeKey === "other") {
             return (
                 <Row>
-                    <Col xs={24} style={{maxWidth: 600}}>
-                        <OtherForm offlineData={offlineData} offline={offline} data={data as Other}/>
+                    <Col xs={24} style={{ maxWidth: 600 }}>
+                        <OtherForm offlineData={offlineData} offline={offline} data={data as Other} />
                     </Col>
                 </Row>
             );
         } else if (activeKey === "upgrade") {
-            return <UpgradeSettingForm offline={offline} data={data as Upgrade}/>;
+            return <UpgradeSettingForm offline={offline} data={data as Upgrade} />;
         }
         return <></>;
     };
 
     return (
         <>
-            <BaseTitle title={getRes()["admin.setting"]}/>
+            <BaseTitle title={getRes()["admin.setting"]} />
             <Tabs
                 activeKey={activeKey}
                 items={[

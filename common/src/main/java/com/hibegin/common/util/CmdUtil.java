@@ -7,7 +7,7 @@ import java.io.InputStream;
 
 public class CmdUtil {
 
-    public static int findPidByPort(int port) throws IOException, InterruptedException {
+    public static int findPidByPort(int port) {
         String cmdStr;
         if (File.separatorChar != '\\') {
             cmdStr = "netstat -anp";
@@ -15,11 +15,11 @@ public class CmdUtil {
             cmdStr = "netstat -atu";
         }
         String content = sendCmd(cmdStr);
-        if (content.length() > 0 && content.split("\n").length > 1) {
-            String cons[] = content.split("\n");
+        if (!content.isEmpty() && content.split("\n").length > 1) {
+            String[] cons = content.split("\n");
             for (int i = 2; i < cons.length; i++) {
                 content = cons[i];
-                String nContext = "";
+                StringBuilder nContext = new StringBuilder();
                 //format
                 for (int j = 0; j < content.length(); j++) {
                     if (j > 0) {
@@ -27,10 +27,10 @@ public class CmdUtil {
                             continue;
                         }
                     }
-                    nContext += content.charAt(j);
+                    nContext.append(content.charAt(j));
                 }
 
-                String strings[] = nContext.trim().split(" ");
+                String[] strings = nContext.toString().trim().split(" ");
                 int flag = 1;
                 if (RuntimeMessage.getSystemRm() == SystemType.LINUX) {
                     flag = 3;
@@ -40,7 +40,7 @@ public class CmdUtil {
                 }
                 String[] ipPort = strings[flag].split(":");
                 if (ipPort.length >= 2) {
-                    Integer tempPort = Integer.parseInt(ipPort[ipPort.length - 1]);
+                    int tempPort = Integer.parseInt(ipPort[ipPort.length - 1]);
                     if (port == tempPort) {
                         //
                         System.out.println(nContext);
@@ -94,7 +94,7 @@ public class CmdUtil {
         return bufferedInputStreams;
     }
 
-    public static Process getProcess(String cmd, Object... args) {
+    public static Process getProcess(String cmd, String... args) {
         if (args != null) {
             cmd += " ";
             StringBuilder cmdBuilder = new StringBuilder(cmd);

@@ -1,9 +1,9 @@
 import Dragger from "antd/es/upload/Dragger";
-import {CSSProperties, FunctionComponent, PropsWithChildren} from "react";
-import {useAxiosBaseInstance} from "../base/AppBase";
-import {getBackendServerUrl, isStaticPage} from "../utils/constants";
+import { CSSProperties, FunctionComponent, PropsWithChildren } from "react";
+import { useAxiosBaseInstance } from "../base/AppBase";
+import { getBackendServerUrl, isStaticPage } from "../utils/constants";
 
-export type DraggerUploadResponse = { data: { url: string } }
+export type DraggerUploadResponse = { data: { url: string } };
 
 type BaseDraggerProps = PropsWithChildren & {
     style?: CSSProperties;
@@ -15,36 +15,34 @@ type BaseDraggerProps = PropsWithChildren & {
     disabled?: boolean;
     onError?: (error: Error) => void;
     getContainer?: () => HTMLElement;
-
-}
+};
 
 const BaseDragger: FunctionComponent<BaseDraggerProps> = ({
-                                                              children,
-                                                              style,
-                                                              action,
-                                                              accept,
-                                                              name,
-                                                              onSuccess,
-                                                              disabled,
-                                                              onProgress,
-                                                              onError,
-                                                              getContainer
-                                                          }) => {
-
+    children,
+    style,
+    action,
+    accept,
+    name,
+    onSuccess,
+    disabled,
+    onProgress,
+    onError,
+    getContainer,
+}) => {
     const axiosInstance = useAxiosBaseInstance(getContainer);
 
     const customRequest = async (options: any) => {
-        const {file} = options;
+        const { file } = options;
 
         const formData = new FormData();
         formData.append(name, file);
 
         try {
-            const {data} = await axiosInstance.post(action, formData, {
+            const { data } = await axiosInstance.post(action, formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data',
+                    "Content-Type": "multipart/form-data",
                 },
-                onUploadProgress: ({total, loaded}) => {
+                onUploadProgress: ({ total, loaded }) => {
                     if (total) {
                         const percent = Math.round((loaded / total) * 100);
                         if (onProgress) {
@@ -69,16 +67,18 @@ const BaseDragger: FunctionComponent<BaseDraggerProps> = ({
         }
     };
 
-    return <Dragger
-        disabled={disabled}
-        multiple={false}
-        accept={accept}
-        showUploadList={false}
-        customRequest={customRequest}
-        style={style}
-    >
-        {children}
-    </Dragger>
-}
+    return (
+        <Dragger
+            disabled={disabled}
+            multiple={false}
+            accept={accept}
+            showUploadList={false}
+            customRequest={customRequest}
+            style={style}
+        >
+            {children}
+        </Dragger>
+    );
+};
 
 export default BaseDragger;

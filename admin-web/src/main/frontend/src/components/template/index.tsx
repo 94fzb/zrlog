@@ -2,16 +2,16 @@ import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
 import Row from "antd/es/grid/row";
 import Col from "antd/es/grid/col";
-import {Badge, Card} from "antd";
-import {CheckOutlined, CloudDownloadOutlined, DeleteOutlined, EyeOutlined, SettingOutlined} from "@ant-design/icons";
+import { Badge, Card } from "antd";
+import { CheckOutlined, CloudDownloadOutlined, DeleteOutlined, EyeOutlined, SettingOutlined } from "@ant-design/icons";
 import Meta from "antd/es/card/Meta";
 import Button from "antd/es/button";
-import {useEffect, useState} from "react";
-import {getBackendServerUrl, getRealRouteUrl, getRes} from "../../utils/constants";
-import {Link} from "react-router-dom";
+import { useEffect, useState } from "react";
+import { getBackendServerUrl, getRealRouteUrl, getRes } from "../../utils/constants";
+import { Link } from "react-router-dom";
 import Popconfirm from "antd/es/popconfirm";
-import {useAxiosBaseInstance} from "../../base/AppBase";
-import {getCsrData} from "../../api";
+import { useAxiosBaseInstance } from "../../base/AppBase";
+import { getCsrData } from "../../api";
 
 export type TemplateEntry = {
     template: string;
@@ -25,13 +25,13 @@ export type TemplateEntry = {
     digest: string;
 };
 
-const Template = ({data}: { data: TemplateEntry[] }) => {
+const Template = ({ data }: { data: TemplateEntry[] }) => {
     const [templateState, setTemplateState] = useState<TemplateEntry[]>(data);
 
     const axiosInstance = useAxiosBaseInstance();
 
     const load = () => {
-        getCsrData("/template", axiosInstance).then(({data}) => {
+        getCsrData("/template", axiosInstance).then(({ data }) => {
             setTemplateState(data);
         });
     };
@@ -63,13 +63,13 @@ const Template = ({data}: { data: TemplateEntry[] }) => {
         const links = [];
         links.push(
             <div onClick={() => preview(template.shortTemplate)}>
-                <EyeOutlined key="preview"/>
+                <EyeOutlined key="preview" />
             </div>,
             <Link to={getRealRouteUrl("/template-config?shortTemplate=" + template.shortTemplate)}>
-                <SettingOutlined key="setting"/>
+                <SettingOutlined key="setting" />
             </Link>,
             <div onClick={() => apply(template.shortTemplate)}>
-                <CheckOutlined/>
+                <CheckOutlined />
             </div>
         );
         if (template.deleteAble) {
@@ -80,7 +80,7 @@ const Template = ({data}: { data: TemplateEntry[] }) => {
                         deleteTemplate(template.shortTemplate);
                     }}
                 >
-                    <DeleteOutlined key="delete"/>
+                    <DeleteOutlined key="delete" />
                 </Popconfirm>
             );
         }
@@ -90,7 +90,7 @@ const Template = ({data}: { data: TemplateEntry[] }) => {
     return (
         <>
             <Title level={4}>{getRes()["admin.template.manage"]}</Title>
-            <Divider/>
+            <Divider />
             <Row gutter={[16, 16]}>
                 {templateState.map((template) => {
                     return (
@@ -100,8 +100,8 @@ const Template = ({data}: { data: TemplateEntry[] }) => {
                                     template.use
                                         ? getRes()["admin.theme.inUse"]
                                         : template.preview
-                                            ? getRes()["admin.theme.inPreview"]
-                                            : ""
+                                        ? getRes()["admin.theme.inPreview"]
+                                        : ""
                                 }
                                 style={{
                                     fontSize: 16,
@@ -111,7 +111,7 @@ const Template = ({data}: { data: TemplateEntry[] }) => {
                                 <Card
                                     cover={
                                         <img
-                                            style={{width: "100%", minHeight: 250}}
+                                            style={{ width: "100%", minHeight: 250 }}
                                             alt={template.name}
                                             title={template.name}
                                             src={getBackendServerUrl() + template.adminPreviewImage.substring(1)}
@@ -119,16 +119,16 @@ const Template = ({data}: { data: TemplateEntry[] }) => {
                                     }
                                     actions={getActions(template)}
                                 >
-                                    <Meta title={template.name} description={template.digest}/>
+                                    <Meta title={template.name} description={template.digest} />
                                 </Card>
                             </Badge.Ribbon>
                         </Col>
                     );
                 })}
             </Row>
-            <Divider/>
+            <Divider />
             <Link to={getRealRouteUrl(`/template-center?host=${window.location.host}`)}>
-                <Button icon={<CloudDownloadOutlined/>} type={"primary"}>
+                <Button icon={<CloudDownloadOutlined />} type={"primary"}>
                     {getRes()["admin.theme.download"]}
                 </Button>
             </Link>

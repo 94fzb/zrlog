@@ -1,10 +1,10 @@
 // @ts-ignore
-import {ModeOfOperation} from "aes-js";
-import {isPWA} from "./env-utils";
-import {removeQueryParam} from "./helpers";
-import {cacheIgnoreReloadKey} from "./constants";
+import { ModeOfOperation } from "aes-js";
+import { isPWA } from "./env-utils";
+import { removeQueryParam } from "./helpers";
+import { cacheIgnoreReloadKey } from "./constants";
 import * as H from "history";
-import {getSsDate, ssKeyStorageKey} from "../base/SsData";
+import { getSsDate, ssKeyStorageKey } from "../base/SsData";
 
 // AES加密函数
 function aesEncrypt(text: string, key: string): string {
@@ -118,7 +118,7 @@ export const removeAllCaches = () => {
     } catch (e) {
         console.error(e);
     }
-}
+};
 
 export const putCache = (cache: Record<string, any>) => {
     try {

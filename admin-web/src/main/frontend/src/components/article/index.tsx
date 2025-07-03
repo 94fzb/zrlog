@@ -1,29 +1,29 @@
-import {EditOutlined, LockOutlined, TagOutlined} from "@ant-design/icons";
+import { EditOutlined, LockOutlined, TagOutlined } from "@ant-design/icons";
 
-import {Col, Row, Space, TableColumnsType, Tag, Tooltip} from "antd";
+import { Col, Row, Space, TableColumnsType, Tag, Tooltip } from "antd";
 import Search from "antd/es/input/Search";
 import Title from "antd/es/typography/Title";
 import Divider from "antd/es/divider";
-import {getColorPrimary, getRealRouteUrl, getRes} from "../../utils/constants";
+import { getColorPrimary, getRealRouteUrl, getRes } from "../../utils/constants";
 import type * as React from "react";
-import {ReactElement, useEffect, useRef, useState} from "react";
-import BaseTable, {ArticlePageDataSource} from "../../common/BaseTable";
-import {Link} from "react-router-dom";
-import {removeCacheDataByKey} from "../../utils/cache";
-import {useLocation} from "react-router";
-import {SortOrder} from "antd/es/table/interface";
+import { ReactElement, useEffect, useRef, useState } from "react";
+import BaseTable, { ArticlePageDataSource } from "../../common/BaseTable";
+import { Link } from "react-router-dom";
+import { removeCacheDataByKey } from "../../utils/cache";
+import { useLocation } from "react-router";
+import { SortOrder } from "antd/es/table/interface";
 
 const genTypes = (d: ArticlePageDataSource, search: string) => {
     const types = new URLSearchParams(search).get("types") as unknown as string;
 
     return d.types
         ? d.types.map((e) => {
-            return {text: e.typeName, value: e.alias, selected: types ? types.split(",").includes(e.alias) : false};
-        })
+              return { text: e.typeName, value: e.alias, selected: types ? types.split(",").includes(e.alias) : false };
+          })
         : [];
 };
 
-const Index = ({data, offline}: { data: ArticlePageDataSource; offline: boolean }) => {
+const Index = ({ data, offline }: { data: ArticlePageDataSource; offline: boolean }) => {
     const location = useLocation();
     const ds = genTypes(data, location.search);
 
@@ -32,12 +32,12 @@ const Index = ({data, offline}: { data: ArticlePageDataSource; offline: boolean 
 
     const tagForMap = (tag: string) => {
         const tagElem = (
-            <Tag icon={<TagOutlined/>} closable={false} color={getColorPrimary()} style={{userSelect: "none"}}>
+            <Tag icon={<TagOutlined />} closable={false} color={getColorPrimary()} style={{ userSelect: "none" }}>
                 {tag}
             </Tag>
         );
         return (
-            <span key={"all-" + tag} style={{display: "inline-block"}}>
+            <span key={"all-" + tag} style={{ display: "inline-block" }}>
                 {tagElem}
             </span>
         );
@@ -45,8 +45,8 @@ const Index = ({data, offline}: { data: ArticlePageDataSource; offline: boolean 
 
     const wrapperArticleStateInfo = (record: any, children: ReactElement) => {
         return (
-            <span style={{display: "flex", gap: 4, whiteSpace: "normal"}}>
-                {record.privacy && <LockOutlined style={{color: getColorPrimary()}}/>}
+            <span style={{ display: "flex", gap: 4, whiteSpace: "normal" }}>
+                {record.privacy && <LockOutlined style={{ color: getColorPrimary() }} />}
                 {record.rubbish && <span>[{getRes()["rubbish"]}]</span>}
                 {children}
             </span>
@@ -99,10 +99,10 @@ const Index = ({data, offline}: { data: ArticlePageDataSource; offline: boolean 
         const sorterMap: Record<string, SortOrder> = {};
 
         data.sort &&
-        data.sort.map((e) => {
-            const arr: string[] = e.split(",");
-            sorterMap[arr[0]] = arr[1] === "ASC" ? "ascend" : "descend";
-        });
+            data.sort.map((e) => {
+                const arr: string[] = e.split(",");
+                sorterMap[arr[0]] = arr[1] === "ASC" ? "ascend" : "descend";
+            });
 
         return [
             {
@@ -119,13 +119,13 @@ const Index = ({data, offline}: { data: ArticlePageDataSource; offline: boolean 
                             placement="top"
                             title={
                                 <div>
-                                    点击查看《<span dangerouslySetInnerHTML={{__html: text}}></span>》
+                                    点击查看《<span dangerouslySetInnerHTML={{ __html: text }}></span>》
                                 </div>
                             }
                         >
                             <div
-                                style={{overflow: "hidden", textOverflow: "ellipsis"}}
-                                dangerouslySetInnerHTML={{__html: text}}
+                                style={{ overflow: "hidden", textOverflow: "ellipsis" }}
+                                dangerouslySetInnerHTML={{ __html: text }}
                             />
                         </Tooltip>
                     );
@@ -241,9 +241,9 @@ const Index = ({data, offline}: { data: ArticlePageDataSource; offline: boolean 
 
     return (
         <>
-            <Row gutter={[8, 8]} style={{paddingTop: 20}}>
+            <Row gutter={[8, 8]} style={{ paddingTop: 20 }}>
                 <Col md={14} xxl={18} sm={6} span={24}>
-                    <Title className="page-header" style={{marginTop: 0, marginBottom: 0}} level={3}>
+                    <Title className="page-header" style={{ marginTop: 0, marginBottom: 0 }} level={3}>
                         {getRes()["blogManage"]}
                     </Title>
                 </Col>
@@ -254,12 +254,12 @@ const Index = ({data, offline}: { data: ArticlePageDataSource; offline: boolean 
                         onSearch={onSearch}
                         defaultValue={data.key}
                         enterButton={getRes()["search"]}
-                        style={{maxWidth: "240px", float: "right"}}
+                        style={{ maxWidth: "240px", float: "right" }}
                     />
                 </Col>
             </Row>
 
-            <Divider/>
+            <Divider />
             <BaseTable
                 defaultPageSize={data.defaultPageSize}
                 offline={offline}
@@ -267,7 +267,7 @@ const Index = ({data, offline}: { data: ArticlePageDataSource; offline: boolean 
                 columns={getColumns()}
                 editBtnRender={(id) => (
                     <Link to={getRealRouteUrl("/article-edit?id=" + id)}>
-                        <EditOutlined style={{color: getColorPrimary()}}/>
+                        <EditOutlined style={{ color: getColorPrimary() }} />
                     </Link>
                 )}
                 deleteSuccessCallback={(id) => {

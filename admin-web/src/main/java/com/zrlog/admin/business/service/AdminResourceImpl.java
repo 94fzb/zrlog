@@ -72,7 +72,7 @@ public class AdminResourceImpl implements AdminResource {
         return uri.contains("/admin/static/js/main.") && uri.endsWith(".js");
     }
 
-    private String buildRealPageUrl(String e, String adminResourceUrl, HttpRequest request) {
+    private List<String> buildRealPageUrls(String e, String adminResourceUrl, HttpRequest request) {
         StringBuilder sb = new StringBuilder();
         String[] split = e.split("\\?");
         if (split.length == 1) {
@@ -94,14 +94,14 @@ public class AdminResourceImpl implements AdminResource {
                 sb.append(split[1]);
             }
         }
-        return sb.toString();
+        return Collections.singletonList(sb.toString());
     }
 
     @Override
     public ByteArrayInputStream renderServiceWorker(HttpRequest request) {
-        List<String> realUris = new ArrayList<>();
+        Set<String> realUris = new LinkedHashSet<>();
         String adminResourceUrl = ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite(request);
-        pageUris.forEach(uri -> realUris.add(buildRealPageUrl(uri, adminResourceUrl, request)));
+        pageUris.forEach(uri -> realUris.addAll(buildRealPageUrls(uri, adminResourceUrl, request)));
         staticUris.forEach(uri -> realUris.add(adminResourceUrl + uri));
         String newUrls = "const urlsToCache = " + new Gson().newBuilder().disableHtmlEscaping().setPrettyPrinting().create().toJson(realUris);
         return new ByteArrayInputStream(IOUtil.getStringInputStream(ResourceUtils.class.getResourceAsStream(Constants.ADMIN_SERVICE_WORKER_JS)).replace("const urlsToCache = []", newUrls).getBytes());

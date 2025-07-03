@@ -4,7 +4,7 @@ import { Input, message, Row } from "antd";
 import Button from "antd/es/button";
 import Col from "antd/es/grid/col";
 import { getRes } from "../utils/constants";
-import {useAxiosBaseInstance} from "../base/AppBase";
+import { useAxiosBaseInstance } from "../base/AppBase";
 import BaseTitle from "../base/BaseTitle";
 
 const layout = {
@@ -29,7 +29,7 @@ const UserUpdatePassword = ({ offline }: { offline: boolean }) => {
     return (
         <>
             {contextHolder}
-            <BaseTitle title={getRes()["admin.changePwd"]}/>
+            <BaseTitle title={getRes()["admin.changePwd"]} />
             <Row>
                 <Col style={{ maxWidth: 600 }} xs={24}>
                     <Form {...layout} onFinish={(value) => onFinish(value)}>

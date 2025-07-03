@@ -73,8 +73,7 @@ export function removeQueryParam(search: string, key: string) {
     key.split(",").map((k: string) => {
         // 删除特定的查询参数
         params.delete(k);
-
-    })
+    });
     // 构建新的查询字符串
     const newSearch = params.toString();
 
@@ -135,7 +134,6 @@ export const colorPickerBgColors = [
     "rgb(0, 0, 0)",
 ];
 
-
 export const getContextPath = () => {
-    return new URL(document.baseURI).pathname
-}
+    return new URL(document.baseURI).pathname;
+};

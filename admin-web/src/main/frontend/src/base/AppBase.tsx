@@ -1,12 +1,12 @@
-import {Route, Routes, useNavigate} from "react-router-dom";
-import {lazy, Suspense} from "react";
-import {App, Spin} from "antd";
-import axios, {AxiosError, AxiosInstance} from "axios";
-import {API_DO_UPGRADE_PATH, API_VERSION_PATH} from "../components/upgrade";
+import { Route, Routes, useNavigate } from "react-router-dom";
+import { lazy, Suspense } from "react";
+import { App, Spin } from "antd";
+import axios, { AxiosError, AxiosInstance } from "axios";
+import { API_DO_UPGRADE_PATH, API_VERSION_PATH } from "../components/upgrade";
 import ErrorBoundary from "../common/ErrorBoundary";
-import {getBackendServerUrl, getRealRouteUrl, isStaticPage} from "../utils/constants";
+import { getBackendServerUrl, getRealRouteUrl, isStaticPage } from "../utils/constants";
 import AdminDashboardPage from "../components/admin-dashboard-page";
-import {NavigateFunction} from "react-router";
+import { NavigateFunction } from "react-router";
 
 const AsyncLogin = lazy(() => import("components/login"));
 
@@ -14,12 +14,19 @@ const errorCountMap = new Map<number, number>();
 
 export const jumpToLoginPage = (navigate: NavigateFunction): void => {
     if (!window.location.search.includes("redirectFrom")) {
-        navigate(getRealRouteUrl(`/login?redirectFrom=${encodeURIComponent(window.location.pathname.split(".html")[0])}${encodeURIComponent(window.location.search)}`), {replace: true});
+        navigate(
+            getRealRouteUrl(
+                `/login?redirectFrom=${encodeURIComponent(
+                    window.location.pathname.split(".html")[0]
+                )}${encodeURIComponent(window.location.search)}`
+            ),
+            { replace: true }
+        );
     }
-}
+};
 
 export const useAxiosBaseInstance = (getContainer?: () => HTMLElement): AxiosInstance => {
-    const {modal, message} = App.useApp();
+    const { modal, message } = App.useApp();
 
     const navigate = useNavigate();
 
@@ -28,9 +35,7 @@ export const useAxiosBaseInstance = (getContainer?: () => HTMLElement): AxiosIns
         axiosInstance.defaults.withCredentials = true;
     }
 
-    const commonAxiosErrorHandle = (
-        error: any,
-    ): Promise<any> => {
+    const commonAxiosErrorHandle = (error: any): Promise<any> => {
         //ignore upgrade api error
         if ((error as AxiosError) && error.config && error.config.url) {
             if (error.config.url.includes(API_VERSION_PATH)) {
@@ -42,11 +47,14 @@ export const useAxiosBaseInstance = (getContainer?: () => HTMLElement): AxiosIns
         }
         if (error && error.response) {
             if (error.response.status) {
-
                 modal.error({
                     title: "服务异常[" + error.response.status + "]",
-                    content: <div style={{paddingTop: 20, overflow: "auto"}}
-                                  dangerouslySetInnerHTML={{__html: error.response.data}}/>,
+                    content: (
+                        <div
+                            style={{ paddingTop: 20, overflow: "auto" }}
+                            dangerouslySetInnerHTML={{ __html: error.response.data }}
+                        />
+                    ),
                     getContainer: getContainer ? getContainer() : undefined,
                 });
                 return Promise.reject(error.response);
@@ -85,7 +93,7 @@ export const useAxiosBaseInstance = (getContainer?: () => HTMLElement): AxiosIns
                         getContainer: getContainer ? getContainer() : undefined,
                         onOk: () => {
                             errorCountMap.set(errorCode, 0);
-                        }
+                        },
                     });
                 }
 
@@ -103,32 +111,31 @@ export const useAxiosBaseInstance = (getContainer?: () => HTMLElement): AxiosIns
     return axiosInstance;
 };
 
-const AppBase = ({offline}: { offline: boolean }) => {
-
+const AppBase = ({ offline }: { offline: boolean }) => {
     return (
         <Routes>
-            {
-                ["login", "login.html"].map(e => {
-                    return <Route
+            {["login", "login.html"].map((e) => {
+                return (
+                    <Route
                         key={e}
                         path={e}
                         element={
                             <ErrorBoundary>
-                                <Suspense fallback={<Spin spinning={true} fullscreen delay={1000}/>}>
-                                    <AsyncLogin offline={offline}/>
+                                <Suspense fallback={<Spin spinning={true} fullscreen delay={1000} />}>
+                                    <AsyncLogin offline={offline} />
                                 </Suspense>
                             </ErrorBoundary>
                         }
                     />
-                })
-            }
+                );
+            })}
 
             <Route
                 path={"logout"}
                 element={
                     <ErrorBoundary>
-                        <Suspense fallback={<Spin spinning={true} fullscreen delay={1000}/>}>
-                            <AsyncLogin offline={offline}/>
+                        <Suspense fallback={<Spin spinning={true} fullscreen delay={1000} />}>
+                            <AsyncLogin offline={offline} />
                         </Suspense>
                     </ErrorBoundary>
                 }
@@ -138,7 +145,7 @@ const AppBase = ({offline}: { offline: boolean }) => {
                 element={
                     <ErrorBoundary>
                         <Suspense>
-                            <AdminDashboardPage offline={offline}/>
+                            <AdminDashboardPage offline={offline} />
                         </Suspense>
                     </ErrorBoundary>
                 }

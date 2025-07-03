@@ -1,13 +1,13 @@
-import {message, PaginationProps, Space, Table, TableColumnsType} from "antd";
-import {FunctionComponent, useEffect, useState} from "react";
-import {mapToQueryString} from "../utils/helpers";
+import { message, PaginationProps, Space, Table, TableColumnsType } from "antd";
+import { FunctionComponent, useEffect, useState } from "react";
+import { mapToQueryString } from "../utils/helpers";
 import Popconfirm from "antd/es/popconfirm";
-import {cacheIgnoreReloadKey, getRes, isDev} from "../utils/constants";
-import {DeleteOutlined} from "@ant-design/icons";
-import {Link, useNavigate} from "react-router-dom";
-import {useLocation} from "react-router";
-import {SorterResult} from "antd/es/table/interface";
-import {useAxiosBaseInstance} from "../base/AppBase";
+import { cacheIgnoreReloadKey, getRes, isDev } from "../utils/constants";
+import { DeleteOutlined } from "@ant-design/icons";
+import { Link, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router";
+import { SorterResult } from "antd/es/table/interface";
+import { useAxiosBaseInstance } from "../base/AppBase";
 
 type BaseTableProps = {
     deleteApi: string;
@@ -51,17 +51,17 @@ export type MyPagination = {
 };
 
 const BaseTable: FunctionComponent<BaseTableProps> = ({
-                                                          deleteApi,
-                                                          editBtnRender,
-                                                          addBtnRender,
-                                                          columns,
-                                                          datasource,
-                                                          defaultPageSize,
-                                                          searchKey,
-                                                          deleteSuccessCallback,
-                                                          hideId,
-                                                          offline,
-                                                      }) => {
+    deleteApi,
+    editBtnRender,
+    addBtnRender,
+    columns,
+    datasource,
+    defaultPageSize,
+    searchKey,
+    deleteSuccessCallback,
+    hideId,
+    offline,
+}) => {
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -126,7 +126,7 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
         },
     });
 
-    const [messageApi, contextHolder] = message.useMessage({maxCount: 3});
+    const [messageApi, contextHolder] = message.useMessage({ maxCount: 3 });
     const axiosInstance = useAxiosBaseInstance();
     const handleDelete = async (pagination: MyPagination, deleteApiUri: string, key: string): Promise<boolean> => {
         const response = await axiosInstance.post(deleteApiUri + "?id=" + key);
@@ -146,7 +146,7 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
         if (searchKey === tableDataState.query) {
             return;
         }
-        setTableDataState({...tableDataState, query: searchKey});
+        setTableDataState({ ...tableDataState, query: searchKey });
         fetchData(1, tableDataState.pagination.size, searchKey, tableDataState.pagination.sort);
     }, [searchKey]);
 
@@ -179,7 +179,7 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
                 fixed: true,
                 width: 64,
                 render: (text: string) => {
-                    return <span style={{maxWidth: 64}}>{text}</span>;
+                    return <span style={{ maxWidth: 64 }}>{text}</span>;
                 },
             });
         }
@@ -211,18 +211,18 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
                                     }
                                 }}
                             >
-                                <DeleteOutlined style={{color: "red"}}/>
+                                <DeleteOutlined style={{ color: "red" }} />
                             </Popconfirm>
                         </Link>
                         {editBtnRender
                             ? editBtnRender(text, record, () => {
-                                fetchDataWithReload(
-                                    tableDataState.pagination.page,
-                                    tableDataState.pagination.size,
-                                    tableDataState.query,
-                                    tableDataState.pagination.sort
-                                );
-                            })
+                                  fetchDataWithReload(
+                                      tableDataState.pagination.page,
+                                      tableDataState.pagination.size,
+                                      tableDataState.query,
+                                      tableDataState.pagination.sort
+                                  );
+                              })
                             : null}
                     </Space>
                 ) : null,
@@ -238,23 +238,23 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
             {contextHolder}
             {addBtnRender
                 ? addBtnRender(() => {
-                    fetchDataWithReload(
-                        tableDataState.pagination.page,
-                        tableDataState.pagination.size,
-                        tableDataState.query,
-                        tableDataState.pagination.sort
-                    );
-                })
+                      fetchDataWithReload(
+                          tableDataState.pagination.page,
+                          tableDataState.pagination.size,
+                          tableDataState.query,
+                          tableDataState.pagination.sort
+                      );
+                  })
                 : undefined}
             <Table
                 onChange={(pagination, _filter, sorter) => {
                     const sort =
                         (sorter as SorterResult) && (sorter as SorterResult).field
                             ? [
-                                (sorter as SorterResult).field +
-                                "," +
-                                ((sorter as SorterResult).order === "descend" ? "DESC" : "ASC"),
-                            ]
+                                  (sorter as SorterResult).field +
+                                      "," +
+                                      ((sorter as SorterResult).order === "descend" ? "DESC" : "ASC"),
+                              ]
                             : [];
                     if (sort.length > 0) {
                         setTableDataState({
@@ -272,7 +272,7 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
                         sort
                     );
                 }}
-                style={{minHeight: 512}}
+                style={{ minHeight: 512 }}
                 columns={getActionedColumns()}
                 pagination={{
                     hideOnSinglePage: true,
@@ -294,7 +294,7 @@ const BaseTable: FunctionComponent<BaseTableProps> = ({
                     },
                 }}
                 dataSource={tableDataState.rows}
-                scroll={{x: "90vw"}}
+                scroll={{ x: "90vw" }}
             ></Table>
         </>
     );

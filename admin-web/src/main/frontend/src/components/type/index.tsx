@@ -46,7 +46,7 @@ const Type = ({ data, offline }: { data: PageDataSource; offline: boolean }) => 
 
     return (
         <>
-            <BaseTitle title={getRes()["admin.type.manage"]}/>
+            <BaseTitle title={getRes()["admin.type.manage"]} />
             <BaseTable
                 defaultPageSize={10}
                 offline={offline}

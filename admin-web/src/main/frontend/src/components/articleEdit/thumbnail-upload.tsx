@@ -1,7 +1,7 @@
-import {CameraOutlined, DeleteFilled, LoadingOutlined} from "@ant-design/icons";
+import { CameraOutlined, DeleteFilled, LoadingOutlined } from "@ant-design/icons";
 import Image from "antd/es/image";
-import {FunctionComponent, useState} from "react";
-import {getColorPrimary, getRes} from "../../utils/constants";
+import { FunctionComponent, useState } from "react";
+import { getColorPrimary, getRes } from "../../utils/constants";
 import BaseDragger from "../../common/BaseDragger";
 
 type ThumbnailUploadProps = {
@@ -9,27 +9,26 @@ type ThumbnailUploadProps = {
     thumbnail?: string;
 };
 
-const ThumbnailUpload: FunctionComponent<ThumbnailUploadProps> = ({onChange, thumbnail}) => {
-
+const ThumbnailUpload: FunctionComponent<ThumbnailUploadProps> = ({ onChange, thumbnail }) => {
     const [uploading, setUploading] = useState<boolean>(false);
 
     return (
         <BaseDragger
-            onSuccess={({data}) => {
-                setUploading(false)
+            onSuccess={({ data }) => {
+                setUploading(false);
                 if (onChange) {
                     onChange(data.url);
                 }
             }}
             disabled={uploading}
             onProgress={() => {
-                setUploading(true)
+                setUploading(true);
             }}
             onError={() => {
                 setUploading(false);
             }}
             accept={"image/*"}
-            style={{overflow: "hidden", minHeight: 102, maxHeight: 256}}
+            style={{ overflow: "hidden", minHeight: 102, maxHeight: 256 }}
             action={"/api/admin/upload/thumbnail?dir=thumbnail"}
             name="imgFile"
         >
@@ -45,7 +44,7 @@ const ThumbnailUpload: FunctionComponent<ThumbnailUploadProps> = ({onChange, thu
                             alignItems: "center",
                         }}
                     >
-                        <CameraOutlined style={{fontSize: "28px"}}/>
+                        <CameraOutlined style={{ fontSize: "28px" }} />
                     </p>
                     <p
                         className="ant-upload-text"
@@ -54,18 +53,18 @@ const ThumbnailUpload: FunctionComponent<ThumbnailUploadProps> = ({onChange, thu
                             margin: 0,
                         }}
                     >
-                        {uploading && <LoadingOutlined/>} {getRes()["uploadTips"]}
+                        {uploading && <LoadingOutlined />} {getRes()["uploadTips"]}
                     </p>
                 </>
             )}
             {thumbnail != null && thumbnail !== "" && (
-                <div style={{position: "relative"}}>
+                <div style={{ position: "relative" }}>
                     <Image
-                        style={{borderRadius: 0, position: "relative"}}
+                        style={{ borderRadius: 0, position: "relative" }}
                         preview={false}
                         id="thumbnail"
                         src={thumbnail}
-                        wrapperStyle={{position: "relative"}}
+                        wrapperStyle={{ position: "relative" }}
                     />
                     <div
                         style={{
@@ -85,7 +84,7 @@ const ThumbnailUpload: FunctionComponent<ThumbnailUploadProps> = ({onChange, thu
                             e.stopPropagation();
                         }}
                     >
-                        <DeleteFilled/>
+                        <DeleteFilled />
                     </div>
                 </div>
             )}

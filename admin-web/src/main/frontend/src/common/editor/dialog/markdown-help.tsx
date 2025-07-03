@@ -1,7 +1,7 @@
-import {Content} from "antd/es/layout/layout";
+import { Content } from "antd/es/layout/layout";
 import EnvUtils from "../../../utils/env-utils";
-import {marked} from "marked";
-import {StyledPreview} from "../styled-preview";
+import { marked } from "marked";
+import { StyledPreview } from "../styled-preview";
 
 const helpMd = `
 ### Markdown语法教程 (Markdown syntax tutorial)
@@ -24,16 +24,19 @@ const helpMd = `
 ### TeX/LaTeX reference
 
 [http://meta.wikimedia.org/wiki/Help:Formula](http://meta.wikimedia.org/wiki/Help:Formula)
-`
+`;
 
 const MarkdownHelp = () => {
-
     const helpHtml = marked(helpMd);
-    return <StyledPreview style={{borderRadius: 8}}>
-        <Content className={"markdown-body"}
-                 style={{padding: 0, background: EnvUtils.isDarkMode() ? "#202020" : "#FFFFFF"}}
-                 dangerouslySetInnerHTML={{__html: helpHtml}}/>
-    </StyledPreview>
-}
+    return (
+        <StyledPreview style={{ borderRadius: 8 }}>
+            <Content
+                className={"markdown-body"}
+                style={{ padding: 0, background: EnvUtils.isDarkMode() ? "#202020" : "#FFFFFF" }}
+                dangerouslySetInnerHTML={{ __html: helpHtml }}
+            />
+        </StyledPreview>
+    );
+};
 
 export default MarkdownHelp;

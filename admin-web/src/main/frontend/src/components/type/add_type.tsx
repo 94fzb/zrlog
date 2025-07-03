@@ -3,7 +3,7 @@ import { Button, Col, Form, Input, message, Modal } from "antd";
 import Row from "antd/es/grid/row";
 import TextArea from "antd/es/input/TextArea";
 import { getRes } from "../../utils/constants";
-import {useAxiosBaseInstance} from "../../base/AppBase";
+import { useAxiosBaseInstance } from "../../base/AppBase";
 
 const layout = {
     labelCol: { span: 4 },
@@ -67,7 +67,7 @@ const AddType = ({ addSuccessCall, offline }: { addSuccessCall: () => void; offl
                     <Row>
                         <Col span={24}>
                             <Form.Item
-                                label="简介"
+                                label={getRes()["introduction"]}
                                 style={{ marginBottom: 8 }}
                                 name="remark"
                                 rules={[{ required: true, message: "" }]}

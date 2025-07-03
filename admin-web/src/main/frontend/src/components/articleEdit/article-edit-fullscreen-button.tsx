@@ -47,7 +47,6 @@ const ArticleEditFullscreenButton: FunctionComponent<ArticleEditFullscreenButton
         }
     };
 
-
     const onfullscreenExit = () => {
         onExitFullScreen();
         if (screenfull.isEnabled) {
