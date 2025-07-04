@@ -2,6 +2,7 @@ package com.zrlog.web;
 
 import com.google.gson.Gson;
 import com.hibegin.common.util.BeanUtil;
+import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.http.HttpMethod;
 import com.hibegin.http.server.WebServerBuilder;
@@ -120,6 +121,7 @@ public class GraalvmAgentApplication {
         new Gson().toJson(new PagerVO.PageEntry());
         new Gson().toJson(new Archive());
         new Gson().toJson(new LambdaApiGatewayRequest());
+        new Gson().fromJson(IOUtil.getStringInputStream(GraalvmAgentApplication.class.getResourceAsStream("/lambda.json")), LambdaApiGatewayRequest.class);
         new Gson().toJson(new ApiGatewayHttp());
         new Gson().toJson(new ApiGatewayRequestContext());
 
