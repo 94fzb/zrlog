@@ -8,8 +8,8 @@ import com.zrlog.util.ZrLogUtil;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.stream.Collectors;
 
 public class LambdaApplication {
 
@@ -28,11 +28,19 @@ public class LambdaApplication {
         System.getProperties().put("sws.root.path", System.getProperty("user.dir"));
     }
 
+    public static String getInput() throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        StringBuilder inputBuilder = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            inputBuilder.append(line).append("\n");
+        }
+        return inputBuilder.toString().trim();
+    }
+
     public static void doHandle(String[] args, int port, String execFile) throws Exception {
         Application.webServerBuilder(port, ZrLogUtil.getContextPath(args), new NativeImageUpdater(args, new File(execFile)));
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        String inputJson = reader.lines().collect(Collectors.joining("\n")).trim();
-        String out = new LambdaHandler(Constants.zrLogConfig).doHandle(inputJson);
+        String out = new LambdaHandler(Constants.zrLogConfig).doHandle(getInput());
         System.out.println(out);
     }
 }
