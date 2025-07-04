@@ -5,6 +5,7 @@ import com.hibegin.http.HttpMethod;
 import com.hibegin.http.server.ApplicationContext;
 import com.hibegin.http.server.config.RequestConfig;
 import com.hibegin.http.server.impl.SimpleHttpRequest;
+import com.hibegin.http.server.util.HttpQueryStringUtils;
 import com.zrlog.lambda.rest.LambdaApiGatewayRequest;
 
 import java.io.ByteArrayInputStream;
@@ -22,6 +23,7 @@ public class LambdaHttpRequestWrapper extends SimpleHttpRequest {
         this.queryStr = ObjectUtil.requireNonNullElse(lambdaApiGatewayRequest.getRawQueryString(), "");
         this.method = HttpMethod.valueOf(lambdaApiGatewayRequest.getRequestContext().getHttp().getMethod());
         this.header = lambdaApiGatewayRequest.getHeaders();
+        this.paramMap = HttpQueryStringUtils.parseUrlEncodedStrToMap(this.queryStr);
         this.getHeaderMap().put("Host", lambdaApiGatewayRequest.getRequestContext().getDomainName());
         this.uri = lambdaApiGatewayRequest.getRequestContext().getHttp().getPath();
         if (Objects.nonNull(lambdaApiGatewayRequest.getBody()) && !lambdaApiGatewayRequest.getBody().isEmpty()) {
