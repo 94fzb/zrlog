@@ -83,9 +83,10 @@ public class LambdaApplication {
     }
 
     public static void doHandle(String[] args, int port, String execFile) throws Exception {
+        Application.webServerBuilder(port, ZrLogUtil.getContextPath(args), new NativeImageUpdater(args, new File(execFile)));
+        //处理请求
         while (true) {
             Map.Entry<String, LambdaApiGatewayRequest> requestInfo = getRequestInfo();
-            Application.webServerBuilder(port, ZrLogUtil.getContextPath(args), new NativeImageUpdater(args, new File(execFile)));
             LambdaApiGatewayResponse apiGatewayResponse = new LambdaHandler(Constants.zrLogConfig).doHandle(getRequestInfo().getValue());
             String output = new Gson().toJson(apiGatewayResponse);
             LOGGER.info("lambda response = " + output);
