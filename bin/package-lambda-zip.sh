@@ -1,7 +1,6 @@
 mkdir -p conf/plugins
 rm -rf conf/plugins/installed-plugins
 mkdir -p conf/plugins/installed-plugins
-wget https://dl.zrlog.com/plugin/core/plugin-core-amd64.bin > conf/plugins/
 urls=(
   "static-plus-Linux-amd64.bin"
   "backup-sql-file-Linux-amd64.bin"
