@@ -7,10 +7,6 @@ import com.hibegin.http.server.handler.HttpRequestHandlerRunnable;
 import com.zrlog.common.ZrLogConfig;
 import com.zrlog.lambda.rest.LambdaApiGatewayRequest;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
-
 public class LambdaHandler {
 
 
@@ -21,21 +17,6 @@ public class LambdaHandler {
         this.serverConfig = zrLogConfig;
         applicationContext = new ApplicationContext(serverConfig.getServerConfig());
         applicationContext.init();
-    }
-
-    public static String toQueryString(Map<String, String> queryParams) {
-        if (queryParams == null || queryParams.isEmpty()) return "";
-
-        StringBuilder queryString = new StringBuilder();
-        for (Map.Entry<String, String> entry : queryParams.entrySet()) {
-            String key = URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8);
-            String value = URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8);
-            if (queryString.length() > 0) {
-                queryString.append("&");
-            }
-            queryString.append(key).append("=").append(value);
-        }
-        return queryString.toString();
     }
 
     /**
