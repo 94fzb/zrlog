@@ -1,6 +1,5 @@
 mkdir -p conf/plugins
 rm -rf conf/plugins/installed-plugins
-rm bootstrap
 mkdir -p conf/plugins/installed-plugins
 urls=(
   "static-plus-Linux-amd64.bin"
