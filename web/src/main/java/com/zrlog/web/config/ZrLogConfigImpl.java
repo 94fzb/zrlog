@@ -412,7 +412,11 @@ public class ZrLogConfigImpl extends ZrLogConfig {
                 return;
             }
             LoggerUtil.getLogger(Application.class).warning("Config database error " + e.getMessage());
-            if (!Constants.zrLogConfig.getServerConfig().isNativeImageAgent() && !ZrLogUtil.isWarMode()) {
+            if (Constants.runMode.isLambda()) {
+                //lambda 环境之间输出错误
+                e.printStackTrace();
+            }
+            if (Constants.runMode != RunMode.NATIVE_AGENT && !ZrLogUtil.isWarMode()) {
                 System.exit(-1);
             }
         }
