@@ -35,9 +35,9 @@ fi
 echo -e "version=${version}\nrunMode=${runMode}\nbuildId=${buildId}\nbuildTime=${Date}\nmirrorWebSite=${mirrorWebSite}" > data/src/main/resources/build.properties
 syncPath=${3}
 
-bash -e bin/package-native-${4}.sh
+bash -e bin/package-native-${packageExt}.sh
 if [[ "${OS}" == "linux" && "${packageExt}" == "zip" ]]; then
-  bash -e bin/package-lambda-${4}.sh
+  bash -e bin/package-lambda-${packageExt}.sh
   cp target/zrlog-${version}-lambda.${packageExt} ${syncPath}/zrlog-${version}{buildId}-${runMode}-${fileArch}-lambda.${packageExt}
   cp target/zrlog-${version}-lambda.${packageExt} ${syncPath}/zrlog-${fileArch}-lambda.${packageExt}
 fi
