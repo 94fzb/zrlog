@@ -37,9 +37,9 @@ syncPath=${3}
 
 bash -e bin/package-native-${4}.sh
 if [[ "${OS}" == "linux" && "${packageExt}" == "zip" ]]; then
-#  bash -e bin/package-lambda-${4}.sh
-#  cp target/zrlog-${version}-lambda.${packageExt} ${syncPath}/zrlog-${version}{buildId}-${runMode}-${fileArch}-lambda.${packageExt}
-#  cp target/zrlog-${version}-lambda.${packageExt} ${syncPath}/zrlog-${fileArch}-lambda.${packageExt}
+  bash -e bin/package-lambda-${4}.sh
+  cp target/zrlog-${version}-lambda.${packageExt} ${syncPath}/zrlog-${version}{buildId}-${runMode}-${fileArch}-lambda.${packageExt}
+  cp target/zrlog-${version}-lambda.${packageExt} ${syncPath}/zrlog-${fileArch}-lambda.${packageExt}
 fi
 #finnally workPath, https://dl.zrlog.com mirror folder
 mkdir -p ${syncPath}/${runMode}
