@@ -2,6 +2,7 @@ package com.zrlog.web;
 
 import com.google.gson.Gson;
 import com.hibegin.common.util.BeanUtil;
+import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.http.HttpMethod;
 import com.hibegin.http.server.WebServerBuilder;
@@ -23,6 +24,8 @@ import com.zrlog.common.rest.response.ApiStandardResponse;
 import com.zrlog.common.type.RunMode;
 import com.zrlog.common.vo.*;
 import com.zrlog.data.dto.PageData;
+import com.zrlog.lambda.LambdaRequest;
+import com.zrlog.lambda.rest.LambdaApiGatewayResponse;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.DbConnectUtils;
 import com.zrlog.util.ZrLogUtil;
@@ -89,6 +92,7 @@ public class GraalvmAgentApplication {
         new Gson().toJson(new LoadEditArticleResponse());
         new Gson().toJson(new UserBasicInfoResponse());
         new Gson().toJson(new ServerInfo("1", "1", ""));
+        new Gson().toJson(new LambdaApiGatewayResponse());
     }
 
     private static void adminJson() {
@@ -114,6 +118,7 @@ public class GraalvmAgentApplication {
         new Gson().toJson(PagerUtil.generatorPager("/all", 1, 20));
         new Gson().toJson(new PagerVO.PageEntry());
         new Gson().toJson(new Archive());
+        new Gson().fromJson(IOUtil.getStringInputStream(GraalvmAgentApplication.class.getResourceAsStream("/lambda.json")), LambdaRequest.class);
 
     }
 
