@@ -4,38 +4,40 @@ import java.util.Map;
 
 public class LambdaApiGatewayRequest {
 
-    private String path;
+    private String rawPath;
 
-    private String httpMethod;
+    private ApiGatewayRequestContext requestContext;
 
-    private Map<String, String> queryStringParameters;
+    private String rawQueryString;
+
+    private Boolean base64Encoded;
+
+    public String getRawQueryString() {
+        return rawQueryString;
+    }
+
+    public void setRawQueryString(String rawQueryString) {
+        this.rawQueryString = rawQueryString;
+    }
 
     private Map<String, String> headers;
 
     private String body;
 
-    public String getPath() {
-        return path;
+    public ApiGatewayRequestContext getRequestContext() {
+        return requestContext;
     }
 
-    public void setPath(String path) {
-        this.path = path;
+    public void setRequestContext(ApiGatewayRequestContext requestContext) {
+        this.requestContext = requestContext;
     }
 
-    public String getHttpMethod() {
-        return httpMethod;
+    public String getRawPath() {
+        return rawPath;
     }
 
-    public void setHttpMethod(String httpMethod) {
-        this.httpMethod = httpMethod;
-    }
-
-    public Map<String, String> getQueryStringParameters() {
-        return queryStringParameters;
-    }
-
-    public void setQueryStringParameters(Map<String, String> queryStringParameters) {
-        this.queryStringParameters = queryStringParameters;
+    public void setRawPath(String rawPath) {
+        this.rawPath = rawPath;
     }
 
     public Map<String, String> getHeaders() {
@@ -52,5 +54,13 @@ public class LambdaApiGatewayRequest {
 
     public void setBody(String body) {
         this.body = body;
+    }
+
+    public Boolean getBase64Encoded() {
+        return base64Encoded;
+    }
+
+    public void setBase64Encoded(Boolean base64Encoded) {
+        this.base64Encoded = base64Encoded;
     }
 }

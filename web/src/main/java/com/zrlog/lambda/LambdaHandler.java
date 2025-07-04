@@ -57,10 +57,10 @@ public class LambdaHandler {
      */
     public String doHandle(String input) throws Exception {
         LambdaApiGatewayRequest lambdaApiGatewayRequest = new Gson().fromJson(input, LambdaApiGatewayRequest.class);
-        HttpRequest request = HttpRequestBuilder.buildRequest(HttpMethod.valueOf(lambdaApiGatewayRequest.getHttpMethod()),
-                lambdaApiGatewayRequest.getPath() + "?" + toQueryString(lambdaApiGatewayRequest.getQueryStringParameters()),
-                lambdaApiGatewayRequest.getHeaders().get("Host"),
-                lambdaApiGatewayRequest.getHeaders().get("User-Agent"), serverConfig.getRequestConfig(), applicationContext);
+        HttpRequest request = HttpRequestBuilder.buildRequest(HttpMethod.valueOf(lambdaApiGatewayRequest.getRequestContext().getHttp().getMethod()),
+                lambdaApiGatewayRequest.getRequestContext().getHttp().getPath() + "?" + lambdaApiGatewayRequest.getRawQueryString(),
+                lambdaApiGatewayRequest.getRequestContext().getDomainName(),
+                lambdaApiGatewayRequest.getRequestContext().getHttp().getUserAgent(), serverConfig.getRequestConfig(), applicationContext);
         LambdaResponse lambdaResponse = new LambdaResponse(request, serverConfig.getResponseConfig());
         new HttpRequestHandlerRunnable(request, lambdaResponse).run();
         return lambdaResponse.getOutput();
