@@ -1,5 +1,6 @@
 package com.zrlog.lambda;
 
+import com.hibegin.common.util.ObjectUtil;
 import com.hibegin.http.HttpMethod;
 import com.hibegin.http.server.ApplicationContext;
 import com.hibegin.http.server.config.RequestConfig;
@@ -10,15 +11,15 @@ import java.io.ByteArrayInputStream;
 import java.util.Base64;
 import java.util.Objects;
 
-public class LambdaRequest extends SimpleHttpRequest {
+public class LambdaHttpRequestWrapper extends SimpleHttpRequest {
 
     private final LambdaApiGatewayRequest lambdaApiGatewayRequest;
 
 
-    protected LambdaRequest(ApplicationContext applicationContext, RequestConfig requestConfig, LambdaApiGatewayRequest lambdaApiGatewayRequest) {
+    protected LambdaHttpRequestWrapper(ApplicationContext applicationContext, RequestConfig requestConfig, LambdaApiGatewayRequest lambdaApiGatewayRequest) {
         super(null, applicationContext, requestConfig);
         this.lambdaApiGatewayRequest = lambdaApiGatewayRequest;
-        this.queryStr = lambdaApiGatewayRequest.getRawQueryString();
+        this.queryStr = ObjectUtil.requireNonNullElse(lambdaApiGatewayRequest.getRawQueryString(), "");
         this.method = HttpMethod.valueOf(lambdaApiGatewayRequest.getRequestContext().getHttp().getMethod());
         this.header = lambdaApiGatewayRequest.getHeaders();
         this.getHeaderMap().put("Host", lambdaApiGatewayRequest.getRequestContext().getDomainName());

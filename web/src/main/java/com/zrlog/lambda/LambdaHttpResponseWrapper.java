@@ -1,6 +1,5 @@
 package com.zrlog.lambda;
 
-import com.google.gson.Gson;
 import com.hibegin.common.util.BytesUtil;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.config.ResponseConfig;
@@ -13,8 +12,8 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 
-public class LambdaResponse extends SimpleHttpResponse {
-    public LambdaResponse(HttpRequest request, ResponseConfig responseConfig) {
+public class LambdaHttpResponseWrapper extends SimpleHttpResponse {
+    public LambdaHttpResponseWrapper(HttpRequest request, ResponseConfig responseConfig) {
         super(request, responseConfig);
     }
 

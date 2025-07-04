@@ -1,16 +1,12 @@
 package com.zrlog.web;
 
-import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.ParseArgsUtil;
 import com.hibegin.common.util.Pid;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.server.WebServerBuilder;
-import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.business.service.NativeImageUpdater;
 import com.zrlog.common.Constants;
 import com.zrlog.common.type.RunMode;
-import com.zrlog.lambda.LambdaHandler;
-import com.zrlog.lambda.LambdaResponse;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.ZrLogUtil;
 
@@ -18,7 +14,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * graalvm 实际的启动入口，开发阶段不使用这个类进行启动

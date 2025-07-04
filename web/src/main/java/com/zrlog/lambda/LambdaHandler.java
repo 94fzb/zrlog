@@ -24,9 +24,9 @@ public class LambdaHandler {
      * @return
      */
     public LambdaApiGatewayResponse doHandle(LambdaApiGatewayRequest lambdaApiGatewayRequest) {
-        HttpRequest request = new LambdaRequest(applicationContext, serverConfig.getRequestConfig(), lambdaApiGatewayRequest);
-        LambdaResponse lambdaResponse = new LambdaResponse(request, serverConfig.getResponseConfig());
-        new HttpRequestHandlerRunnable(request, lambdaResponse).run();
-        return lambdaResponse.getOutput();
+        HttpRequest request = new LambdaHttpRequestWrapper(applicationContext, serverConfig.getRequestConfig(), lambdaApiGatewayRequest);
+        LambdaHttpResponseWrapper lambdaHttpResponseWrapper = new LambdaHttpResponseWrapper(request, serverConfig.getResponseConfig());
+        new HttpRequestHandlerRunnable(request, lambdaHttpResponseWrapper).run();
+        return lambdaHttpResponseWrapper.getOutput();
     }
 }
