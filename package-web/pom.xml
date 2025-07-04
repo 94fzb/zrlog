@@ -336,10 +336,10 @@
                                     <snapshotEnv>USER</snapshotEnv>
                                     <skipPOMs>false</skipPOMs>
                                     <deb>
-                                        target/${packageName}-[[version]]-native.[[extension]]
+                                        target/${packageName}-${project.version}-native.[[extension]]
                                     </deb>
                                     <changesOut>
-                                        target/${packageName}-[[version]]-native.changes
+                                        target/${packageName}-${project.version}-native.changes
                                     </changesOut>
                                     <controlDir>${basedir}/src/deb/control</controlDir>
                                     <dataSet>
