@@ -70,7 +70,7 @@ public class LambdaApplication {
         HttpResponse<String> send = httpClient.send(HttpRequest.newBuilder(URI.create(getBaseUrl() + "/next")).build(), HttpResponse.BodyHandlers.ofString());
         LambdaApiGatewayRequest apiGatewayRequest = new Gson().fromJson(send.body(), LambdaApiGatewayRequest.class);
         LOGGER.info("lambda request = " + new Gson().toJson(apiGatewayRequest));
-        return new AbstractMap.SimpleEntry<>(send.headers().firstValue("Request-Id").orElse("Lambda-Runtime-Aws-Request-Id"), apiGatewayRequest);
+        return new AbstractMap.SimpleEntry<>(send.headers().firstValue("Lambda-Runtime-Aws-Request-Id").orElse(""), apiGatewayRequest);
     }
 
     private static void report(String output, String requestId) throws IOException, InterruptedException {
