@@ -34,15 +34,16 @@ else
 fi
 echo -e "version=${version}\nrunMode=${runMode}\nbuildId=${buildId}\nbuildTime=${Date}\nmirrorWebSite=${mirrorWebSite}" > data/src/main/resources/build.properties
 syncPath=${3}
-
+#finnally workPath, https://dl.zrlog.com mirror folder
+mkdir -p ${syncPath}/${runMode}
 bash -e bin/package-native-${packageExt}.sh
 if [[ "${OS}" == "linux" && "${packageExt}" == "zip" ]]; then
   bash -e bin/package-lambda-${packageExt}.sh
-  cp target/zrlog-${version}-lambda.${packageExt} ${syncPath}/zrlog-${version}{buildId}-${runMode}-${fileArch}-lambda.${packageExt}
-  cp target/zrlog-${version}-lambda.${packageExt} ${syncPath}/zrlog-${fileArch}-lambda.${packageExt}
+#copy lambda
+  cp target/zrlog-${version}-lambda.${packageExt} ${syncPath}/${runMode}/zrlog-${version}{buildId}-${runMode}-${fileArch}-lambda.${packageExt}
+  cp target/zrlog-${version}-lambda.${packageExt} ${syncPath}/${runMode}/zrlog-${fileArch}-lambda.${packageExt}
 fi
-#finnally workPath, https://dl.zrlog.com mirror folder
-mkdir -p ${syncPath}/${runMode}
+#
 buildFile=target/zrlog-${version}-native.${packageExt}
 zipFileName=${runMode}/zrlog-${version}-${buildId}-${runMode}-${fileArch}.${packageExt}
 zipFinalFileName=${syncPath}/${runMode}/zrlog-${fileArch}.${packageExt}
