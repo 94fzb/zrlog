@@ -33,11 +33,16 @@ else
     fileArch=$(uname -s)-$(uname -m)
 fi
 echo -e "version=${version}\nrunMode=${runMode}\nbuildId=${buildId}\nbuildTime=${Date}\nmirrorWebSite=${mirrorWebSite}" > data/src/main/resources/build.properties
-bash -e bin/package-native-${4}.sh
-#finnally workPath, https://dl.zrlog.com mirror folder
 syncPath=${3}
+
+bash -e bin/package-native-${4}.sh
+if [[ "${OS}" == "linux" ]]; then
+  bash -e bin/package-lambda-${4}.sh
+  cp target/zrlog-${version}-lambda.${packageExt} ${syncPath}/zrlog-${version}{buildId}-${runMode}-${fileArch}-lambda.${packageExt}
+fi
+#finnally workPath, https://dl.zrlog.com mirror folder
 mkdir -p ${syncPath}/${runMode}
-buildFile=target/zrlog-*.${packageExt}
+buildFile=target/zrlog-${version}.${packageExt}
 zipFileName=${runMode}/zrlog-${version}-${buildId}-${runMode}-${fileArch}.${packageExt}
 zipFinalFileName=${syncPath}/${runMode}/zrlog-${fileArch}.${packageExt}
 cp ${buildFile} ${zipFinalFileName}
