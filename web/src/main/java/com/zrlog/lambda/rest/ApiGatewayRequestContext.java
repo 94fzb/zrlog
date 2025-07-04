@@ -4,6 +4,7 @@ public class ApiGatewayRequestContext {
 
     private ApiGatewayHttp http;
     private String domainName;
+    private String requestId;
 
     public ApiGatewayHttp getHttp() {
         return http;
@@ -19,5 +20,13 @@ public class ApiGatewayRequestContext {
 
     public void setDomainName(String domainName) {
         this.domainName = domainName;
+    }
+
+    public String getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
     }
 }

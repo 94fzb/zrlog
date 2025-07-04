@@ -13,9 +13,7 @@ while true; do
   BODY=$(echo "$RESPONSE" | sed -n '/^\r$/,$p' | sed '1d')
   # 这里处理 EVENT，比如打印或者传给程序
   echo "RequestId: $REQUEST_ID"
-  RESULT=$(echo "$BODY" | ./zrlog)
-
-  echo $RESULT
-  # 回复 Lambda 运行环境，示例返回事件原文
-  echo "$RESULT" | curl -s -X POST "http://${AWS_LAMBDA_RUNTIME_API}/2018-06-01/runtime/invocation/${REQUEST_ID}/response" --data-binary @-
+  echo "$BODY" | ./zrlog
+  # 回复 Lambda 运行环境
+  curl -s -X POST "http://${AWS_LAMBDA_RUNTIME_API}/2018-06-01/runtime/invocation/${REQUEST_ID}/response" --data-binary @"/tmp/temp/${REQUEST_ID}.json"
 done

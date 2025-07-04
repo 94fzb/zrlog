@@ -1,13 +1,16 @@
 package com.zrlog.web;
 
+import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.ParseArgsUtil;
 import com.hibegin.common.util.Pid;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.server.WebServerBuilder;
+import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.business.service.NativeImageUpdater;
 import com.zrlog.common.Constants;
 import com.zrlog.common.type.RunMode;
 import com.zrlog.lambda.LambdaHandler;
+import com.zrlog.lambda.LambdaResponse;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.ZrLogUtil;
 
@@ -75,13 +78,6 @@ public class GraalvmNativeImageApplication {
             return;
         }
         WebServerBuilder webServerBuilder = Application.webServerBuilder(port, ZrLogUtil.getContextPath(args), new NativeImageUpdater(args, new File(execFile)));
-        if (Constants.runMode.isLambda()) {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-            String inputJson = reader.lines().collect(Collectors.joining("\n")).trim();
-            String out = new LambdaHandler(Constants.zrLogConfig).doHandle(inputJson);
-            System.out.println(out);
-            return;
-        }
         webServerBuilder.start();
     }
 }

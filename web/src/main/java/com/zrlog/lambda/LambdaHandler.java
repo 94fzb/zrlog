@@ -1,11 +1,17 @@
 package com.zrlog.lambda;
 
 import com.google.gson.Gson;
+import com.hibegin.common.util.IOUtil;
 import com.hibegin.http.server.ApplicationContext;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.handler.HttpRequestHandlerRunnable;
+import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.common.ZrLogConfig;
 import com.zrlog.lambda.rest.LambdaApiGatewayRequest;
+import jdk.jpackage.internal.IOUtils;
+
+import java.io.File;
+import java.util.logging.Logger;
 
 public class LambdaHandler {
 
@@ -20,25 +26,13 @@ public class LambdaHandler {
     }
 
     /**
-     * {
-     * "resource": "/myresource",
-     * "path": "/myresource",
-     * "httpMethod": "GET",
-     * "headers": { "Content-Type": "application/json" },
-     * "queryStringParameters": { "name": "Alice" },
-     * "body": null,
-     * "isBase64Encoded": false
-     * }
-     *
-     * @param input
+     * @param lambdaApiGatewayRequest
      * @return
      */
-    public String doHandle(String input) {
-        System.err.println("input = " + input);
-        LambdaApiGatewayRequest lambdaApiGatewayRequest = new Gson().fromJson(input, LambdaApiGatewayRequest.class);
+    public LambdaResponse doHandle(LambdaApiGatewayRequest lambdaApiGatewayRequest) {
         HttpRequest request = new LambdaRequest(applicationContext, serverConfig.getRequestConfig(), lambdaApiGatewayRequest);
         LambdaResponse lambdaResponse = new LambdaResponse(request, serverConfig.getResponseConfig());
         new HttpRequestHandlerRunnable(request, lambdaResponse).run();
-        return lambdaResponse.getOutput();
+        return lambdaResponse;
     }
 }

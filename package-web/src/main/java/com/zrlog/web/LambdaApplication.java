@@ -1,23 +1,31 @@
 package com.zrlog.web;
 
+import com.google.gson.Gson;
+import com.hibegin.common.util.IOUtil;
+import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.business.service.NativeImageUpdater;
 import com.zrlog.common.Constants;
 import com.zrlog.common.type.RunMode;
 import com.zrlog.lambda.LambdaHandler;
+import com.zrlog.lambda.LambdaResponse;
+import com.zrlog.lambda.rest.LambdaApiGatewayRequest;
 import com.zrlog.util.ZrLogUtil;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.logging.Logger;
 
 public class LambdaApplication {
+
+    private static final Logger LOGGER = Logger.getLogger(LambdaApplication.class.getName());
 
     static {
         initLambdaEnv();
     }
 
-    public static void initLambdaEnv() {
+    private static void initLambdaEnv() {
         if (!RunMode.isLambdaEnv()) {
             return;
         }
@@ -28,7 +36,7 @@ public class LambdaApplication {
         System.getProperties().put("sws.root.path", System.getProperty("user.dir"));
     }
 
-    public static String getInput() throws IOException {
+    private static String getInput() throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         StringBuilder inputBuilder = new StringBuilder();
         String line;
@@ -39,8 +47,12 @@ public class LambdaApplication {
     }
 
     public static void doHandle(String[] args, int port, String execFile) throws Exception {
+        LambdaApiGatewayRequest lambdaApiGatewayRequest = new Gson().fromJson(getInput(), LambdaApiGatewayRequest.class);
+        LOGGER.info("lambda input = " + new Gson().toJson(lambdaApiGatewayRequest));
         Application.webServerBuilder(port, ZrLogUtil.getContextPath(args), new NativeImageUpdater(args, new File(execFile)));
-        String out = new LambdaHandler(Constants.zrLogConfig).doHandle(getInput());
-        System.out.println(out);
+        LambdaResponse lambdaResponse = new LambdaHandler(Constants.zrLogConfig).doHandle(lambdaApiGatewayRequest);
+        String output = new Gson().toJson(lambdaResponse);
+        IOUtil.writeStrToFile(output, new File(PathUtil.getTempPath() + "/" + lambdaApiGatewayRequest.getRequestContext().getRequestId() + ".json"));
+        LOGGER.info("lambda output = " + output);
     }
 }
