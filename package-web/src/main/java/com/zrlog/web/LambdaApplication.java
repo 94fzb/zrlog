@@ -20,6 +20,7 @@ public class LambdaApplication {
         System.getProperties().put("sws.temp.path", "/tmp/temp");
         System.getProperties().put("sws.cache.path", "/tmp/cache");
         System.getProperties().put("sws.static.path", "/tmp/static");
+        System.getProperties().put("sws.root.path", System.getProperty("user.dir"));
     }
 
     public static void doHandle(String[] args, int port, String execFile) throws Exception {
