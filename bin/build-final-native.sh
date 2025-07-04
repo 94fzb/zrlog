@@ -43,7 +43,7 @@ if [[ "${OS}" == "linux" && "${packageExt}" == "zip" ]]; then
 fi
 #finnally workPath, https://dl.zrlog.com mirror folder
 mkdir -p ${syncPath}/${runMode}
-buildFile=target/zrlog-${version}.${packageExt}
+buildFile=target/zrlog-${version}-native.${packageExt}
 zipFileName=${runMode}/zrlog-${version}-${buildId}-${runMode}-${fileArch}.${packageExt}
 zipFinalFileName=${syncPath}/${runMode}/zrlog-${fileArch}.${packageExt}
 cp ${buildFile} ${zipFinalFileName}
