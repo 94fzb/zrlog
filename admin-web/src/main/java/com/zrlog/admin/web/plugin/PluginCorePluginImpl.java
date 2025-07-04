@@ -35,7 +35,7 @@ public class PluginCorePluginImpl implements PluginCorePlugin {
     }
 
     private String getPluginFileName() {
-        if (Constants.runMode == RunMode.NATIVE) {
+        if (Constants.runMode.isNative()) {
             if (Constants.getRealFileArch().contains("Window")) {
                 return "plugin-core-" + Constants.getRealFileArch() + ".exe";
             }

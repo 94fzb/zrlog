@@ -141,6 +141,34 @@
             </build>
         </profile>
         <profile>
+            <id>package-lambda-zip</id>
+            <build>
+                <finalName>${finalName}-${project.version}-lambda</finalName>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <configuration>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <outputDirectory>../target</outputDirectory>
+                            <descriptors>
+                                <descriptor>src/assembly/lambda-zip.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>make-zip</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>native</id>
             <build>
                 <plugins>

@@ -1,0 +1,9 @@
+{
+  "resource": "/myresource",
+  "path": "/myresource",
+  "httpMethod": "GET",
+  "headers": { "Content-Type": "application/json" },
+  "queryStringParameters": { "name": "Alice" },
+  "body": null,
+  "isBase64Encoded": false
+}

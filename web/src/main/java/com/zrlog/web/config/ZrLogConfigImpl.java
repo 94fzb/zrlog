@@ -57,6 +57,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 /**
@@ -78,7 +79,28 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     private final String contextPath;
     private HikariDataSource dataSource;
 
+    public static void silence() {
+        // 关闭所有日志
+        LogManager.getLogManager().reset();
+
+        // 设置全局级别为 OFF
+        Logger global = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+        global.setLevel(Level.OFF);
+        disableHikariLogging();
+    }
+
+    static {
+        disableHikariLogging();
+    }
+
+    private static void disableHikariLogging() {
+        System.setProperty("org.slf4j.simpleLogger.log.com.zaxxer.hikari", "off");
+    }
+
     public ZrLogConfigImpl(Integer port, Updater updater, String contextPath) {
+        if (Constants.runMode.isLambda()) {
+            silence();
+        }
         this.contextPath = contextPath;
         this.port = port;
         this.plugins = new Plugins();
@@ -90,6 +112,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         this.uptime = System.currentTimeMillis();
         this.configRouter();
         this.configDatabaseWithRetry(20);
+
         if (ThreadUtils.isEnableLoom() && Constants.debugLoggerPrintAble()) {
             LOGGER.info("Java VirtualThread(loom) enabled");
         }
@@ -100,11 +123,11 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     }
 
     /**
-     * 将 docker 配置的 DB_PROPERTIES 写入到实际的文件中，便于程序读取
+     * 将 env 配置的 DB_PROPERTIES 写入到实际的文件中，便于程序读取
      */
     private static void tryInitDbPropertiesFile() throws IOException {
         if (StringUtils.isNotEmpty(ZrLogUtil.getDbInfoByEnv())) {
-            IOUtil.writeBytesToFile(ZrLogUtil.getDbInfoByEnv().getBytes(), Constants.getDbPropertiesFile());
+            IOUtil.writeBytesToFile(new String(ZrLogUtil.getDbInfoByEnv().getBytes()).replaceAll(" ", "\n").getBytes(), Constants.getDbPropertiesFile());
         }
         Properties properties = InstallUtils.getDbProp();
         if (Objects.isNull(properties)) {

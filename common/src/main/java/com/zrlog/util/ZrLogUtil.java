@@ -291,7 +291,6 @@ public class ZrLogUtil {
         return updater.getType() == UpdaterTypeEnum.WAR;
     }
 
-
     public static void putLongTimeCache(HttpResponse response) {
         response.addHeader("Cache-Control", "max-age=31536000, immutable"); // 1 年的秒数
     }

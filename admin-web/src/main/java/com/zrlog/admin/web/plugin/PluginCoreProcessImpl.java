@@ -40,7 +40,7 @@ public class PluginCoreProcessImpl implements PluginCoreProcess {
     }
 
     private String programName(File pluginCoreFile) {
-        if (Constants.runMode == RunMode.NATIVE) {
+        if (Constants.runMode.isNative()) {
             return pluginCoreFile.toString();
         }
         String java = System.getProperty("java.home");
@@ -80,7 +80,7 @@ public class PluginCoreProcessImpl implements PluginCoreProcess {
         args.add(runTimeVersion);
         args.add(Constants.zrLogConfig.getServerConfig().getPort() + "");
         args.add(token);
-        if (Constants.runMode == RunMode.NATIVE) {
+        if (Constants.runMode.isNative()) {
             args.add(Constants.getRealFileArch());
         } else {
             args.add("-");
