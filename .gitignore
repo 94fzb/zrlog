@@ -51,4 +51,4 @@ package-web/src/main/webapp/WEB-INF/plugins/*
 tomcat.*
 package-web/src/main/webapp/static/attached/*
 doc/build_system_info.md
-./bootstrap
+bootstrap
