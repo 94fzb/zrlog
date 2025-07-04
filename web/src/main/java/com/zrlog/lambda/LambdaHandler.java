@@ -1,13 +1,11 @@
 package com.zrlog.lambda;
 
 import com.google.gson.Gson;
-import com.hibegin.http.HttpMethod;
 import com.hibegin.http.server.ApplicationContext;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.handler.HttpRequestHandlerRunnable;
-import com.hibegin.http.server.util.HttpRequestBuilder;
 import com.zrlog.common.ZrLogConfig;
-import com.zrlog.lambda.vo.LambdaApiGatewayRequest;
+import com.zrlog.lambda.rest.LambdaApiGatewayRequest;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -53,14 +51,10 @@ public class LambdaHandler {
      *
      * @param input
      * @return
-     * @throws Exception
      */
-    public String doHandle(String input) throws Exception {
+    public String doHandle(String input) {
         LambdaApiGatewayRequest lambdaApiGatewayRequest = new Gson().fromJson(input, LambdaApiGatewayRequest.class);
-        HttpRequest request = HttpRequestBuilder.buildRequest(HttpMethod.valueOf(lambdaApiGatewayRequest.getRequestContext().getHttp().getMethod()),
-                lambdaApiGatewayRequest.getRequestContext().getHttp().getPath() + "?" + lambdaApiGatewayRequest.getRawQueryString(),
-                lambdaApiGatewayRequest.getRequestContext().getDomainName(),
-                lambdaApiGatewayRequest.getRequestContext().getHttp().getUserAgent(), serverConfig.getRequestConfig(), applicationContext);
+        HttpRequest request = new LambdaRequest(applicationContext, serverConfig.getRequestConfig(), lambdaApiGatewayRequest);
         LambdaResponse lambdaResponse = new LambdaResponse(request, serverConfig.getResponseConfig());
         new HttpRequestHandlerRunnable(request, lambdaResponse).run();
         return lambdaResponse.getOutput();

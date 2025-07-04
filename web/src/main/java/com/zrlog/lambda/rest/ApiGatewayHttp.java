@@ -1,4 +1,4 @@
-package com.zrlog.lambda.vo;
+package com.zrlog.lambda.rest;
 
 public class ApiGatewayHttp {
 
