@@ -34,7 +34,7 @@ public class LambdaHandler {
      * @return
      */
     public String doHandle(String input) {
-        System.out.println("input = " + input);
+        System.err.println("input = " + input);
         LambdaApiGatewayRequest lambdaApiGatewayRequest = new Gson().fromJson(input, LambdaApiGatewayRequest.class);
         HttpRequest request = new LambdaRequest(applicationContext, serverConfig.getRequestConfig(), lambdaApiGatewayRequest);
         LambdaResponse lambdaResponse = new LambdaResponse(request, serverConfig.getResponseConfig());
