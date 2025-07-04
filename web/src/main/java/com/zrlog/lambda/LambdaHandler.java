@@ -5,6 +5,7 @@ import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.handler.HttpRequestHandlerRunnable;
 import com.zrlog.common.ZrLogConfig;
 import com.zrlog.lambda.rest.LambdaApiGatewayRequest;
+import com.zrlog.lambda.rest.LambdaApiGatewayResponse;
 
 public class LambdaHandler {
 
@@ -22,10 +23,10 @@ public class LambdaHandler {
      * @param lambdaApiGatewayRequest
      * @return
      */
-    public LambdaResponse doHandle(LambdaApiGatewayRequest lambdaApiGatewayRequest) {
+    public LambdaApiGatewayResponse doHandle(LambdaApiGatewayRequest lambdaApiGatewayRequest) {
         HttpRequest request = new LambdaRequest(applicationContext, serverConfig.getRequestConfig(), lambdaApiGatewayRequest);
         LambdaResponse lambdaResponse = new LambdaResponse(request, serverConfig.getResponseConfig());
         new HttpRequestHandlerRunnable(request, lambdaResponse).run();
-        return lambdaResponse;
+        return lambdaResponse.getOutput();
     }
 }

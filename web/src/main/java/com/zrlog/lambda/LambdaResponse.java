@@ -56,7 +56,7 @@ public class LambdaResponse extends SimpleHttpResponse {
         return true;
     }
 
-    public String getOutput() {
+    public LambdaApiGatewayResponse getOutput() {
         byte[] bytes = BytesUtil.mergeBytes(bodyList.toArray(new byte[bodyList.size()][]));
         LambdaApiGatewayResponse lambdaApiGatewayResponse = new LambdaApiGatewayResponse();
         if (isRequiredBase64Encode()) {
@@ -67,6 +67,6 @@ public class LambdaResponse extends SimpleHttpResponse {
         }
         lambdaApiGatewayResponse.setStatusCode(statusCode);
         lambdaApiGatewayResponse.setHeaders(getHeader());
-        return new Gson().toJson(lambdaApiGatewayResponse);
+        return lambdaApiGatewayResponse;
     }
 }

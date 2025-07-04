@@ -9,6 +9,7 @@ import com.zrlog.common.type.RunMode;
 import com.zrlog.lambda.LambdaHandler;
 import com.zrlog.lambda.LambdaResponse;
 import com.zrlog.lambda.rest.LambdaApiGatewayRequest;
+import com.zrlog.lambda.rest.LambdaApiGatewayResponse;
 import com.zrlog.util.ZrLogUtil;
 
 import java.io.BufferedReader;
@@ -47,12 +48,12 @@ public class LambdaApplication {
     }
 
     public static void doHandle(String[] args, int port, String execFile) throws Exception {
-        LambdaApiGatewayRequest lambdaApiGatewayRequest = new Gson().fromJson(getInput(), LambdaApiGatewayRequest.class);
-        LOGGER.info("lambda input = " + new Gson().toJson(lambdaApiGatewayRequest));
+        LambdaApiGatewayRequest apiGatewayRequest = new Gson().fromJson(getInput(), LambdaApiGatewayRequest.class);
+        LOGGER.info("lambda input = " + new Gson().toJson(apiGatewayRequest));
         Application.webServerBuilder(port, ZrLogUtil.getContextPath(args), new NativeImageUpdater(args, new File(execFile)));
-        LambdaResponse lambdaResponse = new LambdaHandler(Constants.zrLogConfig).doHandle(lambdaApiGatewayRequest);
-        String output = new Gson().toJson(lambdaResponse);
-        IOUtil.writeStrToFile(output, new File(PathUtil.getTempPath() + "/" + lambdaApiGatewayRequest.getRequestContext().getRequestId() + ".json"));
+        LambdaApiGatewayResponse apiGatewayResponse = new LambdaHandler(Constants.zrLogConfig).doHandle(apiGatewayRequest);
+        String output = new Gson().toJson(apiGatewayResponse);
+        IOUtil.writeStrToFile(output, new File(PathUtil.getTempPath() + "/" + apiGatewayRequest.getRequestContext().getRequestId() + ".json"));
         LOGGER.info("lambda output = " + output);
     }
 }
