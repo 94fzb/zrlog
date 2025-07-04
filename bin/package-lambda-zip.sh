@@ -12,6 +12,5 @@ for url in "${urls[@]}"; do
   wget -O "conf/plugins/installed-plugins/$filename" "https://pub-c16cba848aff4e6b8d8e0d00f0f741f0.r2.dev/plugin/$url"
 done
 wget -O "conf/plugins/plugin-core-Linux-amd64.bin" "https://pub-c16cba848aff4e6b8d8e0d00f0f741f0.r2.dev/plugin/core/plugin-core-Linux-amd64.bin"
-cp bin/bootstrap.sh bootstrap
-chmod a+x bootstrap
+ln -s zrlog bootstrap
 ./mvnw -Ppackage-lambda-zip assembly:single -f "package-web/pom.xml"
