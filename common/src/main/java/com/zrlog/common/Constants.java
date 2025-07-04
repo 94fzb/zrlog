@@ -61,7 +61,7 @@ public class Constants {
     }
 
     public static boolean debugLoggerPrintAble() {
-        return EnvKit.isDevMode();
+        return EnvKit.isDevMode() || RunMode.isLambdaEnv();
     }
 
     public static String getRealFileArch() {
