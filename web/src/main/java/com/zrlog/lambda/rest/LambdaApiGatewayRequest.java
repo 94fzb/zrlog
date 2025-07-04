@@ -1,6 +1,9 @@
 package com.zrlog.lambda.rest;
 
+import com.hibegin.common.util.ObjectUtil;
+
 import java.util.Map;
+import java.util.Objects;
 
 public class LambdaApiGatewayRequest {
 
@@ -56,8 +59,8 @@ public class LambdaApiGatewayRequest {
         this.body = body;
     }
 
-    public Boolean getBase64Encoded() {
-        return base64Encoded;
+    public boolean isBase64Encoded() {
+        return Objects.equals(base64Encoded, true);
     }
 
     public void setBase64Encoded(Boolean base64Encoded) {
