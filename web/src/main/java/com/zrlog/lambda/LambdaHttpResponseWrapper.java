@@ -60,7 +60,7 @@ public class LambdaHttpResponseWrapper extends SimpleHttpResponse {
         LambdaApiGatewayResponse lambdaApiGatewayResponse = new LambdaApiGatewayResponse();
         if (isRequiredBase64Encode()) {
             lambdaApiGatewayResponse.setBody(Base64.getEncoder().encodeToString(bytes));
-            lambdaApiGatewayResponse.setBase64Encoded(true);
+            lambdaApiGatewayResponse.setIsBase64Encoded(true);
         } else {
             lambdaApiGatewayResponse.setBody(new String(bytes));
         }

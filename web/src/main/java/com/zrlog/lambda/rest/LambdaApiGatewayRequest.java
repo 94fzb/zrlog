@@ -1,6 +1,6 @@
 package com.zrlog.lambda.rest;
 
-import com.hibegin.common.util.ObjectUtil;
+import com.google.gson.annotations.SerializedName;
 
 import java.util.Map;
 import java.util.Objects;
@@ -13,7 +13,8 @@ public class LambdaApiGatewayRequest {
 
     private String rawQueryString;
 
-    private Boolean base64Encoded;
+    @SerializedName("isBase64Encoded")
+    private Boolean isBase64Encoded;
 
     public String getRawQueryString() {
         return rawQueryString;
@@ -60,10 +61,10 @@ public class LambdaApiGatewayRequest {
     }
 
     public boolean isBase64Encoded() {
-        return Objects.equals(base64Encoded, true);
+        return Objects.equals(isBase64Encoded, true);
     }
 
     public void setBase64Encoded(Boolean base64Encoded) {
-        this.base64Encoded = base64Encoded;
+        this.isBase64Encoded = Objects.equals(base64Encoded, true);
     }
 }

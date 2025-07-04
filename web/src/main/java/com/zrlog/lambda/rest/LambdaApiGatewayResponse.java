@@ -1,5 +1,7 @@
 package com.zrlog.lambda.rest;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.Map;
 import java.util.Objects;
 
@@ -11,7 +13,8 @@ public class LambdaApiGatewayResponse {
 
     private Map<String, String> headers;
 
-    private Boolean base64Encoded;
+    @SerializedName("isBase64Encoded")
+    private Boolean isBase64Encoded;
 
     public String getBody() {
         return body;
@@ -38,10 +41,10 @@ public class LambdaApiGatewayResponse {
     }
 
     public boolean isBase64Encoded() {
-        return Objects.equals(base64Encoded, true);
+        return Objects.equals(isBase64Encoded, true);
     }
 
-    public void setBase64Encoded(Boolean base64Encoded) {
-        this.base64Encoded = base64Encoded;
+    public void setBase64Encoded(Boolean isBase64Encoded) {
+        this.isBase64Encoded = Objects.equals(isBase64Encoded, true);
     }
 }
