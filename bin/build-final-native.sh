@@ -36,7 +36,7 @@ echo -e "version=${version}\nrunMode=${runMode}\nbuildId=${buildId}\nbuildTime=$
 syncPath=${3}
 
 bash -e bin/package-native-${4}.sh
-if [[ "${OS}" == "linux" ]]; then
+if [[ "${OS}" == "linux" && "${packageExt}" == "zip" ]]; then
   bash -e bin/package-lambda-${4}.sh
   cp target/zrlog-${version}-lambda.${packageExt} ${syncPath}/zrlog-${version}{buildId}-${runMode}-${fileArch}-lambda.${packageExt}
 fi
