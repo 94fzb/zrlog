@@ -2,6 +2,7 @@ package com.zrlog.web;
 
 import com.zrlog.business.service.NativeImageUpdater;
 import com.zrlog.common.Constants;
+import com.zrlog.common.type.RunMode;
 import com.zrlog.lambda.LambdaHandler;
 import com.zrlog.util.ZrLogUtil;
 
@@ -12,8 +13,12 @@ import java.util.stream.Collectors;
 
 public class LambdaApplication {
 
+    static {
+        initLambdaEnv();
+    }
+
     public static void initLambdaEnv() {
-        if (!Constants.runMode.isLambda()) {
+        if (!RunMode.isLambdaEnv()) {
             return;
         }
         System.getProperties().put("sws.log.path", "/tmp/log");
@@ -24,7 +29,6 @@ public class LambdaApplication {
     }
 
     public static void doHandle(String[] args, int port, String execFile) throws Exception {
-        initLambdaEnv();
         Application.webServerBuilder(port, ZrLogUtil.getContextPath(args), new NativeImageUpdater(args, new File(execFile)));
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         String inputJson = reader.lines().collect(Collectors.joining("\n")).trim();
