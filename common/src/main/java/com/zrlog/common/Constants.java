@@ -163,6 +163,9 @@ public class Constants {
     }
 
     public static File getDbPropertiesFile() {
+        if (Constants.runMode.isLambda()) {
+            return new File("/tmp/db.properties");
+        }
         File file = new File(PathUtil.getConfPath() + "/db.properties");
         new File(PathUtil.getConfPath()).mkdirs();
         return file;

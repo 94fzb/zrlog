@@ -416,7 +416,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
                 //lambda 环境之间输出错误
                 e.printStackTrace();
             }
-            if (Constants.runMode != RunMode.NATIVE_AGENT && !ZrLogUtil.isWarMode()) {
+            if (Constants.runMode != RunMode.NATIVE_AGENT && !ZrLogUtil.isWarMode(updater)) {
                 System.exit(-1);
             }
         }

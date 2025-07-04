@@ -291,6 +291,16 @@ public class ZrLogUtil {
         return updater.getType() == UpdaterTypeEnum.WAR;
     }
 
+    public static boolean isWarMode(Updater updater) {
+        if (EnvKit.isDevMode()) {
+            return false;
+        }
+        if (Objects.isNull(updater)) {
+            return false;
+        }
+        return updater.getType() == UpdaterTypeEnum.WAR;
+    }
+
     public static void putLongTimeCache(HttpResponse response) {
         response.addHeader("Cache-Control", "max-age=31536000, immutable"); // 1 年的秒数
     }

@@ -61,8 +61,19 @@ public class GraalvmNativeImageApplication {
         return execFile;
     }
 
+    public static void initLambdaEnv() {
+        if (!Constants.runMode.isLambda()) {
+            return;
+        }
+        System.getProperties().put("sws.log.path", "/tmp/log");
+        System.getProperties().put("sws.temp.path", "/tmp/temp");
+        System.getProperties().put("sws.cache.path", "/tmp/cache");
+        System.getProperties().put("sws.static.path", "/tmp/static");
+    }
+
     public static void main(String[] args) throws Exception {
         Constants.runMode = RunMode.isLambdaEnv() ? RunMode.NATIVE_LAMBDA : RunMode.NATIVE;
+        initLambdaEnv();
         String execFile = getExecFile();
         //parse args
         if (ParseArgsUtil.justTips(args, new File(execFile).getName(), BlogBuildInfoUtil.getVersionInfoFull())) {
