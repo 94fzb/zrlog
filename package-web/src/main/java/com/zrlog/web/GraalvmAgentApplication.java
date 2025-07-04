@@ -118,7 +118,8 @@ public class GraalvmAgentApplication {
         new Gson().toJson(PagerUtil.generatorPager("/all", 1, 20));
         new Gson().toJson(new PagerVO.PageEntry());
         new Gson().toJson(new Archive());
-        new Gson().fromJson(IOUtil.getStringInputStream(GraalvmAgentApplication.class.getResourceAsStream("/lambda.json")), LambdaRequest.class);
+        LambdaRequest lambdaRequest = new Gson().fromJson(IOUtil.getStringInputStream(GraalvmAgentApplication.class.getResourceAsStream("/lambda.json")), LambdaRequest.class);
+        new Gson().toJson(lambdaRequest);
 
     }
 
