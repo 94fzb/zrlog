@@ -61,25 +61,19 @@ public class GraalvmNativeImageApplication {
         return execFile;
     }
 
-    public static void initLambdaEnv() {
-        if (!Constants.runMode.isLambda()) {
-            return;
-        }
-        System.getProperties().put("sws.log.path", "/tmp/log");
-        System.getProperties().put("sws.temp.path", "/tmp/temp");
-        System.getProperties().put("sws.cache.path", "/tmp/cache");
-        System.getProperties().put("sws.static.path", "/tmp/static");
-    }
 
     public static void main(String[] args) throws Exception {
         Constants.runMode = RunMode.isLambdaEnv() ? RunMode.NATIVE_LAMBDA : RunMode.NATIVE;
-        initLambdaEnv();
         String execFile = getExecFile();
         //parse args
         if (ParseArgsUtil.justTips(args, new File(execFile).getName(), BlogBuildInfoUtil.getVersionInfoFull())) {
             return;
         }
         int port = ZrLogUtil.getPort(args);
+        if (Constants.runMode.isLambda()) {
+            LambdaApplication.doHandle(args, port, execFile);
+            return;
+        }
         WebServerBuilder webServerBuilder = Application.webServerBuilder(port, ZrLogUtil.getContextPath(args), new NativeImageUpdater(args, new File(execFile)));
         if (Constants.runMode.isLambda()) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
