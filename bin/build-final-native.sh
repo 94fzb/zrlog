@@ -40,7 +40,7 @@ bash -e bin/package-native-${packageExt}.sh
 if [[ "${OS}" == "linux" && "${packageExt}" == "zip" ]]; then
   bash -e bin/package-lambda-${packageExt}.sh
 #copy lambda
-  cp target/zrlog-${version}-lambda.${packageExt} ${syncPath}/${runMode}/zrlog-${version}{buildId}-${runMode}-${fileArch}-lambda.${packageExt}
+  cp target/zrlog-${version}-lambda.${packageExt} ${syncPath}/${runMode}/zrlog-${version}-${buildId}-${runMode}-${fileArch}-lambda.${packageExt}
   cp target/zrlog-${version}-lambda.${packageExt} ${syncPath}/${runMode}/zrlog-${fileArch}-lambda.${packageExt}
 fi
 #
