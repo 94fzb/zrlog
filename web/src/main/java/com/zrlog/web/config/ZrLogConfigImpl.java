@@ -79,16 +79,6 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     private final String contextPath;
     private HikariDataSource dataSource;
 
-    public static void silence() {
-        // 关闭所有日志
-        LogManager.getLogManager().reset();
-
-        // 设置全局级别为 OFF
-        Logger global = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-        global.setLevel(Level.OFF);
-        disableHikariLogging();
-    }
-
     static {
         disableHikariLogging();
     }
@@ -98,9 +88,6 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     }
 
     public ZrLogConfigImpl(Integer port, Updater updater, String contextPath) {
-        if (Constants.runMode.isLambda()) {
-            silence();
-        }
         this.contextPath = contextPath;
         this.port = port;
         this.plugins = new Plugins();

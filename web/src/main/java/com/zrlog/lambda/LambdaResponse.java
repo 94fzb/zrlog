@@ -9,7 +9,9 @@ import com.zrlog.lambda.rest.LambdaApiGatewayResponse;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
+import java.util.Objects;
 
 public class LambdaResponse extends SimpleHttpResponse {
     public LambdaResponse(HttpRequest request, ResponseConfig responseConfig) {
@@ -37,10 +39,32 @@ public class LambdaResponse extends SimpleHttpResponse {
         return super.wrapperBaseResponseHeader(statusCode);
     }
 
+    public boolean isRequiredBase64Encode() {
+        String contentType = getHeader().get("Content-Type");
+        if (Objects.isNull(contentType)) {
+            return true;
+        }
+        if (contentType.startsWith("application/json")) {
+            return false;
+        }
+        if (contentType.startsWith("text/")) {
+            return false;
+        }
+        if (contentType.startsWith("application/javascript")) {
+            return false;
+        }
+        return true;
+    }
+
     public String getOutput() {
         byte[] bytes = BytesUtil.mergeBytes(bodyList.toArray(new byte[bodyList.size()][]));
         LambdaApiGatewayResponse lambdaApiGatewayResponse = new LambdaApiGatewayResponse();
-        lambdaApiGatewayResponse.setBody(new String(bytes));
+        if (isRequiredBase64Encode()) {
+            lambdaApiGatewayResponse.setBody(Base64.getEncoder().encodeToString(bytes));
+            lambdaApiGatewayResponse.setBase64Encoded(true);
+        } else {
+            lambdaApiGatewayResponse.setBody(new String(bytes));
+        }
         lambdaApiGatewayResponse.setStatusCode(statusCode);
         lambdaApiGatewayResponse.setHeaders(getHeader());
         return new Gson().toJson(lambdaApiGatewayResponse);

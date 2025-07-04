@@ -10,6 +10,8 @@ public class LambdaApiGatewayResponse {
 
     private Map<String, String> headers;
 
+    private Boolean base64Encoded;
+
     public String getBody() {
         return body;
     }
@@ -32,5 +34,13 @@ public class LambdaApiGatewayResponse {
 
     public void setHeaders(Map<String, String> headers) {
         this.headers = headers;
+    }
+
+    public Boolean getBase64Encoded() {
+        return base64Encoded;
+    }
+
+    public void setBase64Encoded(Boolean base64Encoded) {
+        this.base64Encoded = base64Encoded;
     }
 }
