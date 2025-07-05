@@ -47,7 +47,7 @@ public class AdminTokenService implements TokenService {
         String newSecretKey = SecurityUtils.md5(secretKey).substring(8, 24);
         secretKeySpec = new SecretKeySpec(newSecretKey.getBytes(StandardCharsets.UTF_8), "AES");
         cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, iv);
-        LOGGER.info("encrypt used time " + (System.currentTimeMillis() - start) + "ms");
+        //LOGGER.info("encrypt used time " + (System.currentTimeMillis() - start) + "ms");
         return cipher.doFinal(value);
     }
 
@@ -58,7 +58,7 @@ public class AdminTokenService implements TokenService {
         String newSecretKey = SecurityUtils.md5(secretKey).substring(8, 24);
         secretKeySpec = new SecretKeySpec(newSecretKey.getBytes(StandardCharsets.UTF_8), "AES");
         cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, iv);
-        LOGGER.info("decrypt used time " + (System.currentTimeMillis() - start) + "ms");
+        //LOGGER.info("decrypt used time " + (System.currentTimeMillis() - start) + "ms");
         return cipher.doFinal(encrypted);
     }
 
