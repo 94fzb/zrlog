@@ -36,7 +36,7 @@ public class LambdaHttpRequestWrapper extends SimpleHttpRequest {
         }
         //
         ServerConfig serverConfig = super.getServerConfig();
-        serverConfig.setApplicationName("Lambda-API-Gateway");
+        serverConfig.setApplicationName("Lambda Function");
         serverConfig.setApplicationVersion(LambdaEventIterator.VERSION);
     }
 
