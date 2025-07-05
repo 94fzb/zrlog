@@ -175,6 +175,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         serverConfig.setContextPath(contextPath);
         serverConfig.setPidFilePathEnvKey("ZRLOG_PID_FILE");
         serverConfig.setServerPortFilePathEnvKey("ZRLOG_HTTP_PORT_FILE");
+        serverConfig.setDisableSavePidFile(RunMode.isLambdaMode());
         serverConfig.setHttpJsonMessageConverter(new ZrLogHttpJsonMessageConverter());
         serverConfig.addErrorHandle(400, new ZrLogErrorHandle(400));
         serverConfig.addErrorHandle(403, new ZrLogErrorHandle(403));
