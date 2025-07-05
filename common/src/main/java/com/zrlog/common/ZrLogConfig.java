@@ -4,6 +4,7 @@ import com.hibegin.http.server.config.AbstractServerConfig;
 import com.zrlog.common.vo.DatabaseConnectPoolInfo;
 import com.zrlog.plugin.Plugins;
 
+import javax.sql.DataSource;
 import java.util.Map;
 
 
@@ -30,6 +31,8 @@ public abstract class ZrLogConfig extends AbstractServerConfig {
     public abstract String getContextPath();
 
     public abstract DatabaseConnectPoolInfo getDatabaseConnectPoolInfo();
+
+    public abstract DataSource getDataSource();
 
     public abstract void stop();
 

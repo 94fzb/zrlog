@@ -47,9 +47,9 @@ import com.zrlog.web.inteceptor.MyI18nInterceptor;
 import com.zrlog.web.inteceptor.PluginInterceptor;
 import com.zrlog.web.inteceptor.StaticResourceInterceptor;
 
+import javax.sql.DataSource;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.sql.Connection;
 import java.sql.SQLRecoverableException;
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -104,7 +104,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     }
 
     public static boolean isTest() {
-        return "junit-test".equals(InstallUtils.getSystemProp().getProperty("env"));
+        return "junit-test".equals(System.getProperties().getProperty("env"));
     }
 
     /**
@@ -367,6 +367,11 @@ public class ZrLogConfigImpl extends ZrLogConfig {
             return new DatabaseConnectPoolInfo(0, 0);
         }
         return new DatabaseConnectPoolInfo(dataSource.getHikariPoolMXBean().getActiveConnections(), dataSource.getHikariPoolMXBean().getTotalConnections());
+    }
+
+    @Override
+    public DataSource getDataSource() {
+        return dataSource;
     }
 
     @Override

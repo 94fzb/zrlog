@@ -102,54 +102,6 @@ public class ZrLogUtil {
         return "//" + getBlogHost(request) + request.getUri().substring(1);
     }
 
-    public static String getDatabaseServerVersion(Properties dbConfig) {
-        try (Connection connect = DbConnectUtils.getConnection(dbConfig)) {
-            if (connect != null) {
-                String queryVersionSQL = "select version()";
-                try (PreparedStatement ps = connect.prepareStatement(queryVersionSQL)) {
-                    try (ResultSet resultSet = ps.executeQuery()) {
-                        if (resultSet.next()) {
-                            return resultSet.getString(1);
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "DB connect error ", e);
-        }
-        return "Unknown";
-    }
-
-
-
-
-    private static Map<Integer, String> getSqlFileList() {
-        Map<Integer, String> fileList = new LinkedHashMap<>();
-        for (int i = 1; i <= Constants.SQL_VERSION; i++) {
-            InputStream sqlStream = PathUtil.getConfInputStream("/update-sql/" + i + ".sql");
-            if (Objects.nonNull(sqlStream)) {
-                fileList.put(i, IOUtil.getStringInputStream(sqlStream));
-            }
-
-        }
-        return fileList;
-    }
-
-    public static List<Map.Entry<Integer, List<String>>> getExecSqlList(Long dbVersion) {
-        List<Map.Entry<Integer, List<String>>> sqlList = new ArrayList<>();
-
-        for (Map.Entry<Integer, String> f : getSqlFileList().entrySet()) {
-            int fileVersion = f.getKey();
-            if (fileVersion > dbVersion) {
-                Map.Entry<Integer, List<String>> entry = new AbstractMap.SimpleEntry<>(fileVersion, extractExecutableSql(f.getValue()));
-                LOGGER.info("Need update sql " + fileVersion + ".sql \n" + String.join(";\n", entry.getValue()) + ";");
-                sqlList.add(entry);
-            }
-        }
-        return sqlList;
-    }
-
-
     public static boolean greatThenCurrentVersion(String buildId, Date releaseDate, String fetchedVersion) {
         if (buildId.equals(BlogBuildInfoUtil.getBuildId()) || releaseDate.before(BlogBuildInfoUtil.getTime())) {
             return false;
