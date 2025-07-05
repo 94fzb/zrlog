@@ -91,7 +91,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
 
     public ZrLogConfigImpl(Integer port, Updater updater, String contextPath) {
         this.dbPropertiesFile = initDbPropertiesFile();
-        new File(PathUtil.getConfPath()).mkdirs();
+
         this.contextPath = contextPath;
         this.port = port;
         this.plugins = new Plugins();
@@ -118,6 +118,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
      */
     private static File initDbPropertiesFile() {
         File dbFiles = new File(PathUtil.getConfPath() + "/db.properties");
+        dbFiles.getParentFile().mkdirs();
         try {
             if (!InstallUtils.isInstalled()) {
                 return dbFiles;
@@ -139,7 +140,6 @@ public class ZrLogConfigImpl extends ZrLogConfig {
             LOGGER.log(Level.SEVERE, "initDbPropertiesFile error " + e.getMessage());
         }
         return dbFiles;
-
     }
 
     static String toNamingDurationString(long milliseconds, boolean en) {
