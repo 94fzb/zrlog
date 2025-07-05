@@ -1,4 +1,4 @@
-package com.zrlog.blog.web.version;
+package com.zrlog.business.version;
 
 import com.zrlog.common.vo.AdminTokenVO;
 

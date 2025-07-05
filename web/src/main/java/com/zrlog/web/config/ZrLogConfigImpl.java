@@ -27,11 +27,11 @@ import com.zrlog.blog.web.interceptor.BlogPageInterceptor;
 import com.zrlog.blog.web.interceptor.PwaInterceptor;
 import com.zrlog.blog.web.plugin.CacheManagerPlugin;
 import com.zrlog.blog.web.plugin.RequestStatisticsPlugin;
-import com.zrlog.blog.web.version.UpgradeVersionHandler;
 import com.zrlog.business.cache.CacheServiceImpl;
 import com.zrlog.business.plugin.StaticSitePlugin;
 import com.zrlog.business.plugin.TemplateDownloadPlugin;
 import com.zrlog.business.plugin.UpdateVersionInfoPlugin;
+import com.zrlog.business.service.DbUpgradeService;
 import com.zrlog.business.util.InstallUtils;
 import com.zrlog.business.util.PluginUtils;
 import com.zrlog.common.*;
@@ -51,13 +51,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLRecoverableException;
-import java.sql.Statement;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
-import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 /**
@@ -231,7 +229,6 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         }
         tryInitDbPropertiesFile();
         Properties dbProperties = Objects.requireNonNull(InstallUtils.getDbProp());
-        int newDbVersion = tryDoUpgrade(dbProperties);
         //启动时候进行数据库连接
         dataSource = new HikariDataSource();
         dataSource.setDataSourceProperties(dbProperties);
@@ -240,10 +237,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         dataSource.setPassword(dbProperties.getProperty("password"));
         dataSource.setJdbcUrl(dbProperties.getProperty("jdbcUrl"));
         DAO.setDs(dataSource);
-        //Test
-        try (Connection connection = dataSource.getConnection()) {
-            LOGGER.info("Db connect success " + connection.getCatalog());
-        }
+        int newDbVersion = new DbUpgradeService(dataSource).tryDoUpgrade();
         if (newDbVersion > 0) {
             new WebSite().updateByKV(Constants.ZRLOG_SQL_VERSION_KEY, newDbVersion + "");
         }
@@ -275,59 +269,6 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         return plugins;
     }
 
-    /**
-     * 检查数据文件是否需要更新
-     * 为了处理由于数据库表的更新，导致系统无法正常使用的情况，通过执行/conf/update-sql/目录下面的*.sql文件来变更数据库的表格式，
-     * 来达到系统无需手动执行数据库脚本文件。
-     */
-    private int tryDoUpgrade(Properties dbProp) {
-        Long currentVersion = ZrLogUtil.getCurrentSqlVersion(dbProp);
-        if (Objects.isNull(currentVersion) || currentVersion < 0) {
-            return -1;
-        }
-        List<Map.Entry<Integer, List<String>>> sqlList = ZrLogUtil.getExecSqlList(currentVersion);
-        if (sqlList.isEmpty()) {
-            return -1;
-        }
-        try (Connection connection = DbConnectUtils.getConnection(dbProp)) {
-            if (Objects.isNull(connection)) {
-                return -1;
-            }
-            for (Map.Entry<Integer, List<String>> entry : sqlList) {
-                //执行需要更新的sql脚本
-                try (Statement statement = connection.createStatement()) {
-                    for (String sql : entry.getValue()) {
-                        if (StringUtils.isEmpty(sql.trim())) {
-                            continue;
-                        }
-                        statement.execute(sql);
-                    }
-                } catch (Exception e) {
-                    LOGGER.log(Level.SEVERE, "execution sql ", e);
-                    //有异常终止升级
-                    return -1;
-                }
-                //执行需要转换的数据
-                try {
-                    UpgradeVersionHandler upgradeVersionHandler = (UpgradeVersionHandler) Class.forName("com.zrlog.web.version.V" + entry.getKey() + "UpgradeVersionHandler").getDeclaredConstructor().newInstance();
-                    try {
-                        upgradeVersionHandler.doUpgrade(connection);
-                    } catch (Exception e) {
-                        LOGGER.log(Level.SEVERE, "", e);
-                        return -1;
-                    }
-                } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
-                    if (Constants.debugLoggerPrintAble()) {
-                        LOGGER.log(Level.WARNING, "Try exec upgrade method error, " + e.getMessage());
-                    }
-                }
-            }
-            return Constants.SQL_VERSION;
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "", e);
-            return -1;
-        }
-    }
 
     /**
      * 系统停止后，关闭插件相关进程服务，防治内存泄漏
@@ -399,10 +340,6 @@ public class ZrLogConfigImpl extends ZrLogConfig {
                 return;
             }
             LoggerUtil.getLogger(Application.class).warning("Config database error " + e.getMessage());
-            if (Constants.runMode.isLambda()) {
-                //lambda 环境之间输出错误
-                e.printStackTrace();
-            }
             if (Constants.runMode != RunMode.NATIVE_AGENT && !ZrLogUtil.isWarMode(updater)) {
                 System.exit(-1);
             }

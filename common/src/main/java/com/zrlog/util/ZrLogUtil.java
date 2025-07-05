@@ -18,6 +18,7 @@ import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -119,24 +120,7 @@ public class ZrLogUtil {
         return "Unknown";
     }
 
-    public static Long getCurrentSqlVersion(Properties dbConfig) {
-        try (Connection connection = DbConnectUtils.getConnection(dbConfig)) {
-            if (connection != null) {
-                String queryVersionSQL = "select value from website where name = ?";
-                try (PreparedStatement ps = connection.prepareStatement(queryVersionSQL)) {
-                    ps.setString(1, Constants.ZRLOG_SQL_VERSION_KEY);
-                    try (ResultSet resultSet = ps.executeQuery()) {
-                        if (resultSet.next()) {
-                            return Long.parseLong(resultSet.getString(1));
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "DB connect error ", e);
-        }
-        return -1L;
-    }
+
 
 
     private static Map<Integer, String> getSqlFileList() {

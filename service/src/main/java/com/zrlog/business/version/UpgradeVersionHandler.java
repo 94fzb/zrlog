@@ -1,4 +1,4 @@
-package com.zrlog.blog.web.version;
+package com.zrlog.business.version;
 
 import java.sql.Connection;
 
