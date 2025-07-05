@@ -33,6 +33,18 @@
             <artifactId>simplewebserver-lambda-function-impl</artifactId>
             <scope>${lambda-scope}</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-core</artifactId>
+            <version>10.1.42</version>
+            <scope>${jakarta-scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-jasper</artifactId>
+            <version>10.1.42</version>
+            <scope>${jakarta-scope}</scope>
+        </dependency>
     </dependencies>
 
     <build>
