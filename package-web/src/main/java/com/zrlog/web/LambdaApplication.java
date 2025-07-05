@@ -23,9 +23,7 @@ public class LambdaApplication {
         if (!RunMode.isLambdaMode()) {
             return;
         }
-        File file = new File("/tmp/log");
-        file.mkdirs();
-        System.getProperties().put("sws.log.path", file.toString());
+        System.getProperties().put("sws.log.path", "/tmp/log");
         System.getProperties().put("sws.temp.path", "/tmp/temp");
         System.getProperties().put("sws.cache.path", "/tmp/cache");
         System.getProperties().put("sws.static.path", "/tmp/static");

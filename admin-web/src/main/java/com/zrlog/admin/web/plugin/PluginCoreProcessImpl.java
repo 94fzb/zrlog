@@ -28,15 +28,23 @@ public class PluginCoreProcessImpl implements PluginCoreProcess {
     private final File infoLogFile;
     private final File errorLogFile;
 
+    private File getLogFile(boolean error) {
+        File logFile = new File(PathUtil.getLogPath() + "/plugin-core-" + (error ? "error" : "info") + "." + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + ".log");
+        if (logFile.exists()) {
+            return logFile;
+        }
+        try {
+            logFile.getParentFile().mkdirs();
+            logFile.createNewFile();
+        } catch (IOException e) {
+            LOGGER.warning("Can't create plugin log file " + logFile.getName());
+        }
+        return logFile;
+    }
+
     public PluginCoreProcessImpl() {
-        infoLogFile = new File(PathUtil.getLogPath() + "/plugin-core-info." + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + ".log");
-        if (infoLogFile.exists()) {
-            infoLogFile.delete();
-        }
-        errorLogFile = new File(PathUtil.getLogPath() + "/plugin-core-error." + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + ".log");
-        if (errorLogFile.exists()) {
-            errorLogFile.delete();
-        }
+        infoLogFile = getLogFile(false);
+        errorLogFile = getLogFile(true);
     }
 
     private String programName(File pluginCoreFile) {
