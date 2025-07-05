@@ -28,8 +28,10 @@ public class LambdaEventIterator implements Iterator<Map.Entry<String, LambdaApi
 
     private boolean hasNext = true;
 
+    public static final String VERSION = "2018-06-01";
+
     private String getBaseUrl() {
-        return "http://" + System.getenv("AWS_LAMBDA_RUNTIME_API") + "/2018-06-01/runtime/invocation";
+        return "http://" + System.getenv("AWS_LAMBDA_RUNTIME_API") + "/" + VERSION + "/runtime/invocation";
     }
 
     private final HttpClient httpClient = HttpClient.newBuilder().build();

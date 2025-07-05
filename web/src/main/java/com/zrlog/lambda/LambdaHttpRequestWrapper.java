@@ -4,6 +4,7 @@ import com.hibegin.common.util.ObjectUtil;
 import com.hibegin.http.HttpMethod;
 import com.hibegin.http.server.ApplicationContext;
 import com.hibegin.http.server.config.RequestConfig;
+import com.hibegin.http.server.config.ServerConfig;
 import com.hibegin.http.server.impl.SimpleHttpRequest;
 import com.hibegin.http.server.util.HttpQueryStringUtils;
 import com.zrlog.lambda.rest.LambdaApiGatewayRequest;
@@ -33,6 +34,10 @@ public class LambdaHttpRequestWrapper extends SimpleHttpRequest {
                 this.inputStream = new ByteArrayInputStream(lambdaApiGatewayRequest.getBody().getBytes());
             }
         }
+        //
+        ServerConfig serverConfig = super.getServerConfig();
+        serverConfig.setApplicationName("Lambda-API-Gateway");
+        serverConfig.setApplicationVersion(LambdaEventIterator.VERSION);
     }
 
     public LambdaApiGatewayRequest getLambdaApiGatewayRequest() {

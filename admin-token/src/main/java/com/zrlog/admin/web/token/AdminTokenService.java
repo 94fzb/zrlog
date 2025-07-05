@@ -41,7 +41,7 @@ public class AdminTokenService implements TokenService {
     }
 
     private static byte[] encrypt(String secretKey, byte[] value) throws Exception {
-        long start = System.currentTimeMillis();
+        //long start = System.currentTimeMillis();
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
         //必须要16位
         String newSecretKey = SecurityUtils.md5(secretKey).substring(8, 24);
@@ -52,7 +52,7 @@ public class AdminTokenService implements TokenService {
     }
 
     private static byte[] decrypt(String secretKey, byte[] encrypted) throws Exception {
-        long start = System.currentTimeMillis();
+        //long start = System.currentTimeMillis();
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
         //必须要16位
         String newSecretKey = SecurityUtils.md5(secretKey).substring(8, 24);
