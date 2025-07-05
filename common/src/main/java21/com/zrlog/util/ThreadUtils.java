@@ -1,7 +1,5 @@
 package com.zrlog.util;
 
-import com.hibegin.common.util.LoggerUtil;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;

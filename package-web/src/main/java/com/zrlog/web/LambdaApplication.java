@@ -1,6 +1,5 @@
 package com.zrlog.web;
 
-import com.zrlog.business.service.NativeImageUpdater;
 import com.zrlog.common.Constants;
 import com.zrlog.common.type.RunMode;
 import com.zrlog.lambda.LambdaEventIterator;
@@ -8,8 +7,8 @@ import com.zrlog.lambda.LambdaHandler;
 import com.zrlog.lambda.rest.LambdaApiGatewayRequest;
 import com.zrlog.lambda.rest.LambdaApiGatewayResponse;
 import com.zrlog.util.ZrLogUtil;
+import com.zrlog.web.config.ZrLogConfigImpl;
 
-import java.io.File;
 import java.util.Map;
 
 public class LambdaApplication {
@@ -18,7 +17,7 @@ public class LambdaApplication {
         initLambdaEnv();
     }
 
-    private static void initLambdaEnv() {
+    public static void initLambdaEnv() {
         if (!RunMode.isLambdaEnv()) {
             return;
         }
@@ -29,8 +28,8 @@ public class LambdaApplication {
         System.getProperties().put("sws.root.path", System.getProperty("user.dir"));
     }
 
-    public static void doHandle(String[] args, int port, String execFile) throws Exception {
-        Application.webServerBuilder(port, ZrLogUtil.getContextPath(args), new NativeImageUpdater(args, new File(execFile)));
+    public static void doHandle(String[] args, int port) throws Exception {
+        Constants.zrLogConfig = new ZrLogConfigImpl(port, null, ZrLogUtil.getContextPath(args));
         LambdaEventIterator lambdaEventIterator = new LambdaEventIterator();
         LambdaHandler lambdaHandler = new LambdaHandler(Constants.zrLogConfig);
         //处理请求

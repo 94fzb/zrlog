@@ -4,7 +4,6 @@ import com.hibegin.common.util.*;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.config.ConfigKit;
-import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.common.Constants;
 import com.zrlog.common.Updater;
@@ -12,23 +11,16 @@ import com.zrlog.common.UpdaterTypeEnum;
 import eu.bitwalker.useragentutils.BrowserType;
 import eu.bitwalker.useragentutils.UserAgent;
 
-import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * ZrLog特有的一些工具方法
  */
 public class ZrLogUtil {
 
-    private static final Logger LOGGER = LoggerUtil.getLogger(ZrLogUtil.class);
+    //private static final Logger LOGGER = LoggerUtil.getLogger(ZrLogUtil.class);
 
     public static String STATIC_USER_AGENT = "Static-Blog-Plugin/" + UUID.randomUUID().toString().replace("-", "");
 

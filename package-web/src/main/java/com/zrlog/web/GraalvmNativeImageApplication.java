@@ -22,7 +22,11 @@ public class GraalvmNativeImageApplication {
 
 
     static {
-        Application.initZrLogEnv();
+        if (RunMode.isLambdaEnv()) {
+            LambdaApplication.initLambdaEnv();
+        } else {
+            Application.initZrLogEnv();
+        }
     }
 
     private static String getWindowsExecutablePath() {
@@ -62,14 +66,14 @@ public class GraalvmNativeImageApplication {
 
     public static void main(String[] args) throws Exception {
         Constants.runMode = RunMode.isLambdaEnv() ? RunMode.NATIVE_LAMBDA : RunMode.NATIVE;
+        int port = ZrLogUtil.getPort(args);
+        if (Constants.runMode.isLambda()) {
+            LambdaApplication.doHandle(args, port);
+            return;
+        }
         String execFile = getExecFile();
         //parse args
         if (ParseArgsUtil.justTips(args, new File(execFile).getName(), BlogBuildInfoUtil.getVersionInfoFull())) {
-            return;
-        }
-        int port = ZrLogUtil.getPort(args);
-        if (Constants.runMode.isLambda()) {
-            LambdaApplication.doHandle(args, port, execFile);
             return;
         }
         WebServerBuilder webServerBuilder = Application.webServerBuilder(port, ZrLogUtil.getContextPath(args), new NativeImageUpdater(args, new File(execFile)));
