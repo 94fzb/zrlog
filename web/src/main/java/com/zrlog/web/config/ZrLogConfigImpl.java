@@ -13,6 +13,7 @@ import com.hibegin.http.server.config.ServerConfig;
 import com.hibegin.http.server.util.PathUtil;
 import com.mysql.cj.jdbc.AbandonedConnectionCleanupThread;
 import com.zaxxer.hikari.HikariDataSource;
+import com.zaxxer.hikari.util.DriverDataSource;
 import com.zrlog.admin.business.service.AdminResourceImpl;
 import com.zrlog.admin.web.config.AdminRouters;
 import com.zrlog.admin.web.interceptor.AdminCrossOriginInterceptor;
@@ -79,7 +80,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     private final long uptime;
     private final AdminResource adminResource;
     private final String contextPath;
-    private HikariDataSource dataSource;
+    private DataSource dataSource;
     private final File dbPropertiesFile;
 
     static {
@@ -92,7 +93,6 @@ public class ZrLogConfigImpl extends ZrLogConfig {
 
     public ZrLogConfigImpl(Integer port, Updater updater, String contextPath) {
         this.dbPropertiesFile = initDbPropertiesFile();
-
         this.contextPath = contextPath;
         this.port = port;
         this.plugins = new Plugins();
@@ -242,17 +242,30 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         }
         Properties dbProperties = getDbProp(dbPropertiesFile);
         //启动时候进行数据库连接
-        dataSource = new HikariDataSource();
-        dataSource.setDataSourceProperties(dbProperties);
-        dataSource.setDriverClassName(dbProperties.getProperty("driverClass"));
-        dataSource.setUsername(dbProperties.getProperty("user"));
-        dataSource.setPassword(dbProperties.getProperty("password"));
-        dataSource.setMinimumIdle(3);
-        dataSource.setJdbcUrl(dbProperties.getProperty("jdbcUrl"));
+        dataSource = buildDataSource(dbProperties);
         DAO.setDs(dataSource);
         int newDbVersion = new DbUpgradeService(dataSource).tryDoUpgrade();
         if (newDbVersion > 0) {
             new WebSite().updateByKV(Constants.ZRLOG_SQL_VERSION_KEY, newDbVersion + "");
+        }
+    }
+
+    private static DataSource buildDataSource(Properties dbProperties) {
+        if (EnvKit.isLambda()) {
+            //Lambda 不用连接池
+            return new DriverDataSource(dbProperties.getProperty("jdbcUrl"),
+                    dbProperties.getProperty("driverClass"),
+                    dbProperties,
+                    dbProperties.getProperty("user"),
+                    dbProperties.getProperty("password"));
+        } else {
+            HikariDataSource dataSource = new HikariDataSource();
+            dataSource.setDataSourceProperties(dbProperties);
+            dataSource.setDriverClassName(dbProperties.getProperty("driverClass"));
+            dataSource.setUsername(dbProperties.getProperty("user"));
+            dataSource.setPassword(dbProperties.getProperty("password"));
+            dataSource.setJdbcUrl(dbProperties.getProperty("jdbcUrl"));
+            return dataSource;
         }
     }
 
@@ -380,7 +393,11 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         if (Objects.isNull(dataSource)) {
             return new DatabaseConnectPoolInfo(0, 0);
         }
-        return new DatabaseConnectPoolInfo(dataSource.getHikariPoolMXBean().getActiveConnections(), dataSource.getHikariPoolMXBean().getTotalConnections());
+        if (dataSource instanceof HikariDataSource) {
+            return new DatabaseConnectPoolInfo(((HikariDataSource) dataSource).getHikariPoolMXBean().getActiveConnections(),
+                    ((HikariDataSource) dataSource).getHikariPoolMXBean().getTotalConnections());
+        }
+        return new DatabaseConnectPoolInfo(0, 0);
     }
 
     @Override
@@ -392,8 +409,8 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     public void stop() {
         try {
             PluginUtils.stopAllPlugin();
-            if (Objects.nonNull(dataSource)) {
-                dataSource.close();
+            if (Objects.nonNull(dataSource) && dataSource instanceof HikariDataSource) {
+                ((HikariDataSource) dataSource).close();
             }
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "", e);
