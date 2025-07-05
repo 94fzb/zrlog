@@ -45,7 +45,7 @@ public class SystemLoad {
         if (isWindows()) {
             return "-";
         }
-        if (RunMode.isLambdaEnv()) {
+        if (RunMode.isLambdaMode()) {
             return "-";
         }
         try {

@@ -22,7 +22,7 @@ public class GraalvmNativeImageApplication {
 
 
     static {
-        if (RunMode.isLambdaEnv()) {
+        if (RunMode.isLambdaMode()) {
             LambdaApplication.initLambdaEnv();
         } else {
             Application.initZrLogEnv();
@@ -65,7 +65,7 @@ public class GraalvmNativeImageApplication {
 
 
     public static void main(String[] args) throws Exception {
-        Constants.runMode = RunMode.isLambdaEnv() ? RunMode.NATIVE_LAMBDA : RunMode.NATIVE;
+        Constants.runMode = RunMode.isLambdaMode() ? RunMode.NATIVE_LAMBDA : RunMode.NATIVE;
         int port = ZrLogUtil.getPort(args);
         if (Constants.runMode.isLambda()) {
             LambdaApplication.doHandle(args, port);

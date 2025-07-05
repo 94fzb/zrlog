@@ -23,7 +23,7 @@ public class Application {
 
 
     static {
-        if (!RunMode.isLambdaEnv()) {
+        if (!RunMode.isLambdaMode()) {
             initZrLogEnv();
         }
     }

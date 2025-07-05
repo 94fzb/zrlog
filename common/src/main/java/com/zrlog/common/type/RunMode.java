@@ -15,7 +15,7 @@ public enum RunMode {
     }
 
 
-    public static boolean isLambdaEnv() {
+    public static boolean isLambdaMode() {
         String value = System.getenv("AWS_LAMBDA_FUNCTION_NAME");
         return Objects.nonNull(value);
     }

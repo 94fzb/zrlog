@@ -14,6 +14,7 @@ import com.zrlog.admin.business.rest.response.UpgradeProcessResponse;
 import com.zrlog.admin.web.plugin.*;
 import com.zrlog.business.plugin.UpdateVersionInfoPlugin;
 import com.zrlog.common.Constants;
+import com.zrlog.common.type.RunMode;
 import com.zrlog.common.vo.Version;
 import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ThreadUtils;
@@ -142,6 +143,8 @@ public class UpgradeService {
             updateVersionHandler = new DockerUpdateVersionHandle(I18nUtil.getBackend());
         } else if (ZrLogUtil.isSystemServiceMode()) {
             updateVersionHandler = new SystemServiceUpdateVersionHandle(I18nUtil.getBackend());
+        } else if (RunMode.isLambdaMode()) {
+            updateVersionHandler = new LambdaUpdateVersionHandler(I18nUtil.getBackend());
         } else {
             HttpFileHandle handle = downloadProcessHandleMap.get(preUpgradeKey);
             if (handle == null) {

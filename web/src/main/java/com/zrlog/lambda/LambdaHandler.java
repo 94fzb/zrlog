@@ -17,8 +17,6 @@ public class LambdaHandler {
         this.serverConfig = zrLogConfig;
         applicationContext = new ApplicationContext(serverConfig.getServerConfig());
         applicationContext.init();
-        //启动关联服务
-        zrLogConfig.startPluginsAsync();
     }
 
     /**

@@ -3,12 +3,10 @@ package com.zrlog.common;
 import com.hibegin.common.util.BooleanUtils;
 import com.hibegin.common.util.EnvKit;
 import com.hibegin.common.util.StringUtils;
-import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.common.type.AutoUpgradeVersionType;
 import com.zrlog.common.type.RunMode;
 import com.zrlog.util.I18nUtil;
 
-import java.io.File;
 import java.util.*;
 
 /**
@@ -61,7 +59,7 @@ public class Constants {
     }
 
     public static boolean debugLoggerPrintAble() {
-        return EnvKit.isDevMode() || RunMode.isLambdaEnv();
+        return EnvKit.isDevMode() || RunMode.isLambdaMode();
     }
 
     public static String getRealFileArch() {
