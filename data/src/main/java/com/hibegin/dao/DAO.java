@@ -1,6 +1,7 @@
 package com.hibegin.dao;
 
 import com.hibegin.common.util.LoggerUtil;
+import com.zrlog.common.Constants;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.MapHandler;
 import org.apache.commons.dbutils.handlers.MapListHandler;
@@ -30,7 +31,7 @@ public class DAO implements IDAO {
 
     public DAO() {
         queryRunner = new CustomQueryRunner(dataSource, true);
-        this.dev = false;
+        this.dev = Constants.debugLoggerPrintAble();
     }
 
     public static void main(String[] args) throws SQLException {
