@@ -1,21 +1,21 @@
-package com.zrlog.lambda;
+package com.hibegin.lambda;
 
 import com.hibegin.http.server.ApplicationContext;
 import com.hibegin.http.server.api.HttpRequest;
+import com.hibegin.http.server.config.AbstractServerConfig;
 import com.hibegin.http.server.handler.HttpRequestHandlerRunnable;
-import com.zrlog.common.ZrLogConfig;
-import com.zrlog.lambda.rest.LambdaApiGatewayRequest;
-import com.zrlog.lambda.rest.LambdaApiGatewayResponse;
+import com.hibegin.lambda.rest.LambdaApiGatewayRequest;
+import com.hibegin.lambda.rest.LambdaApiGatewayResponse;
 
 public class LambdaHandler {
 
 
     private final ApplicationContext applicationContext;
-    private final ZrLogConfig serverConfig;
+    private final AbstractServerConfig serverConfig;
 
-    public LambdaHandler(ZrLogConfig zrLogConfig) {
-        this.serverConfig = zrLogConfig;
-        applicationContext = new ApplicationContext(serverConfig.getServerConfig());
+    public LambdaHandler(AbstractServerConfig serverConfig) {
+        this.serverConfig = serverConfig;
+        applicationContext = new ApplicationContext(this.serverConfig.getServerConfig());
         applicationContext.init();
     }
 

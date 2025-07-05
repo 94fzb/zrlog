@@ -1,4 +1,4 @@
-package com.zrlog.lambda;
+package com.hibegin.lambda;
 
 import com.hibegin.common.util.ObjectUtil;
 import com.hibegin.http.HttpMethod;
@@ -7,7 +7,7 @@ import com.hibegin.http.server.config.RequestConfig;
 import com.hibegin.http.server.config.ServerConfig;
 import com.hibegin.http.server.impl.SimpleHttpRequest;
 import com.hibegin.http.server.util.HttpQueryStringUtils;
-import com.zrlog.lambda.rest.LambdaApiGatewayRequest;
+import com.hibegin.lambda.rest.LambdaApiGatewayRequest;
 
 import java.io.ByteArrayInputStream;
 import java.util.Base64;

@@ -1,4 +1,4 @@
-package com.zrlog.lambda.rest;
+package com.hibegin.lambda.rest;
 
 import com.google.gson.annotations.SerializedName;
 

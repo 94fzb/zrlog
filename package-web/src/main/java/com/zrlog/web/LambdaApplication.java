@@ -4,10 +4,10 @@ import com.hibegin.http.server.WebServerBuilder;
 import com.zrlog.business.service.NativeImageUpdater;
 import com.zrlog.common.Constants;
 import com.zrlog.common.type.RunMode;
-import com.zrlog.lambda.LambdaEventIterator;
-import com.zrlog.lambda.LambdaHandler;
-import com.zrlog.lambda.rest.LambdaApiGatewayRequest;
-import com.zrlog.lambda.rest.LambdaApiGatewayResponse;
+import com.hibegin.lambda.LambdaEventIterator;
+import com.hibegin.lambda.LambdaHandler;
+import com.hibegin.lambda.rest.LambdaApiGatewayRequest;
+import com.hibegin.lambda.rest.LambdaApiGatewayResponse;
 import com.zrlog.util.ZrLogUtil;
 
 import java.io.File;

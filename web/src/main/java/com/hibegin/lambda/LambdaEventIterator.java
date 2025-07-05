@@ -1,11 +1,9 @@
-package com.zrlog.lambda;
-
+package com.hibegin.lambda;
 
 import com.google.gson.Gson;
 import com.hibegin.common.util.EnvKit;
-import com.zrlog.common.Constants;
-import com.zrlog.lambda.rest.LambdaApiGatewayRequest;
-import com.zrlog.lambda.rest.LambdaApiGatewayResponse;
+import com.hibegin.lambda.rest.LambdaApiGatewayRequest;
+import com.hibegin.lambda.rest.LambdaApiGatewayResponse;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -55,7 +53,7 @@ public class LambdaEventIterator implements Iterator<Map.Entry<String, LambdaApi
     public Map.Entry<String, LambdaApiGatewayRequest> next() {
         try {
             Map.Entry<String, LambdaApiGatewayRequest> requestInfo = getRequestInfo();
-            if (Constants.debugLoggerPrintAble()) {
+            if (EnvKit.isDevMode()) {
                 LOGGER.info("lambda request  " + requestInfo.getKey() + " : " + new Gson().toJson(requestInfo.getValue()));
             }
             return requestInfo;
@@ -81,7 +79,7 @@ public class LambdaEventIterator implements Iterator<Map.Entry<String, LambdaApi
 
     public void report(LambdaApiGatewayResponse response, String requestId) throws IOException, InterruptedException {
         String output = new Gson().toJson(response);
-        if (Constants.debugLoggerPrintAble()) {
+        if (EnvKit.isDevMode()) {
             LOGGER.info("lambda response " + requestId + " : " + output);
         }
         if (EnvKit.isDevMode()) {
@@ -91,7 +89,7 @@ public class LambdaEventIterator implements Iterator<Map.Entry<String, LambdaApi
         HttpRequest.Builder builder = HttpRequest.newBuilder(URI.create(getBaseUrl() + "/" + requestId + "/response"));
         builder.POST(HttpRequest.BodyPublishers.ofString(output));
         HttpResponse<String> send = httpClient.send(builder.build(), HttpResponse.BodyHandlers.ofString());
-        if (Constants.debugLoggerPrintAble()) {
+        if (EnvKit.isDevMode()) {
             LOGGER.info("lambda main server response = " + send.statusCode() + ":" + send.body());
         }
     }

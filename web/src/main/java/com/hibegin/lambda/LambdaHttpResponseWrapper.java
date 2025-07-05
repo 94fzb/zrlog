@@ -1,10 +1,10 @@
-package com.zrlog.lambda;
+package com.hibegin.lambda;
 
 import com.hibegin.common.util.BytesUtil;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.config.ResponseConfig;
 import com.hibegin.http.server.impl.SimpleHttpResponse;
-import com.zrlog.lambda.rest.LambdaApiGatewayResponse;
+import com.hibegin.lambda.rest.LambdaApiGatewayResponse;
 
 import java.io.InputStream;
 import java.util.ArrayList;
