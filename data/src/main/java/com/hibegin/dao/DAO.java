@@ -27,11 +27,8 @@ public class DAO implements IDAO {
     protected QueryRunner queryRunner;
     private Map<String, Object> attrs = new HashMap<>();
 
-    private final boolean dev;
-
     public DAO() {
-        queryRunner = new CustomQueryRunner(dataSource, true);
-        this.dev = Constants.debugLoggerPrintAble();
+        queryRunner = new CustomQueryRunner(dataSource, true,Constants.debugLoggerPrintAble());
     }
 
     public static void main(String[] args) throws SQLException {
@@ -170,9 +167,7 @@ public class DAO implements IDAO {
         sb.append(") values(");
         sb.append(appendParams());
         sb.append(")");
-        if (dev) {
-            log.log(Level.FINER, sb.toString());
-        }
+
         return queryRunner.update(sb.toString(), getMapValues(attrs)) > 0;
     }
 
@@ -188,9 +183,6 @@ public class DAO implements IDAO {
         sb.append(attrsMap2Str(attrs));
         sb.append(" where ");
         sb.append(condsMap2Str(conditions));
-        if (dev) {
-            log.log(Level.FINER, sb.toString());
-        }
         return queryRunner.update(sb.toString(), getAttsValues(attrs, conditions)) > 0;
     }
 
@@ -209,9 +201,6 @@ public class DAO implements IDAO {
         sb.append(tableName);
         sb.append(" where ");
         sb.append(condsMap2Str(attrs));
-        if (dev) {
-            log.log(Level.FINER, sb.toString());
-        }
         return queryRunner.update(sb.toString(), getMapValues(attrs)) > 0;
     }
 
@@ -224,9 +213,6 @@ public class DAO implements IDAO {
         sb.append("delete from ");
         sb.append(tableName);
         sb.append(" where ").append(pk).append("=?");
-        if (dev) {
-            log.log(Level.FINER, sb.toString());
-        }
         return queryRunner.update(sb.toString(), id) > 0;
     }
 
@@ -243,16 +229,13 @@ public class DAO implements IDAO {
         sb.deleteCharAt(sb.length() - 1);
         sb.append(" from ");
         sb.append(tableName);
-        Map<String, Object> map = null;
+        Map<String, Object> map;
         if (!attrs.isEmpty()) {
             sb.append(" where ");
             sb.append(condsMap2Str(attrs));
             map = queryRunner.query(sb.toString(), new MapHandler(), getMapValues(attrs));
         } else {
             map = queryRunner.query(sb.toString(), new MapHandler());
-        }
-        if (dev) {
-            log.log(Level.FINER, sb.toString());
         }
         return map;
     }
@@ -271,9 +254,6 @@ public class DAO implements IDAO {
             map = queryRunner.query(sb + " order by " + column, new MapHandler(), getMapValues(attrs));
         } else {
             map = queryRunner.query(sb + " order by " + column, new MapHandler());
-        }
-        if (dev) {
-            log.log(Level.FINER, sb.toString());
         }
         if (map != null) {
             return map.get(column);
@@ -297,14 +277,8 @@ public class DAO implements IDAO {
         if (!attrs.isEmpty()) {
             sb.append(" where ");
             sb.append(condsMap2Str(attrs));
-            if (dev) {
-                log.log(Level.INFO, sb.toString());
-            }
             return queryRunner.query(sb.toString(), new MapListHandler(), getMapValues(attrs));
         } else {
-            if (dev) {
-                log.log(Level.INFO, sb.toString());
-            }
             return queryRunner.query(sb.toString(), new MapListHandler());
         }
     }
@@ -333,9 +307,6 @@ public class DAO implements IDAO {
         } else {
             lmap = queryRunner.query(sb.toString(), new MapListHandler());
         }
-        if (dev) {
-            log.log(Level.FINER, sb.toString());
-        }
         return lmap;
     }
 
@@ -357,9 +328,6 @@ public class DAO implements IDAO {
             lmap = queryRunner.query(sb.toString(), new MapListHandler(), getMapValues(attrs));
         } else {
             lmap = queryRunner.query(sb.toString(), new MapListHandler());
-        }
-        if (dev) {
-            log.log(Level.FINER, sb.toString());
         }
         return lmap;
     }
