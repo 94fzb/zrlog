@@ -33,6 +33,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -208,16 +212,35 @@ public class AdminArticleService {
     }
 
     public ArticlePageData adminPage(PageRequest pageRequest, String keywords, String typeAlias, HttpRequest request) {
-        PageData<Map<String, Object>> data = new Log().adminFind(pageRequest, keywords, typeAlias);
-        VisitorArticleService.wrapperSearchKeyword(data, keywords);
-        PageData<ArticleResponseEntry> articleResponseEntryPageData = VisitorArticleService.convertPageable(data, request);
-        return BeanUtil.convert(articleResponseEntryPageData, ArticlePageData.class);
+        try (ExecutorService executorService = Executors.newFixedThreadPool(2)) {
+            CompletableFuture<PageData<Map<String, Object>>> dataCompletableFuture = CompletableFuture.supplyAsync(() -> {
+                return new Log().adminFind(pageRequest, keywords, typeAlias);
+            }, executorService);
+            CompletableFuture<List<Map<String, Object>>> listCompletableFuture = CompletableFuture.supplyAsync(() -> {
+                return Constants.zrLogConfig.getCacheService().getArticleTypes(request);
+            }, executorService);
+            CompletableFuture.allOf(listCompletableFuture, dataCompletableFuture).join();
+            VisitorArticleService.wrapperSearchKeyword(dataCompletableFuture.join(), keywords);
+            PageData<ArticleResponseEntry> articleResponseEntryPageData = VisitorArticleService.convertPageable(dataCompletableFuture.join(), request);
+            ArticlePageData convert = BeanUtil.convert(articleResponseEntryPageData, ArticlePageData.class);
+            convert.setTypes(listCompletableFuture.join());
+            convert.setKey(keywords);
+            convert.setDefaultPageSize(pageRequest.getSize());
+            return convert;
+        }
     }
 
-    public List<ArticleActivityData> activityDataList() throws SQLException {
-        Map<String, Long> adminArticleData = new Log().getAdminArticleData();
-        return adminArticleData.entrySet().stream().map(e -> {
-            return new ArticleActivityData(e.getKey(), e.getValue());
-        }).collect(Collectors.toList());
+    public CompletableFuture<List<ArticleActivityData>> activityDataList(Executor executor) {
+        return CompletableFuture.supplyAsync(() -> {
+            Map<String, Long> adminArticleData;
+            try {
+                adminArticleData = new Log().getAdminArticleData();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            return adminArticleData.entrySet().stream().map(e -> {
+                return new ArticleActivityData(e.getKey(), e.getValue());
+            }).collect(Collectors.toList());
+        }, executor);
     }
 }

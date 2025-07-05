@@ -249,6 +249,18 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
         return cacheInit;
     }
 
+    @Override
+    public List<Map<String, Object>> getArticleTypes(HttpRequest request) {
+        if (Objects.nonNull(cacheInit)) {
+            return cacheInit.getTypes();
+        }
+        try {
+            refreshInitDataCacheAsync(request, false);
+            return new Type().findAll();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override
     public Map<String, Object> refreshWebSite() {

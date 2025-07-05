@@ -21,6 +21,7 @@ import com.zrlog.model.Log;
 import com.zrlog.model.Tag;
 import com.zrlog.model.Type;
 import com.zrlog.util.I18nUtil;
+import com.zrlog.util.ThreadUtils;
 import com.zrlog.util.ZrLogUtil;
 
 import java.sql.SQLException;
@@ -28,6 +29,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 
 public class AdminArticleController extends Controller {
 
@@ -78,9 +81,6 @@ public class AdminArticleController extends Controller {
         String types = request.getParaToStr("types", "");
         int articlePageSize = Constants.getAdminArticlePageSize();
         ArticlePageData pageData = articleService.adminPage(ControllerUtil.toPageRequest(this, articlePageSize), key, types, request);
-        pageData.setKey(key);
-        pageData.setDefaultPageSize(Long.parseLong(articlePageSize + ""));
-        pageData.setTypes(Constants.zrLogConfig.getCacheService().refreshInitDataCacheAsync(request, false).get().getTypes());
         AdminApiPageDataStandardResponse<ArticlePageData> standardResponse = new AdminApiPageDataStandardResponse<>(pageData);
         standardResponse.setDocumentTitle(Constants.getAdminDocumentTitleByUri(request.getUri()));
         return standardResponse;

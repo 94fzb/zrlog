@@ -9,10 +9,7 @@ import com.hibegin.http.annotation.ResponseBody;
 import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.dto.UserLoginDTO;
 import com.zrlog.admin.business.rest.request.LoginRequest;
-import com.zrlog.admin.business.rest.response.IndexResponse;
-import com.zrlog.admin.business.rest.response.StatisticsInfoResponse;
-import com.zrlog.admin.business.rest.response.UpdateRecordResponse;
-import com.zrlog.admin.business.rest.response.UserBasicInfoResponse;
+import com.zrlog.admin.business.rest.response.*;
 import com.zrlog.admin.business.service.AdminArticleService;
 import com.zrlog.admin.business.service.UserService;
 import com.zrlog.admin.web.controller.page.AdminPageController;
@@ -28,12 +25,17 @@ import com.zrlog.model.Log;
 import com.zrlog.model.User;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.I18nUtil;
+import com.zrlog.util.ThreadUtils;
 import com.zrlog.util.ZrLogUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class AdminController extends Controller {
 
@@ -87,13 +89,37 @@ public class AdminController extends Controller {
         return new UpdateRecordResponse();
     }
 
-    private StatisticsInfoResponse statisticsInfo() throws SQLException {
-        StatisticsInfoResponse info = new StatisticsInfoResponse();
-        info.setCommCount(new Comment().count());
-        info.setToDayCommCount(new Comment().countToDayComment());
-        info.setClickCount(new Log().sumClick().longValue());
-        info.setArticleCount(new Log().getAdminCount());
-        return info;
+    private CompletableFuture<StatisticsInfoResponse> statisticsInfo(Executor executor) {
+        return CompletableFuture.supplyAsync(() -> {
+            StatisticsInfoResponse info = new StatisticsInfoResponse();
+            List<CompletableFuture<Void>> futures = new ArrayList<>();
+            futures.add(CompletableFuture.runAsync(() -> {
+                try {
+                    info.setCommCount(new Comment().count());
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }, executor));
+            futures.add(CompletableFuture.runAsync(() -> {
+                try {
+                    info.setToDayCommCount(new Comment().countToDayComment());
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }, executor));
+            futures.add(CompletableFuture.runAsync(() -> {
+                try {
+                    info.setClickCount(new Log().sumClick().longValue());
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }, executor));
+            futures.add(CompletableFuture.runAsync(() -> {
+                info.setArticleCount(new Log().getAdminCount());
+            }, executor));
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+            return info;
+        }, executor);
     }
 
     @ResponseBody
@@ -121,9 +147,17 @@ public class AdminController extends Controller {
             tips.add(I18nUtil.getBackendStringFromRes("admin.index.welcomeTips_" + i));
         }
         Collections.shuffle(tips);
-        return new ApiStandardResponse<>(new IndexResponse(statisticsInfo(),
-                I18nUtil.getBackendStringFromRes("admin.index.welcomeTip"),
-                new ArrayList<>(Collections.singletonList(tips.get(0))),
-                new AdminArticleService().activityDataList(), BlogBuildInfoUtil.getVersionInfo()));
+        try (ExecutorService executor = ThreadUtils.newFixedThreadPool(20)) {
+            List<CompletableFuture> futures = new ArrayList<>();
+            CompletableFuture<StatisticsInfoResponse> statisticsInfo = statisticsInfo(executor);
+            futures.add(statisticsInfo);
+            CompletableFuture<List<ArticleActivityData>> dataList = new AdminArticleService().activityDataList(executor);
+            futures.add(dataList);
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+            return new ApiStandardResponse<>(new IndexResponse(statisticsInfo.join(),
+                    I18nUtil.getBackendStringFromRes("admin.index.welcomeTip"),
+                    new ArrayList<>(Collections.singletonList(tips.get(0))),
+                    dataList.join(), BlogBuildInfoUtil.getVersionInfo()));
+        }
     }
 }

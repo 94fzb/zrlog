@@ -28,7 +28,7 @@ public class DAO implements IDAO {
     private Map<String, Object> attrs = new HashMap<>();
 
     public DAO() {
-        queryRunner = new CustomQueryRunner(dataSource, true,Constants.debugLoggerPrintAble());
+        queryRunner = new CustomQueryRunner(dataSource, true, Constants.debugLoggerPrintAble());
     }
 
     public static void main(String[] args) throws SQLException {

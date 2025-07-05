@@ -5,6 +5,7 @@ import com.zrlog.business.cache.vo.BaseDataInitVO;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -29,4 +30,6 @@ public interface CacheService {
     boolean isCacheableByRequest(HttpRequest request);
 
     Map<String, Object> refreshWebSite();
+
+    List<Map<String, Object>> getArticleTypes(HttpRequest request);
 }
