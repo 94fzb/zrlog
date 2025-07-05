@@ -386,16 +386,11 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
         }, executor));
         futures.add(CompletableFuture.runAsync(this::refreshFavicon, executor));
         futures.add(CompletableFuture.runAsync(() -> {
-            List<Map<String, Object>> all;
             try {
-                all = new Tag().refreshTag();
+                cacheInit.setTags(new Tag().refreshTag());
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
-            for (Map<String, Object> kv : all) {
-                kv.put("keycode", kv.get("text").hashCode());
-            }
-            cacheInit.setTags(all);
             statistics.setTotalTagSize((long) cacheInit.getTags().size());
         }, executor));
         try {

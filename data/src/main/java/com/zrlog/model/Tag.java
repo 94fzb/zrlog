@@ -102,6 +102,7 @@ public class Tag extends BasePageableDAO {
                     tagDO.put("id", id);
                     tagDO.put("text", tag.getKey());
                     tagDO.put("count", tag.getValue());
+                    tagDO.put("keycode", tag.getKey().hashCode());
                     return tagDO;
                 }, executorService));
             }
