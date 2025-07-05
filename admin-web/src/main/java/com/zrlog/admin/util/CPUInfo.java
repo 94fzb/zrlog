@@ -32,7 +32,7 @@ public class CPUInfo {
 
     private String readCPUModel() {
         if (RunMode.isLambdaEnv()) {
-            return "-";
+            return System.getenv("AWS_EXECUTION_ENV");
         }
         String os = System.getProperty("os.name").toLowerCase();
         try {
