@@ -212,7 +212,8 @@ public class AdminArticleService {
     }
 
     public ArticlePageData adminPage(PageRequest pageRequest, String keywords, String typeAlias, HttpRequest request) {
-        try (ExecutorService executorService = Executors.newFixedThreadPool(2)) {
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
+        try {
             CompletableFuture<PageData<Map<String, Object>>> dataCompletableFuture = CompletableFuture.supplyAsync(() -> {
                 return new Log().adminFind(pageRequest, keywords, typeAlias);
             }, executorService);
@@ -227,6 +228,8 @@ public class AdminArticleService {
             convert.setKey(keywords);
             convert.setDefaultPageSize(pageRequest.getSize());
             return convert;
+        } finally {
+            executorService.shutdown();
         }
     }
 

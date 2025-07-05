@@ -147,7 +147,8 @@ public class AdminController extends Controller {
             tips.add(I18nUtil.getBackendStringFromRes("admin.index.welcomeTips_" + i));
         }
         Collections.shuffle(tips);
-        try (ExecutorService executor = ThreadUtils.newFixedThreadPool(20)) {
+        ExecutorService executor = ThreadUtils.newFixedThreadPool(20);
+        try {
             List<CompletableFuture> futures = new ArrayList<>();
             CompletableFuture<StatisticsInfoResponse> statisticsInfo = statisticsInfo(executor);
             futures.add(statisticsInfo);
@@ -158,6 +159,8 @@ public class AdminController extends Controller {
                     I18nUtil.getBackendStringFromRes("admin.index.welcomeTip"),
                     new ArrayList<>(Collections.singletonList(tips.get(0))),
                     dataList.join(), BlogBuildInfoUtil.getVersionInfo()));
+        } finally {
+            executor.shutdown();
         }
     }
 }
