@@ -13,7 +13,6 @@ import com.hibegin.http.server.config.ServerConfig;
 import com.hibegin.http.server.util.PathUtil;
 import com.mysql.cj.jdbc.AbandonedConnectionCleanupThread;
 import com.zaxxer.hikari.HikariDataSource;
-import com.zaxxer.hikari.util.DriverDataSource;
 import com.zrlog.admin.business.service.AdminResourceImpl;
 import com.zrlog.admin.web.config.AdminRouters;
 import com.zrlog.admin.web.interceptor.AdminCrossOriginInterceptor;
@@ -43,7 +42,10 @@ import com.zrlog.common.vo.DatabaseConnectPoolInfo;
 import com.zrlog.model.WebSite;
 import com.zrlog.plugin.IPlugin;
 import com.zrlog.plugin.Plugins;
-import com.zrlog.util.*;
+import com.zrlog.util.BlogBuildInfoUtil;
+import com.zrlog.util.I18nUtil;
+import com.zrlog.util.ThreadUtils;
+import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.Application;
 import com.zrlog.web.inteceptor.GlobalBaseInterceptor;
 import com.zrlog.web.inteceptor.MyI18nInterceptor;
@@ -251,22 +253,27 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     }
 
     private static DataSource buildDataSource(Properties dbProperties) {
-        if (EnvKit.isLambda()) {
+        /*if (EnvKit.isLambda()) {
             //Lambda 不用连接池
             return new DriverDataSource(dbProperties.getProperty("jdbcUrl"),
                     dbProperties.getProperty("driverClass"),
                     dbProperties,
                     dbProperties.getProperty("user"),
                     dbProperties.getProperty("password"));
-        } else {
-            HikariDataSource dataSource = new HikariDataSource();
-            dataSource.setDataSourceProperties(dbProperties);
-            dataSource.setDriverClassName(dbProperties.getProperty("driverClass"));
-            dataSource.setUsername(dbProperties.getProperty("user"));
-            dataSource.setPassword(dbProperties.getProperty("password"));
-            dataSource.setJdbcUrl(dbProperties.getProperty("jdbcUrl"));
-            return dataSource;
+        } else {*/
+        HikariDataSource dataSource = new HikariDataSource();
+        dataSource.setDataSourceProperties(dbProperties);
+        dataSource.setDriverClassName(dbProperties.getProperty("driverClass"));
+        dataSource.setUsername(dbProperties.getProperty("user"));
+        dataSource.setPassword(dbProperties.getProperty("password"));
+        if (EnvKit.isLambda()) {
+            dataSource.setMinimumIdle(5);
+            dataSource.setIdleTimeout(5000);
+            dataSource.setKeepaliveTime(2000);
         }
+        dataSource.setJdbcUrl(dbProperties.getProperty("jdbcUrl"));
+        return dataSource;
+        /*}*/
     }
 
     /***
