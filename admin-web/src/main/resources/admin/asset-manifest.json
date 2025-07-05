@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.js": "/admin/static/js/main.42de7fc6.js",
-    "static/js/9270.5d49d95a.chunk.js": "/admin/static/js/9270.5d49d95a.chunk.js",
+    "main.js": "/admin/static/js/main.924abd75.js",
+    "static/js/9270.569fc644.chunk.js": "/admin/static/js/9270.569fc644.chunk.js",
     "static/js/6271.2a3c1f80.chunk.js": "/admin/static/js/6271.2a3c1f80.chunk.js",
     "static/js/2640.cf467fc9.chunk.js": "/admin/static/js/2640.cf467fc9.chunk.js",
     "static/js/2478.800aaed2.chunk.js": "/admin/static/js/2478.800aaed2.chunk.js",
@@ -117,7 +117,7 @@
     "static/js/2214.84ffbdc1.chunk.js": "/admin/static/js/2214.84ffbdc1.chunk.js",
     "vendor.js": "/admin/static/js/vendor.49cca471.js",
     "static/css/4483.e3f855df.chunk.css": "/admin/static/css/4483.e3f855df.chunk.css",
-    "static/js/4483.4833ba48.chunk.js": "/admin/static/js/4483.4833ba48.chunk.js",
+    "static/js/4483.26b0d505.chunk.js": "/admin/static/js/4483.26b0d505.chunk.js",
     "static/js/2769.00e2fdea.js": "/admin/static/js/2769.00e2fdea.js",
     "static/media/KaTeX_AMS-Regular.ttf": "/admin/static/media/KaTeX_AMS-Regular.853be92419a6c3766b9a.ttf",
     "static/media/KaTeX_Main-Regular.ttf": "/admin/static/media/KaTeX_Main-Regular.9eba1d77abcf2aa6e94e.ttf",
@@ -184,6 +184,6 @@
   "entrypoints": [
     "static/js/vendor.49cca471.js",
     "static/js/2769.00e2fdea.js",
-    "static/js/main.42de7fc6.js"
+    "static/js/main.924abd75.js"
   ]
 }

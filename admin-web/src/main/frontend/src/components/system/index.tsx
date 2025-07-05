@@ -20,19 +20,21 @@ const System: FunctionComponent<SystemProps> = ({ data }) => {
 
     const axiosInstance = useAxiosBaseInstance();
 
+    const cycleDuration = 5000;
+
     const fetchSystemInfo = () => {
         if (document.visibilityState === "visible") {
             getCsrData("/system", axiosInstance).then(({ data }) => {
                 setState(data);
-                timer = setTimeout(fetchSystemInfo, 5000);
+                timer = setTimeout(fetchSystemInfo, cycleDuration);
             });
         } else {
-            timer = setTimeout(fetchSystemInfo, 5000);
+            timer = setTimeout(fetchSystemInfo, cycleDuration);
         }
     };
 
     useEffect(() => {
-        fetchSystemInfo();
+        timer = setTimeout(fetchSystemInfo, cycleDuration);
         return () => {
             if (timer) {
                 clearTimeout(timer);
