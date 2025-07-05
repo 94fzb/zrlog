@@ -96,6 +96,7 @@ public class GraalvmAgentApplication {
         new Gson().toJson(new UserBasicInfoResponse());
         new Gson().toJson(new ServerInfo("1", "1", ""));
         new Gson().toJson(new LambdaApiGatewayResponse());
+        new Gson().toJson(new SystemResponse(new ArrayList<>(), new ArrayList<>(), false, false));
     }
 
     private static void adminJson() {
