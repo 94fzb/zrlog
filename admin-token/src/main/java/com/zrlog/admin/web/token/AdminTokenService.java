@@ -41,20 +41,24 @@ public class AdminTokenService implements TokenService {
     }
 
     private static byte[] encrypt(String secretKey, byte[] value) throws Exception {
+        long start = System.currentTimeMillis();
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
         //必须要16位
         String newSecretKey = SecurityUtils.md5(secretKey).substring(8, 24);
         secretKeySpec = new SecretKeySpec(newSecretKey.getBytes(StandardCharsets.UTF_8), "AES");
         cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, iv);
+        LOGGER.info("encrypt used time " + (System.currentTimeMillis() - start) + "ms");
         return cipher.doFinal(value);
     }
 
     private static byte[] decrypt(String secretKey, byte[] encrypted) throws Exception {
+        long start = System.currentTimeMillis();
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
         //必须要16位
         String newSecretKey = SecurityUtils.md5(secretKey).substring(8, 24);
         secretKeySpec = new SecretKeySpec(newSecretKey.getBytes(StandardCharsets.UTF_8), "AES");
         cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, iv);
+        LOGGER.info("decrypt used time " + (System.currentTimeMillis() - start) + "ms");
         return cipher.doFinal(encrypted);
     }
 
