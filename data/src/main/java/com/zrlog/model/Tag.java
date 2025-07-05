@@ -4,9 +4,12 @@ import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.StringUtils;
 import com.zrlog.common.rest.request.PageRequest;
 import com.zrlog.data.dto.PageData;
+import com.zrlog.util.ThreadUtils;
 
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -71,7 +74,7 @@ public class Tag extends BasePageableDAO {
         return true;
     }
 
-    public void refreshTag() throws SQLException {
+    public List<Map<String, Object>> refreshTag() throws SQLException {
         execute("delete from " + tableName);
         Map<String, Integer> countMap = new HashMap<>();
         List<Map<String, Object>> logs = new Log().queryListWithParams("select keywords from " + Log.TABLE_NAME + " where rubbish=? and privacy=? ", false, false);
@@ -83,15 +86,33 @@ public class Tag extends BasePageableDAO {
                 }
             }
         }
-        int count = 1;
-        for (Map.Entry<String, Integer> tag : countMap.entrySet()) {
-            try {
-                new Tag().set("tagId", count++).set("text", tag.getKey()).set("count", tag.getValue()).save();
-            } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "save error", e);
+        List<CompletableFuture<Map<String, Object>>> futures = new ArrayList<>();
+        ExecutorService executorService = ThreadUtils.newFixedThreadPool(20);
+        List<Map<String, Object>> all = new ArrayList<>();
+        try {
+            for (Map.Entry<String, Integer> tag : countMap.entrySet()) {
+                int id = futures.size() + 1;
+                futures.add(CompletableFuture.supplyAsync(() -> {
+                    try {
+                        new Tag().set("tagId", id).set("text", tag.getKey()).set("count", tag.getValue()).save();
+                    } catch (Exception e) {
+                        LOGGER.log(Level.SEVERE, "save error", e);
+                    }
+                    Map<String, Object> tagDO = new HashMap<>();
+                    tagDO.put("id", id);
+                    tagDO.put("text", tag.getKey());
+                    tagDO.put("count", tag.getValue());
+                    return tagDO;
+                }, executorService));
             }
-
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+            for (CompletableFuture<Map<String, Object>> future : futures) {
+                all.add(future.join());
+            }
+        } finally {
+            executorService.shutdown();
         }
+        return all;
     }
 
     private void insertTag(Set<String> now) {

@@ -343,8 +343,6 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
                 cacheInit.setTypes(new Type().findAll());
                 statistics.setTotalTypeSize((long) cacheInit.getTypes().size());
                 List<Map<String, Object>> types = cacheInit.getTypes();
-                //Last article
-                cacheInit.setHotLogs(new Log().visitorFind(new PageRequestImpl(1L, 6L), "").getRows().stream().map(this::convertToBasicVO).collect(Collectors.toList()));
                 Map<Map<String, Object>, List<HotLogBasicInfoVO>> indexHotLog = new LinkedHashMap<>();
                 cacheInit.setIndexHotLogs(indexHotLog);
                 //设置分类Hot
@@ -360,6 +358,10 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
+        }, executor));
+        futures.add(CompletableFuture.runAsync(() -> {
+            //Last article
+            cacheInit.setHotLogs(new Log().visitorFind(new PageRequestImpl(1L, 6L), "").getRows().stream().map(this::convertToBasicVO).collect(Collectors.toList()));
         }, executor));
         futures.add(CompletableFuture.runAsync(() -> {
             try {
@@ -386,8 +388,7 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService {
         futures.add(CompletableFuture.runAsync(() -> {
             List<Map<String, Object>> all;
             try {
-                new Tag().refreshTag();
-                all = new Tag().findAll();
+                all = new Tag().refreshTag();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
