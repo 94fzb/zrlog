@@ -12,7 +12,10 @@ import com.zrlog.data.dto.FaviconBase64DTO;
 
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * 存放全局的设置，比如网站标题，关键字，插件，主题的配置信息等，当字典表处理即可，对应数据库的website表
@@ -112,16 +115,32 @@ public class WebSite extends DAO {
     }
 
     public FaviconBase64DTO faviconBase64DTO() {
-        FaviconBase64DTO faviconBase64DTO = new FaviconBase64DTO();
-        faviconBase64DTO.setFavicon_ico_base64(getStringValueByName("favicon_ico_base64"));
-        faviconBase64DTO.setFavicon_png_pwa_192_base64(getStringValueByName("favicon_png_pwa_192_base64"));
-        faviconBase64DTO.setFavicon_png_pwa_512_base64(getStringValueByName("favicon_png_pwa_512_base64"));
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
         try {
-            faviconBase64DTO.setGenerator_html_status(getBoolValueByName("generator_html_status"));
-        } catch (SQLException e) {
-            LoggerUtil.getLogger(WebSite.class).warning("Load html status error " + e.getMessage());
-            faviconBase64DTO.setGenerator_html_status(false);
+            FaviconBase64DTO faviconBase64DTO = new FaviconBase64DTO();
+            List<CompletableFuture<Void>> futures = new ArrayList<>();
+            futures.add(CompletableFuture.runAsync(() -> {
+                faviconBase64DTO.setFavicon_ico_base64(getStringValueByName("favicon_ico_base64"));
+                ;
+            }));
+            futures.add(CompletableFuture.runAsync(() -> {
+                faviconBase64DTO.setFavicon_png_pwa_192_base64(getStringValueByName("favicon_png_pwa_192_base64"));
+            }));
+            futures.add(CompletableFuture.runAsync(() -> {
+                faviconBase64DTO.setFavicon_png_pwa_512_base64(getStringValueByName("favicon_png_pwa_512_base64"));
+            }));
+            futures.add(CompletableFuture.runAsync(() -> {
+                try {
+                    faviconBase64DTO.setGenerator_html_status(getBoolValueByName("generator_html_status"));
+                } catch (SQLException e) {
+                    LoggerUtil.getLogger(WebSite.class).warning("Load html status error " + e.getMessage());
+                    faviconBase64DTO.setGenerator_html_status(false);
+                }
+            }));
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+            return faviconBase64DTO;
+        } finally {
+            executorService.shutdown();
         }
-        return faviconBase64DTO;
     }
 }
