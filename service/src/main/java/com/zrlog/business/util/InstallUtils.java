@@ -5,12 +5,9 @@ import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.server.util.PathUtil;
 import com.hibegin.http.server.util.ServerInfo;
 import com.zrlog.business.service.InstallService;
-import com.zrlog.common.Constants;
 import com.zrlog.util.ZrLogUtil;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
