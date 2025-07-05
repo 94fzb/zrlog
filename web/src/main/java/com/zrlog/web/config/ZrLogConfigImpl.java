@@ -264,7 +264,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
                 if (pluginJvmArgsObj == null) {
                     pluginJvmArgsObj = "";
                 }
-                String folder = RunMode.isLambdaEnv() ? "/var/task/conf/plugins" : PathUtil.getConfPath() + "/plugins";
+                String folder = RunMode.isLambdaEnv() ? System.getenv("LAMBDA_TASK_ROOT") + "/conf/plugins" : PathUtil.getConfPath() + "/plugins";
                 //这里使用独立的线程进行启动，主要是为了防止插件服务出问题后，影响整体，同时是避免启动过慢的问题。
                 plugins.add(new PluginCorePluginImpl(dbPropertiesFile, new File(folder), pluginJvmArgsObj.toString(), pluginCoreProcess, UUID.randomUUID().toString().replace("-", "")));
                 plugins.add(new UpdateVersionInfoPlugin());

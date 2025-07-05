@@ -26,7 +26,6 @@ public class LambdaApplication {
         System.getProperties().put("sws.cache.path", "/tmp/cache");
         System.getProperties().put("sws.static.path", "/tmp/static");
         System.getProperties().put("sws.conf.path", "/tmp/conf");
-        System.getProperties().put("sws.root.path", "/tmp");
     }
 
     public static void doHandle(String[] args, int port) throws Exception {
