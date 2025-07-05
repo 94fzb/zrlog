@@ -246,6 +246,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         dataSource.setDriverClassName(dbProperties.getProperty("driverClass"));
         dataSource.setUsername(dbProperties.getProperty("user"));
         dataSource.setPassword(dbProperties.getProperty("password"));
+        dataSource.setMinimumIdle(3);
         dataSource.setJdbcUrl(dbProperties.getProperty("jdbcUrl"));
         DAO.setDs(dataSource);
         int newDbVersion = new DbUpgradeService(dataSource).tryDoUpgrade();
