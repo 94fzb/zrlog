@@ -87,6 +87,7 @@ public class GraalvmAgentApplication {
         new Gson().toJson(new StatisticsInfoResponse());
         new Gson().toJson(new ServerSideDataResponse(new UserBasicInfoResponse(), new HashMap<>(), new Object(), "/", ""));
         new Gson().toJson(new AdminTokenVO());
+        new Gson().toJson(new AdminFullTokenVO());
         new Gson().toJson(new ExceptionResponse());
         new Gson().toJson(new VersionResponse());
         new Gson().toJson(new UploadTemplateResponse());
