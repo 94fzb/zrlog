@@ -29,7 +29,7 @@
         <jakarta-scope>compile</jakarta-scope>
         <servlet-scope>compile</servlet-scope>
         <lambda-scope>compile</lambda-scope>
-        <sws.version>4.0.71</sws.version>
+        <sws.version>4.0.72</sws.version>
         <disableJava21>false</disableJava21>
         <project.build.outputTimestamp>2013-01-01T00:00:00Z</project.build.outputTimestamp>
     </properties>
