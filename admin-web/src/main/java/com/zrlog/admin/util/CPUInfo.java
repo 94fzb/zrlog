@@ -1,6 +1,7 @@
 package com.zrlog.admin.util;
 
 import com.sun.management.OperatingSystemMXBean;
+import com.zrlog.common.type.RunMode;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -30,6 +31,9 @@ public class CPUInfo {
     }
 
     private String readCPUModel() {
+        if (RunMode.isLambdaEnv()) {
+            return "-";
+        }
         String os = System.getProperty("os.name").toLowerCase();
         try {
             // Windows 系统

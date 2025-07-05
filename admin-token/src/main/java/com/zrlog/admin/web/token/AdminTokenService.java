@@ -10,6 +10,7 @@ import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.business.util.InstallUtils;
 import com.zrlog.common.Constants;
 import com.zrlog.common.TokenService;
+import com.zrlog.common.vo.AdminFullTokenVO;
 import com.zrlog.common.vo.AdminTokenVO;
 import com.zrlog.model.User;
 
@@ -58,14 +59,14 @@ public class AdminTokenService implements TokenService {
     }
 
     @Override
-    public AdminTokenVO getAdminTokenVO(HttpRequest request) {
+    public AdminFullTokenVO getAdminTokenVO(HttpRequest request) {
         if (!InstallUtils.isInstalled()) {
             return null;
         }
         //header first, seconds parse cookie
         String tokenInHeader = request.getHeader(ADMIN_TOKEN_KEY_IN_REQUEST_HEADER);
         if (StringUtils.isNotEmpty(tokenInHeader)) {
-            AdminTokenVO adminTokenVO = parseAdminTokenByStr(tokenInHeader);
+            AdminFullTokenVO adminTokenVO = parseAdminTokenByStr(tokenInHeader);
             if (Objects.nonNull(adminTokenVO)) {
                 return adminTokenVO;
             }
@@ -86,7 +87,7 @@ public class AdminTokenService implements TokenService {
         return parseAdminTokenByStr(tokenString);
     }
 
-    private AdminTokenVO parseAdminTokenByStr(String tokenString) {
+    private AdminFullTokenVO parseAdminTokenByStr(String tokenString) {
         try {
             int userId = Integer.parseInt(tokenString.substring(0, tokenString.indexOf(TOKEN_SPLIT_CHAR)));
             Map<String, Object> user = new User().loadById(userId);
@@ -94,8 +95,10 @@ public class AdminTokenService implements TokenService {
                 return null;
             }
             byte[] adminTokenEncryptAfter = ByteUtils.hexString2Bytes(tokenString.substring(tokenString.indexOf(TOKEN_SPLIT_CHAR) + 1));
-            String base64Encode = new String(decrypt((String) user.get("secretKey"), Base64.getDecoder().decode(adminTokenEncryptAfter)));
-            AdminTokenVO adminTokenVO = new Gson().fromJson(base64Encode, AdminTokenVO.class);
+            String secretKey = (String) user.get("secretKey");
+            String base64Encode = new String(decrypt(secretKey, Base64.getDecoder().decode(adminTokenEncryptAfter)));
+            AdminFullTokenVO adminTokenVO = new Gson().fromJson(base64Encode, AdminFullTokenVO.class);
+            adminTokenVO.setSecretKey(secretKey);
             if (adminTokenVO.getCreatedDate() + Constants.getSessionTimeout() > System.currentTimeMillis()) {
                 return adminTokenVO;
             }
@@ -135,16 +138,16 @@ public class AdminTokenService implements TokenService {
     }
 
     @Override
-    public void setAdminToken(Map<String, Object> user, String sessionId, String protocol, HttpRequest request, HttpResponse response) throws Exception {
+    public void setAdminToken(Integer userId, String secretKey, String sessionId, String protocol, HttpRequest request, HttpResponse response) throws Exception {
         AdminTokenVO adminTokenVO = new AdminTokenVO();
-        adminTokenVO.setUserId((Integer) user.get("userId"));
+        adminTokenVO.setUserId(userId);
         adminTokenVO.setSessionId(sessionId);
         adminTokenVO.setProtocol(protocol);
         long loginTime = System.currentTimeMillis();
         adminTokenVO.setCreatedDate(loginTime);
         AdminTokenThreadLocal.setAdminToken(adminTokenVO);
         String encryptBeforeString = new Gson().toJson(adminTokenVO);
-        byte[] base64Bytes = Base64.getEncoder().encode(encrypt(user.get("secretKey").toString(), encryptBeforeString.getBytes()));
+        byte[] base64Bytes = Base64.getEncoder().encode(encrypt(secretKey, encryptBeforeString.getBytes()));
         String encryptAfterString = ByteUtils.bytesToHexString(base64Bytes);
         String finalTokenString = adminTokenVO.getUserId() + TOKEN_SPLIT_CHAR + encryptAfterString;
         Cookie cookie = new Cookie();

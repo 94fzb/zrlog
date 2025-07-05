@@ -12,6 +12,7 @@ import com.zrlog.admin.web.plugin.PluginCorePluginImpl;
 import com.zrlog.admin.web.token.AdminTokenThreadLocal;
 import com.zrlog.blog.web.util.WebTools;
 import com.zrlog.common.Constants;
+import com.zrlog.common.vo.AdminFullTokenVO;
 import com.zrlog.common.vo.AdminTokenVO;
 import com.zrlog.model.User;
 import com.zrlog.util.ZrLogUtil;
@@ -71,13 +72,12 @@ public class AdminInterceptor implements HandleAbleInterceptor {
             }
             Method method = request.getServerConfig().getRouter().getMethod(request.getUri());
             if (Objects.nonNull(method) && !ZrLogUtil.isStaticPlugin(request)) {
-                AdminTokenVO adminTokenVO = Constants.zrLogConfig.getTokenService().getAdminTokenVO(request);
+                AdminFullTokenVO adminTokenVO = Constants.zrLogConfig.getTokenService().getAdminTokenVO(request);
                 if (adminTokenVO == null) {
                     WebTools.blockUnLoginRequestHandler(request, response);
                     return false;
                 }
-                Map<String, Object> user = new User().loadById(adminTokenVO.getUserId());
-                Constants.zrLogConfig.getTokenService().setAdminToken(user, adminTokenVO.getSessionId(), adminTokenVO.getProtocol(), request, response);
+                Constants.zrLogConfig.getTokenService().setAdminToken(adminTokenVO.getUserId(), adminTokenVO.getSecretKey(), adminTokenVO.getSessionId(), adminTokenVO.getProtocol(), request, response);
             }
             new MethodInterceptor().doInterceptor(request, response);
             if (Objects.nonNull(method)) {

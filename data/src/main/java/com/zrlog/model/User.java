@@ -16,22 +16,6 @@ public class User extends DAO {
         this.pk = "userId";
     }
 
-    public String getPasswordByUserName(String userName) throws SQLException {
-        Map<String, Object> user = queryFirstWithParams("select * from " + tableName + " where userName=?", userName);
-        if (user != null) {
-            return (String) user.get("password");
-        }
-        return null;
-    }
-
-    public Long getIdByUserName(String userName) throws SQLException {
-        Map<String, Object> user = queryFirstWithParams("select * from " + tableName + " where userName=?", userName);
-        if (user != null) {
-            return Long.parseLong(user.get("userId") + "");
-        }
-        return null;
-    }
-
     public Map<String, Object> getUserByUserName(String userName) throws SQLException {
         return queryFirstWithParams("select * from " + tableName + " where userName=?", userName);
     }

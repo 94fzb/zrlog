@@ -7,6 +7,7 @@ import com.hibegin.common.util.ObjectHelpers;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.annotation.ResponseBody;
 import com.hibegin.http.server.web.Controller;
+import com.zrlog.admin.business.dto.UserLoginDTO;
 import com.zrlog.admin.business.rest.request.LoginRequest;
 import com.zrlog.admin.business.rest.response.IndexResponse;
 import com.zrlog.admin.business.rest.response.StatisticsInfoResponse;
@@ -44,9 +45,10 @@ public class AdminController extends Controller {
             throw new MissingInstallException();
         }
         LoginRequest loginRequest = BeanUtil.convertWithValid(getRequest().getInputStream(), LoginRequest.class);
-        UserBasicInfoResponse resp = userService.login(loginRequest, request);
-        Constants.zrLogConfig.getTokenService().setAdminToken(new User().getUserByUserName(resp.getUserName().toLowerCase()), resp.getKey(), Objects.equals(loginRequest.getHttps(), true) ? "https" : "http", getRequest(), getResponse());
-        return new ApiStandardResponse<>(resp);
+        UserLoginDTO dto = userService.login(loginRequest, request);
+        Constants.zrLogConfig.getTokenService().setAdminToken(dto.getId(), dto.getSecretKey(), dto.getUserBasicInfoResponse().getKey(),
+                Objects.equals(loginRequest.getHttps(), true) ? "https" : "http", getRequest(), getResponse());
+        return new ApiStandardResponse<>(dto.getUserBasicInfoResponse());
     }
 
     @ResponseBody
@@ -97,7 +99,7 @@ public class AdminController extends Controller {
     @ResponseBody
     public ApiStandardResponse<Map<String, Object>> error() {
         Map<String, Object> map = new HashMap<>();
-        map.put("message", request.getParaToStr("message",""));
+        map.put("message", request.getParaToStr("message", ""));
         return new ApiStandardResponse<>(map);
     }
 

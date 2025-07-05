@@ -1,9 +1,11 @@
 package com.zrlog.admin.business.service;
 
 import com.hibegin.common.util.BeanUtil;
+import com.hibegin.common.util.ObjectUtil;
 import com.hibegin.common.util.SecurityUtils;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.server.api.HttpRequest;
+import com.zrlog.admin.business.dto.UserLoginDTO;
 import com.zrlog.admin.business.exception.*;
 import com.zrlog.admin.business.rest.request.LoginRequest;
 import com.zrlog.admin.business.rest.request.UpdateAdminRequest;
@@ -56,7 +58,11 @@ public class UserService {
 
     public UserBasicInfoResponse getUserInfo(int userId, String sessionId, HttpRequest request) {
         Map<String, Object> byId = new User().loadById(userId);
-        UserBasicInfoResponse basicInfoResponse = Objects.requireNonNullElse(BeanUtil.convert(byId, UserBasicInfoResponse.class), new UserBasicInfoResponse());
+        return getUserInfoByUser(byId, sessionId, request);
+    }
+
+    private UserBasicInfoResponse getUserInfoByUser(Map<String, Object> byId, String sessionId, HttpRequest request) {
+        UserBasicInfoResponse basicInfoResponse = ObjectUtil.requireNonNullElse(BeanUtil.convert(byId, UserBasicInfoResponse.class), new UserBasicInfoResponse());
         if (StringUtils.isEmpty(basicInfoResponse.getHeader())) {
             basicInfoResponse.setHeader(WebTools.buildEncodedUrl(request, "assets/images/default-portrait.gif"));
         }
@@ -67,17 +73,22 @@ public class UserService {
         return basicInfoResponse;
     }
 
-    public UserBasicInfoResponse login(LoginRequest loginRequest, HttpRequest request) throws SQLException {
+    public UserLoginDTO login(LoginRequest loginRequest, HttpRequest request) throws SQLException {
         if (StringUtils.isNotEmpty(loginRequest.getUserName()) && StringUtils.isNotEmpty(loginRequest.getPassword())) {
-            String dbPassword = new User().getPasswordByUserName(loginRequest.getUserName().toLowerCase());
+            Map<String, Object> user = new User().getUserByUserName(loginRequest.getUserName().toLowerCase());
+            if (Objects.isNull(user)) {
+                throw new UserNameOrPasswordException();
+            }
+            String dbPassword = (String) user.get("password");
             if (dbPassword == null || !Objects.equals(dbPassword.toLowerCase(), loginRequest.getPassword().toLowerCase())) {
                 throw new UserNameOrPasswordException();
             }
-            Long id = new User().getIdByUserName(loginRequest.getUserName().toLowerCase());
-            if (Objects.isNull(id)) {
-                throw new UserNameOrPasswordException();
-            }
-            return getUserInfo(id.intValue(), UUID.randomUUID().toString(), request);
+            UserBasicInfoResponse userInfoByUser = getUserInfoByUser(user, UUID.randomUUID().toString(), request);
+            UserLoginDTO  userLoginDTO = new UserLoginDTO();
+            userLoginDTO.setSecretKey((String) user.get("secretKey"));
+            userLoginDTO.setUserBasicInfoResponse(userInfoByUser);
+            userLoginDTO.setId((Integer) user.get("userId"));
+            return userLoginDTO;
         } else {
             throw new UserNameAndPasswordRequiredException();
         }
