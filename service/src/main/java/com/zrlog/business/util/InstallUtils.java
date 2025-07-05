@@ -35,18 +35,6 @@ public class InstallUtils {
         return new InstallService(PathUtil.getConfPath()).getLockFile();
     }
 
-    public static Properties getDbProp() {
-        if (InstallUtils.isInstalled()) {
-            Properties dbProperties = new Properties();
-            try (FileInputStream in = new FileInputStream(Constants.getDbPropertiesFile())) {
-                dbProperties.load(in);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            return dbProperties;
-        }
-        return null;
-    }
 
     public static Properties getSystemProp(Connection connection) {
         Properties systemProp = System.getProperties();

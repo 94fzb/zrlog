@@ -9,7 +9,6 @@ import com.zrlog.common.Constants;
 import com.zrlog.common.type.RunMode;
 import com.zrlog.util.DbConnectUtils;
 import com.zrlog.util.I18nUtil;
-import com.zrlog.util.ParseUtil;
 import com.zrlog.util.ZrLogUtil;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
@@ -137,7 +136,7 @@ public class InstallService {
      * @throws IOException
      */
     private void installSuccess() throws IOException {
-        File dbFile = new File(basePath + "/db.properties");
+        File dbFile = Constants.zrLogConfig.getDbPropertiesFile();
         if (dbFile.exists()) {
             dbFile.delete();
         }

@@ -9,6 +9,7 @@ import com.hibegin.http.server.api.Interceptor;
 import com.hibegin.http.server.config.RequestConfig;
 import com.hibegin.http.server.config.ResponseConfig;
 import com.hibegin.http.server.config.ServerConfig;
+import com.hibegin.http.server.util.PathUtil;
 import com.mysql.cj.jdbc.AbandonedConnectionCleanupThread;
 import com.zaxxer.hikari.HikariDataSource;
 import com.zrlog.admin.business.service.AdminResourceImpl;
@@ -48,6 +49,8 @@ import com.zrlog.web.inteceptor.PluginInterceptor;
 import com.zrlog.web.inteceptor.StaticResourceInterceptor;
 
 import javax.sql.DataSource;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.SQLRecoverableException;
@@ -76,6 +79,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     private final AdminResource adminResource;
     private final String contextPath;
     private HikariDataSource dataSource;
+    private final File dbPropertiesFile;
 
     static {
         disableHikariLogging();
@@ -86,6 +90,8 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     }
 
     public ZrLogConfigImpl(Integer port, Updater updater, String contextPath) {
+        this.dbPropertiesFile = initDbPropertiesFile();
+        new File(PathUtil.getConfPath()).mkdirs();
         this.contextPath = contextPath;
         this.port = port;
         this.plugins = new Plugins();
@@ -110,23 +116,30 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     /**
      * 将 env 配置的 DB_PROPERTIES 写入到实际的文件中，便于程序读取
      */
-    private static void tryInitDbPropertiesFile() throws IOException {
-        if (StringUtils.isNotEmpty(ZrLogUtil.getDbInfoByEnv())) {
-            IOUtil.writeBytesToFile(new String(ZrLogUtil.getDbInfoByEnv().getBytes()).replaceAll(" ", "\n").getBytes(), Constants.getDbPropertiesFile());
+    private static File initDbPropertiesFile() {
+        File dbFiles = new File(PathUtil.getConfPath() + "/db.properties");
+        try {
+            if (!InstallUtils.isInstalled()) {
+                return dbFiles;
+            }
+            if (StringUtils.isNotEmpty(ZrLogUtil.getDbInfoByEnv())) {
+                IOUtil.writeBytesToFile(new String(ZrLogUtil.getDbInfoByEnv().getBytes()).replaceAll(" ", "\n").getBytes(), dbFiles);
+            }
+            Properties properties = getDbProp(dbFiles);
+            if ("com.mysql.cj.jdbc.Driver".equals(properties.get("driverClass"))) {
+                return dbFiles;
+            }
+            try (FileOutputStream fileOutputStream = new FileOutputStream(dbFiles)) {
+                properties.put("driverClass", "com.mysql.cj.jdbc.Driver");
+                properties.put("jdbcUrl", properties.get("jdbcUrl") + "&" + ApiInstallController.JDBC_URL_BASE_QUERY_PARAM);
+                properties.store(fileOutputStream, "Support mysql8");
+                LOGGER.info("Upgrade properties success");
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "initDbPropertiesFile error " + e.getMessage());
         }
-        Properties properties = InstallUtils.getDbProp();
-        if (Objects.isNull(properties)) {
-            return;
-        }
-        if ("com.mysql.cj.jdbc.Driver".equals(properties.get("driverClass"))) {
-            return;
-        }
-        try (FileOutputStream fileOutputStream = new FileOutputStream(Constants.getDbPropertiesFile())) {
-            properties.put("driverClass", "com.mysql.cj.jdbc.Driver");
-            properties.put("jdbcUrl", properties.get("jdbcUrl") + "&" + ApiInstallController.JDBC_URL_BASE_QUERY_PARAM);
-            properties.store(fileOutputStream, "Support mysql8");
-            LOGGER.info("Upgrade properties success");
-        }
+        return dbFiles;
+
     }
 
     static String toNamingDurationString(long milliseconds, boolean en) {
@@ -155,9 +168,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     }
 
     private ServerConfig initServerConfig(String contextPath) {
-        ServerConfig serverConfig = new ServerConfig().setApplicationName("zrlog")
-                .setApplicationVersion(BlogBuildInfoUtil.getVersionInfo())
-                .setDisablePrintWebServerInfo(true);
+        ServerConfig serverConfig = new ServerConfig().setApplicationName("zrlog").setApplicationVersion(BlogBuildInfoUtil.getVersionInfo()).setDisablePrintWebServerInfo(true);
         serverConfig.setNativeImageAgent(Constants.runMode == RunMode.NATIVE_AGENT);
         serverConfig.setDisableSession(true);
         serverConfig.setPort(port);
@@ -227,8 +238,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
             LOGGER.log(Level.WARNING, "Not found lock file(" + InstallUtils.getLockFile() + "), Please visit the" + " http://yourHostName:port/install start installation");
             return;
         }
-        tryInitDbPropertiesFile();
-        Properties dbProperties = Objects.requireNonNull(InstallUtils.getDbProp());
+        Properties dbProperties = getDbProp(dbPropertiesFile);
         //启动时候进行数据库连接
         dataSource = new HikariDataSource();
         dataSource.setDataSourceProperties(dbProperties);
@@ -254,8 +264,9 @@ public class ZrLogConfigImpl extends ZrLogConfig {
                 if (pluginJvmArgsObj == null) {
                     pluginJvmArgsObj = "";
                 }
+                String folder = RunMode.isLambdaEnv() ? "/var/task/conf/plugins" : PathUtil.getConfPath() + "/plugins";
                 //这里使用独立的线程进行启动，主要是为了防止插件服务出问题后，影响整体，同时是避免启动过慢的问题。
-                plugins.add(new PluginCorePluginImpl(Constants.getDbPropertiesFile(), pluginJvmArgsObj.toString(), pluginCoreProcess, UUID.randomUUID().toString().replace("-", "")));
+                plugins.add(new PluginCorePluginImpl(dbPropertiesFile, new File(folder), pluginJvmArgsObj.toString(), pluginCoreProcess, UUID.randomUUID().toString().replace("-", "")));
                 plugins.add(new UpdateVersionInfoPlugin());
                 plugins.add(new CacheManagerPlugin());
                 //需要缓存加载完毕后执行的插件
@@ -392,5 +403,20 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     @Override
     public AdminResource getAdminResource() {
         return adminResource;
+    }
+
+    @Override
+    public File getDbPropertiesFile() {
+        return dbPropertiesFile;
+    }
+
+    private static Properties getDbProp(File dbPropertiesFile) {
+        Properties dbProperties = new Properties();
+        try (FileInputStream in = new FileInputStream(dbPropertiesFile)) {
+            dbProperties.load(in);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return dbProperties;
     }
 }

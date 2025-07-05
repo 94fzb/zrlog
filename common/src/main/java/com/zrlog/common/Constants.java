@@ -162,15 +162,6 @@ public class Constants {
         return (int) Double.parseDouble((String) Objects.requireNonNullElse(Constants.zrLogConfig.getPublicWebSite().get("admin_article_page_size"), "10"));
     }
 
-    public static File getDbPropertiesFile() {
-        if (Constants.runMode.isLambda()) {
-            return new File("/tmp/db.properties");
-        }
-        File file = new File(PathUtil.getConfPath() + "/db.properties");
-        new File(PathUtil.getConfPath()).mkdirs();
-        return file;
-    }
-
     public static String getAdminTitle(String startTitle) {
         String title = (String) Constants.zrLogConfig.getPublicWebSite().get("title");
         StringJoiner sj = new StringJoiner(ADMIN_TITLE_CHAR);

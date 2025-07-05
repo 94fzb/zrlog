@@ -5,7 +5,9 @@ import com.zrlog.common.vo.DatabaseConnectPoolInfo;
 import com.zrlog.plugin.Plugins;
 
 import javax.sql.DataSource;
+import java.io.File;
 import java.util.Map;
+import java.util.Properties;
 
 
 public abstract class ZrLogConfig extends AbstractServerConfig {
@@ -37,4 +39,7 @@ public abstract class ZrLogConfig extends AbstractServerConfig {
     public abstract void stop();
 
     public abstract AdminResource getAdminResource();
+
+    public abstract File getDbPropertiesFile();
+
 }

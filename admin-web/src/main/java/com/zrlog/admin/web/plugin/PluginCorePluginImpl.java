@@ -26,12 +26,14 @@ public class PluginCorePluginImpl implements PluginCorePlugin {
     private final String pluginJvmArgs;
     private final PluginCoreProcess pluginCoreProcess;
     private final String token;
+    private final File pluginFolder;
 
-    public PluginCorePluginImpl(File dbPropertiesPath, String pluginJvmArgs, PluginCoreProcess pluginCoreProcess, String token) {
+    public PluginCorePluginImpl(File dbPropertiesPath, File pluginsFolder, String pluginJvmArgs, PluginCoreProcess pluginCoreProcess, String token) {
         this.dbPropertiesPath = dbPropertiesPath;
         this.pluginJvmArgs = pluginJvmArgs;
         this.pluginCoreProcess = pluginCoreProcess;
         this.token = token;
+        this.pluginFolder = pluginsFolder;
     }
 
     private String getPluginFileName() {
@@ -50,7 +52,7 @@ public class PluginCorePluginImpl implements PluginCorePlugin {
             return true;
         }
         //加载 ZrLog 提供的插件
-        int port = pluginCoreProcess.pluginServerStart(new File(PathUtil.getConfPath() + "/plugins/" + getPluginFileName()),
+        int port = pluginCoreProcess.pluginServerStart(new File(pluginFolder + "/" + getPluginFileName()),
                 dbPropertiesPath.toString(), pluginJvmArgs, PathUtil.getStaticPath(), BlogBuildInfoUtil.getVersion(), token);
         Constants.pluginServer = "http://127.0.0.1:" + port;
         return true;
