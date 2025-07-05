@@ -1,5 +1,6 @@
 package com.zrlog.admin.util;
 
+import com.hibegin.common.util.EnvKit;
 import com.hibegin.common.util.LoggerUtil;
 import com.zrlog.common.type.RunMode;
 
@@ -45,7 +46,7 @@ public class SystemLoad {
         if (isWindows()) {
             return "-";
         }
-        if (RunMode.isLambdaMode()) {
+        if (EnvKit.isLambda()) {
             return "-";
         }
         try {

@@ -59,7 +59,7 @@ public class Constants {
     }
 
     public static boolean debugLoggerPrintAble() {
-        return EnvKit.isDevMode() || RunMode.isLambdaMode();
+        return EnvKit.isDevMode() || EnvKit.isDebugMode();
     }
 
     public static String getRealFileArch() {

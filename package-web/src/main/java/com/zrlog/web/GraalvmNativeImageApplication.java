@@ -1,9 +1,11 @@
 package com.zrlog.web;
 
+import com.hibegin.common.util.EnvKit;
 import com.hibegin.common.util.ParseArgsUtil;
 import com.hibegin.common.util.Pid;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.http.server.WebServerBuilder;
+import com.hibegin.lambda.LambdaApplication;
 import com.zrlog.business.service.NativeImageUpdater;
 import com.zrlog.common.Constants;
 import com.zrlog.common.type.RunMode;
@@ -22,7 +24,7 @@ public class GraalvmNativeImageApplication {
 
 
     static {
-        if (RunMode.isLambdaMode()) {
+        if (EnvKit.isLambda()) {
             LambdaApplication.initLambdaEnv();
         } else {
             Application.initZrLogEnv();
@@ -65,10 +67,13 @@ public class GraalvmNativeImageApplication {
 
 
     public static void main(String[] args) throws Exception {
-        Constants.runMode = RunMode.isLambdaMode() ? RunMode.NATIVE_LAMBDA : RunMode.NATIVE;
+        Constants.runMode = EnvKit.isLambda() ? RunMode.NATIVE_LAMBDA : RunMode.NATIVE;
         int port = ZrLogUtil.getPort(args);
         if (Constants.runMode.isLambda()) {
-            LambdaApplication.doHandle(args, port);
+            File file = new File(ZrLogUtil.getLambdaRoot() + "/zrlog");
+            WebServerBuilder webServerBuilder = Application.webServerBuilder(port, ZrLogUtil.getContextPath(args), new NativeImageUpdater(args, file));
+            webServerBuilder.startInBackground();
+            LambdaApplication.startHandle(Constants.zrLogConfig);
             return;
         }
         String execFile = getExecFile();

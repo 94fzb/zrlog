@@ -1,5 +1,6 @@
 package com.zrlog.web.config;
 
+import com.hibegin.common.util.EnvKit;
 import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.StringUtils;
@@ -175,7 +176,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         serverConfig.setContextPath(contextPath);
         serverConfig.setPidFilePathEnvKey("ZRLOG_PID_FILE");
         serverConfig.setServerPortFilePathEnvKey("ZRLOG_HTTP_PORT_FILE");
-        serverConfig.setDisableSavePidFile(RunMode.isLambdaMode());
+        serverConfig.setDisableSavePidFile(EnvKit.isLambda());
         serverConfig.setHttpJsonMessageConverter(new ZrLogHttpJsonMessageConverter());
         serverConfig.addErrorHandle(400, new ZrLogErrorHandle(400));
         serverConfig.addErrorHandle(403, new ZrLogErrorHandle(403));
@@ -266,7 +267,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
                 if (pluginJvmArgsObj == null) {
                     pluginJvmArgsObj = "";
                 }
-                String folder = RunMode.isLambdaMode() ? ZrLogUtil.getLambdaRoot() + "/conf/plugins" : PathUtil.getConfPath() + "/plugins";
+                String folder = EnvKit.isLambda() ? ZrLogUtil.getLambdaRoot() + "/conf/plugins" : PathUtil.getConfPath() + "/plugins";
                 //这里使用独立的线程进行启动，主要是为了防止插件服务出问题后，影响整体，同时是避免启动过慢的问题。
                 plugins.add(new PluginCorePluginImpl(dbPropertiesFile, new File(folder), pluginJvmArgsObj.toString(), pluginCoreProcess, UUID.randomUUID().toString().replace("-", "")));
                 plugins.add(new UpdateVersionInfoPlugin());

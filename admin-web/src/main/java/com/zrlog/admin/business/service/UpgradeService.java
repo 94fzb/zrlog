@@ -1,9 +1,6 @@
 package com.zrlog.admin.business.service;
 
-import com.hibegin.common.util.BeanUtil;
-import com.hibegin.common.util.LoggerUtil;
-import com.hibegin.common.util.SecurityUtils;
-import com.hibegin.common.util.StringUtils;
+import com.hibegin.common.util.*;
 import com.hibegin.common.util.http.HttpUtil;
 import com.hibegin.common.util.http.handle.HttpFileHandle;
 import com.zrlog.admin.business.exception.DownloadUpgradeFileException;
@@ -143,7 +140,7 @@ public class UpgradeService {
             updateVersionHandler = new DockerUpdateVersionHandle(I18nUtil.getBackend());
         } else if (ZrLogUtil.isSystemServiceMode()) {
             updateVersionHandler = new SystemServiceUpdateVersionHandle(I18nUtil.getBackend());
-        } else if (RunMode.isLambdaMode()) {
+        } else if (EnvKit.isLambda()) {
             updateVersionHandler = new LambdaUpdateVersionHandler(I18nUtil.getBackend());
         } else {
             HttpFileHandle handle = downloadProcessHandleMap.get(preUpgradeKey);

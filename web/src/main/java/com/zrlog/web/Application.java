@@ -8,7 +8,6 @@ import com.zrlog.business.service.ZipUpdater;
 import com.zrlog.business.util.UpdaterUtils;
 import com.zrlog.common.Constants;
 import com.zrlog.common.Updater;
-import com.zrlog.common.type.RunMode;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.config.ZrLogConfigImpl;
@@ -23,7 +22,7 @@ public class Application {
 
 
     static {
-        if (!RunMode.isLambdaMode()) {
+        if (!EnvKit.isLambda()) {
             initZrLogEnv();
         }
     }

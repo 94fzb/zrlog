@@ -29,16 +29,9 @@
             <artifactId>web</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.tomcat.embed</groupId>
-            <artifactId>tomcat-embed-core</artifactId>
-            <version>10.1.42</version>
-            <scope>${jakarta-scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tomcat.embed</groupId>
-            <artifactId>tomcat-embed-jasper</artifactId>
-            <version>10.1.42</version>
-            <scope>${jakarta-scope}</scope>
+            <groupId>com.hibegin</groupId>
+            <artifactId>simplewebserver-lambda-function-impl</artifactId>
+            <scope>${lambda-scope}</scope>
         </dependency>
     </dependencies>
 
@@ -87,8 +80,6 @@
             </plugin>
         </plugins>
     </build>
-
-
 
 
     <profiles>
@@ -222,7 +213,8 @@
                                     --initialize-at-build-time=java.util.ImmutableCollections$ListN
                                     --trace-class-initialization=sun.security.krb5.SCDynamicStoreConfig
                                     -march=compatibility --enable-preview -H:DashboardDump=${imageName}
-                                    -H:+DashboardAll -H:IncludeResources= --enable-url-protocols=http --enable-url-protocols=https --enable-monitoring=heapdump
+                                    -H:+DashboardAll -H:IncludeResources= --enable-url-protocols=http
+                                    --enable-url-protocols=https --enable-monitoring=heapdump
                                 </arg>
                             </buildArgs>
                             <mainClass>com.zrlog.web.GraalvmNativeImageApplication</mainClass>
@@ -309,6 +301,10 @@
                         <configuration>
                             <finalName>${finalName}</finalName>
                             <classifier>starter</classifier>
+                            <excludes>
+                                <exclude>com/**</exclude>
+                                <exclude>lambda.json</exclude>
+                            </excludes>
                             <archive>
                                 <manifest>
                                     <addClasspath>true</addClasspath>

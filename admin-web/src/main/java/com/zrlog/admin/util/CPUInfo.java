@@ -1,5 +1,6 @@
 package com.zrlog.admin.util;
 
+import com.hibegin.common.util.EnvKit;
 import com.hibegin.common.util.ObjectUtil;
 import com.sun.management.OperatingSystemMXBean;
 import com.zrlog.common.type.RunMode;
@@ -32,7 +33,7 @@ public class CPUInfo {
     }
 
     private String readCPUModel() {
-        if (RunMode.isLambdaMode()) {
+        if (EnvKit.isLambda()) {
             return ObjectUtil.requireNonNullElse(System.getenv("AWS_EXECUTION_ENV"), "AWS_Lambda_OS");
         }
         String os = System.getProperty("os.name").toLowerCase();
