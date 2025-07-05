@@ -77,9 +77,7 @@ public class LambdaApplication {
         HttpRequest.Builder builder = HttpRequest.newBuilder(URI.create(getBaseUrl() + "/" + requestId + "/response"));
         builder.POST(HttpRequest.BodyPublishers.ofString(output));
         HttpResponse<String> send = httpClient.send(builder.build(), HttpResponse.BodyHandlers.ofString());
-        if (send.statusCode() == 200) {
-            LOGGER.info("lambda main server response = " + new Gson().toJson(send.body()));
-        }
+        LOGGER.info("lambda main server response = " + send.statusCode() + ":" + send.body());
     }
 
     public static void doHandle(String[] args, int port, String execFile) throws Exception {
