@@ -8,6 +8,7 @@ import com.zrlog.common.type.RunMode;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -85,7 +86,7 @@ public class Constants {
     }
 
     public static boolean getBooleanByFromWebSite(String key) {
-        Object dbSetting = zrLogConfig.getCacheService().getPublicWebSiteInfoFirstByCache().get(key);
+        Object dbSetting = getStringByFromWebSite(key);
         return websiteValueIsTrue(dbSetting);
     }
 
@@ -94,11 +95,11 @@ public class Constants {
     }
 
     public static String getStringByFromWebSite(String key, String defaultValue) {
-        Object dbSetting = zrLogConfig.getCacheService().getPublicWebSiteInfoFirstByCache().get(key);
+        Object dbSetting = zrLogConfig.getCacheService().getPublicWebSiteInfoFirstByCache(key);
         if (Objects.isNull(dbSetting)) {
             return defaultValue;
         }
-        return (String) dbSetting;
+        return dbSetting + "";
     }
 
     public static boolean websiteValueIsTrue(Object dbSetting) {
@@ -115,7 +116,7 @@ public class Constants {
     }
 
     public static Long getSessionTimeout() {
-        String sessionTimeoutString = (String) Constants.zrLogConfig.getCacheService().getPublicWebSiteInfoFirstByCache().get(SESSION_TIMEOUT_KEY);
+        String sessionTimeoutString = Constants.getStringByFromWebSite(SESSION_TIMEOUT_KEY);
         if (StringUtils.isEmpty(sessionTimeoutString)) {
             return DEFAULT_SESSION_TIMEOUT;
         }
@@ -136,11 +137,11 @@ public class Constants {
     }
 
     public static long getDefaultRows() {
-        return (long) Double.parseDouble((String) Objects.requireNonNullElse(Constants.zrLogConfig.getCacheService().getPublicWebSiteInfoFirstByCache().get("rows"), "10"));
+        return (long) Double.parseDouble(Constants.getStringByFromWebSite("rows", "10"));
     }
 
     public static String getAppId() {
-        return String.valueOf(Constants.zrLogConfig.getCacheService().getPublicWebSiteInfoFirstByCache().get("appId"));
+        return String.valueOf(Constants.getStringByFromWebSite("appId"));
     }
 
     public static void init() {
@@ -152,5 +153,9 @@ public class Constants {
             return ".html";
         }
         return "";
+    }
+
+    public static String getLanguage() {
+        return Constants.getStringByFromWebSite("language");
     }
 }

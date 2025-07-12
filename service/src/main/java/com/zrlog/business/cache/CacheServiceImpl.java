@@ -273,12 +273,12 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService<Bas
     }
 
     @Override
-    public Map<String, Object> getPublicWebSiteInfoFirstByCache() {
+    public Object getPublicWebSiteInfoFirstByCache(String key) {
         if (Objects.nonNull(cacheInit)) {
-            return cacheInit.getWebSite();
+            return cacheInit.getWebSite().get(key);
         }
         refreshInitDataCacheAsync(null, false);
-        return new WebSite().getPublicWebSite();
+        return new WebSite().getStringValueByName(key);
     }
 
     @Override

@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 public interface CacheService<T> {
@@ -30,7 +31,7 @@ public interface CacheService<T> {
 
     Map<String, Object> refreshWebSite();
 
-    Map<String,Object> getPublicWebSiteInfoFirstByCache();
+    Object getPublicWebSiteInfoFirstByCache(String key);
 
     List<Map<String, Object>> getArticleTypes(HttpRequest request);
 

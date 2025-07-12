@@ -96,7 +96,7 @@ class UpdateVersionTimerTask extends TimerTask {
         //手动设置对应ChangeLog
         String language;
         if(Objects.nonNull(Constants.zrLogConfig)) {
-            language = Constants.getStringByFromWebSite("language");
+            language = Constants.getLanguage();
         } else {
             language = "zh_CN";
         }
