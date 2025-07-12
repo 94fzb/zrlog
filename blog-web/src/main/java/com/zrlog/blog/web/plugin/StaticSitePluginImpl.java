@@ -15,6 +15,7 @@ import com.hibegin.http.server.impl.SimpleHttpResponse;
 import com.hibegin.http.server.util.HttpRequestBuilder;
 import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.blog.web.interceptor.TemplateUtils;
+import com.zrlog.business.plugin.PluginCorePlugin;
 import com.zrlog.business.plugin.StaticSitePlugin;
 import com.zrlog.business.service.TemplateInfoHelper;
 import com.zrlog.common.CacheService;
@@ -52,6 +53,7 @@ public class StaticSitePluginImpl extends BaseLockObject implements StaticSitePl
     private final ReentrantLock parseLock = new ReentrantLock();
     private final String notFindFile;
     private final String contextPath;
+    private long version;
 
     public StaticSitePluginImpl(AbstractServerConfig abstractServerConfig, String contextPath) {
         this.applicationContext = new ApplicationContext(abstractServerConfig.getServerConfig());
@@ -139,6 +141,11 @@ public class StaticSitePluginImpl extends BaseLockObject implements StaticSitePl
         return Objects.equals(ua, staticUserAgent);
     }
 
+    @Override
+    public void setVersion(long version) {
+        this.version = version;
+    }
+
     private HttpRequest buildMockRequest(HttpMethod method, String uri, RequestConfig requestConfig, ApplicationContext applicationContext) throws Exception {
         return HttpRequestBuilder.buildRequest(method, uri, ZrLogUtil.getBlogHostByWebSite(), staticUserAgent, requestConfig, applicationContext);
     }
@@ -202,7 +209,7 @@ public class StaticSitePluginImpl extends BaseLockObject implements StaticSitePl
         }
     }
 
-    private void doGeneratorAllAsync() {
+    private void doGenerator() {
         if (!Constants.isStaticHtmlStatus()) {
             return;
         }
@@ -237,16 +244,16 @@ public class StaticSitePluginImpl extends BaseLockObject implements StaticSitePl
             lock.unlock();
             long usedTime = (System.currentTimeMillis() - start);
             if (Constants.debugLoggerPrintAble()) {
-                LOGGER.info("Generator " + ZrLogUtil.getBlogHostByWebSite() + " size " + handleStatusPageMap.size() + " finished in " + usedTime + "ms");
+                LOGGER.info("Generator [" + version + "] " + "size " + handleStatusPageMap.size() + " finished in " + usedTime + "ms");
             } else if (usedTime > Duration.ofSeconds(10).toMillis()) {
-                LOGGER.warning("Generator slow size " + handleStatusPageMap.size() + " finish in " + usedTime);
+                LOGGER.warning("Generator [" + version + "] slow size " + handleStatusPageMap.size() + " finish in " + usedTime + "ms");
             }
         }
     }
 
     @Override
     public boolean start() {
-        doGeneratorAllAsync();
+        doGenerator();
         return true;
     }
 

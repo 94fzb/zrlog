@@ -27,11 +27,12 @@ public class PluginUtils {
         }
         if (includeBlog) {
             //静态化插件，重新生成全量的 html
-            StaticSitePlugin staticSitePluginImpl = Constants.zrLogConfig.getPlugin(StaticSitePlugin.class);
-            if (Objects.nonNull(staticSitePluginImpl)) {
+            StaticSitePlugin staticSitePlugin = Constants.zrLogConfig.getPlugin(StaticSitePlugin.class);
+            if (Objects.nonNull(staticSitePlugin)) {
                 //restart plugin, for update
-                staticSitePluginImpl.stop();
-                staticSitePluginImpl.start();
+                staticSitePlugin.stop();
+                staticSitePlugin.setVersion(cacheVersion);
+                staticSitePlugin.start();
             }
         }
         //plugin cache

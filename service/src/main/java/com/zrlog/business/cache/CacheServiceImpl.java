@@ -37,7 +37,7 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService<Bas
     private static final Logger LOGGER = LoggerUtil.getLogger(CacheServiceImpl.class);
     private final String cacheStaticPath;
 
-    private final AtomicLong version = new AtomicLong();
+    private final AtomicLong version = new AtomicLong(System.currentTimeMillis());
     private final Map<String, String> cacheFileMap = new ConcurrentHashMap<>();
     private final String contextPath;
     private volatile BaseDataInitVO cacheInit;

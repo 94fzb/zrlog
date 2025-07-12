@@ -213,7 +213,7 @@ public class PluginCorePluginImpl extends BaseLockObject implements PluginCorePl
 
     private void refreshCacheWithRetry(int retryCount, long cacheVersion) {
         try {
-            HttpUtil.getInstance().getSuccessTextByUrl(pluginServerBaseUrl + "/api/refreshCache?cacheVersion=" + cacheVersion + "token=" + token);
+            HttpUtil.getInstance().getSuccessTextByUrl(pluginServerBaseUrl + "/api/refreshCache?cacheVersion=" + cacheVersion + "&token=" + token);
         } catch (IOException | InterruptedException | URISyntaxException e) {
             int rCount = retryCount - 1;
             if (retryCount < 0) {
