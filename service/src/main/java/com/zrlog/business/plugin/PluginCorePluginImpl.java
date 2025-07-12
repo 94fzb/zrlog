@@ -123,8 +123,7 @@ public class PluginCorePluginImpl extends BaseLockObject implements PluginCorePl
     @Override
     public <T> T requestService(HttpRequest inputRequest, Map<String, String[]> body, AdminTokenVO adminTokenVO, Class<T> clazz) throws IOException, InterruptedException {
         waitToStarted();
-        return HttpUtil.getInstance().sendPostRequest(pluginServerBaseUrl + "/service", body, new HttpResponseJsonHandle<>(clazz),
-                genHeaderMapByRequest(inputRequest, adminTokenVO)).getT();
+        return HttpUtil.getInstance().sendPostRequest(pluginServerBaseUrl + "/service", body, new HttpResponseJsonHandle<>(clazz), genHeaderMapByRequest(inputRequest, adminTokenVO)).getT();
     }
 
 
@@ -175,8 +174,7 @@ public class PluginCorePluginImpl extends BaseLockObject implements PluginCorePl
                 return true;
             }
             //加载 ZrLog 提供的插件
-            int port = pluginCoreProcess.pluginServerStart(new File(pluginFolder + "/" + getPluginFileName()),
-                    dbPropertiesPath.toString(), pluginJvmArgs, PathUtil.getStaticPath(), BlogBuildInfoUtil.getVersion(), token);
+            int port = pluginCoreProcess.pluginServerStart(new File(pluginFolder + "/" + getPluginFileName()), dbPropertiesPath.toString(), pluginJvmArgs, PathUtil.getStaticPath(), BlogBuildInfoUtil.getVersion(), token);
             String serverUrl = "http://127.0.0.1:" + port;
             waitToStarted(serverUrl, token, 360);
             this.pluginServerBaseUrl = serverUrl;
@@ -209,6 +207,20 @@ public class PluginCorePluginImpl extends BaseLockObject implements PluginCorePl
             return;
         }
         refreshCacheWithRetry(EnvKit.isFaaSMode() ? Integer.MAX_VALUE : 5, cacheVersion);
+        StaticSitePlugin staticSitePlugin = Constants.zrLogConfig.getPlugin(StaticSitePlugin.class);
+        if (Objects.isNull(staticSitePlugin)) {
+            return;
+        }
+        for (int i = 0; i < 360; i++) {
+            if (staticSitePlugin.isSynchronized()) {
+                return;
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     private void refreshCacheWithRetry(int retryCount, long cacheVersion) {

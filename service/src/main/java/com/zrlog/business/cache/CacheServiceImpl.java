@@ -157,6 +157,27 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService<Bas
     }
 
     @Override
+    public String saveCacheHtmlFolderVersion() {
+        List<File> files = new ArrayList<>();
+        FileUtils.getAllFiles(getCacheHtmlFolder().toString(), files);
+        StringBuilder sb = new StringBuilder();
+        File versionFile = new File(getCacheHtmlFolder() + "/" + versionFileName);
+        for (File file : files) {
+            try {
+                if (Objects.equals(file.toString(), versionFile.toString())) {
+                    continue;
+                }
+                sb.append(SecurityUtils.md5(new FileInputStream(file)));
+            } catch (FileNotFoundException e) {
+                LOGGER.warning("getCacheHtmlFolderVersion error " + e.getMessage());
+            }
+        }
+        String version = SecurityUtils.md5(sb.toString());
+        IOUtil.writeStrToFile(version, new File(Constants.zrLogConfig.getCacheService().getCacheHtmlFolder() + "/" + versionFileName));
+        return version;
+    }
+
+    @Override
     public long getWebSiteVersion() {
         if (Objects.isNull(cacheInit)) {
             return 0;

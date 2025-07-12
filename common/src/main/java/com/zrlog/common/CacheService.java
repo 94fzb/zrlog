@@ -6,10 +6,11 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 public interface CacheService<T> {
+
+    String versionFileName = "version.txt";
 
     void refreshFavicon();
 
@@ -18,6 +19,8 @@ public interface CacheService<T> {
     File saveResponseBodyToHtml(HttpRequest httpRequest, String copy);
 
     File getCacheHtmlFolder();
+
+    String saveCacheHtmlFolderVersion();
 
     long getWebSiteVersion();
 

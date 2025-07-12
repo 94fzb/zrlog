@@ -2,8 +2,10 @@ package com.zrlog.blog.web.plugin;
 
 import com.hibegin.common.BaseLockObject;
 import com.hibegin.common.util.FileUtils;
+import com.hibegin.common.util.IOUtil;
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.StringUtils;
+import com.hibegin.common.util.http.HttpUtil;
 import com.hibegin.http.HttpMethod;
 import com.hibegin.http.server.ApplicationContext;
 import com.hibegin.http.server.api.HttpRequest;
@@ -15,7 +17,6 @@ import com.hibegin.http.server.impl.SimpleHttpResponse;
 import com.hibegin.http.server.util.HttpRequestBuilder;
 import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.blog.web.interceptor.TemplateUtils;
-import com.zrlog.business.plugin.PluginCorePlugin;
 import com.zrlog.business.plugin.StaticSitePlugin;
 import com.zrlog.business.service.TemplateInfoHelper;
 import com.zrlog.common.CacheService;
@@ -31,11 +32,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
@@ -54,6 +53,7 @@ public class StaticSitePluginImpl extends BaseLockObject implements StaticSitePl
     private final String notFindFile;
     private final String contextPath;
     private long version;
+    private String siteVersion;
 
     public StaticSitePluginImpl(AbstractServerConfig abstractServerConfig, String contextPath) {
         this.applicationContext = new ApplicationContext(abstractServerConfig.getServerConfig());
@@ -144,6 +144,21 @@ public class StaticSitePluginImpl extends BaseLockObject implements StaticSitePl
     @Override
     public void setVersion(long version) {
         this.version = version;
+    }
+
+    @Override
+    public boolean isSynchronized() {
+        try {
+            String host = Constants.getHost();
+            if (StringUtils.isEmpty(host)) {
+                return true;
+            }
+            String remoteSiteVersion = HttpUtil.getInstance().getSuccessTextByUrl("https://" + Constants.getHost() + "/" + CacheService.versionFileName);
+            return Objects.equals(siteVersion, remoteSiteVersion);
+        } catch (IOException | InterruptedException | URISyntaxException e) {
+            LOGGER.info(e.getMessage());
+        }
+        return false;
     }
 
     private HttpRequest buildMockRequest(HttpMethod method, String uri, RequestConfig requestConfig, ApplicationContext applicationContext) throws Exception {
@@ -248,6 +263,7 @@ public class StaticSitePluginImpl extends BaseLockObject implements StaticSitePl
             } else if (usedTime > Duration.ofSeconds(10).toMillis()) {
                 LOGGER.warning("Generator [" + version + "] slow size " + handleStatusPageMap.size() + " finish in " + usedTime + "ms");
             }
+            this.siteVersion = Constants.zrLogConfig.getCacheService().saveCacheHtmlFolderVersion();
         }
     }
 

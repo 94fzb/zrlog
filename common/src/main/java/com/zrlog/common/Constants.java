@@ -98,6 +98,10 @@ public class Constants {
         return getStringByFromWebSite(key, null);
     }
 
+    public static String getHost() {
+        return getStringByFromWebSite("host","");
+    }
+
     public static String getStringByFromWebSite(String key, String defaultValue) {
         Object dbSetting = zrLogConfig.getCacheService().getPublicWebSiteInfoFirstByCache(key);
         if (Objects.isNull(dbSetting)) {

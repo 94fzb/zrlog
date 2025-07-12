@@ -5,7 +5,10 @@ import com.zrlog.plugin.IPlugin;
 
 public interface StaticSitePlugin extends IPlugin {
 
+
     boolean isStaticPlugin(HttpRequest request);
 
     void setVersion(long version);
+
+    boolean isSynchronized();
 }
