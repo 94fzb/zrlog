@@ -12,7 +12,7 @@ public interface StaticSitePlugin extends IPlugin {
 
     File saveResponseBodyToHtml(HttpRequest httpRequest, String copy);
 
-    boolean isStaticPlugin(HttpRequest request);
+    boolean isStaticPluginRequest(HttpRequest request);
 
     void setVersion(long version);
 

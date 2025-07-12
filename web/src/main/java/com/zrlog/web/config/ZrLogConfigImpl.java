@@ -251,7 +251,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
             if (Objects.isNull(staticSitePluginImpl)) {
                 return false;
             }
-            return staticSitePluginImpl.isStaticPlugin(request);
+            return staticSitePluginImpl.isStaticPluginRequest(request);
         } catch (Exception e) {
             return false;
         }

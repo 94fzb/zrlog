@@ -227,7 +227,7 @@ public class StaticSitePluginImpl extends BaseLockObject implements StaticSitePl
         }
     }
 
-    public boolean isStaticPlugin(HttpRequest request) {
+    public boolean isStaticPluginRequest(HttpRequest request) {
         if (Objects.isNull(request)) {
             return false;
         }
