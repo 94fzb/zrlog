@@ -12,6 +12,7 @@ import com.zrlog.business.cache.vo.HotLogBasicInfoVO;
 import com.zrlog.common.AdminResource;
 import com.zrlog.common.CacheService;
 import com.zrlog.common.Constants;
+import com.zrlog.common.ZrLogConfig;
 import com.zrlog.data.dto.FaviconBase64DTO;
 import com.zrlog.model.*;
 import com.zrlog.util.I18nUtil;
@@ -274,6 +275,9 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService<Bas
 
     @Override
     public Object getPublicWebSiteInfoFirstByCache(String key) {
+        if (!Constants.zrLogConfig.isInstalled()) {
+            return null;
+        }
         if (Objects.nonNull(cacheInit)) {
             return cacheInit.getWebSite().get(key);
         }
