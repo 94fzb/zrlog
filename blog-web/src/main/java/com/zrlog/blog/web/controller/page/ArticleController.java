@@ -85,7 +85,11 @@ public class ArticleController extends Controller {
     }
 
     public String record() {
-        ArticleUriInfoVO uriInfoVO = parseUriInfo(request.getUri());
+        String uri = request.getUri();
+        if (uri.split("-").length < 3) {
+            uri = uri + "-1";
+        }
+        ArticleUriInfoVO uriInfoVO = parseUriInfo(uri);
         request.getAttr().put("tipsType", I18nUtil.getBlogStringFromRes("archive"));
         request.getAttr().put("tipsName", uriInfoVO.getKey());
 
