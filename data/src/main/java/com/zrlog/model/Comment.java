@@ -46,7 +46,11 @@ public class Comment extends BasePageableDAO {
     }
 
     public List<Map<String, Object>> findAllByLogId(int logId) throws SQLException {
-        return queryListWithParams("select * from " + tableName + " where logId=?", logId);
+        List<Map<String, Object>> comments = queryListWithParams("select * from " + tableName + " where logId=?", logId);
+        for (Map<String, Object> comment : comments) {
+            comment.put("commTime", ResultValueConvertUtils.formatDate(comment.get("commTime"), "yyyy-MM-dd HH:mm:ss"));
+        }
+        return comments;
     }
 
     public void doRead(long id) {
