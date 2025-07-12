@@ -83,7 +83,11 @@ public class ArticleController extends Controller {
         return "page";
     }
 
-    public String record() {
+    /**
+     * 补 1 按照规则
+     * @return
+     */
+    private String getRecordRealUri() {
         String uri = request.getUri();
         int length = uri.split("-").length;
         if (length < 2) {
@@ -96,7 +100,11 @@ public class ArticleController extends Controller {
                 uri = uri + "-1";
             }
         }
-        ArticleUriInfoVO uriInfoVO = parseUriInfo(uri);
+        return uri;
+    }
+
+    public String record() {
+        ArticleUriInfoVO uriInfoVO = parseUriInfo(getRecordRealUri());
         request.getAttr().put("tipsType", I18nUtil.getBlogStringFromRes("archive"));
         request.getAttr().put("tipsName", uriInfoVO.getKey());
 
