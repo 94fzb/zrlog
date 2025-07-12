@@ -92,6 +92,13 @@ public class WebSite extends DAO {
         return "";
     }
 
+    public String getPublicStringValueByName(String name) {
+        if (!websitePublicQueryKeys.contains(name)) {
+            throw new ArithmeticException(name);
+        }
+       return getStringValueByName(name);
+    }
+
     public static void clearTemplateConfigMap() {
         Constants.zrLogConfig.getTemplateConfigCacheMap().clear();
     }
@@ -110,7 +117,7 @@ public class WebSite extends DAO {
         new WebSite().updateByKV(templateName + TEMPLATE_CONFIG_SUFFIX, new GsonBuilder().serializeNulls().create().toJson(settingMap));
         return settingMap;
     }
- 
+
     public FaviconBase64DTO faviconBase64DTO() {
         FaviconBase64DTO faviconBase64DTO = new FaviconBase64DTO();
         Map<String, Object> dataMap = getWebSiteByNameIn(Arrays.asList("favicon_ico_base64", "favicon_png_pwa_192_base64", "favicon_png_pwa_512_base64", "generator_html_status"));
