@@ -95,7 +95,7 @@ public class ArticleController extends Controller {
         }
         if (length == 2) {
             if (uri.endsWith(".html")) {
-                uri = uri.split("-")[0] + "-" + (uri.split("-")[1]).replace(".html", "-1.html`");
+                uri = uri.split("-")[0] + "-" + (uri.split("-")[1]).replace(".html", "-1.html");
             } else {
                 uri = uri + "-1";
             }
