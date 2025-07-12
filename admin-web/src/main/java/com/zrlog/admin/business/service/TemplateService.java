@@ -89,7 +89,7 @@ public class TemplateService {
 
 
     private static TemplateVO getTemplateVO(File file) {
-        String templatePath = file.toString().substring(PathUtil.getStaticPath().length() - 1).replace("\\", "/");
+        String templatePath = file.toString().substring(PathUtil.getStaticPath().length()).replace("\\", "/");
         if (!file.exists() || !file.isDirectory()) {
             return null;
         }
