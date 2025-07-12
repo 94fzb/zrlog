@@ -110,7 +110,6 @@ public class Tag extends BasePageableDAO {
     private List<Map<String, Object>> batchInsert(Map<String, Integer> countMap, int idBase) throws SQLException {
         StringBuilder insertSql = new StringBuilder("insert into " + tableName + " (tagId,text,count) values ");
         List<Object> params = new ArrayList<>();
-        Map<String, Object> tagDO = new HashMap<>();
         int id = idBase;
         StringJoiner valueJoiner = new StringJoiner(",");
         List<Map<String, Object>> all = new ArrayList<>();
@@ -120,6 +119,7 @@ public class Tag extends BasePageableDAO {
             params.add(id);
             params.add(tag.getKey());
             params.add(tag.getValue());
+            Map<String, Object> tagDO = new HashMap<>();
             tagDO.put("text", tag.getKey());
             tagDO.put("count", tag.getValue());
             tagDO.put("keycode", tag.getKey().hashCode());
