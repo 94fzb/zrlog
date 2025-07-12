@@ -207,14 +207,6 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     }
 
     @Override
-    public Map<String, Object> getPublicWebSite() {
-        if (!isInstalled()) {
-            return new HashMap<>();
-        }
-        return cacheService.refreshInitDataCacheAsync(null, false).join().getWebSite();
-    }
-
-    @Override
     public String getProgramUptime() {
         return ParseUtil.toNamingDurationString(System.currentTimeMillis() - uptime, I18nUtil.getCurrentLocale().contains("en"));
     }

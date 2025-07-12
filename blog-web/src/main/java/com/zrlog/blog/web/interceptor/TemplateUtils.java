@@ -16,7 +16,7 @@ public class TemplateUtils {
      * 获取主题的相对于程序的路径，当Cookie中有值的情况下，优先使用Cookie里面的数据（仅当主题存在的情况下，否则返回默认的主题），
      */
     public static String getTemplatePath(HttpRequest request) {
-        String templatePath = Objects.requireNonNullElse((String) Constants.zrLogConfig.getPublicWebSite().get("template"), Constants.DEFAULT_TEMPLATE_PATH);
+        String templatePath = Constants.getStringByFromWebSite("template", Constants.DEFAULT_TEMPLATE_PATH);
         if (Objects.isNull(request)) {
             return templatePath;
         }
@@ -34,7 +34,7 @@ public class TemplateUtils {
         if (!Constants.zrLogConfig.isInstalled()) {
             return;
         }
-        String configTemplate = Constants.zrLogConfig.getPublicWebSite().getOrDefault("template", Constants.DEFAULT_TEMPLATE_PATH).toString();
+        String configTemplate = Constants.getStringByFromWebSite("template", Constants.DEFAULT_TEMPLATE_PATH);
         File path = new File(PathUtil.getStaticPath() + configTemplate);
         if (path.exists() && !Objects.equals(configTemplate, Constants.DEFAULT_TEMPLATE_PATH)) {
             try {
@@ -52,7 +52,7 @@ public class TemplateUtils {
     }
 
     public static boolean existsByTemplateName(String templateName) {
-        String configTemplate = Constants.zrLogConfig.getPublicWebSite().getOrDefault("template", Constants.DEFAULT_TEMPLATE_PATH).toString();
+        String configTemplate = Constants.getStringByFromWebSite("template", Constants.DEFAULT_TEMPLATE_PATH);
         File path = new File(PathUtil.getStaticPath() + configTemplate);
         if (path.exists() && !Objects.equals(configTemplate, Constants.DEFAULT_TEMPLATE_PATH)) {
             return Arrays.stream(Objects.requireNonNull(path.listFiles())).anyMatch(e -> e.getName().startsWith(templateName + "."));

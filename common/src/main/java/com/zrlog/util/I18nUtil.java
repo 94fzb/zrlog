@@ -123,11 +123,11 @@ public class I18nUtil {
                     || request.getUri().contains("/api" + Constants.ADMIN_URI_BASE_PATH + "/")
                     || request.getUri().contains("/api/public/adminResource")
             ) {
-                locale = (String) Constants.zrLogConfig.getPublicWebSite().get("language");
+                locale = Constants.getStringByFromWebSite("language");
             } else {
                 String referer = request.getHeader("referer");
                 if (StringUtils.isNotEmpty(referer) && referer.contains(Constants.ADMIN_URI_BASE_PATH + "/")) {
-                    locale = (String) Constants.zrLogConfig.getPublicWebSite().get("language");
+                    locale = Constants.getStringByFromWebSite("language");
                 } else {
                     //try to get locale info from HTTP header
                     locale = getAcceptLocal(request);
@@ -243,8 +243,9 @@ public class I18nUtil {
         if (i18nVO != null) {
             locale = i18nVO.getLocale();
         } else {
-            if (Objects.nonNull(Constants.zrLogConfig) && Constants.zrLogConfig.getPublicWebSite().get("language") != null) {
-                locale = (String) Constants.zrLogConfig.getPublicWebSite().get("language");
+            Map<String, Object> website = Constants.zrLogConfig.getCacheService().getPublicWebSiteInfoFirstByCache();
+            if (Objects.nonNull(Constants.zrLogConfig) && website.get("language") != null) {
+                locale = (String) website.get("language");
             }
         }
         if (StringUtils.isNotEmpty(locale)) {

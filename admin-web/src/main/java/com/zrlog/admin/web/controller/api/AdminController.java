@@ -70,7 +70,7 @@ public class AdminController extends BaseController {
             }
             map.put("name", AdminConstants.getAdminDocumentTitleByUri("/"));
             map.put("theme_color", publicInfoVO.getPwaThemeColor());
-            map.put("description", ObjectHelpers.requireNonNullElse(Constants.zrLogConfig.getPublicWebSite().get("description"), ""));
+            map.put("description", Constants.getStringByFromWebSite("description", ""));
             map.put("id", Constants.getAppId());
             map.put("background_color", publicInfoVO.getAdmin_darkMode() ? "#000000" : "#FFFFFF");
             List<Map<String, Object>> list = (List<Map<String, Object>>) map.get("icons");

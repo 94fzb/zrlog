@@ -13,13 +13,13 @@ public class CommonService {
     public PublicInfoVO getPublicInfo(HttpRequest request) {
         Boolean darkMode = Constants.getBooleanByFromWebSite("admin_darkMode");
         String themeColor;
-        String adminColor = Objects.toString(Constants.zrLogConfig.getPublicWebSite().get("admin_color_primary"), "#1677ff");
+        String adminColor = Objects.toString(Constants.getBooleanByFromWebSite("admin_color_primary"), "#1677ff");
         if (darkMode) {
             themeColor = "#000000";
         } else {
             themeColor = adminColor;
         }
-        return new PublicInfoVO(BlogBuildInfoUtil.getVersion(), (String) Constants.zrLogConfig.getPublicWebSite().get("title"), ZrLogUtil.getHomeUrlWithHost(request), darkMode, adminColor, themeColor);
+        return new PublicInfoVO(BlogBuildInfoUtil.getVersion(), Constants.getStringByFromWebSite("title"), ZrLogUtil.getHomeUrlWithHost(request), darkMode, adminColor, themeColor);
     }
 
 

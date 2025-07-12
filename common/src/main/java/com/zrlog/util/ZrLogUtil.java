@@ -60,7 +60,7 @@ public class ZrLogUtil {
     }
 
     public static String getBlogHostByWebSite() {
-        String websiteHost = (String) Constants.zrLogConfig.getPublicWebSite().get("host");
+        String websiteHost = (String) Constants.zrLogConfig.getCacheService().getPublicWebSiteInfoFirstByCache().get("host");
         if (Objects.nonNull(websiteHost) && !websiteHost.trim().isEmpty()) {
             return websiteHost;
         }
@@ -71,7 +71,7 @@ public class ZrLogUtil {
         if (Objects.isNull(Constants.zrLogConfig)) {
             return "";
         }
-        String websiteHost = (String) Constants.zrLogConfig.getPublicWebSite().get("admin_static_resource_base_url");
+        String websiteHost = (String) Constants.zrLogConfig.getCacheService().getPublicWebSiteInfoFirstByCache().get("admin_static_resource_base_url");
         if (Objects.nonNull(websiteHost) && !websiteHost.trim().isEmpty()) {
             return websiteHost + request.getContextPath();
         }

@@ -134,8 +134,8 @@ public class TemplateRenderUtils {
     }
 
     private static void staticHtml(HttpRequest request, String suffix, boolean thumbnailEnableArticle) {
-        String webSiteTitle = (String) Constants.zrLogConfig.getPublicWebSite().get("title");
-        String webSiteSecondTitle = (String) Constants.zrLogConfig.getPublicWebSite().get("second_title");
+        String webSiteTitle = Constants.getStringByFromWebSite("title", "");
+        String webSiteSecondTitle = Constants.getStringByFromWebSite("second_title", "");
         StringJoiner sj = new StringJoiner(" - ");
         if (request.getAttr().get("data") != null) {
             PageData<Map<String, Object>> map = (PageData) request.getAttr().get("data");
@@ -160,7 +160,7 @@ public class TemplateRenderUtils {
                     }
                 }
             }
-            request.getAttr().put("keywords", Constants.zrLogConfig.getPublicWebSite().get("keywords"));
+            request.getAttr().put("keywords", Constants.getStringByFromWebSite("keywords"));
         } else if (request.getAttr().get("log") != null) {
             Map<String, Object> objectMap = (Map<String, Object>) request.getAttr().get("log");
             fillArticleInfo(objectMap, request, suffix);
@@ -172,7 +172,7 @@ public class TemplateRenderUtils {
             if (StringUtils.isNotEmpty(keywords)) {
                 request.getAttr().put("keywords", keywords);
             } else {
-                request.getAttr().put("keywords", Objects.requireNonNullElse(Constants.zrLogConfig.getPublicWebSite().get("keywords"), ""));
+                request.getAttr().put("keywords", Constants.getStringByFromWebSite("keywords", ""));
             }
         }
         if (StringUtils.isNotEmpty(webSiteTitle)) {
@@ -181,7 +181,7 @@ public class TemplateRenderUtils {
         if (StringUtils.isNotEmpty(webSiteSecondTitle)) {
             sj.add(webSiteSecondTitle);
         }
-        request.getAttr().put("description", Objects.requireNonNullElse(Constants.zrLogConfig.getPublicWebSite().get("description"), ""));
+        request.getAttr().put("description", Constants.getStringByFromWebSite("description", ""));
         request.getAttr().put("title", sj.toString());
     }
 

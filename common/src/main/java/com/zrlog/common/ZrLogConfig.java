@@ -58,8 +58,6 @@ public abstract class ZrLogConfig extends AbstractServerConfig {
 
     public abstract TokenService getTokenService();
 
-    public abstract Map<String, Object> getPublicWebSite();
-
     public abstract String getProgramUptime();
 
 

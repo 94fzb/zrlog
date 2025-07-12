@@ -30,6 +30,8 @@ public interface CacheService<T> {
 
     Map<String, Object> refreshWebSite();
 
+    Map<String,Object> getPublicWebSiteInfoFirstByCache();
+
     List<Map<String, Object>> getArticleTypes(HttpRequest request);
 
     List<Map<String, Object>> getTags(HttpRequest request);

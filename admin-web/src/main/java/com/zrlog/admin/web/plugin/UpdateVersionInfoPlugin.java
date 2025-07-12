@@ -91,7 +91,7 @@ public class UpdateVersionInfoPlugin implements IPlugin {
         if (isStarted()) {
             return true;
         }
-        String value = (String) Constants.zrLogConfig.getPublicWebSite().get(AdminConstants.AUTO_UPGRADE_VERSION_KEY);
+        String value = Constants.getStringByFromWebSite(AdminConstants.AUTO_UPGRADE_VERSION_KEY);
         if (value != null && !value.isEmpty()) {
             AutoUpgradeVersionType autoUpgradeVersionType = AutoUpgradeVersionType.cycle((int) Double.parseDouble(value));
             if (scheduledExecutorService != null) {

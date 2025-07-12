@@ -60,7 +60,7 @@ public class CacheManagerPlugin implements IPlugin {
     private class CacheManageRunnable implements Runnable {
 
         private int getInitDataMaxCacheTimeout() {
-            Object dbSettingSize = CacheManagerPlugin.this.zrLogConfig.getPublicWebSite().get("cache_timeout_minutes");
+            Object dbSettingSize = Constants.getStringByFromWebSite("cache_timeout_minutes");
             if (dbSettingSize != null) {
                 try {
                     return (int) (Double.parseDouble(dbSettingSize.toString()) * 60 * 1000);
@@ -74,7 +74,7 @@ public class CacheManagerPlugin implements IPlugin {
         @Override
         public void run() {
             if (System.currentTimeMillis() - Constants.getLastAccessTime() > getInitDataMaxCacheTimeout()) {
-                Constants.zrLogConfig.getCacheService().refreshInitDataCacheAsync(null, true).join();
+                zrLogConfig.getCacheService().refreshInitDataCacheAsync(null, true).join();
             }
         }
     }

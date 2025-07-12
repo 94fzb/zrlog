@@ -85,8 +85,20 @@ public class Constants {
     }
 
     public static boolean getBooleanByFromWebSite(String key) {
-        Object dbSetting = zrLogConfig.getPublicWebSite().get(key);
+        Object dbSetting = zrLogConfig.getCacheService().getPublicWebSiteInfoFirstByCache().get(key);
         return websiteValueIsTrue(dbSetting);
+    }
+
+    public static String getStringByFromWebSite(String key) {
+        return getStringByFromWebSite(key, null);
+    }
+
+    public static String getStringByFromWebSite(String key, String defaultValue) {
+        Object dbSetting = zrLogConfig.getCacheService().getPublicWebSiteInfoFirstByCache().get(key);
+        if (Objects.isNull(dbSetting)) {
+            return defaultValue;
+        }
+        return (String) dbSetting;
     }
 
     public static boolean websiteValueIsTrue(Object dbSetting) {
@@ -103,7 +115,7 @@ public class Constants {
     }
 
     public static Long getSessionTimeout() {
-        String sessionTimeoutString = (String) Constants.zrLogConfig.getPublicWebSite().get(SESSION_TIMEOUT_KEY);
+        String sessionTimeoutString = (String) Constants.zrLogConfig.getCacheService().getPublicWebSiteInfoFirstByCache().get(SESSION_TIMEOUT_KEY);
         if (StringUtils.isEmpty(sessionTimeoutString)) {
             return DEFAULT_SESSION_TIMEOUT;
         }
@@ -124,11 +136,11 @@ public class Constants {
     }
 
     public static long getDefaultRows() {
-        return (long) Double.parseDouble((String) Objects.requireNonNullElse(Constants.zrLogConfig.getPublicWebSite().get("rows"), "10"));
+        return (long) Double.parseDouble((String) Objects.requireNonNullElse(Constants.zrLogConfig.getCacheService().getPublicWebSiteInfoFirstByCache().get("rows"), "10"));
     }
 
     public static String getAppId() {
-        return String.valueOf(zrLogConfig.getPublicWebSite().get("appId"));
+        return String.valueOf(Constants.zrLogConfig.getCacheService().getPublicWebSiteInfoFirstByCache().get("appId"));
     }
 
     public static void init() {

@@ -40,11 +40,11 @@ public class AdminConstants {
     }
 
     public static int getAdminArticlePageSize() {
-        return (int) Double.parseDouble((String) Objects.requireNonNullElse(Constants.zrLogConfig.getPublicWebSite().get("admin_article_page_size"), "10"));
+        return (int) Double.parseDouble(Constants.getStringByFromWebSite("admin_article_page_size", "10"));
     }
 
     public static String getAdminTitle(String startTitle) {
-        String title = (String) Constants.zrLogConfig.getPublicWebSite().get("title");
+        String title = Constants.getStringByFromWebSite("title","");
         StringJoiner sj = new StringJoiner(ADMIN_TITLE_CHAR);
         if (StringUtils.isNotEmpty(startTitle) && !startTitle.trim().isEmpty()) {
             sj.add(startTitle);
@@ -57,7 +57,7 @@ public class AdminConstants {
     }
 
     public static int getAutoDigestLength() {
-        Object dbSettingSize = Constants.zrLogConfig.getPublicWebSite().get("article_auto_digest_length");
+        Object dbSettingSize = Constants.getStringByFromWebSite("article_auto_digest_length");
         if (dbSettingSize != null) {
             try {
                 return (int) Double.parseDouble(dbSettingSize.toString());

@@ -273,13 +273,21 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService<Bas
     }
 
     @Override
+    public Map<String, Object> getPublicWebSiteInfoFirstByCache() {
+        if (Objects.nonNull(cacheInit)) {
+            return cacheInit.getWebSite();
+        }
+        return new WebSite().getPublicWebSite();
+    }
+
+    @Override
     public Map<String, Object> refreshWebSite() {
         if (!Constants.zrLogConfig.isInstalled()) {
             return new HashMap<>();
         }
         Map<String, Object> website = new WebSite().getPublicWebSite();
-        Constants.zrLogConfig.getPublicWebSite().clear();
-        Constants.zrLogConfig.getPublicWebSite().putAll(website);
+        cacheInit.getWebSite().clear();
+        cacheInit.getWebSite().putAll(website);
         String robotTxt = (String) website.get("robotRuleContent");
         if (StringUtils.isEmpty(robotTxt)) {
             return website;
