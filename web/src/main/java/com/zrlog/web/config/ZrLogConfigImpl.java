@@ -59,7 +59,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         this.dbPropertiesFile = DbUtils.initDbPropertiesFile(this);
         this.plugins = new Plugins();
         this.updater = updater;
-        this.cacheService = new CacheServiceImpl(contextPath);
+        this.cacheService = new CacheServiceImpl();
         this.serverConfig = initServerConfig(contextPath, port);
         SetupConfig setupConfig = new SetupConfig(this, dbPropertiesFile, installLockFile, contextPath, cacheService, updater);
         this.includeBlog = setupConfig.isIncludeBlog();

@@ -169,7 +169,7 @@ public class Log extends BasePageableDAO implements Serializable {
         for (Map<String, Object> entry : lo) {
             Object value = entry.get("releaseTime");
             if (value != null) {
-                String key = ResultValueConvertUtils.formatDate(value, "yyyy-MM");
+                String key = ResultValueConvertUtils.formatDate(value, "yyyy_MM");
                 if (archives.containsKey(key)) {
                     archives.put(key, archives.get(key) + 1);
                 } else {
@@ -219,9 +219,9 @@ public class Log extends BasePageableDAO implements Serializable {
         String sql =
                 "select l.*,t.typeName,t.alias as typeAlias,(select count(commentId) from " + Comment.TABLE_NAME + " "
                         + "where logId=l.logId ) commentSize,u.userName from " + tableName + " l inner join user u," + "type t where rubbish=? and privacy=? and u.userId=l.userId and t.typeId=l.typeId and releaseTime between ? and ? order by l.logId desc";
-        YearMonth parse = YearMonth.parse(yyyyMM, DateTimeFormatter.ofPattern("yyyy-MM"));
-        String start = yyyyMM + "-01 00:00:00";
-        String end = parse.atEndOfMonth().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + " 23:59:59";
+        YearMonth parse = YearMonth.parse(yyyyMM, DateTimeFormatter.ofPattern("yyyy_MM"));
+        String start = yyyyMM + "_01 00:00:00";
+        String end = parse.atEndOfMonth().format(DateTimeFormatter.ofPattern("yyyy_MM_dd")) + " 23:59:59";
         return queryPageData(sql, new PageRequestImpl(page, pageSize)
                 , new Object[]{false, false, start, end});
 

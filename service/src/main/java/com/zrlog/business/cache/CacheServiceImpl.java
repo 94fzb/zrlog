@@ -39,14 +39,11 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService<Bas
 
     private final AtomicLong version = new AtomicLong(System.currentTimeMillis());
     private final Map<String, String> cacheFileMap = new ConcurrentHashMap<>();
-    private final String contextPath;
     private volatile BaseDataInitVO cacheInit;
     private final ExecutorService executor;
 
-    public CacheServiceImpl(String contextPath) {
-        this.contextPath = contextPath;
+    public CacheServiceImpl() {
         this.executor = ThreadUtils.newFixedThreadPool(10);
-
     }
 
     private static String getStreamTag(InputStream inputStream) {

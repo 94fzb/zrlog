@@ -83,28 +83,8 @@ public class ArticleController extends Controller {
         return "page";
     }
 
-    /**
-     * 补 1 按照规则
-     * @return
-     */
-    private String getRecordRealUri() {
-        String uri = request.getUri();
-        int length = uri.split("-").length;
-        if (length < 2) {
-            return uri;
-        }
-        if (length == 2) {
-            if (uri.endsWith(".html")) {
-                uri = uri.split("-")[0] + "-" + (uri.split("-")[1]).replace(".html", "-1.html");
-            } else {
-                uri = uri + "-1";
-            }
-        }
-        return uri;
-    }
-
     public String record() {
-        ArticleUriInfoVO uriInfoVO = parseUriInfo(getRecordRealUri());
+        ArticleUriInfoVO uriInfoVO = parseUriInfo(request.getUri());
         request.getAttr().put("tipsType", I18nUtil.getBlogStringFromRes("archive"));
         request.getAttr().put("tipsName", uriInfoVO.getKey());
 
