@@ -47,7 +47,7 @@ public class WebSiteService {
         AdminWebSiteInfo admin = new AdminWebSiteInfo();
         FaviconBase64DTO faviconBase64DTO = new WebSite().faviconBase64DTO();
         admin.setAdmin_darkMode(Constants.getBooleanByFromWebSite("admin_darkMode"));
-        admin.setLanguage((String) Constants.getStringByFromWebSite("language"));
+        admin.setLanguage(Constants.getStringByFromWebSite("language"));
         admin.setAdmin_static_resource_base_url(ZrLogUtil.getAdminStaticResourceBaseUrlByWebSite(request));
         admin.setAdmin_color_primary(Objects.toString(Constants.getStringByFromWebSite("admin_color_primary"), "#1677ff"));
         admin.setSession_timeout(Constants.getSessionTimeout() / 60 / 1000);

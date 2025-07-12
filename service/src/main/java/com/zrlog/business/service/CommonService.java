@@ -13,7 +13,7 @@ public class CommonService {
     public PublicInfoVO getPublicInfo(HttpRequest request) {
         Boolean darkMode = Constants.getBooleanByFromWebSite("admin_darkMode");
         String themeColor;
-        String adminColor = Objects.toString(Constants.getBooleanByFromWebSite("admin_color_primary"), "#1677ff");
+        String adminColor = Constants.getStringByFromWebSite("admin_color_primary", "#1677ff");
         if (darkMode) {
             themeColor = "#000000";
         } else {
