@@ -84,7 +84,7 @@ public class ArticleController extends Controller {
     }
 
     public String record() {
-        String uri = request.getUri();
+        String uri = request.getUri().replace(".html", "");
         int length = uri.split("-").length;
         if (length < 2) {
             return "page";
