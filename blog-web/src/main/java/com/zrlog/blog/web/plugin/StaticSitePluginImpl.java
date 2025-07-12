@@ -1,10 +1,7 @@
 package com.zrlog.blog.web.plugin;
 
 import com.hibegin.common.BaseLockObject;
-import com.hibegin.common.util.FileUtils;
-import com.hibegin.common.util.IOUtil;
-import com.hibegin.common.util.LoggerUtil;
-import com.hibegin.common.util.StringUtils;
+import com.hibegin.common.util.*;
 import com.hibegin.common.util.http.HttpUtil;
 import com.hibegin.http.HttpMethod;
 import com.hibegin.http.server.ApplicationContext;
@@ -17,22 +14,23 @@ import com.hibegin.http.server.impl.SimpleHttpResponse;
 import com.hibegin.http.server.util.HttpRequestBuilder;
 import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.blog.web.interceptor.TemplateUtils;
+import com.zrlog.business.cache.CacheServiceImpl;
 import com.zrlog.business.plugin.StaticSitePlugin;
 import com.zrlog.business.service.TemplateInfoHelper;
+import com.zrlog.common.AdminResource;
 import com.zrlog.common.CacheService;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.TemplateVO;
+import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ThreadUtils;
 import com.zrlog.util.ZrLogUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -54,6 +52,9 @@ public class StaticSitePluginImpl extends BaseLockObject implements StaticSitePl
     private final String contextPath;
     private long version;
     private String siteVersion;
+    private final String cacheStaticPath;
+    private final PageService pageService;
+
 
     public StaticSitePluginImpl(AbstractServerConfig abstractServerConfig, String contextPath) {
         this.applicationContext = new ApplicationContext(abstractServerConfig.getServerConfig());
@@ -62,48 +63,145 @@ public class StaticSitePluginImpl extends BaseLockObject implements StaticSitePl
         this.contextPath = contextPath;
         this.notFindFile = contextPath + "/error/404.html";
         this.staticUserAgent = "Static-Blog-Plugin/" + UUID.randomUUID().toString().replace("-", "");
+        this.cacheStaticPath = PathUtil.getCachePath();
+        this.pageService = new PageService(this);
     }
 
-    private static void copyCommonAssert() {
+    @Override
+    public void copyResourceToCacheFolder(String resourceName) {
+        InputStream inputStream = CacheServiceImpl.class.getResourceAsStream(resourceName);
+        if (Objects.isNull(inputStream)) {
+            LOGGER.warning("Missing resource " + resourceName);
+            return;
+        }
+        AdminResource adminResource = Constants.zrLogConfig.getAdminResource();
+        if (Objects.isNull(adminResource)) {
+            return;
+        }
+        if (adminResource.isAdminMainJs(resourceName)) {
+            String stringInputStream = IOUtil.getStringInputStream(inputStream);
+            String adminPath = "admin/";
+            String newStr = stringInputStream.replace("\"/admin/\"", "document.currentScript.baseURI + \"" + adminPath + "\"");
+            saveToCacheFolder(new ByteArrayInputStream(newStr.getBytes()), resourceName);
+            return;
+        }
+        saveToCacheFolder(inputStream, resourceName);
+    }
+
+    @Override
+    public void saveToCacheFolder(InputStream inputStream, String uri) {
+        if (!Constants.isStaticHtmlStatus()) {
+            return;
+        }
+        File file = new File(getCacheHtmlFolder() + "/" + uri);
+        if (!file.exists()) {
+            file.getParentFile().mkdirs();
+        }
+        try (FileOutputStream outputStream = new FileOutputStream(file)) {
+            inputStream.transferTo(outputStream);
+            inputStream.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    @Override
+    public File loadCacheFile(HttpRequest request) {
+        String lang = I18nUtil.getAcceptLocal(request);
+        String cacheKey = request.getUri();
+        if (Objects.equals(cacheKey, "/")) {
+            cacheKey = "/index.html";
+        }
+        return new File(cacheStaticPath + lang + contextPath + "/" + cacheKey);
+    }
+
+
+    /**
+     * 将一个网页转化对应文件，用于静态化文章页
+     */
+    @Override
+    public File saveResponseBodyToHtml(HttpRequest httpRequest, String copy) {
+        if (copy == null) {
+            return null;
+        }
+        byte[] bytes = copy.getBytes(StandardCharsets.UTF_8);
+        File htmlFile = loadCacheFile(httpRequest);
+        if (!htmlFile.exists()) {
+            htmlFile.getParentFile().mkdirs();
+        }
+        if (httpRequest.getUri().startsWith("/admin") && !httpRequest.getUri().contains(".")) {
+            htmlFile = new File(htmlFile + ".html");
+        }
+        IOUtil.writeBytesToFile(bytes, htmlFile);
+        return htmlFile;
+    }
+
+    @Override
+    public File getCacheHtmlFolder() {
+        return new File(cacheStaticPath + "/zh_CN/" + contextPath + "/");
+    }
+
+    @Override
+    public String saveCacheHtmlFolderVersion() {
+        List<File> files = new ArrayList<>();
+        FileUtils.getAllFiles(getCacheHtmlFolder().toString(), files);
+        StringBuilder sb = new StringBuilder();
+        File versionFile = new File(getCacheHtmlFolder() + "/" + versionFileName);
+        for (File file : files) {
+            try {
+                if (Objects.equals(file.toString(), versionFile.toString())) {
+                    continue;
+                }
+                sb.append(SecurityUtils.md5(new FileInputStream(file)));
+            } catch (FileNotFoundException e) {
+                LOGGER.warning("getCacheHtmlFolderVersion error " + e.getMessage());
+            }
+        }
+        String version = SecurityUtils.md5(sb.toString());
+        IOUtil.writeStrToFile(version, new File(getCacheHtmlFolder() + "/" + versionFileName));
+        return version;
+    }
+
+    private void copyCommonAssert() {
         //admin resource
         CacheService<?> cacheService = Constants.zrLogConfig.getCacheService();
-        Constants.zrLogConfig.getAdminResource().getAdminStaticResourceUris().forEach(cacheService::copyResourceToCacheFolder);
+        Constants.zrLogConfig.getAdminResource().getAdminStaticResourceUris().forEach(this::copyResourceToCacheFolder);
         //video.js
-        cacheService.copyResourceToCacheFolder("/assets/css/font/vjs.eot");
-        cacheService.copyResourceToCacheFolder("/assets/css/font/vjs.svg");
-        cacheService.copyResourceToCacheFolder("/assets/css/font/vjs.ttf");
-        cacheService.copyResourceToCacheFolder("/assets/css/font/vjs.woff");
-        cacheService.copyResourceToCacheFolder("/assets/css/video-js.css");
-        cacheService.copyResourceToCacheFolder("/assets/css/katex.min.css");
-        cacheService.copyResourceToCacheFolder("/assets/js/video.js");
-        cacheService.copyResourceToCacheFolder("/assets/css/hljs/dark.css");
-        cacheService.copyResourceToCacheFolder("/assets/css/hljs/light.css");
+        copyResourceToCacheFolder("/assets/css/font/vjs.eot");
+        copyResourceToCacheFolder("/assets/css/font/vjs.svg");
+        copyResourceToCacheFolder("/assets/css/font/vjs.ttf");
+        copyResourceToCacheFolder("/assets/css/font/vjs.woff");
+        copyResourceToCacheFolder("/assets/css/video-js.css");
+        copyResourceToCacheFolder("/assets/css/katex.min.css");
+        copyResourceToCacheFolder("/assets/js/video.js");
+        copyResourceToCacheFolder("/assets/css/hljs/dark.css");
+        copyResourceToCacheFolder("/assets/css/hljs/light.css");
         //default avatar url
-        cacheService.copyResourceToCacheFolder("/assets/images/default-portrait.gif");
+        copyResourceToCacheFolder("/assets/images/default-portrait.gif");
         File faviconFile = new File(PathUtil.getStaticPath() + "/favicon.ico");
         if (faviconFile.exists()) {
             try {
-                Constants.zrLogConfig.getCacheService().saveToCacheFolder(new FileInputStream(faviconFile), "/" + faviconFile.getName());
+                saveToCacheFolder(new FileInputStream(faviconFile), "/" + faviconFile.getName());
             } catch (FileNotFoundException e) {
                 LOGGER.warning("Missing resource " + faviconFile);
             }
         } else {
             //favicon
-            cacheService.copyResourceToCacheFolder("/favicon.ico");
+            copyResourceToCacheFolder("/favicon.ico");
         }
     }
 
 
-    private static void copyDefaultTemplateAssets() {
+    private void copyDefaultTemplateAssets() {
         String templatePath = TemplateUtils.getTemplatePath(null);
         if (!Objects.equals(templatePath, Constants.DEFAULT_TEMPLATE_PATH)) {
             return;
         }
-        CacheService<?> cacheService = Constants.zrLogConfig.getCacheService();
         TemplateVO templateVO = TemplateInfoHelper.getDefaultTemplateVO();
         templateVO.getStaticResources().forEach(e -> {
             String resourceUri = Constants.DEFAULT_TEMPLATE_PATH + "/" + e;
-            cacheService.copyResourceToCacheFolder(resourceUri);
+            copyResourceToCacheFolder(resourceUri);
         });
     }
 
@@ -153,7 +251,7 @@ public class StaticSitePluginImpl extends BaseLockObject implements StaticSitePl
             if (StringUtils.isEmpty(host)) {
                 return true;
             }
-            String remoteSiteVersion = HttpUtil.getInstance().getSuccessTextByUrl("https://" + Constants.getHost() + "/" + CacheService.versionFileName);
+            String remoteSiteVersion = HttpUtil.getInstance().getSuccessTextByUrl("https://" + Constants.getHost() + "/" + versionFileName);
             return Objects.equals(siteVersion, remoteSiteVersion);
         } catch (IOException | InterruptedException | URISyntaxException e) {
             LOGGER.info(e.getMessage());
@@ -231,7 +329,7 @@ public class StaticSitePluginImpl extends BaseLockObject implements StaticSitePl
         if (StringUtils.isEmpty(ZrLogUtil.getBlogHostByWebSite())) {
             return;
         }
-        File cacheFolder = Constants.zrLogConfig.getCacheService().getCacheHtmlFolder();
+        File cacheFolder = getCacheHtmlFolder();
         if (cacheFolder.exists()) {
             FileUtils.deleteFile(cacheFolder.toString());
         }
@@ -248,7 +346,7 @@ public class StaticSitePluginImpl extends BaseLockObject implements StaticSitePl
         });
         //生成 404 页面，用于配置第三方 cdn，或者云存储的错误页面
         handleStatusPageMap.put(notFindFile, HandleState.NEW);
-        PageServiceUtil.saveRedirectRules(notFindFile);
+        pageService.saveRedirectRules(notFindFile);
         lock.lock();
         long start = System.currentTimeMillis();
         try {
@@ -263,7 +361,7 @@ public class StaticSitePluginImpl extends BaseLockObject implements StaticSitePl
             } else if (usedTime > Duration.ofSeconds(10).toMillis()) {
                 LOGGER.warning("Generator [" + version + "] slow size " + handleStatusPageMap.size() + " finish in " + usedTime + "ms");
             }
-            this.siteVersion = Constants.zrLogConfig.getCacheService().saveCacheHtmlFolderVersion();
+            this.siteVersion = saveCacheHtmlFolderVersion();
         }
     }
 

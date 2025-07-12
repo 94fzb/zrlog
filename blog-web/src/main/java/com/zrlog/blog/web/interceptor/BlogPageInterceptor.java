@@ -8,6 +8,7 @@ import com.hibegin.http.server.util.FreeMarkerUtil;
 import com.hibegin.http.server.util.MimeTypeUtil;
 import com.hibegin.http.server.web.Controller;
 import com.zrlog.blog.web.util.TemplateRenderUtils;
+import com.zrlog.business.plugin.StaticSitePlugin;
 import com.zrlog.common.Constants;
 import com.zrlog.util.ZrLogUtil;
 
@@ -93,7 +94,10 @@ public class BlogPageInterceptor implements HandleAbleInterceptor {
                 response.renderHtmlStr(realHtmlStr);
             }
             if (Constants.catGeneratorHtml(target) && responseRenderPrintWriter.isRenderSuccess()) {
-                request.getAttr().put(Constants.STATIC_SITE_PLUGIN_HTML_FILE_KEY, Constants.zrLogConfig.getCacheService().saveResponseBodyToHtml(request, realHtmlStr));
+                StaticSitePlugin staticSitePlugin = Constants.zrLogConfig.getPlugin(StaticSitePlugin.class);
+                if (staticSitePlugin != null) {
+                    request.getAttr().put(Constants.STATIC_SITE_PLUGIN_HTML_FILE_KEY, staticSitePlugin.saveResponseBodyToHtml(request, realHtmlStr));
+                }
             }
         }
     }

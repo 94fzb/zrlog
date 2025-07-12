@@ -5,10 +5,12 @@ import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.util.PathUtil;
 import com.hibegin.http.server.web.MethodInterceptor;
+import com.zrlog.business.plugin.StaticSitePlugin;
 import com.zrlog.common.Constants;
 import com.zrlog.util.ZrLogUtil;
 
 import java.io.File;
+import java.util.Objects;
 
 public class StaticResourceInterceptor implements HandleAbleInterceptor {
 
@@ -36,10 +38,13 @@ public class StaticResourceInterceptor implements HandleAbleInterceptor {
             return false;
         }
         if (Constants.catGeneratorHtml(actionKey)) {
-            File cacheFile = Constants.zrLogConfig.getCacheService().loadCacheFile(request);
-            if (cacheFile.exists()) {
-                response.writeFile(cacheFile);
-                return false;
+            StaticSitePlugin staticSitePlugin = Constants.zrLogConfig.getPlugin(StaticSitePlugin.class);
+            if (Objects.nonNull(staticSitePlugin)) {
+                File cacheFile = staticSitePlugin.loadCacheFile(request);
+                if (cacheFile.exists()) {
+                    response.writeFile(cacheFile);
+                    return false;
+                }
             }
         }
         return true;

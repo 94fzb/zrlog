@@ -5,6 +5,7 @@ import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.AdminConstants;
 import com.zrlog.admin.business.rest.response.ServerSideDataResponse;
 import com.zrlog.admin.business.service.AdminPageService;
+import com.zrlog.business.plugin.StaticSitePlugin;
 import com.zrlog.common.Constants;
 import com.zrlog.common.rest.response.ApiStandardResponse;
 
@@ -37,7 +38,11 @@ public class AdminPageController extends Controller {
         String html = adminPageService.buildHtml(request, response, inputStream);
         response.renderHtmlStr(html);
         if (Constants.zrLogConfig.isStaticPluginRequest(request)) {
-            request.getAttr().put(Constants.STATIC_SITE_PLUGIN_HTML_FILE_KEY, Constants.zrLogConfig.getCacheService().saveResponseBodyToHtml(request, html));
+            StaticSitePlugin staticSitePlugin = Constants.zrLogConfig.getPlugin(StaticSitePlugin.class);
+            if (Objects.nonNull(staticSitePlugin)) {
+                request.getAttr().put(Constants.STATIC_SITE_PLUGIN_HTML_FILE_KEY, staticSitePlugin.saveResponseBodyToHtml(request, html));
+            }
+
         }
     }
 

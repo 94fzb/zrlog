@@ -8,6 +8,7 @@ import com.hibegin.http.server.util.MimeTypeUtil;
 import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.AdminConstants;
 import com.zrlog.admin.business.service.AdminResourceImpl;
+import com.zrlog.business.plugin.StaticSitePlugin;
 import com.zrlog.business.service.TemplateInfoHelper;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.TemplateVO;
@@ -79,7 +80,10 @@ public class AdminPwaInterceptor implements HandleAbleInterceptor {
             return false;
         } finally {
             if (Objects.nonNull(bytes) && Constants.zrLogConfig.isStaticPluginRequest(request)) {
-                Constants.zrLogConfig.getCacheService().saveResponseBodyToHtml(request, new String(bytes));
+                StaticSitePlugin staticSitePlugin = Constants.zrLogConfig.getPlugin(StaticSitePlugin.class);
+                if (Objects.nonNull(staticSitePlugin)) {
+                    staticSitePlugin.saveResponseBodyToHtml(request, new String(bytes));
+                }
             }
         }
     }

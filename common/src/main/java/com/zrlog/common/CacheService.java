@@ -10,21 +10,10 @@ import java.util.concurrent.CompletableFuture;
 
 public interface CacheService<T> {
 
-    String versionFileName = "version.txt";
 
     void refreshFavicon();
 
-    File loadCacheFile(HttpRequest request);
-
-    File saveResponseBodyToHtml(HttpRequest httpRequest, String copy);
-
-    File getCacheHtmlFolder();
-
-    String saveCacheHtmlFolderVersion();
-
     long getWebSiteVersion();
-
-    void saveToCacheFolder(InputStream inputStream, String uri);
 
     CompletableFuture<T> refreshInitDataCacheAsync(HttpRequest servletRequest, boolean cleanAble);
 
@@ -40,5 +29,4 @@ public interface CacheService<T> {
 
     List<Map<String, Object>> getTags(HttpRequest request);
 
-    void copyResourceToCacheFolder(String resourceName);
 }

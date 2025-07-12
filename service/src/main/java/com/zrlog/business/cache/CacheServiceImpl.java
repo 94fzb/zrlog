@@ -9,6 +9,7 @@ import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.business.cache.vo.BaseDataInitVO;
 import com.zrlog.business.cache.vo.HotLogBasicInfoVO;
+import com.zrlog.business.plugin.StaticSitePlugin;
 import com.zrlog.common.AdminResource;
 import com.zrlog.common.CacheService;
 import com.zrlog.common.Constants;
@@ -35,7 +36,6 @@ import java.util.stream.Collectors;
  */
 public class CacheServiceImpl extends BaseLockObject implements CacheService<BaseDataInitVO> {
     private static final Logger LOGGER = LoggerUtil.getLogger(CacheServiceImpl.class);
-    private final String cacheStaticPath;
 
     private final AtomicLong version = new AtomicLong(System.currentTimeMillis());
     private final Map<String, String> cacheFileMap = new ConcurrentHashMap<>();
@@ -45,7 +45,6 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService<Bas
 
     public CacheServiceImpl(String contextPath) {
         this.contextPath = contextPath;
-        this.cacheStaticPath = PathUtil.getCachePath();
         this.executor = ThreadUtils.newFixedThreadPool(10);
 
     }
@@ -121,61 +120,6 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService<Bas
         faviconHandle(faviconBase64DTO.getFavicon_png_pwa_512_base64(), Constants.FAVICON_PNG_PWA_512_URI_PATH, ResultValueConvertUtils.toBoolean(faviconBase64DTO.getGenerator_html_status()));
     }
 
-    @Override
-    public File loadCacheFile(HttpRequest request) {
-        String lang = I18nUtil.getAcceptLocal(request);
-        String cacheKey = request.getUri();
-        if (Objects.equals(cacheKey, "/")) {
-            cacheKey = "/index.html";
-        }
-        return new File(cacheStaticPath + lang + contextPath + "/" + cacheKey);
-    }
-
-    /**
-     * 将一个网页转化对应文件，用于静态化文章页
-     */
-    @Override
-    public File saveResponseBodyToHtml(HttpRequest httpRequest, String copy) {
-        if (copy == null) {
-            return null;
-        }
-        byte[] bytes = copy.getBytes(StandardCharsets.UTF_8);
-        File htmlFile = loadCacheFile(httpRequest);
-        if (!htmlFile.exists()) {
-            htmlFile.getParentFile().mkdirs();
-        }
-        if (httpRequest.getUri().startsWith("/admin") && !httpRequest.getUri().contains(".")) {
-            htmlFile = new File(htmlFile + ".html");
-        }
-        IOUtil.writeBytesToFile(bytes, htmlFile);
-        return htmlFile;
-    }
-
-    @Override
-    public File getCacheHtmlFolder() {
-        return new File(cacheStaticPath + "/zh_CN/" + contextPath + "/");
-    }
-
-    @Override
-    public String saveCacheHtmlFolderVersion() {
-        List<File> files = new ArrayList<>();
-        FileUtils.getAllFiles(getCacheHtmlFolder().toString(), files);
-        StringBuilder sb = new StringBuilder();
-        File versionFile = new File(getCacheHtmlFolder() + "/" + versionFileName);
-        for (File file : files) {
-            try {
-                if (Objects.equals(file.toString(), versionFile.toString())) {
-                    continue;
-                }
-                sb.append(SecurityUtils.md5(new FileInputStream(file)));
-            } catch (FileNotFoundException e) {
-                LOGGER.warning("getCacheHtmlFolderVersion error " + e.getMessage());
-            }
-        }
-        String version = SecurityUtils.md5(sb.toString());
-        IOUtil.writeStrToFile(version, new File(Constants.zrLogConfig.getCacheService().getCacheHtmlFolder() + "/" + versionFileName));
-        return version;
-    }
 
     @Override
     public long getWebSiteVersion() {
@@ -185,22 +129,6 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService<Bas
         return ObjectUtil.requireNonNullElse(cacheInit.getWebSiteVersion(), 0L);
     }
 
-    @Override
-    public void saveToCacheFolder(InputStream inputStream, String uri) {
-        if (!Constants.isStaticHtmlStatus()) {
-            return;
-        }
-        File file = new File(getCacheHtmlFolder() + "/" + uri);
-        if (!file.exists()) {
-            file.getParentFile().mkdirs();
-        }
-        try (FileOutputStream outputStream = new FileOutputStream(file)) {
-            inputStream.transferTo(outputStream);
-            inputStream.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     private Map<String, String> getCacheFileMap() {
         //cache fileMap
@@ -318,7 +246,10 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService<Bas
         IOUtil.writeStrToFile(robotTxt, robotFile);
         if (Constants.websiteValueIsTrue(website.get("generator_html_status"))) {
             try {
-                saveToCacheFolder(new FileInputStream(robotFile), "/" + robotFile.getName());
+                StaticSitePlugin staticSitePlugin = Constants.zrLogConfig.getPlugin(StaticSitePlugin.class);
+                if (Objects.nonNull(staticSitePlugin)) {
+                    staticSitePlugin.saveToCacheFolder(new FileInputStream(robotFile), "/" + robotFile.getName());
+                }
             } catch (FileNotFoundException e) {
                 LOGGER.warning("save to Cache error " + e.getMessage());
             }
@@ -348,31 +279,13 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService<Bas
         return BeanUtil.convert(log, HotLogBasicInfoVO.class);
     }
 
-
-    @Override
-    public void copyResourceToCacheFolder(String resourceName) {
-        InputStream inputStream = CacheServiceImpl.class.getResourceAsStream(resourceName);
-        if (Objects.isNull(inputStream)) {
-            LOGGER.warning("Missing resource " + resourceName);
-            return;
-        }
-        AdminResource adminResource = Constants.zrLogConfig.getAdminResource();
-        if (Objects.isNull(adminResource)) {
-            return;
-        }
-        if (adminResource.isAdminMainJs(resourceName)) {
-            String stringInputStream = IOUtil.getStringInputStream(inputStream);
-            String adminPath = "admin/";
-            String newStr = stringInputStream.replace("\"/admin/\"", "document.currentScript.baseURI + \"" + adminPath + "\"");
-            saveToCacheFolder(new ByteArrayInputStream(newStr.getBytes()), resourceName);
-            return;
-        }
-        saveToCacheFolder(inputStream, resourceName);
-    }
-
     private void faviconHandle(String faviconIconBase64, String saveFilePath, Boolean saveToCache) {
+        StaticSitePlugin staticSitePlugin = Constants.zrLogConfig.getPlugin(StaticSitePlugin.class);
         if (StringUtils.isEmpty(faviconIconBase64)) {
-            copyResourceToCacheFolder(saveFilePath);
+
+            if (staticSitePlugin != null) {
+                staticSitePlugin.copyResourceToCacheFolder(saveFilePath);
+            }
             return;
         }
         try {
@@ -386,7 +299,9 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService<Bas
             }
             IOUtil.writeBytesToFile(binBytes, file);
             if (Objects.equals(saveToCache, true)) {
-                saveToCacheFolder(new ByteArrayInputStream(binBytes), saveFilePath);
+                if (Objects.nonNull(staticSitePlugin)) {
+                    staticSitePlugin.saveToCacheFolder(new ByteArrayInputStream(binBytes), saveFilePath);
+                }
             }
         } catch (Exception e) {
             LOGGER.warning("Save favicon error " + e.getMessage());
