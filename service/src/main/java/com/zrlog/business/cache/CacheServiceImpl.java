@@ -284,19 +284,11 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService<Bas
         return new WebSite().getPublicStringValueByName(key);
     }
 
-    @Override
-    public Map<String, Object> refreshWebSite() {
-        if (!Constants.zrLogConfig.isInstalled()) {
-            return new HashMap<>();
-        }
-        Map<String, Object> website = new WebSite().getPublicWebSite();
-        if (Objects.nonNull(cacheInit)) {
-            cacheInit.getWebSite().clear();
-            cacheInit.getWebSite().putAll(website);
-        }
+    private void handleRobotsTxt(Map<String, Object> website) {
         String robotTxt = (String) website.get("robotRuleContent");
+
         if (StringUtils.isEmpty(robotTxt)) {
-            return website;
+            return;
         }
         File robotFile = PathUtil.getStaticFile("robots.txt");
         if (!robotFile.getParentFile().exists()) {
@@ -310,6 +302,19 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService<Bas
                 LOGGER.warning("save to Cache error " + e.getMessage());
             }
         }
+    }
+
+    @Override
+    public Map<String, Object> refreshWebSite() {
+        if (!Constants.zrLogConfig.isInstalled()) {
+            return new HashMap<>();
+        }
+        Map<String, Object> website = new WebSite().getPublicWebSite();
+        if (Objects.nonNull(cacheInit)) {
+            cacheInit.getWebSite().clear();
+            cacheInit.getWebSite().putAll(website);
+        }
+        handleRobotsTxt(website);
         return website;
     }
 
