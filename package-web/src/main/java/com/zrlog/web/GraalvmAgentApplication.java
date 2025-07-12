@@ -178,7 +178,7 @@ public class GraalvmAgentApplication {
         BeanUtil.cloneObject(Boolean.FALSE);
         BeanUtil.cloneObject(Byte.valueOf((byte) 0));
         BeanUtil.cloneObject(new ArrayList<>());
-        BeanUtil.convert(new FaviconBase64DTO(), FaviconBase64DTO.class);
+        BeanUtil.convert(new HashMap<>(), FaviconBase64DTO.class);
         BeanUtil.convert(new UploadServiceResponseEntity(), UploadServiceResponseEntity.class);
         try {
             Arrays.stream(Class.forName("java.util.ImmutableCollections$ListN").getDeclaredConstructors()).forEach(e -> {
