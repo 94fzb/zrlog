@@ -3,7 +3,7 @@ package com.zrlog.admin.business.service;
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.http.server.api.HttpRequest;
 import com.zrlog.admin.business.rest.response.UploadFileResponse;
-import com.zrlog.admin.plugin.rest.response.UploadServiceResponse;
+import com.zrlog.admin.plugin.rest.response.UploadServiceResponseEntity;
 import com.zrlog.business.plugin.PluginCorePlugin;
 import com.zrlog.common.Constants;
 import com.zrlog.common.vo.AdminTokenVO;
@@ -26,10 +26,10 @@ public class UploadService {
             uploadParams.put("name", new String[]{"uploadService"});
 
             PluginCorePlugin pluginCorePlugin = Constants.zrLogConfig.getPlugin(PluginCorePlugin.class);
-            UploadServiceResponse urls = pluginCorePlugin.requestService(request,
-                    uploadParams, adminTokenVO, UploadServiceResponse.class);
-            if (urls != null && !urls.isEmpty()) {
-                url = urls.get(0).getUrl();
+            UploadServiceResponseEntity[] urls = pluginCorePlugin.requestService(request,
+                    uploadParams, adminTokenVO, UploadServiceResponseEntity[].class);
+            if (urls != null && urls.length > 0) {
+                url = urls[0].getUrl();
                 if (!url.startsWith("https://") && !url.startsWith("http://")) {
                     String tUrl = url;
                     if (!url.startsWith("/")) {
