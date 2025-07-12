@@ -119,9 +119,7 @@ public class WebSite extends DAO {
     }
 
     public FaviconBase64DTO faviconBase64DTO() {
-        FaviconBase64DTO faviconBase64DTO = new FaviconBase64DTO();
         Map<String, Object> dataMap = getWebSiteByNameIn(Arrays.asList("favicon_ico_base64", "favicon_png_pwa_192_base64", "favicon_png_pwa_512_base64", "generator_html_status"));
-        BeanUtil.convert(dataMap, FaviconBase64DTO.class);
-        return faviconBase64DTO;
+        return BeanUtil.convert(dataMap, FaviconBase64DTO.class);
     }
 }
