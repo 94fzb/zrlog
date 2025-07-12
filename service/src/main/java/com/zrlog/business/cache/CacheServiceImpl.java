@@ -290,8 +290,10 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService<Bas
             return new HashMap<>();
         }
         Map<String, Object> website = new WebSite().getPublicWebSite();
-        cacheInit.getWebSite().clear();
-        cacheInit.getWebSite().putAll(website);
+        if (Objects.nonNull(cacheInit)) {
+            cacheInit.getWebSite().clear();
+            cacheInit.getWebSite().putAll(website);
+        }
         String robotTxt = (String) website.get("robotRuleContent");
         if (StringUtils.isEmpty(robotTxt)) {
             return website;
