@@ -54,7 +54,7 @@ public class TemplateService {
             defaultTemplateInfo.setConfigAble(true);
             templates.add(defaultTemplateInfo);
         }
-        File[] templatesFile = new File(PathUtil.getStaticPath() + Constants.TEMPLATE_BASE_PATH).listFiles();
+        File[] templatesFile = PathUtil.getStaticFile(Constants.TEMPLATE_BASE_PATH).listFiles();
         if (templatesFile != null) {
             for (File file : templatesFile) {
                 if (file.isDirectory() && !file.isHidden()) {
@@ -89,7 +89,6 @@ public class TemplateService {
 
 
     private static TemplateVO getTemplateVO(File file) {
-        String templatePath = file.toString().substring(PathUtil.getStaticPath().length()).replace("\\", "/");
         if (!file.exists() || !file.isDirectory()) {
             return null;
         }
@@ -98,6 +97,7 @@ public class TemplateService {
             return null;
         }
         try {
+            String templatePath = file.toString().substring(PathUtil.getStaticFile("/").toString().length()).replace("\\", "/");
             return TemplateInfoHelper.getTemplateVOByInputStream(templatePath, new FileInputStream(templateInfo));
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
