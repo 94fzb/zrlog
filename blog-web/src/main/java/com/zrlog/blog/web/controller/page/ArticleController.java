@@ -84,13 +84,17 @@ public class ArticleController extends Controller {
     }
 
     public String record() {
-        String uri = request.getUri().replace(".html", "");
+        String uri = request.getUri();
         int length = uri.split("-").length;
         if (length < 2) {
             return "page";
         }
         if (length == 2) {
-            uri = uri + "-1";
+            if (uri.endsWith(".html")) {
+                uri = uri.split("-")[0] + (uri.split("-")[1]).replace(".html", "-1.html`");
+            } else {
+                uri = uri + "-1";
+            }
         }
         ArticleUriInfoVO uriInfoVO = parseUriInfo(uri);
         request.getAttr().put("tipsType", I18nUtil.getBlogStringFromRes("archive"));
