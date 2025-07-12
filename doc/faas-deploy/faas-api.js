@@ -19,7 +19,7 @@ export default {
             });
         }
 
-        const lambdaUrl = "https://ii5uzqmg7ge56vhom6nxvh3giq0wldws.lambda-url.us-west-1.on.aws/";
+        const lambdaUrl = "https://lambda-url";
         const url = new URL(request.url);
         const newUrl = lambdaUrl + url.pathname + url.search;
 
