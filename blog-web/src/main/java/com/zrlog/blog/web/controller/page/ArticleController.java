@@ -40,8 +40,7 @@ public class ArticleController extends Controller {
      */
     private void setPageDataInfo(String currentUri, PageData<Map<String, Object>> data, PageRequest pageRequest) {
         getRequest().getAttr().put("yurl", Constants.getArticleUri() + currentUri);
-        long totalPage =
-                BigDecimal.valueOf(Math.ceil(data.getTotalElements() * 1.0 / pageRequest.getSize())).longValue();
+        long totalPage = BigDecimal.valueOf(Math.ceil(data.getTotalElements() * 1.0 / pageRequest.getSize())).longValue();
         if (totalPage > 0) {
             getRequest().getAttr().put("data", data);
             //大于1页
@@ -86,16 +85,18 @@ public class ArticleController extends Controller {
 
     public String record() {
         String uri = request.getUri();
-        if (uri.split("-").length == 2) {
+        int length = uri.split("-").length;
+        if (length < 2) {
+            return "page";
+        }
+        if (length == 2) {
             uri = uri + "-1";
         }
         ArticleUriInfoVO uriInfoVO = parseUriInfo(uri);
         request.getAttr().put("tipsType", I18nUtil.getBlogStringFromRes("archive"));
         request.getAttr().put("tipsName", uriInfoVO.getKey());
 
-        setPageDataInfo("record/" + uriInfoVO.getKey() + "-", new Log().findByDate(uriInfoVO.getPage(), Constants.getDefaultRows(),
-                uriInfoVO.getKey()), new PageRequestImpl(uriInfoVO.getPage(),
-                Constants.getDefaultRows()));
+        setPageDataInfo("record/" + uriInfoVO.getKey() + "-", new Log().findByDate(uriInfoVO.getPage(), Constants.getDefaultRows(), uriInfoVO.getKey()), new PageRequestImpl(uriInfoVO.getPage(), Constants.getDefaultRows()));
         return "page";
     }
 
@@ -110,8 +111,7 @@ public class ArticleController extends Controller {
     }
 
     public CreateCommentResponse saveComment() throws SQLException {
-        CreateCommentRequest createCommentRequest = ZrLogUtil.convertRequestParam(getRequest().decodeParamMap(),
-                CreateCommentRequest.class);
+        CreateCommentRequest createCommentRequest = ZrLogUtil.convertRequestParam(getRequest().decodeParamMap(), CreateCommentRequest.class);
         createCommentRequest.setIp(WebTools.getRealIp(getRequest()));
         createCommentRequest.setUserAgent(Jsoup.clean(request.getHeader("User-Agent"), Safelist.basic()));
         return commentService.save(createCommentRequest);
@@ -158,9 +158,7 @@ public class ArticleController extends Controller {
 
     public String sort() throws SQLException {
         ArticleUriInfoVO uriInfoVO = parseUriInfo(request.getUri());
-        setPageDataInfo("sort/" + uriInfoVO.getKey() + "-", new Log().findByTypeAlias(uriInfoVO.getPage(), Constants.getDefaultRows(),
-                uriInfoVO.getKey()), new PageRequestImpl(uriInfoVO.getPage(),
-                Constants.getDefaultRows()));
+        setPageDataInfo("sort/" + uriInfoVO.getKey() + "-", new Log().findByTypeAlias(uriInfoVO.getPage(), Constants.getDefaultRows(), uriInfoVO.getKey()), new PageRequestImpl(uriInfoVO.getPage(), Constants.getDefaultRows()));
 
         Map<String, Object> type = new Type().findByAlias(uriInfoVO.getKey());
         request.getAttr().put("type", type);
@@ -174,9 +172,7 @@ public class ArticleController extends Controller {
     public String tag() throws SQLException {
         ArticleUriInfoVO uriInfoVO = parseUriInfo(request.getUri());
         String tag = uriInfoVO.getKey();
-        setPageDataInfo("tag/" + tag + "-", new Log().findByTag(uriInfoVO.getPage(), Constants.getDefaultRows(), tag),
-                new PageRequestImpl(uriInfoVO.getPage(),
-                        Constants.getDefaultRows()));
+        setPageDataInfo("tag/" + tag + "-", new Log().findByTag(uriInfoVO.getPage(), Constants.getDefaultRows(), tag), new PageRequestImpl(uriInfoVO.getPage(), Constants.getDefaultRows()));
         getRequest().getAttr().put("tipsType", I18nUtil.getBlogStringFromRes("tag"));
         getRequest().getAttr().put("tipsName", tag);
         return "page";
