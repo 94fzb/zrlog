@@ -54,6 +54,7 @@ public class StaticSitePluginImpl extends BaseLockObject implements StaticSitePl
     private String siteVersion;
     private final String cacheStaticPath;
     private final PageService pageService;
+    private final String versionFileName = "version.txt";
 
 
     public StaticSitePluginImpl(AbstractServerConfig abstractServerConfig, String contextPath) {
@@ -137,13 +138,11 @@ public class StaticSitePluginImpl extends BaseLockObject implements StaticSitePl
         return htmlFile;
     }
 
-    @Override
-    public File getCacheHtmlFolder() {
+    private File getCacheHtmlFolder() {
         return new File(cacheStaticPath + "/zh_CN/" + contextPath + "/");
     }
 
-    @Override
-    public String saveCacheHtmlFolderVersion() {
+    private String saveCacheHtmlFolderVersion() {
         List<File> files = new ArrayList<>();
         FileUtils.getAllFiles(getCacheHtmlFolder().toString(), files);
         StringBuilder sb = new StringBuilder();

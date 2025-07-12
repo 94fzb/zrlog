@@ -8,16 +8,9 @@ import java.io.InputStream;
 
 public interface StaticSitePlugin extends IPlugin {
 
-    String versionFileName = "version.txt";
-
     void copyResourceToCacheFolder(String resourceName);
 
-
     File saveResponseBodyToHtml(HttpRequest httpRequest, String copy);
-
-    File getCacheHtmlFolder();
-
-    String saveCacheHtmlFolderVersion();
 
     boolean isStaticPlugin(HttpRequest request);
 
