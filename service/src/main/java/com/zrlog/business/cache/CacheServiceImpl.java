@@ -281,7 +281,6 @@ public class CacheServiceImpl extends BaseLockObject implements CacheService<Bas
         if (Objects.nonNull(cacheInit)) {
             return cacheInit.getWebSite().get(key);
         }
-        refreshInitDataCacheAsync(null, false);
         return new WebSite().getPublicStringValueByName(key);
     }
 
