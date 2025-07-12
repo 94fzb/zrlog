@@ -40,7 +40,7 @@ program.
 
 - Deployment environment prerequisites
     - 1.jdk version >= 21
-    - 2.mysql
+    - 2.mysql/cloudflare d1
 - Data initialization
     - 1.Download [latest zip](https://www.zrlog.com/download) unzip, and run sh bin/run.sh or bin\run.bat (for windows)
     - 2.Visit http://host:port/install
