@@ -49,7 +49,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     private final File dbPropertiesFile;
     private final AdminTokenService adminTokenService;
     private final boolean includeBlog;
-    private final List<WebSetup> webSetups = new ArrayList<>();
+    private final List<WebSetup> webSetups;
     private final File installLockFile;
 
 
@@ -66,7 +66,8 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         this.adminTokenService = setupConfig.getAdminTokenService();
         this.adminResource = setupConfig.getAdminResource();
         //config
-        setupConfig.getWebSetups().forEach(WebSetup::setup);
+        this.webSetups = setupConfig.getWebSetups();
+        this.webSetups.forEach(WebSetup::setup);
         if (!includeBlog) {
             serverConfig.getInterceptors().add(DefaultInterceptor.class);
         }
@@ -207,7 +208,10 @@ public class ZrLogConfigImpl extends ZrLogConfig {
 
     @Override
     public Map<String, Object> getPublicWebSite() {
-        return website;
+        if (!isInstalled()) {
+            return new HashMap<>();
+        }
+        return cacheService.refreshInitDataCacheAsync(null, false).join().getWebSite();
     }
 
     @Override
