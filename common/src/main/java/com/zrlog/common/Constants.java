@@ -69,6 +69,10 @@ public class Constants {
         return System.getenv().get("ZRLOG_HOME");
     }
 
+    public static String getTemplatePath() {
+        return Constants.getStringByFromWebSite("template", Constants.DEFAULT_TEMPLATE_PATH);
+    }
+
     public static String getZrLogHome() {
         if (Constants.getZrLogHomeByEnv() == null) {
             return System.getProperty("user.dir");
