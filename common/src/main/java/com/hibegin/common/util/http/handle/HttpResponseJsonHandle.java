@@ -6,8 +6,6 @@ import com.hibegin.common.util.IOUtil;
 import java.io.InputStream;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
-import java.util.List;
 
 public class HttpResponseJsonHandle<T> extends HttpHandle<T> {
 

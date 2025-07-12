@@ -2,7 +2,6 @@ package com.zrlog.admin.util;
 
 import com.hibegin.common.util.EnvKit;
 import com.hibegin.common.util.LoggerUtil;
-import com.zrlog.common.type.RunMode;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

@@ -1,7 +1,6 @@
 package com.zrlog.admin.web;
 
 import com.hibegin.http.server.api.Interceptor;
-import com.zrlog.web.WebSetup;
 import com.zrlog.admin.web.config.AdminRouters;
 import com.zrlog.admin.web.interceptor.AdminCrossOriginInterceptor;
 import com.zrlog.admin.web.interceptor.AdminInterceptor;
@@ -10,6 +9,7 @@ import com.zrlog.admin.web.plugin.UpdateVersionInfoPlugin;
 import com.zrlog.common.AdminResource;
 import com.zrlog.common.ZrLogConfig;
 import com.zrlog.plugin.Plugins;
+import com.zrlog.web.WebSetup;
 
 import java.util.List;
 

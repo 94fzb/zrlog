@@ -1,7 +1,6 @@
 package com.zrlog.admin.web.controller.api;
 
 import com.hibegin.http.annotation.ResponseBody;
-import com.hibegin.http.server.web.Controller;
 import com.zrlog.admin.business.rest.response.DownloadUpdatePackageResponse;
 import com.zrlog.admin.business.rest.response.PreCheckVersionResponse;
 import com.zrlog.admin.business.rest.response.UpgradeProcessResponse;

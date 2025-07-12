@@ -2,8 +2,6 @@ package com.zrlog.admin.web.controller.api;
 
 import com.hibegin.common.dao.dto.PageData;
 import com.hibegin.http.annotation.ResponseBody;
-import com.zrlog.common.controller.BaseController;
-import com.zrlog.common.exception.ArgsException;
 import com.zrlog.admin.business.exception.DeleteTypeException;
 import com.zrlog.admin.business.rest.request.CreateTypeRequest;
 import com.zrlog.admin.business.rest.request.UpdateTypeRequest;
@@ -13,6 +11,7 @@ import com.zrlog.admin.business.service.ArticleTypeService;
 import com.zrlog.admin.web.annotation.RefreshCache;
 import com.zrlog.business.util.ControllerUtil;
 import com.zrlog.common.Constants;
+import com.zrlog.common.controller.BaseController;
 import com.zrlog.common.rest.response.ApiStandardResponse;
 import com.zrlog.model.Log;
 import com.zrlog.model.Type;

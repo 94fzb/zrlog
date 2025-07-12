@@ -4,13 +4,13 @@ import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.StringUtils;
 import com.hibegin.common.util.http.HttpUtil;
 import com.zrlog.admin.business.AdminConstants;
-import com.zrlog.common.Constants;
+import com.zrlog.admin.util.MarkdownUtil;
 import com.zrlog.admin.web.type.AutoUpgradeVersionType;
+import com.zrlog.common.Constants;
 import com.zrlog.common.vo.Version;
 import com.zrlog.plugin.IPlugin;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.I18nUtil;
-import com.zrlog.admin.util.MarkdownUtil;
 import com.zrlog.util.ThreadUtils;
 
 import java.io.IOException;

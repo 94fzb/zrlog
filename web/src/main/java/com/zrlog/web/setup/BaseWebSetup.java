@@ -2,11 +2,11 @@ package com.zrlog.web.setup;
 
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.http.server.api.Interceptor;
-import com.zrlog.web.WebSetup;
 import com.zrlog.common.Constants;
 import com.zrlog.common.Updater;
 import com.zrlog.common.ZrLogConfig;
 import com.zrlog.util.ThreadUtils;
+import com.zrlog.web.WebSetup;
 import com.zrlog.web.config.DbUtils;
 import com.zrlog.web.inteceptor.GlobalBaseInterceptor;
 import com.zrlog.web.inteceptor.MyI18nInterceptor;

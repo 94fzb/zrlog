@@ -1,7 +1,6 @@
 package com.zrlog.business.plugin;
 
 import com.hibegin.common.util.http.handle.CloseResponseHandle;
-import com.hibegin.common.util.http.handle.HttpHandle;
 import com.hibegin.http.HttpMethod;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;

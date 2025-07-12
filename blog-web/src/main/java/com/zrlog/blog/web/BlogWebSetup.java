@@ -1,16 +1,16 @@
 package com.zrlog.blog.web;
 
 import com.hibegin.http.server.api.Interceptor;
-import com.zrlog.blog.web.plugin.StaticSitePluginImpl;
-import com.zrlog.web.WebSetup;
 import com.zrlog.blog.web.config.BlogRouters;
 import com.zrlog.blog.web.interceptor.BlogApiInterceptor;
 import com.zrlog.blog.web.interceptor.BlogPageInterceptor;
 import com.zrlog.blog.web.interceptor.PwaInterceptor;
 import com.zrlog.blog.web.plugin.ArticleStatisticsPluginImpl;
+import com.zrlog.blog.web.plugin.StaticSitePluginImpl;
 import com.zrlog.blog.web.plugin.TemplateDownloadPlugin;
 import com.zrlog.common.ZrLogConfig;
 import com.zrlog.plugin.Plugins;
+import com.zrlog.web.WebSetup;
 
 import java.util.List;
 
