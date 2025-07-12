@@ -86,7 +86,7 @@ public class ArticleController extends Controller {
 
     public String record() {
         String uri = request.getUri();
-        if (uri.split("-").length < 3) {
+        if (uri.split("-").length == 2) {
             uri = uri + "-1";
         }
         ArticleUriInfoVO uriInfoVO = parseUriInfo(uri);
