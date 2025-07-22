@@ -26,7 +26,7 @@
         <lambda-scope>compile</lambda-scope>
         <sws.version>4.0.85</sws.version>
         <common-dao.version>1.0.13</common-dao.version>
-        <zrlog-base.version>3.2.14</zrlog-base.version>
+        <zrlog-base.version>3.2.15</zrlog-base.version>
         <zrlog-install-web.version>3.2.3</zrlog-install-web.version>
         <zrlog-blog-web.version>3.2.14</zrlog-blog-web.version>
         <zrlog-admin-web.version>3.2.14</zrlog-admin-web.version>
