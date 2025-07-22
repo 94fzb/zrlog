@@ -29,4 +29,4 @@ jobs:
         run: |
           mkdir -p /tmp/download
           bash -e shell/native/build-final-native.sh preview 预览版 /tmp/download deb
-          bash -e shell/native/upload-bin.sh ${{ secrets.SECRET_ID }} ${{ secrets.SECRET_KEY }} ${{ secrets.BUCKET }} /tmp/download preview ${{ secrets.HOST }}
+          bash -e shell/upload-bin.sh ${{ secrets.SECRET_ID }} ${{ secrets.SECRET_KEY }} ${{ secrets.BUCKET }} /tmp/download preview ${{ secrets.HOST }}
