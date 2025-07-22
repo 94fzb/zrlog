@@ -35,9 +35,11 @@ public class ZrLogConfigImpl extends ZrLogConfig {
 
     @Override
     public DataSourceWrapper configDatabase() throws Exception {
-        super.configDatabase();
-        this.cacheService = new CacheServiceImpl();
-        new DbUpgradeService(this.dataSource, this.cacheService.getCurrentSqlVersion()).tryDoUpgrade();
+        this.dataSource = super.configDatabase();
+        if (Objects.nonNull(dataSource)) {
+            this.cacheService = new CacheServiceImpl();
+            new DbUpgradeService(this.dataSource, this.cacheService.getCurrentSqlVersion()).tryDoUpgrade();
+        }
         return dataSource;
     }
 
