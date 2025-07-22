@@ -7,7 +7,7 @@
 | base        | https://github.com/zrlog-extensions/zrlog-base        | 基础库        | [![Maven Central](https://img.shields.io/maven-central/v/com.hibegin/zrlog-base.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/com.hibegin/zrlog-base)               |
 | install-web | https://github.com/zrlog-extensions/zrlog-install-web | 初始化程序      | [![Maven Central](https://img.shields.io/maven-central/v/com.hibegin/zrlog-install-web.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/com.hibegin/zrlog-install-web) |
 | blog-web    | https://github.com/zrlog-extensions/zrlog-blog-web    | 与服务端页面渲染相关 | [![Maven Central](https://img.shields.io/maven-central/v/com.hibegin/zrlog-blog-web.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/com.hibegin/zrlog-blog-web)       |
-| admin-web   | https://github.com/zrlog-extensions/zrlog-admin-web   | 管理后台       | [![Maven Central](https://img.shields.io/maven-central/v/com.hibegin/zrlog-admin-web.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/com.hibegin/admin-blog-web)      |
+| admin-web   | https://github.com/zrlog-extensions/zrlog-admin-web   | 管理后台       | [![Maven Central](https://img.shields.io/maven-central/v/com.hibegin/zrlog-admin-web.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/com.hibegin/zrlog-admin-web)     |
 
 ### 开发流程
 
