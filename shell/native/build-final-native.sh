@@ -29,8 +29,6 @@ elif [[ "${OS}" == "linux" ]]; then
 else
     fileArch=$(uname -s)-$(uname -m)
 fi
-syncPath=${3}
-mkdir -p ${syncPath}/${runMode}
 bash -e shell/native/package-native-${packageExt}.sh "${1}" "${2}"
 
 mirrorWebSite=$(buildProp 'mirrorWebSite')
@@ -40,6 +38,8 @@ Date=$(buildProp 'buildTime')
 buildId=$(buildProp 'buildId')
 runModeDesc=$(buildProp 'runModeDesc')
 
+syncPath=${3}
+mkdir -p ${syncPath}/${runMode}
 if [[ "${OS}" == "linux" && "${packageExt}" == "zip" ]]; then
   bash -e shell/native/package-faas-${packageExt}.sh
 #copy faas
