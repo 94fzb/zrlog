@@ -29,7 +29,7 @@
         <zrlog-base.version>3.2.15</zrlog-base.version>
         <zrlog-install-web.version>3.2.3</zrlog-install-web.version>
         <zrlog-blog-web.version>3.2.14</zrlog-blog-web.version>
-        <zrlog-admin-web.version>3.2.15</zrlog-admin-web.version>
+        <zrlog-admin-web.version>3.2.16</zrlog-admin-web.version>
         <project.build.outputTimestamp/>
     </properties>
 
