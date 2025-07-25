@@ -5,7 +5,6 @@ import com.zrlog.blog.web.plugin.TemplateDownloadPlugin;
 import com.zrlog.business.plugin.PluginCorePlugin;
 import com.zrlog.business.plugin.StaticSitePlugin;
 import com.zrlog.common.Constants;
-import com.zrlog.plugin.IPlugin;
 
 import java.util.Objects;
 
@@ -37,10 +36,5 @@ public class PluginUtils {
         if (Objects.nonNull(pluginCorePlugin)) {
             pluginCorePlugin.refreshCache(cacheVersion, request);
         }
-    }
-
-    public static void stopAllPlugin() {
-        Constants.zrLogConfig.getAllPlugins().forEach(IPlugin::stop);
-        Constants.zrLogConfig.getAllPlugins().clear();
     }
 }

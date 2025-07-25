@@ -3,14 +3,13 @@ package com.zrlog.web.config;
 import com.hibegin.common.util.LoggerUtil;
 import com.zrlog.admin.business.service.AdminResource;
 import com.zrlog.admin.web.token.AdminTokenService;
+import com.zrlog.common.Updater;
 import com.zrlog.common.ZrLogConfig;
-import com.zrlog.web.BaseWebSetup;
 import com.zrlog.web.WebSetup;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.AbstractMap;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
@@ -24,6 +23,7 @@ public class SetupConfig {
     private final File installLockFile;
     private AdminTokenService adminTokenService;
     private boolean includeBlog;
+    private final Updater updater;
 
     public boolean isIncludeBlog() {
         return includeBlog;
@@ -36,10 +36,12 @@ public class SetupConfig {
 
     public SetupConfig(ZrLogConfig zrLogConfig, File dbPropertiesFile,
                        File installLockFile, String contextPath,
-                       List<WebSetup> webSetups) {
+                       List<WebSetup> webSetups,
+                       Updater updater) {
         this.zrLogConfig = zrLogConfig;
         this.dbPropertiesFile = dbPropertiesFile;
         this.installLockFile = installLockFile;
+        this.updater = updater;
         try {
             this.adminTokenService = new AdminTokenService();
             AbstractMap.SimpleEntry<WebSetup, AdminResource> webSetupObjectSimpleEntry = setupAdmin(contextPath);
@@ -74,7 +76,7 @@ public class SetupConfig {
 
     private WebSetup setupInstall() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         Class<?> aClass = Class.forName("com.zrlog.web.setup.install.InstallWebSetup");
-        return (WebSetup) aClass.getConstructor(ZrLogConfig.class, File.class, File.class).newInstance(zrLogConfig, dbPropertiesFile, installLockFile);
+        return (WebSetup) aClass.getConstructor(ZrLogConfig.class, File.class, File.class, Updater.class).newInstance(zrLogConfig, dbPropertiesFile, installLockFile, updater);
     }
 
     private WebSetup setupBlog(String contextPath) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {

@@ -1,7 +1,6 @@
 package com.zrlog.web.config;
 
 import com.hibegin.common.dao.DataSourceWrapper;
-import com.hibegin.common.util.http.HttpUtil;
 import com.hibegin.http.server.api.HttpRequest;
 import com.mysql.cj.jdbc.AbandonedConnectionCleanupThread;
 import com.zrlog.business.plugin.CacheManagerPlugin;
@@ -24,7 +23,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
 
     public ZrLogConfigImpl(Integer port, Updater updater, String contextPath) {
         super(port, updater, contextPath);
-        SetupConfig setupConfig = new SetupConfig(this, dbPropertiesFile, installLockFile, contextPath, webSetups);
+        SetupConfig setupConfig = new SetupConfig(this, dbPropertiesFile, installLockFile, contextPath, webSetups, updater);
         this.tokenService = setupConfig.getAdminTokenService();
         //config
         this.webSetups.forEach(WebSetup::setup);
@@ -61,17 +60,8 @@ public class ZrLogConfigImpl extends ZrLogConfig {
 
     @Override
     public void stop() {
-        try {
-            PluginUtils.stopAllPlugin();
-            if (Objects.nonNull(dataSource)) {
-                dataSource.close();
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "", e);
-        } finally {
-            HttpUtil.getInstance().closeHttpClient();
-            AbandonedConnectionCleanupThread.checkedShutdown();
-        }
+        super.stop();
+        AbandonedConnectionCleanupThread.checkedShutdown();
     }
 
     @Override
