@@ -24,12 +24,12 @@
         <jakarta-scope>compile</jakarta-scope>
         <servlet-scope>compile</servlet-scope>
         <lambda-scope>compile</lambda-scope>
-        <sws.version>4.0.85</sws.version>
+        <zrlog-base.version>3.2.34</zrlog-base.version>
+        <zrlog-install-web.version>3.2.9</zrlog-install-web.version>
+        <zrlog-blog-web.version>3.2.35</zrlog-blog-web.version>
+        <zrlog-admin-web.version>3.2.35</zrlog-admin-web.version>
         <common-dao.version>1.0.16</common-dao.version>
-        <zrlog-base.version>3.2.24</zrlog-base.version>
-        <zrlog-install-web.version>3.2.8</zrlog-install-web.version>
-        <zrlog-blog-web.version>3.2.14</zrlog-blog-web.version>
-        <zrlog-admin-web.version>3.2.25</zrlog-admin-web.version>
+        <sws.version>4.0.90</sws.version>
         <project.build.outputTimestamp/>
     </properties>
 

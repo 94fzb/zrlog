@@ -24,11 +24,13 @@ public class ZrLogInstallConfig extends DefaultInstallConfig {
     private final File dbPropertiesFile;
     private final File lockFile;
     private final LastVersionInfo lastVersionInfo;
+    private final Updater updater;
 
     public ZrLogInstallConfig(ZrLogConfig zrLogConfig, File dbPropertiesFile, File lockFile, Updater updater) {
         this.zrLogConfig = zrLogConfig;
         this.dbPropertiesFile = dbPropertiesFile;
         this.lockFile = lockFile;
+        this.updater = updater;
         this.lastVersionInfo = prefetchVersion(updater);
     }
 
@@ -36,7 +38,7 @@ public class ZrLogInstallConfig extends DefaultInstallConfig {
         if (zrLogConfig.isInstalled()) {
             return null;
         }
-        UpdateVersionTimerTask versionTimerTask = new UpdateVersionTimerTask(false, "zh_CN");
+        UpdateVersionTimerTask versionTimerTask = new UpdateVersionTimerTask(!BlogBuildInfoUtil.isRelease(), "zh_CN");
         versionTimerTask.run();
         Version lastVersion = versionTimerTask.getVersion();
         boolean upgradable = ZrLogUtil.greatThenCurrentVersion(lastVersion.getBuildId(), lastVersion.getBuildDate(), lastVersion.getVersion());
@@ -66,7 +68,7 @@ public class ZrLogInstallConfig extends DefaultInstallConfig {
 
     @Override
     public boolean isWarMode() {
-        return ZrLogUtil.isWarMode();
+        return Objects.nonNull(updater) && updater.getType() == UpdaterTypeEnum.WAR;
     }
 
     @Override
