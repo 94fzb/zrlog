@@ -10,6 +10,7 @@ import com.zrlog.common.ZrLogConfig;
 import com.zrlog.common.vo.Version;
 import com.zrlog.install.business.response.LastVersionInfo;
 import com.zrlog.install.web.InstallAction;
+import com.zrlog.install.web.InstallConstants;
 import com.zrlog.install.web.config.DefaultInstallConfig;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.I18nUtil;
@@ -22,16 +23,16 @@ public class ZrLogInstallConfig extends DefaultInstallConfig {
 
     private final ZrLogConfig zrLogConfig;
     private final File dbPropertiesFile;
-    private final File lockFile;
     private final LastVersionInfo lastVersionInfo;
     private final Updater updater;
+    private final InstallAction installAction;
 
     public ZrLogInstallConfig(ZrLogConfig zrLogConfig, File dbPropertiesFile, File lockFile, Updater updater) {
         this.zrLogConfig = zrLogConfig;
         this.dbPropertiesFile = dbPropertiesFile;
-        this.lockFile = lockFile;
         this.updater = updater;
         this.lastVersionInfo = prefetchVersion(updater);
+        this.installAction = new ZrLogInstallAction(zrLogConfig, lockFile);
     }
 
     private LastVersionInfo prefetchVersion(Updater updater) {
@@ -63,7 +64,7 @@ public class ZrLogInstallConfig extends DefaultInstallConfig {
 
     @Override
     public InstallAction getAction() {
-        return new ZrLogInstallAction(zrLogConfig, lockFile);
+        return installAction;
     }
 
     @Override
