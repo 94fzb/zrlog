@@ -10,6 +10,7 @@ import com.zrlog.web.WebSetup;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
@@ -42,28 +43,34 @@ public class SetupConfig {
         this.dbPropertiesFile = dbPropertiesFile;
         this.installLockFile = installLockFile;
         this.updater = updater;
-        try {
-            this.adminTokenService = new AdminTokenService();
-            AbstractMap.SimpleEntry<WebSetup, AdminResource> webSetupObjectSimpleEntry = setupAdmin(contextPath);
-            if (Objects.nonNull(webSetupObjectSimpleEntry.getKey())) {
-                webSetups.add(webSetupObjectSimpleEntry.getKey());
+        List<String> disableModules = List.of(Objects.requireNonNullElse(System.getenv("DISABLE_MODULES"), "").split(","));
+        if (!disableModules.contains("admin")) {
+            try {
+                this.adminTokenService = new AdminTokenService();
+                AbstractMap.SimpleEntry<WebSetup, AdminResource> webSetupObjectSimpleEntry = setupAdmin(contextPath);
+                if (Objects.nonNull(webSetupObjectSimpleEntry.getKey())) {
+                    webSetups.add(webSetupObjectSimpleEntry.getKey());
+                }
+            } catch (Throwable e) {
+                LOGGER.warning("Setup admin web error: " + e.getMessage());
             }
-        } catch (Throwable e) {
-            LOGGER.warning("Setup admin web error: " + e.getMessage());
         }
-        try {
-            WebSetup webSetup = setupInstall();
-            webSetups.add(webSetup);
-        } catch (Throwable e) {
-            LOGGER.warning("Setup install web error: " + e.getMessage());
+        if (!disableModules.contains("install")) {
+            try {
+                WebSetup webSetup = setupInstall();
+                webSetups.add(webSetup);
+            } catch (Throwable e) {
+                LOGGER.warning("Setup install web error: " + e.getMessage());
+            }
         }
-        try {
-            WebSetup webSetup = setupBlog(contextPath);
-            webSetups.add(webSetup);
-            this.includeBlog = true;
-        } catch (Throwable e) {
-            e.printStackTrace();
-            LOGGER.warning("Setup blog error: " + e.getMessage());
+        if (!disableModules.contains("blog")) {
+            try {
+                WebSetup webSetup = setupBlog(contextPath);
+                webSetups.add(webSetup);
+                this.includeBlog = true;
+            } catch (Throwable e) {
+                LOGGER.warning("Setup blog error: " + e.getMessage());
+            }
         }
     }
 
