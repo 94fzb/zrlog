@@ -24,7 +24,7 @@
         <jakarta-scope>compile</jakarta-scope>
         <servlet-scope>compile</servlet-scope>
         <lambda-scope>compile</lambda-scope>
-        <zrlog-base.version>3.2.47</zrlog-base.version>
+        <zrlog-base.version>3.2.48</zrlog-base.version>
         <zrlog-install-web.version>3.2.10</zrlog-install-web.version>
         <zrlog-blog-web.version>3.2.47</zrlog-blog-web.version>
         <zrlog-admin-web.version>3.2.47</zrlog-admin-web.version>
