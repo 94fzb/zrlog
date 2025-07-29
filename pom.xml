@@ -29,7 +29,7 @@
         <zrlog-blog-web.version>3.2.39</zrlog-blog-web.version>
         <zrlog-admin-web.version>3.2.38</zrlog-admin-web.version>
         <common-dao.version>1.0.18</common-dao.version>
-        <sws.version>4.0.93</sws.version>
+        <sws.version>4.0.94</sws.version>
     </properties>
 
     <developers>
