@@ -16,6 +16,7 @@
                 <include>zrlog</include>
                 <include>bootstrap</include>
                 <include>conf/plugins.zip</include>
+                <include>static/include/templates/*.zip</include>
                 <!--DOC-->
                 <include>doc/**</include>
                 <include>LICENSE</include>
