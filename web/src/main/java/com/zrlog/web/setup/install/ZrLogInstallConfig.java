@@ -10,7 +10,6 @@ import com.zrlog.common.ZrLogConfig;
 import com.zrlog.common.vo.Version;
 import com.zrlog.install.business.response.LastVersionInfo;
 import com.zrlog.install.web.InstallAction;
-import com.zrlog.install.web.InstallConstants;
 import com.zrlog.install.web.config.DefaultInstallConfig;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.I18nUtil;

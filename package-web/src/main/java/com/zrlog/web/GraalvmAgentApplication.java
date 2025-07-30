@@ -22,7 +22,6 @@ import com.zrlog.data.dto.FaviconBase64DTO;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.ZrLogUtil;
 
-import java.io.IOException;
 import java.util.*;
 
 /**
