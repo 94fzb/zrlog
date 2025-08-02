@@ -61,6 +61,11 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     @Override
     public void stop() {
         super.stop();
+        if (Objects.nonNull(this.dataSource)) {
+            if (this.dataSource.isWebApi()) {
+                return;
+            }
+        }
         AbandonedConnectionCleanupThread.checkedShutdown();
     }
 

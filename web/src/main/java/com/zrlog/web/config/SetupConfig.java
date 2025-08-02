@@ -68,6 +68,7 @@ public class SetupConfig {
                 webSetups.add(webSetup);
                 this.includeBlog = true;
             } catch (Throwable e) {
+                e.printStackTrace();
                 LOGGER.warning("Setup blog error: " + e.getMessage());
             }
         }
