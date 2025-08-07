@@ -48,6 +48,6 @@ public class ZrLogSwsServletFilter extends SwsServletFilter {
     @Override
     public void init() {
         super.init();
-        Constants.zrLogConfig.startPluginsAsync();
+        Constants.zrLogConfig.startPlugins(!EnvKit.isFaaSMode());
     }
 }

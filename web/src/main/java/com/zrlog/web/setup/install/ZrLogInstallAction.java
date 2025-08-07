@@ -1,5 +1,6 @@
 package com.zrlog.web.setup.install;
 
+import com.hibegin.common.util.EnvKit;
 import com.zrlog.common.ZrLogConfig;
 import com.zrlog.install.web.config.DefaultInstallAction;
 
@@ -19,7 +20,7 @@ public class ZrLogInstallAction extends DefaultInstallAction {
     public void installSuccess() {
         try {
             zrLogConfig.configDatabase();
-            zrLogConfig.startPluginsAsync();
+            zrLogConfig.startPlugins(!EnvKit.isFaaSMode());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

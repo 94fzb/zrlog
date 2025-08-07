@@ -1,14 +1,14 @@
 package com.zrlog.web.config;
 
 import com.hibegin.common.dao.DataSourceWrapper;
-import com.hibegin.common.util.http.HttpUtil;
-import com.hibegin.http.server.api.HttpRequest;
 import com.mysql.cj.jdbc.AbandonedConnectionCleanupThread;
 import com.zrlog.business.plugin.CacheManagerPlugin;
 import com.zrlog.business.plugin.PluginCorePluginImpl;
 import com.zrlog.business.service.DbUpgradeService;
+import com.zrlog.common.TokenService;
 import com.zrlog.common.Updater;
 import com.zrlog.common.ZrLogConfig;
+import com.zrlog.common.vo.PublicWebSiteInfo;
 import com.zrlog.data.cache.CacheServiceImpl;
 import com.zrlog.plugin.Plugins;
 import com.zrlog.web.WebSetup;
@@ -22,10 +22,11 @@ import java.util.logging.Level;
  */
 public class ZrLogConfigImpl extends ZrLogConfig {
 
+    private final SetupConfig setupConfig;
+
     public ZrLogConfigImpl(Integer port, Updater updater, String contextPath) {
         super(port, updater, contextPath);
-        SetupConfig setupConfig = new SetupConfig(this, dbPropertiesFile, installLockFile, contextPath, webSetups);
-        this.tokenService = setupConfig.getAdminTokenService();
+        this.setupConfig = new SetupConfig(this, dbPropertiesFile, installLockFile, contextPath, webSetups, updater);
         //config
         this.webSetups.forEach(WebSetup::setup);
         if (!setupConfig.isIncludeBlog()) {
@@ -35,12 +36,22 @@ public class ZrLogConfigImpl extends ZrLogConfig {
 
     @Override
     public DataSourceWrapper configDatabase() throws Exception {
-        super.configDatabase();
-        this.cacheService = new CacheServiceImpl();
-        new DbUpgradeService(this.dataSource, this.cacheService.getCurrentSqlVersion()).tryDoUpgrade();
+        this.dataSource = super.configDatabase();
+        if (Objects.nonNull(dataSource)) {
+            this.cacheService = new CacheServiceImpl();
+            new DbUpgradeService(this.dataSource, this.cacheService.getCurrentSqlVersion()).tryDoUpgrade();
+        }
         return dataSource;
     }
 
+    @Override
+    protected TokenService initTokenService() {
+        if (Objects.isNull(cacheService)) {
+            return null;
+        }
+        PublicWebSiteInfo publicWebSiteInfo = this.cacheService.getPublicWebSiteInfo();
+        return setupConfig.buildAdminTokenService(publicWebSiteInfo.getSession_timeout());
+    }
 
     @Override
     public Plugins getBasePluginList() {
@@ -59,22 +70,12 @@ public class ZrLogConfigImpl extends ZrLogConfig {
 
     @Override
     public void stop() {
-        try {
-            PluginUtils.stopAllPlugin();
-            if (Objects.nonNull(dataSource)) {
-                dataSource.close();
+        super.stop();
+        if (Objects.nonNull(this.dataSource)) {
+            if (this.dataSource.isWebApi()) {
+                return;
             }
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "", e);
-        } finally {
-            HttpUtil.getInstance().closeHttpClient();
-            AbandonedConnectionCleanupThread.checkedShutdown();
         }
+        AbandonedConnectionCleanupThread.checkedShutdown();
     }
-
-    @Override
-    public void refreshPluginCacheData(String version, HttpRequest request) {
-        PluginUtils.refreshPluginCacheData(version, request);
-    }
-
 }

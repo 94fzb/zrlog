@@ -11,10 +11,13 @@ import java.io.File;
  * 支持将 SimpleWebServer 的包，构建为标准 web 也能运行的程序（war包）
  * 该文件不打包进入生产环境，仅开发调试用
  */
-public class JakartaServletApplication {
+public class JakartaServletDevApplication {
+
+    static {
+        System.setProperty("sws.run.mode", "dev");
+    }
 
     public static void main(String[] args) throws LifecycleException {
-        System.setProperty("sws.run.mode", "dev");
         // Declare an alternative location for your "target/classes" dir
         Constants.init();
         File additionWebInfClasses = new File("target/classes");

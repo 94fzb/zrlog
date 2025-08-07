@@ -216,8 +216,6 @@
                                 <arg>
                                     -Ob
                                     -H:+UnlockExperimentalVMOptions
-                                    --enable-sbom
-                                    -H:+BuildReport
                                     -H:+AddAllCharsets
                                     --no-fallback
                                     --strict-image-heap

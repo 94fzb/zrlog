@@ -1,6 +1,7 @@
 package com.zrlog.web.setup.install;
 
 import com.hibegin.common.util.LoggerUtil;
+import com.zrlog.common.Updater;
 import com.zrlog.common.ZrLogConfig;
 import com.zrlog.install.util.InstallNativeImageResourceUtils;
 import com.zrlog.install.web.InstallAction;
@@ -19,24 +20,26 @@ public class InstallWebSetup implements WebSetup {
     private final ZrLogConfig zrLogConfig;
     private final File dbPropertiesFile;
     private final File lockFile;
+    private final Updater updater;
 
-    public InstallWebSetup(ZrLogConfig zrLogConfig, File dbPropertiesFile, File lockFile) {
+    public InstallWebSetup(ZrLogConfig zrLogConfig, File dbPropertiesFile, File lockFile, Updater updater) {
         this.zrLogConfig = zrLogConfig;
         this.dbPropertiesFile = dbPropertiesFile;
         this.lockFile = lockFile;
         if (zrLogConfig.getServerConfig().isNativeImageAgent()) {
             InstallNativeImageResourceUtils.getResourceNameList();
         }
+        this.updater = updater;
     }
 
     @Override
     public void setup() {
-        InstallConstants.installConfig = new ZrLogInstallConfig(zrLogConfig, dbPropertiesFile, lockFile);
+        InstallConstants.installConfig = new ZrLogInstallConfig(zrLogConfig, dbPropertiesFile, lockFile, updater);
         InstallRouters.configRouter(zrLogConfig.getServerConfig());
         zrLogConfig.getServerConfig().addInterceptor(BlogInstallInterceptor.class);
         InstallAction action = InstallConstants.installConfig.getAction();
         if (!action.isInstalled()) {
-            LOGGER.log(Level.WARNING, "Not found lock file(" + action.getLockFile() + "), Please visit the http://yourHostName:port/install start installation");
+            LOGGER.log(Level.WARNING, "Not found lock file(" + action.getLockFile() + "), Please visit the http://yourHostName:port" + zrLogConfig.getServerConfig().getContextPath() + "/install start installation");
         }
     }
 }
