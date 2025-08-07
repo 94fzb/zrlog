@@ -1,4 +1,3 @@
-#bash -e shell/download-upload-dependency.sh || true
 #upload
 aws --version
 aws configure set aws_access_key_id ${1}
