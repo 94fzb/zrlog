@@ -27,7 +27,7 @@
         <zrlog-base.version>3.2.87</zrlog-base.version>
         <zrlog-install-web.version>3.2.10</zrlog-install-web.version>
         <zrlog-blog-web.version>3.2.71</zrlog-blog-web.version>
-        <zrlog-admin-web.version>3.2.89</zrlog-admin-web.version>
+        <zrlog-admin-web.version>3.2.90-SNAPSHOT</zrlog-admin-web.version>
         <common-dao.version>1.1.5</common-dao.version>
         <sws.version>4.0.103</sws.version>
     </properties>
@@ -78,6 +78,16 @@
             <version>${sws.version}</version>
         </dependency>
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>central</id>
+            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
     <dependencyManagement>
         <dependencies>
