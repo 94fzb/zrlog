@@ -88,7 +88,7 @@
             </snapshots>
         </repository>
         <repository>
-            <id>central</id>
+            <id>central-center</id>
             <url>https://repo1.maven.org/maven2/</url>
         </repository>
     </repositories>
