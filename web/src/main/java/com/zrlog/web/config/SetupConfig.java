@@ -21,7 +21,7 @@ public class SetupConfig {
     private final ZrLogConfig zrLogConfig;
     private final File dbPropertiesFile;
     private final File installLockFile;
-    private boolean includeBlog;
+    private final boolean includeBlog;
     private final Updater updater;
 
     public boolean isIncludeBlog() {
@@ -32,6 +32,16 @@ public class SetupConfig {
         return new AdminTokenService(sessionTimeout);
     }
 
+    private boolean initBlog(List<WebSetup> webSetups, String contextPath) {
+        try {
+            WebSetup webSetup = setupBlog(contextPath);
+            webSetups.add(webSetup);
+            return true;
+        } catch (Throwable e) {
+            LOGGER.warning("Setup blog error: " + e.getMessage());
+        }
+        return false;
+    }
 
     public SetupConfig(ZrLogConfig zrLogConfig, File dbPropertiesFile,
                        File installLockFile, String contextPath,
@@ -61,14 +71,9 @@ public class SetupConfig {
             }
         }
         if (!disableModules.contains("blog")) {
-            try {
-                WebSetup webSetup = setupBlog(contextPath);
-                webSetups.add(webSetup);
-                this.includeBlog = true;
-            } catch (Throwable e) {
-                e.printStackTrace();
-                LOGGER.warning("Setup blog error: " + e.getMessage());
-            }
+            this.includeBlog = initBlog(webSetups, contextPath);
+        } else {
+            this.includeBlog = false;
         }
     }
 
