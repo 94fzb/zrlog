@@ -1,7 +1,6 @@
 ### faas deploy
 
-#### cloudflare d1 & aws lambda 
-
+#### cloudflare d1 & aws lambda
 
 create d1 database;
 
