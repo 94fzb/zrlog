@@ -277,6 +277,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-dependency-plugin</artifactId>
+                        <version>3.8.1</version>
                         <executions>
                             <execution>
                                 <id>copy-dependencies</id>
@@ -287,8 +288,8 @@
                                 <configuration>
                                     <outputDirectory>../${libOutputPath}</outputDirectory>
                                     <overWriteReleases>false</overWriteReleases>
-                                    <overWriteSnapshots>false</overWriteSnapshots>
                                     <overWriteIfNewer>true</overWriteIfNewer>
+                                    <useBaseVersion>false</useBaseVersion>
                                     <excludeScope>${jakarta-scope}</excludeScope>
                                     <excludeArtifactIds>
                                         junit,hamcrest-core
@@ -320,7 +321,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-jar-plugin</artifactId>
-                        <version>3.2.0</version>
+                        <version>3.4.2</version>
                         <configuration>
                             <finalName>${finalName}</finalName>
                             <classifier>starter</classifier>
