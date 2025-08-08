@@ -20,7 +20,8 @@
                 <include>bin/start.bat</include>
                 <include>bin/run.sh</include>
                 <!--DOC-->
-                <include>doc/**</include>
+                <include>doc/install.md</include>
+                <include>doc/build_system_info.md</include>
                 <include>LICENSE</include>
                 <include>README.en-us.md</include>
                 <include>README.md</include>
