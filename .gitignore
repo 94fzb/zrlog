@@ -52,3 +52,4 @@ doc/build_system_info.md
 bootstrap
 conf/*.sql
 conf/sqlite-db.properties
+/web/src/main/resources/build_system_info.md

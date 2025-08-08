@@ -1,12 +1,12 @@
-REPORT_FILE=doc/build_system_info.md
+REPORT_FILE=web/src/main/resources/build_system_info.md
 
 mkdir -p "$(dirname "$REPORT_FILE")"
 
-echo "# 🧾 Build System info" > "$REPORT_FILE"
+echo "### 🧾 Build System info" > "$REPORT_FILE"
 echo "" >> "$REPORT_FILE"
 
 # OS Info
-echo "## 🖥 OS Info" >> "$REPORT_FILE"
+echo "#### 🖥 OS Info" >> "$REPORT_FILE"
 {
   echo '```'
   uname -srmv
@@ -18,7 +18,7 @@ echo "## 🖥 OS Info" >> "$REPORT_FILE"
 echo "" >> "$REPORT_FILE"
 
 # CPU Info
-echo "## 🧠 CPU Info" >> "$REPORT_FILE"
+echo "#### 🧠 CPU Info" >> "$REPORT_FILE"
 {
   echo '```'
   if command -v lscpu &> /dev/null; then
@@ -35,7 +35,7 @@ echo "## 🧠 CPU Info" >> "$REPORT_FILE"
 echo "" >> "$REPORT_FILE"
 
 # Java Version
-echo "## ☕ Java Version" >> "$REPORT_FILE"
+echo "#### ☕ Java Version" >> "$REPORT_FILE"
 {
   echo '```'
   java -version 2>&1
@@ -44,7 +44,7 @@ echo "## ☕ Java Version" >> "$REPORT_FILE"
 echo "" >> "$REPORT_FILE"
 
 # GitHub Runner Context (optional)
-echo "## 🤖 Runner Context" >> "$REPORT_FILE"
+echo "#### 🤖 Runner Context" >> "$REPORT_FILE"
 {
   echo '```'
   echo "RUNNER_OS=$RUNNER_OS"
@@ -53,3 +53,5 @@ echo "## 🤖 Runner Context" >> "$REPORT_FILE"
   echo "GITHUB_SHA=$GITHUB_SHA"
   echo '```'
 } >> "$REPORT_FILE"
+
+cp ${REPORT_FILE} "doc/"
