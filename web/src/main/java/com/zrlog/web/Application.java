@@ -63,7 +63,7 @@ public class Application {
     private static void nativeStart(String[] args) throws Exception {
         int port = ZrLogUtil.getPort(args);
         if (EnvKit.isFaaSMode()) {
-            File file = new File(ZrLogUtil.getFaaSRoot() + "/zrlog");
+            File file = new File(ZrLogNativeImageUtils.getExecFile());
             WebServerBuilder webServerBuilder = webServerBuilder(port, ZrLogUtil.getContextPath(args), new NativeImageUpdater(args, file));
             webServerBuilder.startInBackground();
             if (EnvKit.isLambda()) {

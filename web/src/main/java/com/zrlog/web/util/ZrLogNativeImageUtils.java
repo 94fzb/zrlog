@@ -4,6 +4,7 @@ import com.hibegin.common.util.EnvKit;
 import com.hibegin.common.util.Pid;
 import com.hibegin.common.util.StringUtils;
 import com.zrlog.common.Constants;
+import com.zrlog.util.ZrLogUtil;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -30,7 +31,7 @@ public class ZrLogNativeImageUtils {
 
     public static String getExecFile() {
         if (EnvKit.isFaaSMode()) {
-            return "zrlog";
+            return ZrLogUtil.getFaaSRoot() + "/zrlog";
         }
         String envBinFile = System.getenv("_");
         if (Objects.isNull(envBinFile)) {
