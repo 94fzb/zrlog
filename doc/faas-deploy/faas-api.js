@@ -26,7 +26,9 @@ export default {
         const response = await fetch(newUrl, {
             method: request.method,
             headers: request.headers,
-            body: request.body
+            body: request.body,
+            //保留 3x 请求
+            redirect: 'manual'
         });
 
         return new Response(response.body, {
