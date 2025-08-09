@@ -19,7 +19,7 @@ export default {
             });
         }
 
-        const lambdaUrl = env.LAMBDA_URL;
+        const lambdaUrl = env.BACKEND_SERVER_URL;
         const url = new URL(request.url);
         const newUrl = lambdaUrl + url.pathname + url.search;
 
