@@ -401,7 +401,16 @@
                                                 <prefix>/etc/zrlog</prefix>
                                                 <user>zrlog</user>
                                                 <group>zrlog</group>
-                                                <filemode>777</filemode>
+                                            </mapper>
+                                        </data>
+                                        <data>
+                                            <src>../README.en-us.md</src>
+                                            <type>file</type>
+                                            <mapper>
+                                                <type>perm</type>
+                                                <prefix>/etc/zrlog</prefix>
+                                                <user>zrlog</user>
+                                                <group>zrlog</group>
                                             </mapper>
                                         </data>
                                         <data>
@@ -412,7 +421,6 @@
                                                 <prefix>/etc/zrlog</prefix>
                                                 <user>zrlog</user>
                                                 <group>zrlog</group>
-                                                <filemode>777</filemode>
                                             </mapper>
                                         </data>
                                     </dataSet>
