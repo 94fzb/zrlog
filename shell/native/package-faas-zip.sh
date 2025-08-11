@@ -9,6 +9,7 @@ urls=(
   "changyan-Linux-amd64.bin"
   "article-arranger-Linux-amd64.bin"
   "mail-Linux-amd64.bin"
+  "statistics-Linux-amd64.bin"
   # 这里可以继续添加其他插件
 )
 UA="Mozilla/5.0 (X11; Ubuntu; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
