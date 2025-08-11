@@ -216,9 +216,9 @@
                                 <arg>
                                     -Ob
                                     -H:+UnlockExperimentalVMOptions
-                                    -H:+AddAllCharsets
                                     --no-fallback
                                     --strict-image-heap
+                                    --allow-incomplete-classpath
                                     --initialize-at-build-time=sun.security.krb5.SCDynamicStoreConfig
                                     --initialize-at-build-time=java.util.ImmutableCollections$ListN
                                     --trace-class-initialization=sun.security.krb5.SCDynamicStoreConfig
