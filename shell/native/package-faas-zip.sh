@@ -8,7 +8,7 @@ urls=(
   "rss-Linux-amd64.bin"
   "changyan-Linux-amd64.bin"
   "article-arranger-Linux-amd64.bin"
-  "mail-Linux-amd64.bin"
+#  "mail-Linux-amd64.bin"
   "statistics-Linux-amd64.bin"
   # 这里可以继续添加其他插件
 )
