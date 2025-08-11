@@ -5,7 +5,6 @@ import com.hibegin.common.util.ParseArgsUtil;
 import com.hibegin.http.server.WebServerBuilder;
 import com.hibegin.http.server.util.PathUtil;
 import com.hibegin.lambda.LambdaApplication;
-import com.zrlog.admin.web.plugin.NativeImageUpdater;
 import com.zrlog.admin.web.plugin.ZipUpdater;
 import com.zrlog.common.Constants;
 import com.zrlog.common.Updater;
@@ -57,14 +56,14 @@ public class Application {
         if (ParseArgsUtil.justTips(args, "zrlog", BlogBuildInfoUtil.getVersionInfoFull())) {
             return;
         }
-        webServerBuilder(ZrLogUtil.getPort(args), ZrLogUtil.getContextPath(args), UpdaterUtils.getZipUpdater(args)).start();
+        webServerBuilder(ZrLogUtil.getPort(args), ZrLogUtil.getContextPath(args), UpdaterUtils.getUpdater(args, null)).start();
     }
 
     private static void nativeStart(String[] args) throws Exception {
         int port = ZrLogUtil.getPort(args);
+        File execFile = new File(ZrLogNativeImageUtils.getExecFile());
         if (EnvKit.isFaaSMode()) {
-            File file = new File(ZrLogNativeImageUtils.getExecFile());
-            WebServerBuilder webServerBuilder = webServerBuilder(port, ZrLogUtil.getContextPath(args), new NativeImageUpdater(args, file));
+            WebServerBuilder webServerBuilder = webServerBuilder(port, ZrLogUtil.getContextPath(args), UpdaterUtils.getUpdater(args, execFile));
             webServerBuilder.startInBackground();
             if (EnvKit.isLambda()) {
                 LambdaApplication.startHandle(Constants.zrLogConfig);
@@ -72,12 +71,11 @@ public class Application {
             }
             throw new NotImplementException();
         }
-        String execFile = ZrLogNativeImageUtils.getExecFile();
         //parse args
-        if (ParseArgsUtil.justTips(args, new File(execFile).getName(), BlogBuildInfoUtil.getVersionInfoFull())) {
+        if (ParseArgsUtil.justTips(args, execFile.getName(), BlogBuildInfoUtil.getVersionInfoFull())) {
             return;
         }
-        WebServerBuilder webServerBuilder = webServerBuilder(port, ZrLogUtil.getContextPath(args), new NativeImageUpdater(args, new File(execFile)));
+        WebServerBuilder webServerBuilder = webServerBuilder(port, ZrLogUtil.getContextPath(args), UpdaterUtils.getUpdater(args, execFile));
         webServerBuilder.start();
     }
 

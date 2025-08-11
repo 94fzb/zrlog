@@ -40,7 +40,7 @@ public class ZrLogSwsServletFilter extends SwsServletFilter {
 
     private Updater getUpdater() {
         if (EnvKit.isDevMode()) {
-            return UpdaterUtils.getZipUpdater(new String[0]);
+            return UpdaterUtils.getUpdater(new String[0], null);
         }
         return new WarUpdater(new File(getWarFile()));
     }
