@@ -19,7 +19,7 @@
                 <include>static/include/templates/*.zip</include>
                 <!--DOC-->
                 <include>doc/install.md</include>
-                <include>doc/faas-deploy/**</include>
+                <include>doc/build_system_info.md</include>
                 <include>LICENSE</include>
                 <include>README.en-us.md</include>
                 <include>README.md</include>
