@@ -11,7 +11,7 @@ import com.zrlog.common.Updater;
 import com.zrlog.common.exception.NotImplementException;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.ZrLogUtil;
-import com.zrlog.web.config.UpdaterUtils;
+import com.zrlog.web.util.UpdaterUtils;
 import com.zrlog.web.config.ZrLogConfigImpl;
 import com.zrlog.web.util.ZrLogNativeImageUtils;
 

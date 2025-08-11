@@ -9,7 +9,7 @@ import com.zrlog.admin.web.plugin.WarUpdater;
 import com.zrlog.common.Constants;
 import com.zrlog.common.Updater;
 import com.zrlog.util.ZrLogUtil;
-import com.zrlog.web.config.UpdaterUtils;
+import com.zrlog.web.util.UpdaterUtils;
 import com.zrlog.web.config.ZrLogConfigImpl;
 
 import java.io.File;

@@ -1,4 +1,4 @@
-package com.zrlog.web.config;
+package com.zrlog.web.util;
 
 
 import com.hibegin.common.util.EnvKit;
