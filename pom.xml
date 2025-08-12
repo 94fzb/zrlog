@@ -28,7 +28,7 @@
         <zrlog-install-web.version>3.2.10</zrlog-install-web.version>
         <common-dao.version>1.1.5</common-dao.version>
         <sws.version>4.0.105</sws.version>
-        <!---->
+        <!--version 1-->
         <zrlog-base.version>3.2.100-SNAPSHOT</zrlog-base.version>
         <zrlog-blog-web.version>3.2.100-SNAPSHOT</zrlog-blog-web.version>
         <zrlog-admin-web.version>3.2.100-SNAPSHOT</zrlog-admin-web.version>
