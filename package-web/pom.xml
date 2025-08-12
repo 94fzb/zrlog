@@ -217,6 +217,7 @@
                                     -Ob
                                     -H:+UnlockExperimentalVMOptions
                                     --no-fallback
+                                    -H:+BuildReport
                                     --strict-image-heap
                                     --allow-incomplete-classpath
                                     -march=compatibility
