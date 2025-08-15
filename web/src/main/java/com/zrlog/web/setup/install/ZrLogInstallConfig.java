@@ -1,6 +1,8 @@
 package com.zrlog.web.setup.install;
 
+import com.hibegin.common.util.EnvKit;
 import com.hibegin.common.util.SecurityUtils;
+import com.hibegin.common.util.StringUtils;
 import com.zrlog.admin.web.plugin.UpdateVersionTimerTask;
 import com.zrlog.business.service.DbUpgradeService;
 import com.zrlog.common.Constants;
@@ -9,6 +11,7 @@ import com.zrlog.common.UpdaterTypeEnum;
 import com.zrlog.common.ZrLogConfig;
 import com.zrlog.common.vo.Version;
 import com.zrlog.install.business.response.LastVersionInfo;
+import com.zrlog.install.business.vo.InstallSuccessData;
 import com.zrlog.install.web.InstallAction;
 import com.zrlog.install.web.config.DefaultInstallConfig;
 import com.zrlog.util.BlogBuildInfoUtil;
@@ -16,6 +19,8 @@ import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ZrLogUtil;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Map;
 import java.util.Objects;
 
 public class ZrLogInstallConfig extends DefaultInstallConfig {
@@ -38,7 +43,7 @@ public class ZrLogInstallConfig extends DefaultInstallConfig {
         if (zrLogConfig.isInstalled()) {
             return null;
         }
-        UpdateVersionTimerTask versionTimerTask = new UpdateVersionTimerTask(!BlogBuildInfoUtil.isRelease(), "zh_CN");
+        UpdateVersionTimerTask versionTimerTask = new UpdateVersionTimerTask(!BlogBuildInfoUtil.isRelease(), Constants.DEFAULT_LANGUAGE);
         versionTimerTask.run();
         Version lastVersion = versionTimerTask.getVersion();
         boolean upgradable = ZrLogUtil.greatThenCurrentVersion(lastVersion.getBuildId(), lastVersion.getBuildDate(), lastVersion.getVersion());
@@ -104,5 +109,27 @@ public class ZrLogInstallConfig extends DefaultInstallConfig {
     @Override
     public LastVersionInfo getLastVersionInfo() {
         return lastVersionInfo;
+    }
+
+    @Override
+    public String getJdbcUrlQueryStr(String dbType, Map<String, String[]> paramMap) {
+        if (Objects.equals(dbType, "mysql")) {
+            return Constants.MYSQL_JDBC_PARAMS;
+        }
+        return "";
+    }
+
+    @Override
+    public boolean isContainerMode() {
+        //return true;
+        return ZrLogUtil.isDockerMode() || EnvKit.isFaaSMode();
+    }
+
+    @Override
+    public boolean isMissingConfig() {
+        if (!isContainerMode()) {
+            return false;
+        }
+        return StringUtils.isEmpty(ZrLogUtil.getDbInfoByEnv());
     }
 }

@@ -1,6 +1,7 @@
 package com.zrlog.web.setup.install;
 
 import com.hibegin.common.util.LoggerUtil;
+import com.hibegin.http.server.util.NativeImageUtils;
 import com.zrlog.common.Updater;
 import com.zrlog.common.ZrLogConfig;
 import com.zrlog.install.util.InstallNativeImageResourceUtils;
@@ -11,6 +12,7 @@ import com.zrlog.install.web.interceptor.BlogInstallInterceptor;
 import com.zrlog.web.WebSetup;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,7 +29,7 @@ public class InstallWebSetup implements WebSetup {
         this.dbPropertiesFile = dbPropertiesFile;
         this.lockFile = lockFile;
         if (zrLogConfig.getServerConfig().isNativeImageAgent()) {
-            InstallNativeImageResourceUtils.getResourceNameList();
+            InstallNativeImageResourceUtils.reg();
         }
         this.updater = updater;
     }

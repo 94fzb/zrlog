@@ -25,11 +25,11 @@
         <servlet-scope>compile</servlet-scope>
         <lambda-scope>compile</lambda-scope>
         <servlet-api.version>6.1.0</servlet-api.version>
-        <zrlog-install-web.version>3.2.12</zrlog-install-web.version>
+        <zrlog-install-web.version>3.2.23</zrlog-install-web.version>
         <common-dao.version>1.1.5</common-dao.version>
         <sws.version>4.0.105</sws.version>
         <!--version 1-->
-        <zrlog-base.version>3.2.104</zrlog-base.version>
+        <zrlog-base.version>3.2.106</zrlog-base.version>
         <zrlog-blog-web.version>3.2.104</zrlog-blog-web.version>
         <zrlog-admin-web.version>3.2.104</zrlog-admin-web.version>
     </properties>
