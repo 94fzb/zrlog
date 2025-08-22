@@ -21,7 +21,7 @@ packageExt="zip"
 # 判断操作系统类型
 if [[ "${OS}" == "windows" ]]; then
     fileArch=Windows-$(uname -m)
-elif [[ "${4}" == "deb" ]]; then
+elif [[ ${buildSubType} == "deb" ]]; then
     fileArch=$(uname -s)-$(dpkg --print-architecture)
     packageExt="deb"
 elif [[ "${OS}" == "linux" ]]; then
@@ -62,6 +62,6 @@ zipMd5sum=$(md5sum ${zipFinalFileName} | awk '{ print $1 }')
 else
 zipMd5sum=$(md5 ${zipFinalFileName} | awk '{ print $NF }')
 fi
-if [[ "${packageExt}" == "zip" ]]; then
+if [[ "${packageExt}" == "zip" && "${buildSubType}" != "faas" &&  "${buildSubType}" != "deb" ]]; then
   echo -e '{"zipMd5sum":"'${zipMd5sum}'","zipDownloadUrl":"'${mirrorWebSite}${zipFileName}'","type":"'${runModeDesc}'","version":"'${version}'","buildId":"'${buildId}'","zipFileSize":'${zipFileSize}',"releaseDate":"'${Date}'"}' > ${syncPath}/${runMode}/last.${fileArch}.version.json
 fi
