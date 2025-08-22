@@ -4,7 +4,7 @@ PWD=`pwd`
 function buildProp() {
     grep "${1}" "web/src/main/resources/build.properties"|awk -F ${1}'=' '{print $2}'
 }
-
+buildSubType=${4}
 OS="$(uname)"
 case $OS in
   Linux)
@@ -29,7 +29,11 @@ elif [[ "${OS}" == "linux" ]]; then
 else
     fileArch=$(uname -s)-$(uname -m)
 fi
+if [[ "${buildSubType}" == "faas" ]]; then
+bash -e shell/native/package-native-${packageExt}.sh "${1}" "${2}" "-Dmysql-scope='provided'"
+else
 bash -e shell/native/package-native-${packageExt}.sh "${1}" "${2}"
+fi
 
 mirrorWebSite=$(buildProp 'mirrorWebSite')
 version=$(buildProp 'version')
@@ -40,11 +44,11 @@ runModeDesc=$(buildProp 'runModeDesc')
 
 syncPath=${3}
 mkdir -p ${syncPath}/${runMode}
-if [[ "${OS}" == "linux" && "${packageExt}" == "zip" ]]; then
-  bash -e shell/native/package-faas-${packageExt}.sh ${fileArch}
 #copy faas
-  cp target/zrlog-${version}-faas.${packageExt} ${syncPath}/${runMode}/zrlog-${version}-${buildId}-${runMode}-${fileArch}-faas.${packageExt}
-  cp target/zrlog-${version}-faas.${packageExt} ${syncPath}/${runMode}/zrlog-${fileArch}-faas.${packageExt}
+if [[ "${OS}" == "linux" && "${packageExt}" == "zip" && "${buildSubType}" == "faas" ]]; then
+  bash -e shell/native/package-${buildSubType}-${packageExt}.sh ${fileArch}
+  cp target/zrlog-${version}-${buildSubType}.${packageExt} ${syncPath}/${runMode}/zrlog-${version}-${buildId}-${runMode}-${fileArch}-${buildSubType}.${packageExt}
+  cp target/zrlog-${version}-${buildSubType}.${packageExt} ${syncPath}/${runMode}/zrlog-${fileArch}-${buildSubType}.${packageExt}
 fi
 #
 buildFile=target/zrlog-${version}-native.${packageExt}
