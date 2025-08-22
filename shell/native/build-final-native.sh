@@ -62,7 +62,7 @@ else
   else
   zipMd5sum=$(md5 ${zipFinalFileName} | awk '{ print $NF }')
   fi
-  if [[ "${packageExt}" == "zip" && "${buildSubType}" != "faas" &&  "${buildSubType}" != "deb" ]]; then
+  if [[ "${packageExt}" == "zip" ]]; then
     echo -e '{"zipMd5sum":"'${zipMd5sum}'","zipDownloadUrl":"'${mirrorWebSite}${zipFileName}'","type":"'${runModeDesc}'","version":"'${version}'","buildId":"'${buildId}'","zipFileSize":'${zipFileSize}',"releaseDate":"'${Date}'"}' > ${syncPath}/${runMode}/last.${fileArch}.version.json
   fi
 fi
