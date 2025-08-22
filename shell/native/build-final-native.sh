@@ -44,7 +44,7 @@ runModeDesc=$(buildProp 'runModeDesc')
 
 syncPath=${3}
 mkdir -p ${syncPath}/${runMode}
-#copy faas
+#faas
 if [[ "${OS}" == "linux" && "${buildSubType}" == "faas" ]]; then
   bash -e shell/native/package-${buildSubType}-${packageExt}.sh ${fileArch}
   cp target/zrlog-${version}-${buildSubType}.${packageExt} ${syncPath}/${runMode}/zrlog-${version}-${buildId}-${runMode}-${fileArch}-${buildSubType}.${packageExt}
