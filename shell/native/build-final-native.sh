@@ -45,23 +45,24 @@ runModeDesc=$(buildProp 'runModeDesc')
 syncPath=${3}
 mkdir -p ${syncPath}/${runMode}
 #copy faas
-if [[ "${OS}" == "linux" && "${packageExt}" == "zip" && "${buildSubType}" == "faas" ]]; then
+if [[ "${OS}" == "linux" && "${buildSubType}" == "faas" ]]; then
   bash -e shell/native/package-${buildSubType}-${packageExt}.sh ${fileArch}
   cp target/zrlog-${version}-${buildSubType}.${packageExt} ${syncPath}/${runMode}/zrlog-${version}-${buildId}-${runMode}-${fileArch}-${buildSubType}.${packageExt}
   cp target/zrlog-${version}-${buildSubType}.${packageExt} ${syncPath}/${runMode}/zrlog-${fileArch}-${buildSubType}.${packageExt}
-fi
-#
-buildFile=target/zrlog-${version}-native.${packageExt}
-zipFileName=${runMode}/zrlog-${version}-${buildId}-${runMode}-${fileArch}.${packageExt}
-zipFinalFileName=${syncPath}/${runMode}/zrlog-${fileArch}.${packageExt}
-cp ${buildFile} ${zipFinalFileName}
-cp ${buildFile} ${syncPath}/${zipFileName}
-zipFileSize=$(ls -ls ${zipFinalFileName} | awk '{print $6}')
-if command -v md5sum >/dev/null 2>&1; then
-zipMd5sum=$(md5sum ${zipFinalFileName} | awk '{ print $1 }')
 else
-zipMd5sum=$(md5 ${zipFinalFileName} | awk '{ print $NF }')
-fi
-if [[ "${packageExt}" == "zip" && "${buildSubType}" != "faas" &&  "${buildSubType}" != "deb" ]]; then
-  echo -e '{"zipMd5sum":"'${zipMd5sum}'","zipDownloadUrl":"'${mirrorWebSite}${zipFileName}'","type":"'${runModeDesc}'","version":"'${version}'","buildId":"'${buildId}'","zipFileSize":'${zipFileSize}',"releaseDate":"'${Date}'"}' > ${syncPath}/${runMode}/last.${fileArch}.version.json
+  #
+  buildFile=target/zrlog-${version}-native.${packageExt}
+  zipFileName=${runMode}/zrlog-${version}-${buildId}-${runMode}-${fileArch}.${packageExt}
+  zipFinalFileName=${syncPath}/${runMode}/zrlog-${fileArch}.${packageExt}
+  cp ${buildFile} ${zipFinalFileName}
+  cp ${buildFile} ${syncPath}/${zipFileName}
+  zipFileSize=$(ls -ls ${zipFinalFileName} | awk '{print $6}')
+  if command -v md5sum >/dev/null 2>&1; then
+  zipMd5sum=$(md5sum ${zipFinalFileName} | awk '{ print $1 }')
+  else
+  zipMd5sum=$(md5 ${zipFinalFileName} | awk '{ print $NF }')
+  fi
+  if [[ "${packageExt}" == "zip" && "${buildSubType}" != "faas" &&  "${buildSubType}" != "deb" ]]; then
+    echo -e '{"zipMd5sum":"'${zipMd5sum}'","zipDownloadUrl":"'${mirrorWebSite}${zipFileName}'","type":"'${runModeDesc}'","version":"'${version}'","buildId":"'${buildId}'","zipFileSize":'${zipFileSize}',"releaseDate":"'${Date}'"}' > ${syncPath}/${runMode}/last.${fileArch}.version.json
+  fi
 fi
