@@ -9,7 +9,7 @@ urls=(
   "rss-${arch}.bin"
   "changyan-${arch}.bin"
   "article-arranger-${arch}.bin"
-#  "mail-${arch}.bin"
+  "mail-${arch}.bin"
   "statistics-${arch}.bin"
   # 这里可以继续添加其他插件
 )
