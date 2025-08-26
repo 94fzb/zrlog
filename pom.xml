@@ -25,7 +25,7 @@
         <servlet-scope>compile</servlet-scope>
         <lambda-scope>compile</lambda-scope>
         <servlet-api.version>6.1.0</servlet-api.version>
-        <zrlog-install-web.version>3.2.27</zrlog-install-web.version>
+        <zrlog-install-web.version>3.2.28</zrlog-install-web.version>
         <common-dao.version>1.1.6</common-dao.version>
         <sws.version>4.0.107</sws.version>
         <!--version 0-->
