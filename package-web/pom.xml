@@ -223,7 +223,8 @@
                                     -march=compatibility
                                     --enable-preview
                                     -H:DashboardDump=${imageName}
-                                    -H:+DashboardAll -H:IncludeResources=
+                                    -H:+DashboardAll
+                                    -H:IncludeResources=
                                     --enable-url-protocols=http
                                     --enable-url-protocols=https
                                 </arg>
