@@ -31,7 +31,7 @@
         <!--version 0-->
         <zrlog-base.version>3.2.111</zrlog-base.version>
         <zrlog-blog-web.version>3.2.111</zrlog-blog-web.version>
-        <zrlog-admin-web.version>3.2.112</zrlog-admin-web.version>
+        <zrlog-admin-web.version>3.2.114</zrlog-admin-web.version>
         <mysql-scope>compile</mysql-scope>
     </properties>
 
