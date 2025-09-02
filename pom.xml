@@ -29,9 +29,9 @@
         <common-dao.version>1.1.6</common-dao.version>
         <sws.version>4.0.107</sws.version>
         <!--version 0-->
-        <zrlog-base.version>3.2.111</zrlog-base.version>
-        <zrlog-blog-web.version>3.2.112-SNAPSHOT</zrlog-blog-web.version>
-        <zrlog-admin-web.version>3.2.116-SNAPSHOT</zrlog-admin-web.version>
+        <zrlog-base.version>3.2.112</zrlog-base.version>
+        <zrlog-blog-web.version>3.2.112</zrlog-blog-web.version>
+        <zrlog-admin-web.version>3.2.116</zrlog-admin-web.version>
         <mysql-scope>compile</mysql-scope>
     </properties>
 

@@ -6,6 +6,10 @@ import com.zrlog.web.Application;
 import java.io.File;
 import java.net.URISyntaxException;
 
+/**
+ * 以 SimpleWebServer 容器进行运行，除 war 包以外都用这个入口启动调试
+ * 该文件不打包进入生产环境，仅开发调试用
+ */
 public class SwsDevApplication {
 
 
