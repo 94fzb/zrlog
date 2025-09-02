@@ -27,7 +27,7 @@
         <servlet-api.version>6.1.0</servlet-api.version>
         <zrlog-install-web.version>3.2.28</zrlog-install-web.version>
         <common-dao.version>1.1.6</common-dao.version>
-        <sws.version>4.0.107</sws.version>
+        <sws.version>4.0.110</sws.version>
         <!--version 0-->
         <zrlog-base.version>3.2.112</zrlog-base.version>
         <zrlog-blog-web.version>3.2.112</zrlog-blog-web.version>
