@@ -124,11 +124,13 @@
                 <groupId>com.hibegin</groupId>
                 <artifactId>simplewebserver-servlet-api-impl</artifactId>
                 <version>${sws.version}</version>
+                <scope>${servlet-scope}</scope>
             </dependency>
             <dependency>
                 <groupId>com.hibegin</groupId>
                 <artifactId>simplewebserver-lambda-function-impl</artifactId>
                 <version>${sws.version}</version>
+                <scope>${lambda-scope}</scope>
             </dependency>
             <dependency>
                 <groupId>com.hibegin</groupId>
@@ -165,6 +167,7 @@
                 <groupId>jakarta.servlet</groupId>
                 <artifactId>jakarta.servlet-api</artifactId>
                 <version>${servlet-api.version}</version>
+                <scope>provided</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

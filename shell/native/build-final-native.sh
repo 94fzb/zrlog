@@ -4,7 +4,7 @@ PWD=`pwd`
 function buildProp() {
     grep "${1}" "web/src/main/resources/build.properties"|awk -F ${1}'=' '{print $2}'
 }
-buildSubType=${4}
+buildSubType=${3}
 OS="$(uname)"
 case $OS in
   Linux)
@@ -30,9 +30,9 @@ else
     fileArch=$(uname -s)-$(uname -m)
 fi
 if [[ "${buildSubType}" == "faas" ]]; then
-bash -e shell/native/package-native-${packageExt}.sh "${1}" "${2}" "-Dmysql-scope='provided'"
+bash -e shell/native/package-native-${packageExt}.sh "${1}" "-Dmysql-scope='provided'"
 else
-bash -e shell/native/package-native-${packageExt}.sh "${1}" "${2}"
+bash -e shell/native/package-native-${packageExt}.sh "${1}"
 fi
 
 mirrorWebSite=$(buildProp 'mirrorWebSite')
@@ -42,7 +42,7 @@ Date=$(buildProp 'buildTime')
 buildId=$(buildProp 'buildId')
 runModeDesc=$(buildProp 'runModeDesc')
 
-syncPath=${3}
+syncPath=${2}
 mkdir -p ${syncPath}/${runMode}
 #faas
 if [[ "${OS}" == "linux" && "${buildSubType}" == "faas" ]]; then

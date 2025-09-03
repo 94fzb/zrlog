@@ -22,17 +22,14 @@
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.hibegin</groupId>
             <artifactId>simplewebserver-servlet-api-impl</artifactId>
-            <scope>${servlet-scope}</scope>
         </dependency>
         <dependency>
             <groupId>com.hibegin</groupId>
             <artifactId>simplewebserver-lambda-function-impl</artifactId>
-            <scope>${lambda-scope}</scope>
         </dependency>
         <dependency>
             <groupId>com.hibegin</groupId>

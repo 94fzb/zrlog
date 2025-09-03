@@ -26,5 +26,5 @@ jobs:
       - name: Build and upload binary
         run: |
           mkdir -p /tmp/download
-          bash -e shell/native/build-final-native.sh release 正式版本 /tmp/download faas
+          bash -e shell/native/build-final-native.sh release /tmp/download faas
           bash -e shell/upload-bin.sh ${{ secrets.SECRET_ID }} ${{ secrets.SECRET_KEY }} ${{ secrets.BUCKET }} /tmp/download release ${{ secrets.HOST }}

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 echo "current "$PWD
 PWD=`pwd`
-bash -e shell/java/package-java-zip.sh "${1}" "${2}"
+bash -e shell/java/package-java-zip.sh "${1}"
 function buildProp() {
     grep "${1}" "web/src/main/resources/build.properties"|awk -F ${1}'=' '{print $2}'
 }
@@ -16,7 +16,7 @@ mv target/zrlog-${version}.zip  zrlog.zip
 cp target/zrlog-"${version}".war zrlog.war
 #zip zrlog.war -d WEB-INF/install.lock WEB-INF/db.properties
 #finnally workPath
-syncPath=${3}
+syncPath=${2}
 mkdir -p ${syncPath}/${runMode}
 relativeFileName=${runMode}/zrlog-${version}-${buildId}-${runMode}.war
 finalFileName=${syncPath}/${runMode}/zrlog.war
