@@ -60,7 +60,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
             return plugins;
         }
         try {
-            plugins.add(new PluginCorePluginImpl(dbPropertiesFile));
+            plugins.add(new PluginCorePluginImpl(dbPropertiesFile, serverConfig.getContextPath()));
             plugins.add(new CacheManagerPlugin(this));
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "configPlugin exception ", e);
