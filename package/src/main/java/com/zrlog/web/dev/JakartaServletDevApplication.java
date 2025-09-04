@@ -28,8 +28,8 @@ public class JakartaServletDevApplication {
         tomcat.getConnector();
         tomcat.setBaseDir(additionWebInfClasses.toString());
         //idea的路径eclipse启动的路径有区别
-        if (!new File("").getAbsolutePath().endsWith(File.separator + "package-web")) {
-            webappDirLocation = "package-web/" + webappDirLocation;
+        if (!new File("").getAbsolutePath().endsWith(File.separator + "package")) {
+            webappDirLocation = "package/" + webappDirLocation;
         }
         tomcat.setAddDefaultWebXmlToWebapp(true);
         tomcat.addWebapp(ZrLogUtil.getContextPath(args), new File(webappDirLocation).getAbsolutePath());

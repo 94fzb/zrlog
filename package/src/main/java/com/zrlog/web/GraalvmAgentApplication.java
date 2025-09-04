@@ -27,7 +27,7 @@ public class GraalvmAgentApplication {
     public static void main(String[] args) throws Exception {
         ZrLogConfig.nativeImageAgent = true;
         BlogBuildInfoUtil.getBlogProp();
-        PathUtil.setRootPath(System.getProperty("user.dir").replace("/package-web/target", ""));
+        PathUtil.setRootPath(System.getProperty("user.dir").replace("/package/target", ""));
         lambdaJson();
         //last
         webserver(args);

@@ -1,13 +1,17 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>com.hibegin</groupId>
+        <artifactId>zrlog-base</artifactId>
+        <version>3.2.114</version>
+    </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.zrlog</groupId>
-    <artifactId>zrlog</artifactId>
+    <artifactId>zrlog-web-parent</artifactId>
     <packaging>pom</packaging>
     <version>3.2.0-SNAPSHOT</version>
     <modules>
-        <module>web</module>
-        <module>package-web</module>
+        <module>zrlog-web</module>
+        <module>package</module>
     </modules>
     <name>zrlog</name>
     <description>ZrLog是使用Java开发的博客/CMS程序，具有简约，易用，组件化，内存占用低等特点。自带Markdown编辑器，让更多的精力放在写作上，而不是花费大量时间在学习程序的使用上。
@@ -26,10 +30,6 @@
         <lambda-scope>compile</lambda-scope>
         <servlet-api.version>6.1.0</servlet-api.version>
         <zrlog-install-web.version>3.2.28</zrlog-install-web.version>
-        <common-dao.version>1.1.6</common-dao.version>
-        <sws.version>4.0.110</sws.version>
-        <!--version 0-->
-        <zrlog-base.version>3.2.113</zrlog-base.version>
         <zrlog-blog-web.version>3.2.112</zrlog-blog-web.version>
         <zrlog-admin-web.version>3.2.117-SNAPSHOT</zrlog-admin-web.version>
         <mysql-scope>compile</mysql-scope>
@@ -76,45 +76,13 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.hibegin</groupId>
-            <artifactId>simplewebserver</artifactId>
-            <version>${sws.version}</version>
-        </dependency>
-        <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
         </dependency>
     </dependencies>
 
-    <repositories>
-        <repository>
-            <id>central-snapshots</id>
-            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>central-center</id>
-            <url>https://repo1.maven.org/maven2/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-    </repositories>
-
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>com.hibegin</groupId>
-                <artifactId>zrlog-admin-token</artifactId>
-                <version>${zrlog-base.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.hibegin</groupId>
-                <artifactId>zrlog-service</artifactId>
-                <version>${zrlog-base.version}</version>
-            </dependency>
             <dependency>
                 <groupId>com.hibegin</groupId>
                 <artifactId>zrlog-admin-web</artifactId>
@@ -134,11 +102,6 @@
             </dependency>
             <dependency>
                 <groupId>com.hibegin</groupId>
-                <artifactId>common-dao</artifactId>
-                <version>${common-dao.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.hibegin</groupId>
                 <artifactId>zrlog-install-web</artifactId>
                 <version>${zrlog-install-web.version}</version>
             </dependency>
@@ -148,14 +111,9 @@
                 <version>${zrlog-blog-web.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.zrlog</groupId>
-                <artifactId>web</artifactId>
+                <groupId>com.hibegin</groupId>
+                <artifactId>zrlog-web</artifactId>
                 <version>3.2.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.code.gson</groupId>
-                <artifactId>gson</artifactId>
-                <version>2.13.1</version>
             </dependency>
             <dependency>
                 <groupId>com.mysql</groupId>
