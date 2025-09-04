@@ -2,7 +2,7 @@
 echo "current "$PWD
 PWD=`pwd`
 function buildProp() {
-    grep "${1}" "web/src/main/resources/build.properties"|awk -F ${1}'=' '{print $2}'
+    grep "${1}" "zrlog-web/src/main/resources/build.properties"|awk -F ${1}'=' '{print $2}'
 }
 buildSubType=${3}
 OS="$(uname)"

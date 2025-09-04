@@ -1,4 +1,4 @@
-REPORT_FILE=web/src/main/resources/build_system_info.md
+REPORT_FILE=zrlog-web/src/main/resources/build_system_info.md
 
 mkdir -p "$(dirname "$REPORT_FILE")"
 

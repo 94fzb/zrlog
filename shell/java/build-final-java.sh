@@ -3,7 +3,7 @@ echo "current "$PWD
 PWD=`pwd`
 bash -e shell/java/package-java-zip.sh "${1}"
 function buildProp() {
-    grep "${1}" "web/src/main/resources/build.properties"|awk -F ${1}'=' '{print $2}'
+    grep "${1}" "zrlog-web/src/main/resources/build.properties"|awk -F ${1}'=' '{print $2}'
 }
 
 mirrorWebSite=$(buildProp 'mirrorWebSite')

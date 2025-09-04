@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 sh shell/native/package-native.sh "${1}"
 function buildProp() {
-    grep "${1}" "web/src/main/resources/build.properties"|awk -F "${1}"'=' '{print $2}'
+    grep "${1}" "zrlog-web/src/main/resources/build.properties"|awk -F "${1}"'=' '{print $2}'
 }
 
 # shellcheck disable=SC2034
