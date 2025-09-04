@@ -21,7 +21,7 @@ import java.util.Objects;
 import static com.zrlog.common.Constants.getZrLogHome;
 
 /**
- * 实际的启动入口，开发阶段不使用这个类启动，使用对应的 package-web 模块下的对应的启动方式
+ * 实际的启动入口，开发阶段不使用这个类启动，使用对应的 package 模块下的对应的启动方式
  * JakartaServletDevApplication， 内嵌 web 容器方式（war）
  * SwsDevApplication，标准的 zip 包的启动方式
  */

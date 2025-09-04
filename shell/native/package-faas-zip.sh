@@ -26,4 +26,4 @@ wget --user-agent="${UA}" -O "static/include/templates/template-www.zip" "https:
 #cd conf && zip -r plugins.zip plugins/** plugins/**/**
 #cd ..
 ln -s zrlog bootstrap
-./mvnw -Dproject.build.outputTimestamp=2013-01-01T00:00:00Z -Ppackage-faas-zip assembly:single -f "package-web/pom.xml"
+./mvnw -Dproject.build.outputTimestamp=2013-01-01T00:00:00Z -Ppackage-faas-zip assembly:single -f "package/pom.xml"
