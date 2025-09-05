@@ -40,8 +40,9 @@ public class InstallWebSetup implements WebSetup {
         InstallRouters.configRouter(zrLogConfig.getServerConfig());
         zrLogConfig.getServerConfig().addInterceptor(BlogInstallInterceptor.class);
         InstallAction action = InstallConstants.installConfig.getAction();
-        if (!action.isInstalled()) {
-            LOGGER.log(Level.WARNING, "Not found lock file(" + action.getLockFile() + "), Please visit the http://yourHostName:port" + zrLogConfig.getServerConfig().getContextPath() + "/install start installation");
+        if (action.isInstalled()) {
+            return;
         }
+        LOGGER.log(Level.WARNING, "Not found lock file(" + action.getLockFile() + "), Please visit the http://yourHostName:port" + zrLogConfig.getServerConfig().getContextPath() + "/install start installation");
     }
 }
