@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.hibegin</groupId>
         <artifactId>zrlog-base</artifactId>
-        <version>3.2.119</version>
+        <version>3.2.121-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>zrlog-web-parent</artifactId>
