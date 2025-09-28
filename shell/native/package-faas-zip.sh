@@ -7,7 +7,7 @@ arch=${1}
 urls=(
   "static-plus-${arch}.bin"
   "rss-${arch}.bin"
-  "changyan-${arch}.bin"
+  "comment-${arch}.bin"
   "article-arranger-${arch}.bin"
   "mail-${arch}.bin"
   "statistics-${arch}.bin"
