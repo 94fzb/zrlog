@@ -8,7 +8,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>zrlog-web-parent</artifactId>
     <packaging>pom</packaging>
-    <version>3.2.1</version>
+    <version>3.2.2-SNAPSHOT</version>
     <modules>
         <module>zrlog-web</module>
         <module>package</module>
@@ -130,7 +130,7 @@
             <dependency>
                 <groupId>com.hibegin</groupId>
                 <artifactId>zrlog-web</artifactId>
-                <version>3.2.1</version>
+                <version>3.2.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.mysql</groupId>
