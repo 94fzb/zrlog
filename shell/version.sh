@@ -15,4 +15,4 @@ git checkout master
 ./mvnw versions:set -DnewVersion=${nextVersion}
 git add -A
 git commit -m '[shell-release]next version '${nextVersion}
-git push
+git push -f

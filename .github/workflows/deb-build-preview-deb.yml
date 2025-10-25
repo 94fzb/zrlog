@@ -9,7 +9,9 @@ jobs:
     #    runs-on: [self-hosted, Linux, X64]
     #    runs-on: buildjet-4vcpu-ubuntu-2204-arm
     runs-on: ${{ matrix.os }}
-
+    concurrency:
+      group: deploy-preview-on-${{ matrix.os }}-deb   # 同一个 group 的任务会排队执行
+      cancel-in-progress: false # 不取消前一个任务，而是等待
     strategy:
       matrix:
         os: [ ubuntu-22.04,ubuntu-24.04-arm ]

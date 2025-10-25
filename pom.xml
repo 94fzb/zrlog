@@ -3,12 +3,12 @@
     <parent>
         <groupId>com.hibegin</groupId>
         <artifactId>zrlog-base</artifactId>
-        <version>3.2.115</version>
+        <version>3.2.122</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>zrlog-web-parent</artifactId>
     <packaging>pom</packaging>
-    <version>3.2.1-SNAPSHOT</version>
+    <version>3.2.1</version>
     <modules>
         <module>zrlog-web</module>
         <module>package</module>
@@ -29,11 +29,28 @@
         <servlet-scope>compile</servlet-scope>
         <lambda-scope>compile</lambda-scope>
         <servlet-api.version>6.1.0</servlet-api.version>
-        <zrlog-install-web.version>3.2.28</zrlog-install-web.version>
-        <zrlog-blog-web.version>3.2.115</zrlog-blog-web.version>
-        <zrlog-admin-web.version>3.2.117</zrlog-admin-web.version>
+        <zrlog-install-web.version>3.2.29</zrlog-install-web.version>
+        <zrlog-blog-web.version>3.2.122</zrlog-blog-web.version>
+        <zrlog-admin-web.version>3.2.126</zrlog-admin-web.version>
         <mysql-scope>compile</mysql-scope>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>central-snapshots</id>
+            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>central-center</id>
+            <url>https://repo1.maven.org/maven2/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+    </repositories>
 
     <developers>
         <developer>
@@ -113,7 +130,7 @@
             <dependency>
                 <groupId>com.hibegin</groupId>
                 <artifactId>zrlog-web</artifactId>
-                <version>3.2.1-SNAPSHOT</version>
+                <version>3.2.1</version>
             </dependency>
             <dependency>
                 <groupId>com.mysql</groupId>

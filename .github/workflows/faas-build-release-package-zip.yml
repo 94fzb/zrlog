@@ -7,7 +7,9 @@ jobs:
   build:
     name: ZrLog on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-
+    concurrency:
+      group: deploy-release-on-${{ matrix.os }}-faas   # 同一个 group 的任务会排队执行
+      cancel-in-progress: false # 不取消前一个任务，而是等待
     strategy:
       matrix:
         os: [ ubuntu-22.04,ubuntu-24.04-arm ]

@@ -7,6 +7,9 @@ jobs:
   build:
     name: ZrLog package ${{ matrix.os }} ${{ matrix.architecture }}
     runs-on: ${{ matrix.os }}
+    concurrency:
+      group: deploy-preview-on-${{ matrix.os }}-java   # 同一个 group 的任务会排队执行
+      cancel-in-progress: false # 不取消前一个任务，而是等待
     strategy:
       matrix:
         os: [ ubuntu-latest ]

@@ -5,4 +5,4 @@
 
 ## FaaS 部署（无服务）
 
-[cloudflare d1 & aws lambda](https://github.com/zrlog-extensions/faas-deploy)
+[cloudflare d1 & aws lambda](https://blog.zrlog.com/serverless-with-aws-lambda-and-cf-d1.html)
