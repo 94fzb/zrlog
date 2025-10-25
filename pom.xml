@@ -31,7 +31,7 @@
         <servlet-api.version>6.1.0</servlet-api.version>
         <zrlog-install-web.version>3.2.29</zrlog-install-web.version>
         <zrlog-blog-web.version>3.2.122</zrlog-blog-web.version>
-        <zrlog-admin-web.version>3.2.126</zrlog-admin-web.version>
+        <zrlog-admin-web.version>3.2.127-SNAPSHOT</zrlog-admin-web.version>
         <mysql-scope>compile</mysql-scope>
     </properties>
 
