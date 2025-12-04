@@ -16,13 +16,8 @@ Date=$(git log -1 --format=%cd --date=format:'%Y-%m-%d %H:%M:%S%z' | sed "s/\([+
 buildId=$(git rev-parse --short HEAD)
 
 mkdir -p zrlog-web/src/main/resources/
-cat <<EOF > zrlog-web/src/main/resources/build.properties
-version=${version}
-runMode=${runMode}
-runModeDesc=${runModeDesc}
-buildId=${buildId}
-buildTime=${Date}
-mirrorWebSite=${mirrorWebSite}
-EOF
+printf "version=%s\nrunMode=%s\nrunModeDesc=%s\nbuildId=%s\nbuildTime=%s\nmirrorWebSite=%s\n" \
+  "$version" "$runMode" "$runModeDesc" "$buildId" "$Date" "$mirrorWebSite" \
+  > zrlog-web/src/main/resources/build.properties
 
 bash bin/build-system-info.sh

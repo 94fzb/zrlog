@@ -11,7 +11,6 @@ import com.zrlog.common.UpdaterTypeEnum;
 import com.zrlog.common.ZrLogConfig;
 import com.zrlog.common.vo.Version;
 import com.zrlog.install.business.response.LastVersionInfo;
-import com.zrlog.install.business.vo.InstallSuccessData;
 import com.zrlog.install.web.InstallAction;
 import com.zrlog.install.web.config.DefaultInstallConfig;
 import com.zrlog.util.BlogBuildInfoUtil;
@@ -19,7 +18,6 @@ import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ZrLogUtil;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 
@@ -46,12 +44,16 @@ public class ZrLogInstallConfig extends DefaultInstallConfig {
         UpdateVersionTimerTask versionTimerTask = new UpdateVersionTimerTask(!BlogBuildInfoUtil.isRelease(), Constants.DEFAULT_LANGUAGE);
         versionTimerTask.run();
         Version lastVersion = versionTimerTask.getVersion();
-        boolean upgradable = ZrLogUtil.greatThenCurrentVersion(lastVersion.getBuildId(), lastVersion.getBuildDate(), lastVersion.getVersion());
-        return getLastVersionInfo(updater, upgradable, lastVersion);
+        return getLastVersionInfo(updater, lastVersion);
     }
 
-    private static LastVersionInfo getLastVersionInfo(Updater updater, boolean upgradable, Version lastVersion) {
+    private static LastVersionInfo getLastVersionInfo(Updater updater, Version lastVersion) {
         LastVersionInfo lastVersionInfo = new LastVersionInfo();
+        if (Objects.isNull(lastVersion)) {
+            lastVersionInfo.setLatestVersion(true);
+            return lastVersionInfo;
+        }
+        boolean upgradable = ZrLogUtil.greatThenCurrentVersion(lastVersion.getBuildId(), lastVersion.getBuildDate(), lastVersion.getVersion());
         lastVersionInfo.setLatestVersion(!upgradable);
         if (lastVersionInfo.getLatestVersion()) {
             return lastVersionInfo;
