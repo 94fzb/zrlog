@@ -12,7 +12,7 @@ jobs:
       cancel-in-progress: false # 不取消前一个任务，而是等待
     strategy:
       matrix:
-        os: [ ubuntu-latest ]
+        os: [ ubuntu-22.04 ]
         architecture: [ amd64 ]
     steps:
       - uses: actions/checkout@v3

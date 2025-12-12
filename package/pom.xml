@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.hibegin</groupId>
         <artifactId>zrlog-web-parent</artifactId>
-        <version>3.2.2-SNAPSHOT</version>
+        <version>3.2.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>package</artifactId>
@@ -14,13 +14,14 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <imageName>zrlog</imageName>
-        <native.maven.plugin.version>0.10.2</native.maven.plugin.version>
+        <native.maven.plugin.version>0.11.2</native.maven.plugin.version>
         <libOutputPath>lib</libOutputPath>
         <native.target>../</native.target>
         <packageName>zrlog</packageName>
         <architecture>all</architecture>
         <packageType>jar</packageType>
         <gitCommitId>0000000</gitCommitId>
+        <tomcat.version>10.1.47</tomcat.version>
     </properties>
 
     <dependencies>
@@ -36,13 +37,13 @@
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
-            <version>10.1.44</version>
+            <version>${tomcat.version}</version>
             <scope>${jakarta-scope}</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-jasper</artifactId>
-            <version>10.1.42</version>
+            <version>${tomcat.version}</version>
             <scope>${jakarta-scope}</scope>
         </dependency>
     </dependencies>
@@ -213,21 +214,42 @@
                         </executions>
                         <configuration>
                             <buildArgs>
-                                <arg>
+                                <buildArg>
                                     -Ob
+                                </buildArg>
+                                <buildArg>
                                     -H:+UnlockExperimentalVMOptions
+                                </buildArg>
+                                <buildArg>
                                     --no-fallback
-                                    -H:+BuildReport
+                                </buildArg>
+                                <buildArg>
                                     --strict-image-heap
+                                </buildArg>
+                                <buildArg>
                                     --allow-incomplete-classpath
+                                </buildArg>
+                                <buildArg>
                                     -march=compatibility
+                                </buildArg>
+                                <buildArg>
                                     --enable-preview
+                                </buildArg>
+                                <buildArg>
                                     -H:DashboardDump=${imageName}
+                                </buildArg>
+                                <buildArg>
                                     -H:+DashboardAll
+                                </buildArg>
+                                <buildArg>
                                     -H:IncludeResources=
+                                </buildArg>
+                                <buildArg>
                                     --enable-url-protocols=http
+                                </buildArg>
+                                <buildArg>
                                     --enable-url-protocols=https
-                                </arg>
+                                </buildArg>
                             </buildArgs>
                             <mainClass>com.zrlog.web.Application</mainClass>
                             <agent>

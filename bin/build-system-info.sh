@@ -54,4 +54,13 @@ echo "#### 🤖 Runner Context" >> "$REPORT_FILE"
   echo '```'
 } >> "$REPORT_FILE"
 
+# Build properties info
+echo "#### 📃 Build.properties Info" >> "$REPORT_FILE"
+{
+  echo '```properties'
+  # shellcheck disable=SC2046
+  echo "$(cat 'zrlog-web/src/main/resources/build.properties')"
+  echo '```'
+} >> "$REPORT_FILE"
+
 cp ${REPORT_FILE} "doc/"

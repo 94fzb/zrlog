@@ -10,10 +10,10 @@ import com.zrlog.common.Constants;
 import com.zrlog.common.Updater;
 import com.zrlog.common.exception.NotImplementException;
 import com.zrlog.util.BlogBuildInfoUtil;
+import com.zrlog.util.ZrLogBaseNativeImageUtils;
 import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.util.UpdaterUtils;
 import com.zrlog.web.config.ZrLogConfigImpl;
-import com.zrlog.web.util.ZrLogNativeImageUtils;
 
 import java.io.File;
 import java.util.Objects;
@@ -61,7 +61,7 @@ public class Application {
 
     private static void nativeStart(String[] args) throws Exception {
         int port = ZrLogUtil.getPort(args);
-        File execFile = new File(ZrLogNativeImageUtils.getExecFile());
+        File execFile = new File(ZrLogBaseNativeImageUtils.getExecFile());
         if (EnvKit.isFaaSMode()) {
             WebServerBuilder webServerBuilder = webServerBuilder(port, ZrLogUtil.getContextPath(args), UpdaterUtils.getUpdater(args, execFile));
             webServerBuilder.startInBackground();

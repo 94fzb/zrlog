@@ -12,14 +12,14 @@ jobs:
       cancel-in-progress: false # 不取消前一个任务，而是等待
     strategy:
       matrix:
-        os: [ ubuntu-22.04,ubuntu-24.04-arm,macos-13,macos-14,windows-2022 ]
+        os: [ ubuntu-22.04,ubuntu-24.04-arm,macos-15-intel,macos-14,windows-2022 ]
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - uses: graalvm/setup-graalvm@v1
         with:
-          java-version: '21'
+          java-version: '25'
           distribution: 'graalvm' # See 'Options' for all available distributions
           cache: 'maven'
           github-token: ${{ secrets.GITHUB_TOKEN }}

@@ -5,7 +5,7 @@
     <parent>
         <artifactId>zrlog-web-parent</artifactId>
         <groupId>com.hibegin</groupId>
-        <version>3.2.2-SNAPSHOT</version>
+        <version>3.2.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>zrlog-web</artifactId>
