@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.hibegin</groupId>
         <artifactId>zrlog-base</artifactId>
-        <version>3.3.6</version>
+        <version>3.3.8-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>zrlog-web-parent</artifactId>
@@ -28,11 +28,11 @@
         <jakarta-scope>compile</jakarta-scope>
         <servlet-scope>compile</servlet-scope>
         <lambda-scope>compile</lambda-scope>
-        <zrlog-hexo-template-scope>provided</zrlog-hexo-template-scope>
+        <zrlog-polyglot-template-scope>provided</zrlog-polyglot-template-scope>
         <servlet-api.version>6.1.0</servlet-api.version>
         <zrlog-install-web.version>3.2.31</zrlog-install-web.version>
-        <zrlog-blog-web.version>3.3.5</zrlog-blog-web.version>
-        <zrlog-admin-web.version>3.3.3</zrlog-admin-web.version>
+        <zrlog-blog-web.version>3.3.6-SNAPSHOT</zrlog-blog-web.version>
+        <zrlog-admin-web.version>3.3.4-SNAPSHOT</zrlog-admin-web.version>
         <mysql-scope>compile</mysql-scope>
     </properties>
 
@@ -147,9 +147,9 @@
             </dependency>
             <dependency>
                 <groupId>com.hibegin</groupId>
-                <artifactId>zrlog-hexo-template</artifactId>
+                <artifactId>zrlog-polyglot-template</artifactId>
                 <version>${zrlog-blog-web.version}</version>
-                <scope>${zrlog-hexo-template-scope}</scope>
+                <scope>${zrlog-polyglot-template-scope}</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

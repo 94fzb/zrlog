@@ -48,9 +48,7 @@
         </dependency>
         <dependency>
             <groupId>com.hibegin</groupId>
-            <artifactId>zrlog-hexo-template</artifactId>
-            <version>${zrlog-blog-web.version}</version>
-            <scope>${zrlog-hexo-template-scope}</scope>
+            <artifactId>zrlog-polyglot-template</artifactId>
         </dependency>
     </dependencies>
 
@@ -319,7 +317,7 @@
                                     <useBaseVersion>false</useBaseVersion>
                                     <excludeScope>${jakarta-scope}</excludeScope>
                                     <excludeArtifactIds>
-                                        junit,hamcrest-core,zrlog-hexo-template
+                                        junit,hamcrest-core,zrlog-polyglot-template
                                     </excludeArtifactIds>
                                 </configuration>
                             </execution>
