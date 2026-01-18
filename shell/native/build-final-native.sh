@@ -5,29 +5,10 @@ function buildProp() {
     grep "${1}" "zrlog-web/src/main/resources/build.properties"|awk -F ${1}'=' '{print $2}'
 }
 buildSubType=${3}
-OS="$(uname)"
-case $OS in
-  Linux)
-    OS='linux'
-    ;;
-  Darwin)
-    OS='mac'
-    ;;
-  *)
-    OS='windows'
-    ;;
-esac
 packageExt="zip"
 # 判断操作系统类型
-if [[ "${OS}" == "windows" ]]; then
-    fileArch=Windows-$(uname -m)
-elif [[ ${buildSubType} == "deb" ]]; then
-    fileArch=$(uname -s)-$(dpkg --print-architecture)
+if [[ ${buildSubType} == "deb" ]]; then
     packageExt="deb"
-elif [[ "${OS}" == "linux" ]]; then
-    fileArch=$(uname -s)-$(dpkg --print-architecture)
-else
-    fileArch=$(uname -s)-$(uname -m)
 fi
 if [[ "${buildSubType}" == "faas" ]]; then
 bash -e shell/native/package-native-${packageExt}.sh "${1}" "-Dmysql-scope='provided'"
@@ -41,11 +22,12 @@ runMode=$(buildProp 'runMode')
 Date=$(buildProp 'buildTime')
 buildId=$(buildProp 'buildId')
 runModeDesc=$(buildProp 'runModeDesc')
+fileArch=$(buildProp 'fileArch')
 
 syncPath=${2}
 mkdir -p ${syncPath}/${runMode}
 #faas
-if [[ "${OS}" == "linux" && "${buildSubType}" == "faas" ]]; then
+if [[ "$(uname)" == "Linux" && "${buildSubType}" == "faas" ]]; then
   bash -e shell/native/package-${buildSubType}-${packageExt}.sh ${fileArch}
   cp target/zrlog-${version}-${buildSubType}.${packageExt} ${syncPath}/${runMode}/zrlog-${version}-${buildId}-${runMode}-${fileArch}-${buildSubType}.${packageExt}
   cp target/zrlog-${version}-${buildSubType}.${packageExt} ${syncPath}/${runMode}/zrlog-${fileArch}-${buildSubType}.${packageExt}

@@ -46,6 +46,12 @@
             <version>${tomcat.version}</version>
             <scope>${jakarta-scope}</scope>
         </dependency>
+        <dependency>
+            <groupId>com.hibegin</groupId>
+            <artifactId>zrlog-hexo-template</artifactId>
+            <version>${zrlog-blog-web.version}</version>
+            <scope>${zrlog-hexo-template-scope}</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -239,9 +245,6 @@
                                     -H:DashboardDump=${imageName}
                                 </buildArg>
                                 <buildArg>
-                                    -H:+DashboardAll
-                                </buildArg>
-                                <buildArg>
                                     -H:IncludeResources=
                                 </buildArg>
                                 <buildArg>
@@ -316,7 +319,7 @@
                                     <useBaseVersion>false</useBaseVersion>
                                     <excludeScope>${jakarta-scope}</excludeScope>
                                     <excludeArtifactIds>
-                                        junit,hamcrest-core
+                                        junit,hamcrest-core,zrlog-hexo-template
                                     </excludeArtifactIds>
                                 </configuration>
                             </execution>

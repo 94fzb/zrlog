@@ -13,3 +13,9 @@ wget https://www.zrlog.com/install/zrlog-upgrade-jakarta-war.sh
 ```
 wget https://www.zrlog.com/install/zrlog-upgrade-jakarta-war-sub.sh
 ```
+
+### 最新包
+
+```
+wget https://www.zrlog.com/install/zrlog-last-war.sh
+```

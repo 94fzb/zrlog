@@ -91,6 +91,6 @@ public class SetupConfig {
 
     private WebSetup setupBlog(String contextPath) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         Class<?> aClass = Class.forName("com.zrlog.blog.web.BlogWebSetup");
-        return (WebSetup) aClass.getConstructor(ZrLogConfig.class, String.class).newInstance(zrLogConfig, contextPath);
+        return (WebSetup) aClass.getConstructor(ZrLogConfig.class, String.class, boolean.class).newInstance(zrLogConfig, contextPath, true);
     }
 }

@@ -29,9 +29,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         this.setupConfig = new SetupConfig(this, dbPropertiesFile, installLockFile, contextPath, webSetups, updater);
         //config
         this.webSetups.forEach(WebSetup::setup);
-        if (!setupConfig.isIncludeBlog()) {
-            serverConfig.getInterceptors().add(DefaultInterceptor.class);
-        }
+        serverConfig.getInterceptors().add(DefaultInterceptor.class);
     }
 
     @Override

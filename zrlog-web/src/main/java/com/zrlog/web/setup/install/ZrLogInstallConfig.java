@@ -4,7 +4,7 @@ import com.hibegin.common.util.EnvKit;
 import com.hibegin.common.util.SecurityUtils;
 import com.hibegin.common.util.StringUtils;
 import com.zrlog.admin.web.plugin.UpdateVersionTimerTask;
-import com.zrlog.business.service.DbUpgradeService;
+import com.zrlog.business.version.UpgradeVersionHandler;
 import com.zrlog.common.Constants;
 import com.zrlog.common.Updater;
 import com.zrlog.common.UpdaterTypeEnum;
@@ -95,7 +95,7 @@ public class ZrLogInstallConfig extends DefaultInstallConfig {
 
     @Override
     public String getZrLogSqlVersion() {
-        return DbUpgradeService.SQL_VERSION + "";
+        return UpgradeVersionHandler.SQL_VERSION + "";
     }
 
     @Override
