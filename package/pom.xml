@@ -251,6 +251,12 @@
                                 <buildArg>
                                     --enable-url-protocols=https
                                 </buildArg>
+                                <buildArg>
+                                    -Djava.locale.providers=CLDR
+                                </buildArg>
+                                <buildArg>
+                                    -H:IncludeLocales=zh
+                                </buildArg>
                             </buildArgs>
                             <mainClass>com.zrlog.web.Application</mainClass>
                             <agent>
