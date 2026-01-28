@@ -224,9 +224,9 @@
                                 <buildArg>
                                     --future-defaults=all
                                 </buildArg>
-                                <buildArgs>
-                                    <arg>--enable-native-access=org.graalvm.truffle</arg>
-                                </buildArgs>
+                                <buildArg>
+                                    --enable-native-access=org.graalvm.truffle
+                                </buildArg>
                                 <buildArg>
                                     -H:+UnlockExperimentalVMOptions
                                 </buildArg>
