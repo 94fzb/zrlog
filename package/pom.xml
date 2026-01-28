@@ -221,6 +221,9 @@
                                 <buildArg>
                                     -Os
                                 </buildArg>
+                                <buildArgs>
+                                    <arg>--enable-native-access=org.graalvm.truffle</arg>
+                                </buildArgs>
                                 <buildArg>
                                     -H:+UnlockExperimentalVMOptions
                                 </buildArg>
