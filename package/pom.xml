@@ -221,6 +221,9 @@
                                 <buildArg>
                                     -Os
                                 </buildArg>
+                                <buildArg>
+                                    --future-defaults=all
+                                </buildArg>
                                 <buildArgs>
                                     <arg>--enable-native-access=org.graalvm.truffle</arg>
                                 </buildArgs>
@@ -229,12 +232,6 @@
                                 </buildArg>
                                 <buildArg>
                                     --no-fallback
-                                </buildArg>
-                                <buildArg>
-                                    --strict-image-heap
-                                </buildArg>
-                                <buildArg>
-                                    --allow-incomplete-classpath
                                 </buildArg>
                                 <buildArg>
                                     -march=compatibility
