@@ -219,7 +219,7 @@
                         <configuration>
                             <buildArgs>
                                 <buildArg>
-                                    -Ob
+                                    -Os
                                 </buildArg>
                                 <buildArg>
                                     -H:+UnlockExperimentalVMOptions
