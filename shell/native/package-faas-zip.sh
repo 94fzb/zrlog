@@ -26,7 +26,7 @@ pluginLocalPath="conf/plugins/plugin-core-${arch}.bin"
 wget --user-agent="${UA}" -O ${pluginLocalPath}  "${mirrorWebSite}/plugin/core/faas/plugin-core-${arch}.bin?v=$(date +%s)"
 #tempaltes
 wget --user-agent="${UA}" -O "static/include/templates/template-sheshui.zip" "${mirrorWebSite}/attachment/template/template-sheshui.zip?v=$(date +%s)"
-wget --user-agent="${UA}" -O "static/include/templates/template-www.zip" "${mirrorWebSite}/attachment/template/template-www.zip?v=$(date +%s)"
+#wget --user-agent="${UA}" -O "static/include/templates/template-www.zip" "${mirrorWebSite}/attachment/template/template-www.zip?v=$(date +%s)"
 #cd conf && zip -r plugins.zip plugins/** plugins/**/**
 #cd ..
 ln -s zrlog bootstrap
