@@ -358,6 +358,7 @@
                                 <exclude>lambda.json</exclude>
                             </excludes>
                             <archive>
+                                <addMavenDescriptor>false</addMavenDescriptor>
                                 <manifest>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>${libOutputPath}</classpathPrefix>
