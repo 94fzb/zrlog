@@ -222,9 +222,6 @@
                                     -Os
                                 </buildArg>
                                 <buildArg>
-                                    --future-defaults=all
-                                </buildArg>
-                                <buildArg>
                                     --enable-native-access=org.graalvm.truffle
                                 </buildArg>
                                 <buildArg>
