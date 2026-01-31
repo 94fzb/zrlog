@@ -120,9 +120,8 @@ public class ZrLogInstallConfig extends DefaultInstallConfig {
     }
 
     @Override
-    public boolean isContainerMode() {
-        //return true;
-        return zrLogConfig.isContainerMode();
+    public boolean isAskConfig() {
+        return zrLogConfig.isAskConfig();
     }
 
     @Override

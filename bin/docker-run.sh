@@ -1,1 +1,0 @@
-docker run -p 8080:8080 -v $(pwd)/package/src/main/webapp/WEB-INF:/opt/zrlog/conf --name zrlog-preview-2 zrlog/zrlog-preview:3.2.3-ubuntu
