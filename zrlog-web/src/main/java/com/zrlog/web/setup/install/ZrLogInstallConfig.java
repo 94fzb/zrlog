@@ -1,8 +1,6 @@
 package com.zrlog.web.setup.install;
 
-import com.hibegin.common.util.EnvKit;
 import com.hibegin.common.util.SecurityUtils;
-import com.hibegin.common.util.StringUtils;
 import com.zrlog.admin.web.plugin.UpdateVersionTimerTask;
 import com.zrlog.business.version.UpgradeVersionHandler;
 import com.zrlog.common.Constants;
@@ -124,17 +122,11 @@ public class ZrLogInstallConfig extends DefaultInstallConfig {
     @Override
     public boolean isContainerMode() {
         //return true;
-        return ZrLogUtil.isDockerMode() || EnvKit.isFaaSMode();
+        return zrLogConfig.isContainerMode();
     }
 
     @Override
     public boolean isMissingConfig() {
-        if (!isContainerMode()) {
-            return false;
-        }
-        if (ZrLogUtil.isShellDockerMode()) {
-            return StringUtils.isEmpty(ZrLogUtil.getDbInfoByEnv());
-        }
-        return false;
+        return zrLogConfig.isMissingConfig();
     }
 }
