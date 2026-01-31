@@ -132,6 +132,9 @@ public class ZrLogInstallConfig extends DefaultInstallConfig {
         if (!isContainerMode()) {
             return false;
         }
-        return StringUtils.isEmpty(ZrLogUtil.getDbInfoByEnv());
+        if (ZrLogUtil.isShellDockerMode()) {
+            return StringUtils.isEmpty(ZrLogUtil.getDbInfoByEnv());
+        }
+        return false;
     }
 }
