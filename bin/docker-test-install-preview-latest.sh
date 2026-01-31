@@ -1,1 +1,1 @@
-docker run -p 8080:8080 -v /tmp:/opt/zrlog/conf --name zrlog-test-preview-9 zrlog/zrlog-preview:latest
+docker run -p 8080:8080 -v /tmp:/opt/zrlog/conf --name zrlog-test-preview-$(pwgen 16 1) zrlog/zrlog-preview:latest
