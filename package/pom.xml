@@ -46,6 +46,10 @@
             <version>${tomcat.version}</version>
             <scope>${jakarta-scope}</scope>
         </dependency>
+        <dependency>
+            <groupId>com.hibegin</groupId>
+            <artifactId>zrlog-polyglot-template</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -215,19 +219,16 @@
                         <configuration>
                             <buildArgs>
                                 <buildArg>
-                                    -Ob
+                                    -Os
+                                </buildArg>
+                                <buildArg>
+                                    --enable-native-access=org.graalvm.truffle
                                 </buildArg>
                                 <buildArg>
                                     -H:+UnlockExperimentalVMOptions
                                 </buildArg>
                                 <buildArg>
                                     --no-fallback
-                                </buildArg>
-                                <buildArg>
-                                    --strict-image-heap
-                                </buildArg>
-                                <buildArg>
-                                    --allow-incomplete-classpath
                                 </buildArg>
                                 <buildArg>
                                     -march=compatibility
@@ -239,9 +240,6 @@
                                     -H:DashboardDump=${imageName}
                                 </buildArg>
                                 <buildArg>
-                                    -H:+DashboardAll
-                                </buildArg>
-                                <buildArg>
                                     -H:IncludeResources=
                                 </buildArg>
                                 <buildArg>
@@ -249,6 +247,12 @@
                                 </buildArg>
                                 <buildArg>
                                     --enable-url-protocols=https
+                                </buildArg>
+                                <buildArg>
+                                    -Djava.locale.providers=CLDR
+                                </buildArg>
+                                <buildArg>
+                                    -H:IncludeLocales=zh
                                 </buildArg>
                             </buildArgs>
                             <mainClass>com.zrlog.web.Application</mainClass>
@@ -316,7 +320,7 @@
                                     <useBaseVersion>false</useBaseVersion>
                                     <excludeScope>${jakarta-scope}</excludeScope>
                                     <excludeArtifactIds>
-                                        junit,hamcrest-core
+                                        junit,hamcrest-core,zrlog-polyglot-template
                                     </excludeArtifactIds>
                                 </configuration>
                             </execution>
@@ -354,6 +358,7 @@
                                 <exclude>lambda.json</exclude>
                             </excludes>
                             <archive>
+                                <addMavenDescriptor>false</addMavenDescriptor>
                                 <manifest>
                                     <addClasspath>true</addClasspath>
                                     <classpathPrefix>${libOutputPath}</classpathPrefix>

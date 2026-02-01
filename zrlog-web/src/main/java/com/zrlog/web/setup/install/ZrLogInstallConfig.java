@@ -1,10 +1,8 @@
 package com.zrlog.web.setup.install;
 
-import com.hibegin.common.util.EnvKit;
 import com.hibegin.common.util.SecurityUtils;
-import com.hibegin.common.util.StringUtils;
 import com.zrlog.admin.web.plugin.UpdateVersionTimerTask;
-import com.zrlog.business.service.DbUpgradeService;
+import com.zrlog.business.version.UpgradeVersionHandler;
 import com.zrlog.common.Constants;
 import com.zrlog.common.Updater;
 import com.zrlog.common.UpdaterTypeEnum;
@@ -95,7 +93,7 @@ public class ZrLogInstallConfig extends DefaultInstallConfig {
 
     @Override
     public String getZrLogSqlVersion() {
-        return DbUpgradeService.SQL_VERSION + "";
+        return UpgradeVersionHandler.SQL_VERSION + "";
     }
 
     @Override
@@ -122,16 +120,12 @@ public class ZrLogInstallConfig extends DefaultInstallConfig {
     }
 
     @Override
-    public boolean isContainerMode() {
-        //return true;
-        return ZrLogUtil.isDockerMode() || EnvKit.isFaaSMode();
+    public boolean isAskConfig() {
+        return zrLogConfig.isAskConfig();
     }
 
     @Override
     public boolean isMissingConfig() {
-        if (!isContainerMode()) {
-            return false;
-        }
-        return StringUtils.isEmpty(ZrLogUtil.getDbInfoByEnv());
+        return zrLogConfig.isMissingConfig();
     }
 }

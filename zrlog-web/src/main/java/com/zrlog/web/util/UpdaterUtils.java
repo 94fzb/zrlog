@@ -11,10 +11,10 @@ import java.io.File;
 public class UpdaterUtils {
 
     public static Updater getUpdater(String[] args, File file) {
-        if (EnvKit.isNativeImage()) {
-            return new NativeImageUpdater(args, file);
-        }
         try {
+            if (EnvKit.isNativeImage()) {
+                return new NativeImageUpdater(args, file);
+            }
             File jarFile = new File(System.getProperty("java.class.path"));
             return new ZipUpdater(args, jarFile);
         } catch (Throwable e) {

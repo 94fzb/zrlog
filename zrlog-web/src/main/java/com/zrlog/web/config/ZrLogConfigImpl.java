@@ -1,6 +1,8 @@
 package com.zrlog.web.config;
 
 import com.hibegin.common.dao.DataSourceWrapper;
+import com.hibegin.http.server.SimpleWebServer;
+import com.hibegin.http.server.WebServerBuilder;
 import com.mysql.cj.jdbc.AbandonedConnectionCleanupThread;
 import com.zrlog.business.plugin.CacheManagerPlugin;
 import com.zrlog.business.plugin.PluginCorePluginImpl;
@@ -23,15 +25,14 @@ import java.util.logging.Level;
 public class ZrLogConfigImpl extends ZrLogConfig {
 
     private final SetupConfig setupConfig;
+    private WebServerBuilder serverBuilder;
 
     public ZrLogConfigImpl(Integer port, Updater updater, String contextPath) {
         super(port, updater, contextPath);
         this.setupConfig = new SetupConfig(this, dbPropertiesFile, installLockFile, contextPath, webSetups, updater);
         //config
         this.webSetups.forEach(WebSetup::setup);
-        if (!setupConfig.isIncludeBlog()) {
-            serverConfig.getInterceptors().add(DefaultInterceptor.class);
-        }
+        serverConfig.getInterceptors().add(DefaultInterceptor.class);
     }
 
     @Override
@@ -68,14 +69,37 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         return plugins;
     }
 
-    @Override
-    public void stop() {
-        super.stop();
+    public void setServerBuilder(WebServerBuilder serverBuilder) {
+        this.serverBuilder = serverBuilder;
+    }
+
+    private void closeDataSource() {
         if (Objects.nonNull(this.dataSource)) {
             if (this.dataSource.isWebApi()) {
                 return;
             }
         }
         AbandonedConnectionCleanupThread.checkedShutdown();
+    }
+
+    private void destroyWebServer() {
+        if (Objects.isNull(serverBuilder)) {
+            return;
+        }
+        SimpleWebServer webServer = serverBuilder.getWebServer();
+        if (Objects.isNull(webServer)) {
+            return;
+        }
+        webServer.destroy("by stop");
+    }
+
+    @Override
+    public void stop() {
+        try {
+            super.stop();
+            closeDataSource();
+        } finally {
+            destroyWebServer();
+        }
     }
 }

@@ -12,8 +12,8 @@ import com.zrlog.common.exception.NotImplementException;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.ZrLogBaseNativeImageUtils;
 import com.zrlog.util.ZrLogUtil;
-import com.zrlog.web.util.UpdaterUtils;
 import com.zrlog.web.config.ZrLogConfigImpl;
+import com.zrlog.web.util.UpdaterUtils;
 
 import java.io.File;
 import java.util.Objects;
@@ -80,9 +80,11 @@ public class Application {
     }
 
     public static WebServerBuilder webServerBuilder(int port, String contextPath, Updater updater) {
-        Constants.zrLogConfig = new ZrLogConfigImpl(port, updater, contextPath);
-        WebServerBuilder builder = new WebServerBuilder.Builder().config(Constants.zrLogConfig).build();
-        Constants.zrLogConfig.getServerConfig().addCreateErrorHandle(() -> {
+        ZrLogConfigImpl zrLogConfig = new ZrLogConfigImpl(port, updater, contextPath);
+        Constants.zrLogConfig = zrLogConfig;
+        WebServerBuilder builder = new WebServerBuilder.Builder().config(zrLogConfig).build();
+        zrLogConfig.setServerBuilder(builder);
+        zrLogConfig.getServerConfig().addCreateErrorHandle(() -> {
             if (updater instanceof ZipUpdater) {
                 Thread.sleep(1000);
                 builder.start();

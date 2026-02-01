@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.hibegin</groupId>
         <artifactId>zrlog-base</artifactId>
-        <version>3.2.125</version>
+        <version>3.3.8</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>zrlog-web-parent</artifactId>
@@ -28,10 +28,11 @@
         <jakarta-scope>compile</jakarta-scope>
         <servlet-scope>compile</servlet-scope>
         <lambda-scope>compile</lambda-scope>
+        <zrlog-polyglot-template-scope>provided</zrlog-polyglot-template-scope>
         <servlet-api.version>6.1.0</servlet-api.version>
-        <zrlog-install-web.version>3.2.30</zrlog-install-web.version>
-        <zrlog-blog-web.version>3.2.122</zrlog-blog-web.version>
-        <zrlog-admin-web.version>3.2.127</zrlog-admin-web.version>
+        <zrlog-install-web.version>3.2.32</zrlog-install-web.version>
+        <zrlog-blog-web.version>3.3.8</zrlog-blog-web.version>
+        <zrlog-admin-web.version>3.3.8</zrlog-admin-web.version>
         <mysql-scope>compile</mysql-scope>
     </properties>
 
@@ -143,6 +144,12 @@
                 <artifactId>jakarta.servlet-api</artifactId>
                 <version>${servlet-api.version}</version>
                 <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.hibegin</groupId>
+                <artifactId>zrlog-polyglot-template</artifactId>
+                <version>${zrlog-blog-web.version}</version>
+                <scope>${zrlog-polyglot-template-scope}</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
