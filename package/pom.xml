@@ -254,6 +254,9 @@
                                 <buildArg>
                                     -H:IncludeLocales=zh
                                 </buildArg>
+                                <buildArg>
+                                    --emit build-report
+                                </buildArg>
                             </buildArgs>
                             <mainClass>com.zrlog.web.Application</mainClass>
                             <agent>
