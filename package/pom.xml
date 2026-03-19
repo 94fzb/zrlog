@@ -21,7 +21,7 @@
         <architecture>all</architecture>
         <packageType>jar</packageType>
         <gitCommitId>0000000</gitCommitId>
-        <tomcat.version>10.1.49</tomcat.version>
+        <tomcat.version>10.1.52</tomcat.version>
     </properties>
 
     <dependencies>
