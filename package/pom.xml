@@ -21,7 +21,7 @@
         <architecture>all</architecture>
         <packageType>jar</packageType>
         <gitCommitId>0000000</gitCommitId>
-        <tomcat.version>10.1.47</tomcat.version>
+        <tomcat.version>10.1.49</tomcat.version>
     </properties>
 
     <dependencies>
@@ -253,6 +253,9 @@
                                 </buildArg>
                                 <buildArg>
                                     -H:IncludeLocales=zh
+                                </buildArg>
+                                <buildArg>
+                                    --emit build-report
                                 </buildArg>
                             </buildArgs>
                             <mainClass>com.zrlog.web.Application</mainClass>
