@@ -63,4 +63,17 @@ echo "#### 📃 Build.properties Info" >> "$REPORT_FILE"
   echo '```'
 } >> "$REPORT_FILE"
 
+./mvnw -Dzrlog-polyglot-template-scope='test' -Dlambda-scope="test" -Dservlet-scope="test" -Djakarta-scope="test" com.github.ferstl:depgraph-maven-plugin:aggregate -DgraphFormat=json -DtransitiveExcludes=* -Dscope=compile
+jq '[.artifacts[] | {key: (.groupId + ":" + .artifactId), value: .version}] | from_entries' target/dependency-graph.json > target/pure-deps.json
+targetJsonFile=zrlog-web/src/main/resources/pure-deps.json
+cat 'target/pure-deps.json'  |grep -v "servlet" > ${targetJsonFile}
+# Build dep info
+echo "#### 📃 Dependency Info" >> "$REPORT_FILE"
+{
+  echo '```json'
+  # shellcheck disable=SC2046
+  echo "$(cat ${targetJsonFile})"
+  echo '```'
+} >> "$REPORT_FILE"
+
 cp ${REPORT_FILE} "doc/"
