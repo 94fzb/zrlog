@@ -1,50 +1,65 @@
 ## ZrLog ![build-preview](https://github.com/94fzb/zrlog/actions/workflows/java-build-preview-package-zip.yml/badge.svg) ![build-release](https://github.com/94fzb/zrlog/actions/workflows/java-build-release-package-zip.yml/badge.svg) [![Apache License](http://img.shields.io/badge/license-apache2-orange.svg?style=flat)](http://www.apache.org/licenses/LICENSE-2.0)
 
-[Chinese](README.md) | [English](README.en-us.md)
+[中文](README.md) | [English](README.en-us.md)
 
-ZrLog is a blog/CMS program developed in Java. It is simple, easy to use, componentized, and has low memory footprint.
-Bring your own Markdown editor and let more focus on writing, rather than spending a lot of time learning the use of the
-program.
+ZrLog is a lightweight blog/Content Management System (CMS) developed in Java. Featuring a componentized architecture, it delivers a low memory footprint and seamless deployment logic. With its built-in Markdown editor, ZrLog is dedicated to providing users with an efficient and focused writing environment.
 
 ### Homepage
 
 [https://www.zrlog.com](https://www.zrlog.com)
 
-### Pictures
+### Previews
 
-![](https://www.zrlog.com/assets/screenprint/post-detail.png)
+#### Article Detail Page
 
-![](https://www.zrlog.com/assets/screenprint/article-edit.png)
+![](https://www.zrlog.com/assets/screenprint/post-detail.png?v=2)
+
+#### Article Edit Page
+
+![](https://www.zrlog.com/assets/screenprint/article-edit-light.png?v=2)
+
+#### Article Edit Page [Dark Mode]
+
+![](https://www.zrlog.com/assets/screenprint/article-edit-dark.png?v=2)
+
+#### Article Edit Page [PWA Full Screen]
+
+![](https://www.zrlog.com/assets/screenprint/article-edit-light-pwa-full-screen.png?v=2)
+
+#### Article Edit Page [PWA Full Screen - Settings]
+
+![](https://www.zrlog.com/assets/screenprint/article-edit-light-pwa-full-screen-setting.png?v=2)
 
 ### Features
 
-1. Provide management of logs, categories, tags, and comments
-2. Support plugin mode [How to write a plugin](https://blog.zrlog.com/zrlog-plugin-dev.html)
-3. Highly customizable theme features [How to make a set of themes](https://blog.zrlog.com/ake-theme-for-zrlog.html)
-4. Support third party comment plugin
-5. Provide `markdown` mainstream rich text editor, basically meet the editing needs of administrators
-6. Page static, cache public data, faster access
-7. Support for extending third-party cloud storage (default seven cattle)
-8. Support database scheduled backup
-9. Online update upgrade<br/>
-10. ...
+- **Content Management**: Provides comprehensive management for articles (logs), categories, tags, and comments.
+- **Extensibility**: Supports core functionality expansion through a plugin mechanism ([How to write a plugin](https://blog.zrlog.com/zrlog-plugin-dev.html)) and integrates with third-party comment services.
+- **Theming**: Features a flexible theme system that supports custom page views ([How to create a theme](https://blog.zrlog.com/make-theme-for-zrlog.html)).
+- **Editing Experience**: Includes a built-in Markdown rich text editor tailored for streamlined content creation.
+- **Performance Optimization**: Supports static page generation and system-level caching for public data, significantly improving response speed.
+- **Cloud Integration**: Supports connecting with third-party cloud object storage services (e.g. Qiniu Cloud natively out-of-the-box).
+- **System Availability**: Provides automatic scheduled database backups and supports online system upgrades.
 
-### Quick start
+### Quick Start
 
-- Start directly by embedding tomcat and find `com.zrlog.web.Application` to start with this `main()`
-- Start with Maven commands (without relying on any IDE)
-    - Windows uses `bin\mvn-run.cmd`
-    - Unix uses `sh bin/mvn-run.sh`
+You can quickly boot up the application using one of the following methods:
 
-### Program installation
+- **Embedded Container Start**: Directly run the `main()` method in the `com.zrlog.web.Application` class via an IDE.
+- **Maven Command Execution** (IDE independent):
+    - Windows: execute `bin\mvn-run.cmd`
+    - Unix/Linux/macOS: execute `sh bin/mvn-run.sh`
 
-- Deployment environment prerequisites
-    - 1.jdk version >= 21
-    - 2.mysql/cloudflare d1
-- Data initialization
-    - 1.Download [latest zip](https://www.zrlog.com/download) unzip, and run sh bin/run.sh or bin\run.bat (for windows)
-    - 2.Visit `http://host:port/install`
-    - 3.Fill in the database, administrator information, complete the installation
+### Installation & Deployment
+
+* **Environment Requirements**
+    * JDK Version: `>= 11` (Note: If using the GraalVM Native Image packaging, a built-in JDK environment may not be required for the runtime executable).
+    * Database: MySQL `>= 5.7` or Cloudflare D1 (accessed via Web API).
+
+* **Data Initialization**
+    * Download the [latest zip package](https://www.zrlog.com/download) and unzip it.
+    * Run `bin/start.sh` (Unix/macOS) or `bin/start.bat` (Windows) in the root directory.
+    * Visit `http://host:port/install` in your browser.
+    * Provide the database connection and administrator account settings as guided to complete the setup.
 
 ### ChangeLog
 
@@ -52,22 +67,31 @@ program.
 
 ### Sample Website
 
-* Website [http://demo.zrlog.com](https://demo.zrlog.com)
-* Management address [admin/login](https://demo.zrlog.com/admin/login)
-* Username admin
-* Password 123456
+* Demo Website: [https://demo.zrlog.com](https://demo.zrlog.com)
+* Admin Login: [admin/login](https://demo.zrlog.com/admin/login)
+* Username: admin
+* Password: 123456
 
-### Getting help
+### Support & Help
 
-* QQ group 6399942
-* Mail support@zrlog.com
-* Have any questions about the program, welcome feedback [http://blog.zrlog.com/feedback.html](https://blog.zrlog.com/feedback.html)
+* WeChat: hibegin
+* QQ Group: 6399942
+* Email Support: support@zrlog.com
+* Feedback: We welcome discussions and feedback on our [Feedback Page](https://blog.zrlog.com/feedback.html) or via GitHub Issues.
 
 ### FAQ
 
-If you have some problems, you can go here to find [FAQ](https://blog.zrlog.com/faq-collect.html)
+#### Unable to complete installation with correct database info under Docker
+
+- Please refer to the troubleshooting guide: [Relevant Summaries](https://blog.zrlog.com/faq-collect.html)
+
+#### Other operational issues
+
+If you encounter errors during deployment, please check the official [FAQ collection](https://blog.zrlog.com/faq-collect.html).
 
 ### Thanks
+
+Special thanks to the following open source projects and services:
 
 * [JFinal](https://jfinal.com)
 * [Editor.md](https://pandao.github.io/editor.md/)
