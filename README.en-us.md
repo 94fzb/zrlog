@@ -1,8 +1,8 @@
 ## ZrLog ![build-preview](https://github.com/94fzb/zrlog/actions/workflows/java-build-preview-package-zip.yml/badge.svg) ![build-release](https://github.com/94fzb/zrlog/actions/workflows/java-build-release-package-zip.yml/badge.svg) [![Apache License](http://img.shields.io/badge/license-apache2-orange.svg?style=flat)](http://www.apache.org/licenses/LICENSE-2.0)
 
-[中文](README.md) | [English](README.en-us.md)
+[Chinese](README.md) | [English](README.en-us.md)
 
-ZrLog is a lightweight blog/Content Management System (CMS) developed in Java. Featuring a componentized architecture, it delivers a low memory footprint and seamless deployment logic. With its built-in Markdown editor, ZrLog is dedicated to providing users with an efficient and focused writing environment.
+ZrLog is a professional open-source blog system (CMS) developed in Java. Built specifically for content creation, it eliminates tedious configuration processes, offering a low memory footprint and one-click deployment capabilities. It features an embedded native Markdown editor and a modern admin panel powered by React + Ant Design to provide a lightweight and highly efficient writing workspace.
 
 ### Homepage
 
@@ -11,87 +11,80 @@ ZrLog is a lightweight blog/Content Management System (CMS) developed in Java. F
 ### Previews
 
 #### Article Detail Page
-
 ![](https://www.zrlog.com/assets/screenprint/post-detail.png?v=2)
 
 #### Article Edit Page
-
 ![](https://www.zrlog.com/assets/screenprint/article-edit-light.png?v=2)
 
 #### Article Edit Page [Dark Mode]
-
 ![](https://www.zrlog.com/assets/screenprint/article-edit-dark.png?v=2)
 
 #### Article Edit Page [PWA Full Screen]
-
 ![](https://www.zrlog.com/assets/screenprint/article-edit-light-pwa-full-screen.png?v=2)
 
 #### Article Edit Page [PWA Full Screen - Settings]
-
 ![](https://www.zrlog.com/assets/screenprint/article-edit-light-pwa-full-screen-setting.png?v=2)
 
 ### Features
 
-- **Content Management**: Provides comprehensive management for articles (logs), categories, tags, and comments.
-- **Extensibility**: Supports core functionality expansion through a plugin mechanism ([How to write a plugin](https://blog.zrlog.com/zrlog-plugin-dev.html)) and integrates with third-party comment services.
-- **Theming**: Features a flexible theme system that supports custom page views ([How to create a theme](https://blog.zrlog.com/make-theme-for-zrlog.html)).
-- **Editing Experience**: Includes a built-in Markdown rich text editor tailored for streamlined content creation.
-- **Performance Optimization**: Supports static page generation and system-level caching for public data, significantly improving response speed.
-- **Cloud Integration**: Supports connecting with third-party cloud object storage services (e.g. Qiniu Cloud natively out-of-the-box).
-- **System Availability**: Provides automatic scheduled database backups and supports online system upgrades.
+1. **Content Management**: Comprehensive handling for logs, categories, tags, and visitor comments.
+2. **Extensibility**: Support plugin expansion mechanism ([How to write a plugin](https://blog.zrlog.com/zrlog-plugin-dev.html)) and seamless integration with third-party comment widgets.
+3. **Theming Customization**: Highly adaptable theme system granting complete layout control ([How to create a custom theme](https://blog.zrlog.com/make-theme-for-zrlog.html)).
+4. **Editing Experience**: Rich-text Markdown capabilities natively providing a clean environment tailored for premium content writing.
+5. **Performance & Speed**: Enhanced built-in static page generation combined with shared data cashing logic.
+6. **Cloud & Serverless Ready**: Smooth interactions built around third-party cloud data persistence (e.g. Qiniu natively) alongside extreme Serverless / D1 DB adaptabilities.
+7. **System Dependability**: Silent online patching support with synchronized scheduled database backup measures.
 
-### Quick Start
+### Quick Start (For Developers & Testing)
 
-You can quickly boot up the application using one of the following methods:
-
-- **Embedded Container Start**: Directly run the `main()` method in the `com.zrlog.web.Application` class via an IDE.
-- **Maven Command Execution** (IDE independent):
-    - Windows: execute `bin\mvn-run.cmd`
-    - Unix/Linux/macOS: execute `sh bin/mvn-run.sh`
+- Embed and initiate within your IDE by targeting `com.zrlog.web.Application`'s `main()` runtime context directly.
+- Standard framework-independent invocation via Maven scripts:
+    - Windows users execute `bin\mvn-run.cmd`
+    - Unix/macOS execute `sh bin/mvn-run.sh`
 
 ### Installation & Deployment
 
-* **Environment Requirements**
-    * JDK Version: `>= 11` (Note: If using the GraalVM Native Image packaging, a built-in JDK environment may not be required for the runtime executable).
-    * Database: MySQL `>= 5.7` or Cloudflare D1 (accessed via Web API).
+* **Deployment Environment Qualifications**
+    * JDK Setup: `v11` or onward (Notice: Avoid setting up an isolated JDK container if exploiting the GraalVM Native Image release variants).
+    * Backend Databases Supported: `MySQL >= 5.7` or `Cloudflare D1` (Operated over Serverless-friendly Web APIs).
 
-* **Data Initialization**
-    * Download the [latest zip package](https://www.zrlog.com/download) and unzip it.
-    * Run `bin/start.sh` (Unix/macOS) or `bin/start.bat` (Windows) in the root directory.
-    * Visit `http://host:port/install` in your browser.
-    * Provide the database connection and administrator account settings as guided to complete the setup.
+* **Method 1: Immediate Spin-up Using Docker (Highly Recommended)**
+  Deploy without underlying ecosystem hurdles via the streamlined standard container command:
+  ```bash
+  docker run -p 8080:8080 -v $(pwd)/conf:/opt/zrlog/conf zrlog/zrlog
+  ```
+
+* **Method 2: Static Zip Extraction Sequence**
+    * Download the [Latest Zip Compilation](https://www.zrlog.com/download) and decompress it.
+    * Proceed to execute `bin/start.sh` (or `bin/start.bat` for Windows) mapped at the main repository depth.
+    * Visit your instance at `http://host:port/install`.
+    * Accomplish the configuration wizard sequence by embedding respective database profiles.
 
 ### ChangeLog
 
-[View the full ChangeLog](https://www.zrlog.com/changelog/index.html?ref=md)
+[View the complete ChangeLog iteration here](https://www.zrlog.com/changelog/index.html?ref=md)
 
-### Sample Website
+### Sample Demo Interfaces
 
-* Demo Website: [https://demo.zrlog.com](https://demo.zrlog.com)
-* Admin Login: [admin/login](https://demo.zrlog.com/admin/login)
-* Username: admin
-* Password: 123456
+* Website Live Endpoint: [http://demo.zrlog.com](https://demo.zrlog.com)
+* Administration Node: [admin/login](https://demo.zrlog.com/admin/login)
+* Provided Username: admin / Password: 123456
 
-### Support & Help
+### Inquiries & Support Contexts
 
-* WeChat: hibegin
-* QQ Group: 6399942
-* Email Support: support@zrlog.com
-* Feedback: We welcome discussions and feedback on our [Feedback Page](https://blog.zrlog.com/feedback.html) or via GitHub Issues.
+* Official WeChat Node: hibegin
+* Corporate/HelpDesk Emails: support@zrlog.com
+* Feedback Tracker & Concerns submission: [Jump to our Bug Reports Feed](https://blog.zrlog.com/feedback.html).
 
-### FAQ
+### FAQ Guidelines
 
-#### Unable to complete installation with correct database info under Docker
+#### Docker Instance rejects database properties upon setup?
+- Consider reviewing standard host-volume connections. Troubleshooting outlines available here: [FAQ References](https://blog.zrlog.com/faq-collect.html).
 
-- Please refer to the troubleshooting guide: [Relevant Summaries](https://blog.zrlog.com/faq-collect.html)
+#### Peripheral operational roadblocks
+Resolve distinct errors and look up functional bypasses directly via: [Categorized Platform FAQS](https://blog.zrlog.com/faq-collect.html).
 
-#### Other operational issues
-
-If you encounter errors during deployment, please check the official [FAQ collection](https://blog.zrlog.com/faq-collect.html).
-
-### Thanks
-
-Special thanks to the following open source projects and services:
+### Open-Source Acknowledgments
 
 * [JFinal](https://jfinal.com)
 * [Editor.md](https://pandao.github.io/editor.md/)
@@ -102,6 +95,6 @@ Special thanks to the following open source projects and services:
 * [e-lionel](http://www.e-lionel.com)
 * [Cloudflare](https://www.cloudflare.com)
 
-### License
+### License Agreements
 
 ZrLog is Open Source software released under the [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0.html).
