@@ -240,7 +240,7 @@
                                     -H:DashboardDump=${imageName}
                                 </buildArg>
                                 <buildArg>
-                                    -H:IncludeResources=
+                                    -H:IncludeResources=META-INF/services/.*
                                 </buildArg>
                                 <buildArg>
                                     --enable-url-protocols=http
