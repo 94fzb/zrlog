@@ -14,7 +14,7 @@
         <module>package</module>
     </modules>
     <name>zrlog</name>
-    <description>ZrLog是使用Java开发的博客/CMS程序，具有简约，易用，组件化，内存占用低等特点。自带Markdown编辑器，让更多的精力放在写作上，而不是花费大量时间在学习程序的使用上。
+    <description>ZrLog 是一款由 Java 开发的专业开源博客系统（CMS）。项目专为个人博主与内容创作者而生，摒弃繁琐配置，具备内存占用低、一键部署等工程特性。内置原生 Markdown 编辑器，且管理界面基于 React + Ant Design 构建，致力于为您提供既轻量又高效的写作空间。
     </description>
     <url>https://www.zrlog.com</url>
 
