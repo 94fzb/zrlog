@@ -13,11 +13,17 @@ import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.ZrLogUtil;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.ServiceLoader;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * 该类仅提供基础的 graalvm native image agent 运行依赖反射扫描等功能，不作为实际的启动入口
  */
 public class GraalvmAgentApplication {
+
+    private static final Logger LOGGER = Logger.getLogger(GraalvmAgentApplication.class.getName());
 
     private static void lambdaJson() {
         NativeImageUtils.gsonNativeAgentByClazz(Arrays.asList(LambdaApiGatewayRequest.class, ApiGatewayHttp.class,
@@ -29,8 +35,16 @@ public class GraalvmAgentApplication {
         BlogBuildInfoUtil.getBlogProp();
         PathUtil.setRootPath(System.getProperty("user.dir").replace("\\", "/").replace("/package/target", ""));
         lambdaJson();
+        logWebSetupProviders();
         //last
         webserver(args);
+    }
+
+    private static void logWebSetupProviders() {
+        List<String> providerNames = ServiceLoader.load(WebSetupProvider.class).stream()
+                .map(provider -> provider.type().getName())
+                .collect(Collectors.toList());
+        LOGGER.info("WebSetup SPI providers: " + providerNames);
     }
 
     private static void webserver(String[] args) {
