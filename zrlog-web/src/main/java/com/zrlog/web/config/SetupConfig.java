@@ -34,7 +34,6 @@ public class SetupConfig {
                 .map(ServiceLoader.Provider::get)
                 .sorted(Comparator.comparingInt(WebSetupProvider::order).thenComparing(WebSetupProvider::name))
                 .collect(Collectors.toList());
-        boolean blogLoaded = false;
         for (WebSetupProvider webSetupProvider : webSetupProviders) {
             String name = webSetupProvider.name();
             if (disableModules.contains(name)) {
@@ -44,7 +43,6 @@ public class SetupConfig {
                 WebSetup webSetup = webSetupProvider.create(webSetupContext);
                 if (Objects.nonNull(webSetup)) {
                     webSetups.add(webSetup);
-                    blogLoaded = blogLoaded || Objects.equals("blog", name);
                 }
             } catch (Throwable e) {
                 LOGGER.warning("Setup " + name + " web error: " + e.getMessage());
