@@ -3,12 +3,12 @@
     <parent>
         <groupId>com.hibegin</groupId>
         <artifactId>zrlog-base</artifactId>
-        <version>3.3.10-SNAPSHOT</version>
+        <version>3.3.10</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>zrlog-web-parent</artifactId>
     <packaging>pom</packaging>
-    <version>3.3.2-SNAPSHOT</version>
+    <version>3.3.2</version>
     <modules>
         <module>zrlog-web</module>
         <module>package</module>
@@ -31,8 +31,8 @@
         <zrlog-polyglot-template-scope>provided</zrlog-polyglot-template-scope>
         <servlet-api.version>6.1.0</servlet-api.version>
         <zrlog-install-web.version>3.2.32</zrlog-install-web.version>
-        <zrlog-blog-web.version>3.3.10-SNAPSHOT</zrlog-blog-web.version>
-        <zrlog-admin-web.version>3.3.10-SNAPSHOT</zrlog-admin-web.version>
+        <zrlog-blog-web.version>3.3.10</zrlog-blog-web.version>
+        <zrlog-admin-web.version>3.3.10</zrlog-admin-web.version>
         <mysql-scope>compile</mysql-scope>
     </properties>
 
@@ -131,7 +131,7 @@
             <dependency>
                 <groupId>com.hibegin</groupId>
                 <artifactId>zrlog-web</artifactId>
-                <version>3.3.2-SNAPSHOT</version>
+                <version>3.3.2</version>
             </dependency>
             <dependency>
                 <groupId>com.mysql</groupId>
