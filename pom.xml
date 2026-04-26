@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.hibegin</groupId>
         <artifactId>zrlog-base</artifactId>
-        <version>3.3.10</version>
+        <version>3.3.11-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>zrlog-web-parent</artifactId>
@@ -32,7 +32,7 @@
         <servlet-api.version>6.1.0</servlet-api.version>
         <zrlog-install-web.version>3.2.32</zrlog-install-web.version>
         <zrlog-blog-web.version>3.3.10</zrlog-blog-web.version>
-        <zrlog-admin-web.version>3.3.10</zrlog-admin-web.version>
+        <zrlog-admin-web.version>3.3.11-SNAPSHOT</zrlog-admin-web.version>
         <mysql-scope>compile</mysql-scope>
     </properties>
 
