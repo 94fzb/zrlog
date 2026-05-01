@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
  */
 public class GraalvmAgentApplication {
 
-    private static final Logger LOGGER = Logger.getLogger(GraalvmAgentApplication.class.getName());
 
     private static void lambdaJson() {
         NativeImageUtils.gsonNativeAgentByClazz(Arrays.asList(LambdaApiGatewayRequest.class, ApiGatewayHttp.class,
@@ -44,7 +43,7 @@ public class GraalvmAgentApplication {
         List<String> providerNames = ServiceLoader.load(WebSetupProvider.class).stream()
                 .map(provider -> provider.type().getName())
                 .collect(Collectors.toList());
-        LOGGER.info("WebSetup SPI providers: " + providerNames);
+        Logger.getLogger(GraalvmAgentApplication.class.getName()).info("WebSetup SPI providers: " + providerNames);
     }
 
     private static void webserver(String[] args) {
