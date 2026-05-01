@@ -243,9 +243,6 @@
                                     -H:IncludeResources=META-INF/services/.*
                                 </buildArg>
                                 <buildArg>
-                                    -H:-ReduceImplicitExceptionStackTraceInformation
-                                </buildArg>
-                                <buildArg>
                                     --enable-url-protocols=http
                                 </buildArg>
                                 <buildArg>
