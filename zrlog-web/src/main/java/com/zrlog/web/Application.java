@@ -29,6 +29,7 @@ public class Application {
 
 
     static {
+        EnvKit.enableLoggingToFile();
         if (EnvKit.isLambda()) {
             LambdaApplication.initLambdaEnv();
         }
