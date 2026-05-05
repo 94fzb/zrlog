@@ -3,10 +3,17 @@ on:
   push:
     branches:
       - master
+  workflow_dispatch:
+  repository_dispatch:
+    types:
+      - zrlog-admin-web-preview-updated
 jobs:
   build:
     name: ZrLog package ${{ matrix.os }} ${{ matrix.architecture }}
     runs-on: ${{ matrix.os }}
+    env:
+      ZRLOG_BUILD_ID: ${{ github.event.client_payload.build_id || '' }}
+      ZRLOG_BUILD_TIME: ${{ github.event.client_payload.build_time || '' }}
     concurrency:
       group: deploy-preview-on-${{ matrix.os }}-java   # 同一个 group 的任务会排队执行
       cancel-in-progress: false # 不取消前一个任务，而是等待
@@ -16,6 +23,8 @@ jobs:
         architecture: [ amd64 ]
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event_name == 'push' && github.sha || 'refs/heads/master' }}
       - uses: actions/setup-java@v3
         with:
           distribution: 'temurin'

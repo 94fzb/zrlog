@@ -3,10 +3,17 @@ on:
   push:
     branches:
       - master
+  workflow_dispatch:
+  repository_dispatch:
+    types:
+      - zrlog-admin-web-preview-updated
 jobs:
   build:
     name: ZrLog on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    env:
+      ZRLOG_BUILD_ID: ${{ github.event.client_payload.build_id || '' }}
+      ZRLOG_BUILD_TIME: ${{ github.event.client_payload.build_time || '' }}
     concurrency:
       group: deploy-preview-on-${{ matrix.os }}-faas   # 同一个 group 的任务会排队执行
       cancel-in-progress: false # 不取消前一个任务，而是等待
@@ -17,6 +24,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          ref: ${{ github.event_name == 'push' && github.sha || 'refs/heads/master' }}
       - uses: graalvm/setup-graalvm@v1
         with:
           java-version: '25'

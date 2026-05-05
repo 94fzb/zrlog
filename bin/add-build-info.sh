@@ -12,8 +12,9 @@ else
 runModeDesc="\\u5F00\\u53D1\\u7248\\u672C"
 fi
 
-Date=$(git log -1 --format=%cd --date=format:'%Y-%m-%d %H:%M:%S%z' | sed "s/\([+-]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1\2:\3/")
-buildId=$(git rev-parse --short HEAD)
+Date="${ZRLOG_BUILD_TIME:-$(git log -1 --format=%cd --date=format:'%Y-%m-%d %H:%M:%S%z' | sed "s/\([+-]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1\2:\3/")}"
+defaultBuildId="$(git rev-parse --short HEAD)"
+buildId="${ZRLOG_BUILD_ID:-$defaultBuildId}"
 
 OS="$(uname)"
 case $OS in
