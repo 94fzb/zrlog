@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-baseVersion=3.3
+baseVersion=3.4
 releaseVersion=${baseVersion}.${1}
 nextVersion=${baseVersion}.$((${1}+1))-SNAPSHOT
 tagName="v${releaseVersion}"

@@ -82,11 +82,6 @@ public class ZrLogInstallConfig extends DefaultInstallConfig {
     }
 
     @Override
-    public String encryptPassword(String password) {
-        return SecurityUtils.md5(password);
-    }
-
-    @Override
     public String defaultTemplatePath() {
         return Constants.DEFAULT_TEMPLATE_PATH;
     }

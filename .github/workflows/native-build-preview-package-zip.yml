@@ -16,7 +16,7 @@ jobs:
       ZRLOG_BUILD_TIME: ${{ github.event.client_payload.build_time || '' }}
     concurrency:
       group: deploy-preview-on-${{ matrix.os }}-native   # 同一个 group 的任务会排队执行
-      cancel-in-progress: false # 不取消前一个任务，而是等待
+      cancel-in-progress: true # 预览版本，取消前一个任务
     strategy:
       matrix:
         os: [ ubuntu-22.04,ubuntu-24.04-arm,macos-15-intel,macos-14,windows-2022 ]

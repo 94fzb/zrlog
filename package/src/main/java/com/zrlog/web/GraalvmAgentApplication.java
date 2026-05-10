@@ -24,6 +24,10 @@ import java.util.stream.Collectors;
 public class GraalvmAgentApplication {
 
 
+    static {
+        Constants.init();
+    }
+
     private static void lambdaJson() {
         NativeImageUtils.gsonNativeAgentByClazz(Arrays.asList(LambdaApiGatewayRequest.class, ApiGatewayHttp.class,
                 ApiGatewayRequestContext.class, LambdaApiGatewayResponse.class));
