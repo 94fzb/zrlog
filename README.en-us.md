@@ -2,7 +2,7 @@
 
 [Chinese](README.md) | [English](README.en-us.md)
 
-ZrLog is a professional open-source blog system (CMS) developed in Java. Built specifically for content creation, it eliminates tedious configuration processes, offering a low memory footprint and one-click deployment capabilities. It features an embedded native Markdown editor and a modern admin panel powered by React + Ant Design to provide a lightweight and highly efficient writing workspace.
+ZrLog is an open-source blog system built with Java. It provides article, category, tag, comment, theme, plugin, static page generation, and online update features. It includes a Markdown editor, and its admin UI is built with React and Ant Design.
 
 ### Homepage
 
@@ -27,62 +27,63 @@ ZrLog is a professional open-source blog system (CMS) developed in Java. Built s
 
 ### Features
 
-1. **Content Management**: Comprehensive handling for logs, categories, tags, and visitor comments.
-2. **Extensibility**: Support plugin expansion mechanism ([How to write a plugin](https://blog.zrlog.com/zrlog-plugin-dev.html)) and seamless integration with third-party comment widgets.
-3. **Theming Customization**: Highly adaptable theme system granting complete layout control ([How to create a custom theme](https://blog.zrlog.com/make-theme-for-zrlog.html)).
-4. **Editing Experience**: Rich-text Markdown capabilities natively providing a clean environment tailored for premium content writing.
-5. **Performance & Speed**: Enhanced built-in static page generation combined with shared data cashing logic.
-6. **Cloud & Serverless Ready**: Smooth interactions built around third-party cloud data persistence (e.g. Qiniu natively) alongside extreme Serverless / D1 DB adaptabilities.
-7. **System Dependability**: Silent online patching support with synchronized scheduled database backup measures.
+1. **Content Management**: Manage articles, categories, tags, and comments.
+2. **Plugin Extensions**: Extend features through plugins ([How to write a plugin](https://blog.zrlog.com/zrlog-plugin-dev.html)) and connect third-party comment services.
+3. **Themes**: Customize and switch blog themes ([How to create a custom theme](https://blog.zrlog.com/make-theme-for-zrlog.html)).
+4. **Article Editing**: Use the built-in Markdown editor for common writing and preview workflows.
+5. **Access Optimization**: Generate static pages and cache shared public data.
+6. **Deployment Options**: Run with Docker, Zip, War, Native Image, or Serverless / D1 deployments.
+7. **Operations**: Use scheduled database backup and online updates.
 
 ### Quick Start (For Developers & Testing)
 
-- Embed and initiate within your IDE by targeting `com.zrlog.web.Application`'s `main()` runtime context directly.
-- Standard framework-independent invocation via Maven scripts:
+- Run `com.zrlog.web.Application`'s `main()` method from your IDE for local debugging.
+- Start with Maven scripts when not using an IDE:
     - Windows users execute `bin\mvn-run.cmd`
     - Unix/macOS execute `sh bin/mvn-run.sh`
 
 ### Installation & Deployment
 
-* **Deployment Environment Qualifications**
-    * JDK Setup: `v11` or onward (Notice: Avoid setting up an isolated JDK container if exploiting the GraalVM Native Image release variants).
-    * Backend Databases Supported: `MySQL >= 5.7` or `Cloudflare D1` (Operated over Serverless-friendly Web APIs).
+* **Runtime Requirements**
+    * JDK: `>= 11` (not required when using the GraalVM Native Image release package).
+    * Database: `MySQL >= 5.7` or `Cloudflare D1` through Web API access.
 
-* **Method 1: Immediate Spin-up Using Docker (Highly Recommended)**
-  Deploy without underlying ecosystem hurdles via the streamlined standard container command:
+* **Method 1: Docker**
+  Start the service with:
   ```bash
   docker run -p 8080:8080 -v $(pwd)/conf:/opt/zrlog/conf zrlog/zrlog
   ```
 
-* **Method 2: Static Zip Extraction Sequence**
-    * Download the [Latest Zip Compilation](https://www.zrlog.com/download) and decompress it.
-    * Proceed to execute `bin/start.sh` (or `bin/start.bat` for Windows) mapped at the main repository depth.
+* **Method 2: Zip Package**
+    * Download the [latest Zip package](https://www.zrlog.com/download) and extract it.
+    * Run `bin/start.sh`, or `bin/start.bat` on Windows, from the extracted directory.
     * Visit your instance at `http://host:port/install`.
-    * Accomplish the configuration wizard sequence by embedding respective database profiles.
+    * Fill in the database and administrator information in the installation page.
 
 ### ChangeLog
 
-[View the complete ChangeLog iteration here](https://www.zrlog.com/changelog/index.html?ref=md)
+[View the complete ChangeLog](https://www.zrlog.com/changelog/index.html?ref=md)
 
-### Sample Demo Interfaces
+### Demo
 
-* Website Live Endpoint: [http://demo.zrlog.com](https://demo.zrlog.com)
-* Administration Node: [admin/login](https://demo.zrlog.com/admin/login)
-* Provided Username: admin / Password: 123456
+* Website: [https://demo.zrlog.com](https://demo.zrlog.com)
+* Admin: [admin/login](https://demo.zrlog.com/admin/login)
+* Username: admin
+* Password: 123456
 
-### Inquiries & Support Contexts
+### Support
 
-* Official WeChat Node: hibegin
-* Corporate/HelpDesk Emails: support@zrlog.com
-* Feedback Tracker & Concerns submission: [Jump to our Bug Reports Feed](https://blog.zrlog.com/feedback.html).
+* WeChat: hibegin
+* Email: support@zrlog.com
+* Feedback and bug reports: [feedback page](https://blog.zrlog.com/feedback.html) or GitHub Issues.
 
-### FAQ Guidelines
+### FAQ
 
-#### Docker Instance rejects database properties upon setup?
-- Consider reviewing standard host-volume connections. Troubleshooting outlines available here: [FAQ References](https://blog.zrlog.com/faq-collect.html).
+#### Docker setup still fails after entering the correct database information
+- Check container networking, the database address, and mounted directories first. More troubleshooting steps are available in the [FAQ](https://blog.zrlog.com/faq-collect.html).
 
-#### Peripheral operational roadblocks
-Resolve distinct errors and look up functional bypasses directly via: [Categorized Platform FAQS](https://blog.zrlog.com/faq-collect.html).
+#### Other questions
+See the [FAQ](https://blog.zrlog.com/faq-collect.html).
 
 ### Open-Source Acknowledgments
 
@@ -95,6 +96,6 @@ Resolve distinct errors and look up functional bypasses directly via: [Categoriz
 * [e-lionel](http://www.e-lionel.com)
 * [Cloudflare](https://www.cloudflare.com)
 
-### License Agreements
+### License
 
 ZrLog is Open Source software released under the [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0.html).

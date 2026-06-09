@@ -17,7 +17,7 @@
                 <include>bootstrap</include>
                 <include>conf/plugins/</include>
                 <include>static/include/templates/*.zip</include>
-                <!--DOC-->
+                <!-- Documentation -->
                 <include>doc/install.md</include>
                 <include>doc/build_system_info.md</include>
                 <include>LICENSE</include>

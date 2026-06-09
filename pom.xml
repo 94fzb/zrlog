@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.hibegin</groupId>
         <artifactId>zrlog-base</artifactId>
-        <version>3.4.0</version>
+        <version>3.5.4</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>zrlog-web-parent</artifactId>
@@ -14,7 +14,7 @@
         <module>package</module>
     </modules>
     <name>zrlog</name>
-    <description>ZrLog 是一款由 Java 开发的专业开源博客系统（CMS）。项目专为个人博主与内容创作者而生，摒弃繁琐配置，具备内存占用低、一键部署等工程特性。内置原生 Markdown 编辑器，且管理界面基于 React + Ant Design 构建，致力于为您提供既轻量又高效的写作空间。
+    <description>ZrLog 是一款基于 Java 的开源博客系统。它提供文章、分类、标签、评论、主题、插件、静态化和在线升级等功能，内置 Markdown 编辑器，管理界面基于 React 和 Ant Design 构建。
     </description>
     <url>https://www.zrlog.com</url>
 
@@ -31,8 +31,8 @@
         <zrlog-polyglot-template-scope>provided</zrlog-polyglot-template-scope>
         <servlet-api.version>6.1.0</servlet-api.version>
         <zrlog-install-web.version>3.3.2</zrlog-install-web.version>
-        <zrlog-blog-web.version>3.4.0</zrlog-blog-web.version>
-        <zrlog-admin-web.version>3.4.3</zrlog-admin-web.version>
+        <zrlog-blog-web.version>3.5.4</zrlog-blog-web.version>
+        <zrlog-admin-web.version>3.5.4</zrlog-admin-web.version>
         <mysql-scope>compile</mysql-scope>
     </properties>
 

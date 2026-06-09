@@ -9,8 +9,8 @@ import com.hibegin.lambda.rest.LambdaApiGatewayRequest;
 import com.hibegin.lambda.rest.LambdaApiGatewayResponse;
 import com.zrlog.common.Constants;
 import com.zrlog.common.ZrLogConfig;
+import com.zrlog.util.ArgsParser;
 import com.zrlog.util.BlogBuildInfoUtil;
-import com.zrlog.util.ZrLogUtil;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,12 +23,13 @@ import java.util.stream.Collectors;
  */
 public class GraalvmAgentApplication {
 
+    private static final Logger LOGGER = Logger.getLogger(GraalvmAgentApplication.class.getName());
 
     static {
         Constants.init();
     }
 
-    private static void lambdaJson() {
+    private static void registerLambdaJsonTypes() {
         NativeImageUtils.gsonNativeAgentByClazz(Arrays.asList(LambdaApiGatewayRequest.class, ApiGatewayHttp.class,
                 ApiGatewayRequestContext.class, LambdaApiGatewayResponse.class));
     }
@@ -37,26 +38,24 @@ public class GraalvmAgentApplication {
         ZrLogConfig.nativeImageAgent = true;
         BlogBuildInfoUtil.getBlogProp();
         PathUtil.setRootPath(System.getProperty("user.dir").replace("\\", "/").replace("/package/target", ""));
-        lambdaJson();
+        registerLambdaJsonTypes();
         logWebSetupProviders();
-        //last
-        webserver(args);
+        startWebServer(args);
     }
 
     private static void logWebSetupProviders() {
         List<String> providerNames = ServiceLoader.load(WebSetupProvider.class).stream()
                 .map(provider -> provider.type().getName())
                 .collect(Collectors.toList());
-        Logger.getLogger(GraalvmAgentApplication.class.getName()).info("WebSetup SPI providers: " + providerNames);
+        LOGGER.info("WebSetup SPI providers: " + providerNames);
     }
 
-    private static void webserver(String[] args) {
-        WebServerBuilder webServerBuilder = Application.webServerBuilder(0, ZrLogUtil.getContextPath(args), null);
+    private static void startWebServer(String[] args) {
+        WebServerBuilder webServerBuilder = Application.webServerBuilder(0, ArgsParser.getContextPath(args), null);
         Constants.zrLogConfig.getServerConfig().addCreateSuccessHandle(() -> {
             System.exit(0);
             return null;
         });
         webServerBuilder.start();
     }
-
 }

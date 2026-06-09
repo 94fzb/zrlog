@@ -1,14 +1,18 @@
 package com.zrlog.web.util;
 
-
 import com.hibegin.common.util.EnvKit;
-import com.zrlog.admin.web.plugin.NativeImageUpdater;
-import com.zrlog.admin.web.plugin.ZipUpdater;
+import com.hibegin.common.util.LoggerUtil;
+import com.zrlog.common.updater.NativeImageUpdater;
+import com.zrlog.common.updater.ZipUpdater;
 import com.zrlog.common.Updater;
 
 import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class UpdaterUtils {
+
+    private static final Logger LOGGER = LoggerUtil.getLogger(UpdaterUtils.class);
 
     public static Updater getUpdater(String[] args, File file) {
         try {
@@ -18,6 +22,7 @@ public class UpdaterUtils {
             File jarFile = new File(System.getProperty("java.class.path"));
             return new ZipUpdater(args, jarFile);
         } catch (Throwable e) {
+            LOGGER.log(Level.WARNING, "Create updater failed", e);
             return null;
         }
     }

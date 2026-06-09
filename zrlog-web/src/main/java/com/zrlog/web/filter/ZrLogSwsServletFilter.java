@@ -5,10 +5,10 @@ import com.hibegin.common.util.ObjectUtil;
 import com.hibegin.http.server.PortDetector;
 import com.hibegin.http.server.config.AbstractServerConfig;
 import com.hibegin.http.server.web.SwsServletFilter;
-import com.zrlog.admin.web.plugin.WarUpdater;
+import com.zrlog.common.updater.WarUpdater;
 import com.zrlog.common.Constants;
 import com.zrlog.common.Updater;
-import com.zrlog.util.ZrLogUtil;
+import com.zrlog.util.ArgsParser;
 import com.zrlog.web.util.UpdaterUtils;
 import com.zrlog.web.config.ZrLogConfigImpl;
 
@@ -19,7 +19,6 @@ import java.lang.management.ManagementFactory;
  * 适配标准 Servlet 容器
  */
 public class ZrLogSwsServletFilter extends SwsServletFilter {
-
 
     private String getWarFile() {
         String contextPath = getServletContext().getContextPath();
@@ -33,8 +32,10 @@ public class ZrLogSwsServletFilter extends SwsServletFilter {
 
     @Override
     protected AbstractServerConfig getServerConfig() {
-        Constants.zrLogConfig = new ZrLogConfigImpl(ObjectUtil.requireNonNullElse(PortDetector.detectHttpPort(), ZrLogUtil.getPort(ManagementFactory.getRuntimeMXBean().getInputArguments().toArray(new String[0]))),
-                getUpdater(), getFilterConfig().getServletContext().getContextPath());
+        String[] runtimeArgs = ManagementFactory.getRuntimeMXBean().getInputArguments().toArray(new String[0]);
+        Integer port = ObjectUtil.requireNonNullElse(PortDetector.detectHttpPort(), ArgsParser.getPort(runtimeArgs));
+        String contextPath = getFilterConfig().getServletContext().getContextPath();
+        Constants.zrLogConfig = new ZrLogConfigImpl(port, getUpdater(), contextPath);
         return Constants.zrLogConfig;
     }
 

@@ -19,8 +19,3 @@ wget https://www.zrlog.com/install/zrlog-upgrade-jakarta-war-sub.sh
 ```
 wget https://www.zrlog.com/install/zrlog-last-war.sh
 ```
-
-### docker
-
-```shell
-```

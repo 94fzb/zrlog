@@ -1,7 +1,7 @@
 package com.zrlog.web.dev;
 
 import com.zrlog.common.Constants;
-import com.zrlog.util.ZrLogUtil;
+import com.zrlog.util.ArgsParser;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
 
@@ -18,21 +18,20 @@ public class JakartaServletDevApplication {
     }
 
     public static void main(String[] args) throws LifecycleException {
-        // Declare an alternative location for your "target/classes" dir
         Constants.init();
         File additionWebInfClasses = new File("target/classes");
         String webappDirLocation = "src/main/webapp/";
         Tomcat tomcat = new Tomcat();
-        tomcat.setPort(ZrLogUtil.getPort(args));
-        //创建服务
+        tomcat.setPort(ArgsParser.getPort(args));
         tomcat.getConnector();
         tomcat.setBaseDir(additionWebInfClasses.toString());
-        //idea的路径eclipse启动的路径有区别
         if (!new File("").getAbsolutePath().endsWith(File.separator + "package")) {
             webappDirLocation = "package/" + webappDirLocation;
         }
         tomcat.setAddDefaultWebXmlToWebapp(true);
-        tomcat.addWebapp(ZrLogUtil.getContextPath(args), new File(webappDirLocation).getAbsolutePath());
+        String contextPath = ArgsParser.getContextPath(args);
+        String webappPath = new File(webappDirLocation).getAbsolutePath();
+        tomcat.addWebapp(contextPath, webappPath);
         tomcat.start();
         tomcat.getServer().await();
     }

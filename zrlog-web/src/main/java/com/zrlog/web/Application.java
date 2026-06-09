@@ -5,13 +5,13 @@ import com.hibegin.common.util.ParseArgsUtil;
 import com.hibegin.http.server.WebServerBuilder;
 import com.hibegin.http.server.util.PathUtil;
 import com.hibegin.lambda.LambdaApplication;
-import com.zrlog.admin.web.plugin.ZipUpdater;
 import com.zrlog.common.Constants;
 import com.zrlog.common.Updater;
 import com.zrlog.common.exception.NotImplementException;
+import com.zrlog.common.updater.ZipUpdater;
+import com.zrlog.util.ArgsParser;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.ZrLogBaseNativeImageUtils;
-import com.zrlog.util.ZrLogUtil;
 import com.zrlog.web.config.ZrLogConfigImpl;
 import com.zrlog.web.util.UpdaterUtils;
 
@@ -26,7 +26,6 @@ import static com.zrlog.common.Constants.getZrLogHome;
  * SwsDevApplication，标准的 zip 包的启动方式
  */
 public class Application {
-
 
     static {
         EnvKit.enableLoggingToFile();
@@ -53,18 +52,20 @@ public class Application {
     }
 
     public static void start(String[] args) {
-        //parse tips args
         if (ParseArgsUtil.justTips(args, "zrlog", BlogBuildInfoUtil.getVersionInfoFull())) {
             return;
         }
-        webServerBuilder(ZrLogUtil.getPort(args), ZrLogUtil.getContextPath(args), UpdaterUtils.getUpdater(args, null)).start();
+        int port = ArgsParser.getPort(args);
+        String contextPath = ArgsParser.getContextPath(args);
+        webServerBuilder(port, contextPath, UpdaterUtils.getUpdater(args, null)).start();
     }
 
     private static void nativeStart(String[] args) throws Exception {
-        int port = ZrLogUtil.getPort(args);
+        int port = ArgsParser.getPort(args);
+        String contextPath = ArgsParser.getContextPath(args);
         File execFile = new File(ZrLogBaseNativeImageUtils.getExecFile());
         if (EnvKit.isFaaSMode()) {
-            WebServerBuilder webServerBuilder = webServerBuilder(port, ZrLogUtil.getContextPath(args), UpdaterUtils.getUpdater(args, execFile));
+            WebServerBuilder webServerBuilder = webServerBuilder(port, contextPath, UpdaterUtils.getUpdater(args, execFile));
             webServerBuilder.startInBackground();
             if (EnvKit.isLambda()) {
                 LambdaApplication.startHandle(Constants.zrLogConfig);
@@ -76,7 +77,7 @@ public class Application {
         if (ParseArgsUtil.justTips(args, execFile.getName(), BlogBuildInfoUtil.getVersionInfoFull())) {
             return;
         }
-        WebServerBuilder webServerBuilder = webServerBuilder(port, ZrLogUtil.getContextPath(args), UpdaterUtils.getUpdater(args, execFile));
+        WebServerBuilder webServerBuilder = webServerBuilder(port, contextPath, UpdaterUtils.getUpdater(args, execFile));
         webServerBuilder.start();
     }
 
@@ -96,6 +97,4 @@ public class Application {
         });
         return builder;
     }
-
-
 }

@@ -15,11 +15,10 @@
             <includes>
                 <include>lib/**</include>
                 <include>zrlog-starter.jar</include>
-                <!---->
                 <include>bin/start.sh</include>
                 <include>bin/start.bat</include>
                 <include>bin/run.sh</include>
-                <!--DOC-->
+                <!-- Documentation -->
                 <include>doc/install.md</include>
                 <include>doc/build_system_info.md</include>
                 <include>LICENSE</include>

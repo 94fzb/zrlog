@@ -79,10 +79,10 @@
 bash shell/version.sh <patch-version>
 ```
 
-例如当前基线是 `3.3`，要发布 `3.3.4` 时，执行：
+例如当前基线是 `3.4`，要发布 `3.4.2` 时，执行：
 
 ```bash
-bash shell/version.sh 4
+bash shell/version.sh 2
 ```
 
 脚本位置：
@@ -91,16 +91,16 @@ bash shell/version.sh 4
 
 脚本当前会自动执行以下动作：
 
-1. 将 `master` 当前版本设置为正式版 `3.3.<n>`
-2. 提交 `[shell-release]release version 3.3.<n>`
+1. 将 `master` 当前版本设置为正式版 `3.4.<n>`
+2. 提交 `[shell-release]release version 3.4.<n>`
 3. 切到 `release`
 4. 用 `master` 强制覆盖 `release`
-5. 创建 tag `v3.3.<n>`
+5. 创建 tag `v3.4.<n>`
 6. 推送 tag
 7. 强制推送 `release`
 8. 回到 `master`
-9. 将版本推进到下一个 `3.3.<n+1>-SNAPSHOT`
-10. 提交 `[shell-release]next version 3.3.<n+1>-SNAPSHOT`
+9. 将版本推进到下一个 `3.4.<n+1>-SNAPSHOT`
+10. 提交 `[shell-release]next version 3.4.<n+1>-SNAPSHOT`
 11. 强制推送 `master`
 
 也就是说，版本从：
@@ -169,6 +169,9 @@ bash shell/version.sh 4
 - `buildId`
 - `buildTime`
 - `fileArch`
+- `runtimeType`
+- `packageType`
+- `updateVersionJsonFilename`
 
 这些信息最终进入：
 
@@ -178,6 +181,8 @@ bash shell/version.sh 4
 
 - `last.version.json`
 - `last.<arch>.version.json`
+- `last.<arch>.faas.version.json`
+- `last.<arch>.deb.version.json`
 
 ## 5. 手工发布兜底流程
 
@@ -215,8 +220,8 @@ X.Y.(Z+1)-SNAPSHOT
 
 历史上可参考的提交风格仍然是：
 
-- `[shell-release]release version 3.3.2`
-- `[shell-release]next version 3.3.3-SNAPSHOT`
+- `[shell-release]release version 3.4.1`
+- `[shell-release]next version 3.4.2-SNAPSHOT`
 
 ## 6. zrlog-www 更新规则
 

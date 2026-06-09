@@ -19,8 +19,7 @@ public class SwsDevApplication {
 
     private static void initDevEnv() throws URISyntaxException {
         String programDir = new File(SwsDevApplication.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath();
-        //对应的开发模式
-        if (programDir.contains("package/target/class") || programDir.contains("package\\target\\class")) {
+        if (programDir.contains("package/target/classes") || programDir.contains("package\\target\\classes")) {
             programDir = new File(programDir).getParentFile().getParentFile().getParent();
         }
         PathUtil.setRootPath(programDir);

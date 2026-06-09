@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
-bash -e shell/native/package-native.sh "${1}"
+set -e
+
+ZRLOG_RUNTIME_TYPE=native ZRLOG_PACKAGE_TYPE=deb bash -e shell/native/package-native.sh "${1}"
 function buildProp() {
-    grep "${1}" "zrlog-web/src/main/resources/build.properties"|awk -F "${1}"'=' '{print $2}'
+    sed -n -e "s/^${1}=//p" "zrlog-web/src/main/resources/build.properties"
 }
 
 # shellcheck disable=SC2034

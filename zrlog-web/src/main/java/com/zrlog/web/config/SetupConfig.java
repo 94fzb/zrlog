@@ -10,6 +10,7 @@ import com.zrlog.web.WebSetupProvider;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -18,11 +19,12 @@ import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class SetupConfig {
 
-    protected static final Logger LOGGER = LoggerUtil.getLogger(ZrLogConfig.class);
+    protected static final Logger LOGGER = LoggerUtil.getLogger(SetupConfig.class);
 
     public AdminTokenService buildAdminTokenService(long sessionTimeout) {
         return new AdminTokenService(sessionTimeout);
@@ -55,7 +57,7 @@ public class SetupConfig {
                     LOGGER.warning("Skip web module " + name + ", provider returned null WebSetup");
                 }
             } catch (Throwable e) {
-                LOGGER.warning("Setup " + name + " web error: " + e.getMessage());
+                LOGGER.log(Level.WARNING, "Setup web module " + name + " failed", e);
             }
         }
         LOGGER.info("Loaded web modules: " + loadedModules);
@@ -63,7 +65,7 @@ public class SetupConfig {
 
     private static Set<String> parseDisableModules() {
         String disableModulesEnv = Objects.requireNonNullElse(System.getenv("DISABLE_MODULES"), "");
-        return List.of(disableModulesEnv.split(",")).stream()
+        return Arrays.stream(disableModulesEnv.split(","))
                 .map(String::trim)
                 .filter(e -> !e.isEmpty())
                 .collect(Collectors.toSet());
@@ -76,7 +78,7 @@ public class SetupConfig {
             try {
                 discoveredProviders.add(provider.get());
             } catch (Throwable e) {
-                LOGGER.warning("Load web module provider " + provider.type().getName() + " error: " + e.getMessage());
+                LOGGER.log(Level.WARNING, "Load web module provider " + provider.type().getName() + " failed", e);
             }
         });
         discoveredProviders.stream()

@@ -19,9 +19,6 @@ import com.zrlog.web.inteceptor.DefaultInterceptor;
 import java.util.Objects;
 import java.util.logging.Level;
 
-/**
- * 核心一些参数的配置。
- */
 public class ZrLogConfigImpl extends ZrLogConfig {
 
     private final SetupConfig setupConfig;
@@ -30,7 +27,6 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     public ZrLogConfigImpl(Integer port, Updater updater, String contextPath) {
         super(port, updater, contextPath);
         this.setupConfig = new SetupConfig(this, dbPropertiesFile, installLockFile, contextPath, webSetups, updater);
-        //config
         this.webSetups.forEach(WebSetup::setup);
         serverConfig.getInterceptors().add(DefaultInterceptor.class);
     }
@@ -64,7 +60,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
             plugins.add(new PluginCorePluginImpl(dbPropertiesFile, serverConfig.getContextPath()));
             plugins.add(new CacheManagerPlugin(this));
         } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "configPlugin exception ", e);
+            LOGGER.log(Level.WARNING, "Configure base plugins failed", e);
         }
         return plugins;
     }
@@ -74,10 +70,8 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     }
 
     private void closeDataSource() {
-        if (Objects.nonNull(this.dataSource)) {
-            if (this.dataSource.isWebApi()) {
-                return;
-            }
+        if (Objects.nonNull(this.dataSource) && this.dataSource.isWebApi()) {
+            return;
         }
         AbandonedConnectionCleanupThread.checkedShutdown();
     }

@@ -1,6 +1,6 @@
 ## 构建 ZrLog
 
-> ZrLog 提供多种运行包 .zip .war .deb，可以运行在大部分操作系统上，甚至是 Android（需原生 arm64 的 Linux 环境） 和树莓派上
+> ZrLog 提供 Zip、War、Deb 等运行包，可部署在常见 Linux 环境中。Native Image 包也可用于树莓派等 arm64 Linux 设备。
 
 ### shell 目录
 

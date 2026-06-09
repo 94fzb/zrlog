@@ -3,7 +3,7 @@ set -e
 # 配置变量
 SERVICE_USER="zrlog"
 SERVICE_GROUP="zrlog"
-USER_HOME="/nonexistent"  # 用户无需登录，设置为无效目录
+USER_HOME="/nonexistent"
 USER_SHELL="/usr/sbin/nologin"
 
 # 创建用户组
@@ -24,10 +24,8 @@ else
     echo "User ${SERVICE_USER} already exists"
 fi
 
-setcap cap_net_bind_service=+ep /usr/bin/${SERVICE_USER}
+setcap cap_net_bind_service=+ep "/usr/bin/${SERVICE_USER}"
 systemctl daemon-reload
-# 开始启动
 service zrlog restart
-# 开机启动
 update-rc.d zrlog defaults
 exit 0

@@ -1,7 +1,6 @@
 package com.zrlog.web.setup.install;
 
 import com.hibegin.common.util.LoggerUtil;
-import com.hibegin.http.server.util.NativeImageUtils;
 import com.zrlog.common.Updater;
 import com.zrlog.common.ZrLogConfig;
 import com.zrlog.install.util.InstallNativeImageResourceUtils;
@@ -12,7 +11,6 @@ import com.zrlog.install.web.interceptor.BlogInstallInterceptor;
 import com.zrlog.web.WebSetup;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,6 +41,8 @@ public class InstallWebSetup implements WebSetup {
         if (action.isInstalled()) {
             return;
         }
-        LOGGER.log(Level.WARNING, "Not found lock file(" + action.getLockFile() + "), Please visit the http://yourHostName:port" + zrLogConfig.getServerConfig().getContextPath() + "/install start installation");
+        LOGGER.log(Level.WARNING, "Install lock file not found: " + action.getLockFile()
+                + ". Visit http://your-host:port" + zrLogConfig.getServerConfig().getContextPath()
+                + "/install to start installation.");
     }
 }

@@ -1,18 +1,22 @@
 #!/usr/bin/env bash
+set -e
+
+: "${1:?patch version is required}"
+
 baseVersion=3.4
 releaseVersion=${baseVersion}.${1}
 nextVersion=${baseVersion}.$((${1}+1))-SNAPSHOT
 tagName="v${releaseVersion}"
-./mvnw versions:set -DnewVersion=${releaseVersion}
+./mvnw versions:set -DnewVersion="${releaseVersion}"
 git add -A
-git commit -m '[shell-release]release version '${releaseVersion}
+git commit -m "[shell-release]release version ${releaseVersion}"
 git checkout release
 git reset --hard master
-git tag ${tagName}
-git push origin ${tagName}
+git tag "${tagName}"
+git push origin "${tagName}"
 git push origin release -f
 git checkout master
-./mvnw versions:set -DnewVersion=${nextVersion}
+./mvnw versions:set -DnewVersion="${nextVersion}"
 git add -A
-git commit -m '[shell-release]next version '${nextVersion}
+git commit -m "[shell-release]next version ${nextVersion}"
 git push -f

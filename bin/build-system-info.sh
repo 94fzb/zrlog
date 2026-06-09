@@ -1,3 +1,6 @@
+#!/usr/bin/env bash
+set -e
+
 REPORT_FILE=zrlog-web/src/main/resources/build_system_info.md
 
 mkdir -p "$(dirname "$REPORT_FILE")"
@@ -58,22 +61,20 @@ echo "#### 🤖 Runner Context" >> "$REPORT_FILE"
 echo "#### 📃 Build.properties Info" >> "$REPORT_FILE"
 {
   echo '```properties'
-  # shellcheck disable=SC2046
-  echo "$(cat 'zrlog-web/src/main/resources/build.properties')"
+  cat 'zrlog-web/src/main/resources/build.properties'
   echo '```'
 } >> "$REPORT_FILE"
 
 ./mvnw -Dzrlog-polyglot-template-scope='test' -Dlambda-scope="test" -Dservlet-scope="test" -Djakarta-scope="test" com.github.ferstl:depgraph-maven-plugin:aggregate -DgraphFormat=json -DtransitiveExcludes=* -Dscope=compile
 jq '[.artifacts[] | {key: (.groupId + ":" + .artifactId), value: .version}] | from_entries' target/dependency-graph.json > target/pure-deps.json
 targetJsonFile=zrlog-web/src/main/resources/pure-deps.json
-cat 'target/pure-deps.json'  |grep -v "servlet" > ${targetJsonFile}
+grep -v "servlet" 'target/pure-deps.json' > "${targetJsonFile}"
 # Build dep info
 echo "#### 📃 Dependency Info" >> "$REPORT_FILE"
 {
   echo '```json'
-  # shellcheck disable=SC2046
-  echo "$(cat ${targetJsonFile})"
+  cat "${targetJsonFile}"
   echo '```'
 } >> "$REPORT_FILE"
 
-cp ${REPORT_FILE} "doc/"
+cp "${REPORT_FILE}" "doc/"

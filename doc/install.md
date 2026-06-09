@@ -3,6 +3,6 @@
 [如何安装 ZrLog](https://blog.zrlog.com/run-zrlog-in-docker.html)
 
 
-## FaaS 部署（无服务）
+## FaaS 部署（无服务器）
 
-[cloudflare d1 & aws lambda](https://blog.zrlog.com/serverless-with-aws-lambda-and-cf-d1.html)
+[Cloudflare D1 & AWS Lambda](https://blog.zrlog.com/serverless-with-aws-lambda-and-cf-d1.html)

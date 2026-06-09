@@ -1,7 +1,6 @@
 package com.zrlog.web.setup.install;
 
-import com.hibegin.common.util.SecurityUtils;
-import com.zrlog.admin.web.plugin.UpdateVersionTimerTask;
+import com.zrlog.common.updater.UpdateVersionTimerTask;
 import com.zrlog.business.version.UpgradeVersionHandler;
 import com.zrlog.common.Constants;
 import com.zrlog.common.Updater;
@@ -51,7 +50,8 @@ public class ZrLogInstallConfig extends DefaultInstallConfig {
             lastVersionInfo.setLatestVersion(true);
             return lastVersionInfo;
         }
-        boolean upgradable = ZrLogUtil.greatThenCurrentVersion(lastVersion.getBuildId(), lastVersion.getBuildDate(), lastVersion.getVersion());
+        boolean upgradable = ZrLogUtil.greatThenCurrentVersion(lastVersion.getBuildId(),
+                lastVersion.getBuildDate(), lastVersion.getVersion());
         lastVersionInfo.setLatestVersion(!upgradable);
         if (lastVersionInfo.getLatestVersion()) {
             return lastVersionInfo;

@@ -22,7 +22,7 @@ public class ZrLogInstallAction extends DefaultInstallAction {
             zrLogConfig.configDatabase();
             zrLogConfig.startPlugins(!EnvKit.isFaaSMode());
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException("Start ZrLog after installation failed", e);
         }
     }
 
