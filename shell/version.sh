@@ -3,7 +3,7 @@ set -e
 
 : "${1:?patch version is required}"
 
-baseVersion=3.4
+baseVersion=3.5
 releaseVersion=${baseVersion}.${1}
 nextVersion=${baseVersion}.$((${1}+1))-SNAPSHOT
 tagName="v${releaseVersion}"
