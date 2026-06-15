@@ -142,6 +142,7 @@ bash shell/version.sh 2
 - `native-build-release-package-zip.yml`
 - `deb-build-release-deb.yml`
 - `faas-build-release-package-zip.yml`
+- `docker-release-publish.yml`（在 native release 包构建成功后自动发布 Docker 镜像）
 
 对应产物包括：
 
@@ -150,11 +151,14 @@ bash shell/version.sh 2
 - Native ZIP
 - DEB
 - FaaS ZIP
+- Docker 镜像：`zrlog/zrlog:<version>`、`zrlog/zrlog:latest`
 
 对应打包脚本：
 
 - `shell/java/build-final-java.sh`
 - `shell/native/build-final-native.sh`
+
+Docker 镜像构建已内置在主仓，不再依赖 `zrlog-docker` 仓库的 `VERSION.txt` 或跨仓库 `repository_dispatch`。正式镜像版本直接来自 `release` 分支的根 `pom.xml` 项目版本。
 
 ### 4.6 发布元数据生成规则
 

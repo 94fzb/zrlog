@@ -1,0 +1,86 @@
+name: build release docker image
+
+on:
+  workflow_run:
+    workflows:
+      - build native release package
+    branches:
+      - release
+    types:
+      - completed
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: ZrLog ref to build from
+        required: false
+        default: release
+        type: string
+      push_image:
+        description: Push image to Docker registries
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  build:
+    name: Build release Docker image
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.ref || github.event.workflow_run.head_sha }}
+
+      - name: Read ZrLog version
+        run: |
+          version=$(awk '
+              /<parent>/ { inParent = 1 }
+              /<\/parent>/ { inParent = 0; next }
+              !inParent && /<version>/ {
+                  line = $0
+                  sub(/.*<version>/, "", line)
+                  sub(/<\/version>.*/, "", line)
+                  print line
+                  exit
+              }
+          ' pom.xml)
+          : "${version:?project version is required}"
+          echo "DOCKER_TAG_VERSION=${version}" >> "${GITHUB_ENV}"
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        if: github.event_name == 'workflow_run' || inputs.push_image
+        uses: docker/login-action@v3
+        with:
+          username: zrlog
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Login to Aliyun Docker Hub
+        if: github.event_name == 'workflow_run' || inputs.push_image
+        uses: docker/login-action@v3
+        with:
+          registry: registry.cn-chengdu.aliyuncs.com
+          username: 90xchun
+          password: ${{ secrets.ALIYUN_DOCKER_PASSWORD }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: ./docker
+          file: ./docker/Dockerfile
+          platforms: linux/amd64
+          push: ${{ github.event_name == 'workflow_run' || inputs.push_image }}
+          build-args: |
+            ZRLOG_CHANNEL=release
+            CACHE_BUST=${{ github.run_id }}-${{ github.run_attempt }}
+          tags: |
+            zrlog/zrlog:${{ env.DOCKER_TAG_VERSION }}
+            zrlog/zrlog:latest
+            registry.cn-chengdu.aliyuncs.com/hibegin/zrlog:${{ env.DOCKER_TAG_VERSION }}
+            registry.cn-chengdu.aliyuncs.com/hibegin/zrlog:latest
