@@ -1,4 +1,4 @@
-FROM registry.cn-chengdu.aliyuncs.com/hibegin/ubuntu:noble
+FROM ubuntu:noble
 
 LABEL maintainer="zrlog <support@zrlog.com>"
 
