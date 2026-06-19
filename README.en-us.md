@@ -60,9 +60,9 @@ ZrLog is an open-source blog system built with Java. It provides article, catego
     * Visit your instance at `http://host:port/install`.
     * Fill in the database and administrator information in the installation page.
 
-### ChangeLog
+### Changelog
 
-[View the complete ChangeLog](https://www.zrlog.com/changelog/index.html?ref=md)
+[View the complete changelog](https://www.zrlog.com/changelog/index.html?ref=md)
 
 ### Demo
 
@@ -92,7 +92,7 @@ See the [FAQ](https://blog.zrlog.com/faq-collect.html).
 * [SheShui.me](http://sheshui.me)
 * [Gentelella](https://github.com/puikinsh/gentelella)
 * [AntD](https://ant.design)
-* [Jetbrains](https://www.jetbrains.com/)
+* [JetBrains](https://www.jetbrains.com/)
 * [e-lionel](http://www.e-lionel.com)
 * [Cloudflare](https://www.cloudflare.com)
 
