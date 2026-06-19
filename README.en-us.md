@@ -33,7 +33,7 @@ ZrLog is an open-source blog system built with Java. It provides article, catego
 4. **Article Editing**: Use the built-in Markdown editor for common writing and preview workflows.
 5. **Access Optimization**: Generate static pages and cache shared public data.
 6. **Deployment Options**: Run with Docker, Zip, War, Native Image, or Serverless / D1 deployments.
-7. **Operations**: Use scheduled database backup and online updates.
+7. **Operations**: Use scheduled database backups and online updates.
 
 ### Quick Start (For Developers & Testing)
 
