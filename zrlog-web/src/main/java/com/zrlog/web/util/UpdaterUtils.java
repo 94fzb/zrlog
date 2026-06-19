@@ -15,14 +15,16 @@ public class UpdaterUtils {
     private static final Logger LOGGER = LoggerUtil.getLogger(UpdaterUtils.class);
 
     public static Updater getUpdater(String[] args, File file) {
+        boolean nativeImage = EnvKit.isNativeImage();
         try {
-            if (EnvKit.isNativeImage()) {
+            if (nativeImage) {
                 return new NativeImageUpdater(args, file);
             }
             File jarFile = new File(System.getProperty("java.class.path"));
             return new ZipUpdater(args, jarFile);
         } catch (Throwable e) {
-            LOGGER.log(Level.WARNING, "Create updater failed", e);
+            LOGGER.log(Level.WARNING,
+                    "Create " + (nativeImage ? "native" : "zip") + " updater failed, target file: " + file, e);
             return null;
         }
     }

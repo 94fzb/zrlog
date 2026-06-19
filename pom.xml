@@ -33,6 +33,7 @@
         <zrlog-install-web.version>3.3.2</zrlog-install-web.version>
         <zrlog-blog-web.version>3.5.4</zrlog-blog-web.version>
         <zrlog-admin-web.version>3.5.5</zrlog-admin-web.version>
+        <junit.version>4.13.2</junit.version>
         <mysql-scope>compile</mysql-scope>
     </properties>
 
@@ -151,6 +152,12 @@
                 <version>${zrlog-blog-web.version}</version>
                 <scope>${zrlog-polyglot-template-scope}</scope>
             </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -194,4 +201,12 @@
             </plugins>
         </pluginManagement>
     </build>
+    <profiles>
+        <profile>
+            <id>ci</id>
+            <properties>
+                <maven.test.skip>false</maven.test.skip>
+            </properties>
+        </profile>
+    </profiles>
 </project>

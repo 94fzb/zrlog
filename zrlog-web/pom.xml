@@ -35,5 +35,10 @@
             <groupId>com.hibegin</groupId>
             <artifactId>zrlog-install-web</artifactId>
         </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

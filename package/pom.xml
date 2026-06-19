@@ -411,7 +411,7 @@
                                                 <prefix>/usr/bin</prefix>
                                                 <user>zrlog</user>
                                                 <group>zrlog</group>
-                                                <filemode>777</filemode>
+                                                <filemode>755</filemode>
                                             </mapper>
                                         </data>
                                         <data>
@@ -422,7 +422,7 @@
                                                 <prefix>/etc/init.d</prefix>
                                                 <user>zrlog</user>
                                                 <group>zrlog</group>
-                                                <filemode>777</filemode>
+                                                <filemode>755</filemode>
                                             </mapper>
                                         </data>
                                         <data>

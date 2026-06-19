@@ -5,9 +5,7 @@ syncPath=${2}
 : "${syncPath:?sync path is required}"
 
 echo "current ${PWD}"
-function buildProp() {
-    sed -n -e "s/^${1}=//p" "zrlog-web/src/main/resources/build.properties"
-}
+source shell/lib/release-manifest.sh
 buildSubType=${3:-zip}
 packageExt="zip"
 # 判断操作系统类型
@@ -20,14 +18,14 @@ else
 ZRLOG_RUNTIME_TYPE=native ZRLOG_PACKAGE_TYPE="${buildSubType}" bash -e shell/native/package-native-${packageExt}.sh "${1}"
 fi
 
-mirrorWebSite=$(buildProp 'mirrorWebSite')
-version=$(buildProp 'version')
-runMode=$(buildProp 'runMode')
-Date=$(buildProp 'buildTime')
-buildId=$(buildProp 'buildId')
-runModeDesc=$(buildProp 'runModeDesc')
-fileArch=$(buildProp 'fileArch')
-updateVersionJsonFilename=$(buildProp 'updateVersionJsonFilename')
+mirrorWebSite=$(releaseManifestBuildProp 'mirrorWebSite')
+version=$(releaseManifestBuildProp 'version')
+runMode=$(releaseManifestBuildProp 'runMode')
+Date=$(releaseManifestBuildProp 'buildTime')
+buildId=$(releaseManifestBuildProp 'buildId')
+runModeDesc=$(releaseManifestBuildProp 'runModeDesc')
+fileArch=$(releaseManifestBuildProp 'fileArch')
+updateVersionJsonFilename=$(releaseManifestBuildProp 'updateVersionJsonFilename')
 if [[ -z "${updateVersionJsonFilename}" ]]; then
   if [[ "${buildSubType}" == "faas" ]]; then
     updateVersionJsonFilename="last.${fileArch}.faas.version.json"
@@ -39,24 +37,13 @@ if [[ -z "${updateVersionJsonFilename}" ]]; then
 fi
 
 mkdir -p "${syncPath}/${runMode}"
-function md5Of() {
-  if command -v md5sum >/dev/null 2>&1; then
-    md5sum "${1}" | awk '{ print $1 }'
-  else
-    md5 "${1}" | awk '{ print $NF }'
-  fi
-}
 function writeZipVersionJson() {
   local artifactFile=${1}
   local downloadPath=${2}
   local jsonFilename=${3}
-  local zipFileSize
-  local zipMd5sum
-  zipFileSize=$(ls -ls "${artifactFile}" | awk '{print $6}')
-  zipMd5sum=$(md5Of "${artifactFile}")
-  printf '{"zipMd5sum":"%s","zipDownloadUrl":"%s","type":"%s","version":"%s","buildId":"%s","zipFileSize":%s,"releaseDate":"%s"}\n' \
-    "${zipMd5sum}" "${mirrorWebSite}${downloadPath}" "${runModeDesc}" "${version}" "${buildId}" "${zipFileSize}" "${Date}" \
-    > "${syncPath}/${runMode}/${jsonFilename}"
+  releaseManifestWriteZipVersionJson "${syncPath}/${runMode}/${jsonFilename}" \
+    "${artifactFile}" "${downloadPath}" "${mirrorWebSite}" \
+    "${runModeDesc}" "${version}" "${buildId}" "${Date}"
 }
 #faas
 if [[ "$(uname)" == "Linux" && "${buildSubType}" == "faas" ]]; then

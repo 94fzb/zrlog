@@ -35,9 +35,13 @@ public class SetupConfig {
                        List<WebSetup> webSetups,
                        Updater updater) {
         Set<String> disableModules = parseDisableModules();
+        boolean strictWebSetup = strictWebSetup();
         WebSetupContext webSetupContext = new WebSetupContext(zrLogConfig, dbPropertiesFile, installLockFile, contextPath, updater);
-        List<WebSetupProvider> webSetupProviders = loadWebSetupProviders();
+        List<WebSetupProvider> webSetupProviders = loadWebSetupProviders(strictWebSetup);
         LOGGER.info("Discovered web modules: " + names(webSetupProviders));
+        if (strictWebSetup) {
+            LOGGER.info("Web setup strict mode enabled");
+        }
         if (!disableModules.isEmpty()) {
             LOGGER.info("Disabled web modules: " + disableModules);
         }
@@ -54,49 +58,85 @@ public class SetupConfig {
                     webSetups.add(webSetup);
                     loadedModules.add(name);
                 } else {
-                    LOGGER.warning("Skip web module " + name + ", provider returned null WebSetup");
+                    handleSetupFailure(strictWebSetup,
+                            "Skip web module " + name + ", provider returned null WebSetup", null);
                 }
             } catch (Throwable e) {
-                LOGGER.log(Level.WARNING, "Setup web module " + name + " failed", e);
+                handleSetupFailure(strictWebSetup, "Setup web module " + name + " failed", e);
             }
         }
         LOGGER.info("Loaded web modules: " + loadedModules);
     }
 
-    private static Set<String> parseDisableModules() {
-        String disableModulesEnv = Objects.requireNonNullElse(System.getenv("DISABLE_MODULES"), "");
-        return Arrays.stream(disableModulesEnv.split(","))
+    static Set<String> parseDisableModules(String disableModulesEnv) {
+        String value = Objects.requireNonNullElse(disableModulesEnv, "");
+        return Arrays.stream(value.split(","))
                 .map(String::trim)
                 .filter(e -> !e.isEmpty())
                 .collect(Collectors.toSet());
     }
 
-    private static List<WebSetupProvider> loadWebSetupProviders() {
+    private static Set<String> parseDisableModules() {
+        return parseDisableModules(System.getenv("DISABLE_MODULES"));
+    }
+
+    static List<WebSetupProvider> normalizeWebSetupProviders(List<WebSetupProvider> discoveredProviders) {
+        return normalizeWebSetupProviders(discoveredProviders, false);
+    }
+
+    static List<WebSetupProvider> normalizeWebSetupProviders(List<WebSetupProvider> discoveredProviders, boolean strictWebSetup) {
         Map<String, WebSetupProvider> webSetupProviderMap = new LinkedHashMap<>();
-        List<WebSetupProvider> discoveredProviders = new ArrayList<>();
-        ServiceLoader.load(WebSetupProvider.class).stream().forEach(provider -> {
-            try {
-                discoveredProviders.add(provider.get());
-            } catch (Throwable e) {
-                LOGGER.log(Level.WARNING, "Load web module provider " + provider.type().getName() + " failed", e);
-            }
-        });
         discoveredProviders.stream()
                 .sorted(Comparator.comparingInt(WebSetupProvider::order).thenComparing(SetupConfig::providerName))
                 .forEach(webSetupProvider -> {
                     String name = providerName(webSetupProvider);
                     if (name.isEmpty()) {
-                        LOGGER.warning("Skip unnamed web module provider: " + webSetupProvider.getClass().getName());
+                        handleSetupFailure(strictWebSetup,
+                                "Skip unnamed web module provider: " + webSetupProvider.getClass().getName(), null);
                         return;
                     }
                     if (webSetupProviderMap.containsKey(name)) {
-                        LOGGER.warning("Skip duplicated web module provider " + webSetupProvider.getClass().getName()
-                                + ", module name: " + name + ", used provider: " + webSetupProviderMap.get(name).getClass().getName());
+                        handleSetupFailure(strictWebSetup,
+                                "Skip duplicated web module provider " + webSetupProvider.getClass().getName()
+                                        + ", module name: " + name + ", used provider: " + webSetupProviderMap.get(name).getClass().getName(),
+                                null);
                         return;
                     }
                     webSetupProviderMap.put(name, webSetupProvider);
                 });
         return new ArrayList<>(webSetupProviderMap.values());
+    }
+
+    private static List<WebSetupProvider> loadWebSetupProviders(boolean strictWebSetup) {
+        List<WebSetupProvider> discoveredProviders = new ArrayList<>();
+        ServiceLoader.load(WebSetupProvider.class).stream().forEach(provider -> {
+            try {
+                discoveredProviders.add(provider.get());
+            } catch (Throwable e) {
+                handleSetupFailure(strictWebSetup, "Load web module provider " + provider.type().getName() + " failed", e);
+            }
+        });
+        return normalizeWebSetupProviders(discoveredProviders, strictWebSetup);
+    }
+
+    static boolean parseStrictMode(String value) {
+        String flag = Objects.requireNonNullElse(value, "").trim();
+        return "true".equalsIgnoreCase(flag) || "1".equals(flag) || "yes".equalsIgnoreCase(flag);
+    }
+
+    private static boolean strictWebSetup() {
+        return parseStrictMode(System.getenv("WEB_SETUP_STRICT"));
+    }
+
+    private static void handleSetupFailure(boolean strictWebSetup, String message, Throwable e) {
+        if (strictWebSetup) {
+            throw new IllegalStateException(message, e);
+        }
+        if (Objects.nonNull(e)) {
+            LOGGER.log(Level.WARNING, message, e);
+            return;
+        }
+        LOGGER.warning(message);
     }
 
     private static List<String> names(List<WebSetupProvider> webSetupProviders) {

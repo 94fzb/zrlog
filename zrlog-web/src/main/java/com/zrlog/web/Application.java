@@ -9,7 +9,6 @@ import com.zrlog.common.Constants;
 import com.zrlog.common.Updater;
 import com.zrlog.common.exception.NotImplementException;
 import com.zrlog.common.updater.ZipUpdater;
-import com.zrlog.util.ArgsParser;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.ZrLogBaseNativeImageUtils;
 import com.zrlog.web.config.ZrLogConfigImpl;
@@ -55,17 +54,16 @@ public class Application {
         if (ParseArgsUtil.justTips(args, "zrlog", BlogBuildInfoUtil.getVersionInfoFull())) {
             return;
         }
-        int port = ArgsParser.getPort(args);
-        String contextPath = ArgsParser.getContextPath(args);
-        webServerBuilder(port, contextPath, UpdaterUtils.getUpdater(args, null)).start();
+        ApplicationStartupOptions options = ApplicationStartupOptions.parse(args);
+        webServerBuilder(options.getPort(), options.getContextPath(), UpdaterUtils.getUpdater(args, null)).start();
     }
 
     private static void nativeStart(String[] args) throws Exception {
-        int port = ArgsParser.getPort(args);
-        String contextPath = ArgsParser.getContextPath(args);
+        ApplicationStartupOptions options = ApplicationStartupOptions.parse(args);
         File execFile = new File(ZrLogBaseNativeImageUtils.getExecFile());
         if (EnvKit.isFaaSMode()) {
-            WebServerBuilder webServerBuilder = webServerBuilder(port, contextPath, UpdaterUtils.getUpdater(args, execFile));
+            WebServerBuilder webServerBuilder = webServerBuilder(options.getPort(), options.getContextPath(),
+                    UpdaterUtils.getUpdater(args, execFile));
             webServerBuilder.startInBackground();
             if (EnvKit.isLambda()) {
                 LambdaApplication.startHandle(Constants.zrLogConfig);
@@ -77,7 +75,8 @@ public class Application {
         if (ParseArgsUtil.justTips(args, execFile.getName(), BlogBuildInfoUtil.getVersionInfoFull())) {
             return;
         }
-        WebServerBuilder webServerBuilder = webServerBuilder(port, contextPath, UpdaterUtils.getUpdater(args, execFile));
+        WebServerBuilder webServerBuilder = webServerBuilder(options.getPort(), options.getContextPath(),
+                UpdaterUtils.getUpdater(args, execFile));
         webServerBuilder.start();
     }
 
