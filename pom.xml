@@ -31,7 +31,7 @@
         <zrlog-polyglot-template-scope>provided</zrlog-polyglot-template-scope>
         <servlet-api.version>6.1.0</servlet-api.version>
         <zrlog-install-web.version>3.3.2</zrlog-install-web.version>
-        <zrlog-blog-web.version>3.5.4</zrlog-blog-web.version>
+        <zrlog-blog-web.version>3.5.5-SNAPSHOT</zrlog-blog-web.version>
         <zrlog-admin-web.version>3.5.6-SNAPSHOT</zrlog-admin-web.version>
         <junit.version>4.13.2</junit.version>
         <mysql-scope>compile</mysql-scope>
