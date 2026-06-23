@@ -35,7 +35,7 @@ ZrLog is an open-source blog system built with Java. It provides article, catego
 6. **Deployment Options**: Run with Docker, Zip, War, Native Image, or Serverless / D1 deployments.
 7. **Operations**: Use scheduled database backups and online updates.
 
-### Quick Start (For Developers & Testing)
+### Quick Start (Developer Startup)
 
 - Run `com.zrlog.web.Application`'s `main()` method from your IDE for local debugging.
 - Start with Maven scripts when not using an IDE:
@@ -44,21 +44,26 @@ ZrLog is an open-source blog system built with Java. It provides article, catego
 
 ### Installation & Deployment
 
-* **Runtime Requirements**
-    * JDK: `>= 11` (not required when using the GraalVM Native Image release package).
-    * Database: `MySQL >= 5.7` or `Cloudflare D1` through Web API access.
+- **Quick trial: Docker**
 
-* **Method 1: Docker**
-  Start the service with:
+  Start the service and persist the config directory:
   ```bash
   docker run -p 8080:8080 -v $(pwd)/conf:/opt/zrlog/conf zrlog/zrlog
   ```
+  Then visit `http://localhost:8080/install`. The installer checks config paths, database connectivity, and the install lock, then shows installation progress while it runs.
 
-* **Method 2: Zip Package**
-    * Download the [latest Zip package](https://www.zrlog.com/download) and extract it.
-    * Run `bin/start.sh`, or `bin/start.bat` on Windows, from the extracted directory.
-    * Visit your instance at `http://host:port/install`.
-    * Fill in the database and administrator information in the installation page.
+- **Production deployment: Docker / Native Image / Zip / WAR**
+
+  - JDK: `>= 11` (not required when using the Native Image release package).
+  - Database: `MySQL >= 5.7` or `Cloudflare D1` through Web API access.
+  - For Zip packages, download the [latest package](https://www.zrlog.com/download), extract it, and run `bin/start.sh` or `bin/start.bat` on Windows.
+  - WAR packages are for existing Tomcat / Jetty containers.
+  - For Docker, make sure `/opt/zrlog/conf` is mounted to persistent storage; `db.properties` and `install.lock` are written there.
+  - After installation, enter admin and create your first article.
+
+- **Developer startup**
+
+  Use your IDE to run `com.zrlog.web.Application`, or use the Maven scripts above.
 
 ### Changelog
 
