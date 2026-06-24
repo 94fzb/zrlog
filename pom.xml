@@ -8,7 +8,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>zrlog-web-parent</artifactId>
     <packaging>pom</packaging>
-    <version>3.5.2-SNAPSHOT</version>
+    <version>3.6.0</version>
     <modules>
         <module>zrlog-web</module>
         <module>package</module>
@@ -30,9 +30,9 @@
         <lambda-scope>compile</lambda-scope>
         <zrlog-polyglot-template-scope>provided</zrlog-polyglot-template-scope>
         <servlet-api.version>6.1.0</servlet-api.version>
-        <zrlog-install-web.version>3.3.3-SNAPSHOT</zrlog-install-web.version>
-        <zrlog-blog-web.version>3.5.5-SNAPSHOT</zrlog-blog-web.version>
-        <zrlog-admin-web.version>3.5.6-SNAPSHOT</zrlog-admin-web.version>
+        <zrlog-install-web.version>3.3.3</zrlog-install-web.version>
+        <zrlog-blog-web.version>3.5.5</zrlog-blog-web.version>
+        <zrlog-admin-web.version>3.5.6</zrlog-admin-web.version>
         <junit.version>4.13.2</junit.version>
         <mysql-scope>compile</mysql-scope>
     </properties>
@@ -132,7 +132,7 @@
             <dependency>
                 <groupId>com.hibegin</groupId>
                 <artifactId>zrlog-web</artifactId>
-                <version>3.5.2-SNAPSHOT</version>
+                <version>3.6.0</version>
             </dependency>
             <dependency>
                 <groupId>com.mysql</groupId>
