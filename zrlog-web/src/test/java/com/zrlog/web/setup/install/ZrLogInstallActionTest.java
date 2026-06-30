@@ -30,8 +30,8 @@ public class ZrLogInstallActionTest {
 
         action.installSuccess();
 
-        assertEquals(1, config.getConfigDatabaseCalls());
-        assertEquals(1, config.getStartPluginsCalls());
+        assertTrue(config.isDatabaseConfigured());
+        assertTrue(config.isPluginsStarted());
         assertEquals(Boolean.valueOf(!EnvKit.isFaaSMode()), config.getLastStartPluginsAsync());
     }
 

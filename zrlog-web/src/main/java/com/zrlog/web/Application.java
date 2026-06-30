@@ -33,7 +33,7 @@ public class Application {
         }
     }
 
-    private static void initZrLogEnv() {
+    static void initZrLogEnv() {
         String home = getZrLogHome();
         if (Objects.isNull(home)) {
             return;
@@ -58,7 +58,7 @@ public class Application {
         webServerBuilder(options.getPort(), options.getContextPath(), UpdaterUtils.getUpdater(args, null)).start();
     }
 
-    private static void nativeStart(String[] args) throws Exception {
+    static void nativeStart(String[] args) throws Exception {
         ApplicationStartupOptions options = ApplicationStartupOptions.parse(args);
         File execFile = new File(ZrLogBaseNativeImageUtils.getExecFile());
         if (EnvKit.isFaaSMode()) {

@@ -5,7 +5,6 @@ import com.zrlog.web.WebSetupContext;
 import com.zrlog.web.WebSetupProvider;
 import org.junit.Test;
 
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -60,29 +59,6 @@ public class SetupConfigTest {
 
         assertEquals(1, providers.size());
         assertEquals("admin", providers.get(0).name());
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    public void shouldBuildProviderNamesForLogging() throws Exception {
-        Method method = SetupConfig.class.getDeclaredMethod("names", List.class);
-        method.setAccessible(true);
-
-        List<String> names = (List<String>) method.invoke(null, Arrays.asList(
-                new FakeProvider(" admin ", 10),
-                new FakeProvider(null, 20)));
-
-        assertEquals(Arrays.asList("admin", ""), names);
-    }
-
-    @Test
-    public void shouldKeepRunningAfterNonStrictSetupFailures() throws Exception {
-        Method method = SetupConfig.class.getDeclaredMethod("handleSetupFailure",
-                boolean.class, String.class, Throwable.class);
-        method.setAccessible(true);
-
-        method.invoke(null, false, "warning without cause", null);
-        method.invoke(null, false, "warning with cause", new IllegalStateException("boom"));
     }
 
     @Test

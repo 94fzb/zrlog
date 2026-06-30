@@ -41,10 +41,10 @@ public class ZrLogInstallConfig extends DefaultInstallConfig {
         UpdateVersionTimerTask versionTimerTask = new UpdateVersionTimerTask(!BlogBuildInfoUtil.isRelease(), Constants.DEFAULT_LANGUAGE);
         versionTimerTask.run();
         Version lastVersion = versionTimerTask.getVersion();
-        return getLastVersionInfo(updater, lastVersion);
+        return toLastVersionInfo(updater, lastVersion);
     }
 
-    private static LastVersionInfo getLastVersionInfo(Updater updater, Version lastVersion) {
+    static LastVersionInfo toLastVersionInfo(Updater updater, Version lastVersion) {
         LastVersionInfo lastVersionInfo = new LastVersionInfo();
         if (Objects.isNull(lastVersion)) {
             lastVersionInfo.setLatestVersion(true);

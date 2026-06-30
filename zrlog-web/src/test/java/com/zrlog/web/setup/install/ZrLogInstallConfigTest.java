@@ -9,7 +9,6 @@ import com.zrlog.install.business.response.LastVersionInfo;
 import org.junit.Test;
 
 import java.io.File;
-import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Date;
 
@@ -100,9 +99,7 @@ public class ZrLogInstallConfigTest {
     }
 
     private static LastVersionInfo lastVersionInfo(Updater updater, Version version) throws Exception {
-        Method method = ZrLogInstallConfig.class.getDeclaredMethod("getLastVersionInfo", Updater.class, Version.class);
-        method.setAccessible(true);
-        return (LastVersionInfo) method.invoke(null, updater, version);
+        return ZrLogInstallConfig.toLastVersionInfo(updater, version);
     }
 
     private static Version upgradableVersion() {

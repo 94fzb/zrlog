@@ -20,14 +20,14 @@ import java.lang.management.ManagementFactory;
  */
 public class ZrLogSwsServletFilter extends SwsServletFilter {
 
-    private String getWarFile() {
+    String getWarFile() {
         String contextPath = getServletContext().getContextPath();
         String webappPath = new File(getServletContext().getRealPath("/")).getParent();
         if ("/".equals(contextPath) || "".equals(contextPath)) {
-            return webappPath + "/ROOT.war";
-        } else {
-            return webappPath + contextPath + ".war";
+            return new File(webappPath, "ROOT.war").getAbsolutePath();
         }
+        String warName = contextPath.startsWith("/") ? contextPath.substring(1) : contextPath;
+        return new File(webappPath, warName + ".war").getAbsolutePath();
     }
 
     @Override
@@ -39,7 +39,7 @@ public class ZrLogSwsServletFilter extends SwsServletFilter {
         return Constants.zrLogConfig;
     }
 
-    private Updater getUpdater() {
+    Updater getUpdater() {
         if (EnvKit.isDevMode()) {
             return UpdaterUtils.getUpdater(new String[0], null);
         }

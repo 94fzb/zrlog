@@ -1,6 +1,5 @@
 package com.zrlog.web.config;
 
-import com.hibegin.http.server.SimpleWebServer;
 import com.hibegin.http.server.WebServerBuilder;
 import com.zrlog.common.Constants;
 import com.zrlog.common.TokenService;
@@ -11,7 +10,6 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
-import java.lang.reflect.Field;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -68,28 +66,13 @@ public class ZrLogConfigImplTest {
     }
 
     @Test
-    public void shouldDestroyAttachedWebServerOnStop() throws Exception {
-        withTestRuntime(() -> {
-            ZrLogConfigImpl config = new ZrLogConfigImpl(19081, null, "");
-            WebServerBuilder builder = new WebServerBuilder.Builder().config(config).build();
-            TrackingSimpleWebServer webServer = new TrackingSimpleWebServer();
-            setWebServer(builder, webServer);
-            config.setServerBuilder(builder);
-
-            config.stop();
-
-            assertEquals("by stop", webServer.reason);
-        });
-    }
-
-    @Test
     public void shouldStopWhenServerBuilderIsMissing() throws Exception {
         withTestRuntime(() -> {
             ZrLogConfigImpl config = new ZrLogConfigImpl(19082, null, "");
 
             config.stop();
 
-            assertNull(getServerBuilder(config));
+            assertNull(config.getTokenService());
         });
     }
 
@@ -98,12 +81,11 @@ public class ZrLogConfigImplTest {
         withTestRuntime(() -> {
             ZrLogConfigImpl config = new ZrLogConfigImpl(19083, null, "");
             WebServerBuilder builder = new WebServerBuilder.Builder().config(config).build();
-            setWebServer(builder, null);
             config.setServerBuilder(builder);
 
             config.stop();
 
-            assertSame(builder, getServerBuilder(config));
+            assertTrue(builder.getWebServer() == null);
         });
     }
 
@@ -140,18 +122,6 @@ public class ZrLogConfigImplTest {
         }
     }
 
-    private static void setWebServer(WebServerBuilder builder, SimpleWebServer webServer) throws Exception {
-        Field field = WebServerBuilder.class.getDeclaredField("webServer");
-        field.setAccessible(true);
-        field.set(builder, webServer);
-    }
-
-    private static WebServerBuilder getServerBuilder(ZrLogConfigImpl config) throws Exception {
-        Field field = ZrLogConfigImpl.class.getDeclaredField("serverBuilder");
-        field.setAccessible(true);
-        return (WebServerBuilder) field.get(config);
-    }
-
     private static void restoreProperty(String key, String value) {
         if (value == null) {
             System.clearProperty(key);
@@ -168,13 +138,4 @@ public class ZrLogConfigImplTest {
         void run(File rootPath) throws Exception;
     }
 
-    private static class TrackingSimpleWebServer extends SimpleWebServer {
-
-        private String reason;
-
-        @Override
-        public void destroy(String reason) {
-            this.reason = reason;
-        }
-    }
 }

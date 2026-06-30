@@ -14,7 +14,6 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 import static org.junit.Assert.assertEquals;
@@ -55,10 +54,8 @@ public class ZrLogSwsServletFilterTest {
         try {
             System.clearProperty("sws.run.mode");
             setFilterConfig(filter, filterConfig("/blog", blog.getAbsolutePath()));
-            Method method = ZrLogSwsServletFilter.class.getDeclaredMethod("getUpdater");
-            method.setAccessible(true);
 
-            Updater updater = (Updater) method.invoke(filter);
+            Updater updater = filter.getUpdater();
 
             assertTrue(updater instanceof WarUpdater);
         } finally {
@@ -75,10 +72,8 @@ public class ZrLogSwsServletFilterTest {
         try {
             System.setProperty("sws.run.mode", "dev");
             setFilterConfig(filter, filterConfig("/blog", blog.getAbsolutePath()));
-            Method method = ZrLogSwsServletFilter.class.getDeclaredMethod("getUpdater");
-            method.setAccessible(true);
 
-            Updater updater = (Updater) method.invoke(filter);
+            Updater updater = filter.getUpdater();
 
             assertNotNull(updater);
             assertEquals(UpdaterTypeEnum.ZIP, updater.getType());
@@ -99,10 +94,8 @@ public class ZrLogSwsServletFilterTest {
             System.setProperty("sws.run.mode", "dev");
             System.setProperty("env", "junit-test");
             setFilterConfig(filter, filterConfig("/blog", blog.getAbsolutePath()));
-            Method method = ZrLogSwsServletFilter.class.getDeclaredMethod("getServerConfig");
-            method.setAccessible(true);
 
-            AbstractServerConfig config = (AbstractServerConfig) method.invoke(filter);
+            AbstractServerConfig config = filter.getServerConfig();
 
             assertNotNull(config);
             assertEquals("/blog", Constants.zrLogConfig.getServerConfig().getContextPath());
@@ -150,9 +143,7 @@ public class ZrLogSwsServletFilterTest {
     private static String getWarFile(String contextPath, String realPath) throws Exception {
         ZrLogSwsServletFilter filter = new ZrLogSwsServletFilter();
         setFilterConfig(filter, filterConfig(contextPath, realPath));
-        Method method = ZrLogSwsServletFilter.class.getDeclaredMethod("getWarFile");
-        method.setAccessible(true);
-        return (String) method.invoke(filter);
+        return filter.getWarFile();
     }
 
     private static void setFilterConfig(GenericFilter filter, FilterConfig filterConfig) throws Exception {

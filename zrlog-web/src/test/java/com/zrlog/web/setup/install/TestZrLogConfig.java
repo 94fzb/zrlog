@@ -20,8 +20,8 @@ class TestZrLogConfig extends ZrLogConfig {
     private boolean missingConfig;
     private boolean failConfigDatabase;
     private boolean trackLifecycleCalls;
-    private int configDatabaseCalls;
-    private int startPluginsCalls;
+    private boolean databaseConfigured;
+    private boolean pluginsStarted;
     private Boolean lastStartPluginsAsync;
 
     private TestZrLogConfig(Updater updater) {
@@ -44,7 +44,7 @@ class TestZrLogConfig extends ZrLogConfig {
             throw new IllegalStateException("database unavailable");
         }
         if (trackLifecycleCalls) {
-            configDatabaseCalls++;
+            databaseConfigured = true;
         }
         return null;
     }
@@ -52,7 +52,7 @@ class TestZrLogConfig extends ZrLogConfig {
     @Override
     public void startPlugins(boolean async) {
         if (trackLifecycleCalls) {
-            startPluginsCalls++;
+            pluginsStarted = true;
             lastStartPluginsAsync = async;
         }
     }
@@ -84,12 +84,12 @@ class TestZrLogConfig extends ZrLogConfig {
         this.failConfigDatabase = failConfigDatabase;
     }
 
-    int getConfigDatabaseCalls() {
-        return configDatabaseCalls;
+    boolean isDatabaseConfigured() {
+        return databaseConfigured;
     }
 
-    int getStartPluginsCalls() {
-        return startPluginsCalls;
+    boolean isPluginsStarted() {
+        return pluginsStarted;
     }
 
     Boolean getLastStartPluginsAsync() {

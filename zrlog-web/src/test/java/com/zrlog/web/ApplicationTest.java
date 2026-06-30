@@ -7,8 +7,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import java.lang.reflect.Method;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -49,10 +47,7 @@ public class ApplicationTest {
 
     @Test
     public void shouldReturnImmediatelyForNativeVersionArgument() throws Exception {
-        Method method = Application.class.getDeclaredMethod("nativeStart", String[].class);
-        method.setAccessible(true);
-
-        method.invoke(null, (Object) new String[]{"--version"});
+        Application.nativeStart(new String[]{"--version"});
 
         assertNull(Constants.zrLogConfig);
     }
@@ -61,10 +56,7 @@ public class ApplicationTest {
     public void shouldIgnoreMissingZrLogHomeWhenInitializingEnvironment() throws Exception {
         String previousRootPath = System.getProperty("sws.root.path");
         try {
-            Method method = Application.class.getDeclaredMethod("initZrLogEnv");
-            method.setAccessible(true);
-
-            method.invoke(null);
+            Application.initZrLogEnv();
 
             assertEquals(previousRootPath, System.getProperty("sws.root.path"));
         } finally {
