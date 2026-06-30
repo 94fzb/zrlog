@@ -36,7 +36,10 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         this.dataSource = super.configDatabase();
         if (Objects.nonNull(dataSource)) {
             this.cacheService = new CacheServiceImpl();
-            new DbUpgradeService(this.dataSource, this.cacheService.getCurrentSqlVersion()).tryDoUpgrade();
+            long currentSqlVersion = this.cacheService.getCurrentSqlVersion();
+            if (currentSqlVersion >= 0) {
+                new DbUpgradeService(this.dataSource, currentSqlVersion).tryDoUpgrade();
+            }
         }
         return dataSource;
     }

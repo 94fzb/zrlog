@@ -35,7 +35,7 @@ public class ZrLogInstallConfig extends DefaultInstallConfig {
     }
 
     private LastVersionInfo prefetchVersion(Updater updater) {
-        if (zrLogConfig.isInstalled()) {
+        if (zrLogConfig.isInstalled() || zrLogConfig.isTest()) {
             return null;
         }
         UpdateVersionTimerTask versionTimerTask = new UpdateVersionTimerTask(!BlogBuildInfoUtil.isRelease(), Constants.DEFAULT_LANGUAGE);
