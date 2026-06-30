@@ -13,9 +13,9 @@ nativeBuildArgs=()
 if [[ -n "${2:-}" ]]; then
   nativeBuildArgs+=("${2}")
 fi
-./mvnw -Dproject.build.outputTimestamp=2013-01-01T00:00:00Z clean install -U
-./mvnw -Dproject.build.outputTimestamp=2013-01-01T00:00:00Z -Djakarta-scope='provided' -Dzrlog-polyglot-template-scope='compile' "${nativeBuildArgs[@]}" -Pnative -Dagent exec:exec@java-agent -U -f package/pom.xml
-./mvnw -Dproject.build.outputTimestamp=2013-01-01T00:00:00Z -Djakarta-scope='provided' -Dzrlog-polyglot-template-scope='compile' "${nativeBuildArgs[@]}" -Pnative package -U -f package/pom.xml
+./mvnw -Dproject.build.outputTimestamp=2013-01-01T00:00:00Z -Dmaven.test.skip=false -DskipTests=false clean install -U
+./mvnw -Dproject.build.outputTimestamp=2013-01-01T00:00:00Z -Dmaven.test.skip=false -DskipTests=false -Djakarta-scope='provided' -Dzrlog-polyglot-template-scope='compile' "${nativeBuildArgs[@]}" -Pnative -Dagent exec:exec@java-agent -U -f package/pom.xml
+./mvnw -Dproject.build.outputTimestamp=2013-01-01T00:00:00Z -Dmaven.test.skip=false -DskipTests=false -Djakarta-scope='provided' -Dzrlog-polyglot-template-scope='compile' "${nativeBuildArgs[@]}" -Pnative package -U -f package/pom.xml
 if [ -f 'package/target/zrlog.exe' ];
 then
   mv "package/target/zrlog.exe" "zrlog.exe"
