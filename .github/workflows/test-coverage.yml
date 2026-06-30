@@ -1,0 +1,133 @@
+name: Test Coverage
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '11'
+          cache: maven
+
+      - name: Run tests and generate coverage
+        run: ./mvnw -q -pl zrlog-web org.jacoco:jacoco-maven-plugin:0.8.12:prepare-agent test org.jacoco:jacoco-maven-plugin:0.8.12:report
+
+      - name: Summarize JaCoCo coverage
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s globstar nullglob
+
+          reports=(**/target/site/jacoco/jacoco.csv)
+          if [ ${#reports[@]} -eq 0 ]; then
+            {
+              echo "## Test Coverage"
+              echo
+              echo "No JaCoCo CSV report found."
+            } >> "${GITHUB_STEP_SUMMARY}"
+            exit 1
+          fi
+
+          totals_file="${RUNNER_TEMP}/jacoco-totals.tsv"
+          : > "${totals_file}"
+
+          for report in "${reports[@]}"; do
+            if [ "${report}" = "target/site/jacoco/jacoco.csv" ]; then
+              module="${GITHUB_REPOSITORY##*/}"
+            else
+              module="${report%/target/site/jacoco/jacoco.csv}"
+            fi
+
+            awk -F, -v module="${module}" '
+              NR > 1 {
+                instruction_missed += $4
+                instruction_covered += $5
+                branch_missed += $6
+                branch_covered += $7
+                line_missed += $8
+                line_covered += $9
+              }
+              END {
+                printf "%s\t%d\t%d\t%d\t%d\t%d\t%d\n",
+                  module,
+                  line_missed,
+                  line_covered,
+                  branch_missed,
+                  branch_covered,
+                  instruction_missed,
+                  instruction_covered
+              }
+            ' "${report}" >> "${totals_file}"
+          done
+
+          {
+            echo "## Test Coverage"
+            echo
+            echo "| Module | Lines | Branches | Instructions |"
+            echo "| --- | ---: | ---: | ---: |"
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+          total_line_missed=0
+          total_line_covered=0
+          total_branch_missed=0
+          total_branch_covered=0
+          total_instruction_missed=0
+          total_instruction_covered=0
+
+          while IFS=$'\t' read -r module line_missed line_covered branch_missed branch_covered instruction_missed instruction_covered; do
+            line_total=$((line_missed + line_covered))
+            branch_total=$((branch_missed + branch_covered))
+            instruction_total=$((instruction_missed + instruction_covered))
+
+            line_percent="$(awk -v covered="${line_covered}" -v total="${line_total}" 'BEGIN { if (total == 0) print "n/a"; else printf "%.2f%%", covered * 100 / total }')"
+            branch_percent="$(awk -v covered="${branch_covered}" -v total="${branch_total}" 'BEGIN { if (total == 0) print "n/a"; else printf "%.2f%%", covered * 100 / total }')"
+            instruction_percent="$(awk -v covered="${instruction_covered}" -v total="${instruction_total}" 'BEGIN { if (total == 0) print "n/a"; else printf "%.2f%%", covered * 100 / total }')"
+
+            echo "| \`${module}\` | ${line_percent} (${line_covered}/${line_total}) | ${branch_percent} (${branch_covered}/${branch_total}) | ${instruction_percent} (${instruction_covered}/${instruction_total}) |" >> "${GITHUB_STEP_SUMMARY}"
+
+            total_line_missed=$((total_line_missed + line_missed))
+            total_line_covered=$((total_line_covered + line_covered))
+            total_branch_missed=$((total_branch_missed + branch_missed))
+            total_branch_covered=$((total_branch_covered + branch_covered))
+            total_instruction_missed=$((total_instruction_missed + instruction_missed))
+            total_instruction_covered=$((total_instruction_covered + instruction_covered))
+          done < "${totals_file}"
+
+          total_lines=$((total_line_missed + total_line_covered))
+          total_branches=$((total_branch_missed + total_branch_covered))
+          total_instructions=$((total_instruction_missed + total_instruction_covered))
+
+          total_line_percent="$(awk -v covered="${total_line_covered}" -v total="${total_lines}" 'BEGIN { if (total == 0) print "n/a"; else printf "%.2f%%", covered * 100 / total }')"
+          total_branch_percent="$(awk -v covered="${total_branch_covered}" -v total="${total_branches}" 'BEGIN { if (total == 0) print "n/a"; else printf "%.2f%%", covered * 100 / total }')"
+          total_instruction_percent="$(awk -v covered="${total_instruction_covered}" -v total="${total_instructions}" 'BEGIN { if (total == 0) print "n/a"; else printf "%.2f%%", covered * 100 / total }')"
+
+          {
+            echo "| **Total** | **${total_line_percent} (${total_line_covered}/${total_lines})** | **${total_branch_percent} (${total_branch_covered}/${total_branches})** | **${total_instruction_percent} (${total_instruction_covered}/${total_instructions})** |"
+            echo
+            echo "Download the \`jacoco-html-report\` artifact for file-level coverage."
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Upload JaCoCo HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-html-report
+          path: '**/target/site/jacoco'
+          if-no-files-found: warn
