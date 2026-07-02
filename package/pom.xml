@@ -31,6 +31,10 @@
         </dependency>
         <dependency>
             <groupId>com.hibegin</groupId>
+            <artifactId>zrlog-install-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.hibegin</groupId>
             <artifactId>simplewebserver-lambda-function-impl</artifactId>
             <scope>${lambda-scope}</scope>
         </dependency>
@@ -321,9 +325,9 @@
                                     <overWriteReleases>false</overWriteReleases>
                                     <overWriteIfNewer>true</overWriteIfNewer>
                                     <useBaseVersion>false</useBaseVersion>
-                                    <excludeScope>${jakarta-scope}</excludeScope>
+                                    <includeScope>runtime</includeScope>
                                     <excludeArtifactIds>
-                                        junit,hamcrest-core,zrlog-polyglot-template
+                                        zrlog-polyglot-template
                                     </excludeArtifactIds>
                                 </configuration>
                             </execution>

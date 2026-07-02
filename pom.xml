@@ -123,6 +123,13 @@
                 <groupId>com.hibegin</groupId>
                 <artifactId>zrlog-install-web</artifactId>
                 <version>${zrlog-install-web.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>2.2.224</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>com.hibegin</groupId>
