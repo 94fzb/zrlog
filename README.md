@@ -42,6 +42,10 @@ ZrLog 是一款基于 Java 的开源博客系统。它提供文章、分类、�
     - Windows 环境执行 `bin\mvn-run.cmd`
     - Unix 平台执行 `sh bin/mvn-run.sh`
 
+### 开发规范
+
+面向 AI Agent 和跨仓库开发的主工程入口见 [AGENTS.md](AGENTS.md)。涉及 `zrlog-base`、`zrlog-admin-web`、`zrlog-blog-web`、`zrlog-install-web` 的联动时，先确认对应仓库边界，再回到本仓库做集成和打包验证。
+
 ### 程序安装与部署
 
 - **快速体验：Docker**
