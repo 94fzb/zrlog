@@ -1,4 +1,5 @@
 name: build release docker image
+run-name: build release docker image (${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || inputs.ref }})
 
 on:
   workflow_run:
