@@ -16,17 +16,12 @@ jobs:
       ZRLOG_BUILD_TIME: ${{ github.event.client_payload.build_time || '' }}
       ARTIFACT_SERVICE_URL: ${{ vars.ARTIFACT_SERVICE_URL }}
       ARTIFACT_SERVICE_TOKEN: ${{ secrets.ARTIFACT_SERVICE_TOKEN }}
-      ARTIFACT_SOURCE_PREFIX: zrlog
-      ARTIFACT_R2_ACCESS_KEY_ID: ${{ secrets.SECRET_ID }}
-      ARTIFACT_R2_SECRET_ACCESS_KEY: ${{ secrets.SECRET_KEY }}
-      ARTIFACT_R2_BUCKET: ${{ secrets.BUCKET }}
-      ARTIFACT_R2_ENDPOINT: ${{ secrets.HOST }}
     concurrency:
       group: deploy-preview-on-${{ matrix.os }}-faas   # 同一个 group 的任务会排队执行
       cancel-in-progress: true # 预览版本，取消前一个任务
     strategy:
       matrix:
-        os: [ ubuntu-22.04,ubuntu-24.04-arm ]
+        os: [ ubuntu-22.04 ]
     steps:
       - uses: actions/checkout@v3
         with:

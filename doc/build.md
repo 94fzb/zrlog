@@ -20,9 +20,9 @@
 ### FaaS 主程序制品
 
 FaaS workflow 在 native 主程序生成后、最终 ZIP 组装前调用
-`shell/native/process-faas-artifact.sh`。脚本将未压缩主程序上传到
-`zrlog-artifact-service`，等待 UPX 派生任务完成，再用服务返回的 `targetKey` 从 R2
-下载并替换本地 `zrlog`。插件下载、最终 FaaS ZIP、
+`shell/native/process-faas-artifact.sh`。脚本将未压缩主程序直接上传到
+`zrlog-artifact-service`，等待 UPX 临时处理任务完成，再从服务下载、校验并替换本地
+`zrlog`。校验成功后脚本通知服务删除临时结果，未确认的结果由服务按 TTL 回收。插件下载、最终 FaaS ZIP、
 `last.<arch>.faas.version.json` 以及发布到下载目录仍由本工程负责。
 
 GitHub 仓库需要配置：
