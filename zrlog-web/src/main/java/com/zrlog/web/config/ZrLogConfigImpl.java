@@ -21,6 +21,7 @@ import java.util.logging.Level;
 
 public class ZrLogConfigImpl extends ZrLogConfig {
 
+    private static final String MYSQL_CLEANUP_THREAD_CLASS_NAME = "com.mysql.cj.jdbc.AbandonedConnectionCleanupThread";
     private final SetupConfig setupConfig;
     private WebServerBuilder serverBuilder;
 
@@ -72,11 +73,27 @@ public class ZrLogConfigImpl extends ZrLogConfig {
         this.serverBuilder = serverBuilder;
     }
 
-    private void closeDataSource() {
+    private boolean isMySqlCleanupThreadAvailable() {
+        try {
+            Class.forName(MYSQL_CLEANUP_THREAD_CLASS_NAME, false, ZrLogConfigImpl.class.getClassLoader());
+            return true;
+        } catch (ClassNotFoundException | LinkageError e) {
+            return false;
+        }
+    }
+
+    private void shutdownMySqlCleanupThread() {
         if (Objects.nonNull(this.dataSource) && this.dataSource.isWebApi()) {
             return;
         }
-        AbandonedConnectionCleanupThread.checkedShutdown();
+        if (!isMySqlCleanupThreadAvailable()) {
+            return;
+        }
+        try {
+            AbandonedConnectionCleanupThread.checkedShutdown();
+        } catch (LinkageError e) {
+            LOGGER.log(Level.FINE, "MySQL cleanup thread is unavailable", e);
+        }
     }
 
     private void destroyWebServer() {
@@ -94,7 +111,7 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     public void stop() {
         try {
             super.stop();
-            closeDataSource();
+            shutdownMySqlCleanupThread();
         } finally {
             destroyWebServer();
         }
