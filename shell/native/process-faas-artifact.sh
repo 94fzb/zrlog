@@ -112,6 +112,25 @@ jobId=$(jq -er 'select(.success == true) | .data.id | select(type == "string" an
 }
 
 encodedJobId=$(jq -nr --arg value "${jobId}" '$value | @uri')
+initialJobStatus=$(jq -er 'select(.success == true) | .data.status | select(type == "string")' \
+  <<< "${jobResponse}") || {
+  echo "Artifact job response has no status: ${jobResponse}" >&2
+  exit 1
+}
+if [[ "${initialJobStatus}" == "FAILED" ]]; then
+  if ! retryResponse=$(curl "${curlArgs[@]}" --max-time 60 \
+      -X POST -H "${authorizationHeader}" \
+      "${serviceUrl}/api/v1/jobs/retry?id=${encodedJobId}"); then
+    echo "Unable to retry failed artifact processing job: ${retryResponse:-no response body}" >&2
+    exit 1
+  fi
+  jq -e 'select(.success == true and .data.status == "PENDING")' \
+    <<< "${retryResponse}" >/dev/null || {
+    echo "Artifact job retry response is invalid: ${retryResponse}" >&2
+    exit 1
+  }
+fi
+
 deadline=$((SECONDS + processTimeout))
 while (( SECONDS < deadline )); do
   if ! jobResponse=$(curl "${curlArgs[@]}" --max-time 60 \
