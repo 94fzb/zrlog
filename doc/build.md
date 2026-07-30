@@ -16,3 +16,24 @@
 │   ├── package-native-zip.sh
 │   └── package-native.sh
 ```
+
+### FaaS 主程序制品
+
+FaaS workflow 在 native 主程序生成后、最终 ZIP 组装前调用
+`shell/native/process-faas-artifact.sh`。脚本将未压缩主程序上传到
+`zrlog-artifact-service`，等待 UPX 派生任务完成，再用服务返回的 `targetKey` 从 R2
+下载并替换本地 `zrlog`。插件下载、最终 FaaS ZIP、
+`last.<arch>.faas.version.json` 以及发布到下载目录仍由本工程负责。
+
+GitHub 仓库需要配置：
+
+```text
+Variable:
+  ARTIFACT_SERVICE_URL=https://artifact.zrlog.com
+
+Secret:
+  ARTIFACT_SERVICE_TOKEN=<zrlog-artifact-service 的 ARTIFACT_API_TOKEN>
+```
+
+R2 下载复用现有 FaaS workflow 的 `SECRET_ID`、`SECRET_KEY`、`BUCKET` 和 `HOST`
+配置。普通 Native ZIP 和 DEB 构建不会调用制品处理服务。
