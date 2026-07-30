@@ -29,11 +29,15 @@ GitHub 仓库需要配置：
 
 ```text
 Variable:
-  ARTIFACT_SERVICE_URL=https://artifact.zrlog.com
+  ARTIFACT_SERVICE_URL=https://webdav.zrlog.com/artifact
 
 Secret:
   ARTIFACT_SERVICE_TOKEN=<zrlog-artifact-service 的 ARTIFACT_API_TOKEN>
 ```
+
+`ARTIFACT_SERVICE_URL` 是制品服务的完整基址。服务通过
+`ARTIFACT_CONTEXT_PATH=/artifact` 部署在子目录时，该变量也必须包含
+`/artifact`；脚本会在此基址后追加 `/api/v1/...`。
 
 R2 下载复用现有 FaaS workflow 的 `SECRET_ID`、`SECRET_KEY`、`BUCKET` 和 `HOST`
 配置。普通 Native ZIP 和 DEB 构建不会调用制品处理服务。
