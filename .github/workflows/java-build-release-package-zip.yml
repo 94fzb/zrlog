@@ -32,7 +32,7 @@ jobs:
           mkdir -p /tmp/download
           bash -e shell/java/build-final-java.sh release /tmp/download
       - name: Attest release artifacts
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest-build-provenance@v4
         with:
           subject-path: |
             /tmp/download/release/zrlog-*-release.zip
