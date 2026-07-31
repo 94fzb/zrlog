@@ -45,6 +45,12 @@ fi
 Date="${ZRLOG_BUILD_TIME:-$(git log -1 --format=%cd --date=format:'%Y-%m-%d %H:%M:%S%z' | sed "s/\([+-]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1\2:\3/")}"
 defaultBuildId="$(git rev-parse --short HEAD)"
 buildId="${ZRLOG_BUILD_ID:-$defaultBuildId}"
+sourceCommit="${ZRLOG_SOURCE_COMMIT:-$(git rev-parse HEAD)}"
+sourceRepository="${ZRLOG_SOURCE_REPOSITORY:-https://github.com/94fzb/zrlog}"
+buildWorkflow="${ZRLOG_BUILD_WORKFLOW:-}"
+if [[ -z "${buildWorkflow}" && -n "${GITHUB_RUN_ID:-}" && -n "${GITHUB_REPOSITORY:-}" ]]; then
+    buildWorkflow="${GITHUB_SERVER_URL:-https://github.com}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+fi
 
 OS="$(uname)"
 case "${OS}" in
@@ -84,8 +90,9 @@ else
 fi
 
 mkdir -p zrlog-web/src/main/resources/
-printf "version=%s\nrunMode=%s\nrunModeDesc=%s\nbuildId=%s\nbuildTime=%s\nmirrorWebSite=%s\nfileArch=%s\nruntimeType=%s\npackageType=%s\nupdateVersionJsonFilename=%s\n" \
+printf "version=%s\nrunMode=%s\nrunModeDesc=%s\nbuildId=%s\nbuildTime=%s\nmirrorWebSite=%s\nfileArch=%s\nruntimeType=%s\npackageType=%s\nupdateVersionJsonFilename=%s\nsourceCommit=%s\nsourceRepository=%s\nbuildWorkflow=%s\n" \
   "$version" "$runMode" "$runModeDesc" "$buildId" "$Date" "$mirrorWebSite" "$fileArch" "$runtimeType" "$packageType" "$updateVersionJsonFilename" \
+  "$sourceCommit" "$sourceRepository" "$buildWorkflow" \
   > zrlog-web/src/main/resources/build.properties
 
 bash bin/build-system-info.sh

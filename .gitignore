@@ -35,6 +35,8 @@ conf/update-temp/zrlog.zip
 zrlog.zip
 /zrlog-web/src/main/resources/build.properties
 node_modules
+__pycache__/
+*.py[cod]
 *.zip
 temp
 cache/**

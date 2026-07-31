@@ -1,0 +1,19 @@
+name: Security baseline
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "23 4 * * 1"
+
+permissions:
+  contents: read
+  security-events: write
+  pull-requests: read
+
+jobs:
+  baseline:
+    uses: zrlog/zrlog-ops/.github/workflows/security-baseline.yml@main
+    with:
+      codeql_languages: java-kotlin
+      codeql_build_mode: none

@@ -3,6 +3,10 @@ on:
   push:
     branches:
       - release
+permissions:
+  contents: read
+  id-token: write
+  attestations: write
 jobs:
   build:
     name: ZrLog package ${{ matrix.os }} ${{ matrix.architecture }}
@@ -21,8 +25,25 @@ jobs:
           distribution: 'temurin'
           java-version: '11'
           cache: 'maven'
+      - uses: anchore/sbom-action/download-syft@v0
+      - uses: sigstore/cosign-installer@v3
       - name: Build with Maven
         run: |
           mkdir -p /tmp/download
           bash -e shell/java/build-final-java.sh release /tmp/download
+      - name: Attest release artifacts
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: |
+            /tmp/download/release/zrlog-*-release.zip
+            /tmp/download/release/zrlog-*-release.war
+      - name: Generate release trust metadata
+        run: |
+          python3 shell/release/generate_trust_metadata.py \
+            --artifact-dir /tmp/download/release \
+            --source-commit "${GITHUB_SHA}" \
+            --source-repository "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
+            --workflow-url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+      - name: Upload release artifacts
+        run: |
           bash shell/upload-bin.sh ${{ secrets.SECRET_ID }} ${{ secrets.SECRET_KEY }} ${{ secrets.BUCKET }} /tmp/download release ${{ secrets.HOST }}

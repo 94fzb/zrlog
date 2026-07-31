@@ -26,6 +26,8 @@
 - `release` 分支可正常触发 GitHub Actions。
 - 下载站 `https://dl.zrlog.com/` 正常可用。
 - `zrlog-www` 可正常发布 changelog 页面。
+- 发布安全门禁没有未豁免的 Critical/High 或 secret scanning 告警。
+- 按 [发布制品验证](artifact-verification.md) 检查 SHA-256、Sigstore、SBOM 和 provenance。
 
 ## 3. 版本联动点
 
