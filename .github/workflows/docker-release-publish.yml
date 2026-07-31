@@ -53,7 +53,9 @@ jobs:
           echo "DOCKER_TAG_VERSION=${version}" >> "${GITHUB_ENV}"
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
+        with:
+          platforms: arm64
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -81,7 +83,7 @@ jobs:
         with:
           context: ./docker
           file: ./docker/Dockerfile
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name == 'workflow_run' || inputs.push_image }}
           provenance: mode=max
           sbom: true
