@@ -38,7 +38,7 @@ jobs:
           mkdir -p /tmp/download
           bash -e shell/native/build-final-native.sh release /tmp/download deb
       - name: Attest release artifact
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest-build-provenance@v4
         with:
           subject-path: /tmp/download/release/zrlog-*-release-*.deb
       - name: Generate release trust metadata
