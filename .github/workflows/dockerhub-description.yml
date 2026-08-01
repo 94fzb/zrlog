@@ -1,0 +1,35 @@
+name: update Docker Hub repository information
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - docker/README.md
+      - .github/workflows/dockerhub-description.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dockerhub-description
+  cancel-in-progress: true
+
+jobs:
+  update:
+    name: Update zrlog/zrlog description
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Update Docker Hub description
+        uses: peter-evans/dockerhub-description@1b9a80c056b620d92cedb9d9b5a223409c68ddfa # v5.0.0
+        with:
+          username: zrlog
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: zrlog/zrlog
+          short-description: Official container image for ZrLog, an open-source blog and content management system
+          readme-filepath: ./docker/README.md
