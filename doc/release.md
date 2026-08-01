@@ -153,7 +153,10 @@ bash shell/version.sh 2
 - Native ZIP
 - DEB
 - FaaS ZIP
-- Docker 镜像：`zrlog/zrlog:<version>`、`zrlog/zrlog:latest`
+- Linux Docker 镜像：`zrlog/zrlog:<version>`、`zrlog/zrlog:latest`，包含
+  `linux/amd64` 和 `linux/arm64`
+- Windows Server 2022 Docker 镜像：`zrlog/zrlog:<version>-windows-ltsc2022`、
+  `zrlog/zrlog:windows-ltsc2022`，平台为 `windows/amd64`
 
 对应打包脚本：
 
@@ -161,6 +164,11 @@ bash shell/version.sh 2
 - `shell/native/build-final-native.sh`
 
 Docker 镜像构建已内置在主仓，不再依赖 `zrlog-docker` 仓库的 `VERSION.txt` 或跨仓库 `repository_dispatch`。正式镜像版本直接来自 `release` 分支的根 `pom.xml` 项目版本。
+
+Linux 镜像由 GitHub 的 AMD64、ARM64 原生 runner 分别构建，再合并为同一个 manifest，
+不依赖 QEMU。Windows 镜像使用 `servercore:ltsc2022` 完成安装，再将 ZrLog 和所需运行库
+复制到 `nanoserver:ltsc2022` 最终镜像。由于 Windows 容器的主机版本兼容要求，Windows
+使用独立标签，不加入 Linux 的 `latest` manifest。
 
 ### 4.6 发布元数据生成规则
 

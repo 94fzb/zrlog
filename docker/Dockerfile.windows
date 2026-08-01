@@ -1,0 +1,48 @@
+# escape=`
+
+FROM mcr.microsoft.com/windows/servercore:ltsc2022 AS installer
+
+SHELL ["powershell", "-NoLogo", "-NoProfile", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
+
+ARG VC_REDIST_URL=https://download.visualstudio.microsoft.com/download/pr/9b0d1fa5-c16d-4ee8-97f0-c2734086ece8/CC0FF0EB1DC3F5188AE6300FAEF32BF5BEEBA4BDD6E8E445A9184072096B713B/VC_redist.x64.exe
+ARG VC_REDIST_SHA256=cc0ff0eb1dc3f5188ae6300faef32bf5beeba4bdd6e8e445a9184072096b713b
+
+RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; `
+    $installer = 'C:\vc_redist.x64.exe'; `
+    Invoke-WebRequest -UseBasicParsing -Uri $env:VC_REDIST_URL -OutFile $installer; `
+    $actualHash = (Get-FileHash -LiteralPath $installer -Algorithm SHA256).Hash.ToLowerInvariant(); `
+    if ($actualHash -ne $env:VC_REDIST_SHA256.ToLowerInvariant()) { throw "Unexpected VC++ runtime SHA-256: $actualHash" }; `
+    $process = Start-Process -FilePath $installer -ArgumentList '/install', '/quiet', '/norestart' -Wait -PassThru; `
+    if ($process.ExitCode -notin @(0, 3010)) { throw "VC++ runtime installer exited with code $($process.ExitCode)" }; `
+    Remove-Item -LiteralPath $installer -Force; `
+    if (-not (Test-Path 'C:\Windows\System32\VCRUNTIME140.dll')) { throw 'VCRUNTIME140.dll was not installed' }; `
+    if (-not (Test-Path 'C:\Windows\System32\VCRUNTIME140_1.dll')) { throw 'VCRUNTIME140_1.dll was not installed' }
+
+ARG ZRLOG_CHANNEL=release
+ARG CACHE_BUST=manual
+
+RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; `
+    $archive = 'C:\zrlog.zip'; `
+    $destination = 'C:\opt\zrlog'; `
+    $artifactUrl = 'https://pub-c16cba848aff4e6b8d8e0d00f0f741f0.r2.dev/{0}/zrlog-Windows-x86_64.zip?{1}' -f $env:ZRLOG_CHANNEL, $env:CACHE_BUST; `
+    $headers = @{ 'User-Agent' = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' }; `
+    New-Item -ItemType Directory -Force -Path $destination | Out-Null; `
+    Invoke-WebRequest -UseBasicParsing -Headers $headers -Uri $artifactUrl -OutFile $archive; `
+    Expand-Archive -LiteralPath $archive -DestinationPath $destination -Force; `
+    Remove-Item -LiteralPath $archive -Force; `
+    if (-not (Test-Path 'C:\opt\zrlog\zrlog.exe')) { throw 'zrlog.exe was not found in the release archive' }
+
+FROM mcr.microsoft.com/windows/nanoserver:ltsc2022
+
+LABEL maintainer="zrlog <support@zrlog.com>"
+
+USER ContainerAdministrator
+
+COPY --from=installer ["/opt/zrlog", "/opt/zrlog"]
+COPY --from=installer ["/Windows/System32/VCRUNTIME140.dll", "/Windows/System32/VCRUNTIME140_1.dll", "/opt/zrlog/"]
+
+WORKDIR C:/opt/zrlog
+
+ENV DOCKER_MODE=true
+
+CMD ["C:/opt/zrlog/zrlog.exe"]

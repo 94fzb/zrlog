@@ -21,22 +21,42 @@ on:
         required: false
         default: false
         type: boolean
+
 permissions:
   contents: read
   id-token: write
 
+env:
+  DOCKERHUB_IMAGE: zrlog/zrlog
+  ALIYUN_IMAGE: registry.cn-chengdu.aliyuncs.com/hibegin/zrlog
+
 jobs:
-  build:
-    name: Build release Docker image
-    runs-on: ubuntu-latest
+  prepare:
+    name: Prepare Docker release
+    runs-on: ubuntu-22.04
     if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    outputs:
+      source_ref: ${{ steps.settings.outputs.source_ref }}
+      version: ${{ steps.version.outputs.value }}
+      push_image: ${{ steps.settings.outputs.push_image }}
     steps:
+      - name: Resolve release settings
+        id: settings
+        env:
+          SOURCE_REF: ${{ github.event_name == 'workflow_dispatch' && inputs.ref || github.event.workflow_run.head_sha }}
+          PUSH_IMAGE: ${{ github.event_name == 'workflow_run' || inputs.push_image }}
+        run: |
+          : "${SOURCE_REF:?source ref is required}"
+          echo "source_ref=${SOURCE_REF}" >> "${GITHUB_OUTPUT}"
+          echo "push_image=${PUSH_IMAGE}" >> "${GITHUB_OUTPUT}"
+
       - name: Checkout
         uses: actions/checkout@v7
         with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.ref || github.event.workflow_run.head_sha }}
+          ref: ${{ steps.settings.outputs.source_ref }}
 
       - name: Read ZrLog version
+        id: version
         run: |
           version=$(awk '
               /<parent>/ { inParent = 1 }
@@ -50,12 +70,126 @@ jobs:
               }
           ' pom.xml)
           : "${version:?project version is required}"
-          echo "DOCKER_TAG_VERSION=${version}" >> "${GITHUB_ENV}"
+          echo "value=${version}" >> "${GITHUB_OUTPUT}"
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v4
+  build-linux:
+    name: Build Linux image (${{ matrix.platform }})
+    needs: prepare
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-22.04
+            platform: linux/amd64
+            arch: amd64
+          - runner: ubuntu-24.04-arm
+            platform: linux/arm64
+            arch: arm64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
         with:
-          platforms: arm64
+          ref: ${{ needs.prepare.outputs.source_ref }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Login to Docker Hub
+        if: needs.prepare.outputs.push_image == 'true'
+        uses: docker/login-action@v4.5.2
+        with:
+          username: zrlog
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Login to Aliyun Docker Hub
+        if: needs.prepare.outputs.push_image == 'true'
+        uses: docker/login-action@v4.5.2
+        with:
+          registry: registry.cn-chengdu.aliyuncs.com
+          username: 90xchun
+          password: ${{ secrets.ALIYUN_DOCKER_PASSWORD }}
+
+      - name: Build and push immutable Linux image
+        id: push
+        if: needs.prepare.outputs.push_image == 'true'
+        uses: docker/build-push-action@v7
+        with:
+          context: ./docker
+          file: ./docker/Dockerfile
+          platforms: ${{ matrix.platform }}
+          provenance: mode=max
+          sbom: true
+          build-args: |
+            ZRLOG_CHANNEL=release
+            CACHE_BUST=${{ github.run_id }}-${{ github.run_attempt }}
+          outputs: >-
+            type=image,"name=${{ env.DOCKERHUB_IMAGE }},${{ env.ALIYUN_IMAGE }}",push-by-digest=true,name-canonical=true,push=true
+
+      - name: Verify pushed Linux image
+        if: needs.prepare.outputs.push_image == 'true'
+        env:
+          IMAGE_DIGEST: ${{ steps.push.outputs.digest }}
+        run: |
+          : "${IMAGE_DIGEST:?image digest is required}"
+          docker run --rm --entrypoint /opt/zrlog/zrlog \
+            "${DOCKERHUB_IMAGE}@${IMAGE_DIGEST}" --version
+
+      - name: Export Linux image digest
+        if: needs.prepare.outputs.push_image == 'true'
+        env:
+          IMAGE_DIGEST: ${{ steps.push.outputs.digest }}
+        run: |
+          : "${IMAGE_DIGEST:?image digest is required}"
+          mkdir -p /tmp/digests
+          touch "/tmp/digests/${IMAGE_DIGEST#sha256:}"
+
+      - name: Upload Linux image digest
+        if: needs.prepare.outputs.push_image == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: linux-digest-${{ matrix.arch }}-${{ github.run_attempt }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Build local Linux image
+        if: needs.prepare.outputs.push_image != 'true'
+        uses: docker/build-push-action@v7
+        with:
+          context: ./docker
+          file: ./docker/Dockerfile
+          platforms: ${{ matrix.platform }}
+          load: true
+          provenance: false
+          sbom: false
+          build-args: |
+            ZRLOG_CHANNEL=release
+            CACHE_BUST=${{ github.run_id }}-${{ github.run_attempt }}
+          tags: zrlog-local:${{ matrix.arch }}
+
+      - name: Verify local Linux image
+        if: needs.prepare.outputs.push_image != 'true'
+        run: |
+          docker run --rm --entrypoint /opt/zrlog/zrlog \
+            "zrlog-local:${{ matrix.arch }}" --version
+
+  merge-linux:
+    name: Publish Linux multi-architecture manifest
+    needs:
+      - prepare
+      - build-linux
+    runs-on: ubuntu-22.04
+    if: needs.prepare.outputs.push_image == 'true'
+    env:
+      DOCKER_TAG_VERSION: ${{ needs.prepare.outputs.version }}
+    steps:
+      - name: Download Linux image digests
+        uses: actions/download-artifact@v7
+        with:
+          path: /tmp/digests
+          pattern: linux-digest-*-${{ github.run_attempt }}
+          merge-multiple: true
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -63,39 +197,165 @@ jobs:
       - uses: sigstore/cosign-installer@v3
 
       - name: Login to Docker Hub
-        if: github.event_name == 'workflow_run' || inputs.push_image
         uses: docker/login-action@v4.5.2
         with:
           username: zrlog
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Login to Aliyun Docker Hub
-        if: github.event_name == 'workflow_run' || inputs.push_image
         uses: docker/login-action@v4.5.2
         with:
           registry: registry.cn-chengdu.aliyuncs.com
           username: 90xchun
           password: ${{ secrets.ALIYUN_DOCKER_PASSWORD }}
 
-      - name: Build and push
-        id: build
-        uses: docker/build-push-action@v7
-        with:
-          context: ./docker
-          file: ./docker/Dockerfile
-          platforms: linux/amd64,linux/arm64
-          push: ${{ github.event_name == 'workflow_run' || inputs.push_image }}
-          provenance: mode=max
-          sbom: true
-          build-args: |
-            ZRLOG_CHANNEL=release
-            CACHE_BUST=${{ github.run_id }}-${{ github.run_attempt }}
-          tags: |
-            zrlog/zrlog:${{ env.DOCKER_TAG_VERSION }}
-            zrlog/zrlog:latest
-            registry.cn-chengdu.aliyuncs.com/hibegin/zrlog:${{ env.DOCKER_TAG_VERSION }}
-            registry.cn-chengdu.aliyuncs.com/hibegin/zrlog:latest
+      - name: Create and verify Linux manifests
+        id: manifest
+        run: |
+          set -euo pipefail
+          mapfile -t digest_files < <(find /tmp/digests -maxdepth 1 -type f -printf '%f\n' | sort)
+          if [[ "${#digest_files[@]}" -ne 2 ]]; then
+            echo "Expected two Linux image digests, found ${#digest_files[@]}" >&2
+            exit 1
+          fi
+
+          dockerhub_sources=()
+          aliyun_sources=()
+          for digest_file in "${digest_files[@]}"; do
+            digest="sha256:${digest_file}"
+            dockerhub_source="${DOCKERHUB_IMAGE}@${digest}"
+            aliyun_source="${ALIYUN_IMAGE}@${digest}"
+            docker buildx imagetools inspect "${dockerhub_source}" >/dev/null
+            docker buildx imagetools inspect "${aliyun_source}" >/dev/null
+            dockerhub_sources+=("${dockerhub_source}")
+            aliyun_sources+=("${aliyun_source}")
+          done
+
+          docker buildx imagetools create \
+            --tag "${DOCKERHUB_IMAGE}:${DOCKER_TAG_VERSION}" \
+            --tag "${DOCKERHUB_IMAGE}:latest" \
+            "${dockerhub_sources[@]}"
+          docker buildx imagetools create \
+            --tag "${ALIYUN_IMAGE}:${DOCKER_TAG_VERSION}" \
+            --tag "${ALIYUN_IMAGE}:latest" \
+            "${aliyun_sources[@]}"
+
+          validate_manifest() {
+            local image="$1"
+            docker buildx imagetools inspect "${image}" --raw | jq -e '
+              ([.manifests[]
+                | select(.platform.os == "linux")
+                | "\(.platform.os)/\(.platform.architecture)"] | sort)
+              == ["linux/amd64", "linux/arm64"]
+            ' >/dev/null
+          }
+          validate_manifest "${DOCKERHUB_IMAGE}:${DOCKER_TAG_VERSION}"
+          validate_manifest "${ALIYUN_IMAGE}:${DOCKER_TAG_VERSION}"
+
+          dockerhub_digest="sha256:$(docker buildx imagetools inspect \
+            "${DOCKERHUB_IMAGE}:${DOCKER_TAG_VERSION}" --raw | sha256sum | cut -d' ' -f1)"
+          aliyun_digest="sha256:$(docker buildx imagetools inspect \
+            "${ALIYUN_IMAGE}:${DOCKER_TAG_VERSION}" --raw | sha256sum | cut -d' ' -f1)"
+          if [[ "${dockerhub_digest}" != "${aliyun_digest}" ]]; then
+            echo "Linux manifest digest differs between registries" >&2
+            exit 1
+          fi
+          echo "dockerhub=${DOCKERHUB_IMAGE}@${dockerhub_digest}" >> "${GITHUB_OUTPUT}"
+
+      - name: Inspect published Linux image
+        run: |
+          docker buildx imagetools inspect "${DOCKERHUB_IMAGE}:${DOCKER_TAG_VERSION}"
+          docker buildx imagetools inspect "${ALIYUN_IMAGE}:${DOCKER_TAG_VERSION}"
 
       - name: Sign canonical Docker image
-        if: github.event_name == 'workflow_run' || inputs.push_image
-        run: cosign sign --yes "zrlog/zrlog@${{ steps.build.outputs.digest }}"
+        run: cosign sign --yes "${{ steps.manifest.outputs.dockerhub }}"
+
+  build-windows:
+    name: Build Windows image (windows/amd64)
+    needs: prepare
+    runs-on: windows-2022
+    env:
+      DOCKER_TAG_VERSION: ${{ needs.prepare.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.prepare.outputs.source_ref }}
+
+      - name: Login to Docker Hub
+        if: needs.prepare.outputs.push_image == 'true'
+        uses: docker/login-action@v4.5.2
+        with:
+          username: zrlog
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Login to Aliyun Docker Hub
+        if: needs.prepare.outputs.push_image == 'true'
+        uses: docker/login-action@v4.5.2
+        with:
+          registry: registry.cn-chengdu.aliyuncs.com
+          username: 90xchun
+          password: ${{ secrets.ALIYUN_DOCKER_PASSWORD }}
+
+      - name: Build Windows image
+        shell: pwsh
+        run: |
+          docker build --file docker/Dockerfile.windows `
+            --build-arg "ZRLOG_CHANNEL=release" `
+            --build-arg "CACHE_BUST=${{ github.run_id }}-${{ github.run_attempt }}" `
+            --tag "${env:DOCKERHUB_IMAGE}:${env:DOCKER_TAG_VERSION}-windows-ltsc2022" `
+            --tag "${env:DOCKERHUB_IMAGE}:windows-ltsc2022" `
+            --tag "${env:ALIYUN_IMAGE}:${env:DOCKER_TAG_VERSION}-windows-ltsc2022" `
+            --tag "${env:ALIYUN_IMAGE}:windows-ltsc2022" `
+            ./docker
+
+      - name: Verify Windows image
+        shell: pwsh
+        run: |
+          $output = docker run --rm `
+            --entrypoint "C:/opt/zrlog/zrlog.exe" `
+            "${env:DOCKERHUB_IMAGE}:${env:DOCKER_TAG_VERSION}-windows-ltsc2022" `
+            --version 2>&1
+          $exitCode = $LASTEXITCODE
+          $output | ForEach-Object { Write-Host $_ }
+          if ($exitCode -ne 0) {
+            throw "zrlog.exe --version exited with code ${exitCode}"
+          }
+          if (($output -join [Environment]::NewLine) -notmatch '(?m)^zrlog version:') {
+            throw 'zrlog.exe --version did not report a ZrLog version'
+          }
+
+      - name: Push Windows image
+        id: push
+        if: needs.prepare.outputs.push_image == 'true'
+        shell: pwsh
+        run: |
+          function Push-Image([string] $Tag) {
+            $output = docker push $Tag 2>&1
+            $output | ForEach-Object { Write-Host $_ }
+            if ($LASTEXITCODE -ne 0) {
+              throw "Failed to push ${Tag}"
+            }
+            $digestMatches = $output | Select-String -Pattern 'digest:\s+(sha256:[0-9a-f]{64})'
+            if (-not $digestMatches) {
+              throw "Docker did not report a digest for ${Tag}"
+            }
+            return $digestMatches[-1].Matches[0].Groups[1].Value
+          }
+
+          $dockerHubVersionTag = "${env:DOCKERHUB_IMAGE}:${env:DOCKER_TAG_VERSION}-windows-ltsc2022"
+          $dockerHubDigest = Push-Image $dockerHubVersionTag
+          Push-Image "${env:DOCKERHUB_IMAGE}:windows-ltsc2022" | Out-Null
+          $aliyunDigest = Push-Image "${env:ALIYUN_IMAGE}:${env:DOCKER_TAG_VERSION}-windows-ltsc2022"
+          Push-Image "${env:ALIYUN_IMAGE}:windows-ltsc2022" | Out-Null
+          if ($dockerHubDigest -ne $aliyunDigest) {
+            throw "Windows image digest differs between registries"
+          }
+          "dockerhub=${env:DOCKERHUB_IMAGE}@${dockerHubDigest}" >> $env:GITHUB_OUTPUT
+
+      - uses: sigstore/cosign-installer@v3
+        if: needs.prepare.outputs.push_image == 'true'
+
+      - name: Sign canonical Windows image
+        if: needs.prepare.outputs.push_image == 'true'
+        run: cosign sign --yes "${{ steps.push.outputs.dockerhub }}"
