@@ -321,7 +321,7 @@ jobs:
           if ($exitCode -ne 0) {
             throw "zrlog.exe --version exited with code ${exitCode}"
           }
-          if (($output -join [Environment]::NewLine) -notmatch '(?m)^zrlog version:') {
+          if (($output -join [Environment]::NewLine) -notmatch '(?m)^zrlog\.exe version:') {
             throw 'zrlog.exe --version did not report a ZrLog version'
           }
 
