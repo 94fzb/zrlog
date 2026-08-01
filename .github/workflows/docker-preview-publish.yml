@@ -13,6 +13,11 @@ on:
         required: false
         default: false
         type: boolean
+      validate_windows:
+        description: Build and verify the Windows Nano Server image
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   build:
@@ -45,3 +50,50 @@ jobs:
             ZRLOG_CHANNEL=preview
             CACHE_BUST=${{ github.run_id }}-${{ github.run_attempt }}
           tags: zrlog/zrlog-preview:latest
+
+  validate-windows:
+    name: Validate preview Windows image
+    if: inputs.validate_windows
+    runs-on: windows-2022
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref || 'master' }}
+
+      - name: Build Windows image
+        shell: pwsh
+        run: |
+          docker build --file docker/Dockerfile.windows `
+            --build-arg "ZRLOG_CHANNEL=preview" `
+            --build-arg "CACHE_BUST=${{ github.run_id }}-${{ github.run_attempt }}" `
+            --tag "zrlog-preview:windows-ltsc2022" `
+            ./docker
+
+      - name: Verify Windows image
+        shell: pwsh
+        run: |
+          $image = "zrlog-preview:windows-ltsc2022"
+          $output = docker run --rm `
+            --entrypoint "C:/opt/zrlog/zrlog.exe" `
+            $image `
+            --version 2>&1
+          $exitCode = $LASTEXITCODE
+          $output | ForEach-Object { Write-Host $_ }
+          if ($exitCode -ne 0) {
+            throw "zrlog.exe --version exited with code ${exitCode}"
+          }
+          if (($output -join [Environment]::NewLine) -notmatch '(?m)^zrlog version:') {
+            throw 'zrlog.exe --version did not report a ZrLog version'
+          }
+
+          $imageSizeRaw = docker image inspect --format '{{.Size}}' $image
+          if ($LASTEXITCODE -ne 0) {
+            throw 'Unable to inspect the Windows image size'
+          }
+          $imageSize = [int64]$imageSizeRaw
+          $imageSizeMiB = [Math]::Round($imageSize / 1MB, 1)
+          Write-Host "Windows image size: ${imageSizeMiB} MiB (${imageSize} bytes)"
+          "### Windows image validation" >> $env:GITHUB_STEP_SUMMARY
+          "- Version: ``$(($output -join ' ').Trim())``" >> $env:GITHUB_STEP_SUMMARY
+          "- Local image size: ${imageSizeMiB} MiB (${imageSize} bytes)" >> $env:GITHUB_STEP_SUMMARY
