@@ -14,8 +14,6 @@ jobs:
     env:
       ZRLOG_BUILD_ID: ${{ github.event.client_payload.build_id || '' }}
       ZRLOG_BUILD_TIME: ${{ github.event.client_payload.build_time || '' }}
-      ARTIFACT_SERVICE_URL: ${{ vars.ARTIFACT_SERVICE_URL }}
-      ARTIFACT_SERVICE_TOKEN: ${{ secrets.ARTIFACT_SERVICE_TOKEN }}
     concurrency:
       group: deploy-preview-on-${{ matrix.os }}-faas   # 同一个 group 的任务会排队执行
       cancel-in-progress: true # 预览版本，取消前一个任务

@@ -47,7 +47,8 @@ function writeZipVersionJson() {
 }
 #faas
 if [[ "$(uname)" == "Linux" && "${buildSubType}" == "faas" ]]; then
-  bash -e shell/native/process-faas-artifact.sh zrlog
+  # Keep the GraalVM executable uncompressed. UPX-packed images can start normally
+  # but crash with SIGILL on deeper runtime paths such as template rendering.
   bash -e shell/native/package-${buildSubType}-${packageExt}.sh "${fileArch}"
   zipFileName=${runMode}/zrlog-${version}-${buildId}-${runMode}-${fileArch}-${buildSubType}.${packageExt}
   zipFinalFileName=${syncPath}/${runMode}/zrlog-${fileArch}-${buildSubType}.${packageExt}
