@@ -11,6 +11,9 @@ jobs:
   build:
     name: ZrLog on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    env:
+      ARTIFACT_SERVICE_URL: ${{ vars.ARTIFACT_SERVICE_URL }}
+      ARTIFACT_SERVICE_TOKEN: ${{ secrets.ARTIFACT_SERVICE_TOKEN }}
     concurrency:
       group: deploy-release-on-${{ matrix.os }}-faas   # 同一个 group 的任务会排队执行
       cancel-in-progress: false # 不取消前一个任务，而是等待

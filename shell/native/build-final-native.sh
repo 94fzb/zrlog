@@ -13,7 +13,7 @@ if [[ ${buildSubType} == "deb" ]]; then
     packageExt="deb"
 fi
 if [[ "${buildSubType}" == "faas" ]]; then
-ZRLOG_RUNTIME_TYPE=native ZRLOG_PACKAGE_TYPE="${buildSubType}" bash -e shell/native/package-native-${packageExt}.sh "${1}" "-Dmysql-scope=provided"
+ZRLOG_RUNTIME_TYPE=native ZRLOG_PACKAGE_TYPE="${buildSubType}" bash -e shell/native/package-native-${packageExt}.sh "${1}" "-Dmysql-scope=provided" "-Dzrlog.faas.native=true"
 else
 ZRLOG_RUNTIME_TYPE=native ZRLOG_PACKAGE_TYPE="${buildSubType}" bash -e shell/native/package-native-${packageExt}.sh "${1}"
 fi
@@ -47,8 +47,7 @@ function writeZipVersionJson() {
 }
 #faas
 if [[ "$(uname)" == "Linux" && "${buildSubType}" == "faas" ]]; then
-  # Keep the GraalVM executable uncompressed. UPX-packed images can start normally
-  # but crash with SIGILL on deeper runtime paths such as template rendering.
+  bash -e shell/native/process-faas-artifact.sh zrlog
   bash -e shell/native/package-${buildSubType}-${packageExt}.sh "${fileArch}"
   zipFileName=${runMode}/zrlog-${version}-${buildId}-${runMode}-${fileArch}-${buildSubType}.${packageExt}
   zipFinalFileName=${syncPath}/${runMode}/zrlog-${fileArch}-${buildSubType}.${packageExt}
