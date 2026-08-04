@@ -1,13 +1,19 @@
 package com.zrlog.web.setup.install;
 
-import com.zrlog.common.updater.UpdateVersionTimerTask;
+import com.hibegin.common.util.EnvKit;
+import com.zrlog.business.rest.response.UpgradeProcessResponse;
+import com.zrlog.business.service.UpgradeService;
 import com.zrlog.business.version.UpgradeVersionHandler;
 import com.zrlog.common.Constants;
 import com.zrlog.common.Updater;
 import com.zrlog.common.UpdaterTypeEnum;
 import com.zrlog.common.ZrLogConfig;
+import com.zrlog.common.updater.UpdateVersionTimerTask;
+import com.zrlog.common.updater.handle.FaasUpdateVersionHandler;
 import com.zrlog.common.vo.Version;
+import com.zrlog.install.business.response.InstallUpgradeResult;
 import com.zrlog.install.business.response.LastVersionInfo;
+import com.zrlog.install.business.service.InstallUpgradeAction;
 import com.zrlog.install.web.InstallAction;
 import com.zrlog.install.web.config.DefaultInstallConfig;
 import com.zrlog.util.BlogBuildInfoUtil;
@@ -23,6 +29,7 @@ public class ZrLogInstallConfig extends DefaultInstallConfig {
     private final ZrLogConfig zrLogConfig;
     private final File dbPropertiesFile;
     private final LastVersionInfo lastVersionInfo;
+    private final Version lastVersion;
     private final Updater updater;
     private final InstallAction installAction;
 
@@ -30,18 +37,19 @@ public class ZrLogInstallConfig extends DefaultInstallConfig {
         this.zrLogConfig = zrLogConfig;
         this.dbPropertiesFile = dbPropertiesFile;
         this.updater = updater;
-        this.lastVersionInfo = prefetchVersion(updater);
+        this.lastVersion = prefetchVersion();
+        this.lastVersionInfo = zrLogConfig.isInstalled() || zrLogConfig.isTest() ? null :
+                toLastVersionInfo(updater, lastVersion);
         this.installAction = new ZrLogInstallAction(zrLogConfig, lockFile);
     }
 
-    private LastVersionInfo prefetchVersion(Updater updater) {
+    private Version prefetchVersion() {
         if (zrLogConfig.isInstalled() || zrLogConfig.isTest()) {
             return null;
         }
         UpdateVersionTimerTask versionTimerTask = new UpdateVersionTimerTask(!BlogBuildInfoUtil.isRelease(), Constants.DEFAULT_LANGUAGE);
         versionTimerTask.run();
-        Version lastVersion = versionTimerTask.getVersion();
-        return toLastVersionInfo(updater, lastVersion);
+        return versionTimerTask.getVersion();
     }
 
     static LastVersionInfo toLastVersionInfo(Updater updater, Version lastVersion) {
@@ -104,6 +112,25 @@ public class ZrLogInstallConfig extends DefaultInstallConfig {
     @Override
     public LastVersionInfo getLastVersionInfo() {
         return lastVersionInfo;
+    }
+
+    @Override
+    public InstallUpgradeAction getUpgradeAction() {
+        return new InstallUpgradeAction() {
+            @Override
+            public boolean isSupported() {
+                return !zrLogConfig.isInstalled() && Objects.nonNull(updater)
+                        && !ZrLogUtil.isDockerMode() && !ZrLogUtil.isSystemServiceMode()
+                        && (!EnvKit.isFaaSMode() || FaasUpdateVersionHandler.isOnlineUpgradeSupported());
+            }
+
+            @Override
+            public InstallUpgradeResult upgrade(ProgressListener progressListener) throws Exception {
+                UpgradeProcessResponse response = new UpgradeService().doUpgrade(lastVersion, updater,
+                        progressListener::onProgress, I18nUtil.getBackend());
+                return new InstallUpgradeResult(Boolean.TRUE.equals(response.getFinish()), response.getMessage());
+            }
+        };
     }
 
     @Override

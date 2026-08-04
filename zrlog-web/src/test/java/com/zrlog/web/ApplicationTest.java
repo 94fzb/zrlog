@@ -39,6 +39,12 @@ public class ApplicationTest {
     }
 
     @Test
+    public void shouldRejectUpgradeOptionWithoutStartingServer() {
+        assertEquals(2, Application.startWithExitCode(new String[]{"--upgrade"}));
+        assertNull(Constants.zrLogConfig);
+    }
+
+    @Test
     public void shouldReturnImmediatelyForVersionMainArgument() throws Exception {
         Application.main(new String[]{"--version"});
 

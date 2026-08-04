@@ -57,6 +57,7 @@ ZrLog is an open-source blog system built with Java. It provides article, catego
   - JDK: `>= 11` (not required when using the Native Image release package).
   - Database: `MySQL >= 5.7` or `Cloudflare D1` through Web API access.
   - For Zip packages, download the [latest package](https://www.zrlog.com/download), extract it, and run `bin/start.sh` or `bin/start.bat` on Windows.
+  - Before installation, upgrade from the installer or run `./zrlog upgrade` for Native Image and `java -jar zrlog-starter.jar upgrade` for Zip packages. `upgrade` is a subcommand, not `--upgrade`.
   - WAR packages are for existing Tomcat / Jetty containers.
   - For Docker, make sure `/opt/zrlog/conf` is mounted to persistent storage; `db.properties` and `install.lock` are written there.
   - After installation, enter admin and create your first article.

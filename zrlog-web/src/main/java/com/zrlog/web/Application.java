@@ -43,41 +43,76 @@ public class Application {
 
     public static void main(String[] args) throws Exception {
         Application.initZrLogEnv();
+        int exitCode;
         if (EnvKit.isNativeImage()) {
-            nativeStart(args);
-            return;
+            exitCode = nativeStartWithExitCode(args);
+        } else {
+            exitCode = startWithExitCode(args);
         }
-        start(args);
+        if (exitCode != 0) {
+            System.exit(exitCode);
+        }
     }
 
     public static void start(String[] args) {
-        if (ParseArgsUtil.justTips(args, "zrlog", BlogBuildInfoUtil.getVersionInfoFull())) {
-            return;
+        startWithExitCode(args);
+    }
+
+    static int startWithExitCode(String[] args) {
+        ApplicationCommandLine commandLine;
+        try {
+            commandLine = ApplicationCommandLine.parse(args);
+        } catch (IllegalArgumentException e) {
+            System.err.println(e.getMessage());
+            return 2;
         }
-        ApplicationStartupOptions options = ApplicationStartupOptions.parse(args);
-        webServerBuilder(options.getPort(), options.getContextPath(), UpdaterUtils.getUpdater(args, null)).start();
+        String[] serveArgs = commandLine.getServeArgs();
+        if (ParseArgsUtil.justTips(serveArgs, "zrlog", BlogBuildInfoUtil.getVersionInfoFull())) {
+            return 0;
+        }
+        if (commandLine.getCommand() == ApplicationCommandLine.Command.UPGRADE) {
+            return ApplicationUpgradeRunner.run(UpdaterUtils.getUpdater(serveArgs, null), commandLine.isPreview());
+        }
+        ApplicationStartupOptions options = ApplicationStartupOptions.parse(serveArgs);
+        webServerBuilder(options.getPort(), options.getContextPath(), UpdaterUtils.getUpdater(serveArgs, null)).start();
+        return 0;
     }
 
     static void nativeStart(String[] args) throws Exception {
-        ApplicationStartupOptions options = ApplicationStartupOptions.parse(args);
+        nativeStartWithExitCode(args);
+    }
+
+    static int nativeStartWithExitCode(String[] args) throws Exception {
+        ApplicationCommandLine commandLine;
+        try {
+            commandLine = ApplicationCommandLine.parse(args);
+        } catch (IllegalArgumentException e) {
+            System.err.println(e.getMessage());
+            return 2;
+        }
+        String[] serveArgs = commandLine.getServeArgs();
+        ApplicationStartupOptions options = ApplicationStartupOptions.parse(serveArgs);
         File execFile = new File(ZrLogBaseNativeImageUtils.getExecFile());
+        if (ParseArgsUtil.justTips(serveArgs, execFile.getName(), BlogBuildInfoUtil.getVersionInfoFull())) {
+            return 0;
+        }
+        if (commandLine.getCommand() == ApplicationCommandLine.Command.UPGRADE) {
+            return ApplicationUpgradeRunner.run(UpdaterUtils.getUpdater(serveArgs, execFile), commandLine.isPreview());
+        }
         if (EnvKit.isFaaSMode()) {
             WebServerBuilder webServerBuilder = webServerBuilder(options.getPort(), options.getContextPath(),
-                    UpdaterUtils.getUpdater(args, execFile));
+                    UpdaterUtils.getUpdater(serveArgs, execFile));
             webServerBuilder.startInBackground();
             if (EnvKit.isLambda()) {
                 LambdaApplication.startHandle(Constants.zrLogConfig);
-                return;
+                return 0;
             }
             throw new NotImplementException();
         }
-        //parse args
-        if (ParseArgsUtil.justTips(args, execFile.getName(), BlogBuildInfoUtil.getVersionInfoFull())) {
-            return;
-        }
         WebServerBuilder webServerBuilder = webServerBuilder(options.getPort(), options.getContextPath(),
-                UpdaterUtils.getUpdater(args, execFile));
+                UpdaterUtils.getUpdater(serveArgs, execFile));
         webServerBuilder.start();
+        return 0;
     }
 
     public static WebServerBuilder webServerBuilder(int port, String contextPath, Updater updater) {

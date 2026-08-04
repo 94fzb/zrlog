@@ -61,6 +61,7 @@ ZrLog 是一款基于 Java 的开源博客系统。它提供文章、分类、�
   - JDK 版本：`>= 11`（Native Image 发行包免装 JDK）。
   - 数据库支持：`MySQL >= 5.7`，或者 `Cloudflare D1`（通过 Web API 方式代理访问）。
   - Zip 包下载后解压，在目录中运行 `bin/start.sh`，Windows 使用 `bin/start.bat`。
+  - 尚未安装时，可在安装页直接升级，也可运行 `./zrlog upgrade`（Native Image）或 `java -jar zrlog-starter.jar upgrade`（Zip）；`upgrade` 是子命令，不使用 `--upgrade`。
   - WAR 包适合已有 Tomcat / Jetty 容器的部署流程。
   - Docker 部署请确认 `/opt/zrlog/conf` 已挂载到持久化目录；`db.properties` 和 `install.lock` 会写入该目录。
   - 安装完成后进入后台开始创建第一篇文章。
