@@ -35,13 +35,17 @@ runs:
     - name: Process artifact
       shell: bash
       env:
+        ARTIFACT_FILE: ${{ inputs.artifact-file }}
+        ARTIFACT_NAME: ${{ inputs.artifact-name }}
+        ARTIFACT_VERSION: ${{ inputs.artifact-version }}
+        ARTIFACT_ARCHITECTURE: ${{ inputs.artifact-architecture }}
         ARTIFACT_SERVICE_URL: ${{ inputs.service-url }}
         ARTIFACT_SERVICE_TOKEN: ${{ inputs.service-token }}
         ARTIFACT_POLL_INTERVAL_SECONDS: ${{ inputs.poll-interval-seconds }}
         ARTIFACT_PROCESS_TIMEOUT_SECONDS: ${{ inputs.process-timeout-seconds }}
       run: |
         bash -e "${GITHUB_ACTION_PATH}/process-artifact.sh" \
-          "${{ inputs.artifact-file }}" \
-          "${{ inputs.artifact-name }}" \
-          "${{ inputs.artifact-version }}" \
-          "${{ inputs.artifact-architecture }}"
+          "${ARTIFACT_FILE}" \
+          "${ARTIFACT_NAME}" \
+          "${ARTIFACT_VERSION}" \
+          "${ARTIFACT_ARCHITECTURE}"
