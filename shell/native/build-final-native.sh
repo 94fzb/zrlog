@@ -47,7 +47,8 @@ function writeZipVersionJson() {
 }
 #faas
 if [[ "$(uname)" == "Linux" && "${buildSubType}" == "faas" ]]; then
-  bash -e shell/native/process-faas-artifact.sh zrlog
+  bash -e .github/actions/process-artifact/process-artifact.sh \
+    zrlog zrlog "${version}" "${fileArch}"
   bash -e shell/native/package-${buildSubType}-${packageExt}.sh "${fileArch}"
   zipFileName=${runMode}/zrlog-${version}-${buildId}-${runMode}-${fileArch}-${buildSubType}.${packageExt}
   zipFinalFileName=${syncPath}/${runMode}/zrlog-${fileArch}-${buildSubType}.${packageExt}

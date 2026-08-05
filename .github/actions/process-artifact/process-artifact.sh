@@ -2,31 +2,33 @@
 set -euo pipefail
 
 artifactFile=${1:-}
+artifactName=${2:-}
+artifactVersion=${3:-}
+artifactArchitecture=${4:-}
+
 : "${artifactFile:?artifact file is required}"
+: "${artifactName:?artifact name is required}"
+: "${artifactVersion:?artifact version is required}"
+: "${artifactArchitecture:?artifact architecture is required}"
 : "${ARTIFACT_SERVICE_URL:?ARTIFACT_SERVICE_URL is required}"
 : "${ARTIFACT_SERVICE_TOKEN:?ARTIFACT_SERVICE_TOKEN is required}"
 
 for commandName in curl jq sha256sum; do
   if ! command -v "${commandName}" >/dev/null 2>&1; then
-    echo "${commandName} is required to process the FaaS artifact" >&2
+    echo "${commandName} is required to process the artifact" >&2
     exit 1
   fi
 done
 
 if [[ ! -f "${artifactFile}" ]]; then
-  echo "FaaS artifact does not exist: ${artifactFile}" >&2
+  echo "Artifact does not exist: ${artifactFile}" >&2
   exit 1
 fi
 
-source shell/lib/release-manifest.sh
-version=$(releaseManifestBuildProp 'version')
-fileArch=$(releaseManifestBuildProp 'fileArch')
-artifactName=$(basename "${artifactFile}")
-
-for metadata in version fileArch artifactName; do
+for metadata in artifactName artifactVersion artifactArchitecture; do
   value=${!metadata}
-  if [[ -z "${value}" || ! "${value}" =~ ^[A-Za-z0-9._-]+$ ]]; then
-    echo "Invalid ${metadata} for FaaS artifact processing: ${value}" >&2
+  if [[ ! "${value}" =~ ^[A-Za-z0-9._-]+$ ]]; then
+    echo "Invalid ${metadata}: ${value}" >&2
     exit 1
   fi
 done
@@ -56,8 +58,8 @@ if ! jobResponse=$(curl "${curlArgs[@]}" --max-time 900 \
     -H "Content-Type: application/octet-stream" \
     -H "Expect:" \
     -H "X-Artifact-Name: ${artifactName}" \
-    -H "X-Artifact-Version: ${version}" \
-    -H "X-Artifact-Architecture: ${fileArch}" \
+    -H "X-Artifact-Version: ${artifactVersion}" \
+    -H "X-Artifact-Architecture: ${artifactArchitecture}" \
     --data-binary "@${artifactFile}" \
     "${serviceUrl}/api/v1/uploads"); then
   echo "Unable to upload artifact for processing: ${jobResponse:-no response body}" >&2
@@ -127,7 +129,7 @@ expectedSize=$(jq -er '.data.sizeBytes
 }
 
 artifactDirectory=$(dirname "${artifactFile}")
-processedFile=$(mktemp "${artifactDirectory}/.faas-artifact.XXXXXX")
+processedFile=$(mktemp "${artifactDirectory}/.processed-artifact.XXXXXX")
 trap 'rm -f "${processedFile}"' EXIT
 if ! curl "${curlArgs[@]}" --max-time 900 \
     -H "${authorizationHeader}" \

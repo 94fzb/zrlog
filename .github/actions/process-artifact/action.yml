@@ -1,0 +1,47 @@
+name: Process native artifact
+description: Process a native artifact through zrlog-artifact-service and replace it with the verified result.
+
+inputs:
+  artifact-file:
+    description: Path to the native artifact to process.
+    required: true
+  artifact-name:
+    description: Stable artifact identity used for processing and idempotency.
+    required: true
+  artifact-version:
+    description: Artifact version used for processing and idempotency.
+    required: true
+  artifact-architecture:
+    description: Operating system and architecture, for example Linux-amd64.
+    required: true
+  service-url:
+    description: Base URL of zrlog-artifact-service.
+    required: true
+  service-token:
+    description: Bearer token for zrlog-artifact-service.
+    required: true
+  poll-interval-seconds:
+    description: Seconds between processing status checks.
+    required: false
+    default: "5"
+  process-timeout-seconds:
+    description: Maximum number of seconds to wait for processing.
+    required: false
+    default: "900"
+
+runs:
+  using: composite
+  steps:
+    - name: Process artifact
+      shell: bash
+      env:
+        ARTIFACT_SERVICE_URL: ${{ inputs.service-url }}
+        ARTIFACT_SERVICE_TOKEN: ${{ inputs.service-token }}
+        ARTIFACT_POLL_INTERVAL_SECONDS: ${{ inputs.poll-interval-seconds }}
+        ARTIFACT_PROCESS_TIMEOUT_SECONDS: ${{ inputs.process-timeout-seconds }}
+      run: |
+        bash -e "${GITHUB_ACTION_PATH}/process-artifact.sh" \
+          "${{ inputs.artifact-file }}" \
+          "${{ inputs.artifact-name }}" \
+          "${{ inputs.artifact-version }}" \
+          "${{ inputs.artifact-architecture }}"
