@@ -15,6 +15,7 @@ jobs:
       group: deploy-release-on-${{ matrix.os }}-native   # 同一个 group 的任务会排队执行
       cancel-in-progress: false # 不取消前一个任务，而是等待
     strategy:
+      fail-fast: false
       matrix:
         os: [ ubuntu-22.04,ubuntu-24.04-arm,macos-15-intel,macos-14,windows-2022 ]
     steps:
@@ -32,20 +33,23 @@ jobs:
       - uses: sigstore/cosign-installer@v3
 
       - name: Build binary
+        shell: bash
         run: |
-          mkdir -p /tmp/download
-          bash -e shell/native/build-final-native.sh release /tmp/download zip
+          mkdir -p .release-output
+          bash -e shell/native/build-final-native.sh release .release-output zip
       - name: Attest release artifact
         uses: actions/attest-build-provenance@v4
         with:
-          subject-path: /tmp/download/release/zrlog-*-release-*.zip
+          subject-path: ${{ github.workspace }}/.release-output/release/zrlog-*-release-*.zip
       - name: Generate release trust metadata
+        shell: bash
         run: |
           python3 shell/release/generate_trust_metadata.py \
-            --artifact-dir /tmp/download/release \
+            --artifact-dir .release-output/release \
             --source-commit "${GITHUB_SHA}" \
             --source-repository "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
             --workflow-url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
       - name: Upload release artifacts
+        shell: bash
         run: |
-          bash -e shell/upload-bin.sh ${{ secrets.SECRET_ID }} ${{ secrets.SECRET_KEY }} ${{ secrets.BUCKET }} /tmp/download release ${{ secrets.HOST }}
+          bash -e shell/upload-bin.sh ${{ secrets.SECRET_ID }} ${{ secrets.SECRET_KEY }} ${{ secrets.BUCKET }} .release-output release ${{ secrets.HOST }}
