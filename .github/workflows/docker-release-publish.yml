@@ -185,7 +185,7 @@ jobs:
       DOCKER_TAG_VERSION: ${{ needs.prepare.outputs.version }}
     steps:
       - name: Download Linux image digests
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           path: /tmp/digests
           pattern: linux-digest-*-${{ github.run_attempt }}
