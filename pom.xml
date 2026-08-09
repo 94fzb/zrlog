@@ -8,7 +8,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>zrlog-web-parent</artifactId>
     <packaging>pom</packaging>
-    <version>3.9.1-SNAPSHOT</version>
+    <version>3.9.2-SNAPSHOT</version>
     <modules>
         <module>zrlog-web</module>
         <module>package</module>
@@ -35,6 +35,7 @@
         <zrlog-admin-web.version>3.5.10-SNAPSHOT</zrlog-admin-web.version>
         <junit.version>4.13.2</junit.version>
         <mysql-scope>compile</mysql-scope>
+        <sqlite-jdbc.version>3.53.2.1</sqlite-jdbc.version>
     </properties>
 
     <repositories>
