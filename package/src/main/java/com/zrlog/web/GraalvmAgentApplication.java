@@ -53,7 +53,8 @@ public class GraalvmAgentApplication {
     private static void startWebServer(String[] args) {
         WebServerBuilder webServerBuilder = Application.webServerBuilder(0, ArgsParser.getContextPath(args), null);
         Constants.zrLogConfig.getServerConfig().addCreateSuccessHandle(() -> {
-            System.exit(0);
+            // Agent sampling is complete; application shutdown hooks can wait on runtime services indefinitely.
+            Runtime.getRuntime().halt(0);
             return null;
         });
         webServerBuilder.start();

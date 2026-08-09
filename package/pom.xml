@@ -125,6 +125,7 @@
                                 WEB-INF/update-temp/**,
                                 WEB-INF/db.properties,
                                 WEB-INF/install.lock,
+                                WEB-INF/lib/sqlite-jdbc-*.jar,
                             </packagingExcludes>
                             <outputDirectory>${project.build.directory}/../../target</outputDirectory>
                         </configuration>
@@ -272,6 +273,58 @@
             </build>
         </profile>
         <profile>
+            <id>native-sqlite</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.xerial</groupId>
+                    <artifactId>sqlite-jdbc</artifactId>
+                    <version>${sqlite-jdbc.version}</version>
+                    <classifier>without-natives</classifier>
+                    <scope>runtime</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.xerial</groupId>
+                    <artifactId>sqlite-jdbc</artifactId>
+                    <version>${sqlite-jdbc.version}</version>
+                    <classifier>${sqlite-jdbc.native-classifier}</classifier>
+                    <scope>runtime</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>sqlite-native-linux</id>
+            <activation>
+                <os>
+                    <name>Linux</name>
+                </os>
+            </activation>
+            <properties>
+                <sqlite-jdbc.native-classifier>natives-linux</sqlite-jdbc.native-classifier>
+            </properties>
+        </profile>
+        <profile>
+            <id>sqlite-native-mac</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                </os>
+            </activation>
+            <properties>
+                <sqlite-jdbc.native-classifier>natives-mac</sqlite-jdbc.native-classifier>
+            </properties>
+        </profile>
+        <profile>
+            <id>sqlite-native-windows</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <properties>
+                <sqlite-jdbc.native-classifier>natives-windows</sqlite-jdbc.native-classifier>
+            </properties>
+        </profile>
+        <profile>
             <id>faas-native</id>
             <activation>
                 <property>
@@ -295,6 +348,14 @@
         </profile>
         <profile>
             <id>jar</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.xerial</groupId>
+                    <artifactId>sqlite-jdbc</artifactId>
+                    <version>${sqlite-jdbc.version}</version>
+                    <scope>runtime</scope>
+                </dependency>
+            </dependencies>
             <build>
                 <finalName>${finalName}-${project.version}</finalName>
                 <plugins>
