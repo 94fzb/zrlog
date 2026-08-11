@@ -1,0 +1,31 @@
+name: validate docker compose
+
+on:
+  pull_request:
+    paths:
+      - docker/docker-compose.yml
+      - docker/.env.example
+      - .github/workflows/docker-compose-validate.yml
+  push:
+    branches:
+      - master
+    paths:
+      - docker/docker-compose.yml
+      - docker/.env.example
+      - .github/workflows/docker-compose-validate.yml
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate Docker Compose configuration
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Validate configuration
+        env:
+          MYSQL_PASSWORD: compose-validation-password
+        run: docker compose --file docker/docker-compose.yml config --quiet

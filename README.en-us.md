@@ -51,6 +51,7 @@ ZrLog is an open-source blog system built with Java. It provides article, catego
   docker run -p 8080:8080 -v $(pwd)/conf:/opt/zrlog/conf zrlog/zrlog
   ```
   Then visit `http://localhost:8080/install`. The installer checks config paths, database connectivity, and the install lock, then shows installation progress while it runs.
+  To start ZrLog together with MySQL, follow the [Docker Compose guide](doc/docker-compose.en-us.md).
 
 - **Production deployment: Docker / Native Image / Zip / WAR**
 

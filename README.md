@@ -55,6 +55,7 @@ ZrLog 是一款基于 Java 的开源博客系统。它提供文章、分类、�
   docker run -p 8080:8080 -v $(pwd)/conf:/opt/zrlog/conf zrlog/zrlog
   ```
   启动后访问 `http://localhost:8080/install`。安装页会检查配置目录、数据库连接和安装锁文件，并在安装过程中显示实际执行进度。
+  需要同时启动 MySQL 时，参见 [Docker Compose 部署说明](doc/docker-compose.md)。
 
 - **正式部署：Docker / Native Image / Zip / WAR**
 

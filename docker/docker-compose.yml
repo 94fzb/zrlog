@@ -1,0 +1,55 @@
+services:
+  mysql:
+    image: ${MYSQL_IMAGE:-mysql:8.4}
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-zrlog}
+      MYSQL_USER: ${MYSQL_USER:-zrlog}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in docker/.env}
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "MYSQL_PWD=\"$${MYSQL_PASSWORD}\" mysqladmin ping --host=127.0.0.1 --user=\"$${MYSQL_USER}\" --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  zrlog:
+    image: ${ZRLOG_IMAGE:-zrlog/zrlog:3.9.1}
+    restart: unless-stopped
+    init: true
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - conf:/opt/zrlog/conf
+      - static:/opt/zrlog/static
+    ports:
+      - target: 8080
+        published: "${ZRLOG_PORT:-8080}"
+        host_ip: ${ZRLOG_BIND_ADDRESS:-0.0.0.0}
+        protocol: tcp
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "--output", "/dev/null", "http://127.0.0.1:8080/api/public/version"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    stop_grace_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  mysql-data:
+  conf:
+  static:
