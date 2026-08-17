@@ -32,7 +32,7 @@
         <servlet-api.version>6.1.0</servlet-api.version>
         <zrlog-install-web.version>3.3.8-SNAPSHOT</zrlog-install-web.version>
         <zrlog-blog-web.version>3.5.9-SNAPSHOT</zrlog-blog-web.version>
-        <zrlog-admin-web.version>3.5.10-SNAPSHOT</zrlog-admin-web.version>
+        <zrlog-admin-web.version>3.5.10</zrlog-admin-web.version>
         <junit.version>4.13.2</junit.version>
         <mysql-scope>compile</mysql-scope>
         <sqlite-jdbc.version>3.53.2.1</sqlite-jdbc.version>
