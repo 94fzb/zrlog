@@ -110,8 +110,8 @@ jobs:
           username: 90xchun
           password: ${{ secrets.ALIYUN_DOCKER_PASSWORD }}
 
-      - name: Build and push immutable Linux image
-        id: push
+      - name: Build and push immutable Linux image to Docker Hub
+        id: push_dockerhub
         if: needs.prepare.outputs.push_image == 'true'
         uses: docker/build-push-action@v7
         with:
@@ -124,12 +124,57 @@ jobs:
             ZRLOG_CHANNEL=release
             CACHE_BUST=${{ github.run_id }}-${{ github.run_attempt }}
           outputs: >-
-            type=image,"name=${{ env.DOCKERHUB_IMAGE }},${{ env.ALIYUN_IMAGE }}",push-by-digest=true,name-canonical=true,push=true
+            type=image,name=${{ env.DOCKERHUB_IMAGE }},push-by-digest=true,name-canonical=true,push=true
+
+      - name: Build and push immutable Linux image to Aliyun
+        id: push_aliyun
+        if: needs.prepare.outputs.push_image == 'true'
+        uses: docker/build-push-action@v7
+        with:
+          context: ./docker
+          file: ./docker/Dockerfile
+          platforms: ${{ matrix.platform }}
+          provenance: false
+          sbom: false
+          build-args: |
+            ZRLOG_CHANNEL=release
+            CACHE_BUST=${{ github.run_id }}-${{ github.run_attempt }}
+          outputs: >-
+            type=image,name=${{ env.ALIYUN_IMAGE }},push-by-digest=true,name-canonical=true,push=true
+
+      - name: Resolve and compare Linux image digests
+        id: image
+        if: needs.prepare.outputs.push_image == 'true'
+        env:
+          ARCH: ${{ matrix.arch }}
+          DOCKERHUB_OUTPUT_DIGEST: ${{ steps.push_dockerhub.outputs.digest }}
+          ALIYUN_DIGEST: ${{ steps.push_aliyun.outputs.digest }}
+        run: |
+          set -euo pipefail
+          : "${DOCKERHUB_OUTPUT_DIGEST:?Docker Hub output digest is required}"
+          : "${ALIYUN_DIGEST:?Aliyun image digest is required}"
+
+          dockerhub_manifest=$(docker buildx imagetools inspect \
+            "${DOCKERHUB_IMAGE}@${DOCKERHUB_OUTPUT_DIGEST}" --raw)
+          dockerhub_image_digest=$(jq -r --arg arch "${ARCH}" '
+            [.manifests[]?
+              | select(.platform.os == "linux" and .platform.architecture == $arch)
+              | .digest]
+            | if length == 1 then .[0] else empty end
+          ' <<<"${dockerhub_manifest}")
+          if [[ -z "${dockerhub_image_digest}" ]]; then
+            dockerhub_image_digest="${DOCKERHUB_OUTPUT_DIGEST}"
+          fi
+          if [[ "${dockerhub_image_digest}" != "${ALIYUN_DIGEST}" ]]; then
+            echo "Linux image digest differs between registries" >&2
+            exit 1
+          fi
+          echo "digest=${dockerhub_image_digest}" >> "${GITHUB_OUTPUT}"
 
       - name: Verify pushed Linux image
         if: needs.prepare.outputs.push_image == 'true'
         env:
-          IMAGE_DIGEST: ${{ steps.push.outputs.digest }}
+          IMAGE_DIGEST: ${{ steps.image.outputs.digest }}
         run: |
           : "${IMAGE_DIGEST:?image digest is required}"
           docker run --rm --entrypoint /opt/zrlog/zrlog \
@@ -138,7 +183,7 @@ jobs:
       - name: Export Linux image digest
         if: needs.prepare.outputs.push_image == 'true'
         env:
-          IMAGE_DIGEST: ${{ steps.push.outputs.digest }}
+          IMAGE_DIGEST: ${{ steps.image.outputs.digest }}
         run: |
           : "${IMAGE_DIGEST:?image digest is required}"
           mkdir -p /tmp/digests

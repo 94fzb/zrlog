@@ -64,5 +64,7 @@ Linux Docker 镜像的 manifest 应同时包含 `linux/amd64` 和 `linux/arm64`�
 2022 镜像使用 `<version>-windows-ltsc2022` 独立标签；不要把 Linux 和 Windows 标签视为可
 互换的运行环境。
 
-Docker BuildKit 同时为 Linux 镜像生成 SBOM 和 provenance。Linux、Windows 镜像都会对
-发布后的不可变 digest 进行签名。部署系统应固定 digest；版本标签只用于发现。
+Docker BuildKit 为 Docker Hub 中的 Linux 镜像生成 SBOM 和 provenance。阿里云仓库不接受
+BuildKit 使用的 OCI 附属 manifest，因此 workflow 会单独推送不含附属 manifest 的同一平台
+镜像，并在发布多架构 manifest 前验证两端平台镜像 digest 完全一致。Linux、Windows 镜像都会
+对发布后的不可变 digest 进行签名。部署系统应固定 digest；版本标签只用于发现。
