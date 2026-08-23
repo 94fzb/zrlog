@@ -265,7 +265,6 @@ jobs:
           fi
 
           dockerhub_sources=()
-          aliyun_sources=()
           for digest_file in "${digest_files[@]}"; do
             digest="sha256:${digest_file}"
             dockerhub_source="${DOCKERHUB_IMAGE}@${digest}"
@@ -273,17 +272,18 @@ jobs:
             docker buildx imagetools inspect "${dockerhub_source}" >/dev/null
             docker buildx imagetools inspect "${aliyun_source}" >/dev/null
             dockerhub_sources+=("${dockerhub_source}")
-            aliyun_sources+=("${aliyun_source}")
           done
 
           docker buildx imagetools create \
             --tag "${DOCKERHUB_IMAGE}:${DOCKER_TAG_VERSION}" \
             --tag "${DOCKERHUB_IMAGE}:latest" \
             "${dockerhub_sources[@]}"
+          dockerhub_digest="sha256:$(docker buildx imagetools inspect \
+            "${DOCKERHUB_IMAGE}:${DOCKER_TAG_VERSION}" --raw | sha256sum | cut -d' ' -f1)"
           docker buildx imagetools create \
             --tag "${ALIYUN_IMAGE}:${DOCKER_TAG_VERSION}" \
             --tag "${ALIYUN_IMAGE}:latest" \
-            "${aliyun_sources[@]}"
+            "${DOCKERHUB_IMAGE}@${dockerhub_digest}"
 
           validate_manifest() {
             local image="$1"
@@ -297,8 +297,6 @@ jobs:
           validate_manifest "${DOCKERHUB_IMAGE}:${DOCKER_TAG_VERSION}"
           validate_manifest "${ALIYUN_IMAGE}:${DOCKER_TAG_VERSION}"
 
-          dockerhub_digest="sha256:$(docker buildx imagetools inspect \
-            "${DOCKERHUB_IMAGE}:${DOCKER_TAG_VERSION}" --raw | sha256sum | cut -d' ' -f1)"
           aliyun_digest="sha256:$(docker buildx imagetools inspect \
             "${ALIYUN_IMAGE}:${DOCKER_TAG_VERSION}" --raw | sha256sum | cut -d' ' -f1)"
           if [[ "${dockerhub_digest}" != "${aliyun_digest}" ]]; then
