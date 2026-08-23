@@ -265,6 +265,7 @@ jobs:
           fi
 
           dockerhub_sources=()
+          aliyun_sources=()
           for digest_file in "${digest_files[@]}"; do
             digest="sha256:${digest_file}"
             dockerhub_source="${DOCKERHUB_IMAGE}@${digest}"
@@ -272,18 +273,17 @@ jobs:
             docker buildx imagetools inspect "${dockerhub_source}" >/dev/null
             docker buildx imagetools inspect "${aliyun_source}" >/dev/null
             dockerhub_sources+=("${dockerhub_source}")
+            aliyun_sources+=("${aliyun_source}")
           done
 
           docker buildx imagetools create \
             --tag "${DOCKERHUB_IMAGE}:${DOCKER_TAG_VERSION}" \
             --tag "${DOCKERHUB_IMAGE}:latest" \
             "${dockerhub_sources[@]}"
-          dockerhub_digest="sha256:$(docker buildx imagetools inspect \
-            "${DOCKERHUB_IMAGE}:${DOCKER_TAG_VERSION}" --raw | sha256sum | cut -d' ' -f1)"
           docker buildx imagetools create \
             --tag "${ALIYUN_IMAGE}:${DOCKER_TAG_VERSION}" \
             --tag "${ALIYUN_IMAGE}:latest" \
-            "${DOCKERHUB_IMAGE}@${dockerhub_digest}"
+            "${aliyun_sources[@]}"
 
           validate_manifest() {
             local image="$1"
@@ -297,13 +297,33 @@ jobs:
           validate_manifest "${DOCKERHUB_IMAGE}:${DOCKER_TAG_VERSION}"
           validate_manifest "${ALIYUN_IMAGE}:${DOCKER_TAG_VERSION}"
 
-          aliyun_digest="sha256:$(docker buildx imagetools inspect \
-            "${ALIYUN_IMAGE}:${DOCKER_TAG_VERSION}" --raw | sha256sum | cut -d' ' -f1)"
-          if [[ "${dockerhub_digest}" != "${aliyun_digest}" ]]; then
-            echo "Linux manifest digest differs between registries" >&2
+          platform_digests() {
+            local image="$1"
+            docker buildx imagetools inspect "${image}" --raw | jq -cS '
+              [.manifests[]
+                | select(.platform.os == "linux")
+                | {
+                    platform: "\(.platform.os)/\(.platform.architecture)",
+                    digest: .digest
+                  }]
+              | sort_by(.platform)
+            '
+          }
+          dockerhub_platforms=$(platform_digests "${DOCKERHUB_IMAGE}:${DOCKER_TAG_VERSION}")
+          aliyun_platforms=$(platform_digests "${ALIYUN_IMAGE}:${DOCKER_TAG_VERSION}")
+          if [[ "${dockerhub_platforms}" != "${aliyun_platforms}" ]]; then
+            echo "Linux platform digests differ between registries" >&2
             exit 1
           fi
+
+          dockerhub_digest="sha256:$(docker buildx imagetools inspect \
+            "${DOCKERHUB_IMAGE}:${DOCKER_TAG_VERSION}" --raw | sha256sum | cut -d' ' -f1)"
+          aliyun_digest="sha256:$(docker buildx imagetools inspect \
+            "${ALIYUN_IMAGE}:${DOCKER_TAG_VERSION}" --raw | sha256sum | cut -d' ' -f1)"
+          echo "Docker Hub manifest: ${DOCKERHUB_IMAGE}@${dockerhub_digest}"
+          echo "Aliyun manifest: ${ALIYUN_IMAGE}@${aliyun_digest}"
           echo "dockerhub=${DOCKERHUB_IMAGE}@${dockerhub_digest}" >> "${GITHUB_OUTPUT}"
+          echo "aliyun=${ALIYUN_IMAGE}@${aliyun_digest}" >> "${GITHUB_OUTPUT}"
 
       - name: Inspect published Linux image
         run: |
