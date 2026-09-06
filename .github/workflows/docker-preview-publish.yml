@@ -62,11 +62,12 @@ jobs:
         env:
           ZRLOG_EXPECTED_SOURCE_COMMIT: ${{ steps.source.outputs.commit }}
           ZRLOG_EXPECTED_VERSION: ${{ steps.version.outputs.value }}
+          ZRLOG_NATIVE_MIRROR_BASE_URL: https://pub-c16cba848aff4e6b8d8e0d00f0f741f0.r2.dev
           ZRLOG_NATIVE_RESOLVE_ATTEMPTS: "6"
           ZRLOG_NATIVE_RESOLVE_RETRY_SECONDS: "10"
         run: >-
           bash docker/resolve-native-package.sh preview Linux-amd64
-          https://dl.zrlog.com/preview/last.Linux-amd64.version.json
+          https://pub-c16cba848aff4e6b8d8e0d00f0f741f0.r2.dev/preview/last.Linux-amd64.version.json
 
       - name: Resolve Windows x86_64 Native package
         id: native_windows_x86_64
@@ -74,11 +75,12 @@ jobs:
         env:
           ZRLOG_EXPECTED_SOURCE_COMMIT: ${{ steps.source.outputs.commit }}
           ZRLOG_EXPECTED_VERSION: ${{ steps.version.outputs.value }}
+          ZRLOG_NATIVE_MIRROR_BASE_URL: https://pub-c16cba848aff4e6b8d8e0d00f0f741f0.r2.dev
           ZRLOG_NATIVE_RESOLVE_ATTEMPTS: "6"
           ZRLOG_NATIVE_RESOLVE_RETRY_SECONDS: "10"
         run: >-
           bash docker/resolve-native-package.sh preview Windows-x86_64
-          https://dl.zrlog.com/preview/last.Windows-x86_64.version.json
+          https://pub-c16cba848aff4e6b8d8e0d00f0f741f0.r2.dev/preview/last.Windows-x86_64.version.json
 
   build:
     name: Build preview Docker image
@@ -111,6 +113,7 @@ jobs:
             ZRLOG_CHANNEL=preview
             ZRLOG_NATIVE_ZIP_URL=${{ needs.prepare.outputs.linux_amd64_url }}
             ZRLOG_NATIVE_ZIP_SHA256=${{ needs.prepare.outputs.linux_amd64_sha256 }}
+            ZRLOG_NATIVE_MIRROR_BASE_URL=https://pub-c16cba848aff4e6b8d8e0d00f0f741f0.r2.dev
             ZRLOG_EXPECTED_VERSION=${{ needs.prepare.outputs.version }}
             CACHE_BUST=${{ github.run_id }}-${{ github.run_attempt }}
           tags: zrlog/zrlog-preview:latest
@@ -131,6 +134,7 @@ jobs:
         env:
           ZRLOG_NATIVE_ZIP_URL: ${{ needs.prepare.outputs.windows_x86_64_url }}
           ZRLOG_NATIVE_ZIP_SHA256: ${{ needs.prepare.outputs.windows_x86_64_sha256 }}
+          ZRLOG_NATIVE_MIRROR_BASE_URL: https://pub-c16cba848aff4e6b8d8e0d00f0f741f0.r2.dev
           ZRLOG_EXPECTED_VERSION: ${{ needs.prepare.outputs.version }}
           CACHE_BUST: ${{ github.run_id }}-${{ github.run_attempt }}
         run: |
@@ -138,6 +142,7 @@ jobs:
             --build-arg "ZRLOG_CHANNEL=preview" `
             --build-arg "ZRLOG_NATIVE_ZIP_URL=$env:ZRLOG_NATIVE_ZIP_URL" `
             --build-arg "ZRLOG_NATIVE_ZIP_SHA256=$env:ZRLOG_NATIVE_ZIP_SHA256" `
+            --build-arg "ZRLOG_NATIVE_MIRROR_BASE_URL=$env:ZRLOG_NATIVE_MIRROR_BASE_URL" `
             --build-arg "ZRLOG_EXPECTED_VERSION=$env:ZRLOG_EXPECTED_VERSION" `
             --build-arg "CACHE_BUST=$env:CACHE_BUST" `
             --tag "zrlog-preview:windows-ltsc2022" `

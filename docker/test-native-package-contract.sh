@@ -11,6 +11,8 @@ version=4.0.0
 buildId=0123456
 sha256=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 packageUrl=https://dl.zrlog.com/release/zrlog-4.0.0-0123456-release-Linux-amd64.zip
+mirrorBaseUrl=https://pub-c16cba848aff4e6b8d8e0d00f0f741f0.r2.dev
+mirrorPackageUrl=https://pub-c16cba848aff4e6b8d8e0d00f0f741f0.r2.dev/release/zrlog-4.0.0-0123456-release-Linux-amd64.zip
 manifest="${fixtureDir}/manifest.json"
 
 fail() {
@@ -101,12 +103,31 @@ resolved=$(env \
 [[ "${resolved}" == $'url='"${packageUrl}"$'\nsha256='"${sha256}" ]] \
   || fail "Resolver did not return the expected default manifest package"
 
+mirrorResolved=$(env \
+  PATH="${fixtureDir}/bin:${PATH}" \
+  MOCK_EXPECTED_MANIFEST_URL="${mirrorBaseUrl}/release/last.Linux-amd64.version.json" \
+  MOCK_MANIFEST_FILE="${manifest}" \
+  ZRLOG_NATIVE_MIRROR_BASE_URL="${mirrorBaseUrl}" \
+  ZRLOG_EXPECTED_SOURCE_COMMIT="${sourceCommit}" \
+  ZRLOG_EXPECTED_VERSION="${version}" \
+  "${resolver}" release Linux-amd64 "${mirrorBaseUrl}/release/last.Linux-amd64.version.json")
+[[ "${mirrorResolved}" == $'url='"${mirrorPackageUrl}"$'\nsha256='"${sha256}" ]] \
+  || fail "Resolver did not map the canonical manifest package to the mirror URL"
+
 explicit=$(ZRLOG_NATIVE_ZIP_URL="${packageUrl}" \
   ZRLOG_NATIVE_ZIP_SHA256="${sha256^^}" \
   ZRLOG_EXPECTED_VERSION="${version}" \
   "${resolver}" release Linux-amd64)
 [[ "${explicit}" == "${resolved}" ]] \
   || fail "Explicit Native package resolution did not match the manifest result"
+
+mirrorExplicit=$(ZRLOG_NATIVE_MIRROR_BASE_URL="${mirrorBaseUrl}" \
+  ZRLOG_NATIVE_ZIP_URL="${mirrorPackageUrl}" \
+  ZRLOG_NATIVE_ZIP_SHA256="${sha256^^}" \
+  ZRLOG_EXPECTED_VERSION="${version}" \
+  "${resolver}" release Linux-amd64)
+[[ "${mirrorExplicit}" == "${mirrorResolved}" ]] \
+  || fail "Explicit mirror Native package resolution did not match the manifest result"
 
 githubOutput="${fixtureDir}/github-output"
 : > "${githubOutput}"
@@ -239,16 +260,11 @@ expectFailure "Resolver accepted output injection through a manifest URL" \
   "${resolver}" release Linux-amd64 "file://${injectedManifest}"
 [[ ! -s "${githubOutput}" ]] || fail "Rejected manifest data modified GITHUB_OUTPUT"
 
-if grep -nH 'r2\.dev' \
-    "${SCRIPT_DIR}/Dockerfile" \
-    "${SCRIPT_DIR}/Dockerfile.windows" \
-    "${SCRIPT_DIR}/../.github/workflows/docker-preview-publish.yml" \
-    "${SCRIPT_DIR}/../.github/workflows/docker-release-publish.yml"; then
-  fail "Docker build contract still references the non-canonical R2 hostname"
-fi
-
 grep -Fq 'sha256sum --check --strict' "${SCRIPT_DIR}/Dockerfile"
+grep -Fq 'ARG ZRLOG_NATIVE_MIRROR_BASE_URL=' "${SCRIPT_DIR}/Dockerfile"
+grep -Fq 'ZRLOG_NATIVE_MIRROR_BASE_URL="${ZRLOG_NATIVE_MIRROR_BASE_URL}"' "${SCRIPT_DIR}/Dockerfile"
 windowsDockerfile="${SCRIPT_DIR}/Dockerfile.windows"
+grep -Fq 'ARG ZRLOG_NATIVE_MIRROR_BASE_URL=' "${windowsDockerfile}"
 grep -Fq 'Get-FileHash -LiteralPath $archive -Algorithm SHA256' "${windowsDockerfile}"
 grep -Fq "ZRLOG_CHANNEL -cnotin @('preview', 'release')" "${windowsDockerfile}"
 grep -Fq 'Expected source commit can only be verified through a Native package manifest' "${windowsDockerfile}"
@@ -258,7 +274,7 @@ grep -Fq "manifestBuildId)) { throw 'Native package manifest build ID is invalid
 grep -Fq "manifestSourceCommit -cnotmatch '^[0-9a-f]{40}$'" "${windowsDockerfile}"
 grep -Fq "manifestBuildId -cnotmatch '^[0-9a-f]{7,40}$'" "${windowsDockerfile}"
 grep -Fq 'manifestSourceCommit.StartsWith($manifestBuildId, [StringComparison]::Ordinal)' "${windowsDockerfile}"
-grep -Fq '[string]::Equals($artifactUrl, $expectedArtifactUrl, [StringComparison]::Ordinal)' "${windowsDockerfile}"
+grep -Fq '[string]::Equals($canonicalArtifactUrl, $expectedArtifactUrl, [StringComparison]::Ordinal)' "${windowsDockerfile}"
 if grep -Fq "ZRLOG_CHANNEL -notmatch '^[A-Za-z0-9._-]+$'" "${windowsDockerfile}"; then
   fail "Windows Dockerfile still accepts unsupported Native package channels"
 fi
@@ -282,6 +298,12 @@ for workflow in docker-preview-publish.yml docker-release-publish.yml; do
   grep -Fq -- '--build-arg "ZRLOG_EXPECTED_VERSION=$env:ZRLOG_EXPECTED_VERSION"' "${workflowPath}"
   grep -Fq 'version:$env:ZRLOG_EXPECTED_VERSION - ' "${workflowPath}"
 done
+
+previewWorkflow="${SCRIPT_DIR}/../.github/workflows/docker-preview-publish.yml"
+grep -Fq "ZRLOG_NATIVE_MIRROR_BASE_URL: ${mirrorBaseUrl}" "${previewWorkflow}"
+grep -Fq "${mirrorBaseUrl}/preview/last.Linux-amd64.version.json" "${previewWorkflow}"
+grep -Fq "${mirrorBaseUrl}/preview/last.Windows-x86_64.version.json" "${previewWorkflow}"
+grep -Fq -- '--build-arg "ZRLOG_NATIVE_MIRROR_BASE_URL=$env:ZRLOG_NATIVE_MIRROR_BASE_URL"' "${previewWorkflow}"
 
 grep -Fq 'zrlog version:${ZRLOG_EXPECTED_VERSION} - ' \
   "${SCRIPT_DIR}/../.github/workflows/docker-release-publish.yml"

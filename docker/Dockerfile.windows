@@ -23,6 +23,7 @@ ARG CACHE_BUST=manual
 ARG ZRLOG_NATIVE_MANIFEST_URL=
 ARG ZRLOG_NATIVE_ZIP_URL=
 ARG ZRLOG_NATIVE_ZIP_SHA256=
+ARG ZRLOG_NATIVE_MIRROR_BASE_URL=
 ARG ZRLOG_EXPECTED_SOURCE_COMMIT=
 ARG ZRLOG_EXPECTED_VERSION=
 
@@ -34,9 +35,12 @@ RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tl
     if ($env:ZRLOG_CHANNEL -cnotin @('preview', 'release')) { throw 'ZrLog channel must be preview or release' }; `
     $artifactUrl = [string]$env:ZRLOG_NATIVE_ZIP_URL; `
     $expectedHash = [string]$env:ZRLOG_NATIVE_ZIP_SHA256; `
+    $mirrorBaseUrl = [string]$env:ZRLOG_NATIVE_MIRROR_BASE_URL; `
     $expectedSourceCommit = [string]$env:ZRLOG_EXPECTED_SOURCE_COMMIT; `
     $expectedVersion = [string]$env:ZRLOG_EXPECTED_VERSION; `
     $headers = @{ 'User-Agent' = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' }; `
+    $canonicalBaseUrl = 'https://dl.zrlog.com'; `
+    if (-not [string]::IsNullOrWhiteSpace($mirrorBaseUrl) -and -not [string]::Equals($mirrorBaseUrl, 'https://pub-c16cba848aff4e6b8d8e0d00f0f741f0.r2.dev', [StringComparison]::Ordinal)) { throw 'Unsupported ZrLog Native mirror URL' }; `
     if (-not [string]::IsNullOrWhiteSpace($expectedSourceCommit) -and $expectedSourceCommit -cnotmatch '^[0-9a-f]{40}$') { throw 'Expected source commit must be a full lowercase Git SHA' }; `
     if (-not [string]::IsNullOrWhiteSpace($expectedVersion) -and -not (Test-SafeToken $expectedVersion)) { throw 'Invalid expected ZrLog version' }; `
     if ([string]::IsNullOrWhiteSpace($artifactUrl) -ne [string]::IsNullOrWhiteSpace($expectedHash)) { throw 'ZRLOG_NATIVE_ZIP_URL and ZRLOG_NATIVE_ZIP_SHA256 must be provided together' }; `
@@ -47,7 +51,9 @@ RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tl
       if ([string]::IsNullOrWhiteSpace($expectedVersion)) { throw 'ZRLOG_EXPECTED_VERSION is required with an explicit Native package URL' }; `
     } else { `
       $manifestUrl = $env:ZRLOG_NATIVE_MANIFEST_URL; `
-      if ([string]::IsNullOrWhiteSpace($manifestUrl)) { $manifestUrl = 'https://dl.zrlog.com/{0}/last.{1}.version.json' -f $env:ZRLOG_CHANNEL, $platform }; `
+      $manifestBaseUrl = $canonicalBaseUrl; `
+      if (-not [string]::IsNullOrWhiteSpace($mirrorBaseUrl)) { $manifestBaseUrl = $mirrorBaseUrl }; `
+      if ([string]::IsNullOrWhiteSpace($manifestUrl)) { $manifestUrl = '{0}/{1}/last.{2}.version.json' -f $manifestBaseUrl, $env:ZRLOG_CHANNEL, $platform }; `
       $manifest = Invoke-RestMethod -UseBasicParsing -Headers $headers -Uri $manifestUrl; `
       $manifestVersion = [string]$manifest.version; `
       $manifestBuildId = [string]$manifest.buildId; `
@@ -64,17 +70,20 @@ RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tl
       $artifactUrl = [string]$manifest.zipDownloadUrl; `
       $expectedHash = [string]$manifest.zipSha256; `
     }; `
-    $expectedPrefix = 'https://dl.zrlog.com/{0}/zrlog-{1}-' -f $env:ZRLOG_CHANNEL, $resolvedVersion; `
+    $canonicalArtifactUrl = $artifactUrl; `
+    if (-not [string]::IsNullOrWhiteSpace($mirrorBaseUrl) -and $artifactUrl.StartsWith($mirrorBaseUrl + '/', [StringComparison]::Ordinal)) { $canonicalArtifactUrl = $canonicalBaseUrl + $artifactUrl.Substring($mirrorBaseUrl.Length) }; `
+    $expectedPrefix = '{0}/{1}/zrlog-{2}-' -f $canonicalBaseUrl, $env:ZRLOG_CHANNEL, $resolvedVersion; `
     $expectedSuffix = '-{0}-{1}.zip' -f $env:ZRLOG_CHANNEL, $platform; `
-    if (-not $artifactUrl.StartsWith($expectedPrefix, [StringComparison]::Ordinal) -or -not $artifactUrl.EndsWith($expectedSuffix, [StringComparison]::Ordinal)) { throw 'Native package URL is not a canonical ZrLog artifact URL' }; `
-    $artifactBuildIdLength = $artifactUrl.Length - $expectedPrefix.Length - $expectedSuffix.Length; `
+    if (-not $canonicalArtifactUrl.StartsWith($expectedPrefix, [StringComparison]::Ordinal) -or -not $canonicalArtifactUrl.EndsWith($expectedSuffix, [StringComparison]::Ordinal)) { throw 'Native package URL is not a canonical ZrLog artifact URL' }; `
+    $artifactBuildIdLength = $canonicalArtifactUrl.Length - $expectedPrefix.Length - $expectedSuffix.Length; `
     if ($artifactBuildIdLength -le 0) { throw 'Native package URL build ID is missing' }; `
-    $artifactBuildId = $artifactUrl.Substring($expectedPrefix.Length, $artifactBuildIdLength); `
+    $artifactBuildId = $canonicalArtifactUrl.Substring($expectedPrefix.Length, $artifactBuildIdLength); `
     if (-not (Test-SafeToken $artifactBuildId)) { throw 'Native package URL build ID is invalid' }; `
     if (-not [string]::IsNullOrWhiteSpace($resolvedBuildId) -and -not [string]::Equals($artifactBuildId, $resolvedBuildId, [StringComparison]::Ordinal)) { throw 'Native package URL build ID does not match the manifest' }; `
     $resolvedBuildId = $artifactBuildId; `
-    $expectedArtifactUrl = 'https://dl.zrlog.com/{0}/zrlog-{1}-{2}-{0}-{3}.zip' -f $env:ZRLOG_CHANNEL, $resolvedVersion, $resolvedBuildId, $platform; `
-    if (-not [string]::Equals($artifactUrl, $expectedArtifactUrl, [StringComparison]::Ordinal)) { throw 'Native package URL is not a canonical ZrLog artifact URL' }; `
+    $expectedArtifactUrl = '{0}/{1}/zrlog-{2}-{3}-{1}-{4}.zip' -f $canonicalBaseUrl, $env:ZRLOG_CHANNEL, $resolvedVersion, $resolvedBuildId, $platform; `
+    if (-not [string]::Equals($canonicalArtifactUrl, $expectedArtifactUrl, [StringComparison]::Ordinal)) { throw 'Native package URL is not a canonical ZrLog artifact URL' }; `
+    if (-not [string]::Equals($artifactUrl, $canonicalArtifactUrl, [StringComparison]::Ordinal) -and ([string]::IsNullOrWhiteSpace($mirrorBaseUrl) -or -not [string]::Equals($artifactUrl, $mirrorBaseUrl + $canonicalArtifactUrl.Substring($canonicalBaseUrl.Length), [StringComparison]::Ordinal))) { throw 'Native package URL is not a canonical ZrLog artifact URL' }; `
     if ($expectedHash -notmatch '^[0-9a-fA-F]{64}$') { throw 'Native package SHA-256 is invalid' }; `
     New-Item -ItemType Directory -Force -Path $destination | Out-Null; `
     Invoke-WebRequest -UseBasicParsing -Headers $headers -Uri $artifactUrl -OutFile $archive; `

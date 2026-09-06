@@ -5,6 +5,13 @@ export LC_ALL=C
 channel=${1:-}
 platform=${2:-}
 manifestUrl=${3:-}
+canonicalBaseUrl=https://dl.zrlog.com
+mirrorBaseUrl=${ZRLOG_NATIVE_MIRROR_BASE_URL:-}
+
+if [[ -n "${mirrorBaseUrl}" && "${mirrorBaseUrl}" != https://pub-c16cba848aff4e6b8d8e0d00f0f741f0.r2.dev ]]; then
+  echo "Unsupported ZrLog Native mirror URL" >&2
+  exit 1
+fi
 
 case "${channel}" in
   preview|release) ;;
@@ -67,7 +74,7 @@ validateManifestPackage() {
       && { [[ ! "${buildId}" =~ ^[0-9a-f]{7,40}$ ]] || [[ "${sourceCommit}" != "${buildId}"* ]]; }; then
     return 1
   fi
-  expectedUrl="https://dl.zrlog.com/${channel}/zrlog-${version}-${buildId}-${channel}-${platform}.zip"
+  expectedUrl="${canonicalBaseUrl}/${channel}/zrlog-${version}-${buildId}-${channel}-${platform}.zip"
   [[ "${url}" == "${expectedUrl}" ]]
 }
 
@@ -78,17 +85,23 @@ validateExplicitPackage() {
   local prefix
   local suffix="-${channel}-${platform}.zip"
   local buildId
+  local canonicalUrl=${url}
 
   if [[ ! "${sha256}" =~ ^[0-9a-fA-F]{64}$ ]] || ! isSafeToken "${version}"; then
     return 1
   fi
-  prefix="https://dl.zrlog.com/${channel}/zrlog-${version}-"
-  if [[ "${url}" != "${prefix}"* || "${url}" != *"${suffix}" ]]; then
+  if [[ -n "${mirrorBaseUrl}" && "${url}" == "${mirrorBaseUrl}/"* ]]; then
+    canonicalUrl="${canonicalBaseUrl}${url#"${mirrorBaseUrl}"}"
+  fi
+  prefix="${canonicalBaseUrl}/${channel}/zrlog-${version}-"
+  if [[ "${canonicalUrl}" != "${prefix}"* || "${canonicalUrl}" != *"${suffix}" ]]; then
     return 1
   fi
-  buildId=${url#"${prefix}"}
+  buildId=${canonicalUrl#"${prefix}"}
   buildId=${buildId%"${suffix}"}
-  isSafeToken "${buildId}" && [[ "${url}" == "${prefix}${buildId}${suffix}" ]]
+  isSafeToken "${buildId}" \
+    && [[ "${canonicalUrl}" == "${prefix}${buildId}${suffix}" ]] \
+    && { [[ "${url}" == "${canonicalUrl}" ]] || [[ -n "${mirrorBaseUrl}" && "${url}" == "${mirrorBaseUrl}${canonicalUrl#"${canonicalBaseUrl}"}" ]]; }
 }
 
 emitPackage() {
@@ -123,7 +136,8 @@ if [[ -n "${explicitUrl}" || -n "${explicitSha256}" ]]; then
 fi
 
 if [[ -z "${manifestUrl}" ]]; then
-  manifestUrl="https://dl.zrlog.com/${channel}/last.${platform}.version.json"
+  manifestBaseUrl=${mirrorBaseUrl:-${canonicalBaseUrl}}
+  manifestUrl="${manifestBaseUrl}/${channel}/last.${platform}.version.json"
 fi
 
 for commandName in curl jq; do
@@ -159,7 +173,11 @@ for ((attempt = 1; attempt <= attempts; attempt++)); do
     if validateManifestPackage "${packageUrl}" "${packageSha256}" "${version}" "${buildId}" "${sourceCommit}" \
         && [[ -z "${expectedSourceCommit}" || "${sourceCommit}" == "${expectedSourceCommit}" ]] \
         && [[ -z "${expectedVersion}" || "${version}" == "${expectedVersion}" ]]; then
-      emitPackage "${packageUrl}" "${packageSha256}"
+      downloadUrl=${packageUrl}
+      if [[ -n "${mirrorBaseUrl}" ]]; then
+        downloadUrl="${mirrorBaseUrl}${packageUrl#"${canonicalBaseUrl}"}"
+      fi
+      emitPackage "${downloadUrl}" "${packageSha256}"
       exit 0
     fi
   fi
