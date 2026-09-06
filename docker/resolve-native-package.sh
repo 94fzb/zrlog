@@ -135,10 +135,12 @@ done
 
 manifestFile=$(mktemp)
 trap 'rm -f "${manifestFile}"' EXIT
+userAgent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
 
 for ((attempt = 1; attempt <= attempts; attempt++)); do
   if curl --fail --silent --show-error --location \
       --retry 3 --retry-all-errors --connect-timeout 15 --max-time 60 \
+      --user-agent "${userAgent}" \
       --output "${manifestFile}" -- "${manifestUrl}"; then
     packageUrl=$(jq -er '
       select(type == "object")

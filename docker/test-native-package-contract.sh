@@ -62,10 +62,15 @@ set -euo pipefail
 
 output=
 url=
+userAgent=
 while (( $# > 0 )); do
   case "$1" in
     --output)
       output=$2
+      shift 2
+      ;;
+    --user-agent|-A)
+      userAgent=$2
       shift 2
       ;;
     --retry|--connect-timeout|--max-time)
@@ -81,6 +86,7 @@ while (( $# > 0 )); do
   esac
 done
 [[ "${url}" == "${MOCK_EXPECTED_MANIFEST_URL}" ]]
+[[ "${userAgent}" == 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' ]]
 cp "${MOCK_MANIFEST_FILE}" "${output}"
 MOCK_CURL
 chmod +x "${fixtureDir}/bin/curl"

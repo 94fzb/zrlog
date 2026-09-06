@@ -36,6 +36,7 @@ RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tl
     $expectedHash = [string]$env:ZRLOG_NATIVE_ZIP_SHA256; `
     $expectedSourceCommit = [string]$env:ZRLOG_EXPECTED_SOURCE_COMMIT; `
     $expectedVersion = [string]$env:ZRLOG_EXPECTED_VERSION; `
+    $headers = @{ 'User-Agent' = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' }; `
     if (-not [string]::IsNullOrWhiteSpace($expectedSourceCommit) -and $expectedSourceCommit -cnotmatch '^[0-9a-f]{40}$') { throw 'Expected source commit must be a full lowercase Git SHA' }; `
     if (-not [string]::IsNullOrWhiteSpace($expectedVersion) -and -not (Test-SafeToken $expectedVersion)) { throw 'Invalid expected ZrLog version' }; `
     if ([string]::IsNullOrWhiteSpace($artifactUrl) -ne [string]::IsNullOrWhiteSpace($expectedHash)) { throw 'ZRLOG_NATIVE_ZIP_URL and ZRLOG_NATIVE_ZIP_SHA256 must be provided together' }; `
@@ -47,7 +48,7 @@ RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tl
     } else { `
       $manifestUrl = $env:ZRLOG_NATIVE_MANIFEST_URL; `
       if ([string]::IsNullOrWhiteSpace($manifestUrl)) { $manifestUrl = 'https://dl.zrlog.com/{0}/last.{1}.version.json' -f $env:ZRLOG_CHANNEL, $platform }; `
-      $manifest = Invoke-RestMethod -UseBasicParsing -Uri $manifestUrl; `
+      $manifest = Invoke-RestMethod -UseBasicParsing -Headers $headers -Uri $manifestUrl; `
       $manifestVersion = [string]$manifest.version; `
       $manifestBuildId = [string]$manifest.buildId; `
       $manifestSourceCommit = [string]$manifest.sourceCommit; `
@@ -75,7 +76,6 @@ RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tl
     $expectedArtifactUrl = 'https://dl.zrlog.com/{0}/zrlog-{1}-{2}-{0}-{3}.zip' -f $env:ZRLOG_CHANNEL, $resolvedVersion, $resolvedBuildId, $platform; `
     if (-not [string]::Equals($artifactUrl, $expectedArtifactUrl, [StringComparison]::Ordinal)) { throw 'Native package URL is not a canonical ZrLog artifact URL' }; `
     if ($expectedHash -notmatch '^[0-9a-fA-F]{64}$') { throw 'Native package SHA-256 is invalid' }; `
-    $headers = @{ 'User-Agent' = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' }; `
     New-Item -ItemType Directory -Force -Path $destination | Out-Null; `
     Invoke-WebRequest -UseBasicParsing -Headers $headers -Uri $artifactUrl -OutFile $archive; `
     $actualHash = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant(); `
