@@ -22,7 +22,7 @@ services:
         max-file: "3"
 
   zrlog:
-    image: ${ZRLOG_IMAGE:-zrlog/zrlog:3.9.1}
+    image: ${ZRLOG_IMAGE:-zrlog/zrlog:3.9.2}
     restart: unless-stopped
     init: true
     depends_on:

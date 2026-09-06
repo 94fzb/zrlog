@@ -17,10 +17,18 @@ PROCESS_NAME=zrlog
 SERVICE_USER=zrlog
 PIDFILE=/var/run/${PROCESS_NAME}/${PROCESS_NAME}.pid
 PORTFILE=/var/run/${PROCESS_NAME}/http-${PROCESS_NAME}.port
+DEFAULT_FILE=/etc/default/${PROCESS_NAME}
+LOG_DIR=/var/lib/${PROCESS_NAME}/log
+CONSOLE_LOG=${LOG_DIR}/console.log
 STOP_SCHEDULE="${STOP_SCHEDULE:-QUIT/1/TERM/5/KILL/1}"
 ENABLE_DEV_MODE='false'
 UPGRADE_VERSION='release'
 configFile="/etc/${PROCESS_NAME}/${PROCESS_NAME}.properties"
+
+ZRLOG_INSTALL_TOKEN="${ZRLOG_INSTALL_TOKEN:-}"
+if [ -r "${DEFAULT_FILE}" ]; then
+  . "${DEFAULT_FILE}"
+fi
 
 prop() {
     sed -n -e "s/^$1=\(.*\)/\1/p" "$configFile"
@@ -32,9 +40,9 @@ dirs="
 /etc/${PROCESS_NAME}
 /var/cache/${PROCESS_NAME}
 /var/run/${PROCESS_NAME}
-/var/log/${PROCESS_NAME}
 /var/${PROCESS_NAME}
 /var/lib/${PROCESS_NAME}
+${LOG_DIR}
 "
 
 for dir in $dirs; do
@@ -65,10 +73,11 @@ start() {
       ZRLOG_PID_FILE="${PIDFILE}" \
       ZRLOG_HOME="/var/lib/${PROCESS_NAME}" \
       ZRLOG_HTTP_PORT_FILE="${PORTFILE}" \
+      ZRLOG_INSTALL_TOKEN="${ZRLOG_INSTALL_TOKEN:-}" \
       ZRLOG_DISABLE_BIND_PORT_ERROR_RETRY_ABLE="true" \
       DEV_MODE="${ENABLE_DEV_MODE}" \
       SYSTEM_SERVICE_MODE="true" \
-      bash -c "/usr/bin/${PROCESS_NAME} ${VM_ARG}  </dev/null >/dev/null 2>&1 & disown"
+      bash -c "/usr/bin/${PROCESS_NAME} ${VM_ARG} </dev/null >>'${CONSOLE_LOG}' 2>&1 & disown"
   echo 'Service started'
 }
 

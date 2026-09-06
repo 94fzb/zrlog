@@ -1,7 +1,9 @@
 package com.zrlog.web;
 
 import com.hibegin.common.util.EnvKit;
+import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.ParseArgsUtil;
+import com.hibegin.http.server.SimpleWebServer;
 import com.hibegin.http.server.WebServerBuilder;
 import com.hibegin.http.server.util.PathUtil;
 import com.hibegin.lambda.LambdaApplication;
@@ -16,6 +18,8 @@ import com.zrlog.web.util.UpdaterUtils;
 
 import java.io.File;
 import java.util.Objects;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
 
 import static com.zrlog.common.Constants.getZrLogHome;
 
@@ -120,6 +124,10 @@ public class Application {
         Constants.zrLogConfig = zrLogConfig;
         WebServerBuilder builder = new WebServerBuilder.Builder().config(zrLogConfig).build();
         zrLogConfig.setServerBuilder(builder);
+        zrLogConfig.getServerConfig().addCreateSuccessHandle(() -> {
+            detachFileHandlerFromWebServerShutdownLogger();
+            return null;
+        });
         zrLogConfig.getServerConfig().addCreateErrorHandle(() -> {
             if (updater instanceof ZipUpdater) {
                 Thread.sleep(1000);
@@ -130,5 +138,12 @@ public class Application {
             return null;
         });
         return builder;
+    }
+
+    static void detachFileHandlerFromWebServerShutdownLogger() {
+        FileHandler fileHandler = LoggerUtil.getFileHandler();
+        if (Objects.nonNull(fileHandler)) {
+            Logger.getLogger(SimpleWebServer.class.getName()).removeHandler(fileHandler);
+        }
     }
 }

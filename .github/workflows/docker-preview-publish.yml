@@ -20,14 +20,75 @@ on:
         type: boolean
 
 jobs:
-  build:
-    name: Build preview Docker image
+  prepare:
+    name: Resolve preview Native packages
     runs-on: ubuntu-latest
+    outputs:
+      source_commit: ${{ steps.source.outputs.commit }}
+      version: ${{ steps.version.outputs.value }}
+      linux_amd64_url: ${{ steps.native_linux_amd64.outputs.url }}
+      linux_amd64_sha256: ${{ steps.native_linux_amd64.outputs.sha256 }}
+      windows_x86_64_url: ${{ steps.native_windows_x86_64.outputs.url }}
+      windows_x86_64_sha256: ${{ steps.native_windows_x86_64.outputs.sha256 }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
         with:
           ref: ${{ inputs.ref || 'master' }}
+
+      - name: Record exact source commit
+        id: source
+        run: echo "commit=$(git rev-parse HEAD)" >> "${GITHUB_OUTPUT}"
+
+      - name: Read ZrLog version
+        id: version
+        run: |
+          version=$(awk '
+              /<parent>/ { inParent = 1 }
+              /<\/parent>/ { inParent = 0; next }
+              !inParent && /<version>/ {
+                  line = $0
+                  sub(/.*<version>/, "", line)
+                  sub(/<\/version>.*/, "", line)
+                  print line
+                  exit
+              }
+          ' pom.xml)
+          : "${version:?project version is required}"
+          echo "value=${version}" >> "${GITHUB_OUTPUT}"
+
+      - name: Resolve Linux AMD64 Native package
+        id: native_linux_amd64
+        env:
+          ZRLOG_EXPECTED_SOURCE_COMMIT: ${{ steps.source.outputs.commit }}
+          ZRLOG_EXPECTED_VERSION: ${{ steps.version.outputs.value }}
+          ZRLOG_NATIVE_RESOLVE_ATTEMPTS: "6"
+          ZRLOG_NATIVE_RESOLVE_RETRY_SECONDS: "10"
+        run: >-
+          bash docker/resolve-native-package.sh preview Linux-amd64
+          https://dl.zrlog.com/preview/last.Linux-amd64.version.json
+
+      - name: Resolve Windows x86_64 Native package
+        id: native_windows_x86_64
+        if: inputs.validate_windows
+        env:
+          ZRLOG_EXPECTED_SOURCE_COMMIT: ${{ steps.source.outputs.commit }}
+          ZRLOG_EXPECTED_VERSION: ${{ steps.version.outputs.value }}
+          ZRLOG_NATIVE_RESOLVE_ATTEMPTS: "6"
+          ZRLOG_NATIVE_RESOLVE_RETRY_SECONDS: "10"
+        run: >-
+          bash docker/resolve-native-package.sh preview Windows-x86_64
+          https://dl.zrlog.com/preview/last.Windows-x86_64.version.json
+
+  build:
+    name: Build preview Docker image
+    needs: prepare
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.prepare.outputs.source_commit }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -48,30 +109,44 @@ jobs:
           push: ${{ inputs.push_image }}
           build-args: |
             ZRLOG_CHANNEL=preview
+            ZRLOG_NATIVE_ZIP_URL=${{ needs.prepare.outputs.linux_amd64_url }}
+            ZRLOG_NATIVE_ZIP_SHA256=${{ needs.prepare.outputs.linux_amd64_sha256 }}
+            ZRLOG_EXPECTED_VERSION=${{ needs.prepare.outputs.version }}
             CACHE_BUST=${{ github.run_id }}-${{ github.run_attempt }}
           tags: zrlog/zrlog-preview:latest
 
   validate-windows:
     name: Validate preview Windows image
+    needs: prepare
     if: inputs.validate_windows
     runs-on: windows-2022
     steps:
       - name: Checkout
         uses: actions/checkout@v7
         with:
-          ref: ${{ inputs.ref || 'master' }}
+          ref: ${{ needs.prepare.outputs.source_commit }}
 
       - name: Build Windows image
         shell: pwsh
+        env:
+          ZRLOG_NATIVE_ZIP_URL: ${{ needs.prepare.outputs.windows_x86_64_url }}
+          ZRLOG_NATIVE_ZIP_SHA256: ${{ needs.prepare.outputs.windows_x86_64_sha256 }}
+          ZRLOG_EXPECTED_VERSION: ${{ needs.prepare.outputs.version }}
+          CACHE_BUST: ${{ github.run_id }}-${{ github.run_attempt }}
         run: |
           docker build --file docker/Dockerfile.windows `
             --build-arg "ZRLOG_CHANNEL=preview" `
-            --build-arg "CACHE_BUST=${{ github.run_id }}-${{ github.run_attempt }}" `
+            --build-arg "ZRLOG_NATIVE_ZIP_URL=$env:ZRLOG_NATIVE_ZIP_URL" `
+            --build-arg "ZRLOG_NATIVE_ZIP_SHA256=$env:ZRLOG_NATIVE_ZIP_SHA256" `
+            --build-arg "ZRLOG_EXPECTED_VERSION=$env:ZRLOG_EXPECTED_VERSION" `
+            --build-arg "CACHE_BUST=$env:CACHE_BUST" `
             --tag "zrlog-preview:windows-ltsc2022" `
             ./docker
 
       - name: Verify Windows image
         shell: pwsh
+        env:
+          ZRLOG_EXPECTED_VERSION: ${{ needs.prepare.outputs.version }}
         run: |
           $image = "zrlog-preview:windows-ltsc2022"
           $output = docker run --rm `
@@ -83,8 +158,10 @@ jobs:
           if ($exitCode -ne 0) {
             throw "zrlog.exe --version exited with code ${exitCode}"
           }
-          if (($output -join [Environment]::NewLine) -notmatch '(?m)^zrlog\.exe version:') {
-            throw 'zrlog.exe --version did not report a ZrLog version'
+          $versionOutput = ($output -join [Environment]::NewLine).Trim()
+          $expectedPrefix = "zrlog.exe version:$env:ZRLOG_EXPECTED_VERSION - "
+          if (-not $versionOutput.StartsWith($expectedPrefix, [StringComparison]::Ordinal)) {
+            throw "zrlog.exe --version did not report expected version $env:ZRLOG_EXPECTED_VERSION"
           }
 
           $imageSizeRaw = docker image inspect --format '{{.Size}}' $image

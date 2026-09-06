@@ -1,5 +1,7 @@
 package com.zrlog.web;
 
+import com.hibegin.common.util.LoggerUtil;
+import com.hibegin.http.server.SimpleWebServer;
 import com.hibegin.http.server.WebServerBuilder;
 import com.zrlog.common.Constants;
 import com.zrlog.web.config.ZrLogConfigImpl;
@@ -7,7 +9,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import java.io.File;
+import java.util.Arrays;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -29,6 +37,26 @@ public class ApplicationTest {
             assertEquals("/site", Constants.zrLogConfig.getServerConfig().getContextPath());
             assertTrue(Constants.zrLogConfig.getServerConfig().getOnCreateErrorHandles().size() > 0);
         });
+    }
+
+    @Test
+    public void shouldDetachSharedFileHandlerFromWebServerShutdownLogger() throws Exception {
+        FileHandler previousFileHandler = LoggerUtil.getFileHandler();
+        Logger webServerLogger = Logger.getLogger(SimpleWebServer.class.getName());
+        File logFile = new File(temporaryFolder.newFolder("shutdown-log"), "server.log");
+        FileHandler fileHandler = new FileHandler(logFile.getAbsolutePath(), true);
+        try {
+            LoggerUtil.initFileHandle(fileHandler);
+            webServerLogger.addHandler(fileHandler);
+
+            Application.detachFileHandlerFromWebServerShutdownLogger();
+
+            assertFalse(Arrays.asList(webServerLogger.getHandlers()).contains(fileHandler));
+        } finally {
+            webServerLogger.removeHandler(fileHandler);
+            fileHandler.close();
+            LoggerUtil.initFileHandle(previousFileHandler);
+        }
     }
 
     @Test
