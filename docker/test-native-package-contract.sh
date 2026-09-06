@@ -303,6 +303,8 @@ previewWorkflow="${SCRIPT_DIR}/../.github/workflows/docker-preview-publish.yml"
 grep -Fq "ZRLOG_NATIVE_MIRROR_BASE_URL: ${mirrorBaseUrl}" "${previewWorkflow}"
 grep -Fq "${mirrorBaseUrl}/preview/last.Linux-amd64.version.json" "${previewWorkflow}"
 grep -Fq "${mirrorBaseUrl}/preview/last.Windows-x86_64.version.json" "${previewWorkflow}"
+grep -Fq 'ZRLOG_NATIVE_RESOLVE_ATTEMPTS: "30"' "${previewWorkflow}"
+grep -Fq 'ZRLOG_NATIVE_RESOLVE_RETRY_SECONDS: "30"' "${previewWorkflow}"
 grep -Fq -- '--build-arg "ZRLOG_NATIVE_MIRROR_BASE_URL=$env:ZRLOG_NATIVE_MIRROR_BASE_URL"' "${previewWorkflow}"
 
 grep -Fq 'zrlog version:${ZRLOG_EXPECTED_VERSION} - ' \

@@ -63,8 +63,8 @@ jobs:
           ZRLOG_EXPECTED_SOURCE_COMMIT: ${{ steps.source.outputs.commit }}
           ZRLOG_EXPECTED_VERSION: ${{ steps.version.outputs.value }}
           ZRLOG_NATIVE_MIRROR_BASE_URL: https://pub-c16cba848aff4e6b8d8e0d00f0f741f0.r2.dev
-          ZRLOG_NATIVE_RESOLVE_ATTEMPTS: "6"
-          ZRLOG_NATIVE_RESOLVE_RETRY_SECONDS: "10"
+          ZRLOG_NATIVE_RESOLVE_ATTEMPTS: "30"
+          ZRLOG_NATIVE_RESOLVE_RETRY_SECONDS: "30"
         run: >-
           bash docker/resolve-native-package.sh preview Linux-amd64
           https://pub-c16cba848aff4e6b8d8e0d00f0f741f0.r2.dev/preview/last.Linux-amd64.version.json
@@ -76,8 +76,8 @@ jobs:
           ZRLOG_EXPECTED_SOURCE_COMMIT: ${{ steps.source.outputs.commit }}
           ZRLOG_EXPECTED_VERSION: ${{ steps.version.outputs.value }}
           ZRLOG_NATIVE_MIRROR_BASE_URL: https://pub-c16cba848aff4e6b8d8e0d00f0f741f0.r2.dev
-          ZRLOG_NATIVE_RESOLVE_ATTEMPTS: "6"
-          ZRLOG_NATIVE_RESOLVE_RETRY_SECONDS: "10"
+          ZRLOG_NATIVE_RESOLVE_ATTEMPTS: "30"
+          ZRLOG_NATIVE_RESOLVE_RETRY_SECONDS: "30"
         run: >-
           bash docker/resolve-native-package.sh preview Windows-x86_64
           https://pub-c16cba848aff4e6b8d8e0d00f0f741f0.r2.dev/preview/last.Windows-x86_64.version.json
