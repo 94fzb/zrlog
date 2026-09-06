@@ -29,13 +29,21 @@ class TestZrLogConfig extends ZrLogConfig {
     }
 
     static TestZrLogConfig installedConfig(Updater updater) throws IOException {
-        File rootPath = Files.createTempDirectory("zrlog-install-test").toFile();
-        rootPath.deleteOnExit();
-        PathUtil.setRootPath(rootPath.getAbsolutePath());
-        TestZrLogConfig config = new TestZrLogConfig(updater);
+        TestZrLogConfig config = config(updater);
         config.installed = true;
         config.trackLifecycleCalls = true;
         return config;
+    }
+
+    static TestZrLogConfig notInstalledConfig(Updater updater) throws IOException {
+        return config(updater);
+    }
+
+    private static TestZrLogConfig config(Updater updater) throws IOException {
+        File rootPath = Files.createTempDirectory("zrlog-install-test").toFile();
+        rootPath.deleteOnExit();
+        PathUtil.setRootPath(rootPath.getAbsolutePath());
+        return new TestZrLogConfig(updater);
     }
 
     @Override

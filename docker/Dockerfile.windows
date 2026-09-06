@@ -20,17 +20,70 @@ RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tl
 
 ARG ZRLOG_CHANNEL=release
 ARG CACHE_BUST=manual
+ARG ZRLOG_NATIVE_MANIFEST_URL=
+ARG ZRLOG_NATIVE_ZIP_URL=
+ARG ZRLOG_NATIVE_ZIP_SHA256=
+ARG ZRLOG_EXPECTED_SOURCE_COMMIT=
+ARG ZRLOG_EXPECTED_VERSION=
 
 RUN [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; `
     $archive = 'C:\zrlog.zip'; `
     $destination = 'C:\opt\zrlog'; `
-    $artifactUrl = 'https://pub-c16cba848aff4e6b8d8e0d00f0f741f0.r2.dev/{0}/zrlog-Windows-x86_64.zip?{1}' -f $env:ZRLOG_CHANNEL, $env:CACHE_BUST; `
+    $platform = 'Windows-x86_64'; `
+    function Test-SafeToken([string]$value) { return $value.Length -le 128 -and $value -cmatch '^[0-9A-Za-z][0-9A-Za-z._-]*$' }; `
+    if ($env:ZRLOG_CHANNEL -cnotin @('preview', 'release')) { throw 'ZrLog channel must be preview or release' }; `
+    $artifactUrl = [string]$env:ZRLOG_NATIVE_ZIP_URL; `
+    $expectedHash = [string]$env:ZRLOG_NATIVE_ZIP_SHA256; `
+    $expectedSourceCommit = [string]$env:ZRLOG_EXPECTED_SOURCE_COMMIT; `
+    $expectedVersion = [string]$env:ZRLOG_EXPECTED_VERSION; `
+    if (-not [string]::IsNullOrWhiteSpace($expectedSourceCommit) -and $expectedSourceCommit -cnotmatch '^[0-9a-f]{40}$') { throw 'Expected source commit must be a full lowercase Git SHA' }; `
+    if (-not [string]::IsNullOrWhiteSpace($expectedVersion) -and -not (Test-SafeToken $expectedVersion)) { throw 'Invalid expected ZrLog version' }; `
+    if ([string]::IsNullOrWhiteSpace($artifactUrl) -ne [string]::IsNullOrWhiteSpace($expectedHash)) { throw 'ZRLOG_NATIVE_ZIP_URL and ZRLOG_NATIVE_ZIP_SHA256 must be provided together' }; `
+    $resolvedVersion = $expectedVersion; `
+    $resolvedBuildId = ''; `
+    if (-not [string]::IsNullOrWhiteSpace($artifactUrl)) { `
+      if (-not [string]::IsNullOrWhiteSpace($expectedSourceCommit)) { throw 'Expected source commit can only be verified through a Native package manifest' }; `
+      if ([string]::IsNullOrWhiteSpace($expectedVersion)) { throw 'ZRLOG_EXPECTED_VERSION is required with an explicit Native package URL' }; `
+    } else { `
+      $manifestUrl = $env:ZRLOG_NATIVE_MANIFEST_URL; `
+      if ([string]::IsNullOrWhiteSpace($manifestUrl)) { $manifestUrl = 'https://dl.zrlog.com/{0}/last.{1}.version.json' -f $env:ZRLOG_CHANNEL, $platform }; `
+      $manifest = Invoke-RestMethod -UseBasicParsing -Uri $manifestUrl; `
+      $manifestVersion = [string]$manifest.version; `
+      $manifestBuildId = [string]$manifest.buildId; `
+      $manifestSourceCommit = [string]$manifest.sourceCommit; `
+      if ([string]$manifest.checksumAlgorithm -cne 'sha256') { throw 'Native package manifest checksum algorithm must be sha256' }; `
+      if (-not (Test-SafeToken $manifestVersion)) { throw 'Native package manifest version is invalid' }; `
+      if (-not (Test-SafeToken $manifestBuildId)) { throw 'Native package manifest build ID is invalid' }; `
+      if ($manifestSourceCommit -cnotmatch '^[0-9a-f]{40}$') { throw 'Native package manifest source commit is invalid' }; `
+      if ($env:ZRLOG_CHANNEL -ceq 'release' -and ($manifestBuildId -cnotmatch '^[0-9a-f]{7,40}$' -or -not $manifestSourceCommit.StartsWith($manifestBuildId, [StringComparison]::Ordinal))) { throw 'Native package release build ID does not match its source commit' }; `
+      if (-not [string]::IsNullOrWhiteSpace($expectedSourceCommit) -and -not [string]::Equals($manifestSourceCommit, $expectedSourceCommit, [StringComparison]::Ordinal)) { throw 'Native package manifest source commit does not match the Docker source' }; `
+      if (-not [string]::IsNullOrWhiteSpace($expectedVersion) -and -not [string]::Equals($manifestVersion, $expectedVersion, [StringComparison]::Ordinal)) { throw 'Native package manifest version does not match the Docker source' }; `
+      $resolvedVersion = $manifestVersion; `
+      $resolvedBuildId = $manifestBuildId; `
+      $artifactUrl = [string]$manifest.zipDownloadUrl; `
+      $expectedHash = [string]$manifest.zipSha256; `
+    }; `
+    $expectedPrefix = 'https://dl.zrlog.com/{0}/zrlog-{1}-' -f $env:ZRLOG_CHANNEL, $resolvedVersion; `
+    $expectedSuffix = '-{0}-{1}.zip' -f $env:ZRLOG_CHANNEL, $platform; `
+    if (-not $artifactUrl.StartsWith($expectedPrefix, [StringComparison]::Ordinal) -or -not $artifactUrl.EndsWith($expectedSuffix, [StringComparison]::Ordinal)) { throw 'Native package URL is not a canonical ZrLog artifact URL' }; `
+    $artifactBuildIdLength = $artifactUrl.Length - $expectedPrefix.Length - $expectedSuffix.Length; `
+    if ($artifactBuildIdLength -le 0) { throw 'Native package URL build ID is missing' }; `
+    $artifactBuildId = $artifactUrl.Substring($expectedPrefix.Length, $artifactBuildIdLength); `
+    if (-not (Test-SafeToken $artifactBuildId)) { throw 'Native package URL build ID is invalid' }; `
+    if (-not [string]::IsNullOrWhiteSpace($resolvedBuildId) -and -not [string]::Equals($artifactBuildId, $resolvedBuildId, [StringComparison]::Ordinal)) { throw 'Native package URL build ID does not match the manifest' }; `
+    $resolvedBuildId = $artifactBuildId; `
+    $expectedArtifactUrl = 'https://dl.zrlog.com/{0}/zrlog-{1}-{2}-{0}-{3}.zip' -f $env:ZRLOG_CHANNEL, $resolvedVersion, $resolvedBuildId, $platform; `
+    if (-not [string]::Equals($artifactUrl, $expectedArtifactUrl, [StringComparison]::Ordinal)) { throw 'Native package URL is not a canonical ZrLog artifact URL' }; `
+    if ($expectedHash -notmatch '^[0-9a-fA-F]{64}$') { throw 'Native package SHA-256 is invalid' }; `
     $headers = @{ 'User-Agent' = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36' }; `
     New-Item -ItemType Directory -Force -Path $destination | Out-Null; `
     Invoke-WebRequest -UseBasicParsing -Headers $headers -Uri $artifactUrl -OutFile $archive; `
+    $actualHash = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant(); `
+    if ($actualHash -ne $expectedHash.ToLowerInvariant()) { throw "Unexpected ZrLog Native ZIP SHA-256: $actualHash" }; `
     Expand-Archive -LiteralPath $archive -DestinationPath $destination -Force; `
     Remove-Item -LiteralPath $archive -Force; `
-    if (-not (Test-Path 'C:\opt\zrlog\zrlog.exe')) { throw 'zrlog.exe was not found in the release archive' }
+    if (-not (Test-Path 'C:\opt\zrlog\zrlog.exe')) { throw 'zrlog.exe was not found in the release archive' }; `
+    if ([string]::IsNullOrWhiteSpace($env:CACHE_BUST)) { throw 'CACHE_BUST must not be empty' }
 
 FROM mcr.microsoft.com/windows/nanoserver:ltsc2022
 

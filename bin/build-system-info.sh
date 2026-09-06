@@ -25,7 +25,9 @@ echo "#### 🧠 CPU Info" >> "$REPORT_FILE"
 {
   echo '```'
   if command -v lscpu &> /dev/null; then
-    lscpu
+    # Current CPU frequency changes while a build is running and makes otherwise
+    # identical package metadata differ across packaging profiles.
+    LC_ALL=C lscpu | sed -E '/^(CPU\(s\) scaling MHz|CPU MHz):/d'
   elif [[ "$OSTYPE" == "darwin"* ]]; then
     sysctl -a | grep machdep.cpu
   elif command -v wmic &> /dev/null; then
