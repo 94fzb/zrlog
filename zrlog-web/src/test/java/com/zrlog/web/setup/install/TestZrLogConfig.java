@@ -47,6 +47,11 @@ class TestZrLogConfig extends ZrLogConfig {
     }
 
     @Override
+    public boolean isTest() {
+        return true;
+    }
+
+    @Override
     public DataSourceWrapper configDatabase() throws Exception {
         if (failConfigDatabase) {
             throw new IllegalStateException("database unavailable");
