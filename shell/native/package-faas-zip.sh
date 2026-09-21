@@ -34,6 +34,12 @@ wget --user-agent="${UA}" -O "${pluginLocalPath}" "${mirrorWebSite}/plugin/core/
 # templates
 wget --user-agent="${UA}" -O "static/include/templates/template-sheshui.zip" "${mirrorWebSite}/attachment/template/template-sheshui.zip?v=$(date +%s)"
 wget --user-agent="${UA}" -O "static/include/templates/template-signal-notes.zip" "${mirrorWebSite}/attachment/template/template-signal-notes.zip?v=$(date +%s)"
+# Kernel is distributed independently of the marketplace. Pin the release and digest together.
+kernelVersion="v0.1.0"
+kernelSha256="76c067ddf1f5e25121a68610c24d176666d39887f32d63a1b1374fe9f2ce03f8"
+kernelZip="static/include/templates/template-kernel.zip"
+wget --user-agent="${UA}" -O "${kernelZip}" "https://github.com/zrlog-extensions/template-kernel/releases/download/${kernelVersion}/template-kernel.zip"
+printf '%s  %s\n' "${kernelSha256}" "${kernelZip}" | sha256sum --check --status
 #wget --user-agent="${UA}" -O "static/include/templates/template-www.zip" "${mirrorWebSite}/attachment/template/template-www.zip?v=$(date +%s)"
 #cd conf && zip -r plugins.zip plugins/** plugins/**/**
 #cd ..

@@ -31,6 +31,12 @@ FaaS workflow 在 native 主程序生成后、最终 ZIP 组装前调用
 未确认的结果由服务按 TTL 回收。
 插件下载、最终 FaaS ZIP、`last.<arch>.faas.version.json` 以及发布到下载目录仍由本工程负责。
 
+FaaS 包通过 `shell/native/package-faas-zip.sh` 预置主题 ZIP。Kernel 固定使用独立仓库
+`zrlog-extensions/template-kernel` 的 `v0.1.0` Release，下载后验证脚本中固定的 SHA-256，
+失败时终止组包。最终路径为 `static/include/templates/template-kernel.zip`；运行时沿用
+现有包内主题安装机制，不自动切换当前站点主题，也不依赖 zrlog-www 市场登记。
+升级 Kernel 时同时更新脚本中的版本和校验值，再核对最终 FaaS ZIP 内的主题文件。
+
 同一实现也通过 `.github/actions/process-artifact/action.yml` 暴露为复合 Action。其他可信
 仓库可以固定到具体提交，并通过 `artifact-file`、`artifact-name`、`artifact-version` 和
 `artifact-architecture` 输入复用处理流程，无需依赖 ZrLog 的 `build.properties`。
