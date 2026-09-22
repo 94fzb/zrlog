@@ -2,7 +2,25 @@
 
 > ZrLog 提供 Zip、War、Deb 等运行包，可部署在常见 Linux 环境中。Native Image 包也可用于树莓派等 arm64 Linux 设备。
 
-### shell 目录
+### Polyglot / Hexo 运行时边界
+
+这是产品约定，不以当前 JDK 是否具备运行 GraalJS 的技术条件为依据。
+
+| 分发形态 | `zrlog-polyglot-template-scope` | Polyglot / GraalJS / Hexo |
+| --- | --- | --- |
+| 普通 JDK ZIP | `provided` | 不打包、不运行 |
+| 普通 JDK WAR | `provided` | 不打包、不运行 |
+| Native ZIP / DEB / FaaS | `compile` | 由 Native 构建启用 |
+
+四款 Hexo 主题必须沿用同一个 scope 属性；默认 Freemarker 主题、WWW 与主题 SPI 不受此禁用规则影响。
+Java 包中的 `provided` 用于排除依赖，不表示要求用户向 Servlet 容器安装 Polyglot。
+
+普通 JDK 的 Markdown、文章发布等流程必须兼容引擎缺席，沿用非 Polyglot 路径或已提交的渲染内容。不能为服务端 Markdown 渲染、JDK 升级或修复测试而将 Java 包改为 `runtime`。
+
+`shell/java/package-java-zip.sh` 为 ZIP/WAR 显式传入 `provided`；`shell/native/package-native.sh` 使用 `compile`。
+`shell/java/test-java-package-contract.sh` 对真实 ZIP/WAR 检查 Polyglot、Graal 运行库、Hexo 主题和 `MarkdownJsRenderer` 均未进入运行时包。改变边界需要用户明确要求，并同时修订本说明、AGENTS 和包校验。
+
+### 脚本目录
 
 ```
 ├── java

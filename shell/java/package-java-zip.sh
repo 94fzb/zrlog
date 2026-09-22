@@ -4,8 +4,9 @@ set -e
 rm -rf lib
 rm -rf zrlog.*
 rm -rf conf/plugins/*
+# Ordinary JDK packages must not bundle Polyglot; see doc/build.md.
 bash -e bin/add-build-info.sh "${1}" java zip
-./mvnw -Dproject.build.outputTimestamp=2013-01-01T00:00:00Z -Dmaven.test.skip=false -DskipTests=false -Djakarta-scope='provided' -Dlambda-scope='provided' -Dservlet-scope='provided' -Dzrlog-polyglot-template-scope='runtime' -Pjar clean package -U
+./mvnw -Dproject.build.outputTimestamp=2013-01-01T00:00:00Z -Dmaven.test.skip=false -DskipTests=false -Djakarta-scope='provided' -Dlambda-scope='provided' -Dservlet-scope='provided' -Dzrlog-polyglot-template-scope='provided' -Pjar clean package -U
 shopt -s nullglob
 javaZips=(target/zrlog-*.zip)
 if [[ ${#javaZips[@]} -ne 1 || ! -f "${javaZips[0]}" ]]; then

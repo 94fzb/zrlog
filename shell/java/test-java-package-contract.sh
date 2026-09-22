@@ -46,10 +46,8 @@ mapfile -t polyglotEntries < <(
     | grep -E "^${libraryRoot}/zrlog-polyglot-template-[^/]+\\.jar$" \
     || true
 )
-expectedPolyglotCount=1
-if [[ "${packageType}" == WAR ]]; then
-  expectedPolyglotCount=0
-fi
+# Both ordinary JDK distributions exclude Polyglot and Hexo.
+expectedPolyglotCount=0
 (( ${#polyglotEntries[@]} == expectedPolyglotCount )) \
   || fail "Expected ${expectedPolyglotCount} zrlog-polyglot-template JARs in ${packageType}, found ${#polyglotEntries[@]}"
 
@@ -63,15 +61,13 @@ for graalArtifact in js-language truffle-runtime polyglot; do
     || fail "Expected ${expectedPolyglotCount} ${graalArtifact} runtime JARs in ${packageType}, found ${#graalEntries[@]}"
 done
 
-if [[ "${packageType}" == WAR ]]; then
-  for entry in "${libraryEntries[@]}"; do
-    case "${entry##*/}" in
-      zrlog-template-hexo-*.jar|truffle-*.jar|icu4j-*.jar|regex-*.jar|jniutils-*.jar|nativeimage-*.jar|collections-*.jar|word-*.jar)
-        fail "WAR must not bundle Polyglot/Hexo runtime dependency: ${entry}"
-        ;;
-    esac
-  done
-fi
+for entry in "${libraryEntries[@]}"; do
+  case "${entry##*/}" in
+    zrlog-template-hexo-*.jar|truffle-*.jar|icu4j-*.jar|regex-*.jar|jniutils-*.jar|nativeimage-*.jar|collections-*.jar|word-*.jar)
+      fail "${packageType} must not bundle Polyglot/Hexo runtime dependency: ${entry}"
+      ;;
+  esac
+done
 
 unzip -qq "${archive}" -d "${workDir}/package"
 
@@ -161,8 +157,6 @@ done
   || fail "Expected ${expectedPolyglotCount} runtime JARs containing ${rendererClass}, found ${#rendererJars[@]}"
 
 if [[ "${packageType}" == ZIP ]]; then
-  [[ "${rendererJars[0]}" == "${polyglotEntries[0]}" ]] \
-    || fail "${rendererClass} is not provided by ${polyglotEntries[0]}"
   starterJar="${workDir}/package/zrlog-starter.jar"
   [[ -f "${starterJar}" ]] || fail "Java ZIP contains no zrlog-starter.jar"
 
@@ -187,12 +181,6 @@ if [[ "${packageType}" == ZIP ]]; then
         ;;
     esac
   done
-fi
-
-scriptDir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-if [[ "${packageType}" == ZIP ]]; then
-  java -cp "${workDir}/package/${libraryRoot}/*" \
-    "${scriptDir}/MarkdownRuntimeContract.java"
 fi
 
 echo "Java ${packageType} contract ok: ${metadataVersion} ${metadataBuildId} ${metadataPackageType}; bundled Polyglot count=${expectedPolyglotCount}"

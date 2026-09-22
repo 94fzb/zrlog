@@ -48,6 +48,10 @@ mvn -q -DskipTests package
 
 ## 边界规则
 
+- **运行时边界：普通 JDK ZIP、WAR 不运行 Polyglot/GraalJS，也不携带 Hexo 主题。** 两类 Java 包的 `zrlog-polyglot-template-scope` 必须为 `provided`；只有 Native 构建使用 `compile` 并启用这些能力。
+- JDK 版本升级、主题 SPI/JAR 拆分、Markdown 功能或包校验调整，都不是改变上述边界的理由。不得为通过测试改成 `runtime`、添加直接运行时依赖或要求 Java 包包含 `MarkdownJsRenderer`。
+- 改变运行时边界必须有用户明确的新要求，并同步更新 [构建边界](doc/build.md) 与 `shell/java/test-java-package-contract.sh`。普通 JDK 中依赖 Polyglot 的功能必须处理引擎缺席，不能通过打包脚本隐式开启。
+
 - `zrlog` 只做集成和打包，不拥有 admin/blog/install/base 的业务模型。
 - 修改内部依赖版本前，先确认对应子工程已经构建或发布了目标版本。
 - 正式 release ref 不能依赖 `SNAPSHOT`；开发和预览集成可以使用本地或远端 snapshot。
