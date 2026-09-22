@@ -13,8 +13,12 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
+import java.util.jar.Attributes;
+import java.util.jar.JarOutputStream;
+import java.util.jar.Manifest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -64,12 +68,20 @@ public class ZrLogSwsServletFilterTest {
     }
 
     @Test
-    public void shouldUseZipUpdaterInDevMode() throws Exception {
+    public void shouldUseZipUpdaterForPackagedDevLaunch() throws Exception {
         File webapps = temporaryFolder.newFolder("webapps");
         File blog = new File(webapps, "blog");
         ZrLogSwsServletFilter filter = new ZrLogSwsServletFilter();
         String previousRunMode = System.getProperty("sws.run.mode");
+        String previousClassPath = System.getProperty("java.class.path");
+        File launcher = temporaryFolder.newFile("zrlog-starter.jar");
+        Manifest manifest = new Manifest();
+        manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
+        manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, "com.zrlog.web.Application");
+        try (JarOutputStream ignored = new JarOutputStream(new FileOutputStream(launcher), manifest)) {
+        }
         try {
+            System.setProperty("java.class.path", launcher.getAbsolutePath());
             System.setProperty("sws.run.mode", "dev");
             setFilterConfig(filter, filterConfig("/blog", blog.getAbsolutePath()));
 
@@ -77,7 +89,9 @@ public class ZrLogSwsServletFilterTest {
 
             assertNotNull(updater);
             assertEquals(UpdaterTypeEnum.ZIP, updater.getType());
+            assertEquals(launcher.getCanonicalFile(), updater.execFile());
         } finally {
+            restoreProperty("java.class.path", previousClassPath);
             restoreProperty("sws.run.mode", previousRunMode);
         }
     }
