@@ -14,7 +14,7 @@ if [[ ${#javaZips[@]} -ne 1 || ! -f "${javaZips[0]}" ]]; then
 fi
 bash -e shell/java/test-java-package-contract.sh "${javaZips[0]}"
 bash -e bin/add-build-info.sh "${1}" java war
-./mvnw -Dproject.build.outputTimestamp=2013-01-01T00:00:00Z -Dmaven.test.skip=false -DskipTests=false -Djakarta-scope='provided' -Dlambda-scope='provided' -Dzrlog-polyglot-template-scope='runtime' -Pwar -DpackageType=war package -U
+./mvnw -Dproject.build.outputTimestamp=2013-01-01T00:00:00Z -Dmaven.test.skip=false -DskipTests=false -Djakarta-scope='provided' -Dlambda-scope='provided' -Dzrlog-polyglot-template-scope='provided' -Pwar -DpackageType=war package -U
 javaWars=(target/zrlog-*.war)
 if [[ ${#javaWars[@]} -ne 1 || ! -f "${javaWars[0]}" ]]; then
   echo "Expected exactly one WAR in target, found ${#javaWars[@]}" >&2

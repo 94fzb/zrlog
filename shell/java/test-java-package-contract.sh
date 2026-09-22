@@ -46,8 +46,12 @@ mapfile -t polyglotEntries < <(
     | grep -E "^${libraryRoot}/zrlog-polyglot-template-[^/]+\\.jar$" \
     || true
 )
-(( ${#polyglotEntries[@]} == 1 )) \
-  || fail "Expected exactly one zrlog-polyglot-template JAR, found ${#polyglotEntries[@]}"
+expectedPolyglotCount=1
+if [[ "${packageType}" == WAR ]]; then
+  expectedPolyglotCount=0
+fi
+(( ${#polyglotEntries[@]} == expectedPolyglotCount )) \
+  || fail "Expected ${expectedPolyglotCount} zrlog-polyglot-template JARs in ${packageType}, found ${#polyglotEntries[@]}"
 
 for graalArtifact in js-language truffle-runtime polyglot; do
   mapfile -t graalEntries < <(
@@ -55,9 +59,19 @@ for graalArtifact in js-language truffle-runtime polyglot; do
       | grep -E "^${libraryRoot}/${graalArtifact}-[^/]+\\.jar$" \
       || true
   )
-  (( ${#graalEntries[@]} == 1 )) \
-    || fail "Expected exactly one ${graalArtifact} runtime JAR, found ${#graalEntries[@]}"
+  (( ${#graalEntries[@]} == expectedPolyglotCount )) \
+    || fail "Expected ${expectedPolyglotCount} ${graalArtifact} runtime JARs in ${packageType}, found ${#graalEntries[@]}"
 done
+
+if [[ "${packageType}" == WAR ]]; then
+  for entry in "${libraryEntries[@]}"; do
+    case "${entry##*/}" in
+      zrlog-template-hexo-*.jar|truffle-*.jar|icu4j-*.jar|regex-*.jar|jniutils-*.jar|nativeimage-*.jar|collections-*.jar|word-*.jar)
+        fail "WAR must not bundle Polyglot/Hexo runtime dependency: ${entry}"
+        ;;
+    esac
+  done
+fi
 
 unzip -qq "${archive}" -d "${workDir}/package"
 
@@ -143,12 +157,12 @@ for entry in "${libraryEntries[@]}"; do
   fi
 done
 
-(( ${#rendererJars[@]} == 1 )) \
-  || fail "Expected exactly one runtime JAR containing ${rendererClass}, found ${#rendererJars[@]}"
-[[ "${rendererJars[0]}" == "${polyglotEntries[0]}" ]] \
-  || fail "${rendererClass} is not provided by ${polyglotEntries[0]}"
+(( ${#rendererJars[@]} == expectedPolyglotCount )) \
+  || fail "Expected ${expectedPolyglotCount} runtime JARs containing ${rendererClass}, found ${#rendererJars[@]}"
 
 if [[ "${packageType}" == ZIP ]]; then
+  [[ "${rendererJars[0]}" == "${polyglotEntries[0]}" ]] \
+    || fail "${rendererClass} is not provided by ${polyglotEntries[0]}"
   starterJar="${workDir}/package/zrlog-starter.jar"
   [[ -f "${starterJar}" ]] || fail "Java ZIP contains no zrlog-starter.jar"
 
@@ -176,7 +190,9 @@ if [[ "${packageType}" == ZIP ]]; then
 fi
 
 scriptDir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-java -cp "${workDir}/package/${libraryRoot}/*" \
-  "${scriptDir}/MarkdownRuntimeContract.java"
+if [[ "${packageType}" == ZIP ]]; then
+  java -cp "${workDir}/package/${libraryRoot}/*" \
+    "${scriptDir}/MarkdownRuntimeContract.java"
+fi
 
-echo "Java ${packageType} contract ok: ${metadataVersion} ${metadataBuildId} ${metadataPackageType}; ${polyglotEntries[0]} provides MarkdownJsRenderer"
+echo "Java ${packageType} contract ok: ${metadataVersion} ${metadataBuildId} ${metadataPackageType}; bundled Polyglot count=${expectedPolyglotCount}"
