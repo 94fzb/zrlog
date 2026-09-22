@@ -18,7 +18,8 @@ ZrLog 通过多个独立仓库维护核心模块。本仓库（`zrlog`）负责�
 ### 日常开发流程
 
 内置主题由 `zrlog-extensions/zrlog-template-*` 的独立 Maven JAR 提供。博客工程只引入 default；
-WWW 与四款 Hexo 主题由本工程的 `zrlog-web/pom.xml` 以 runtime 依赖组装。
+WWW 由本工程的 `zrlog-web/pom.xml` 以 runtime 依赖组装；四款 Hexo 主题的 scope 使用
+`${zrlog-polyglot-template-scope}`，与 Polyglot 引擎一起受打包 profile 控制。
 `com.hibegin:zrlog-template-spi:1.0.0` 使用 Java ServiceLoader 注册主题和默认项；安装器通过
 `Constants.getDefaultTemplatePath()` 选择默认主题。主题 JAR 自带 Native Image 资源和构造器注册，
 主工程无需维护主题路径白名单。新主题先发布 SPI/资源制品，再验证博客与主工程；主题版本不随核心版本改号。
