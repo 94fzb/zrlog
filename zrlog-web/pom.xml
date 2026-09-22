@@ -11,6 +11,37 @@
     <artifactId>zrlog-web</artifactId>
 
     <dependencies>
+        <!-- Optional bundled themes belong to the application assembly, not the rendering engines. -->
+        <dependency>
+            <groupId>com.hibegin</groupId>
+            <artifactId>zrlog-template-www</artifactId>
+            <version>3.2</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.hibegin</groupId>
+            <artifactId>zrlog-template-hexo-fluid</artifactId>
+            <version>1.9.8</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.hibegin</groupId>
+            <artifactId>zrlog-template-hexo-butterfly</artifactId>
+            <version>5.5.4-b1</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.hibegin</groupId>
+            <artifactId>zrlog-template-hexo-shiro</artifactId>
+            <version>1.2.0</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.hibegin</groupId>
+            <artifactId>zrlog-template-hexo-next</artifactId>
+            <version>8.27.0</version>
+            <scope>runtime</scope>
+        </dependency>
         <dependency>
             <groupId>com.hibegin</groupId>
             <artifactId>zrlog-blog-web</artifactId>
