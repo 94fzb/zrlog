@@ -99,6 +99,31 @@
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
         </dependency>
+        <!-- Inherit themes directly in both web and standalone package builds. -->
+        <dependency>
+            <groupId>com.hibegin</groupId>
+            <artifactId>zrlog-template-hexo-fluid</artifactId>
+            <version>1.9.8</version>
+            <scope>${zrlog-polyglot-template-scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.hibegin</groupId>
+            <artifactId>zrlog-template-hexo-butterfly</artifactId>
+            <version>5.5.4-b1</version>
+            <scope>${zrlog-polyglot-template-scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.hibegin</groupId>
+            <artifactId>zrlog-template-hexo-shiro</artifactId>
+            <version>1.2.0</version>
+            <scope>${zrlog-polyglot-template-scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.hibegin</groupId>
+            <artifactId>zrlog-template-hexo-next</artifactId>
+            <version>8.27.0</version>
+            <scope>${zrlog-polyglot-template-scope}</scope>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>

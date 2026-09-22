@@ -20,6 +20,8 @@ Java 包中的 `provided` 用于排除依赖，不表示要求用户向 Servlet 
 `shell/java/package-java-zip.sh` 为 ZIP/WAR 显式传入 `provided`；`shell/native/package-native.sh` 使用 `compile`。
 `shell/java/test-java-package-contract.sh` 对真实 ZIP/WAR 检查 Polyglot、Graal 运行库、Hexo 主题和 `MarkdownJsRenderer` 均未进入运行时包。改变边界需要用户明确要求，并同时修订本说明、AGENTS 和包校验。
 
+Hexo 依赖在主工程父 POM 的 `dependencies` 中统一声明，由 `zrlog-web` 和 `package` 直接继承。Native 单独构建 `package/pom.xml` 时，`compile` 才能直接生效；不要改回仅由 `zrlog-web` 传递，因为其默认 `provided` 依赖不会向下传递。
+
 ### 脚本目录
 
 ```
