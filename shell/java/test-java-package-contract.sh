@@ -63,6 +63,9 @@ done
 
 for entry in "${libraryEntries[@]}"; do
   case "${entry##*/}" in
+    zrlog-test-support-*.jar|zrlog-admin-test-support-*.jar|*-tests.jar)
+      fail "${packageType} must not bundle test fixtures: ${entry}"
+      ;;
     zrlog-template-hexo-*.jar|truffle-*.jar|icu4j-*.jar|regex-*.jar|jniutils-*.jar|nativeimage-*.jar|collections-*.jar|word-*.jar)
       fail "${packageType} must not bundle Polyglot/Hexo runtime dependency: ${entry}"
       ;;
@@ -147,8 +150,13 @@ fi
 
 rendererClass='com/zrlog/blog/polyglot/markdown/MarkdownJsRenderer.class'
 rendererJars=()
+testClassPattern='(^com/zrlog/(test|admin)/support/|(^|/)MemoryApplication[^/]*\.class$)'
 for entry in "${libraryEntries[@]}"; do
-  if jar tf "${workDir}/package/${entry}" | grep -Fx "${rendererClass}" >/dev/null; then
+  jarEntries=$(jar tf "${workDir}/package/${entry}")
+  if grep -E "${testClassPattern}" <<< "${jarEntries}" >/dev/null; then
+    fail "${packageType} contains test support or memory application classes: ${entry}"
+  fi
+  if grep -Fx "${rendererClass}" <<< "${jarEntries}" >/dev/null; then
     rendererJars+=("${entry}")
   fi
 done
@@ -159,6 +167,9 @@ done
 if [[ "${packageType}" == ZIP ]]; then
   starterJar="${workDir}/package/zrlog-starter.jar"
   [[ -f "${starterJar}" ]] || fail "Java ZIP contains no zrlog-starter.jar"
+  if jar tf "${starterJar}" | grep -E "${testClassPattern}" >/dev/null; then
+    fail "Java ZIP starter contains test support or memory application classes"
+  fi
 
   manifest=$(
     unzip -p "${starterJar}" META-INF/MANIFEST.MF \

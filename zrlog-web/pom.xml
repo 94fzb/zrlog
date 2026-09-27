@@ -11,6 +11,12 @@
     <artifactId>zrlog-web</artifactId>
 
     <dependencies>
+        <dependency>
+            <groupId>com.hibegin</groupId>
+            <artifactId>zrlog-test-support</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!-- Optional bundled themes belong to the application assembly, not the rendering engines. -->
         <dependency>
             <groupId>com.hibegin</groupId>

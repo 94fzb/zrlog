@@ -77,3 +77,7 @@ mvn -q -DskipTests package
 | 更新内部模块版本 | 根 `pom.xml` 的依赖和 dependencyManagement |
 | 修改构建元数据 | `bin/`、`shell/`、`doc/build_system_info.md` |
 | 安装体验集成验证 | `zrlog-ops/acceptance/zrlog-preview-package-install.yaml` |
+
+## 共享测试标准
+
+遵守 `zrlog-base/docs/test-support.md`。通用测试工具仅以 test scope 引入。已安装站点的启动测试使用真实 InstallService 生成临时配置、锁文件和默认数据，不手写 install.lock。最终 ZIP/WAR、starter 不得包含 `zrlog-test-support` 或 `*-tests.jar`。
