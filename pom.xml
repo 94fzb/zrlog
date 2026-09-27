@@ -35,7 +35,7 @@
         <zrlog-admin-web.version>4.0.0-SNAPSHOT</zrlog-admin-web.version>
         <junit.version>4.13.2</junit.version>
         <mysql-scope>compile</mysql-scope>
-        <sqlite-jdbc.version>3.53.2.1</sqlite-jdbc.version>
+        <sqlite-jdbc.version>3.53.4.0</sqlite-jdbc.version>
     </properties>
 
     <repositories>
