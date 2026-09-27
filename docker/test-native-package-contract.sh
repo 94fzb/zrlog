@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Each fixture controls its own output mode and resolver inputs, including on CI.
+unset GITHUB_OUTPUT ZRLOG_EXPECTED_SOURCE_COMMIT ZRLOG_EXPECTED_VERSION \
+  ZRLOG_NATIVE_ZIP_URL ZRLOG_NATIVE_ZIP_SHA256 ZRLOG_NATIVE_MIRROR_BASE_URL \
+  ZRLOG_NATIVE_RESOLVE_ATTEMPTS ZRLOG_NATIVE_RESOLVE_RETRY_SECONDS
+
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 resolver="${SCRIPT_DIR}/resolve-native-package.sh"
 fixtureDir=$(mktemp -d)
