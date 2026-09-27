@@ -34,6 +34,8 @@ WWW 由本工程的 `zrlog-web/pom.xml` 以 runtime 依赖组装；四款 Hexo �
 > **提示：本地调试技巧**
 > 可以从各子模块的 `Application` 入口独立运行联调。涉及多个模块时，可先在模块仓库执行 `./mvnw clean install`，将 SNAPSHOT 安装到本地 Maven 仓库，再回到本仓库验证。
 
+Web 模块通过 base 中的 `WebSetupLoader` 统一发现 `WebSetupProvider`。主工程加载全部 Provider；admin 独立开发入口仅选择 `admin` 和 `admin-*`。两者共享 `DISABLE_MODULES`（逗号分隔的精确模块名）及 `WEB_SETUP_STRICT` 规则，模块的路由和插件仍由 `WebSetup` 提供。
+
 ### 开发文档与资源体系
 
 插件构建、主题开发等说明见：[开发指引](https://blog.zrlog.com/for-developer)
