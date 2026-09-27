@@ -35,7 +35,7 @@
         <zrlog-admin-web.version>4.0.0-SNAPSHOT</zrlog-admin-web.version>
         <junit.version>4.13.2</junit.version>
         <mysql-scope>compile</mysql-scope>
-        <sqlite-jdbc.version>3.53.2.1</sqlite-jdbc.version>
+        <sqlite-jdbc.version>3.53.4.0</sqlite-jdbc.version>
     </properties>
 
     <repositories>
@@ -154,7 +154,7 @@
             <dependency>
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
-                <version>2.4.240</version>
+                <version>2.5.250</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -211,7 +211,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>
-                <version>2.21.0</version>
+                <version>2.22.0</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
