@@ -21,7 +21,7 @@
         <dependency>
             <groupId>com.hibegin</groupId>
             <artifactId>zrlog-template-www</artifactId>
-            <version>3.2</version>
+            <version>4.0.0</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
