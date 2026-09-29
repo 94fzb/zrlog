@@ -49,6 +49,10 @@ FaaS workflow 在 native 主程序生成后、最终 ZIP 组装前调用
 运行架构；脚本将未压缩主程序直接上传到 `zrlog-artifact-service`，等待 UPX 临时处理任务
 完成，再从服务下载、校验并替换本地 `zrlog`。校验成功后脚本通知服务删除临时结果，
 未确认的结果由服务按 TTL 回收。
+上传、轮询和删除确认的 JSON 响应通过临时文件接收，确保 `curl` 重试时丢弃前次的
+错误响应，避免网关 504 HTML 与后续成功 JSON 串接。临时文件在脚本退出时清理。
+可运行 `python3 .github/actions/process-artifact/test_process_artifact.py`，使用本机 HTTP
+夹具验证超时重试、真实下载文件校验、原文件保护和清理确认（需要 curl、jq、sha256sum）。
 插件下载、最终 FaaS ZIP、`last.<arch>.faas.version.json` 以及发布到下载目录仍由本工程负责。
 
 FaaS 包通过 `shell/native/package-faas-zip.sh` 预置主题 ZIP。Kernel 固定使用独立仓库

@@ -52,7 +52,27 @@ curlArgs=(
   --connect-timeout 15
 )
 
-if ! jobResponse=$(curl "${curlArgs[@]}" --max-time 900 \
+responseFile=$(mktemp)
+processedFile=""
+cleanupTemporaryFiles() {
+  rm -f -- "${responseFile}"
+  if [[ -n "${processedFile}" ]]; then
+    rm -f -- "${processedFile}"
+  fi
+}
+trap cleanupTemporaryFiles EXIT
+
+requestJson() {
+  local curlStatus=0
+  # curl can rewind a regular output file on retry, but cannot rewind stdout.
+  # Keep only the final attempt's body, including when all attempts fail.
+  : > "${responseFile}"
+  curl "${curlArgs[@]}" --output "${responseFile}" "$@" || curlStatus=$?
+  cat "${responseFile}"
+  return "${curlStatus}"
+}
+
+if ! jobResponse=$(requestJson --max-time 900 \
     -X POST \
     -H "${authorizationHeader}" \
     -H "Content-Type: application/octet-stream" \
@@ -74,7 +94,7 @@ encodedJobId=$(jq -nr --arg value "${jobId}" '$value | @uri')
 
 deadline=$((SECONDS + processTimeout))
 while (( SECONDS < deadline )); do
-  if ! jobResponse=$(curl "${curlArgs[@]}" --max-time 60 \
+  if ! jobResponse=$(requestJson --max-time 60 \
       -H "${authorizationHeader}" \
       "${serviceUrl}/api/v1/jobs/detail?id=${encodedJobId}"); then
     echo "Unable to query artifact processing job: ${jobResponse:-no response body}" >&2
@@ -130,7 +150,6 @@ expectedSize=$(jq -er '.data.sizeBytes
 
 artifactDirectory=$(dirname "${artifactFile}")
 processedFile=$(mktemp "${artifactDirectory}/.processed-artifact.XXXXXX")
-trap 'rm -f "${processedFile}"' EXIT
 if ! curl "${curlArgs[@]}" --max-time 900 \
     -H "${authorizationHeader}" \
     "${serviceUrl}${downloadPath}" \
@@ -152,9 +171,9 @@ fi
 
 chmod +x "${processedFile}"
 mv "${processedFile}" "${artifactFile}"
-trap - EXIT
+processedFile=""
 
-if ! cleanupResponse=$(curl "${curlArgs[@]}" --max-time 60 \
+if ! cleanupResponse=$(requestJson --max-time 60 \
     -X DELETE -H "${authorizationHeader}" \
     "${serviceUrl}${downloadPath}"); then
   echo "Warning: unable to remove temporary artifact result; server TTL cleanup will retry" >&2
