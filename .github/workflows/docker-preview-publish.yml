@@ -23,6 +23,11 @@ on:
         required: false
         default: false
         type: boolean
+      updater_verify_version:
+        description: Only verify this existing updater preview (requires updater_only and push_image=false)
+        required: false
+        default: ''
+        type: string
 
 permissions:
   contents: read
@@ -40,6 +45,7 @@ jobs:
     with:
       ref: ${{ inputs.ref }}
       push_image: ${{ inputs.push_image }}
+      verify_version: ${{ inputs.updater_verify_version }}
     secrets: inherit
 
   prepare:
