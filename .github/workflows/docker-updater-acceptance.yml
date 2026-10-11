@@ -30,7 +30,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           repository: zrlog/zrlog-admin-web
-          ref: 69674675f70ff8167c3286a62480ad1ef0ceeca3
+          ref: 9332f22762b7bfc4a54b6d3af75add44491825b1
           path: admin
       - uses: actions/setup-java@v5
         with:
@@ -47,6 +47,11 @@ jobs:
           corepack prepare yarn@1.22.22 --activate
           cd admin/zrlog-admin-web-ui/src/main/frontend
           yarn install --frozen-lockfile --registry https://registry.npmjs.org
+          yarn type-check
+          CI=true yarn test --watchAll=false --runInBand \
+            src/components/upgrade.test.tsx \
+            src/components/website/DockerRepositorySetting.test.tsx \
+            src/utils/docker-upgrade.test.ts
           yarn build
           cd ../../../..
           mvn -B -ntp -DskipTests install
