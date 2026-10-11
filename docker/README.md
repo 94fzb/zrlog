@@ -54,7 +54,7 @@ docker run --name zrlog \
 ZrLog 官方阿里云仓库为 `registry.cn-chengdu.aliyuncs.com/hibegin/zrlog`。
 
 后台升级需要包含此功能的 ZrLog 版本，以及独立的 updater 容器。启用方法见
-[updater 部署说明](updater/README.md#compose-配置)，使用附加配置
+[updater 部署说明](https://github.com/zrlog/zrlog-updater#compose-配置)，使用附加配置
 `docker-compose.updater.yml`。已有站点必须保留原项目名、数据卷和部署目录；首次接入
 需要管理员更新部署配置，接入后日常升级可在后台完成。
 

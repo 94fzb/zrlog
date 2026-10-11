@@ -70,7 +70,8 @@ class UpdateSourcesTest(unittest.TestCase):
                 self.data[Key] = Body
         key = "release/last.version.json"
         store = Store({key: self.manifest,
-                       "release/last.updater.Linux-amd64.version.json": dict(self.manifest, packageType="updater", zipDownloadUrl="https://dl.zrlog.com/release/unapproved-updater.zip"),
+                       # Skip legacy updater entries even if their filename matches an application asset.
+                       "release/last.updater.Linux-amd64.version.json": dict(self.manifest, packageType="updater"),
                        "release/last.other.version.json": dict(self.manifest, sourceCommit="c" * 40)})
         original_enrich = module.enrich
         def verified(*args): return original_enrich(*args, verifier=lambda *download: None)

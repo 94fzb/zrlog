@@ -17,7 +17,7 @@
 `<mirrorWebSite>/<release或preview>/<清单文件名>`，要求 HTTPS。后台更新设置选择
 安装包下载源或镜像仓库，元数据地址不通过页面修改。
 
-独立 [Docker updater](../docker/updater/README.md) 使用自己的 `build.properties`；它的
+独立 [Docker updater](https://github.com/zrlog/zrlog-updater) 使用自己的 `build.properties`；它的
 `mirrorWebSite` 与应用一致，`updateVersionJsonFilename` 对应应用的 Docker 清单名。
 两端配置不一致时拒绝开启容器升级。updater 使用独立 POM，只带 Gson 和 JDK HTTP 服务，
 不继承主工程的页面、安装、数据库或主题依赖。

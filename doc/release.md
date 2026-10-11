@@ -64,21 +64,18 @@ FaaS 和 Docker 制品构建。相关入口包括：
 构建产生的 `build.properties` 和 `last*.version.json` 仍由正式构建链生成和校验，不能在
 开发工作区中作为手工发版依据。
 
-Linux Native 构建同时生成独立 updater ZIP。Release Order v5 的可选
-`artifacts.updater_attachments` 明确批准 AMD64/ARM64 两个附件；未声明的附件不进入
-GitHub Release。镜像发布流程读取相同版本、提交和 SHA-256 的 updater 包，为 Docker Hub
-与阿里云生成并验证独立 updater 镜像。
+[zrlog-updater](https://github.com/zrlog/zrlog-updater) 独立维护 Docker 升级服务端、Native
+ZIP 与 Docker Hub/阿里云镜像，使用自己的版本和源提交。本工程只维护应用镜像、应用
+升级清单与 Compose 接入；应用 Release Order 不再生成或附带 updater 安装包。
 
 Docker release/preview 发布在镜像验证后分别读取各仓库实际 digest，先写不可变镜像
 清单，再条件更新 `last.docker-image.version.json`。GitHub 正式 Release 公开后，
 `update-package-sources.yml` 逐项下载并校验 GitHub/dl 的包，验证字节一致后才补充
 `zipSources`/`warSources`；保留原 URL 字段，失败不切换到未经验证的来源。
 
-独立 updater 的开发预览可通过 `docker-preview-publish.yml` 的 `updater_only=true`
-入口发布。该模式只构建 updater 的两个 Linux 架构，使用带源码提交和运行编号的唯一预览
-标签，不创建正式 tag、不更新应用镜像或 dl 通道元数据。发布前执行真实引擎与 Native
-冒烟测试，发布后验证 Docker Hub、阿里云的镜像身份和匿名拉取，证据保留在 Actions
-artifact。正式版本继续遵循上述 Release Order 流程。
+updater 构建和发布入口为独立仓库的 `build-publish.yml`，不再由本工程调度。
+其安装包使用 GitHub Release 与 `dl.zrlog.com/updater/{channel}/`；应用的更新元数据
+仍使用 `dl.zrlog.com/{channel}/`。两者版本和发布生命周期独立，镜像仓库名保持兼容。
 
 ## 禁止的旧流程
 

@@ -86,9 +86,7 @@ def publish(store, bucket, release, commit):
         if manifest.get("sourceCommit") != commit:
             continue
         if manifest.get("packageType") == "updater":
-            package_name = urllib.parse.urlparse(manifest.get("zipDownloadUrl", "")).path.rsplit("/", 1)[-1]
-            if not any(asset.get("name") == package_name for asset in release.get("assets", [])):
-                continue  # This Release Order did not approve the optional updater attachments.
+            continue  # Independently versioned/published by zrlog/zrlog-updater.
         result = enrich(manifest, release, commit)
         body = (json.dumps(result, ensure_ascii=False, indent=2) + "\n").encode()
         immutable = f"release/package-sources/{result['version']}-{result['buildId']}/{key.rsplit('/', 1)[1]}"
