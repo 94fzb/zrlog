@@ -51,6 +51,8 @@ docker run --name zrlog \
 
 `docker-compose.yml` 提供 ZrLog、MySQL、独立 updater 和持久化卷。复制 `.env.example` 为 `.env`，
 填写数据库密码、项目名、部署目录绝对路径和随机 updater 令牌后启动。
+镜像版本、仓库、端口等部署参数统一在 `.env` 维护，保留样例的全部配置项，无需修改 YAML。
+Compose 与 updater 读取同一份 `.env`；该文件含密码与令牌，不提交到 Git。
 `ZRLOG_IMAGE`、`ZRLOG_UPDATER_IMAGE`、`MYSQL_IMAGE` 都可填写该环境能访问的完整镜像地址；
 ZrLog 官方阿里云仓库为 `registry.cn-chengdu.aliyuncs.com/hibegin/zrlog`。
 

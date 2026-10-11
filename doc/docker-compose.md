@@ -8,9 +8,11 @@
 ```bash
 cd docker
 cp .env.example .env
+chmod 600 .env
 ```
 
-编辑 `.env`，填写以下配置：
+所有部署参数统一在 `.env` 中维护，YAML 只引用变量；镜像版本、仓库和端口无需修改 YAML。
+保留样例中的全部配置项，填写以下空值：
 
 - `MYSQL_PASSWORD`：随机数据库密码。
 - `COMPOSE_PROJECT_NAME`：新站点可填 `zrlog`；已有站点必须填写原项目名，以继续使用原数据卷。
@@ -26,6 +28,11 @@ MySQL 镜像来源。然后启动服务：
 docker compose up --detach
 docker compose ps
 ```
+
+以上命令在部署目录执行，Compose 会自动读取同目录的 `.env`。updater 也显式读取这份文件，
+成功更新后将 `ZRLOG_IMAGE` 写为目标镜像 digest，后续启动继续使用升级后的版本。
+不要用 shell 的 `export ZRLOG_IMAGE=...` 覆盖该值，否则人工启动和 updater 可能读到不同配置。
+`.env` 包含密码和令牌，保存在部署机器上，不提交到 Git；仓库仅维护 `.env.example`。
 
 MySQL 健康后 ZrLog 才会启动。访问 [http://localhost:8080/install](http://localhost:8080/install)，并使用以下数据库参数完成首次安装：
 

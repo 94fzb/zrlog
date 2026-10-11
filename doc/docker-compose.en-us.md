@@ -8,9 +8,11 @@ and the independent [updater service](https://github.com/zrlog/zrlog-updater). N
 ```bash
 cd docker
 cp .env.example .env
+chmod 600 .env
 ```
 
-Fill in these values in `.env`:
+Maintain deployment values in `.env`; the YAML references variables without duplicating their defaults.
+Keep every setting from the example and fill in these empty values:
 
 - `MYSQL_PASSWORD`: a randomly generated database password.
 - `COMPOSE_PROJECT_NAME`: for a new site, you may use `zrlog`; existing sites must keep their original project name and volumes.
@@ -25,6 +27,12 @@ Then start the services:
 docker compose up --detach
 docker compose ps
 ```
+
+Run these commands in the deployment directory so Compose reads its `.env` automatically.
+The updater explicitly reads the same file and writes the target image digest to `ZRLOG_IMAGE` after
+an upgrade. Subsequent starts therefore use the upgraded image. Avoid overriding this value with
+`export ZRLOG_IMAGE=...`, which can make manual starts and the updater use different configurations.
+Keep the real `.env`, containing passwords and tokens, on the deployment host; commit only `.env.example`.
 
 ZrLog starts after MySQL becomes healthy. Visit [http://localhost:8080/install](http://localhost:8080/install) and use these database settings for the initial installation:
 
