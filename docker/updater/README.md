@@ -21,9 +21,15 @@
 使用后台升级功能还需要包含对应 base/admin 集成的应用版本和已发布的应用镜像清单。
 
 2026-10-11 发布的预览标签为 `1.0.0-preview.8739d2a868ba.38142228210.1`。
-Docker Hub 已通过匿名拉取；阿里云同名标签已推送并通过登录拉取验证，公开访问设置待完成。
+Docker Hub 和阿里云均已公开，支持 `linux/amd64`、`linux/arm64`。
 [构建及发布记录](https://github.com/94fzb/zrlog/actions/runs/38142228210)包含两个架构各
-22 项测试、Native 冒烟与镜像身份验证；该次工作流因阿里云匿名访问被拒绝而保留失败状态。
+22 项测试、Native 冒烟与镜像身份验证。阿里云公开设置完成后，
+[双架构匿名拉取及运行复验](https://github.com/94fzb/zrlog/actions/runs/38143384408)已全部通过。
+中国地区可配置：
+
+```dotenv
+ZRLOG_UPDATER_IMAGE=registry.cn-chengdu.aliyuncs.com/hibegin/zrlog-updater:1.0.0-preview.8739d2a868ba.38142228210.1
+```
 
 仓库访问设置修复后，可在同一入口设置 `updater_only=true`、`push_image=false`、
 `updater_verify_version=<已发布标签>`，并将 `ref` 指向该镜像的完整源码 SHA，执行双架构
