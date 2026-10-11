@@ -74,6 +74,12 @@ Docker release/preview 发布在镜像验证后分别读取各仓库实际 diges
 `update-package-sources.yml` 逐项下载并校验 GitHub/dl 的包，验证字节一致后才补充
 `zipSources`/`warSources`；保留原 URL 字段，失败不切换到未经验证的来源。
 
+独立 updater 的开发预览可通过 `docker-preview-publish.yml` 的 `updater_only=true`
+入口发布。该模式只构建 updater 的两个 Linux 架构，使用带源码提交和运行编号的唯一预览
+标签，不创建正式 tag、不更新应用镜像或 dl 通道元数据。发布前执行真实引擎与 Native
+冒烟测试，发布后验证 Docker Hub、阿里云的镜像身份和匿名拉取，证据保留在 Actions
+artifact。正式版本继续遵循上述 Release Order 流程。
+
 ## 禁止的旧流程
 
 以下动作已经退出正式发布流程：

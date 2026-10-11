@@ -4,6 +4,22 @@
 服务。运行时、后台及发布流程已接入源码；当前工作区尚未发布对应镜像，首次使用前须确认
 所选版本已完成正式发布，并通过真实 Compose 部署验收。
 
+## 独立预览镜像
+
+维护者可通过 `build preview docker image` 工作流指定源码 `ref`，设置
+`updater_only=true`、`push_image=true`，独立构建并发布 updater，无需先构建整站应用包。
+工作流在 AMD64、ARM64 原生 Runner 上执行真实 Docker 测试、Native HTTP/重启冒烟、
+容器检查，再推送 Docker Hub 与阿里云，验证两边的 digest、签名及匿名拉取。
+
+预览标签为 `1.0.0-preview.<源码短提交>.<运行编号>.<重试次数>`，实际值见工作流摘要和
+`updater-preview-publication-*` 证据。两个仓库使用相同标签：
+
+- `zrlog/zrlog-updater:<预览标签>`
+- `registry.cn-chengdu.aliyuncs.com/hibegin/zrlog-updater:<预览标签>`
+
+将完整引用填入 `.env` 的 `ZRLOG_UPDATER_IMAGE`。此流程不推进应用更新清单或正式版本；
+使用后台升级功能还需要包含对应 base/admin 集成的应用版本和已发布的应用镜像清单。
+
 ## 构建
 
 此 POM 独立于博客主工程父 POM，只引入 Gson；HTTP 服务使用 JDK 的 `jdk.httpserver`。

@@ -18,6 +18,11 @@ on:
         required: false
         default: false
         type: boolean
+      updater_only:
+        description: Build and publish only the standalone updater preview
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -26,8 +31,20 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  updater-preview:
+    if: inputs.updater_only
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/docker-updater-preview.yml
+    with:
+      ref: ${{ inputs.ref }}
+      push_image: ${{ inputs.push_image }}
+    secrets: inherit
+
   prepare:
     name: Resolve preview Native packages
+    if: ${{ !inputs.updater_only }}
     runs-on: ubuntu-latest
     outputs:
       source_commit: ${{ steps.source.outputs.commit }}
