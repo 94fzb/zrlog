@@ -2,6 +2,11 @@ name: Build Docker updater acceptance application
 
 on:
   workflow_dispatch:
+    inputs:
+      metadata_origin:
+        description: HTTPS metadata origin embedded in build.properties
+        type: string
+        default: https://dl.zrlog.com/
   push:
     branches: [codex/docker-compose-updater]
     paths: [.github/workflows/docker-updater-acceptance.yml]
@@ -54,7 +59,7 @@ jobs:
         working-directory: app
         shell: bash
         env:
-          ZRLOG_MIRROR_WEBSITE: https://metadata:8443/
+          ZRLOG_MIRROR_WEBSITE: ${{ inputs.metadata_origin || 'https://dl.zrlog.com/' }}
         run: |
           bash shell/native/build-final-native.sh preview /tmp/updater-acceptance zip
           ./zrlog --version
