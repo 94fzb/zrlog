@@ -25,6 +25,9 @@ services:
     image: ${ZRLOG_IMAGE:-zrlog/zrlog:3.9.2}
     restart: unless-stopped
     init: true
+    environment:
+      ZRLOG_UPDATER_URL: http://updater:8081
+      ZRLOG_UPDATER_TOKEN: ${ZRLOG_UPDATER_TOKEN:?Set a random ZRLOG_UPDATER_TOKEN in .env}
     depends_on:
       mysql:
         condition: service_healthy
@@ -49,7 +52,43 @@ services:
         max-size: "10m"
         max-file: "3"
 
+  updater:
+    image: ${ZRLOG_UPDATER_IMAGE:-registry.cn-chengdu.aliyuncs.com/hibegin/zrlog-updater:1.0.0-preview.1ef3c8e7cd37.38146772016.1}
+    restart: unless-stopped
+    init: true
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      UPDATER_TOKEN: ${ZRLOG_UPDATER_TOKEN:?Set a random ZRLOG_UPDATER_TOKEN in .env}
+      UPDATER_PROJECT: ${COMPOSE_PROJECT_NAME:?Set COMPOSE_PROJECT_NAME; preserve the existing name on upgrades}
+      UPDATER_DEPLOYMENT_DIR: ${ZRLOG_DEPLOYMENT_DIR:?Set the absolute host deployment path in .env}
+      UPDATER_COMPOSE_FILES: ${ZRLOG_COMPOSE_FILES:-docker-compose.yml}
+    volumes:
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+      - type: bind
+        source: ${ZRLOG_DEPLOYMENT_DIR:?Set ZRLOG_DEPLOYMENT_DIR}
+        target: ${ZRLOG_DEPLOYMENT_DIR:?Set ZRLOG_DEPLOYMENT_DIR}
+      - updater-state:/var/lib/zrlog-updater
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/zrlog-updater", "--healthcheck"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    stop_grace_period: 45s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
 volumes:
   mysql-data:
   conf:
   static:
+  updater-state:

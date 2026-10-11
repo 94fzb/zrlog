@@ -1,6 +1,7 @@
 # Docker Compose 部署
 
-仓库中的 [`docker/docker-compose.yml`](../docker/docker-compose.yml) 可以同时启动 ZrLog 和 MySQL 8.4。
+仓库中的 [`docker/docker-compose.yml`](../docker/docker-compose.yml) 同时启动 ZrLog、MySQL 8.4
+和独立的 [updater 服务](https://github.com/zrlog/zrlog-updater)。新配置无需再叠加 updater 文件。
 
 ## 启动
 
@@ -9,7 +10,17 @@ cd docker
 cp .env.example .env
 ```
 
-编辑 `.env`，为 `MYSQL_PASSWORD` 设置一个随机强密码，然后启动服务：
+编辑 `.env`，填写以下配置：
+
+- `MYSQL_PASSWORD`：随机数据库密码。
+- `COMPOSE_PROJECT_NAME`：新站点可填 `zrlog`；已有站点必须填写原项目名，以继续使用原数据卷。
+- `ZRLOG_DEPLOYMENT_DIR`：当前部署目录的宿主机绝对路径（即包含 `.env` 和 Compose 文件的目录）。
+- `ZRLOG_UPDATER_TOKEN`：至少 32 位随机令牌，可用 `openssl rand -hex 32` 生成。
+
+`ZRLOG_IMAGE`、`ZRLOG_UPDATER_IMAGE`、`MYSQL_IMAGE` 均接受完整镜像地址。updater 默认固定
+到已经公开验证的阿里云双架构预览镜像，`.env.example` 同时给出 Docker Hub 地址。
+中国地区可将应用镜像改为 `registry.cn-chengdu.aliyuncs.com/hibegin/zrlog:3.9.2`，并选择可访问的
+MySQL 镜像来源。然后启动服务：
 
 ```bash
 docker compose up --detach
@@ -26,15 +37,30 @@ MySQL 健康后 ZrLog 才会启动。访问 [http://localhost:8080/install](http
 | 用户名 | `.env` 中的 `MYSQL_USER`，默认 `zrlog` |
 | 密码 | `.env` 中的 `MYSQL_PASSWORD` |
 
+## 后台升级
+
+默认应用版本仍为 3.9.2，尚不包含本次 Docker 后台升级集成。使用包含该集成且有已发布
+应用镜像清单的版本后，即可通过现有更新设置选择镜像仓库并提交升级任务。updater 的版本
+与应用版本独立；它只替换 `zrlog` 服务，不升级 MySQL。
+
+updater 端口仅在 Compose 网络内可用，通过共享令牌与应用通信。它挂载 Docker socket，
+以及宿主机部署目录到容器中的相同绝对路径，用于保留 Compose 配置并更新 `.env` 的镜像引用。
+保持 `ZRLOG_COMPOSE_FILES=docker-compose.yml` 与实际启动文件一致。
+
+已有自定义 Compose 可使用 [`docker-compose.updater.yml`](../docker/docker-compose.updater.yml)
+附加配置，此时设置 `ZRLOG_COMPOSE_FILES=docker-compose.yml,docker-compose.updater.yml`，
+并用相同顺序的两个 `-f` 参数启动。已有站点只补齐所需配置，保留原项目名、镜像及存储设置。
+
 ## 健康检查
 
-Compose 分别检查 MySQL 和 ZrLog：MySQL 探针验证数据库进程可连接，ZrLog 探针通过
+Compose 分别检查 MySQL、ZrLog 和 updater：updater 探针验证自身 HTTP 服务，MySQL 探针验证数据库进程可连接，ZrLog 探针通过
 `/api/public/version` 验证 HTTP 服务存活。版本接口不执行数据库查询，因此它是 liveness
 检查，不代表已安装站点的数据库 readiness。
 
 ## 数据与生产配置
 
-`mysql-data`、`conf` 和 `static` 是需要备份的命名卷。其中 `static` 包含附件、自定义主题和
+`mysql-data`、`conf`、`static` 和 `updater-state` 是需要备份的命名卷。`updater-state` 保存
+升级任务与恢复信息；`static` 包含附件、自定义主题和
 站点静态文件。执行 `docker compose down` 会保留这些数据；不要在没有备份的情况下执行
 `docker compose down --volumes`。
 

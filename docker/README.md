@@ -49,13 +49,15 @@ docker run --name zrlog \
 
 ## Docker Compose 与后台升级
 
-`docker-compose.yml` 提供 ZrLog、MySQL 和持久化卷。复制 `.env.example` 为 `.env`，
-设置数据库密码后启动。`ZRLOG_IMAGE`、`MYSQL_IMAGE` 都可填写该环境能访问的完整镜像地址；
+`docker-compose.yml` 提供 ZrLog、MySQL、独立 updater 和持久化卷。复制 `.env.example` 为 `.env`，
+填写数据库密码、项目名、部署目录绝对路径和随机 updater 令牌后启动。
+`ZRLOG_IMAGE`、`ZRLOG_UPDATER_IMAGE`、`MYSQL_IMAGE` 都可填写该环境能访问的完整镜像地址；
 ZrLog 官方阿里云仓库为 `registry.cn-chengdu.aliyuncs.com/hibegin/zrlog`。
 
 后台升级需要包含此功能的 ZrLog 版本，以及独立的 updater 容器。启用方法见
-[updater 部署说明](https://github.com/zrlog/zrlog-updater#compose-配置)，使用附加配置
-`docker-compose.updater.yml`。已有站点必须保留原项目名、数据卷和部署目录；首次接入
+[Compose 部署说明](../doc/docker-compose.md)。默认配置已包含 updater，旧版或自定义配置可使用
+附加配置 `docker-compose.updater.yml`。默认应用 3.9.2 尚不包含本次后台升级集成。
+已有站点必须保留原项目名、数据卷和部署目录；首次接入
 需要管理员更新部署配置，接入后日常升级可在后台完成。
 
 在「更新设置」加载可用镜像仓库并保存选择，再到升级页面检查版本、确认风险并开始升级。

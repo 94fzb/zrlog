@@ -1,4 +1,5 @@
-# Optional overlay: use with the existing docker-compose.yml and the same project name.
+# Compatibility overlay for an older/custom Compose file without updater.
+# The current default docker-compose.yml already includes this service.
 services:
   zrlog:
     environment:

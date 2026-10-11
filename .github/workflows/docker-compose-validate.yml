@@ -6,6 +6,8 @@ on:
       - docker/Dockerfile
       - docker/Dockerfile.windows
       - docker/docker-compose.yml
+      - docker/docker-compose.updater.yml
+      - docker/test-compose-updater-config.sh
       - docker/.env.example
       - docker/resolve-native-package.sh
       - docker/test-native-package-contract.sh
@@ -19,6 +21,8 @@ on:
       - docker/Dockerfile
       - docker/Dockerfile.windows
       - docker/docker-compose.yml
+      - docker/docker-compose.updater.yml
+      - docker/test-compose-updater-config.sh
       - docker/.env.example
       - docker/resolve-native-package.sh
       - docker/test-native-package-contract.sh
@@ -49,6 +53,4 @@ jobs:
         run: bash docker/test-native-package-contract.sh
 
       - name: Validate configuration
-        env:
-          MYSQL_PASSWORD: compose-validation-password
-        run: docker compose --file docker/docker-compose.yml config --quiet
+        run: bash docker/test-compose-updater-config.sh
