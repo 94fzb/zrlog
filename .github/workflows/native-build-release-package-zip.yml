@@ -37,6 +37,10 @@ jobs:
         run: |
           mkdir -p .release-output
           bash -e shell/native/build-final-native.sh release .release-output zip
+      - name: Build standalone Linux updater package
+        if: runner.os == 'Linux'
+        shell: bash
+        run: bash docker/updater/build-package.sh .release-output/release
       - name: Attest release artifact
         uses: actions/attest-build-provenance@v4
         with:

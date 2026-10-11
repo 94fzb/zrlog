@@ -2,6 +2,26 @@
 
 > ZrLog 提供 Zip、War、Deb 等运行包，可部署在常见 Linux 环境中。Native Image 包也可用于树莓派等 arm64 Linux 设备。
 
+### 更新元数据配置
+
+`bin/add-build-info.sh` 生成应用包内 `build.properties`。以下配置由构建决定：
+
+| 属性 | 默认值 | 用途 |
+| --- | --- | --- |
+| `mirrorWebSite` | `https://dl.zrlog.com/` | 版本元数据基址 |
+| `updateVersionJsonFilename` | 由包类型和架构确定 | ZIP/WAR/Native 文件包清单 |
+| `dockerUpdateVersionJsonFilename` | `last.docker-image.version.json` | Docker 运行模式的镜像清单 |
+
+定制构建可分别传入 `ZRLOG_MIRROR_WEBSITE`、`ZRLOG_UPDATE_VERSION_JSON_FILENAME` 和
+`ZRLOG_DOCKER_UPDATE_VERSION_JSON_FILENAME`。实际检查地址是
+`<mirrorWebSite>/<release或preview>/<清单文件名>`，要求 HTTPS。后台更新设置选择
+安装包下载源或镜像仓库，元数据地址不通过页面修改。
+
+独立 [Docker updater](../docker/updater/README.md) 使用自己的 `build.properties`；它的
+`mirrorWebSite` 与应用一致，`updateVersionJsonFilename` 对应应用的 Docker 清单名。
+两端配置不一致时拒绝开启容器升级。updater 使用独立 POM，只带 Gson 和 JDK HTTP 服务，
+不继承主工程的页面、安装、数据库或主题依赖。
+
 ### Polyglot / Hexo 运行时边界
 
 这是产品约定，不以当前 JDK 是否具备运行 GraalJS 的技术条件为依据。

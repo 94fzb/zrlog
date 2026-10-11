@@ -64,6 +64,16 @@ FaaS 和 Docker 制品构建。相关入口包括：
 构建产生的 `build.properties` 和 `last*.version.json` 仍由正式构建链生成和校验，不能在
 开发工作区中作为手工发版依据。
 
+Linux Native 构建同时生成独立 updater ZIP。Release Order v5 的可选
+`artifacts.updater_attachments` 明确批准 AMD64/ARM64 两个附件；未声明的附件不进入
+GitHub Release。镜像发布流程读取相同版本、提交和 SHA-256 的 updater 包，为 Docker Hub
+与阿里云生成并验证独立 updater 镜像。
+
+Docker release/preview 发布在镜像验证后分别读取各仓库实际 digest，先写不可变镜像
+清单，再条件更新 `last.docker-image.version.json`。GitHub 正式 Release 公开后，
+`update-package-sources.yml` 逐项下载并校验 GitHub/dl 的包，验证字节一致后才补充
+`zipSources`/`warSources`；保留原 URL 字段，失败不切换到未经验证的来源。
+
 ## 禁止的旧流程
 
 以下动作已经退出正式发布流程：

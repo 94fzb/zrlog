@@ -177,6 +177,9 @@ for ((attempt = 1; attempt <= attempts; attempt++)); do
       if [[ -n "${mirrorBaseUrl}" ]]; then
         downloadUrl="${mirrorBaseUrl}${packageUrl#"${canonicalBaseUrl}"}"
       fi
+      if [[ -n "${ZRLOG_NATIVE_METADATA_OUTPUT:-}" ]]; then
+        cp "${manifestFile}" "${ZRLOG_NATIVE_METADATA_OUTPUT}"
+      fi
       emitPackage "${downloadUrl}" "${packageSha256}"
       exit 0
     fi

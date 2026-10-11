@@ -30,6 +30,10 @@ env:
   DOCKERHUB_IMAGE: zrlog/zrlog
   ALIYUN_IMAGE: registry.cn-chengdu.aliyuncs.com/hibegin/zrlog
 
+concurrency:
+  group: docker-release-publish
+  cancel-in-progress: false
+
 jobs:
   prepare:
     name: Prepare Docker release
@@ -86,6 +90,7 @@ jobs:
       - name: Resolve Linux AMD64 Native package
         id: native_linux_amd64
         env:
+          ZRLOG_NATIVE_METADATA_OUTPUT: native-image-input.json
           ZRLOG_EXPECTED_SOURCE_COMMIT: ${{ steps.source.outputs.commit }}
           ZRLOG_EXPECTED_VERSION: ${{ steps.version.outputs.value }}
           ZRLOG_NATIVE_RESOLVE_ATTEMPTS: "6"
@@ -116,6 +121,13 @@ jobs:
           bash docker/resolve-native-package.sh release Windows-x86_64
           https://dl.zrlog.com/release/last.Windows-x86_64.version.json
 
+      - name: Preserve validated Native metadata
+        uses: actions/upload-artifact@v7
+        with:
+          name: docker-native-input-${{ github.run_attempt }}
+          path: native-image-input.json
+          if-no-files-found: error
+
   build-linux:
     name: Build Linux image (${{ matrix.platform }})
     needs: prepare
@@ -139,6 +151,12 @@ jobs:
         uses: actions/checkout@v7
         with:
           ref: ${{ needs.prepare.outputs.source_commit }}
+
+      - name: Read validated Native build identity
+        uses: actions/download-artifact@v8
+        with:
+          name: docker-native-input-${{ github.run_attempt }}
+          path: .docker-metadata
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -173,6 +191,7 @@ jobs:
             ZRLOG_NATIVE_ZIP_URL=${{ env.ZRLOG_NATIVE_ZIP_URL }}
             ZRLOG_NATIVE_ZIP_SHA256=${{ env.ZRLOG_NATIVE_ZIP_SHA256 }}
             ZRLOG_EXPECTED_VERSION=${{ env.ZRLOG_EXPECTED_VERSION }}
+            ZRLOG_SOURCE_COMMIT=${{ needs.prepare.outputs.source_commit }}
             CACHE_BUST=${{ github.run_id }}-${{ github.run_attempt }}
           outputs: >-
             type=image,name=${{ env.DOCKERHUB_IMAGE }},push-by-digest=true,name-canonical=true,push=true
@@ -192,6 +211,7 @@ jobs:
             ZRLOG_NATIVE_ZIP_URL=${{ env.ZRLOG_NATIVE_ZIP_URL }}
             ZRLOG_NATIVE_ZIP_SHA256=${{ env.ZRLOG_NATIVE_ZIP_SHA256 }}
             ZRLOG_EXPECTED_VERSION=${{ env.ZRLOG_EXPECTED_VERSION }}
+            ZRLOG_SOURCE_COMMIT=${{ needs.prepare.outputs.source_commit }}
             CACHE_BUST=${{ github.run_id }}-${{ github.run_attempt }}
           outputs: >-
             type=image,name=${{ env.ALIYUN_IMAGE }},push-by-digest=true,name-canonical=true,push=true
@@ -229,15 +249,20 @@ jobs:
         if: needs.prepare.outputs.push_image == 'true'
         env:
           IMAGE_DIGEST: ${{ steps.image.outputs.digest }}
+          EXPECTED_COMMIT: ${{ needs.prepare.outputs.source_commit }}
+          PLATFORM: ${{ matrix.platform }}
         run: |
           : "${IMAGE_DIGEST:?image digest is required}"
-          version_output=$(docker run --rm --entrypoint /opt/zrlog/zrlog \
-            "${DOCKERHUB_IMAGE}@${IMAGE_DIGEST}" --version)
-          printf '%s\n' "${version_output}"
-          if [[ "${version_output}" != "zrlog version:${ZRLOG_EXPECTED_VERSION} - "* ]]; then
-            echo "zrlog --version did not report expected version ${ZRLOG_EXPECTED_VERSION}" >&2
-            exit 1
-          fi
+          build_id=$(jq -r .buildId .docker-metadata/native-image-input.json)
+          for repository in "${DOCKERHUB_IMAGE}" "${ALIYUN_IMAGE}"; do
+            reference="${repository}@${IMAGE_DIGEST}"
+            docker pull --platform "${PLATFORM}" "${reference}"
+            version_output=$(docker run --rm --platform "${PLATFORM}" --entrypoint /opt/zrlog/zrlog "${reference}" --version)
+            version_output="${version_output/ version: / version:}"
+            [[ "${version_output}" == "zrlog version:${ZRLOG_EXPECTED_VERSION} - ${build_id} "* ]]
+            docker image inspect "${reference}" | jq -e --arg version "${ZRLOG_EXPECTED_VERSION}" --arg commit "${EXPECTED_COMMIT}" \
+              '.[0].Config.Labels | .["org.opencontainers.image.version"] == $version and .["org.opencontainers.image.revision"] == $commit'
+          done
 
       - name: Export Linux image digest
         if: needs.prepare.outputs.push_image == 'true'
@@ -272,6 +297,7 @@ jobs:
             ZRLOG_NATIVE_ZIP_URL=${{ env.ZRLOG_NATIVE_ZIP_URL }}
             ZRLOG_NATIVE_ZIP_SHA256=${{ env.ZRLOG_NATIVE_ZIP_SHA256 }}
             ZRLOG_EXPECTED_VERSION=${{ env.ZRLOG_EXPECTED_VERSION }}
+            ZRLOG_SOURCE_COMMIT=${{ needs.prepare.outputs.source_commit }}
             CACHE_BUST=${{ github.run_id }}-${{ github.run_attempt }}
           tags: zrlog-local:${{ matrix.arch }}
 
@@ -281,6 +307,7 @@ jobs:
           version_output=$(docker run --rm --entrypoint /opt/zrlog/zrlog \
             "zrlog-local:${{ matrix.arch }}" --version)
           printf '%s\n' "${version_output}"
+          version_output="${version_output/ version: / version:}"
           if [[ "${version_output}" != "zrlog version:${ZRLOG_EXPECTED_VERSION} - "* ]]; then
             echo "zrlog --version did not report expected version ${ZRLOG_EXPECTED_VERSION}" >&2
             exit 1
@@ -291,11 +318,19 @@ jobs:
     needs:
       - prepare
       - build-linux
+      - updater-merge
     runs-on: ubuntu-22.04
     if: needs.prepare.outputs.push_image == 'true'
     env:
       DOCKER_TAG_VERSION: ${{ needs.prepare.outputs.version }}
     steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.prepare.outputs.source_commit }}
+      - uses: actions/download-artifact@v8
+        with:
+          name: docker-native-input-${{ github.run_attempt }}
+          path: .docker-metadata
       - name: Download Linux image digests
         uses: actions/download-artifact@v8
         with:
@@ -383,10 +418,10 @@ jobs:
             exit 1
           fi
 
-          dockerhub_digest="sha256:$(docker buildx imagetools inspect \
-            "${DOCKERHUB_IMAGE}:${DOCKER_TAG_VERSION}" --raw | sha256sum | cut -d' ' -f1)"
-          aliyun_digest="sha256:$(docker buildx imagetools inspect \
-            "${ALIYUN_IMAGE}:${DOCKER_TAG_VERSION}" --raw | sha256sum | cut -d' ' -f1)"
+          dockerhub_digest=$(docker buildx imagetools inspect \
+            "${DOCKERHUB_IMAGE}:${DOCKER_TAG_VERSION}" --format '{{.Manifest.Digest}}')
+          aliyun_digest=$(docker buildx imagetools inspect \
+            "${ALIYUN_IMAGE}:${DOCKER_TAG_VERSION}" --format '{{.Manifest.Digest}}')
           echo "Docker Hub manifest: ${DOCKERHUB_IMAGE}@${dockerhub_digest}"
           echo "Aliyun manifest: ${ALIYUN_IMAGE}@${aliyun_digest}"
           echo "dockerhub=${DOCKERHUB_IMAGE}@${dockerhub_digest}" >> "${GITHUB_OUTPUT}"
@@ -399,6 +434,27 @@ jobs:
 
       - name: Sign canonical Docker image
         run: cosign sign --yes "${{ steps.manifest.outputs.dockerhub }}"
+
+      - name: Generate Docker update metadata
+        env:
+          DOCKERHUB_REF: ${{ steps.manifest.outputs.dockerhub }}
+          ALIYUN_REF: ${{ steps.manifest.outputs.aliyun }}
+        run: |
+          python3 docker/collect-image-manifest.py \
+            --native-metadata .docker-metadata/native-image-input.json \
+            --channel release --tag "${DOCKER_TAG_VERSION}" \
+            --image "${DOCKERHUB_REF}" --image "${ALIYUN_REF}" \
+            --platform linux/amd64 --platform linux/arm64 \
+            --output .docker-metadata/last.docker-image.version.json
+      - name: Publish Docker update metadata after image verification
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.SECRET_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET_KEY }}
+          ZRLOG_S3_BUCKET: ${{ secrets.BUCKET }}
+          ZRLOG_S3_ENDPOINT: ${{ secrets.HOST }}
+        run: |
+          python3 -m pip install 'boto3>=1.40,<2'
+          python3 docker/publish-image-manifest.py .docker-metadata/last.docker-image.version.json
 
   build-windows:
     name: Build Windows image (windows/amd64)
@@ -458,7 +514,7 @@ jobs:
           if ($exitCode -ne 0) {
             throw "zrlog.exe --version exited with code ${exitCode}"
           }
-          $versionOutput = ($output -join [Environment]::NewLine).Trim()
+          $versionOutput = ($output -join [Environment]::NewLine).Trim().Replace(" version: ", " version:")
           $expectedPrefix = "zrlog.exe version:$env:ZRLOG_EXPECTED_VERSION - "
           if (-not $versionOutput.StartsWith($expectedPrefix, [StringComparison]::Ordinal)) {
             throw "zrlog.exe --version did not report expected version $env:ZRLOG_EXPECTED_VERSION"
@@ -498,3 +554,130 @@ jobs:
       - name: Sign canonical Windows image
         if: needs.prepare.outputs.push_image == 'true'
         run: cosign sign --yes "${{ steps.push.outputs.dockerhub }}"
+
+  updater-linux:
+    name: Build standalone updater (${{ matrix.platform }})
+    needs: prepare
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-22.04
+            platform: linux/amd64
+            arch: amd64
+          - runner: ubuntu-24.04-arm
+            platform: linux/arm64
+            arch: arm64
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.prepare.outputs.source_commit }}
+      - uses: docker/setup-buildx-action@v4
+      - name: Resolve and verify the exact updater binary
+        env:
+          EXPECTED_VERSION: ${{ needs.prepare.outputs.version }}
+          EXPECTED_COMMIT: ${{ needs.prepare.outputs.source_commit }}
+          ARCH: ${{ matrix.arch }}
+        run: |
+          python3 docker/updater/fetch-package.py --platform "Linux-${ARCH}" \
+            --version "${EXPECTED_VERSION}" --commit "${EXPECTED_COMMIT}" \
+            --output docker/updater/target/zrlog-updater
+          [[ $(docker/updater/target/zrlog-updater --version) == "zrlog-updater ${EXPECTED_VERSION}" ]]
+          python3 docker/updater/smoke-native.py docker/updater/target/zrlog-updater
+      - uses: docker/login-action@v4.6.0
+        if: needs.prepare.outputs.push_image == 'true'
+        with:
+          username: zrlog
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - uses: docker/login-action@v4.6.0
+        if: needs.prepare.outputs.push_image == 'true'
+        with:
+          registry: registry.cn-chengdu.aliyuncs.com
+          username: 90xchun
+          password: ${{ secrets.ALIYUN_DOCKER_PASSWORD }}
+      - name: Build and test updater container
+        env:
+          EXPECTED_VERSION: ${{ needs.prepare.outputs.version }}
+          EXPECTED_COMMIT: ${{ needs.prepare.outputs.source_commit }}
+        run: |
+          docker build --tag zrlog-updater:verified \
+            --build-arg "ZRLOG_UPDATER_VERSION=${EXPECTED_VERSION}" \
+            --build-arg "ZRLOG_UPDATER_COMMIT=${EXPECTED_COMMIT}" docker/updater
+          [[ $(docker run --rm zrlog-updater:verified --version) == "zrlog-updater ${EXPECTED_VERSION}" ]]
+      - name: Publish updater to Docker Hub
+        id: updater_dockerhub
+        if: needs.prepare.outputs.push_image == 'true'
+        uses: docker/build-push-action@v7
+        with:
+          context: ./docker/updater
+          platforms: ${{ matrix.platform }}
+          push: true
+          provenance: mode=max
+          sbom: true
+          tags: zrlog/zrlog-updater:${{ needs.prepare.outputs.version }}-${{ matrix.arch }}
+          build-args: |
+            ZRLOG_UPDATER_VERSION=${{ needs.prepare.outputs.version }}
+            ZRLOG_UPDATER_COMMIT=${{ needs.prepare.outputs.source_commit }}
+      - name: Publish updater to Aliyun
+        id: updater_aliyun
+        if: needs.prepare.outputs.push_image == 'true'
+        uses: docker/build-push-action@v7
+        with:
+          context: ./docker/updater
+          platforms: ${{ matrix.platform }}
+          push: true
+          provenance: false
+          sbom: false
+          tags: registry.cn-chengdu.aliyuncs.com/hibegin/zrlog-updater:${{ needs.prepare.outputs.version }}-${{ matrix.arch }}
+          build-args: |
+            ZRLOG_UPDATER_VERSION=${{ needs.prepare.outputs.version }}
+            ZRLOG_UPDATER_COMMIT=${{ needs.prepare.outputs.source_commit }}
+
+      - name: Verify published updater images by digest
+        if: needs.prepare.outputs.push_image == 'true'
+        env:
+          EXPECTED_VERSION: ${{ needs.prepare.outputs.version }}
+          EXPECTED_COMMIT: ${{ needs.prepare.outputs.source_commit }}
+          DOCKERHUB_DIGEST: ${{ steps.updater_dockerhub.outputs.digest }}
+          ALIYUN_DIGEST: ${{ steps.updater_aliyun.outputs.digest }}
+          PLATFORM: ${{ matrix.platform }}
+        run: |
+          set -euo pipefail
+          for ref in "zrlog/zrlog-updater@${DOCKERHUB_DIGEST}" \
+            "registry.cn-chengdu.aliyuncs.com/hibegin/zrlog-updater@${ALIYUN_DIGEST}"; do
+            docker pull --platform "${PLATFORM}" "${ref}"
+            [[ $(docker run --rm --platform "${PLATFORM}" "${ref}" --version) == "zrlog-updater ${EXPECTED_VERSION}" ]]
+            docker image inspect "${ref}" | jq -e --arg version "${EXPECTED_VERSION}" --arg commit "${EXPECTED_COMMIT}" \
+              '.[0].Config.Labels | .["org.opencontainers.image.version"] == $version and .["org.opencontainers.image.revision"] == $commit'
+          done
+
+  updater-merge:
+    name: Publish updater multi-architecture images
+    needs: [prepare, updater-linux]
+    if: needs.prepare.outputs.push_image == 'true'
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: docker/setup-buildx-action@v4
+      - uses: sigstore/cosign-installer@v3
+      - uses: docker/login-action@v4.6.0
+        with:
+          username: zrlog
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - uses: docker/login-action@v4.6.0
+        with:
+          registry: registry.cn-chengdu.aliyuncs.com
+          username: 90xchun
+          password: ${{ secrets.ALIYUN_DOCKER_PASSWORD }}
+      - name: Publish and verify each registry index
+        env:
+          VERSION: ${{ needs.prepare.outputs.version }}
+        run: |
+          for repository in zrlog/zrlog-updater registry.cn-chengdu.aliyuncs.com/hibegin/zrlog-updater; do
+            docker buildx imagetools create --tag "${repository}:${VERSION}" \
+              "${repository}:${VERSION}-amd64" "${repository}:${VERSION}-arm64"
+            docker buildx imagetools inspect "${repository}:${VERSION}" --raw | jq -e \
+              '([.manifests[] | select(.platform.os == "linux") | .platform.architecture] | sort) == ["amd64", "arm64"]'
+            digest=$(docker buildx imagetools inspect "${repository}:${VERSION}" --format '{{.Manifest.Digest}}')
+            cosign sign --yes "${repository}@${digest}"
+          done

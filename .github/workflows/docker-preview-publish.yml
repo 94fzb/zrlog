@@ -9,7 +9,7 @@ on:
         default: master
         type: string
       push_image:
-        description: Push image to Docker Hub
+        description: Push verified images and update metadata
         required: false
         default: false
         type: boolean
@@ -18,6 +18,12 @@ on:
         required: false
         default: false
         type: boolean
+
+permissions:
+  contents: read
+concurrency:
+  group: docker-preview-publish
+  cancel-in-progress: false
 
 jobs:
   prepare:
@@ -60,6 +66,7 @@ jobs:
       - name: Resolve Linux AMD64 Native package
         id: native_linux_amd64
         env:
+          ZRLOG_NATIVE_METADATA_OUTPUT: native-image-input.json
           ZRLOG_EXPECTED_SOURCE_COMMIT: ${{ steps.source.outputs.commit }}
           ZRLOG_EXPECTED_VERSION: ${{ steps.version.outputs.value }}
           ZRLOG_NATIVE_MIRROR_BASE_URL: https://pub-c16cba848aff4e6b8d8e0d00f0f741f0.r2.dev
@@ -82,6 +89,13 @@ jobs:
           bash docker/resolve-native-package.sh preview Windows-x86_64
           https://pub-c16cba848aff4e6b8d8e0d00f0f741f0.r2.dev/preview/last.Windows-x86_64.version.json
 
+      - name: Preserve validated Native metadata
+        uses: actions/upload-artifact@v7
+        with:
+          name: docker-native-input-${{ github.run_attempt }}
+          path: native-image-input.json
+          if-no-files-found: error
+
   build:
     name: Build preview Docker image
     needs: prepare
@@ -102,6 +116,17 @@ jobs:
           username: zrlog
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - uses: actions/download-artifact@v8
+        with:
+          name: docker-native-input-${{ github.run_attempt }}
+          path: .docker-metadata
+      - name: Login to Aliyun
+        if: inputs.push_image
+        uses: docker/login-action@v4.6.0
+        with:
+          registry: registry.cn-chengdu.aliyuncs.com
+          username: 90xchun
+          password: ${{ secrets.ALIYUN_DOCKER_PASSWORD }}
       - name: Build and push
         uses: docker/build-push-action@v7
         with:
@@ -115,8 +140,46 @@ jobs:
             ZRLOG_NATIVE_ZIP_SHA256=${{ needs.prepare.outputs.linux_amd64_sha256 }}
             ZRLOG_NATIVE_MIRROR_BASE_URL=https://pub-c16cba848aff4e6b8d8e0d00f0f741f0.r2.dev
             ZRLOG_EXPECTED_VERSION=${{ needs.prepare.outputs.version }}
+            ZRLOG_SOURCE_COMMIT=${{ needs.prepare.outputs.source_commit }}
             CACHE_BUST=${{ github.run_id }}-${{ github.run_attempt }}
-          tags: zrlog/zrlog-preview:latest
+          tags: |
+            zrlog/zrlog-preview:latest
+            zrlog/zrlog:${{ needs.prepare.outputs.version }}-${{ needs.prepare.outputs.source_commit }}-preview
+            registry.cn-chengdu.aliyuncs.com/hibegin/zrlog:${{ needs.prepare.outputs.version }}-${{ needs.prepare.outputs.source_commit }}-preview
+
+      - name: Verify published preview images and collect metadata
+        if: inputs.push_image
+        env:
+          IMAGE_TAG: ${{ needs.prepare.outputs.version }}-${{ needs.prepare.outputs.source_commit }}-preview
+          EXPECTED_VERSION: ${{ needs.prepare.outputs.version }}
+          EXPECTED_COMMIT: ${{ needs.prepare.outputs.source_commit }}
+        run: |
+          refs=()
+          for repository in zrlog/zrlog registry.cn-chengdu.aliyuncs.com/hibegin/zrlog; do
+            digest=$(docker buildx imagetools inspect "${repository}:${IMAGE_TAG}" --format '{{.Manifest.Digest}}')
+            reference="${repository}@${digest}"
+            docker pull --platform linux/amd64 "${reference}"
+            output=$(docker run --rm --entrypoint /opt/zrlog/zrlog "${reference}" --version)
+            build_id=$(jq -r .buildId .docker-metadata/native-image-input.json)
+            output="${output/ version: / version:}"
+            [[ "${output}" == "zrlog version:${EXPECTED_VERSION} - ${build_id} "* ]]
+            [[ $(docker image inspect --format '{{index .Config.Labels "org.opencontainers.image.revision"}}' "${reference}") == "${EXPECTED_COMMIT}" ]]
+            refs+=(--image "${reference}")
+          done
+          python3 docker/collect-image-manifest.py \
+            --native-metadata .docker-metadata/native-image-input.json \
+            --channel preview --tag "${IMAGE_TAG}" "${refs[@]}" \
+            --platform linux/amd64 --output .docker-metadata/last.docker-image.version.json
+      - name: Publish preview update metadata after image verification
+        if: inputs.push_image
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.SECRET_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET_KEY }}
+          ZRLOG_S3_BUCKET: ${{ secrets.BUCKET }}
+          ZRLOG_S3_ENDPOINT: ${{ secrets.HOST }}
+        run: |
+          python3 -m pip install 'boto3>=1.40,<2'
+          python3 docker/publish-image-manifest.py .docker-metadata/last.docker-image.version.json
 
   validate-windows:
     name: Validate preview Windows image
@@ -163,7 +226,7 @@ jobs:
           if ($exitCode -ne 0) {
             throw "zrlog.exe --version exited with code ${exitCode}"
           }
-          $versionOutput = ($output -join [Environment]::NewLine).Trim()
+          $versionOutput = ($output -join [Environment]::NewLine).Trim().Replace(" version: ", " version:")
           $expectedPrefix = "zrlog.exe version:$env:ZRLOG_EXPECTED_VERSION - "
           if (-not $versionOutput.StartsWith($expectedPrefix, [StringComparison]::Ordinal)) {
             throw "zrlog.exe --version did not report expected version $env:ZRLOG_EXPECTED_VERSION"

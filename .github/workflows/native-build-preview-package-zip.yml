@@ -37,4 +37,5 @@ jobs:
         run: |
           mkdir -p /tmp/download
           bash -e shell/native/build-final-native.sh preview /tmp/download zip
+          bash docker/updater/build-package.sh /tmp/download/preview
           bash -e shell/upload-bin.sh ${{ secrets.SECRET_ID }} ${{ secrets.SECRET_KEY }} ${{ secrets.BUCKET }} /tmp/download preview ${{ secrets.HOST }}

@@ -1,0 +1,44 @@
+# Optional overlay: use with the existing docker-compose.yml and the same project name.
+services:
+  zrlog:
+    environment:
+      ZRLOG_UPDATER_URL: http://updater:8081
+      ZRLOG_UPDATER_TOKEN: ${ZRLOG_UPDATER_TOKEN:?Set ZRLOG_UPDATER_TOKEN in .env}
+
+  updater:
+    image: ${ZRLOG_UPDATER_IMAGE:?Set ZRLOG_UPDATER_IMAGE to a published updater image or a locally built image}
+    restart: unless-stopped
+    init: true
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      UPDATER_TOKEN: ${ZRLOG_UPDATER_TOKEN:?Set ZRLOG_UPDATER_TOKEN in .env}
+      UPDATER_PROJECT: ${COMPOSE_PROJECT_NAME:?Set COMPOSE_PROJECT_NAME to the existing project name}
+      UPDATER_DEPLOYMENT_DIR: ${ZRLOG_DEPLOYMENT_DIR:?Set ZRLOG_DEPLOYMENT_DIR to this directory's absolute host path}
+      UPDATER_COMPOSE_FILES: ${ZRLOG_COMPOSE_FILES:-docker-compose.yml,docker-compose.updater.yml}
+    volumes:
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+      - type: bind
+        source: ${ZRLOG_DEPLOYMENT_DIR:?Set ZRLOG_DEPLOYMENT_DIR}
+        target: ${ZRLOG_DEPLOYMENT_DIR:?Set ZRLOG_DEPLOYMENT_DIR}
+      - updater-state:/var/lib/zrlog-updater
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/zrlog-updater", "--healthcheck"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    stop_grace_period: 45s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  updater-state:

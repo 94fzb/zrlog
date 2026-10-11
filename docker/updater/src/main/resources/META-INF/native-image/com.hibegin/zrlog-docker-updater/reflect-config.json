@@ -1,0 +1,12 @@
+[
+  {"name":"com.zrlog.updater.Protocol$UpgradeRequest","allDeclaredConstructors":true,"allDeclaredFields":true},
+  {"name":"com.zrlog.updater.Protocol$Settings","allDeclaredConstructors":true,"allDeclaredFields":true},
+  {"name":"com.zrlog.updater.Protocol$SettingsResponse","allDeclaredConstructors":true,"allDeclaredFields":true},
+  {"name":"com.zrlog.updater.Protocol$Manifest","allDeclaredConstructors":true,"allDeclaredFields":true},
+  {"name":"com.zrlog.updater.Protocol$Image","allDeclaredConstructors":true,"allDeclaredFields":true},
+  {"name":"com.zrlog.updater.Protocol$Job","allDeclaredConstructors":true,"allDeclaredFields":true},
+  {"name":"com.zrlog.updater.Protocol$State","allDeclaredConstructors":true,"allDeclaredFields":true},
+  {"name":"com.zrlog.updater.Protocol$Capabilities","allDeclaredConstructors":true,"allDeclaredFields":true},
+  {"name":"com.zrlog.updater.Protocol$ErrorResponse","allDeclaredConstructors":true,"allDeclaredFields":true},
+  {"name":"com.zrlog.updater.Protocol$Health","allDeclaredConstructors":true,"allDeclaredFields":true}
+]

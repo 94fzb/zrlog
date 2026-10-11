@@ -47,6 +47,27 @@ docker run --name zrlog \
 
 生产环境建议使用具体版本标签或不可变 digest，不要依赖可移动的 `latest` 标签。
 
+## Docker Compose 与后台升级
+
+`docker-compose.yml` 提供 ZrLog、MySQL 和持久化卷。复制 `.env.example` 为 `.env`，
+设置数据库密码后启动。`ZRLOG_IMAGE`、`MYSQL_IMAGE` 都可填写该环境能访问的完整镜像地址；
+ZrLog 官方阿里云仓库为 `registry.cn-chengdu.aliyuncs.com/hibegin/zrlog`。
+
+后台升级需要包含此功能的 ZrLog 版本，以及独立的 updater 容器。启用方法见
+[updater 部署说明](updater/README.md#compose-配置)，使用附加配置
+`docker-compose.updater.yml`。已有站点必须保留原项目名、数据卷和部署目录；首次接入
+需要管理员更新部署配置，接入后日常升级可在后台完成。
+
+在「更新设置」加载可用镜像仓库并保存选择，再到升级页面检查版本、确认风险并开始升级。
+updater 会先下载并校验所选仓库的镜像，再替换 `zrlog` 容器；MySQL、配置和附件沿用原有
+存储。替换期间网站会短暂断开，页面恢复后继续查询同一任务。失败时保留任务记录；
+下载失败不会停止旧容器，也不会静默切换到 Docker Hub。
+
+元数据由程序 `build.properties` 配置，默认 `https://dl.zrlog.com/`。界面中的安装包源
+（dl/GitHub）用于 ZIP/WAR 更新，Docker 更新使用清单中的镜像仓库。GitHub 包来源只在
+正式 Release 附件实际发布并通过校验后可用。Linux 正式镜像清单支持 AMD64/ARM64，
+当前预览镜像清单仅声明 AMD64；已有 Windows 容器不在此 Compose updater 的范围内。
+
 ## Windows Server 2022
 
 从 v3.9.0 开始，可以在 PowerShell 和 Windows 容器模式下运行：
