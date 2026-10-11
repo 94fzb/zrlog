@@ -1,0 +1,72 @@
+name: Build Docker updater acceptance application
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [codex/docker-compose-updater]
+    paths: [.github/workflows/docker-updater-acceptance.yml]
+
+permissions:
+  contents: read
+
+jobs:
+  native:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          path: app
+      - uses: actions/checkout@v7
+        with:
+          repository: zrlog/zrlog-base
+          ref: e862813712c19728e045419f5388b82f4d45daad
+          path: base
+      - uses: actions/checkout@v7
+        with:
+          repository: zrlog/zrlog-admin-web
+          ref: 69674675f70ff8167c3286a62480ad1ef0ceeca3
+          path: admin
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '25'
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+      - name: Build pinned base and admin integration
+        shell: bash
+        run: |
+          mvn -B -ntp -DskipTests install -f base/pom.xml
+          corepack enable
+          corepack prepare yarn@1.22.22 --activate
+          cd admin/zrlog-admin-web-ui/src/main/frontend
+          yarn install --frozen-lockfile --registry https://registry.npmjs.org
+          yarn build
+          cd ../../../..
+          mvn -B -ntp -DskipTests install
+      - uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '25'
+          distribution: graalvm
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build isolated Native acceptance package
+        working-directory: app
+        shell: bash
+        env:
+          ZRLOG_MIRROR_WEBSITE: https://metadata:8443/
+        run: |
+          bash shell/native/build-final-native.sh preview /tmp/updater-acceptance zip
+          ./zrlog --version
+          mkdir -p /tmp/updater-acceptance/evidence
+          cp zrlog-web/src/main/resources/build.properties /tmp/updater-acceptance/evidence/
+          git rev-parse HEAD > /tmp/updater-acceptance/evidence/application-commit.txt
+          git -C ../base rev-parse HEAD > /tmp/updater-acceptance/evidence/base-commit.txt
+          git -C ../admin rev-parse HEAD > /tmp/updater-acceptance/evidence/admin-commit.txt
+          sha256sum target/*-native.zip > /tmp/updater-acceptance/evidence/sha256.txt
+      - uses: actions/upload-artifact@v6
+        with:
+          name: docker-updater-native-acceptance
+          path: /tmp/updater-acceptance
+          if-no-files-found: error
+          retention-days: 7
