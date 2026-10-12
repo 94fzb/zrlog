@@ -1,0 +1,175 @@
+name: Publish preview Docker image
+description: Publish and verify both registries from an archived Native preview package
+inputs:
+  native-run-id:
+    description: Native preview producer run ID
+    required: true
+  native-artifact-id:
+    description: Exact artifact ID from the successful Native producer job
+    required: true
+  github-token:
+    description: Token with actions read permission
+    required: true
+  docker-password:
+    description: Docker Hub password
+    required: true
+  aliyun-docker-password:
+    description: Aliyun registry password
+    required: true
+  secret-id:
+    description: S3 access key ID for update metadata
+    required: true
+  secret-key:
+    description: S3 secret access key for update metadata
+    required: true
+  bucket:
+    description: S3 bucket for update metadata
+    required: true
+  host:
+    description: S3 endpoint for update metadata
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Restore and verify the exact Native package
+      id: native
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+        NATIVE_RUN_ID: ${{ inputs.native-run-id }}
+        NATIVE_ARTIFACT_ID: ${{ inputs.native-artifact-id }}
+      run: |
+        bash docker/download-preview-package.sh "$NATIVE_RUN_ID" .prepared-native "$NATIVE_ARTIFACT_ID"
+        mkdir -p .docker-metadata
+        cp .prepared-native/native-image-input.json .docker-metadata/native-image-input.json
+        {
+          echo "source_commit=$(jq -r .sourceCommit .docker-metadata/native-image-input.json)"
+          echo "version=$(jq -r .version .docker-metadata/native-image-input.json)"
+          echo "image_tag=$(bash docker/preview-image-tag.sh .docker-metadata/native-image-input.json)"
+        } >> "$GITHUB_OUTPUT"
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v4
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v4.6.0
+      with:
+        username: zrlog
+        password: ${{ inputs.docker-password }}
+
+    - name: Login to Aliyun
+      uses: docker/login-action@v4.6.0
+      with:
+        registry: registry.cn-chengdu.aliyuncs.com
+        username: 90xchun
+        password: ${{ inputs.aliyun-docker-password }}
+    - name: Preserve existing immutable preview tags
+      id: existing
+      env:
+        IMAGE_TAG: ${{ steps.native.outputs.image_tag }}
+      shell: bash
+      run: |
+        bash docker/preserve-preview-images.sh .docker-metadata/native-image-input.json "$IMAGE_TAG" >> "$GITHUB_OUTPUT"
+
+    - name: Build and push verified Native package
+      if: steps.existing.outputs.dockerhub != 'true'
+      uses: docker/build-push-action@v7
+      with:
+        context: .prepared-native/package
+        file: docker/Dockerfile.package
+        platforms: linux/amd64
+        push: true
+        build-args: |
+          ZRLOG_EXPECTED_VERSION=${{ steps.native.outputs.version }}
+          ZRLOG_SOURCE_COMMIT=${{ steps.native.outputs.source_commit }}
+        tags: |
+          zrlog/zrlog:${{ steps.native.outputs.image_tag }}
+
+    - name: Publish compatible Aliyun preview index
+      if: steps.existing.outputs.aliyun != 'true'
+      env:
+        IMAGE_TAG: ${{ steps.native.outputs.image_tag }}
+      shell: bash
+      run: |
+        hub=zrlog/zrlog
+        aliyun=registry.cn-chengdu.aliyuncs.com/hibegin/zrlog
+        digest=$(docker buildx imagetools inspect "$hub:$IMAGE_TAG" --format '{{.Manifest.Digest}}')
+        # Aliyun does not accept BuildKit OCI attestation manifests. Copy the
+        # runtime image through Docker, preserving layers/config; retain Hub provenance.
+        docker pull --platform linux/amd64 "$hub@$digest"
+        docker tag "$hub@$digest" "$aliyun:$IMAGE_TAG-amd64"
+        docker push "$aliyun:$IMAGE_TAG-amd64"
+        runtime_digest=$(docker buildx imagetools inspect "$aliyun:$IMAGE_TAG-amd64" --format '{{.Manifest.Digest}}')
+        docker buildx imagetools create --tag "$aliyun:$IMAGE_TAG" "$aliyun@$runtime_digest"
+
+    - name: Verify published preview images and collect metadata
+      env:
+        IMAGE_TAG: ${{ steps.native.outputs.image_tag }}
+        EXPECTED_VERSION: ${{ steps.native.outputs.version }}
+        EXPECTED_COMMIT: ${{ steps.native.outputs.source_commit }}
+      shell: bash
+      run: |
+        refs=()
+        anonymous=$(mktemp -d)
+        trap 'rm -rf "$anonymous"' EXIT
+        for repository in zrlog/zrlog registry.cn-chengdu.aliyuncs.com/hibegin/zrlog; do
+          digest=$(docker buildx imagetools inspect "${repository}:${IMAGE_TAG}" --format '{{.Manifest.Digest}}')
+          reference="${repository}@${digest}"
+          docker --config "$anonymous" pull --platform linux/amd64 "${reference}"
+          output=$(docker run --rm --entrypoint /opt/zrlog/zrlog "${reference}" --version)
+          build_id=$(jq -r .buildId .docker-metadata/native-image-input.json)
+          output="${output/ version: / version:}"
+          [[ "${output}" == "zrlog version:${EXPECTED_VERSION} - ${build_id} "* ]]
+          [[ $(docker image inspect --format '{{index .Config.Labels "org.opencontainers.image.revision"}}' "${reference}") == "${EXPECTED_COMMIT}" ]]
+          if [[ -f .prepared-native/package/zrlog ]]; then
+            expected_sha=$(sha256sum .prepared-native/package/zrlog | cut -d ' ' -f 1)
+            actual_sha=$(docker run --rm --entrypoint sha256sum "${reference}" /opt/zrlog/zrlog | cut -d ' ' -f 1)
+            [[ "$actual_sha" == "$expected_sha" ]]
+          fi
+          refs+=(--image "${reference}")
+        done
+        bash docker/collect-image-manifest.sh \
+          --native-metadata .docker-metadata/native-image-input.json \
+          --channel preview --tag "${IMAGE_TAG}" "${refs[@]}" \
+          --platform linux/amd64 --output .docker-metadata/last.docker-image.version.json
+    - name: Publish preview update metadata after image verification
+      env:
+        AWS_ACCESS_KEY_ID: ${{ inputs.secret-id }}
+        AWS_SECRET_ACCESS_KEY: ${{ inputs.secret-key }}
+        ZRLOG_S3_BUCKET: ${{ inputs.bucket }}
+        ZRLOG_S3_ENDPOINT: ${{ inputs.host }}
+      shell: bash
+      run: |
+        bash docker/publish-image-manifest.sh .docker-metadata/last.docker-image.version.json \
+          --allow-tag-alias-update > .docker-metadata/publication.json
+
+    - name: Advance verified preview aliases in both registries
+      shell: bash
+      run: |
+        jq -r '.images[] | [.repository,.digest] | @tsv' .docker-metadata/last.docker-image.version.json |
+        while IFS=$'\t' read -r repository digest; do
+          docker buildx imagetools create --tag "$repository:preview" "$repository@$digest"
+          [[ $(docker buildx imagetools inspect "$repository:preview" --format '{{.Manifest.Digest}}') == "$digest" ]]
+        done
+
+    - name: Verify public Docker metadata
+      shell: bash
+      run: |
+        manifest=.docker-metadata/last.docker-image.version.json
+        for path in "$(jq -r .immutableKey .docker-metadata/publication.json)" preview/last.docker-image.version.json; do
+          if ! curl --fail --silent --show-error --location --retry 3 --retry-all-errors \
+            --connect-timeout 15 --max-time 120 -D /tmp/public-metadata.headers \
+            "https://dl.zrlog.com/$path" -o .docker-metadata/public.json; then
+            grep -Ei '^HTTP/|^server:|^cf-mitigated:' /tmp/public-metadata.headers >&2 || true
+            exit 1
+          fi
+          cmp "$manifest" .docker-metadata/public.json
+        done
+
+    - name: Preserve publication evidence
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: docker-preview-publication-${{ github.run_attempt }}
+        path: .docker-metadata/*.json
+        if-no-files-found: warn
+        include-hidden-files: true

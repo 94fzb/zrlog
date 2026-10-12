@@ -88,12 +88,23 @@ updater 会先下载并校验所选仓库的镜像，再替换 `zrlog` 容器；
 `dl.zrlog.com` 只保存 Docker 更新清单 JSON，记录版本、各镜像仓库的 digest 和已验证平台，
 不保存 Docker 镜像或镜像 TAR。镜像本体由 Docker Hub 与阿里云分发。
 
-`docker-preview-publish.yml` 可使用 `native_run_id` 复用成功的
-`docker-updater-acceptance.yml` 构建；`ref` 必须解析为该构建的精确应用提交。
-流水线验证来源、包 SHA-256、大小和 `build.properties`，只把包内 Native 可执行文件装入镜像，
-不重新构建程序或上传该 ZIP 到 dl。此入口目前仅支持 `linux/amd64`，不更新 `latest` 标签。
+`native-build-preview-package-zip.yml` 在 `master` 提交、后台预览更新通知或手动运行时，
+先沿用原有 Native ZIP 构建和上传步骤，再由独立 Docker job 自动发布镜像。
+发布步骤封装在 `.github/actions/publish-preview-docker/action.yml`，不再提供独立的预览
+Docker workflow。Java、DEB、FaaS 和正式版工作流各自运行。
 
-在 `push_image=true` 时，流水线先发布到两个镜像仓库，再匿名拉取并检查版本、源码标签及
+Native job 将本次 ZIP、清单和 `build.properties` 保存为 30 天的 GitHub artifact。
+Docker 验证生产者工作流、Native job 成功状态、包 SHA-256、大小与构建身份，只把包内
+Native 可执行文件装入镜像；不读取可能已被后续构建替换的 `last` 包。
+此链路目前仅支持 `linux/amd64`，不更新 `latest` 标签。
+
+Docker 失败时选择 **Re-run failed jobs**，或者在 Docker job 上选择 **Re-run this job**，
+会按原 Native job 输出的 artifact ID 复用同一份产物，不重新编译 Native 或上传 ZIP。
+重试不依赖当前 `run_attempt`，也不要求整个运行成功；只要求产物所属 Native job 成功。
+应在 artifact 的 30 天保留期内重试，**Re-run all jobs** 会重新执行 Native 打包。
+快照保存失败会在 Docker job 报错，Native 打包结果仍独立保留。
+
+流水线先发布到两个镜像仓库，再匿名拉取并检查版本、源码标签及
 Native 文件 SHA-256。Bash/jq/AWS CLI 脚本随后写入
 `preview/docker-image/<version>-<buildId>.json`，校验回读后条件更新
 `preview/last.docker-image.version.json`。最后验证两个 dl 公开地址返回同一份 JSON。
@@ -101,11 +112,12 @@ Native 文件 SHA-256。Bash/jq/AWS CLI 脚本随后写入
 `preview/docker-image/<version>-<buildId>/aliases/<JSON-SHA256>.json` 后推进通道入口，
 不会覆盖原不可变清单。
 这些动作不更新正式版通道或 GitHub Release 附件。离线检查入口是
-`bash docker/test-image-manifest.sh`。
+`bash docker/test-image-manifest.sh` 和 `bash docker/test-preview-package.sh`。
 
 重跑时复用已有不可变标签，重新检查镜像与清单。阿里云使用从 Docker Hub 复制的运行
 镜像生成兼容索引；构建证明保留在 Docker Hub，不把阿里云不支持的 OCI attestation
 格式上传到该仓库。两个仓库的索引 digest 因此分别读取和记录。
+恢复失败的 job 仍保留通道时间校验，不能用旧包覆盖更新的 `preview` 通道。
 
 若最后的 dl 公开回读被 Cloudflare challenge 拦截，流水线保持失败并输出 HTTP 状态与
 `cf-mitigated`，不能把上传成功当成公开可用。应另行核对实际部署网络的匿名清单响应、

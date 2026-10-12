@@ -10,6 +10,13 @@
 固定预览标签必须复用实际包里的 buildId，不能改用主工程完整 SHA，否则依赖更新也可能
 碰撞到同一个镜像标签。完整源码身份由 `sourceCommit` 单独保存。
 
+Native ZIP 预览与 Docker 预览共用 `native-build-preview-package-zip.yml`：先构建并上传
+Native 包，再由独立 job 使用本次产物快照发布双仓库镜像。Docker 失败不改变 Native job
+结果。Docker 失败后选择 **Re-run failed jobs** 或对 Docker job 选择 **Re-run this job**，
+可复用原 Native 快照补发镜像，不重新编译或上传 Native 包；快照保留 30 天。
+Java、DEB、FaaS 和正式版工作流保持独立。恢复和校验细节见
+[Docker 预览发布说明](../docker/README.md#发布-docker-预览清单)。
+
 `bin/add-build-info.sh` 生成应用包内 `build.properties`。以下配置由构建决定：
 
 | 属性 | 默认值 | 用途 |

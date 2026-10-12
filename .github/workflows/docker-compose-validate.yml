@@ -11,7 +11,11 @@ on:
       - docker/.env.example
       - docker/resolve-native-package.sh
       - docker/test-native-package-contract.sh
-      - .github/workflows/docker-preview-publish.yml
+      - .github/workflows/native-build-preview-package-zip.yml
+      - .github/actions/publish-preview-docker/**
+      - docker/*preview*.sh
+      - docker/Dockerfile.package
+      - docker/*image*.sh
       - .github/workflows/docker-release-publish.yml
       - .github/workflows/docker-compose-validate.yml
   push:
@@ -26,7 +30,11 @@ on:
       - docker/.env.example
       - docker/resolve-native-package.sh
       - docker/test-native-package-contract.sh
-      - .github/workflows/docker-preview-publish.yml
+      - .github/workflows/native-build-preview-package-zip.yml
+      - .github/actions/publish-preview-docker/**
+      - docker/*preview*.sh
+      - docker/Dockerfile.package
+      - docker/*image*.sh
       - .github/workflows/docker-release-publish.yml
       - .github/workflows/docker-compose-validate.yml
 
@@ -43,6 +51,12 @@ jobs:
 
       - name: Verify Native package pinning contract
         run: bash docker/test-native-package-contract.sh
+
+      - name: Verify Native preview Docker recovery
+        run: bash docker/test-preview-package.sh
+
+      - name: Verify Docker image metadata
+        run: bash docker/test-image-manifest.sh
 
       - name: Validate configuration
         run: bash docker/test-compose-updater-config.sh
