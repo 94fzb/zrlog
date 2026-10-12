@@ -23,11 +23,6 @@ on:
         required: false
         default: false
         type: boolean
-      retire_legacy_repository:
-        description: Delete the retired zrlog/zrlog-preview repository after validating replacement images
-        required: false
-        default: false
-        type: boolean
 
 permissions:
   contents: read
@@ -283,12 +278,6 @@ jobs:
             docker buildx imagetools create --tag "$repository:preview" "$repository@$digest"
             [[ $(docker buildx imagetools inspect "$repository:preview" --format '{{.Manifest.Digest}}') == "$digest" ]]
           done
-
-      - name: Retire old preview repository after replacement verification
-        if: inputs.push_image && inputs.retire_legacy_repository
-        env:
-          DOCKERHUB_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        run: bash docker/retire-preview-repository.sh --delete-zrlog-preview
 
       - name: Verify public Docker metadata
         if: inputs.push_image
