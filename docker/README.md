@@ -16,6 +16,7 @@
 | `latest`, `X.Y.Z` | `linux/amd64` | 所有当前正式版本 |
 | `latest`, `X.Y.Z` | `linux/arm64` | 从 v3.9.0 开始 |
 | `windows-ltsc2022`, `X.Y.Z-windows-ltsc2022` | `windows/amd64` | 从 v3.9.0 开始 |
+| `preview`, `<version>-<buildId>-preview` | `linux/amd64` | 预览版本 |
 
 `latest` 始终指向最新的 Linux 正式版，不包含 Windows 镜像。v3.8.x 及更早版本只有
 Linux AMD64；从 v3.9.0 开始，Linux 标签同时包含 AMD64 和 ARM64。Windows 镜像使用
@@ -46,6 +47,16 @@ docker run --name zrlog \
 容器可以访问的宿主机地址。
 
 生产环境建议使用具体版本标签或不可变 digest，不要依赖可移动的 `latest` 标签。
+
+正式版与预览版统一使用 `zrlog/zrlog`，阿里云统一使用
+`registry.cn-chengdu.aliyuncs.com/hibegin/zrlog`。`latest` 只由正式发布推进，`preview`
+只由预览发布推进。旧 `zrlog/zrlog-preview` 仓库退役，不再发布或提供兼容入口；旧配置改用
+`zrlog/zrlog:preview`。
+
+固定预览标签沿用安装包的 `<version>-<buildId>-preview` 命名，例如
+`4.0.0-SNAPSHOT-f48fc58-preview`。buildId 原样读取包元数据：主工程为短提交号，
+依赖更新可为 `base-1234567`、`adminweb-1234567`、`blogweb-1234567`，不另取当前主工程
+提交号或完整 Git SHA。完整 SHA 保留在 `sourceCommit` 与 OCI revision 标签中用于追溯。
 
 ## Docker Compose 与后台升级
 
@@ -86,6 +97,9 @@ updater 会先下载并校验所选仓库的镜像，再替换 `zrlog` 容器；
 Native 文件 SHA-256。Bash/jq/AWS CLI 脚本随后写入
 `preview/docker-image/<version>-<buildId>.json`，校验回读后条件更新
 `preview/last.docker-image.version.json`。最后验证两个 dl 公开地址返回同一份 JSON。
+只修正镜像 tag 且版本、源码、仓库、平台和 digest 全部相同时，允许将修订清单写入
+`preview/docker-image/<version>-<buildId>/aliases/<JSON-SHA256>.json` 后推进通道入口，
+不会覆盖原不可变清单。
 这些动作不更新正式版通道或 GitHub Release 附件。离线检查入口是
 `bash docker/test-image-manifest.sh`。
 

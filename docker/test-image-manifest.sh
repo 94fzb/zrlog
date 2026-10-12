@@ -19,6 +19,12 @@ generate() {
 reject() {
   if "$@" > "$tmp/rejected.log" 2>&1; then echo "Unexpected success: $*" >&2; exit 1; fi
 }
+for build_id in abcdef1 base-1234567 adminweb-1234567 blogweb-1234567; do
+  jq --arg build_id "$build_id" '.version="4.0.0-SNAPSHOT" | .buildId=$build_id' "$tmp/native.json" > "$tmp/preview.json"
+  [[ $(bash "$script_dir/preview-image-tag.sh" "$tmp/preview.json") == "4.0.0-SNAPSHOT-$build_id-preview" ]]
+done
+jq '.version="4.0.0-SNAPSHOT" | .buildId=.sourceCommit' "$tmp/native.json" > "$tmp/preview.json"
+reject bash "$script_dir/preview-image-tag.sh" "$tmp/preview.json"
 generate --image-entry "$tmp/hub.json" --image-entry "$tmp/mirror.json"
 jq -e --arg digest "$digest" --arg commit "$commit" '.images[0].repository == "docker.io/zrlog/zrlog" and
   .images[0].digest == $digest and .images[1].digest != $digest and .sourceCommit == $commit' "$tmp/manifest.json" >/dev/null
@@ -80,7 +86,7 @@ else
 fi
 MOCK
 chmod +x "$tmp/bin/aws"
-publish() { bash "$script_dir/publish-image-manifest.sh" "$tmp/manifest.json"; }
+publish() { bash "$script_dir/publish-image-manifest.sh" "$tmp/manifest.json" "$@"; }
 publish > "$tmp/result.json"
 printf '%s\n' release/docker-image/4.0.1-abcdef1.json release/last.docker-image.version.json > "$tmp/expected-writes"
 cmp "$tmp/expected-writes" "$tmp/store/writes"
@@ -105,6 +111,24 @@ IMAGE_TEST_BAD_READBACK=1 reject publish
 cmp "$tmp/original-manifest.json" "$tmp/store/release/last.docker-image.version.json"
 publish > /dev/null
 cmp "$tmp/manifest.json" "$tmp/store/release/last.docker-image.version.json"
+
+# Retagging preserves every image digest and all original immutable bytes.
+cp "$tmp/manifest.json" "$tmp/before-retag.json"
+jq '.images |= map(.tag="4.0.1-abcdef100")' "$tmp/before-retag.json" > "$tmp/manifest.json"
+reject publish
+publish --allow-tag-alias-update > "$tmp/alias-result.json"
+alias_key=$(jq -er .immutableKey "$tmp/alias-result.json")
+[[ $alias_key == release/docker-image/4.0.1-abcdef100/aliases/*.json ]]
+cmp "$tmp/manifest.json" "$tmp/store/$alias_key"
+cmp "$tmp/before-retag.json" "$tmp/store/release/docker-image/4.0.1-abcdef100.json"
+cp "$tmp/store/writes" "$tmp/alias-writes"
+publish --allow-tag-alias-update >/dev/null
+cmp "$tmp/alias-writes" "$tmp/store/writes"
+jq '.images[0].digest="sha256:3333333333333333333333333333333333333333333333333333333333333333"' \
+  "$tmp/manifest.json" > "$tmp/invalid.json"
+cp "$tmp/invalid.json" "$tmp/manifest.json"
+reject publish --allow-tag-alias-update
+cmp "$tmp/alias-writes" "$tmp/store/writes"
 
 # Registry platform discovery must reject platforms never runtime-tested.
 cat > "$tmp/bin/docker" <<'MOCK'

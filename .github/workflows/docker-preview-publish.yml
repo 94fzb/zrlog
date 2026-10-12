@@ -23,6 +23,11 @@ on:
         required: false
         default: false
         type: boolean
+      retire_legacy_repository:
+        description: Delete the retired zrlog/zrlog-preview repository after validating replacement images
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -38,6 +43,7 @@ jobs:
     outputs:
       source_commit: ${{ steps.source.outputs.commit }}
       version: ${{ steps.version.outputs.value }}
+      image_tag: ${{ steps.image_tag.outputs.value }}
       linux_amd64_url: ${{ steps.native_linux_amd64.outputs.url }}
       linux_amd64_sha256: ${{ steps.native_linux_amd64.outputs.sha256 }}
       windows_x86_64_url: ${{ steps.native_windows_x86_64.outputs.url }}
@@ -114,6 +120,10 @@ jobs:
           bash docker/resolve-native-package.sh preview Windows-x86_64
           https://pub-c16cba848aff4e6b8d8e0d00f0f741f0.r2.dev/preview/last.Windows-x86_64.version.json
 
+      - name: Use the actual package buildId for the Docker tag
+        id: image_tag
+        run: echo "value=$(bash docker/preview-image-tag.sh native-image-input.json)" >> "$GITHUB_OUTPUT"
+
       - name: Preserve validated Native metadata
         uses: actions/upload-artifact@v7
         with:
@@ -171,18 +181,9 @@ jobs:
         id: existing
         if: inputs.push_image
         env:
-          IMAGE_TAG: ${{ needs.prepare.outputs.version }}-${{ needs.prepare.outputs.source_commit }}-preview
+          IMAGE_TAG: ${{ needs.prepare.outputs.image_tag }}
         run: |
-          for repository in zrlog/zrlog registry.cn-chengdu.aliyuncs.com/hibegin/zrlog; do
-            registry=dockerhub
-            [[ "$repository" != registry.* ]] || registry=aliyun
-            if docker buildx imagetools inspect "$repository:$IMAGE_TAG" > /tmp/image-descriptor 2> /tmp/image-error; then
-              echo "$registry=true" >> "$GITHUB_OUTPUT"
-            elif ! grep -Eqi 'not found|manifest unknown' /tmp/image-error; then
-              cat /tmp/image-error >&2
-              exit 1
-            fi
-          done
+          bash docker/preserve-preview-images.sh .docker-metadata/native-image-input.json "$IMAGE_TAG" >> "$GITHUB_OUTPUT"
 
       - name: Build and push
         if: inputs.native_run_id == '' && steps.existing.outputs.dockerhub != 'true'
@@ -201,8 +202,7 @@ jobs:
             ZRLOG_SOURCE_COMMIT=${{ needs.prepare.outputs.source_commit }}
             CACHE_BUST=${{ github.run_id }}-${{ github.run_attempt }}
           tags: |
-            zrlog/zrlog-preview:latest
-            zrlog/zrlog:${{ needs.prepare.outputs.version }}-${{ needs.prepare.outputs.source_commit }}-preview
+            zrlog/zrlog:${{ needs.prepare.outputs.image_tag }}
 
       - name: Build and push verified acceptance package
         if: inputs.native_run_id != '' && steps.existing.outputs.dockerhub != 'true'
@@ -216,12 +216,12 @@ jobs:
             ZRLOG_EXPECTED_VERSION=${{ needs.prepare.outputs.version }}
             ZRLOG_SOURCE_COMMIT=${{ needs.prepare.outputs.source_commit }}
           tags: |
-            zrlog/zrlog:${{ needs.prepare.outputs.version }}-${{ needs.prepare.outputs.source_commit }}-preview
+            zrlog/zrlog:${{ needs.prepare.outputs.image_tag }}
 
       - name: Publish compatible Aliyun preview index
         if: inputs.push_image && steps.existing.outputs.aliyun != 'true'
         env:
-          IMAGE_TAG: ${{ needs.prepare.outputs.version }}-${{ needs.prepare.outputs.source_commit }}-preview
+          IMAGE_TAG: ${{ needs.prepare.outputs.image_tag }}
         run: |
           hub=zrlog/zrlog
           aliyun=registry.cn-chengdu.aliyuncs.com/hibegin/zrlog
@@ -237,7 +237,7 @@ jobs:
       - name: Verify published preview images and collect metadata
         if: inputs.push_image
         env:
-          IMAGE_TAG: ${{ needs.prepare.outputs.version }}-${{ needs.prepare.outputs.source_commit }}-preview
+          IMAGE_TAG: ${{ needs.prepare.outputs.image_tag }}
           EXPECTED_VERSION: ${{ needs.prepare.outputs.version }}
           EXPECTED_COMMIT: ${{ needs.prepare.outputs.source_commit }}
         run: |
@@ -272,13 +272,29 @@ jobs:
           ZRLOG_S3_BUCKET: ${{ secrets.BUCKET }}
           ZRLOG_S3_ENDPOINT: ${{ secrets.HOST }}
         run: |
-          bash docker/publish-image-manifest.sh .docker-metadata/last.docker-image.version.json
+          bash docker/publish-image-manifest.sh .docker-metadata/last.docker-image.version.json \
+            --allow-tag-alias-update > .docker-metadata/publication.json
+
+      - name: Advance verified preview aliases in both registries
+        if: inputs.push_image
+        run: |
+          jq -r '.images[] | [.repository,.digest] | @tsv' .docker-metadata/last.docker-image.version.json |
+          while IFS=$'\t' read -r repository digest; do
+            docker buildx imagetools create --tag "$repository:preview" "$repository@$digest"
+            [[ $(docker buildx imagetools inspect "$repository:preview" --format '{{.Manifest.Digest}}') == "$digest" ]]
+          done
+
+      - name: Retire old preview repository after replacement verification
+        if: inputs.push_image && inputs.retire_legacy_repository
+        env:
+          DOCKERHUB_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: bash docker/retire-preview-repository.sh --delete-zrlog-preview
 
       - name: Verify public Docker metadata
         if: inputs.push_image
         run: |
           manifest=.docker-metadata/last.docker-image.version.json
-          for path in "preview/docker-image/$(jq -r '.version + "-" + .buildId' "$manifest").json" preview/last.docker-image.version.json; do
+          for path in "$(jq -r .immutableKey .docker-metadata/publication.json)" preview/last.docker-image.version.json; do
             if ! curl --fail --silent --show-error --location --retry 3 --retry-all-errors \
               --connect-timeout 15 --max-time 120 -D /tmp/public-metadata.headers \
               "https://dl.zrlog.com/$path" -o .docker-metadata/public.json; then

@@ -4,6 +4,12 @@
 
 ### 更新元数据配置
 
+`buildId` 与 `sourceCommit` 用途不同。`bin/add-build-info.sh` 默认以
+`git rev-parse --short HEAD` 生成 buildId；子工程通知预览构建时通过 `ZRLOG_BUILD_ID`
+传入 `base-<7位短号>`、`adminweb-<7位短号>` 或 `blogweb-<7位短号>`。安装包和 Docker
+固定预览标签必须复用实际包里的 buildId，不能改用主工程完整 SHA，否则依赖更新也可能
+碰撞到同一个镜像标签。完整源码身份由 `sourceCommit` 单独保存。
+
 `bin/add-build-info.sh` 生成应用包内 `build.properties`。以下配置由构建决定：
 
 | 属性 | 默认值 | 用途 |

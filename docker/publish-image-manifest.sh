@@ -3,6 +3,8 @@
 set -euo pipefail
 script_dir=$(cd "$(dirname "$0")" && pwd)
 manifest=$(realpath "${1:?manifest required}")
+tag_alias_update=${2:-}
+[[ -z $tag_alias_update || $tag_alias_update == --allow-tag-alias-update ]]
 : "${ZRLOG_S3_BUCKET:?}" "${ZRLOG_S3_ENDPOINT:?}" "${AWS_ACCESS_KEY_ID:?}" "${AWS_SECRET_ACCESS_KEY:?}"
 [[ $ZRLOG_S3_ENDPOINT == https://* ]]
 export AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-auto} AWS_PAGER=''
@@ -46,8 +48,18 @@ fi
 status=0
 get_object "$key" "$tmp/immutable" || status=$?
 if [[ $status == 0 ]]; then
-  cmp "$manifest" "$tmp/immutable"
-else
+  if ! cmp -s "$manifest" "$tmp/immutable"; then
+    [[ $tag_alias_update == --allow-tag-alias-update ]] || { echo 'Immutable metadata differs' >&2; exit 1; }
+    # Retagging the exact same images keeps the original immutable document intact.
+    diff -u <(jq -S '.images |= map(del(.tag))' "$manifest") \
+      <(jq -S '.images |= map(del(.tag))' "$tmp/immutable")
+    key="${key%.json}/aliases/$(sha256sum "$manifest" | cut -d ' ' -f 1).json"
+    status=0
+    get_object "$key" "$tmp/alias" || status=$?
+    if [[ $status == 0 ]]; then cmp "$manifest" "$tmp/alias"; fi
+  fi
+fi
+if [[ $status != 0 ]]; then
   [[ $status == 4 ]]
   s3 put-object --bucket "$ZRLOG_S3_BUCKET" --key "$key" --body "$manifest" \
     --content-type application/json --cache-control 'public, max-age=31536000, immutable' --if-none-match '*' >/dev/null

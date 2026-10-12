@@ -14,5 +14,6 @@ jobs:
       - name: Application metadata and publication contract tests
         run: |
           bash docker/test-image-manifest.sh
+          bash docker/test-preview-retirement.sh
           python3 shell/release/test_update_sources.py
           bash docker/test-native-package-contract.sh

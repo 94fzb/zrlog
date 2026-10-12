@@ -61,6 +61,10 @@ ZRLOG_IMAGE=registry.cn-chengdu.aliyuncs.com/hibegin/zrlog@sha256:53cc959934bf5d
 [`preview/last.docker-image.version.json`](https://dl.zrlog.com/preview/last.docker-image.version.json)。
 dl 只存放 Docker 清单 JSON，镜像从所选 Docker Hub 或阿里云仓库拉取。
 
+预览版也使用 `zrlog/zrlog` / `hibegin/zrlog`，可用 `:preview` 跟踪预览通道，或使用
+`4.0.0-SNAPSHOT-f48fc58-preview` 这样的固定标签。旧 `zrlog/zrlog-preview:latest` 地址
+退役，已有配置需改成 `zrlog/zrlog:preview`。后台升级仍按清单 digest 固定目标镜像。
+
 updater 端口仅在 Compose 网络内可用，通过共享令牌与应用通信。它挂载 Docker socket，
 以及宿主机部署目录到容器中的相同绝对路径，用于保留 Compose 配置并更新 `.env` 的镜像引用。
 保持 `ZRLOG_COMPOSE_FILES=docker-compose.yml` 与实际启动文件一致。
