@@ -30,7 +30,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           repository: zrlog/zrlog-admin-web
-          ref: 7ae798f0b5fa01847cc18ba347da6fc1acb2e44e
+          ref: 7d5ffc0ffb079a381b1dee629602a624e59afd0d
           path: admin
       - uses: actions/setup-java@v5
         with:
