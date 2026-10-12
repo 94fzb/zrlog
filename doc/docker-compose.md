@@ -50,6 +50,17 @@ MySQL 健康后 ZrLog 才会启动。访问 [http://localhost:8080/install](http
 应用镜像清单的版本后，即可通过现有更新设置选择镜像仓库并提交升级任务。updater 的版本
 与应用版本独立；它只替换 `zrlog` 服务，不升级 MySQL。
 
+已发布的 `4.0.0-SNAPSHOT / f48fc58` 预览镜像包含后台升级集成，目前支持 `linux/amd64`。
+需要体验此功能时，在 `.env` 中设置已验证的阿里云镜像：
+
+```dotenv
+ZRLOG_IMAGE=registry.cn-chengdu.aliyuncs.com/hibegin/zrlog@sha256:53cc959934bf5dbbe707ec64981c9bbebbc16bea71854279565ce5b675c677f0
+```
+
+部署后在「更新设置」开启预览版本检查，加载并保存镜像仓库选择。预览更新清单为
+[`preview/last.docker-image.version.json`](https://dl.zrlog.com/preview/last.docker-image.version.json)。
+dl 只存放 Docker 清单 JSON，镜像从所选 Docker Hub 或阿里云仓库拉取。
+
 updater 端口仅在 Compose 网络内可用，通过共享令牌与应用通信。它挂载 Docker socket，
 以及宿主机部署目录到容器中的相同绝对路径，用于保留 Compose 配置并更新 `.env` 的镜像引用。
 保持 `ZRLOG_COMPOSE_FILES=docker-compose.yml` 与实际启动文件一致。

@@ -89,6 +89,14 @@ Native 文件 SHA-256。Bash/jq/AWS CLI 脚本随后写入
 这些动作不更新正式版通道或 GitHub Release 附件。离线检查入口是
 `bash docker/test-image-manifest.sh`。
 
+重跑时复用已有不可变标签，重新检查镜像与清单。阿里云使用从 Docker Hub 复制的运行
+镜像生成兼容索引；构建证明保留在 Docker Hub，不把阿里云不支持的 OCI attestation
+格式上传到该仓库。两个仓库的索引 digest 因此分别读取和记录。
+
+若最后的 dl 公开回读被 Cloudflare challenge 拦截，流水线保持失败并输出 HTTP 状态与
+`cf-mitigated`，不能把上传成功当成公开可用。应另行核对实际部署网络的匿名清单响应、
+SHA-256 和 updater 仓库列表；已经发布的镜像与不可变清单仍保留。
+
 ## Windows Server 2022
 
 从 v3.9.0 开始，可以在 PowerShell 和 Windows 容器模式下运行：
