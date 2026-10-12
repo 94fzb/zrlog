@@ -16,7 +16,7 @@
 | `latest`, `X.Y.Z` | `linux/amd64` | 所有当前正式版本 |
 | `latest`, `X.Y.Z` | `linux/arm64` | 从 v3.9.0 开始 |
 | `windows-ltsc2022`, `X.Y.Z-windows-ltsc2022` | `windows/amd64` | 从 v3.9.0 开始 |
-| `preview`, `<version>-<buildId>-preview` | `linux/amd64` | 预览版本 |
+| `preview`, `<version>-<buildId>` | `linux/amd64` | 预览版本 |
 
 `latest` 始终指向最新的 Linux 正式版，不包含 Windows 镜像。v3.8.x 及更早版本只有
 Linux AMD64；从 v3.9.0 开始，Linux 标签同时包含 AMD64 和 ARM64。Windows 镜像使用
@@ -53,8 +53,8 @@ docker run --name zrlog \
 只由预览发布推进。旧 `zrlog/zrlog-preview` 仓库退役，不再发布或提供兼容入口；旧配置改用
 `zrlog/zrlog:preview`。
 
-固定预览标签沿用安装包的 `<version>-<buildId>-preview` 命名，例如
-`4.0.0-SNAPSHOT-f48fc58-preview`。buildId 原样读取包元数据：主工程为短提交号，
+固定预览标签使用 `<version>-<buildId>`，例如 `4.0.0-SNAPSHOT-f48fc58`。
+版本号中的 `SNAPSHOT` 已表示预览版，无需再加 `-preview`。buildId 原样读取包元数据：主工程为短提交号，
 依赖更新可为 `base-1234567`、`adminweb-1234567`、`blogweb-1234567`，不另取当前主工程
 提交号或完整 Git SHA。完整 SHA 保留在 `sourceCommit` 与 OCI revision 标签中用于追溯。
 

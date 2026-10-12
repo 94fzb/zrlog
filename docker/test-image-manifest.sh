@@ -21,7 +21,7 @@ reject() {
 }
 for build_id in abcdef1 base-1234567 adminweb-1234567 blogweb-1234567; do
   jq --arg build_id "$build_id" '.version="4.0.0-SNAPSHOT" | .buildId=$build_id' "$tmp/native.json" > "$tmp/preview.json"
-  [[ $(bash "$script_dir/preview-image-tag.sh" "$tmp/preview.json") == "4.0.0-SNAPSHOT-$build_id-preview" ]]
+  [[ $(bash "$script_dir/preview-image-tag.sh" "$tmp/preview.json") == "4.0.0-SNAPSHOT-$build_id" ]]
 done
 jq '.version="4.0.0-SNAPSHOT" | .buildId=.sourceCommit' "$tmp/native.json" > "$tmp/preview.json"
 reject bash "$script_dir/preview-image-tag.sh" "$tmp/preview.json"
