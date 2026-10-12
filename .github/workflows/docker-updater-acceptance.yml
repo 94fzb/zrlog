@@ -30,7 +30,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           repository: zrlog/zrlog-admin-web
-          ref: 4c52a1acfd336083e1e40466ee9c63f56b06e566
+          ref: 7ae798f0b5fa01847cc18ba347da6fc1acb2e44e
           path: admin
       - uses: actions/setup-java@v5
         with:
@@ -52,7 +52,8 @@ jobs:
             src/components/upgrade.test.tsx \
             src/components/website/DockerRepositorySetting.test.tsx \
             src/components/website/UpgradeSettingForm.test.tsx \
-            src/utils/docker-upgrade.test.ts
+            src/utils/docker-upgrade.test.ts \
+            src/utils/sse-utils.test.ts
           yarn build
           cd ../../../..
           mvn -B -ntp -DskipTests install
