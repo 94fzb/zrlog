@@ -439,7 +439,7 @@ jobs:
           DOCKERHUB_REF: ${{ steps.manifest.outputs.dockerhub }}
           ALIYUN_REF: ${{ steps.manifest.outputs.aliyun }}
         run: |
-          python3 docker/collect-image-manifest.py \
+          bash docker/collect-image-manifest.sh \
             --native-metadata .docker-metadata/native-image-input.json \
             --channel release --tag "${DOCKER_TAG_VERSION}" \
             --image "${DOCKERHUB_REF}" --image "${ALIYUN_REF}" \
@@ -452,8 +452,7 @@ jobs:
           ZRLOG_S3_BUCKET: ${{ secrets.BUCKET }}
           ZRLOG_S3_ENDPOINT: ${{ secrets.HOST }}
         run: |
-          python3 -m pip install 'boto3>=1.40,<2'
-          python3 docker/publish-image-manifest.py .docker-metadata/last.docker-image.version.json
+          bash docker/publish-image-manifest.sh .docker-metadata/last.docker-image.version.json
 
   build-windows:
     name: Build Windows image (windows/amd64)

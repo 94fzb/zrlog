@@ -72,6 +72,23 @@ updater 会先下载并校验所选仓库的镜像，再替换 `zrlog` 容器；
 正式 Release 附件实际发布并通过校验后可用。Linux 正式镜像清单支持 AMD64/ARM64，
 当前预览镜像清单仅声明 AMD64；已有 Windows 容器不在此 Compose updater 的范围内。
 
+### 发布 Docker 预览清单
+
+`dl.zrlog.com` 只保存 Docker 更新清单 JSON，记录版本、各镜像仓库的 digest 和已验证平台，
+不保存 Docker 镜像或镜像 TAR。镜像本体由 Docker Hub 与阿里云分发。
+
+`docker-preview-publish.yml` 可使用 `native_run_id` 复用成功的
+`docker-updater-acceptance.yml` 构建；`ref` 必须解析为该构建的精确应用提交。
+流水线验证来源、包 SHA-256、大小和 `build.properties`，只把包内 Native 可执行文件装入镜像，
+不重新构建程序或上传该 ZIP 到 dl。此入口目前仅支持 `linux/amd64`，不更新 `latest` 标签。
+
+在 `push_image=true` 时，流水线先发布到两个镜像仓库，再匿名拉取并检查版本、源码标签及
+Native 文件 SHA-256。Bash/jq/AWS CLI 脚本随后写入
+`preview/docker-image/<version>-<buildId>.json`，校验回读后条件更新
+`preview/last.docker-image.version.json`。最后验证两个 dl 公开地址返回同一份 JSON。
+这些动作不更新正式版通道或 GitHub Release 附件。离线检查入口是
+`bash docker/test-image-manifest.sh`。
+
 ## Windows Server 2022
 
 从 v3.9.0 开始，可以在 PowerShell 和 Windows 容器模式下运行：

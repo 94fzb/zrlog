@@ -13,6 +13,6 @@ jobs:
       - uses: actions/checkout@v7
       - name: Application metadata and publication contract tests
         run: |
-          python3 docker/test_image_manifest.py
+          bash docker/test-image-manifest.sh
           python3 shell/release/test_update_sources.py
           bash docker/test-native-package-contract.sh
