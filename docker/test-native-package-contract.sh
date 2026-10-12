@@ -284,7 +284,7 @@ if grep -Fq "ZRLOG_CHANNEL -notmatch '^[A-Za-z0-9._-]+$'" "${windowsDockerfile}"
   fail "Windows Dockerfile still accepts unsupported Native package channels"
 fi
 
-for workflow in docker-preview-publish.yml docker-release-publish.yml; do
+for workflow in docker-release-publish.yml; do
   workflowPath="${SCRIPT_DIR}/../.github/workflows/${workflow}"
   grep -Fq 'ZRLOG_EXPECTED_SOURCE_COMMIT:' "${workflowPath}"
   grep -Fq 'ZRLOG_EXPECTED_VERSION:' "${workflowPath}"
@@ -303,14 +303,6 @@ for workflow in docker-preview-publish.yml docker-release-publish.yml; do
   grep -Fq -- '--build-arg "ZRLOG_EXPECTED_VERSION=$env:ZRLOG_EXPECTED_VERSION"' "${workflowPath}"
   grep -Fq 'version:$env:ZRLOG_EXPECTED_VERSION - ' "${workflowPath}"
 done
-
-previewWorkflow="${SCRIPT_DIR}/../.github/workflows/docker-preview-publish.yml"
-grep -Fq "ZRLOG_NATIVE_MIRROR_BASE_URL: ${mirrorBaseUrl}" "${previewWorkflow}"
-grep -Fq "${mirrorBaseUrl}/preview/last.Linux-amd64.version.json" "${previewWorkflow}"
-grep -Fq "${mirrorBaseUrl}/preview/last.Windows-x86_64.version.json" "${previewWorkflow}"
-grep -Fq 'ZRLOG_NATIVE_RESOLVE_ATTEMPTS: "30"' "${previewWorkflow}"
-grep -Fq 'ZRLOG_NATIVE_RESOLVE_RETRY_SECONDS: "30"' "${previewWorkflow}"
-grep -Fq -- '--build-arg "ZRLOG_NATIVE_MIRROR_BASE_URL=$env:ZRLOG_NATIVE_MIRROR_BASE_URL"' "${previewWorkflow}"
 
 grep -Fq 'zrlog version:${ZRLOG_EXPECTED_VERSION} - ' \
   "${SCRIPT_DIR}/../.github/workflows/docker-release-publish.yml"

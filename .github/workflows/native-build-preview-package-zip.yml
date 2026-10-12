@@ -1,4 +1,4 @@
-name: build native preview package
+name: build native preview package and docker image
 on:
   push:
     branches:
@@ -7,10 +7,15 @@ on:
   repository_dispatch:
     types:
       - zrlog-admin-web-preview-updated
+permissions:
+  contents: read
+  actions: read
 jobs:
   build:
     name: ZrLog on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    outputs:
+      docker_artifact_id: ${{ steps.docker_artifact.outputs.artifact-id }}
     env:
       ZRLOG_BUILD_ID: ${{ github.event.client_payload.build_id || '' }}
       ZRLOG_BUILD_TIME: ${{ github.event.client_payload.build_time || '' }}
@@ -38,3 +43,50 @@ jobs:
           mkdir -p /tmp/download
           bash -e shell/native/build-final-native.sh preview /tmp/download zip
           bash -e shell/upload-bin.sh ${{ secrets.SECRET_ID }} ${{ secrets.SECRET_KEY }} ${{ secrets.BUCKET }} /tmp/download preview ${{ secrets.HOST }}
+
+      # Docker handoff is optional for Native packaging: its failure must not fail this job.
+      - name: Capture Native package for Docker
+        id: docker_snapshot
+        continue-on-error: true
+        run: |
+          mkdir -p /tmp/native-preview-docker/preview /tmp/native-preview-docker/evidence
+          cp /tmp/download/preview/zrlog-Linux-amd64.zip /tmp/download/preview/last.Linux-amd64.version.json /tmp/native-preview-docker/preview/
+          cp zrlog-web/src/main/resources/build.properties /tmp/native-preview-docker/evidence/
+
+      - name: Preserve Native package for Docker recovery
+        id: docker_artifact
+        if: steps.docker_snapshot.outcome == 'success'
+        continue-on-error: true
+        uses: actions/upload-artifact@v7
+        with:
+          name: native-preview-docker-${{ github.run_attempt }}
+          path: /tmp/native-preview-docker
+          if-no-files-found: error
+          retention-days: 30
+
+  docker:
+    name: Publish preview Docker image
+    needs: build
+    runs-on: ubuntu-latest
+    concurrency:
+      group: docker-preview-publish
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+      - name: Require the current Native snapshot
+        env:
+          NATIVE_ARTIFACT_ID: ${{ needs.build.outputs.docker_artifact_id }}
+        run: test -n "$NATIVE_ARTIFACT_ID"
+      - uses: ./.github/actions/publish-preview-docker
+        with:
+          native-run-id: ${{ github.run_id }}
+          native-artifact-id: ${{ needs.build.outputs.docker_artifact_id }}
+          github-token: ${{ github.token }}
+          docker-password: ${{ secrets.DOCKER_PASSWORD }}
+          aliyun-docker-password: ${{ secrets.ALIYUN_DOCKER_PASSWORD }}
+          secret-id: ${{ secrets.SECRET_ID }}
+          secret-key: ${{ secrets.SECRET_KEY }}
+          bucket: ${{ secrets.BUCKET }}
+          host: ${{ secrets.HOST }}

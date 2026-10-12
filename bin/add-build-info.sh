@@ -22,7 +22,7 @@ function projectVersion() {
 version=$(projectVersion)
 : "${version:?project version is required}"
 # https://dl.zrlog.com mirror folder
-mirrorWebSite=https://dl.zrlog.com/
+mirrorWebSite="${ZRLOG_MIRROR_WEBSITE:-https://dl.zrlog.com/}"
 runMode=${1:-dev}
 runtimeType="${ZRLOG_RUNTIME_TYPE:-}"
 packageType="${ZRLOG_PACKAGE_TYPE:-}"
@@ -95,9 +95,12 @@ else
     updateVersionJsonFilename="last.version.json"
 fi
 
+updateVersionJsonFilename="${ZRLOG_UPDATE_VERSION_JSON_FILENAME:-$updateVersionJsonFilename}"
+dockerUpdateVersionJsonFilename="${ZRLOG_DOCKER_UPDATE_VERSION_JSON_FILENAME:-last.docker-image.version.json}"
+
 mkdir -p zrlog-web/src/main/resources/
-printf "version=%s\nrunMode=%s\nrunModeDesc=%s\nbuildId=%s\nbuildTime=%s\nmirrorWebSite=%s\nfileArch=%s\nruntimeType=%s\npackageType=%s\nupdateVersionJsonFilename=%s\nsourceCommit=%s\nsourceRepository=%s\nbuildWorkflow=%s\n" \
-  "$version" "$runMode" "$runModeDesc" "$buildId" "$Date" "$mirrorWebSite" "$fileArch" "$runtimeType" "$packageType" "$updateVersionJsonFilename" \
+printf "version=%s\nrunMode=%s\nrunModeDesc=%s\nbuildId=%s\nbuildTime=%s\nmirrorWebSite=%s\nfileArch=%s\nruntimeType=%s\npackageType=%s\nupdateVersionJsonFilename=%s\ndockerUpdateVersionJsonFilename=%s\nsourceCommit=%s\nsourceRepository=%s\nbuildWorkflow=%s\n" \
+  "$version" "$runMode" "$runModeDesc" "$buildId" "$Date" "$mirrorWebSite" "$fileArch" "$runtimeType" "$packageType" "$updateVersionJsonFilename" "$dockerUpdateVersionJsonFilename" \
   "$sourceCommit" "$sourceRepository" "$buildWorkflow" \
   > zrlog-web/src/main/resources/build.properties
 

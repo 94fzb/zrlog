@@ -1,0 +1,13 @@
+# CI verifies package SHA-256 and source identity before preparing this context.
+FROM ubuntu:noble
+ARG ZRLOG_EXPECTED_VERSION
+ARG ZRLOG_SOURCE_COMMIT
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl \
+    && rm -rf /var/lib/apt/lists/*
+COPY --chmod=755 zrlog /opt/zrlog/zrlog
+LABEL org.opencontainers.image.version="${ZRLOG_EXPECTED_VERSION}" \
+      org.opencontainers.image.revision="${ZRLOG_SOURCE_COMMIT}" \
+      org.opencontainers.image.source="https://github.com/94fzb/zrlog"
+ENV DOCKER_MODE=true
+WORKDIR /opt/zrlog
+CMD ["/opt/zrlog/zrlog"]

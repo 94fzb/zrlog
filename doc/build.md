@@ -2,6 +2,39 @@
 
 > ZrLog 提供 Zip、War、Deb 等运行包，可部署在常见 Linux 环境中。Native Image 包也可用于树莓派等 arm64 Linux 设备。
 
+### 更新元数据配置
+
+`buildId` 与 `sourceCommit` 用途不同。`bin/add-build-info.sh` 默认以
+`git rev-parse --short HEAD` 生成 buildId；子工程通知预览构建时通过 `ZRLOG_BUILD_ID`
+传入 `base-<7位短号>`、`adminweb-<7位短号>` 或 `blogweb-<7位短号>`。安装包和 Docker
+固定预览标签必须复用实际包里的 buildId，不能改用主工程完整 SHA，否则依赖更新也可能
+碰撞到同一个镜像标签。完整源码身份由 `sourceCommit` 单独保存。
+
+Native ZIP 预览与 Docker 预览共用 `native-build-preview-package-zip.yml`：先构建并上传
+Native 包，再由独立 job 使用本次产物快照发布双仓库镜像。Docker 失败不改变 Native job
+结果。Docker 失败后选择 **Re-run failed jobs** 或对 Docker job 选择 **Re-run this job**，
+可复用原 Native 快照补发镜像，不重新编译或上传 Native 包；快照保留 30 天。
+Java、DEB、FaaS 和正式版工作流保持独立。恢复和校验细节见
+[Docker 预览发布说明](../docker/README.md#发布-docker-预览清单)。
+
+`bin/add-build-info.sh` 生成应用包内 `build.properties`。以下配置由构建决定：
+
+| 属性 | 默认值 | 用途 |
+| --- | --- | --- |
+| `mirrorWebSite` | `https://dl.zrlog.com/` | 版本元数据基址 |
+| `updateVersionJsonFilename` | 由包类型和架构确定 | ZIP/WAR/Native 文件包清单 |
+| `dockerUpdateVersionJsonFilename` | `last.docker-image.version.json` | Docker 运行模式的镜像清单 |
+
+定制构建可分别传入 `ZRLOG_MIRROR_WEBSITE`、`ZRLOG_UPDATE_VERSION_JSON_FILENAME` 和
+`ZRLOG_DOCKER_UPDATE_VERSION_JSON_FILENAME`。实际检查地址是
+`<mirrorWebSite>/<release或preview>/<清单文件名>`，要求 HTTPS。后台更新设置选择
+安装包下载源或镜像仓库，元数据地址不通过页面修改。
+
+独立 [Docker updater](https://github.com/zrlog/zrlog-updater) 使用自己的 `build.properties`；它的
+`mirrorWebSite` 与应用一致，`updateVersionJsonFilename` 对应应用的 Docker 清单名。
+两端配置不一致时拒绝开启容器升级。updater 使用独立 POM，只带 Gson 和 JDK HTTP 服务，
+不继承主工程的页面、安装、数据库或主题依赖。
+
 ### Polyglot / Hexo 运行时边界
 
 这是产品约定，不以当前 JDK 是否具备运行 GraalJS 的技术条件为依据。

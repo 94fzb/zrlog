@@ -11,6 +11,11 @@ ARG ZRLOG_NATIVE_ZIP_SHA256=
 ARG ZRLOG_NATIVE_MIRROR_BASE_URL=
 ARG ZRLOG_EXPECTED_SOURCE_COMMIT=
 ARG ZRLOG_EXPECTED_VERSION=
+ARG ZRLOG_SOURCE_COMMIT=
+
+LABEL org.opencontainers.image.version="${ZRLOG_EXPECTED_VERSION}" \
+      org.opencontainers.image.revision="${ZRLOG_SOURCE_COMMIT}" \
+      org.opencontainers.image.source="https://github.com/94fzb/zrlog"
 
 RUN set -eux; \
     sed -i 's|http://archive.ubuntu.com/ubuntu/|http://mirrors.tuna.tsinghua.edu.cn/ubuntu/|g; s|http://security.ubuntu.com/ubuntu/|http://mirrors.tuna.tsinghua.edu.cn/ubuntu/|g' /etc/apt/sources.list.d/ubuntu.sources; \

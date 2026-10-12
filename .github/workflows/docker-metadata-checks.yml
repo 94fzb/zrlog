@@ -1,0 +1,18 @@
+name: Docker metadata checks
+on:
+  pull_request:
+    paths: ['docker/**', '.github/workflows/docker-*.yml', 'shell/release/*sources*']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  metadata:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - name: Application metadata and publication contract tests
+        run: |
+          bash docker/test-image-manifest.sh
+          python3 shell/release/test_update_sources.py
+          bash docker/test-native-package-contract.sh

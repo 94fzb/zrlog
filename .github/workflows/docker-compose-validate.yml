@@ -6,10 +6,16 @@ on:
       - docker/Dockerfile
       - docker/Dockerfile.windows
       - docker/docker-compose.yml
+      - docker/docker-compose.updater.yml
+      - docker/test-compose-updater-config.sh
       - docker/.env.example
       - docker/resolve-native-package.sh
       - docker/test-native-package-contract.sh
-      - .github/workflows/docker-preview-publish.yml
+      - .github/workflows/native-build-preview-package-zip.yml
+      - .github/actions/publish-preview-docker/**
+      - docker/*preview*.sh
+      - docker/Dockerfile.package
+      - docker/*image*.sh
       - .github/workflows/docker-release-publish.yml
       - .github/workflows/docker-compose-validate.yml
   push:
@@ -19,10 +25,16 @@ on:
       - docker/Dockerfile
       - docker/Dockerfile.windows
       - docker/docker-compose.yml
+      - docker/docker-compose.updater.yml
+      - docker/test-compose-updater-config.sh
       - docker/.env.example
       - docker/resolve-native-package.sh
       - docker/test-native-package-contract.sh
-      - .github/workflows/docker-preview-publish.yml
+      - .github/workflows/native-build-preview-package-zip.yml
+      - .github/actions/publish-preview-docker/**
+      - docker/*preview*.sh
+      - docker/Dockerfile.package
+      - docker/*image*.sh
       - .github/workflows/docker-release-publish.yml
       - .github/workflows/docker-compose-validate.yml
 
@@ -37,18 +49,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Verify default ZrLog image
-        shell: bash
-        run: |
-          expected_image=$(sed -n 's/^ZRLOG_IMAGE=//p' docker/.env.example)
-          compose_default=$(sed -n 's/^[[:space:]]*image: ${ZRLOG_IMAGE:-\([^}]*\)}$/\1/p' docker/docker-compose.yml)
-          test -n "${expected_image}"
-          test "${compose_default}" = "${expected_image}"
-
       - name: Verify Native package pinning contract
         run: bash docker/test-native-package-contract.sh
 
+      - name: Verify Native preview Docker recovery
+        run: bash docker/test-preview-package.sh
+
+      - name: Verify Docker image metadata
+        run: bash docker/test-image-manifest.sh
+
       - name: Validate configuration
-        env:
-          MYSQL_PASSWORD: compose-validation-password
-        run: docker compose --file docker/docker-compose.yml config --quiet
+        run: bash docker/test-compose-updater-config.sh
