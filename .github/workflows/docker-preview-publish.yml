@@ -194,23 +194,19 @@ jobs:
         env:
           IMAGE_TAG: ${{ needs.prepare.outputs.version }}-${{ needs.prepare.outputs.source_commit }}-preview
         run: |
-          found=0
           for repository in zrlog/zrlog registry.cn-chengdu.aliyuncs.com/hibegin/zrlog; do
+            registry=dockerhub
+            [[ "$repository" != registry.* ]] || registry=aliyun
             if docker buildx imagetools inspect "$repository:$IMAGE_TAG" > /tmp/image-descriptor 2> /tmp/image-error; then
-              found=$((found + 1))
+              echo "$registry=true" >> "$GITHUB_OUTPUT"
             elif ! grep -Eqi 'not found|manifest unknown' /tmp/image-error; then
               cat /tmp/image-error >&2
               exit 1
             fi
           done
-          if [[ $found == 1 ]]; then
-            echo 'Partial publication already exists; preserve its tag and resolve the missing repository first' >&2
-            exit 1
-          fi
-          if [[ $found == 2 ]]; then echo 'reuse=true' >> "$GITHUB_OUTPUT"; fi
 
       - name: Build and push verified acceptance package
-        if: inputs.native_run_id != '' && steps.existing.outputs.reuse != 'true'
+        if: inputs.native_run_id != '' && steps.existing.outputs.dockerhub != 'true'
         uses: docker/build-push-action@v7
         with:
           context: .prepared-native/package
@@ -222,7 +218,22 @@ jobs:
             ZRLOG_SOURCE_COMMIT=${{ needs.prepare.outputs.source_commit }}
           tags: |
             zrlog/zrlog:${{ needs.prepare.outputs.version }}-${{ needs.prepare.outputs.source_commit }}-preview
-            registry.cn-chengdu.aliyuncs.com/hibegin/zrlog:${{ needs.prepare.outputs.version }}-${{ needs.prepare.outputs.source_commit }}-preview
+
+      - name: Publish compatible Aliyun preview index
+        if: inputs.native_run_id != '' && inputs.push_image && steps.existing.outputs.aliyun != 'true'
+        env:
+          IMAGE_TAG: ${{ needs.prepare.outputs.version }}-${{ needs.prepare.outputs.source_commit }}-preview
+        run: |
+          hub=zrlog/zrlog
+          aliyun=registry.cn-chengdu.aliyuncs.com/hibegin/zrlog
+          digest=$(docker buildx imagetools inspect "$hub:$IMAGE_TAG" --format '{{.Manifest.Digest}}')
+          # Aliyun does not accept BuildKit OCI attestation manifests. Copy the
+          # runtime image through Docker, preserving layers/config; retain Hub provenance.
+          docker pull --platform linux/amd64 "$hub@$digest"
+          docker tag "$hub@$digest" "$aliyun:$IMAGE_TAG-amd64"
+          docker push "$aliyun:$IMAGE_TAG-amd64"
+          runtime_digest=$(docker buildx imagetools inspect "$aliyun:$IMAGE_TAG-amd64" --format '{{.Manifest.Digest}}')
+          docker buildx imagetools create --tag "$aliyun:$IMAGE_TAG" "$aliyun@$runtime_digest"
 
       - name: Verify published preview images and collect metadata
         if: inputs.push_image
