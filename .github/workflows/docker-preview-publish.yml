@@ -128,6 +128,7 @@ jobs:
           name: docker-native-package-${{ github.run_attempt }}
           path: .prepared-native
           if-no-files-found: error
+          include-hidden-files: true
           retention-days: 7
 
   build:
@@ -280,6 +281,7 @@ jobs:
           name: docker-preview-publication-${{ github.run_attempt }}
           path: .docker-metadata/*.json
           if-no-files-found: warn
+          include-hidden-files: true
 
   validate-windows:
     name: Validate preview Windows image
