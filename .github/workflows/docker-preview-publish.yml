@@ -167,8 +167,25 @@ jobs:
           registry: registry.cn-chengdu.aliyuncs.com
           username: 90xchun
           password: ${{ secrets.ALIYUN_DOCKER_PASSWORD }}
+      - name: Preserve existing immutable preview tags
+        id: existing
+        if: inputs.push_image
+        env:
+          IMAGE_TAG: ${{ needs.prepare.outputs.version }}-${{ needs.prepare.outputs.source_commit }}-preview
+        run: |
+          for repository in zrlog/zrlog registry.cn-chengdu.aliyuncs.com/hibegin/zrlog; do
+            registry=dockerhub
+            [[ "$repository" != registry.* ]] || registry=aliyun
+            if docker buildx imagetools inspect "$repository:$IMAGE_TAG" > /tmp/image-descriptor 2> /tmp/image-error; then
+              echo "$registry=true" >> "$GITHUB_OUTPUT"
+            elif ! grep -Eqi 'not found|manifest unknown' /tmp/image-error; then
+              cat /tmp/image-error >&2
+              exit 1
+            fi
+          done
+
       - name: Build and push
-        if: inputs.native_run_id == ''
+        if: inputs.native_run_id == '' && steps.existing.outputs.dockerhub != 'true'
         uses: docker/build-push-action@v7
         with:
           context: ./docker
@@ -186,24 +203,6 @@ jobs:
           tags: |
             zrlog/zrlog-preview:latest
             zrlog/zrlog:${{ needs.prepare.outputs.version }}-${{ needs.prepare.outputs.source_commit }}-preview
-            registry.cn-chengdu.aliyuncs.com/hibegin/zrlog:${{ needs.prepare.outputs.version }}-${{ needs.prepare.outputs.source_commit }}-preview
-
-      - name: Preserve existing immutable preview tags
-        id: existing
-        if: inputs.native_run_id != '' && inputs.push_image
-        env:
-          IMAGE_TAG: ${{ needs.prepare.outputs.version }}-${{ needs.prepare.outputs.source_commit }}-preview
-        run: |
-          for repository in zrlog/zrlog registry.cn-chengdu.aliyuncs.com/hibegin/zrlog; do
-            registry=dockerhub
-            [[ "$repository" != registry.* ]] || registry=aliyun
-            if docker buildx imagetools inspect "$repository:$IMAGE_TAG" > /tmp/image-descriptor 2> /tmp/image-error; then
-              echo "$registry=true" >> "$GITHUB_OUTPUT"
-            elif ! grep -Eqi 'not found|manifest unknown' /tmp/image-error; then
-              cat /tmp/image-error >&2
-              exit 1
-            fi
-          done
 
       - name: Build and push verified acceptance package
         if: inputs.native_run_id != '' && steps.existing.outputs.dockerhub != 'true'
@@ -220,7 +219,7 @@ jobs:
             zrlog/zrlog:${{ needs.prepare.outputs.version }}-${{ needs.prepare.outputs.source_commit }}-preview
 
       - name: Publish compatible Aliyun preview index
-        if: inputs.native_run_id != '' && inputs.push_image && steps.existing.outputs.aliyun != 'true'
+        if: inputs.push_image && steps.existing.outputs.aliyun != 'true'
         env:
           IMAGE_TAG: ${{ needs.prepare.outputs.version }}-${{ needs.prepare.outputs.source_commit }}-preview
         run: |
@@ -280,8 +279,12 @@ jobs:
         run: |
           manifest=.docker-metadata/last.docker-image.version.json
           for path in "preview/docker-image/$(jq -r '.version + "-" + .buildId' "$manifest").json" preview/last.docker-image.version.json; do
-            curl --fail --silent --show-error --location --retry 3 --retry-all-errors \
-              --connect-timeout 15 --max-time 120 "https://dl.zrlog.com/$path" -o .docker-metadata/public.json
+            if ! curl --fail --silent --show-error --location --retry 3 --retry-all-errors \
+              --connect-timeout 15 --max-time 120 -D /tmp/public-metadata.headers \
+              "https://dl.zrlog.com/$path" -o .docker-metadata/public.json; then
+              grep -Ei '^HTTP/|^server:|^cf-mitigated:' /tmp/public-metadata.headers >&2 || true
+              exit 1
+            fi
             cmp "$manifest" .docker-metadata/public.json
           done
 
