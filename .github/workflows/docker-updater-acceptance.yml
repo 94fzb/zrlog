@@ -25,12 +25,12 @@ jobs:
       - uses: actions/checkout@v7
         with:
           repository: zrlog/zrlog-base
-          ref: 9238b03235c8cbdb1c53cd7b35899bd98718a0a7
+          ref: 2d47e84362e7ca72f6a58d6f56d3fea304f088aa
           path: base
       - uses: actions/checkout@v7
         with:
           repository: zrlog/zrlog-admin-web
-          ref: 697b73050e5ebe8145f2d50423bcac6c0cc15aae
+          ref: 839bf124164e1cbf8fd8ce4fde85cdc58aab1af0
           path: admin
       - uses: actions/setup-java@v5
         with:
