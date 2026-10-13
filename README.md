@@ -32,7 +32,7 @@ ZrLog 是一款基于 Java 的开源博客系统。它提供文章、分类、�
 3. **主题系统**: 支持自定义和切换博客主题（[如何制作一套主题](https://blog.zrlog.com/make-theme-for-zrlog.html)）。
 4. **文章编辑**: 内置 Markdown 编辑器，支持常用写作和预览流程。
 5. **访问优化**: 支持页面静态化和公共数据缓存。
-6. **部署形态**: 支持 Docker、Zip、War、Native Image 和 Serverless / D1 相关部署方式。
+6. **部署形态**: 推荐 Native/Zip + SQLite 或 Docker Compose + MySQL；AWS Lambda + Cloudflare D1 作为高级路径，并支持 WAR 容器部署。
 7. **运维能力**: 支持数据库定时备份和在线升级。
 
 ### 快速开始（开发者启动）
@@ -55,15 +55,17 @@ ZrLog 是一款基于 Java 的开源博客系统。它提供文章、分类、�
   docker run -p 8080:8080 -v $(pwd)/conf:/opt/zrlog/conf zrlog/zrlog
   ```
   启动后访问 `http://localhost:8080/install`。安装页会检查配置目录、数据库连接和安装锁文件，并在安装过程中显示实际执行进度。
+  安装令牌默认关闭，以减少首次使用步骤；安装完成后，`install.lock` 会阻止重复安装。未安装实例若直接暴露到公网，仍可能被他人抢先初始化；公网或无人值守部署应在启动前显式设置 `ZRLOG_INSTALL_TOKEN`。不同发布形态的配置方式见[安装说明](doc/install.md#首次安装保护)。
   需要同时启动 MySQL 时，参见 [Docker Compose 部署说明](doc/docker-compose.md)。
 
-- **正式部署：Docker / Native Image / Zip / WAR**
+- **推荐与高级部署**
 
-  - JDK 版本：`>= 11`（Native Image 发行包免装 JDK）。
-  - 数据库支持：`MySQL >= 5.7`，或者 `Cloudflare D1`（通过 Web API 方式代理访问）。
+  - 推荐路径（个人或本机）：Native/Zip + SQLite。Native Image 发行包免装 JDK；Zip 运行需要 JDK `>= 11`。
+  - 推荐路径（服务器）：Docker Compose + MySQL。官方 Compose 配置包含 MySQL、健康检查和持久化卷。
+  - 高级路径：AWS Lambda + Cloudflare D1。使用 Linux FaaS 包，并通过 WebApi 连接 D1。
   - Zip 包下载后解压，在目录中运行 `bin/start.sh`，Windows 使用 `bin/start.bat`。
   - 尚未安装时，可在安装页直接升级，也可运行 `./zrlog upgrade`（Native Image）或 `java -jar zrlog-starter.jar upgrade`（Zip）；`upgrade` 是子命令，不使用 `--upgrade`。
-  - WAR 包适合已有 Tomcat / Jetty 容器的部署流程。
+  - WAR 是其他支持形态，适合已有 Tomcat / Jetty 与外部数据库的部署流程。
   - Docker 部署请确认 `/opt/zrlog/conf` 已挂载到持久化目录；`db.properties` 和 `install.lock` 会写入该目录。
   - 安装完成后进入后台开始创建第一篇文章。
 

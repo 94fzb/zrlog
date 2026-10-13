@@ -32,7 +32,7 @@ ZrLog is an open-source blog system built with Java. It provides article, catego
 3. **Themes**: Customize and switch blog themes ([How to create a custom theme](https://blog.zrlog.com/make-theme-for-zrlog.html)).
 4. **Article Editing**: Use the built-in Markdown editor for common writing and preview workflows.
 5. **Access Optimization**: Generate static pages and cache shared public data.
-6. **Deployment Options**: Run with Docker, Zip, War, Native Image, or Serverless / D1 deployments.
+6. **Deployment Options**: Use Native/Zip + SQLite or Docker Compose + MySQL as the recommended paths; AWS Lambda + Cloudflare D1 is the advanced path, and WAR container deployment remains supported.
 7. **Operations**: Use scheduled database backups and online updates.
 
 ### Quick Start (Developer Startup)
@@ -51,15 +51,17 @@ ZrLog is an open-source blog system built with Java. It provides article, catego
   docker run -p 8080:8080 -v $(pwd)/conf:/opt/zrlog/conf zrlog/zrlog
   ```
   Then visit `http://localhost:8080/install`. The installer checks config paths, database connectivity, and the install lock, then shows installation progress while it runs.
+  The installation token is disabled by default to keep first-time setup simple. After a successful setup, `install.lock` prevents another installation. An uninstalled instance exposed directly to the public Internet can still be initialized by someone else; set `ZRLOG_INSTALL_TOKEN` explicitly before startup for public or unattended deployments. See the [installation guide](doc/install.md#首次安装保护) for deployment-specific configuration.
   To start ZrLog together with MySQL, follow the [Docker Compose guide](doc/docker-compose.en-us.md).
 
-- **Production deployment: Docker / Native Image / Zip / WAR**
+- **Recommended and advanced deployment**
 
-  - JDK: `>= 11` (not required when using the Native Image release package).
-  - Database: `MySQL >= 5.7` or `Cloudflare D1` through Web API access.
+  - Recommended for personal or local use: Native/Zip + SQLite. Native Image packages include the runtime; Zip requires JDK `>= 11`.
+  - Recommended for servers: Docker Compose + MySQL. The official Compose configuration includes MySQL, health checks, and persistent volumes.
+  - Advanced path: AWS Lambda + Cloudflare D1. Use a Linux FaaS package and connect to D1 through WebApi.
   - For Zip packages, download the [latest package](https://www.zrlog.com/download), extract it, and run `bin/start.sh` or `bin/start.bat` on Windows.
   - Before installation, upgrade from the installer or run `./zrlog upgrade` for Native Image and `java -jar zrlog-starter.jar upgrade` for Zip packages. `upgrade` is a subcommand, not `--upgrade`.
-  - WAR packages are for existing Tomcat / Jetty containers.
+  - WAR remains supported for deployments with an existing Tomcat / Jetty container and external database.
   - For Docker, make sure `/opt/zrlog/conf` is mounted to persistent storage; `db.properties` and `install.lock` are written there.
   - After installation, enter admin and create your first article.
 

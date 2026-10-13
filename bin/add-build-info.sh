@@ -43,6 +43,12 @@ runModeDesc="\\u5F00\\u53D1\\u7248\\u672C"
 fi
 
 Date="${ZRLOG_BUILD_TIME:-$(git log -1 --format=%cd --date=format:'%Y-%m-%d %H:%M:%S%z' | sed "s/\([+-]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1\2:\3/")}"
+Date="${Date/T/ }"
+buildTimePattern='^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}(Z|[+-][0-9]{2}:[0-9]{2})$'
+if [[ ! "${Date}" =~ ${buildTimePattern} ]]; then
+    printf 'Invalid build time: %s (expected yyyy-MM-dd HH:mm:ssXXX)\n' "${Date}" >&2
+    exit 1
+fi
 defaultBuildId="$(git rev-parse --short HEAD)"
 buildId="${ZRLOG_BUILD_ID:-$defaultBuildId}"
 sourceCommit="${ZRLOG_SOURCE_COMMIT:-$(git rev-parse HEAD)}"

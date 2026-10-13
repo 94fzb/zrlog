@@ -3,15 +3,27 @@ name: validate docker compose
 on:
   pull_request:
     paths:
+      - docker/Dockerfile
+      - docker/Dockerfile.windows
       - docker/docker-compose.yml
       - docker/.env.example
+      - docker/resolve-native-package.sh
+      - docker/test-native-package-contract.sh
+      - .github/workflows/docker-preview-publish.yml
+      - .github/workflows/docker-release-publish.yml
       - .github/workflows/docker-compose-validate.yml
   push:
     branches:
       - master
     paths:
+      - docker/Dockerfile
+      - docker/Dockerfile.windows
       - docker/docker-compose.yml
       - docker/.env.example
+      - docker/resolve-native-package.sh
+      - docker/test-native-package-contract.sh
+      - .github/workflows/docker-preview-publish.yml
+      - .github/workflows/docker-release-publish.yml
       - .github/workflows/docker-compose-validate.yml
 
 permissions:
@@ -24,6 +36,17 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+
+      - name: Verify default ZrLog image
+        shell: bash
+        run: |
+          expected_image=$(sed -n 's/^ZRLOG_IMAGE=//p' docker/.env.example)
+          compose_default=$(sed -n 's/^[[:space:]]*image: ${ZRLOG_IMAGE:-\([^}]*\)}$/\1/p' docker/docker-compose.yml)
+          test -n "${expected_image}"
+          test "${compose_default}" = "${expected_image}"
+
+      - name: Verify Native package pinning contract
+        run: bash docker/test-native-package-contract.sh
 
       - name: Validate configuration
         env:
