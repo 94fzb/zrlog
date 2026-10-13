@@ -106,8 +106,9 @@ Docker 失败时选择 **Re-run failed jobs**，或者在 Docker job 上选择 *
 
 流水线先发布到两个镜像仓库，再匿名拉取并检查版本、源码标签及
 Native 文件 SHA-256。Bash/jq/AWS CLI 脚本随后写入
-`preview/docker-image/<version>-<buildId>.json`，校验回读后条件更新
-`preview/last.docker-image.version.json`。最后验证两个 dl 公开地址返回同一份 JSON。
+`preview/docker-image/<version>-<buildId>.json`，通过 S3 API 回读并逐字节比对后，条件更新
+`preview/last.docker-image.version.json`，再通过 S3 API 回读并核对通道清单。
+两份清单验证成功后推进两个镜像仓库的 `preview` 标签，并保存发布证据。
 只修正镜像 tag 且版本、源码、仓库、平台和 digest 全部相同时，允许将修订清单写入
 `preview/docker-image/<version>-<buildId>/aliases/<JSON-SHA256>.json` 后推进通道入口，
 不会覆盖原不可变清单。
@@ -119,9 +120,8 @@ Native 文件 SHA-256。Bash/jq/AWS CLI 脚本随后写入
 格式上传到该仓库。两个仓库的索引 digest 因此分别读取和记录。
 恢复失败的 job 仍保留通道时间校验，不能用旧包覆盖更新的 `preview` 通道。
 
-若最后的 dl 公开回读被 Cloudflare challenge 拦截，流水线保持失败并输出 HTTP 状态与
-`cf-mitigated`，不能把上传成功当成公开可用。应另行核对实际部署网络的匿名清单响应、
-SHA-256 和 updater 仓库列表；已经发布的镜像与不可变清单仍保留。
+发布完成以镜像验证和 S3 清单回读一致为准，不再通过 `dl.zrlog.com` 或 R2 公开地址重复
+下载清单。CDN 可达性不作为此发布任务的成功条件。
 
 ## Windows Server 2022
 

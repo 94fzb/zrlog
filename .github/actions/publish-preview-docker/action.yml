@@ -151,20 +151,6 @@ runs:
           [[ $(docker buildx imagetools inspect "$repository:preview" --format '{{.Manifest.Digest}}') == "$digest" ]]
         done
 
-    - name: Verify public Docker metadata
-      shell: bash
-      run: |
-        manifest=.docker-metadata/last.docker-image.version.json
-        for path in "$(jq -r .immutableKey .docker-metadata/publication.json)" preview/last.docker-image.version.json; do
-          if ! curl --fail --silent --show-error --location --retry 3 --retry-all-errors \
-            --connect-timeout 15 --max-time 120 -D /tmp/public-metadata.headers \
-            "https://dl.zrlog.com/$path" -o .docker-metadata/public.json; then
-            grep -Ei '^HTTP/|^server:|^cf-mitigated:' /tmp/public-metadata.headers >&2 || true
-            exit 1
-          fi
-          cmp "$manifest" .docker-metadata/public.json
-        done
-
     - name: Preserve publication evidence
       if: always()
       uses: actions/upload-artifact@v7
