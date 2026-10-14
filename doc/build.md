@@ -39,8 +39,18 @@ Java、DEB、FaaS 和正式版工作流保持独立。恢复和校验细节见
 父 POM 的 `zrlog-updater.version` 选择。base/admin 的生产依赖只包含 SPI。
 `shell/lib/updater-modules.sh` 为 Web 和独立 package 构建选择 runtime scope，其余实现只用于测试。
 JDK ZIP 选 ZIP/Docker，WAR 选 WAR，Native ZIP 选 Native/Docker，FaaS 选 FaaS，deb 选 deb；
-common/SPI 随实现依赖传入。ZIP/WAR 校验真实 ServiceLoader、文案和无关实现/HTTP 服务的缺席。
+common/SPI 随实现依赖传入。主工程的 ZIP/WAR 包契约校验构件、依赖和无关实现/HTTP 服务的缺席；
+真实 ServiceLoader、文案和兼容入口验收由 updater 工程维护。
 该依赖需由 updater 的应用构件发布流程先提供；正式应用版本不能使用 SNAPSHOT。
+
+Web 启动直接编译依赖 updater-common 的 `UpdaterUtils`，由它选择部署类型和可信启动 JAR，
+并调度创建流程。主工程 `ApplicationUpdaterFactory` 只读取宿主环境、classpath 和应用目录，
+通过已有 `UpdaterHosts` 提供 HTTP、路径及生命周期适配。base/admin 仍只生产依赖 SPI，
+不把共享 updater 创建逻辑留在 Web 工具类，也不把宿主能力反向引入 updater-common。
+升级专项测试也由 updater 工程维护；主工程编译后生成 test classpath，交给 updater 的
+`scripts/test-application-host.sh` 执行 WAR/ZIP 装配、工厂和 deb CLI 验收。
+实际 ZIP/WAR 交给 updater 的 `scripts/test-application-package.sh <应用包路径>`，
+校验包内 Provider、语言资源和 base 兼容入口，测试源码不放回主工程。
 
 迁入的 updater 构件从 `4.0.0-SNAPSHOT` 开始。六类 Provider 和各类独立语言资源由
 updater 维护；主工程按 Docker、FaaS、deb、Native、ZIP 选择，Servlet 包选择 WAR。

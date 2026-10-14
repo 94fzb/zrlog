@@ -5,19 +5,13 @@ import jakarta.servlet.GenericFilter;
 import jakarta.servlet.ServletContext;
 import com.hibegin.http.server.config.AbstractServerConfig;
 import com.zrlog.common.Constants;
-import com.zrlog.common.Updater;
-import com.zrlog.common.UpdaterTypeEnum;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
-import java.util.jar.Attributes;
-import java.util.jar.JarOutputStream;
-import java.util.jar.Manifest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -27,75 +21,6 @@ public class ZrLogSwsServletFilterTest {
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
-
-    @Test
-    public void shouldResolveRootWarFileFromServletContext() throws Exception {
-        File webapps = temporaryFolder.newFolder("webapps");
-        File root = new File(webapps, "ROOT");
-
-        String warFile = getWarFile("/", root.getAbsolutePath());
-
-        assertEquals(new File(webapps, "ROOT.war").getAbsolutePath(), warFile);
-    }
-
-    @Test
-    public void shouldResolveContextWarFileFromServletContext() throws Exception {
-        File webapps = temporaryFolder.newFolder("webapps");
-        File blog = new File(webapps, "blog");
-
-        String warFile = getWarFile("/blog", blog.getAbsolutePath());
-
-        assertEquals(new File(webapps, "blog.war").getAbsolutePath(), warFile);
-    }
-
-    @Test
-    public void shouldUseWarUpdaterOutsideDevMode() throws Exception {
-        File webapps = temporaryFolder.newFolder("webapps");
-        File blog = new File(webapps, "blog");
-        ZrLogSwsServletFilter filter = new ZrLogSwsServletFilter();
-        String previousRunMode = System.getProperty("sws.run.mode");
-        try {
-            System.clearProperty("sws.run.mode");
-            setFilterConfig(filter, filterConfig("/blog", blog.getAbsolutePath()));
-
-            Updater updater = filter.getUpdater();
-
-            assertNotNull(updater);
-            assertEquals(UpdaterTypeEnum.WAR, updater.getType());
-            assertEquals(new File(webapps, "blog.war"), updater.execFile());
-        } finally {
-            restoreProperty("sws.run.mode", previousRunMode);
-        }
-    }
-
-    @Test
-    public void shouldUseZipUpdaterForPackagedDevLaunch() throws Exception {
-        File webapps = temporaryFolder.newFolder("webapps");
-        File blog = new File(webapps, "blog");
-        ZrLogSwsServletFilter filter = new ZrLogSwsServletFilter();
-        String previousRunMode = System.getProperty("sws.run.mode");
-        String previousClassPath = System.getProperty("java.class.path");
-        File launcher = temporaryFolder.newFile("zrlog-starter.jar");
-        Manifest manifest = new Manifest();
-        manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
-        manifest.getMainAttributes().put(Attributes.Name.MAIN_CLASS, "com.zrlog.web.Application");
-        try (JarOutputStream ignored = new JarOutputStream(new FileOutputStream(launcher), manifest)) {
-        }
-        try {
-            System.setProperty("java.class.path", launcher.getAbsolutePath());
-            System.setProperty("sws.run.mode", "dev");
-            setFilterConfig(filter, filterConfig("/blog", blog.getAbsolutePath()));
-
-            Updater updater = filter.getUpdater();
-
-            assertNotNull(updater);
-            assertEquals(UpdaterTypeEnum.ZIP, updater.getType());
-            assertEquals(launcher.getCanonicalFile(), updater.execFile());
-        } finally {
-            restoreProperty("java.class.path", previousClassPath);
-            restoreProperty("sws.run.mode", previousRunMode);
-        }
-    }
 
     @Test
     public void shouldBuildServerConfigFromServletContext() throws Exception {
@@ -153,12 +78,6 @@ public class ZrLogSwsServletFilterTest {
             restoreProperty("sws.log.path", previousLogPath);
             restoreProperty("sws.temp.path", previousTempPath);
         }
-    }
-
-    private static String getWarFile(String contextPath, String realPath) throws Exception {
-        ZrLogSwsServletFilter filter = new ZrLogSwsServletFilter();
-        setFilterConfig(filter, filterConfig(contextPath, realPath));
-        return filter.getWarFile();
     }
 
     private static void setFilterConfig(GenericFilter filter, FilterConfig filterConfig) throws Exception {

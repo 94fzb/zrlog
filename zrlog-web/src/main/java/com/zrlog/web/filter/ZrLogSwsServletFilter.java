@@ -11,7 +11,7 @@ import com.zrlog.common.UpdaterTypeEnum;
 import com.zrlog.common.updater.UpdaterHosts;
 import com.zrlog.updater.spi.UpdateProviders;
 import com.zrlog.util.ArgsParser;
-import com.zrlog.web.util.UpdaterUtils;
+import com.zrlog.web.ApplicationUpdaterFactory;
 import com.zrlog.web.config.ZrLogConfigImpl;
 
 import java.io.File;
@@ -43,7 +43,7 @@ public class ZrLogSwsServletFilter extends SwsServletFilter {
 
     Updater getUpdater() {
         if (EnvKit.isDevMode()) {
-            return UpdaterUtils.getUpdater(new String[0], null);
+            return ApplicationUpdaterFactory.create(new String[0], null);
         }
         if (UpdateProviders.find(UpdaterTypeEnum.WAR).isEmpty()) {
             return null;
