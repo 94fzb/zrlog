@@ -32,6 +32,7 @@
         <servlet-api.version>6.1.0</servlet-api.version>
         <zrlog-install-web.version>4.0.0-SNAPSHOT</zrlog-install-web.version>
         <zrlog-blog-web.version>4.0.0-SNAPSHOT</zrlog-blog-web.version>
+        <zrlog-updater.version>1.0.0-SNAPSHOT</zrlog-updater.version>
         <zrlog-admin-web.version>4.0.0-SNAPSHOT</zrlog-admin-web.version>
         <junit.version>4.13.2</junit.version>
         <mysql-scope>compile</mysql-scope>
@@ -95,6 +96,11 @@
     </licenses>
 
     <dependencies>
+        <!-- Both Web and standalone package builds assemble the updater implementation. -->
+        <dependency>
+            <groupId>com.hibegin</groupId><artifactId>zrlog-updater-core</artifactId>
+            <version>${zrlog-updater.version}</version><scope>runtime</scope>
+        </dependency>
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>

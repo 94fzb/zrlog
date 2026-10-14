@@ -41,6 +41,16 @@ mapfile -t libraryEntries < <(
 )
 (( ${#libraryEntries[@]} > 0 )) || fail "${packageType} contains no runtime libraries"
 
+for updaterArtifact in zrlog-updater-spi zrlog-updater-core; do
+  mapfile -t updaterEntries < <(
+    printf '%s\n' "${libraryEntries[@]}" \
+      | grep -E "^${libraryRoot}/${updaterArtifact}-[^/]+\\.jar$" \
+      || true
+  )
+  (( ${#updaterEntries[@]} == 1 )) \
+    || fail "Expected exactly one ${updaterArtifact} JAR, found ${#updaterEntries[@]}"
+done
+
 mapfile -t polyglotEntries < <(
   printf '%s\n' "${libraryEntries[@]}" \
     | grep -E "^${libraryRoot}/zrlog-polyglot-template-[^/]+\\.jar$" \
@@ -66,6 +76,9 @@ for entry in "${libraryEntries[@]}"; do
     zrlog-test-support-*.jar|zrlog-admin-test-support-*.jar|*-tests.jar)
       fail "${packageType} must not bundle test fixtures: ${entry}"
       ;;
+    zrlog-docker-updater-*.jar)
+      fail "${packageType} must not bundle the standalone Docker updater server: ${entry}"
+      ;;
     zrlog-template-hexo-*.jar|truffle-*.jar|icu4j-*.jar|regex-*.jar|jniutils-*.jar|nativeimage-*.jar|collections-*.jar|word-*.jar)
       fail "${packageType} must not bundle Polyglot/Hexo runtime dependency: ${entry}"
       ;;
@@ -73,6 +86,24 @@ for entry in "${libraryEntries[@]}"; do
 done
 
 unzip -qq "${archive}" -d "${workDir}/package"
+
+cat > "${workDir}/UpdaterContract.java" <<'JAVA'
+import com.zrlog.common.updater.PackageDownloadSource;
+import com.zrlog.common.vo.Version;
+import com.zrlog.updater.spi.UpdateCatalogs;
+
+class UpdaterContract {
+  public static void main(String[] args) {
+    UpdateCatalogs.getInstance();
+    Version legacy = new Version();
+    legacy.setZipDownloadUrl("https://dl.zrlog.com/release/zrlog.zip");
+    if (!legacy.getZipDownloadUrl().equals(PackageDownloadSource.select(legacy, false, "dl"))) {
+      throw new AssertionError("The packaged base facade cannot use updater SPI");
+    }
+  }
+}
+JAVA
+java -cp "${workDir}/package/${libraryRoot}/*" "${workDir}/UpdaterContract.java"
 
 mapfile -t webEntries < <(
   printf '%s\n' "${libraryEntries[@]}" \
