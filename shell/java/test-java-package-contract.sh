@@ -41,7 +41,13 @@ mapfile -t libraryEntries < <(
 )
 (( ${#libraryEntries[@]} > 0 )) || fail "${packageType} contains no runtime libraries"
 
-for updaterArtifact in zrlog-updater-spi zrlog-updater-core; do
+updaterArtifacts=(zrlog-updater-spi zrlog-updater-common)
+if [[ "$packageType" == ZIP ]]; then
+  updaterArtifacts+=(zrlog-updater-zip zrlog-updater-docker)
+else
+  updaterArtifacts+=(zrlog-updater-war)
+fi
+for updaterArtifact in "${updaterArtifacts[@]}"; do
   mapfile -t updaterEntries < <(
     printf '%s\n' "${libraryEntries[@]}" \
       | grep -E "^${libraryRoot}/${updaterArtifact}-[^/]+\\.jar$" \
@@ -49,6 +55,14 @@ for updaterArtifact in zrlog-updater-spi zrlog-updater-core; do
   )
   (( ${#updaterEntries[@]} == 1 )) \
     || fail "Expected exactly one ${updaterArtifact} JAR, found ${#updaterEntries[@]}"
+done
+for module in zip native war faas docker deb core; do
+  artifact="zrlog-updater-$module"
+  if [[ " ${updaterArtifacts[*]} " != *" $artifact "* ]]; then
+    if printf '%s\n' "${libraryEntries[@]}" | grep -E "^${libraryRoot}/${artifact}-[^/]+\\.jar$" >/dev/null; then
+      fail "${packageType} contains an unrelated updater module: ${artifact}"
+    fi
+  fi
 done
 
 mapfile -t polyglotEntries < <(
@@ -95,15 +109,21 @@ import com.zrlog.updater.spi.UpdateCatalogs;
 class UpdaterContract {
   public static void main(String[] args) throws Exception {
     UpdateCatalogs.getInstance();
+    java.util.Set<com.zrlog.common.UpdaterTypeEnum> expected = args[0].equals("ZIP")
+      ? java.util.Set.of(com.zrlog.common.UpdaterTypeEnum.ZIP, com.zrlog.common.UpdaterTypeEnum.DOCKER)
+      : java.util.Set.of(com.zrlog.common.UpdaterTypeEnum.WAR);
     for (com.zrlog.common.UpdaterTypeEnum type : com.zrlog.common.UpdaterTypeEnum.values()) {
-      com.zrlog.updater.spi.UpdateProviders.get(type);
+      if (com.zrlog.updater.spi.UpdateProviders.find(type).isPresent() != expected.contains(type)) {
+        throw new AssertionError("Unexpected packaged updater: " + type);
+      }
     }
     for (String resource : com.zrlog.updater.spi.UpdateProviders.messageResources("zh_CN")) {
       try (java.io.InputStream input = UpdaterContract.class.getResourceAsStream(resource)) {
         if (input == null) throw new AssertionError("Missing updater messages: " + resource);
       }
     }
-    if (!"正在解压".equals(com.zrlog.util.I18nUtil.getBackend().get("upgrade.zip.status.unzipping"))) {
+    String message = args[0].equals("ZIP") ? "upgrade.zip.status.unzipping" : "upgrade.status.backingUp";
+    if (com.zrlog.util.I18nUtil.getBackend().get(message) == null) {
       throw new AssertionError("The packaged host cannot load updater messages");
     }
     Version legacy = new Version();
@@ -114,7 +134,7 @@ class UpdaterContract {
   }
 }
 JAVA
-java -cp "${workDir}/package/${libraryRoot}/*" "${workDir}/UpdaterContract.java"
+java -cp "${workDir}/package/${libraryRoot}/*" "${workDir}/UpdaterContract.java" "$packageType"
 
 mapfile -t webEntries < <(
   printf '%s\n' "${libraryEntries[@]}" \

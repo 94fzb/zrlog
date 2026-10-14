@@ -35,10 +35,11 @@ Java、DEB、FaaS 和正式版工作流保持独立。恢复和校验细节见
 两端配置不一致时拒绝开启容器升级。updater 使用独立 POM，只带 Gson 和 JDK HTTP 服务，
 不继承主工程的页面、安装、数据库或主题依赖。
 
-应用使用同一独立仓库的 `zrlog-updater-spi` 与 `zrlog-updater-core`，版本由主工程父 POM
-的 `zrlog-updater.version` 选择。主工程父 POM 以 runtime scope 装配 core，让 Web 和
-单独的 package 构建均可取得实现；base/admin 的生产依赖只包含 SPI。
-ZIP/WAR 校验检查两个应用构件及真实 ServiceLoader 调用，并排除 Docker HTTP 服务。
+应用使用同一独立仓库的 `zrlog-updater-spi`、`zrlog-updater-common` 和分类型实现，版本由
+父 POM 的 `zrlog-updater.version` 选择。base/admin 的生产依赖只包含 SPI。
+`shell/lib/updater-modules.sh` 为 Web 和独立 package 构建选择 runtime scope，其余实现只用于测试。
+JDK ZIP 选 ZIP/Docker，WAR 选 WAR，Native ZIP 选 Native/Docker，FaaS 选 FaaS，deb 选 deb；
+common/SPI 随实现依赖传入。ZIP/WAR 校验真实 ServiceLoader、文案和无关实现/HTTP 服务的缺席。
 该依赖需由 updater 的应用构件发布流程先提供；正式应用版本不能使用 SNAPSHOT。
 
 迁入的 updater 构件从 `4.0.0-SNAPSHOT` 开始。六类 Provider 和各类独立语言资源由
