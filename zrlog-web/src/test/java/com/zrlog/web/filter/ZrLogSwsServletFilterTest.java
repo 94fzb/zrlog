@@ -7,7 +7,6 @@ import com.hibegin.http.server.config.AbstractServerConfig;
 import com.zrlog.common.Constants;
 import com.zrlog.common.Updater;
 import com.zrlog.common.UpdaterTypeEnum;
-import com.zrlog.common.updater.WarUpdater;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -61,7 +60,9 @@ public class ZrLogSwsServletFilterTest {
 
             Updater updater = filter.getUpdater();
 
-            assertTrue(updater instanceof WarUpdater);
+            assertNotNull(updater);
+            assertEquals(UpdaterTypeEnum.WAR, updater.getType());
+            assertEquals(new File(webapps, "blog.war"), updater.execFile());
         } finally {
             restoreProperty("sws.run.mode", previousRunMode);
         }
