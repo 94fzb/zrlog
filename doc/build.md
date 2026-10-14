@@ -41,6 +41,14 @@ Java、DEB、FaaS 和正式版工作流保持独立。恢复和校验细节见
 ZIP/WAR 校验检查两个应用构件及真实 ServiceLoader 调用，并排除 Docker HTTP 服务。
 该依赖需由 updater 的应用构件发布流程先提供；正式应用版本不能使用 SNAPSHOT。
 
+迁入的 updater 构件从 `4.0.0-SNAPSHOT` 开始。六类 Provider 和各类独立语言资源由
+updater 维护；主工程按 Docker、FaaS、deb、Native、ZIP 选择，Servlet 包选择 WAR。
+deb 的可执行文件、init.d 和 systemd unit 必须归 root 管理。应用用户只可写
+`/var/lib/zrlog/upgrade-request/{release,preview}.request`；oneshot 使用固定 CLI
+`upgrade --channel=<通道> --non-interactive --json`，进入该分支前不启动 Web/数据库。
+安装后用 `shell/native/test-deb-package-contract.sh <包.deb>` 检查权限及 unit。
+deb 清单的 `debPackageVersion` 来自实际 dpkg 包，buildId 继续使用现有短提交规范。
+
 ### Polyglot / Hexo 运行时边界
 
 这是产品约定，不以当前 JDK 是否具备运行 GraalJS 的技术条件为依据。

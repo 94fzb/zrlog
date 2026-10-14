@@ -85,6 +85,7 @@ function releaseManifestWriteZipVersionJson() {
     local sourceCommit
     local sourceRepository
     local buildWorkflow
+    local debPackageVersion=""
 
     zipFileSize=$(releaseManifestFileSizeOf "${artifactFile}")
     zipMd5sum=$(releaseManifestMd5Of "${artifactFile}")
@@ -92,9 +93,12 @@ function releaseManifestWriteZipVersionJson() {
     sourceCommit=$(releaseManifestSourceMetadata 'sourceCommit')
     sourceRepository=$(releaseManifestSourceMetadata 'sourceRepository')
     buildWorkflow=$(releaseManifestSourceMetadata 'buildWorkflow')
+    if [[ "${artifactFile}" == *.deb ]]; then
+        debPackageVersion=$(dpkg-deb --field "${artifactFile}" Version)
+    fi
 
-    printf '{"checksumAlgorithm":"sha256","zipSha256":"%s","zipMd5sum":"%s","zipDownloadUrl":"%s","type":"%s","version":"%s","buildId":"%s","zipFileSize":%s,"releaseDate":"%s","sourceCommit":"%s","sourceRepository":"%s","buildWorkflow":"%s"}\n' \
+    printf '{"checksumAlgorithm":"sha256","zipSha256":"%s","zipMd5sum":"%s","zipDownloadUrl":"%s","type":"%s","version":"%s","buildId":"%s","zipFileSize":%s,"releaseDate":"%s","sourceCommit":"%s","sourceRepository":"%s","buildWorkflow":"%s","debPackageVersion":"%s"}\n' \
         "${zipSha256}" "${zipMd5sum}" "${mirrorWebSite}${downloadPath}" "${type}" "${version}" "${buildId}" "${zipFileSize}" "${releaseDate}" \
-        "${sourceCommit}" "${sourceRepository}" "${buildWorkflow}" \
+        "${sourceCommit}" "${sourceRepository}" "${buildWorkflow}" "${debPackageVersion}" \
         > "${outputFile}"
 }

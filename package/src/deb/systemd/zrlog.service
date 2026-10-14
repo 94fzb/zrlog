@@ -1,0 +1,16 @@
+[Unit]
+Description=ZrLog application
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=forking
+PIDFile=/var/run/zrlog/zrlog.pid
+ExecStart=/etc/init.d/zrlog start
+ExecStop=/etc/init.d/zrlog stop
+TimeoutStartSec=90
+TimeoutStopSec=30
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

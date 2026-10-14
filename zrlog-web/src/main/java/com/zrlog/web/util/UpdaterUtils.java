@@ -6,6 +6,10 @@ import com.zrlog.common.updater.NativeImageUpdater;
 import com.zrlog.common.updater.ZipUpdater;
 import com.zrlog.common.Updater;
 import com.zrlog.common.Constants;
+import com.zrlog.common.UpdaterTypeEnum;
+import com.zrlog.common.updater.UpdaterHosts;
+import com.zrlog.util.BlogBuildInfoUtil;
+import com.zrlog.util.ZrLogUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +29,10 @@ public class UpdaterUtils {
     public static Updater getUpdater(String[] args, File file) {
         boolean nativeImage = EnvKit.isNativeImage();
         try {
+            if (ZrLogUtil.isDockerMode()) return UpdaterHosts.create(UpdaterTypeEnum.DOCKER, args, file);
+            if (EnvKit.isFaaSMode()) return UpdaterHosts.create(UpdaterTypeEnum.FAAS, args, file);
+            if ("deb".equals(BlogBuildInfoUtil.getPackageType()))
+                return UpdaterHosts.create(UpdaterTypeEnum.DEB, args, file);
             if (nativeImage) {
                 return new NativeImageUpdater(args, file);
             }

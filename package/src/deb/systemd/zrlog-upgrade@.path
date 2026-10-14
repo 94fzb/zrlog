@@ -1,0 +1,9 @@
+[Unit]
+Description=Watch ZrLog %i package upgrade requests
+
+[Path]
+PathExists=/var/lib/zrlog/upgrade-request/%i.request
+Unit=zrlog-upgrade@%i.service
+
+[Install]
+WantedBy=multi-user.target

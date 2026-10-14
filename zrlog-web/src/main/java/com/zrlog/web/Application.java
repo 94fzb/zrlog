@@ -53,7 +53,8 @@ public class Application {
         } else {
             exitCode = startWithExitCode(args);
         }
-        if (exitCode != 0) {
+        boolean debCommand = args.length > 0 && "upgrade".equals(args[0]) && "deb".equals(BlogBuildInfoUtil.getPackageType());
+        if (exitCode != 0 || debCommand) {
             System.exit(exitCode);
         }
     }
@@ -75,7 +76,7 @@ public class Application {
             return 0;
         }
         if (commandLine.getCommand() == ApplicationCommandLine.Command.UPGRADE) {
-            return ApplicationUpgradeRunner.run(UpdaterUtils.getUpdater(serveArgs, null), commandLine.isPreview());
+            return ApplicationUpgradeRunner.run(UpdaterUtils.getUpdater(serveArgs, null), commandLine.isPreview(), commandLine.isJson());
         }
         ApplicationStartupOptions options = ApplicationStartupOptions.parse(serveArgs);
         webServerBuilder(options.getPort(), options.getContextPath(), UpdaterUtils.getUpdater(serveArgs, null)).start();
@@ -95,14 +96,14 @@ public class Application {
             return 2;
         }
         String[] serveArgs = commandLine.getServeArgs();
-        ApplicationStartupOptions options = ApplicationStartupOptions.parse(serveArgs);
         File execFile = new File(ZrLogBaseNativeImageUtils.getExecFile());
         if (ParseArgsUtil.justTips(serveArgs, execFile.getName(), BlogBuildInfoUtil.getVersionInfoFull())) {
             return 0;
         }
         if (commandLine.getCommand() == ApplicationCommandLine.Command.UPGRADE) {
-            return ApplicationUpgradeRunner.run(UpdaterUtils.getUpdater(serveArgs, execFile), commandLine.isPreview());
+            return ApplicationUpgradeRunner.run(UpdaterUtils.getUpdater(serveArgs, execFile), commandLine.isPreview(), commandLine.isJson());
         }
+        ApplicationStartupOptions options = ApplicationStartupOptions.parse(serveArgs);
         if (EnvKit.isFaaSMode()) {
             WebServerBuilder webServerBuilder = webServerBuilder(options.getPort(), options.getContextPath(),
                     UpdaterUtils.getUpdater(serveArgs, execFile));

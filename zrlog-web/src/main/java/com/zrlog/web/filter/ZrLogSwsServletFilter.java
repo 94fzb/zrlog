@@ -43,6 +43,7 @@ public class ZrLogSwsServletFilter extends SwsServletFilter {
         if (EnvKit.isDevMode()) {
             return UpdaterUtils.getUpdater(new String[0], null);
         }
+        if (com.zrlog.updater.spi.UpdateProviders.find(com.zrlog.common.UpdaterTypeEnum.WAR).isEmpty()) return null;
         return new WarUpdater(new File(getWarFile()));
     }
 

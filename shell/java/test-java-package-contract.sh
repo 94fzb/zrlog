@@ -93,8 +93,19 @@ import com.zrlog.common.vo.Version;
 import com.zrlog.updater.spi.UpdateCatalogs;
 
 class UpdaterContract {
-  public static void main(String[] args) {
+  public static void main(String[] args) throws Exception {
     UpdateCatalogs.getInstance();
+    for (com.zrlog.common.UpdaterTypeEnum type : com.zrlog.common.UpdaterTypeEnum.values()) {
+      com.zrlog.updater.spi.UpdateProviders.get(type);
+    }
+    for (String resource : com.zrlog.updater.spi.UpdateProviders.messageResources("zh_CN")) {
+      try (java.io.InputStream input = UpdaterContract.class.getResourceAsStream(resource)) {
+        if (input == null) throw new AssertionError("Missing updater messages: " + resource);
+      }
+    }
+    if (!"正在解压".equals(com.zrlog.util.I18nUtil.getBackend().get("upgrade.zip.status.unzipping"))) {
+      throw new AssertionError("The packaged host cannot load updater messages");
+    }
     Version legacy = new Version();
     legacy.setZipDownloadUrl("https://dl.zrlog.com/release/zrlog.zip");
     if (!legacy.getZipDownloadUrl().equals(PackageDownloadSource.select(legacy, false, "dl"))) {

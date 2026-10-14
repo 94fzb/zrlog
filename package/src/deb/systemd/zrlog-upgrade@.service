@@ -1,0 +1,15 @@
+[Unit]
+Description=Install the verified ZrLog %i system package
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+WorkingDirectory=/
+Environment=PATH=/usr/sbin:/usr/bin:/sbin:/bin
+Environment=ZRLOG_HOME=/var/lib/zrlog-updater
+ExecStart=/usr/bin/zrlog upgrade --channel=%i --non-interactive --json
+TimeoutStartSec=30min
+UMask=0022

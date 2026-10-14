@@ -127,14 +127,10 @@ stop() {
 }
 
 upgrade() {
-  architecture=$(dpkg --print-architecture)
-  fileName=${PROCESS_NAME}-Linux-${architecture}.deb
-  fullFileName=/tmp/${fileName}
-  test -f "${fullFileName}" && rm "${fullFileName}"
-  sudo -u "${SERVICE_USER}" \
-    bash -c "wget -q --show-progress https://dl.zrlog.com/${UPGRADE_VERSION}/${fileName} -O ${fullFileName}"
-  dpkg -i "${fullFileName}"
-  exit 0
+  PATH=/usr/sbin:/usr/bin:/sbin:/bin
+  export PATH
+  /usr/bin/zrlog upgrade --channel="${UPGRADE_VERSION}" --non-interactive --json
+  exit $?
 }
 
 case "$1" in
