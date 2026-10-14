@@ -1,0 +1,9 @@
+#!/bin/sh
+set -e
+case "${1:-}" in
+  remove|deconfigure)
+    systemctl stop zrlog-upgrade@release.path zrlog-upgrade@preview.path || true
+    systemctl disable zrlog-upgrade@release.path zrlog-upgrade@preview.path zrlog.service || true
+    systemctl stop zrlog.service || true
+    ;;
+esac

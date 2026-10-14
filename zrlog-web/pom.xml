@@ -13,6 +13,11 @@
     <dependencies>
         <dependency>
             <groupId>com.hibegin</groupId>
+            <artifactId>zrlog-updater-common</artifactId>
+            <version>${zrlog-updater.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.hibegin</groupId>
             <artifactId>zrlog-test-support</artifactId>
             <scope>test</scope>
         </dependency>

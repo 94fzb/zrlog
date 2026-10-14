@@ -489,13 +489,25 @@
                                     <controlDir>${basedir}/src/deb/control</controlDir>
                                     <dataSet>
                                         <data>
+                                            <src>${basedir}/src/deb/systemd</src>
+                                            <type>directory</type>
+                                            <mapper>
+                                                <type>perm</type>
+                                                <prefix>/lib/systemd/system</prefix>
+                                                <user>root</user>
+                                                <group>root</group>
+                                                <filemode>644</filemode>
+                                                <dirmode>755</dirmode>
+                                            </mapper>
+                                        </data>
+                                        <data>
                                             <src>${native.target}/zrlog</src>
                                             <type>file</type>
                                             <mapper>
                                                 <type>perm</type>
                                                 <prefix>/usr/bin</prefix>
-                                                <user>zrlog</user>
-                                                <group>zrlog</group>
+                                                <user>root</user>
+                                                <group>root</group>
                                                 <filemode>755</filemode>
                                             </mapper>
                                         </data>
@@ -505,8 +517,8 @@
                                             <mapper>
                                                 <type>perm</type>
                                                 <prefix>/etc/init.d</prefix>
-                                                <user>zrlog</user>
-                                                <group>zrlog</group>
+                                                <user>root</user>
+                                                <group>root</group>
                                                 <filemode>755</filemode>
                                             </mapper>
                                         </data>

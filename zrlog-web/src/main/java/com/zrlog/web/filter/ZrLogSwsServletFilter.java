@@ -5,11 +5,10 @@ import com.hibegin.common.util.ObjectUtil;
 import com.hibegin.http.server.PortDetector;
 import com.hibegin.http.server.config.AbstractServerConfig;
 import com.hibegin.http.server.web.SwsServletFilter;
-import com.zrlog.common.updater.WarUpdater;
 import com.zrlog.common.Constants;
 import com.zrlog.common.Updater;
 import com.zrlog.util.ArgsParser;
-import com.zrlog.web.util.UpdaterUtils;
+import com.zrlog.web.ApplicationUpdaterFactory;
 import com.zrlog.web.config.ZrLogConfigImpl;
 
 import java.io.File;
@@ -41,9 +40,9 @@ public class ZrLogSwsServletFilter extends SwsServletFilter {
 
     Updater getUpdater() {
         if (EnvKit.isDevMode()) {
-            return UpdaterUtils.getUpdater(new String[0], null);
+            return ApplicationUpdaterFactory.create(new String[0], null);
         }
-        return new WarUpdater(new File(getWarFile()));
+        return ApplicationUpdaterFactory.createWar(new File(getWarFile()));
     }
 
     @Override

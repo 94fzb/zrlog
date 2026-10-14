@@ -53,6 +53,7 @@ mvn -q -DskipTests package
 - 改变运行时边界必须有用户明确的新要求，并同步更新 [构建边界](doc/build.md) 与 `shell/java/test-java-package-contract.sh`。普通 JDK 中依赖 Polyglot 的功能必须处理引擎缺席，不能通过打包脚本隐式开启。
 
 - `zrlog` 只做集成和打包，不拥有 admin/blog/install/base 的业务模型。
+- updater 相关逻辑和专项测试由 `zrlog-updater` 维护；本工程只提供环境读取和宿主适配。WAR/ZIP/deb 专项装配验收使用 updater 的 `scripts/test-application-host.sh` 与本工程产物 classpath；包内 Provider/文案/兼容入口验收使用其 `scripts/test-application-package.sh`。本工程保留通用启动、Servlet、安装集成测试及包结构检查。
 - 修改内部依赖版本前，先确认对应子工程已经构建或发布了目标版本。
 - 正式 release ref 不能依赖 `SNAPSHOT`；开发和预览集成可以使用本地或远端 snapshot。
 - 变更模块 classpath、依赖 scope、package 配置或启动参数时，要验证最终包内 `lib/`、manifest、启动日志和模块发现结果。

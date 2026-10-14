@@ -35,6 +35,33 @@ Java、DEB、FaaS 和正式版工作流保持独立。恢复和校验细节见
 两端配置不一致时拒绝开启容器升级。updater 使用独立 POM，只带 Gson 和 JDK HTTP 服务，
 不继承主工程的页面、安装、数据库或主题依赖。
 
+应用使用同一独立仓库的 `zrlog-updater-spi`、`zrlog-updater-common` 和分类型实现，版本由
+父 POM 的 `zrlog-updater.version` 选择。base/admin 的生产依赖只包含 SPI。
+`shell/lib/updater-modules.sh` 为 Web 和独立 package 构建选择 runtime scope，其余实现只用于测试。
+JDK ZIP 选 ZIP/Docker，WAR 选 WAR，Native ZIP 选 Native/Docker，FaaS 选 FaaS，deb 选 deb；
+common/SPI 随实现依赖传入。主工程的 ZIP/WAR 包契约校验构件、依赖和无关实现/HTTP 服务的缺席；
+真实 ServiceLoader、文案和兼容入口验收由 updater 工程维护。
+该依赖需由 updater 的应用构件发布流程先提供；正式应用版本不能使用 SNAPSHOT。
+
+Web 启动直接编译依赖 updater-common 的 `UpdaterUtils`。`create(runtime, context)`
+内部选择部署类型、识别可信启动 JAR，经 SPI 自动发现并创建实现，返回实际实现与解析后上下文。
+主工程 `ApplicationUpdaterFactory` 只读取宿主环境、classpath 和应用目录，
+由已有 `UpdaterHosts` 提供 HTTP、路径及生命周期能力，再用 `adapt` 包装旧接口，
+无需传创建回调。Servlet WAR 使用相同入口。base/admin 仍只生产依赖 SPI，
+不把共享 updater 创建逻辑留在 Web 工具类，也不把宿主能力反向引入 updater-common。
+升级专项测试也由 updater 工程维护；主工程编译后生成 test classpath，交给 updater 的
+`scripts/test-application-host.sh` 执行 WAR/ZIP 装配、工厂和 deb CLI 验收。
+实际 ZIP/WAR 交给 updater 的 `scripts/test-application-package.sh <应用包路径>`，
+校验包内 Provider、语言资源和 base 兼容入口，测试源码不放回主工程。
+
+迁入的 updater 构件从 `4.0.0-SNAPSHOT` 开始。六类 Provider 和各类独立语言资源由
+updater 维护；主工程按 Docker、FaaS、deb、Native、ZIP 选择，Servlet 包选择 WAR。
+deb 的可执行文件、init.d 和 systemd unit 必须归 root 管理。应用用户只可写
+`/var/lib/zrlog/upgrade-request/{release,preview}.request`；oneshot 使用固定 CLI
+`upgrade --channel=<通道> --non-interactive --json`，进入该分支前不启动 Web/数据库。
+安装后用 `shell/native/test-deb-package-contract.sh <包.deb>` 检查权限及 unit。
+deb 清单的 `debPackageVersion` 来自实际 dpkg 包，buildId 继续使用现有短提交规范。
+
 ### Polyglot / Hexo 运行时边界
 
 这是产品约定，不以当前 JDK 是否具备运行 GraalJS 的技术条件为依据。

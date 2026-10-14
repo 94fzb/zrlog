@@ -9,6 +9,11 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 public class ApplicationCommandLineTest {
+    @Test public void shouldKeepDebOptionsOutOfServerArguments() {
+        ApplicationCommandLine command = ApplicationCommandLine.parse(new String[]{"upgrade", "--channel=release", "--non-interactive", "--json"});
+        assertTrue(command.isNonInteractive()); assertTrue(command.isJson());
+        assertArrayEquals(new String[0], command.getServeArgs());
+    }
 
     @Test
     public void shouldParseUpgradeAndRemoveOneShotArgumentsFromServeArgs() {

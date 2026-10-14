@@ -41,6 +41,30 @@ mapfile -t libraryEntries < <(
 )
 (( ${#libraryEntries[@]} > 0 )) || fail "${packageType} contains no runtime libraries"
 
+updaterArtifacts=(zrlog-updater-spi zrlog-updater-common)
+if [[ "$packageType" == ZIP ]]; then
+  updaterArtifacts+=(zrlog-updater-zip zrlog-updater-docker)
+else
+  updaterArtifacts+=(zrlog-updater-war)
+fi
+for updaterArtifact in "${updaterArtifacts[@]}"; do
+  mapfile -t updaterEntries < <(
+    printf '%s\n' "${libraryEntries[@]}" \
+      | grep -E "^${libraryRoot}/${updaterArtifact}-[^/]+\\.jar$" \
+      || true
+  )
+  (( ${#updaterEntries[@]} == 1 )) \
+    || fail "Expected exactly one ${updaterArtifact} JAR, found ${#updaterEntries[@]}"
+done
+for module in zip native war faas docker deb core; do
+  artifact="zrlog-updater-$module"
+  if [[ " ${updaterArtifacts[*]} " != *" $artifact "* ]]; then
+    if printf '%s\n' "${libraryEntries[@]}" | grep -E "^${libraryRoot}/${artifact}-[^/]+\\.jar$" >/dev/null; then
+      fail "${packageType} contains an unrelated updater module: ${artifact}"
+    fi
+  fi
+done
+
 mapfile -t polyglotEntries < <(
   printf '%s\n' "${libraryEntries[@]}" \
     | grep -E "^${libraryRoot}/zrlog-polyglot-template-[^/]+\\.jar$" \
@@ -65,6 +89,9 @@ for entry in "${libraryEntries[@]}"; do
   case "${entry##*/}" in
     zrlog-test-support-*.jar|zrlog-admin-test-support-*.jar|*-tests.jar)
       fail "${packageType} must not bundle test fixtures: ${entry}"
+      ;;
+    zrlog-docker-updater-*.jar)
+      fail "${packageType} must not bundle the standalone Docker updater server: ${entry}"
       ;;
     zrlog-template-hexo-*.jar|truffle-*.jar|icu4j-*.jar|regex-*.jar|jniutils-*.jar|nativeimage-*.jar|collections-*.jar|word-*.jar)
       fail "${packageType} must not bundle Polyglot/Hexo runtime dependency: ${entry}"
