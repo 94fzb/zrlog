@@ -46,8 +46,10 @@ common/SPI 随实现依赖传入。主工程的 ZIP/WAR 包契约校验构件、
 Web 启动直接编译依赖 updater-common 的 `UpdaterUtils`。`create(runtime, context)`
 内部选择部署类型、识别可信启动 JAR，经 SPI 自动发现并创建实现，返回实际实现与解析后上下文。
 主工程 `ApplicationUpdaterFactory` 只读取宿主环境、classpath 和应用目录，
-由已有 `UpdaterHosts` 提供 HTTP、路径及生命周期能力，再用 `adapt` 包装旧接口，
-无需传创建回调。Servlet WAR 使用相同入口。base/admin 仍只生产依赖 SPI，
+由 base 的 `com.zrlog.common.adapter.UpdaterHosts` 提供 HTTP、路径及生命周期能力，
+再用 `adapt` 包装旧接口，无需传创建回调。定时检查位于 service 的业务层；
+base 不再定义 `com.zrlog.common.updater` 包，升级 DTO/契约由 updater SPI 提供。
+Servlet WAR 使用相同入口。base/admin 仍只生产依赖 SPI，
 不把共享 updater 创建逻辑留在 Web 工具类，也不把宿主能力反向引入 updater-common。
 升级专项测试也由 updater 工程维护；主工程编译后生成 test classpath，交给 updater 的
 `scripts/test-application-host.sh` 执行 WAR/ZIP 装配、工厂和 deb CLI 验收。
