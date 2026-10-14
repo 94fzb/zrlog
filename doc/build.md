@@ -43,9 +43,11 @@ common/SPI 随实现依赖传入。主工程的 ZIP/WAR 包契约校验构件、
 真实 ServiceLoader、文案和兼容入口验收由 updater 工程维护。
 该依赖需由 updater 的应用构件发布流程先提供；正式应用版本不能使用 SNAPSHOT。
 
-Web 启动直接编译依赖 updater-common 的 `UpdaterUtils`，由它选择部署类型和可信启动 JAR，
-并调度创建流程。主工程 `ApplicationUpdaterFactory` 只读取宿主环境、classpath 和应用目录，
-通过已有 `UpdaterHosts` 提供 HTTP、路径及生命周期适配。base/admin 仍只生产依赖 SPI，
+Web 启动直接编译依赖 updater-common 的 `UpdaterUtils`。`create(runtime, context)`
+内部选择部署类型、识别可信启动 JAR，经 SPI 自动发现并创建实现，返回实际实现与解析后上下文。
+主工程 `ApplicationUpdaterFactory` 只读取宿主环境、classpath 和应用目录，
+由已有 `UpdaterHosts` 提供 HTTP、路径及生命周期能力，再用 `adapt` 包装旧接口，
+无需传创建回调。Servlet WAR 使用相同入口。base/admin 仍只生产依赖 SPI，
 不把共享 updater 创建逻辑留在 Web 工具类，也不把宿主能力反向引入 updater-common。
 升级专项测试也由 updater 工程维护；主工程编译后生成 test classpath，交给 updater 的
 `scripts/test-application-host.sh` 执行 WAR/ZIP 装配、工厂和 deb CLI 验收。

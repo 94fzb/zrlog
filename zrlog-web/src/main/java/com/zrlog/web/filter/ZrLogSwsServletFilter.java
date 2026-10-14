@@ -7,9 +7,6 @@ import com.hibegin.http.server.config.AbstractServerConfig;
 import com.hibegin.http.server.web.SwsServletFilter;
 import com.zrlog.common.Constants;
 import com.zrlog.common.Updater;
-import com.zrlog.common.UpdaterTypeEnum;
-import com.zrlog.common.updater.UpdaterHosts;
-import com.zrlog.updater.spi.UpdateProviders;
 import com.zrlog.util.ArgsParser;
 import com.zrlog.web.ApplicationUpdaterFactory;
 import com.zrlog.web.config.ZrLogConfigImpl;
@@ -45,10 +42,7 @@ public class ZrLogSwsServletFilter extends SwsServletFilter {
         if (EnvKit.isDevMode()) {
             return ApplicationUpdaterFactory.create(new String[0], null);
         }
-        if (UpdateProviders.find(UpdaterTypeEnum.WAR).isEmpty()) {
-            return null;
-        }
-        return UpdaterHosts.create(UpdaterTypeEnum.WAR, new String[0], new File(getWarFile()));
+        return ApplicationUpdaterFactory.createWar(new File(getWarFile()));
     }
 
     @Override
