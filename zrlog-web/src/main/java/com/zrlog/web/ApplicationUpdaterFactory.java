@@ -3,7 +3,7 @@ package com.zrlog.web;
 import com.hibegin.common.util.EnvKit;
 import com.zrlog.common.Constants;
 import com.zrlog.common.Updater;
-import com.zrlog.common.updater.UpdaterHosts;
+import com.zrlog.common.adapter.UpdaterHosts;
 import com.zrlog.updater.common.UpdaterUtils;
 import com.zrlog.updater.common.UpdaterRuntime;
 import com.zrlog.util.BlogBuildInfoUtil;
