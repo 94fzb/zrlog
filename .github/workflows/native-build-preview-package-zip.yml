@@ -32,7 +32,7 @@ jobs:
           ref: ${{ github.event_name == 'push' && github.sha || 'refs/heads/master' }}
       - uses: graalvm/setup-graalvm@v1
         with:
-          java-version: '25'
+          java-version: ${{ runner.os == 'macOS' && runner.arch == 'X64' && '25.0.1' || '25' }}
           distribution: 'graalvm' # See 'Options' for all available distributions
           cache: 'maven'
           github-token: ${{ secrets.GITHUB_TOKEN }}

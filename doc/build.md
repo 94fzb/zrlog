@@ -2,6 +2,18 @@
 
 > ZrLog 提供 Zip、War、Deb 等运行包，可部署在常见 Linux 环境中。Native Image 包也可用于树莓派等 arm64 Linux 设备。
 
+### macOS Intel Native 构建兼容
+
+macOS Intel Native 单独保留 ZrLog 3.9.2 已使用的构建组合：GraalVM `25.0.1`、
+Native Maven 插件 `0.11.2` 及其对应的默认 reachability metadata。`25.0.1` 是上游
+支持 macOS x64 的最后版本；新版 Native Build Tools 的 metadata schema 校验与它不兼容。
+`package/pom.xml` 的 `native-macos-intel-compat` profile 仅在 macOS `x86_64` JVM 上
+自动激活，适用于本地、预览和正式构建。其他平台继续使用默认的新版本插件与 GraalVM 25 更新。
+此兼容组合只固定构建工具，不冻结应用版本或业务依赖。
+
+升级默认插件时保留该兼容 profile；变更 Intel 专用版本前须确认它仍支持 GraalVM `25.0.1`。
+实际构建继续使用现有 Native 工作流，构建成功与产品运行验收分别记录。
+
 ### 更新元数据配置
 
 `buildId` 与 `sourceCommit` 用途不同。`bin/add-build-info.sh` 默认以
