@@ -94,6 +94,8 @@ class PackageWorkflowContract(unittest.TestCase):
         self.assertNotIn('workflow_call', trigger)
         self.assertIs(False, trigger['workflow_dispatch']['inputs']['full_platforms']['default'])
         reference = SHARED['jobs']['native_linux_amd64']['steps']
+        self.assertEqual('${{ matrix.package_type }} on ${{ matrix.os }}',
+                         SHARED['jobs']['native_linux_amd64']['name'])
         for job in ['native_linux_arm64', 'native_windows', 'packages']:
             self.assertIs(reference, SHARED['jobs'][job]['steps'])
         self.assertFalse(list(WORKFLOWS.glob('*-build-preview-*.yml')))

@@ -64,7 +64,7 @@ jobs:
         run: python3 shell/ci/plan-package-build.py
 
   native_linux_amd64:
-    name: native on ubuntu-22.04
+    name: ${{ matrix.package_type }} on ${{ matrix.os }}
     needs: plan
     if: needs.plan.outputs.build_native == 'true'
     runs-on: ${{ matrix.os }}
