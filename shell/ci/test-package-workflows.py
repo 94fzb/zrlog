@@ -15,73 +15,106 @@ import yaml
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOWS = ROOT / '.github/workflows'
 SHARED = yaml.safe_load((WORKFLOWS / 'build-package.yml').read_text())
-PLAN = SHARED['jobs']['plan']['steps'][0]['run']
+PLAN_SPEC = importlib.util.spec_from_file_location('plan_package', Path(__file__).with_name('plan-package-build.py'))
+PLANNER = importlib.util.module_from_spec(PLAN_SPEC)
+PLAN_SPEC.loader.exec_module(PLANNER)
 SPEC = importlib.util.spec_from_file_location('record_package', Path(__file__).with_name('record-package-build.py'))
 RECORD = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(RECORD)
 
 
-def plan(kind='native', full=False, channel='preview', publish=False, **overrides):
-    with tempfile.TemporaryDirectory() as temporary:
-        output = Path(temporary) / 'output'
-        env = dict(os.environ, PACKAGE_TYPE=kind, CHANNEL=channel, SOURCE_COMMIT='a' * 40,
-                   FULL_PLATFORMS=str(full).lower(), PUBLISH=str(publish).lower(),
-                   GITHUB_REPOSITORY='94fzb/zrlog', GITHUB_REF='refs/heads/master',
-                   GITHUB_EVENT_NAME='push', GITHUB_SHA='a' * 40, GITHUB_OUTPUT=str(output))
-        env.update(overrides)
-        result = subprocess.run(['bash', '-e', '-c', PLAN], env=env, capture_output=True, text=True)
-        if result.returncode:
-            raise ValueError(result.stderr)
-        return json.loads(output.read_text().removeprefix('matrix='))['include']
+def plan(kind='all', full=False, channel='preview', event='workflow_dispatch', **overrides):
+    env = dict(PACKAGE_TYPE=kind, CHANNEL=channel, FULL_PLATFORMS=str(full).lower(),
+               GITHUB_REPOSITORY='94fzb/zrlog', GITHUB_REF='refs/heads/master',
+               GITHUB_EVENT_NAME=event, GITHUB_SHA='a' * 40)
+    env.update(overrides)
+    return PLANNER.plan(env)
+
+
+def platforms(settings):
+    targets = list(settings['matrix']['include'])
+    if settings['build_native']:
+        targets.append(dict(package_type='native', os='ubuntu-22.04', java='25'))
+        if settings['full_platforms']:
+            for job in ['native_linux_arm64', 'native_windows']:
+                targets.extend(SHARED['jobs'][job]['strategy']['matrix']['include'])
+    return targets
 
 
 class PackageWorkflowContract(unittest.TestCase):
-    def test_daily_builds_only_linux_amd64_for_every_package_type(self):
-        for kind in ['java', 'native', 'deb', 'faas']:
-            with self.subTest(kind=kind):
-                self.assertEqual([dict(os='ubuntu-22.04', java='11' if kind == 'java' else '25')], plan(kind))
+    def test_daily_builds_all_formats_on_linux_amd64_only(self):
+        for event in ['push', 'repository_dispatch']:
+            settings = plan(event=event)
+            self.assertEqual('preview', settings['channel'])
+            self.assertTrue(settings['publish'])
+            targets = platforms(settings)
+            self.assertEqual({'java', 'native', 'deb', 'faas'}, {x['package_type'] for x in targets})
+            self.assertEqual(['ubuntu-22.04'] * 4, [x['os'] for x in targets])
 
-    def test_full_build_covers_release_platforms_and_intel_toolchain(self):
-        self.assertEqual(['ubuntu-22.04'], [x['os'] for x in plan('java', True)])
-        for kind in ['deb', 'faas']:
-            self.assertEqual(['ubuntu-22.04', 'ubuntu-24.04-arm'], [x['os'] for x in plan(kind, True)])
-        native = plan('native', True)
-        self.assertEqual(['ubuntu-22.04', 'ubuntu-24.04-arm', 'macos-15-intel', 'macos-14', 'windows-2022'],
-                         [x['os'] for x in native])
-        self.assertEqual(['25', '25', '25.0.1', '25', '25'], [x['java'] for x in native])
-        self.assertEqual(native, plan('native', True, 'release'))
+    def test_manual_full_matrix_preserves_every_release_platform(self):
+        expected = {
+            'java': {'ubuntu-22.04'},
+            'native': {'ubuntu-22.04', 'ubuntu-24.04-arm', 'macos-15-intel', 'macos-14', 'windows-2022'},
+            'deb': {'ubuntu-22.04', 'ubuntu-24.04-arm'},
+            'faas': {'ubuntu-22.04', 'ubuntu-24.04-arm'},
+        }
+        for kind, runners in expected.items():
+            targets = platforms(plan(kind, True, 'release'))
+            self.assertEqual(runners, {x['os'] for x in targets})
+            self.assertEqual({kind}, {x['package_type'] for x in targets})
+        self.assertEqual(10, len(platforms(plan(full=True))))
+        intel = next(x for x in platforms(plan('native', True)) if x['os'] == 'macos-15-intel')
+        self.assertEqual('25.0.1', intel['java'])
 
-    def test_release_cannot_publish_partial_matrix_or_from_manual_event(self):
-        for kwargs in [dict(), dict(full=True, GITHUB_EVENT_NAME='workflow_dispatch'),
-                       dict(full=True, SOURCE_COMMIT='b' * 40),
-                       dict(full=True, GITHUB_REF='refs/heads/master'),
-                       dict(full=True, GITHUB_REPOSITORY='someone/fork')]:
-            options = dict(channel='release', publish=True, GITHUB_REF='refs/heads/release')
-            options.update(kwargs)
-            with self.subTest(options=options), self.assertRaises(ValueError):
+    def test_manual_builds_never_publish_even_in_release_mode(self):
+        for full in [False, True]:
+            settings = plan('native', full, 'release', PUBLISH='true')
+            self.assertFalse(settings['publish'])
+            self.assertEqual('release', settings['channel'])
+            self.assertEqual(full, settings['full_platforms'])
+            self.assertEqual(5 if full else 1, len(platforms(settings)))
+
+    def test_release_push_always_publishes_all_formats_and_platforms(self):
+        settings = plan('java', False, 'preview', event='push', GITHUB_REF='refs/heads/release')
+        self.assertTrue(settings['publish'])
+        self.assertTrue(settings['full_platforms'])
+        self.assertEqual('release', settings['channel'])
+        self.assertEqual(10, len(platforms(settings)))
+        for overrides in [dict(GITHUB_REF='refs/heads/feature'), dict(GITHUB_REPOSITORY='someone/fork'),
+                          dict(event='pull_request'),
+                          dict(event='repository_dispatch', GITHUB_REF='refs/heads/release')]:
+            options = dict(event='push')
+            options.update(overrides)
+            with self.subTest(overrides=overrides), self.assertRaises(ValueError):
                 plan(**options)
-        self.assertEqual(5, len(plan(full=True, channel='release', publish=True,
-                                     GITHUB_REF='refs/heads/release')))
-        self.assertEqual(5, len(plan(full=True, channel='release', GITHUB_EVENT_NAME='workflow_dispatch')))
 
-    def test_every_entry_uses_the_shared_builder_and_forwards_platform_selection(self):
-        for kind in ['java', 'native', 'deb', 'faas']:
-            pattern = f'{kind}-build-{{}}-' + ('deb.yml' if kind == 'deb' else 'package-zip.yml')
-            for channel in ['preview', 'release']:
-                workflow = yaml.safe_load((WORKFLOWS / pattern.format(channel)).read_text())
-                build = workflow['jobs']['build']
-                self.assertEqual('./.github/workflows/build-package.yml', build['uses'])
-                self.assertNotIn('steps', build)
-                self.assertEqual(kind, build['with']['package_type'])
-                self.assertEqual('${{ github.sha }}', build['with']['source_commit'])
-                if channel == 'release':
-                    self.assertIs(True, build['with']['full_platforms'])
-                    self.assertIs(True, build['with']['publish'])
-                else:
-                    self.assertEqual("${{ github.event_name != 'workflow_dispatch' }}", build['with']['publish'])
-                    self.assertIn('inputs.full_platforms', build['with']['full_platforms'])
-                    trigger = workflow.get('on', workflow.get(True))
-                    self.assertIs(False, trigger['workflow_dispatch']['inputs']['full_platforms']['default'])
+    def test_one_entry_and_one_step_list_for_every_application_package(self):
+        trigger = SHARED.get('on', SHARED.get(True))
+        self.assertEqual(['master', 'release'], trigger['push']['branches'])
+        self.assertNotIn('workflow_call', trigger)
+        self.assertIs(False, trigger['workflow_dispatch']['inputs']['full_platforms']['default'])
+        reference = SHARED['jobs']['native_linux_amd64']['steps']
+        for job in ['native_linux_arm64', 'native_windows', 'packages']:
+            self.assertIs(reference, SHARED['jobs'][job]['steps'])
+        self.assertFalse(list(WORKFLOWS.glob('*-build-preview-*.yml')))
+        self.assertFalse(list(WORKFLOWS.glob('*-build-release-*.yml')))
+        self.assertFalse((WORKFLOWS / 'docker-release-publish.yml').exists())
+
+    def test_each_docker_platform_waits_for_its_own_native_package(self):
+        expected = {'docker_preview': 'native_linux_amd64', 'docker_linux_amd64': 'native_linux_amd64',
+                    'docker_linux_arm64': 'native_linux_arm64', 'docker_windows': 'native_windows'}
+        for docker, native in expected.items():
+            job = SHARED['jobs'][docker]
+            self.assertEqual({'plan', native}, set(job['needs']))
+            self.assertIn("needs.plan.outputs.publish == 'true'", job['if'])
+            self.assertNotIn('always()', job['if'])
+            self.assertEqual(['plan'], [SHARED['jobs'][native]['needs']])
+        self.assertEqual({'plan', 'docker_linux_amd64', 'docker_linux_arm64'},
+                         set(SHARED['jobs']['docker_linux_manifest']['needs']))
+        windows = SHARED['jobs']['docker_windows']
+        self.assertEqual('windows-2022', windows['runs-on'])
+        self.assertTrue(any(step.get('name') == 'Push Windows image' for step in windows['steps']))
+        self.assertTrue(any(step.get('name') == 'Sign canonical Windows image' for step in windows['steps']))
 
     def test_index_binds_actual_bytes_to_source_and_effective_java(self):
         with tempfile.TemporaryDirectory() as temporary:

@@ -16,30 +16,35 @@ Native Maven 插件 `0.11.2` 及其对应的默认 reachability metadata。`25.0
 
 ### 统一打包工作流
 
-Java、Native ZIP、DEB、FaaS 的预览和正式入口统一调用
-`.github/workflows/build-package.yml`。平台矩阵、JDK/GraalVM、打包命令、来源记录及产物归档
-只在这一份可复用工作流定义。入口保留原名称和触发方式，负责选择包类型、渠道、平台范围和发布开关。
+Java、Native ZIP、DEB、FaaS 和 Docker 的预览、候选与正式构建只有一个入口：
+`.github/workflows/build-package.yml`。同一份包构建步骤通过 YAML anchor 复用，统一工具链、
+组包命令、来源记录、签名、上传和归档；分支及参数选择渠道和平台。
 
-- 日常 `master` 和依赖更新预览只构建 Linux amd64。
-- 手动运行任一 `*-build-preview-*.yml`，默认也只构建 Linux amd64；
-  `full_platforms=true` 开启该类型的完整正式矩阵。Java 仍只需要 Linux amd64；Native ZIP
-  包含 Linux amd64/arm64、macOS Intel/ARM、Windows；DEB/FaaS 包含 Linux amd64/arm64。
-- 手动构建可设置 `channel=release` 使用正式模式的同一组包命令。手动运行只向 Actions
-  归档产物，不签名、不更新下载站或 Docker；`release` 分支的既有自动入口才执行正式发布，
-  并强制完整矩阵。FaaS 的二进制压缩服务仍属于构建步骤，需要原有 service 配置。
+- 日常 `master` 和依赖更新构建四类 Linux amd64 包，Native 完成后构建 Docker 预览镜像。
+- 手动运行默认 `package_type=all`、`full_platforms=false`；也可选择 `java`、`native`、
+  `deb` 或 `faas`。`full_platforms=true` 开启所选类型的完整矩阵：Java 只需 Linux amd64；
+  Native ZIP 包含 Linux amd64/arm64、macOS Intel/ARM、Windows；DEB/FaaS 包含 Linux 两架构。
+- 手动 `channel=release` 使用正式组包命令，实际包及 JSON 只归档到 Actions。
+  手动运行不签名、不上传下载站、不推送 Docker；FaaS 二进制压缩仍需原制品服务配置。
+- `release` 分支 push 固定全部包类型、完整平台，执行正式签名、包上传及镜像发布。
 
-例如，按当前工程分支检查所有 Native 平台：
+例如，按固定工程分支检查所有 Native 平台：
 
 ```bash
-gh workflow run native-build-preview-package-zip.yml -R 94fzb/zrlog \
-  --ref <工程分支> -f full_platforms=true -f channel=release
+gh workflow run build-package.yml -R 94fzb/zrlog \
+  --ref <工程分支> -f package_type=native -f full_platforms=true -f channel=release
 ```
 
 日常构建省略 `full_platforms` 或传 `false`。每个平台归档为
 `package-<类型>-<runner>-<attempt>`，内含 `.package-output/<渠道>/` 下的实际包、更新 JSON，
 以及 `.package-evidence/build.json` 的完整源码 SHA、实际 Java 版本、runner、producer run 和包 SHA-256。
-测试应下载这些实际产物，不另写 Maven/组包步骤。不同源码、依赖或渠道的包不能记成同一候选；
-共用工作流也不保证两次独立重建的字节必然相同，必须按索引核对实际包。
+测试下载这些实际产物并核对索引；不同源码、依赖或渠道的包分别记录，共用组包步骤不保证
+两次独立重建的字节相同。
+
+Docker 通过同一 workflow 的 `needs` 接在对应 Native job 后：Linux amd64 包触发 Docker
+预览或正式 amd64 镜像，Linux arm64 包触发正式 arm64 镜像，Windows 包触发 Windows
+LTSC 2022 镜像及双仓库发布、签名。两个 Linux 镜像成功后汇总多架构 manifest 和更新 JSON。
+每个 Docker job 只等待对应平台，macOS、Java、DEB、FaaS 的构建独立进行。
 
 ### 更新元数据配置
 
@@ -49,11 +54,11 @@ gh workflow run native-build-preview-package-zip.yml -R 94fzb/zrlog \
 固定预览标签必须复用实际包里的 buildId，不能改用主工程完整 SHA，否则依赖更新也可能
 碰撞到同一个镜像标签。完整源码身份由 `sourceCommit` 单独保存。
 
-Native ZIP 预览与 Docker 预览共用 `native-build-preview-package-zip.yml`：先构建并上传
+Native ZIP 预览与 Docker 预览使用同一 `build-package.yml`：先构建并上传
 Native 包，再由独立 job 使用本次产物快照发布双仓库镜像。Docker 失败不改变 Native job
 结果。Docker 失败后选择 **Re-run failed jobs** 或对 Docker job 选择 **Re-run this job**，
 可复用原 Native 快照补发镜像，不重新编译或上传 Native 包；快照保留 30 天。
-Java、DEB、FaaS 和正式版保留独立入口，共用上述打包工作流。恢复和校验细节见
+Java、DEB、FaaS 和正式版也由该入口构建。恢复和校验细节见
 [Docker 预览发布说明](../docker/README.md#发布-docker-预览清单)。
 
 `bin/add-build-info.sh` 生成应用包内 `build.properties`。以下配置由构建决定：
