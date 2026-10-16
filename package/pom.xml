@@ -104,6 +104,20 @@
 
 
     <profiles>
+        <!-- GraalVM 25.0.1 is the last macOS Intel build. Keep its known-good
+             Native Build Tools / metadata pair from ZrLog 3.9.2 isolated here. -->
+        <profile>
+            <id>native-macos-intel-compat</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                    <arch>x86_64</arch>
+                </os>
+            </activation>
+            <properties>
+                <native.maven.plugin.version>0.11.2</native.maven.plugin.version>
+            </properties>
+        </profile>
         <profile>
             <id>war</id>
             <build>
