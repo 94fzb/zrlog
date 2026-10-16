@@ -13,7 +13,7 @@ jq -e --arg repo "$repo" '.repository.full_name == $repo and
   .head_repository.full_name == $repo and
   .path == ".github/workflows/native-build-preview-package-zip.yml"' "$tmp/run.json" >/dev/null
 gh api --paginate "repos/$repo/actions/runs/$run_id/jobs?filter=all&per_page=100" \
-  --jq '.jobs[]' | jq -s '[.[] | select(.name == "ZrLog on ubuntu-22.04" and .conclusion == "success") | .run_attempt] | unique' > "$tmp/attempts.json"
+  --jq '.jobs[]' | jq -s '[.[] | select((.name == "ZrLog on ubuntu-22.04" or .name == "build / native on ubuntu-22.04") and .conclusion == "success") | .run_attempt] | unique' > "$tmp/attempts.json"
 gh api --paginate "repos/$repo/actions/runs/$run_id/artifacts?per_page=100" \
   --jq '.artifacts[]' | jq -s '.' > "$tmp/artifacts.json"
 selected=$(jq -er --arg id "$artifact_id" --slurpfile attempts "$tmp/attempts.json" '

@@ -1,0 +1,211 @@
+name: Build application package
+
+on:
+  workflow_call:
+    inputs:
+      package_type:
+        required: true
+        type: string
+      channel:
+        required: true
+        type: string
+      source_commit:
+        required: true
+        type: string
+      full_platforms:
+        default: false
+        type: boolean
+      publish:
+        default: false
+        type: boolean
+      build_id:
+        default: ''
+        type: string
+      build_time:
+        default: ''
+        type: string
+    secrets:
+      SECRET_ID:
+        required: false
+      SECRET_KEY:
+        required: false
+      BUCKET:
+        required: false
+      HOST:
+        required: false
+      ARTIFACT_SERVICE_TOKEN:
+        required: false
+    outputs:
+      docker_artifact_id:
+        value: ${{ jobs.build.outputs.docker_artifact_id }}
+
+jobs:
+  plan:
+    runs-on: ubuntu-22.04
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - name: Select the shared platform matrix
+        id: plan
+        env:
+          PACKAGE_TYPE: ${{ inputs.package_type }}
+          CHANNEL: ${{ inputs.channel }}
+          SOURCE_COMMIT: ${{ inputs.source_commit }}
+          FULL_PLATFORMS: ${{ inputs.full_platforms }}
+          PUBLISH: ${{ inputs.publish }}
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json, os, re
+          kind = os.environ['PACKAGE_TYPE']
+          channel = os.environ['CHANNEL']
+          full = os.environ['FULL_PLATFORMS'] == 'true'
+          publish = os.environ['PUBLISH'] == 'true'
+          if kind not in {'java', 'native', 'deb', 'faas'} or channel not in {'preview', 'release'}:
+              raise SystemExit('Unsupported package type or channel')
+          if not re.fullmatch(r'[0-9a-f]{40}', os.environ['SOURCE_COMMIT']):
+              raise SystemExit('source_commit must be a full commit SHA')
+          if publish:
+              expected_ref = 'refs/heads/master' if channel == 'preview' else 'refs/heads/release'
+              allowed_events = {'push', 'repository_dispatch'} if channel == 'preview' else {'push'}
+              if (os.environ['GITHUB_REPOSITORY'] != '94fzb/zrlog'
+                      or os.environ['GITHUB_REF'] != expected_ref
+                      or os.environ['GITHUB_EVENT_NAME'] not in allowed_events
+                      or os.environ['SOURCE_COMMIT'] != os.environ['GITHUB_SHA']):
+                  raise SystemExit('Publication requires the matching trusted branch and event')
+              if channel == 'release' and not full:
+                  raise SystemExit('Release publication requires every supported platform')
+          targets = [dict(os='ubuntu-22.04', java='11' if kind == 'java' else '25')]
+          if full and kind != 'java':
+              targets.append(dict(os='ubuntu-24.04-arm', java='25'))
+              if kind == 'native':
+                  targets.extend([
+                      dict(os='macos-15-intel', java='25.0.1'),
+                      dict(os='macos-14', java='25'),
+                      dict(os='windows-2022', java='25'),
+                  ])
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write('matrix=' + json.dumps({'include': targets}) + '\n')
+          PY
+
+  build:
+    name: ${{ inputs.package_type }} on ${{ matrix.os }}
+    needs: plan
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 180
+    defaults:
+      run:
+        shell: bash
+    concurrency:
+      group: package-${{ inputs.publish && 'publish' || github.run_id }}-${{ inputs.channel }}-${{ inputs.package_type }}-${{ matrix.os }}
+      cancel-in-progress: ${{ inputs.publish && inputs.channel == 'preview' }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+    outputs:
+      docker_artifact_id: ${{ steps.docker_artifact.outputs.artifact-id }}
+    env:
+      ZRLOG_BUILD_ID: ${{ inputs.build_id }}
+      ZRLOG_BUILD_TIME: ${{ inputs.build_time }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.source_commit }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify the exact source
+        env:
+          EXPECTED_COMMIT: ${{ inputs.source_commit }}
+        run: test "$(git rev-parse HEAD)" = "$EXPECTED_COMMIT"
+      - uses: actions/setup-java@v6
+        if: inputs.package_type == 'java'
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+          cache: maven
+      - uses: graalvm/setup-graalvm@v1
+        if: inputs.package_type != 'java'
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: graalvm
+          cache: maven
+          github-token: ${{ github.token }}
+          native-image-job-reports: 'true'
+      - uses: anchore/sbom-action/download-syft@v0
+        if: inputs.publish && inputs.channel == 'release'
+      - uses: sigstore/cosign-installer@v3
+        if: inputs.publish && inputs.channel == 'release'
+      - name: Build application package
+        env:
+          PACKAGE_TYPE: ${{ inputs.package_type }}
+          CHANNEL: ${{ inputs.channel }}
+          ARTIFACT_SERVICE_URL: ${{ inputs.package_type == 'faas' && vars.ARTIFACT_SERVICE_URL || '' }}
+          ARTIFACT_SERVICE_TOKEN: ${{ inputs.package_type == 'faas' && secrets.ARTIFACT_SERVICE_TOKEN || '' }}
+        run: |
+          mkdir -p .package-output
+          case "$PACKAGE_TYPE" in
+            java) bash -e shell/java/build-final-java.sh "$CHANNEL" .package-output ;;
+            native) bash -e shell/native/build-final-native.sh "$CHANNEL" .package-output zip ;;
+            deb|faas) bash -e shell/native/build-final-native.sh "$CHANNEL" .package-output "$PACKAGE_TYPE" ;;
+          esac
+      - name: Record the actual package bytes and build inputs
+        env:
+          PACKAGE_TYPE: ${{ inputs.package_type }}
+          CHANNEL: ${{ inputs.channel }}
+          EXPECTED_COMMIT: ${{ inputs.source_commit }}
+          REQUESTED_JAVA: ${{ matrix.java }}
+        run: python3 shell/ci/record-package-build.py
+      - name: Attest release artifacts
+        if: inputs.publish && inputs.channel == 'release'
+        uses: actions/attest-build-provenance@v4
+        with:
+          subject-path: |
+            ${{ github.workspace }}/.package-output/release/zrlog-*-release*.zip
+            ${{ github.workspace }}/.package-output/release/zrlog-*-release*.war
+            ${{ github.workspace }}/.package-output/release/zrlog-*-release*.deb
+      - name: Generate release trust metadata
+        if: inputs.publish && inputs.channel == 'release'
+        run: |
+          python3 shell/release/generate_trust_metadata.py \
+            --artifact-dir .package-output/release \
+            --source-commit "$(git rev-parse HEAD)" \
+            --source-repository "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
+            --workflow-url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+      - name: Upload channel artifacts
+        if: inputs.publish
+        env:
+          SECRET_ID: ${{ secrets.SECRET_ID }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          BUCKET: ${{ secrets.BUCKET }}
+          HOST: ${{ secrets.HOST }}
+          CHANNEL: ${{ inputs.channel }}
+        run: bash -e shell/upload-bin.sh "$SECRET_ID" "$SECRET_KEY" "$BUCKET" .package-output "$CHANNEL" "$HOST"
+      - name: Preserve packages and build evidence
+        uses: actions/upload-artifact@v7
+        with:
+          name: package-${{ inputs.package_type }}-${{ matrix.os }}-${{ github.run_attempt }}
+          path: |
+            .package-output
+            .package-evidence
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14
+      - name: Capture Native package for Docker
+        id: docker_snapshot
+        if: inputs.publish && inputs.channel == 'preview' && inputs.package_type == 'native' && matrix.os == 'ubuntu-22.04'
+        continue-on-error: true
+        run: |
+          mkdir -p .native-preview-docker/preview .native-preview-docker/evidence
+          cp .package-output/preview/zrlog-Linux-amd64.zip .package-output/preview/last.Linux-amd64.version.json .native-preview-docker/preview/
+          cp zrlog-web/src/main/resources/build.properties .native-preview-docker/evidence/
+      - name: Preserve Native package for Docker recovery
+        id: docker_artifact
+        if: steps.docker_snapshot.outcome == 'success'
+        continue-on-error: true
+        uses: actions/upload-artifact@v7
+        with:
+          name: native-preview-docker-${{ github.run_attempt }}
+          path: .native-preview-docker
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 30

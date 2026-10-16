@@ -12,7 +12,34 @@ Native Maven 插件 `0.11.2` 及其对应的默认 reachability metadata。`25.0
 此兼容组合只固定构建工具，不冻结应用版本或业务依赖。
 
 升级默认插件时保留该兼容 profile；变更 Intel 专用版本前须确认它仍支持 GraalVM `25.0.1`。
-实际构建继续使用现有 Native 工作流，构建成功与产品运行验收分别记录。
+构建成功与产品运行验收分别记录。
+
+### 统一打包工作流
+
+Java、Native ZIP、DEB、FaaS 的预览和正式入口统一调用
+`.github/workflows/build-package.yml`。平台矩阵、JDK/GraalVM、打包命令、来源记录及产物归档
+只在这一份可复用工作流定义。入口保留原名称和触发方式，负责选择包类型、渠道、平台范围和发布开关。
+
+- 日常 `master` 和依赖更新预览只构建 Linux amd64。
+- 手动运行任一 `*-build-preview-*.yml`，默认也只构建 Linux amd64；
+  `full_platforms=true` 开启该类型的完整正式矩阵。Java 仍只需要 Linux amd64；Native ZIP
+  包含 Linux amd64/arm64、macOS Intel/ARM、Windows；DEB/FaaS 包含 Linux amd64/arm64。
+- 手动构建可设置 `channel=release` 使用正式模式的同一组包命令。手动运行只向 Actions
+  归档产物，不签名、不更新下载站或 Docker；`release` 分支的既有自动入口才执行正式发布，
+  并强制完整矩阵。FaaS 的二进制压缩服务仍属于构建步骤，需要原有 service 配置。
+
+例如，按当前工程分支检查所有 Native 平台：
+
+```bash
+gh workflow run native-build-preview-package-zip.yml -R 94fzb/zrlog \
+  --ref <工程分支> -f full_platforms=true -f channel=release
+```
+
+日常构建省略 `full_platforms` 或传 `false`。每个平台归档为
+`package-<类型>-<runner>-<attempt>`，内含 `.package-output/<渠道>/` 下的实际包、更新 JSON，
+以及 `.package-evidence/build.json` 的完整源码 SHA、实际 Java 版本、runner、producer run 和包 SHA-256。
+测试应下载这些实际产物，不另写 Maven/组包步骤。不同源码、依赖或渠道的包不能记成同一候选；
+共用工作流也不保证两次独立重建的字节必然相同，必须按索引核对实际包。
 
 ### 更新元数据配置
 
@@ -26,7 +53,7 @@ Native ZIP 预览与 Docker 预览共用 `native-build-preview-package-zip.yml`�
 Native 包，再由独立 job 使用本次产物快照发布双仓库镜像。Docker 失败不改变 Native job
 结果。Docker 失败后选择 **Re-run failed jobs** 或对 Docker job 选择 **Re-run this job**，
 可复用原 Native 快照补发镜像，不重新编译或上传 Native 包；快照保留 30 天。
-Java、DEB、FaaS 和正式版工作流保持独立。恢复和校验细节见
+Java、DEB、FaaS 和正式版保留独立入口，共用上述打包工作流。恢复和校验细节见
 [Docker 预览发布说明](../docker/README.md#发布-docker-预览清单)。
 
 `bin/add-build-info.sh` 生成应用包内 `build.properties`。以下配置由构建决定：

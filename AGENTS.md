@@ -46,6 +46,10 @@ mvn -q -DskipTests package
 
 修改 `zrlog-web` 行为时至少运行 `mvn -q -pl zrlog-web -am test`。修改打包、依赖范围、release 脚本或启动 classpath 时，需要检查真实产物结构，不能只依赖 Maven 编译通过。
 
+预览、候选与正式包统一使用 `.github/workflows/build-package.yml`。日常开发只构建 Linux amd64，
+手动参数 `full_platforms=true` 开启完整矩阵；正式发布固定完整矩阵。不得在 Ops 或验收工作流另写
+工具链与打包步骤。验收消费已归档的实际包并核对 source/producer/SHA-256，不能把另一次组包当作相同制品。
+
 ## 边界规则
 
 - **运行时边界：普通 JDK ZIP、WAR 不运行 Polyglot/GraalJS，也不携带 Hexo 主题。** 两类 Java 包的 `zrlog-polyglot-template-scope` 必须为 `provided`；只有 Native 构建使用 `compile` 并启用这些能力。

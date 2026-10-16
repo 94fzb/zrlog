@@ -12,6 +12,7 @@ on:
       - docker/resolve-native-package.sh
       - docker/test-native-package-contract.sh
       - .github/workflows/native-build-preview-package-zip.yml
+      - .github/workflows/build-package.yml
       - .github/actions/publish-preview-docker/**
       - docker/*preview*.sh
       - docker/Dockerfile.package
@@ -31,6 +32,7 @@ on:
       - docker/resolve-native-package.sh
       - docker/test-native-package-contract.sh
       - .github/workflows/native-build-preview-package-zip.yml
+      - .github/workflows/build-package.yml
       - .github/actions/publish-preview-docker/**
       - docker/*preview*.sh
       - docker/Dockerfile.package
