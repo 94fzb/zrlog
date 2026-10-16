@@ -47,7 +47,7 @@ mvn -q -DskipTests package
 修改 `zrlog-web` 行为时至少运行 `mvn -q -pl zrlog-web -am test`。修改打包、依赖范围、release 脚本或启动 classpath 时，需要检查真实产物结构，不能只依赖 Maven 编译通过。
 
 预览、候选、正式包和 Docker 只有一个入口 `.github/workflows/build-package.yml`。日常开发只构建 Linux amd64，
-手动参数 `full_platforms=true` 开启完整矩阵；正式发布固定完整矩阵。Docker job 等待对应 Native 平台，保留 Windows Native 和 Windows Docker 发布。不得在 Ops 或验收工作流另写
+手动参数 `full_platforms=true` 开启完整矩阵；正式发布固定完整矩阵。各包类型和平台并行，Docker job 只等待对应 Native 平台；预览与正式共用相同 job、脚本、工具链、Dockerfile 和证明步骤，不按渠道删减包类型。Windows 镜像同时支持两个渠道，手动构建也归档所选平台镜像。不得在 Ops 或验收工作流另写
 工具链与打包步骤。验收消费已归档的实际包并核对 source/producer/SHA-256，不能把另一次组包当作相同制品。
 
 ## 边界规则

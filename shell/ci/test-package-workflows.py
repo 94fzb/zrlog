@@ -98,17 +98,20 @@ class PackageWorkflowContract(unittest.TestCase):
                          SHARED['jobs']['native_linux_amd64']['name'])
         for job in ['native_linux_arm64', 'native_windows', 'packages']:
             self.assertIs(reference, SHARED['jobs'][job]['steps'])
+        for step in reference:
+            self.assertNotIn('channel', step.get('if', ''), 'Channel must not select a different package pipeline')
         self.assertFalse(list(WORKFLOWS.glob('*-build-preview-*.yml')))
         self.assertFalse(list(WORKFLOWS.glob('*-build-release-*.yml')))
         self.assertFalse((WORKFLOWS / 'docker-release-publish.yml').exists())
 
     def test_each_docker_platform_waits_for_its_own_native_package(self):
-        expected = {'docker_preview': 'native_linux_amd64', 'docker_linux_amd64': 'native_linux_amd64',
+        expected = {'docker_linux_amd64': 'native_linux_amd64',
                     'docker_linux_arm64': 'native_linux_arm64', 'docker_windows': 'native_windows'}
         for docker, native in expected.items():
             job = SHARED['jobs'][docker]
             self.assertEqual({'plan', native}, set(job['needs']))
-            self.assertIn("needs.plan.outputs.publish == 'true'", job['if'])
+            self.assertNotIn('channel', job['if'])
+            self.assertNotIn('publish', job['if'])
             self.assertNotIn('always()', job['if'])
             self.assertEqual(['plan'], [SHARED['jobs'][native]['needs']])
         self.assertEqual({'plan', 'docker_linux_amd64', 'docker_linux_arm64'},
@@ -117,6 +120,17 @@ class PackageWorkflowContract(unittest.TestCase):
         self.assertEqual('windows-2022', windows['runs-on'])
         self.assertTrue(any(step.get('name') == 'Push Windows image' for step in windows['steps']))
         self.assertTrue(any(step.get('name') == 'Sign canonical Windows image' for step in windows['steps']))
+        self.assertNotIn('docker_preview', SHARED['jobs'])
+        self.assertIs(SHARED['jobs']['docker_linux_amd64']['steps'], SHARED['jobs']['docker_linux_arm64']['steps'])
+        for job_id in expected:
+            steps = SHARED['jobs'][job_id]['steps']
+            self.assertTrue(any(step.get('with', {}).get('artifact-ids') for step in steps))
+            self.assertTrue(any('prepare-workflow-package.py' in step.get('run', '') for step in steps))
+            self.assertFalse(any('resolve-native-package.sh' in step.get('run', '') for step in steps))
+            self.assertTrue(any('image.tar' in step.get('with', {}).get('path', '') for step in steps))
+            for step in steps:
+                if 'channel' in step.get('if', ''):
+                    self.fail('Channel cannot select a different Docker build or publication step')
 
     def test_index_binds_actual_bytes_to_source_and_effective_java(self):
         with tempfile.TemporaryDirectory() as temporary:

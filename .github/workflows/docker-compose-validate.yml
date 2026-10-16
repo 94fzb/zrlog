@@ -5,6 +5,9 @@ on:
     paths:
       - docker/Dockerfile
       - docker/Dockerfile.windows
+      - docker/Dockerfile.windows.package
+      - docker/prepare-workflow-package.py
+      - docker/test-workflow-package.py
       - docker/docker-compose.yml
       - docker/docker-compose.updater.yml
       - docker/test-compose-updater-config.sh
@@ -23,6 +26,9 @@ on:
     paths:
       - docker/Dockerfile
       - docker/Dockerfile.windows
+      - docker/Dockerfile.windows.package
+      - docker/prepare-workflow-package.py
+      - docker/test-workflow-package.py
       - docker/docker-compose.yml
       - docker/docker-compose.updater.yml
       - docker/test-compose-updater-config.sh
@@ -52,6 +58,9 @@ jobs:
 
       - name: Verify Native preview Docker recovery
         run: bash docker/test-preview-package.sh
+
+      - name: Verify exact workflow package inputs for all Docker platforms
+        run: python3 docker/test-workflow-package.py
 
       - name: Verify Docker image metadata
         run: bash docker/test-image-manifest.sh

@@ -284,27 +284,17 @@ if grep -Fq "ZRLOG_CHANNEL -notmatch '^[A-Za-z0-9._-]+$'" "${windowsDockerfile}"
   fail "Windows Dockerfile still accepts unsupported Native package channels"
 fi
 
-for workflow in build-package.yml; do
-  workflowPath="${SCRIPT_DIR}/../.github/workflows/${workflow}"
-  grep -Fq 'ZRLOG_EXPECTED_SOURCE_COMMIT:' "${workflowPath}"
-  grep -Fq 'ZRLOG_EXPECTED_VERSION:' "${workflowPath}"
-  grep -Fq 'ZRLOG_NATIVE_ZIP_URL=' "${workflowPath}"
-  grep -Fq 'ZRLOG_NATIVE_ZIP_SHA256=' "${workflowPath}"
-  if grep -A3 -F 'bash docker/resolve-native-package.sh' "${workflowPath}" | grep -Fq 'GITHUB_OUTPUT'; then
-    fail "${workflow} redirects resolver stdout into GITHUB_OUTPUT"
-  fi
-  if grep -Fq -- '--build-arg "ZRLOG_NATIVE_ZIP_URL=${{' "${workflowPath}" \
-      || grep -Fq -- '--build-arg "ZRLOG_NATIVE_ZIP_SHA256=${{' "${workflowPath}" \
-      || grep -Fq -- '--build-arg "ZRLOG_EXPECTED_VERSION=${{' "${workflowPath}"; then
-    fail "${workflow} interpolates Native package data into PowerShell source"
-  fi
-  grep -Fq -- '--build-arg "ZRLOG_NATIVE_ZIP_URL=$env:ZRLOG_NATIVE_ZIP_URL"' "${workflowPath}"
-  grep -Fq -- '--build-arg "ZRLOG_NATIVE_ZIP_SHA256=$env:ZRLOG_NATIVE_ZIP_SHA256"' "${workflowPath}"
-  grep -Fq -- '--build-arg "ZRLOG_EXPECTED_VERSION=$env:ZRLOG_EXPECTED_VERSION"' "${workflowPath}"
-  grep -Fq 'version:$env:ZRLOG_EXPECTED_VERSION - ' "${workflowPath}"
-done
-
-grep -Fq 'zrlog version:${ZRLOG_EXPECTED_VERSION} - ' \
-  "${SCRIPT_DIR}/../.github/workflows/build-package.yml"
+workflowPath="${SCRIPT_DIR}/../.github/workflows/build-package.yml"
+grep -Fq 'prepare-workflow-package.py' "${workflowPath}"
+grep -Fq 'artifact-ids:' "${workflowPath}"
+grep -Fq 'file: docker/Dockerfile.package' "${workflowPath}"
+grep -Fq -- '--file docker/Dockerfile.windows.package' "${workflowPath}"
+grep -Fq -- '--build-arg "ZRLOG_EXPECTED_VERSION=$env:ZRLOG_EXPECTED_VERSION"' "${workflowPath}"
+grep -Fq -- '--build-arg "ZRLOG_SOURCE_COMMIT=$env:ZRLOG_EXPECTED_SOURCE_COMMIT"' "${workflowPath}"
+grep -Fq 'version:$env:ZRLOG_EXPECTED_VERSION - ' "${workflowPath}"
+grep -Fq 'zrlog version:${ZRLOG_EXPECTED_VERSION} - ' "${workflowPath}"
+if grep -Fq 'resolve-native-package.sh' "${workflowPath}"; then
+  fail "Workflow re-downloads a mutable channel package instead of its exact Native artifact"
+fi
 
 echo "native Docker package contract ok"

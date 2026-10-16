@@ -16,7 +16,8 @@
 | `latest`, `X.Y.Z` | `linux/amd64` | 所有当前正式版本 |
 | `latest`, `X.Y.Z` | `linux/arm64` | 从 v3.9.0 开始 |
 | `windows-ltsc2022`, `X.Y.Z-windows-ltsc2022` | `windows/amd64` | 从 v3.9.0 开始 |
-| `preview`, `<version>-<buildId>` | `linux/amd64` | 预览版本 |
+| `preview`, `<version>-<buildId>` | `linux/amd64` | 日常预览版本；全平台构建也支持 ARM64 |
+| `preview-windows-ltsc2022`, `<version>-<buildId>-windows-ltsc2022` | `windows/amd64` | Windows 预览镜像 |
 
 `latest` 始终指向最新的 Linux 正式版，不包含 Windows 镜像。v3.8.x 及更早版本只有
 Linux AMD64；从 v3.9.0 开始，Linux 标签同时包含 AMD64 和 ARM64。Windows 镜像使用
@@ -88,23 +89,22 @@ updater 会先下载并校验所选仓库的镜像，再替换 `zrlog` 容器；
 `dl.zrlog.com` 只保存 Docker 更新清单 JSON，记录版本、各镜像仓库的 digest 和已验证平台，
 不保存 Docker 镜像或镜像 TAR。镜像本体由 Docker Hub 与阿里云分发。
 
-`build-package.yml` 在 `master` 提交、依赖预览更新通知或手动运行时，
-先沿用原有 Native ZIP 构建和上传步骤，再由独立 Docker job 自动发布镜像。
-发布步骤封装在 `.github/actions/publish-preview-docker/action.yml`，不再提供独立的预览
-Docker workflow。Java、DEB、FaaS 和正式版工作流各自运行。
+预览、正式包和 Docker 共用 `build-package.yml` 的同一套 job、脚本、工具链与 Dockerfile。
+Java、Native、DEB、FaaS 并行打包，各平台 Docker 只等待对应 Native job。
+日常默认 Linux amd64，`full_platforms=true` 展开所选包类型的完整平台；Windows Native
+与镜像在两个渠道均可构建。手动构建归档应用包和 Docker TAR，不推送镜像或更新清单。
 
-Native job 将本次 ZIP、清单和 `build.properties` 保存为 30 天的 GitHub artifact。
-Docker 验证生产者工作流、Native job 成功状态、包 SHA-256、大小与构建身份，只把包内
-Native 可执行文件装入镜像；不读取可能已被后续构建替换的 `last` 包。
-此链路目前仅支持 `linux/amd64`，不更新 `latest` 标签。
+Docker 按对应 Native job 输出的 artifact ID 下载本次实际包，核对源码、producer run、
+渠道、平台、包索引、更新 JSON、SHA-256 与大小，只把已校验的 Native 可执行文件装入镜像。
+Linux 两架构共用 `Dockerfile.package`，Windows 共用 `Dockerfile.windows.package`；
+两个渠道均不从下载站的 `last` 包重新取输入。原下载型 Dockerfile 仍供独立构建使用。
 
 Docker 失败时选择 **Re-run failed jobs**，或者在 Docker job 上选择 **Re-run this job**，
 会按原 Native job 输出的 artifact ID 复用同一份产物，不重新编译 Native 或上传 ZIP。
-重试不依赖当前 `run_attempt`，也不要求整个运行成功；只要求产物所属 Native job 成功。
-应在 artifact 的 30 天保留期内重试，**Re-run all jobs** 会重新执行 Native 打包。
-快照保存失败会在 Docker job 报错，Native 打包结果仍独立保留。
+重试不依赖当前 `run_attempt`，应在 artifact 的 14 天保留期内重试。
+**Re-run all jobs** 会重新执行 Native 打包。历史 Linux amd64 预览快照的恢复脚本继续保留。
 
-流水线先发布到两个镜像仓库，再匿名拉取并检查版本、源码标签及
+流水线先发布到两个镜像仓库，再拉取并检查版本、源码标签及
 Native 文件 SHA-256。Bash/jq/AWS CLI 脚本随后写入
 `preview/docker-image/<version>-<buildId>.json`，通过 S3 API 回读并逐字节比对后，条件更新
 `preview/last.docker-image.version.json`，再通过 S3 API 回读并核对通道清单。
@@ -115,9 +115,8 @@ Native 文件 SHA-256。Bash/jq/AWS CLI 脚本随后写入
 这些动作不更新正式版通道或 GitHub Release 附件。离线检查入口是
 `bash docker/test-image-manifest.sh` 和 `bash docker/test-preview-package.sh`。
 
-重跑时复用已有不可变标签，重新检查镜像与清单。阿里云使用从 Docker Hub 复制的运行
-镜像生成兼容索引；构建证明保留在 Docker Hub，不把阿里云不支持的 OCI attestation
-格式上传到该仓库。两个仓库的索引 digest 因此分别读取和记录。
+重跑时核对已有不可变标签，拒绝用不同平台镜像覆盖它。阿里云使用不带 OCI attestation 的
+兼容索引；构建证明保留在 Docker Hub。两个仓库的索引 digest 因此分别读取和记录。
 恢复失败的 job 仍保留通道时间校验，不能用旧包覆盖更新的 `preview` 通道。
 
 发布完成以镜像验证和 S3 清单回读一致为准，不再通过 `dl.zrlog.com` 或 R2 公开地址重复
@@ -142,10 +141,10 @@ docker run --name zrlog `
 
 ## 制品验证
 
-正式发布的 Linux 和 Windows 镜像 digest 均使用 Cosign 签名；Linux 镜像同时生成 SBOM
+两个渠道发布的 Linux 和 Windows 镜像 digest 均使用 Cosign 签名；Linux 镜像同时生成 SBOM
 和 provenance。生产部署建议固定 digest，并按[发布制品验证文档](https://github.com/94fzb/zrlog/blob/master/doc/artifact-verification.md)
 验证发布身份。
 
-正式 Docker 也由 `build-package.yml` 调度：Linux amd64/arm64 和 Windows 各自等待对应的
+Docker 统一由 `build-package.yml` 调度：Linux amd64/arm64 和 Windows 各自等待对应的
 Native 组包 job，Linux 镜像再汇总多架构 manifest；Windows LTSC 2022 的双仓库推送和签名保留。
-手动包构建只归档实际包，不触发这些镜像发布 job。
+手动构建同样生成所选平台镜像，归档 TAR、Native 来源与 SHA-256；不登录仓库、不推送、不签名。

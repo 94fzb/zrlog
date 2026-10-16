@@ -71,5 +71,8 @@ Docker BuildKit 为 Docker Hub 中的 Linux 镜像生成 SBOM 和 provenance。�
 BuildKit 使用的 OCI 附属 manifest，因此 workflow 会单独推送不含附属 manifest 的同一平台
 镜像，并在发布多架构 manifest 前验证两端平台镜像 digest 完全一致。由于 Docker Hub 的 index
 额外包含 attestation descriptor，两端的多架构 index digest 应分别记录，不能要求二者相同。
-Linux、Windows 镜像都会对发布后的不可变 digest 进行签名。部署系统应固定 digest；版本标签
+预览与正式渠道的 Linux、Windows 镜像均对发布后的不可变 digest 签名。部署系统应固定 digest；版本标签
 只用于发现。
+
+手动构建归档 `docker-<平台>-<渠道>-<attempt>`，包含可用 `docker load` 导入的 `image.tar`、
+`image.sha256` 及对应 Native 包的来源索引、更新 JSON 和可执行文件 SHA-256。它不代表镜像已发布。

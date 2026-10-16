@@ -12,7 +12,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 
-ARTIFACT_PATTERN = re.compile(r"^zrlog-.+-release(?:-.+)?\.(?:zip|war|deb)$")
 COMMIT_PATTERN = re.compile(r"^[0-9a-f]{40}$")
 
 
@@ -91,17 +90,19 @@ def generate(
     return [checksum_path, sbom_path, signature_path, provenance_path]
 
 
-def release_artifacts(directory: Path) -> list[Path]:
+def release_artifacts(directory: Path, channel: str = "release") -> list[Path]:
+    pattern = re.compile(rf"^zrlog-.+-{re.escape(channel)}(?:-.+)?\.(?:zip|war|deb)$")
     return sorted(
         path
         for path in directory.iterdir()
-        if path.is_file() and ARTIFACT_PATTERN.fullmatch(path.name)
+        if path.is_file() and pattern.fullmatch(path.name)
     )
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--artifact-dir", required=True, type=Path)
+    parser.add_argument("--channel", choices=["preview", "release"], default="release")
     parser.add_argument("--source-commit", required=True)
     parser.add_argument("--source-repository", required=True)
     parser.add_argument("--workflow-url", required=True)
@@ -113,9 +114,9 @@ def main() -> int:
     directory = args.artifact_dir.resolve()
     if not directory.is_dir():
         raise SystemExit(f"artifact directory does not exist: {directory}")
-    artifacts = release_artifacts(directory)
+    artifacts = release_artifacts(directory, args.channel)
     if not artifacts:
-        raise SystemExit(f"no versioned release artifacts found in {directory}")
+        raise SystemExit(f"no versioned {args.channel} artifacts found in {directory}")
 
     timestamp = args.build_timestamp or datetime.now(timezone.utc).isoformat()
     generated = []

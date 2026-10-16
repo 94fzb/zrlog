@@ -25,7 +25,8 @@ Java、Native ZIP、DEB、FaaS 和 Docker 的预览、候选与正式构建只�
   `deb` 或 `faas`。`full_platforms=true` 开启所选类型的完整矩阵：Java 只需 Linux amd64；
   Native ZIP 包含 Linux amd64/arm64、macOS Intel/ARM、Windows；DEB/FaaS 包含 Linux 两架构。
 - 手动 `channel=release` 使用正式组包命令，实际包及 JSON 只归档到 Actions。
-  手动运行不签名、不上传下载站、不推送 Docker；FaaS 二进制压缩仍需原制品服务配置。
+  手动运行同样构建所选 Native 平台的 Docker 镜像并归档 TAR、来源和 SHA-256，
+  不签名、不上传下载站、不推送镜像；FaaS 二进制压缩仍需原制品服务配置。
 - `release` 分支 push 固定全部包类型、完整平台，执行正式签名、包上传及镜像发布。
 
 例如，按固定工程分支检查所有 Native 平台：
@@ -41,10 +42,16 @@ gh workflow run build-package.yml -R 94fzb/zrlog \
 测试下载这些实际产物并核对索引；不同源码、依赖或渠道的包分别记录，共用组包步骤不保证
 两次独立重建的字节相同。
 
-Docker 通过同一 workflow 的 `needs` 接在对应 Native job 后：Linux amd64 包触发 Docker
-预览或正式 amd64 镜像，Linux arm64 包触发正式 arm64 镜像，Windows 包触发 Windows
-LTSC 2022 镜像及双仓库发布、签名。两个 Linux 镜像成功后汇总多架构 manifest 和更新 JSON。
-每个 Docker job 只等待对应平台，macOS、Java、DEB、FaaS 的构建独立进行。
+预览与正式渠道共用相同的工具链、打包、制品证明、Dockerfile 和镜像发布步骤，分支只决定
+渠道身份与发布目标；不按渠道删减包类型或维护两套构建实现。平台选择沿用上述日常与正式入口规则。
+
+Java、Native、DEB、FaaS 及所选平台并行构建。Docker 通过同一 workflow 的 `needs` 只等待
+对应 Linux amd64、Linux arm64 或 Windows Native job，不等待 macOS 或其他包类型。
+所有 Docker 平台均支持预览和正式渠道。Docker 按 Native job 输出的 artifact ID 下载本次
+实际归档，核对 source、producer run、渠道、平台、索引、更新 JSON、大小与 SHA-256，
+从已校验 ZIP 提取可执行文件作为同一套 Dockerfile 的输入，不重新编译或重新下载通道包。
+发布时验证包与镜像中的可执行文件相同，再双仓库发布和签名；Linux 镜像成功后汇总
+所选架构的 manifest 和更新 JSON。Windows 使用 LTSC 2022 独立标签，预览不覆盖正式标签。
 
 ### 更新元数据配置
 
@@ -55,9 +62,9 @@ LTSC 2022 镜像及双仓库发布、签名。两个 Linux 镜像成功后汇总
 碰撞到同一个镜像标签。完整源码身份由 `sourceCommit` 单独保存。
 
 Native ZIP 预览与 Docker 预览使用同一 `build-package.yml`：先构建并上传
-Native 包，再由独立 job 使用本次产物快照发布双仓库镜像。Docker 失败不改变 Native job
+Native 包，再由对应 Docker job 使用本次归档发布双仓库镜像。Docker 失败不改变 Native job
 结果。Docker 失败后选择 **Re-run failed jobs** 或对 Docker job 选择 **Re-run this job**，
-可复用原 Native 快照补发镜像，不重新编译或上传 Native 包；快照保留 30 天。
+可按原 artifact ID 复用 Native 包补发镜像，不重新编译或上传 Native 包；归档保留 14 天。
 Java、DEB、FaaS 和正式版也由该入口构建。恢复和校验细节见
 [Docker 预览发布说明](../docker/README.md#发布-docker-预览清单)。
 

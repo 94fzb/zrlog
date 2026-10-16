@@ -29,9 +29,9 @@ permissions:
   id-token: write
   attestations: write
 
-# Serialize complete releases, including image manifests. Manual runs are isolated.
+# Serialize channel publications, including image manifests. Manual runs are isolated.
 concurrency:
-  group: application-packages-${{ github.event_name == 'push' && github.ref == 'refs/heads/release' && 'release' || github.run_id }}
+  group: application-packages-${{ github.event_name != 'workflow_dispatch' && github.ref_name || github.run_id }}
   cancel-in-progress: false
 
 env:
@@ -74,14 +74,14 @@ jobs:
         shell: bash
     concurrency: &package_concurrency
       group: package-${{ needs.plan.outputs.publish == 'true' && 'publish' || github.run_id }}-${{ needs.plan.outputs.channel }}-${{ matrix.package_type }}-${{ matrix.os }}
-      cancel-in-progress: ${{ needs.plan.outputs.publish == 'true' && needs.plan.outputs.channel == 'preview' }}
+      cancel-in-progress: false
     strategy:
       fail-fast: false
       matrix:
         include:
           - {package_type: native, os: ubuntu-22.04, java: '25'}
     outputs:
-      docker_artifact_id: ${{ steps.docker_artifact.outputs.artifact-id }}
+      package_artifact_id: ${{ steps.package_artifact.outputs.artifact-id }}
     env: &package_env
       ZRLOG_BUILD_ID: ${{ github.event.client_payload.build_id || '' }}
       ZRLOG_BUILD_TIME: ${{ github.event.client_payload.build_time || '' }}
@@ -110,9 +110,9 @@ jobs:
           github-token: ${{ github.token }}
           native-image-job-reports: 'true'
       - uses: anchore/sbom-action/download-syft@v0
-        if: needs.plan.outputs.publish == 'true' && needs.plan.outputs.channel == 'release'
+        if: needs.plan.outputs.publish == 'true'
       - uses: sigstore/cosign-installer@v3
-        if: needs.plan.outputs.publish == 'true' && needs.plan.outputs.channel == 'release'
+        if: needs.plan.outputs.publish == 'true'
       - name: Build application package
         env:
           PACKAGE_TYPE: ${{ matrix.package_type }}
@@ -133,19 +133,22 @@ jobs:
           EXPECTED_COMMIT: ${{ github.sha }}
           REQUESTED_JAVA: ${{ matrix.java }}
         run: python3 shell/ci/record-package-build.py
-      - name: Attest release artifacts
-        if: needs.plan.outputs.publish == 'true' && needs.plan.outputs.channel == 'release'
+      - name: Attest channel artifacts
+        if: needs.plan.outputs.publish == 'true'
         uses: actions/attest-build-provenance@v4
         with:
           subject-path: |
-            ${{ github.workspace }}/.package-output/release/zrlog-*-release*.zip
-            ${{ github.workspace }}/.package-output/release/zrlog-*-release*.war
-            ${{ github.workspace }}/.package-output/release/zrlog-*-release*.deb
-      - name: Generate release trust metadata
-        if: needs.plan.outputs.publish == 'true' && needs.plan.outputs.channel == 'release'
+            ${{ github.workspace }}/.package-output/${{ needs.plan.outputs.channel }}/zrlog-*-${{ needs.plan.outputs.channel }}*.zip
+            ${{ github.workspace }}/.package-output/${{ needs.plan.outputs.channel }}/zrlog-*-${{ needs.plan.outputs.channel }}*.war
+            ${{ github.workspace }}/.package-output/${{ needs.plan.outputs.channel }}/zrlog-*-${{ needs.plan.outputs.channel }}*.deb
+      - name: Generate channel trust metadata
+        env:
+          CHANNEL: ${{ needs.plan.outputs.channel }}
+        if: needs.plan.outputs.publish == 'true'
         run: |
           python3 shell/release/generate_trust_metadata.py \
-            --artifact-dir .package-output/release \
+            --artifact-dir ".package-output/$CHANNEL" \
+            --channel "$CHANNEL" \
             --source-commit "$(git rev-parse HEAD)" \
             --source-repository "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
             --workflow-url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
@@ -159,6 +162,7 @@ jobs:
           CHANNEL: ${{ needs.plan.outputs.channel }}
         run: bash -e shell/upload-bin.sh "$SECRET_ID" "$SECRET_KEY" "$BUCKET" .package-output "$CHANNEL" "$HOST"
       - name: Preserve packages and build evidence
+        id: package_artifact
         uses: actions/upload-artifact@v7
         with:
           name: package-${{ matrix.package_type }}-${{ matrix.os }}-${{ github.run_attempt }}
@@ -168,25 +172,6 @@ jobs:
           include-hidden-files: true
           if-no-files-found: error
           retention-days: 14
-      - name: Capture Native package for Docker
-        id: docker_snapshot
-        if: needs.plan.outputs.publish == 'true' && needs.plan.outputs.channel == 'preview' && matrix.package_type == 'native' && matrix.os == 'ubuntu-22.04'
-        continue-on-error: true
-        run: |
-          mkdir -p .native-preview-docker/preview .native-preview-docker/evidence
-          cp .package-output/preview/zrlog-Linux-amd64.zip .package-output/preview/last.Linux-amd64.version.json .native-preview-docker/preview/
-          cp zrlog-web/src/main/resources/build.properties .native-preview-docker/evidence/
-      - name: Preserve Native package for Docker recovery
-        id: docker_artifact
-        if: steps.docker_snapshot.outcome == 'success'
-        continue-on-error: true
-        uses: actions/upload-artifact@v7
-        with:
-          name: native-preview-docker-${{ github.run_attempt }}
-          path: .native-preview-docker
-          include-hidden-files: true
-          if-no-files-found: error
-          retention-days: 30
 
   native_linux_arm64:
     name: ${{ matrix.package_type }} on ${{ matrix.os }}
@@ -201,6 +186,8 @@ jobs:
       matrix:
         include:
           - {package_type: native, os: ubuntu-24.04-arm, java: '25'}
+    outputs:
+      package_artifact_id: ${{ steps.package_artifact.outputs.artifact-id }}
     env: *package_env
     steps: *package_steps
 
@@ -217,6 +204,8 @@ jobs:
       matrix:
         include:
           - {package_type: native, os: windows-2022, java: '25'}
+    outputs:
+      package_artifact_id: ${{ steps.package_artifact.outputs.artifact-id }}
     env: *package_env
     steps: *package_steps
 
@@ -234,41 +223,19 @@ jobs:
     env: *package_env
     steps: *package_steps
 
-  docker_preview:
-    name: Publish preview Docker image
-    needs: [plan, native_linux_amd64]
-    if: needs.plan.outputs.publish == 'true' && needs.plan.outputs.channel == 'preview'
-    runs-on: ubuntu-latest
-    concurrency:
-      group: docker-preview-publish
-      cancel-in-progress: false
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          ref: ${{ github.sha }}
-      - name: Require the current Native snapshot
-        env:
-          NATIVE_ARTIFACT_ID: ${{ needs.native_linux_amd64.outputs.docker_artifact_id }}
-        run: test -n "$NATIVE_ARTIFACT_ID"
-      - uses: ./.github/actions/publish-preview-docker
-        with:
-          native-run-id: ${{ github.run_id }}
-          native-artifact-id: ${{ needs.native_linux_amd64.outputs.docker_artifact_id }}
-          github-token: ${{ github.token }}
-          docker-password: ${{ secrets.DOCKER_PASSWORD }}
-          aliyun-docker-password: ${{ secrets.ALIYUN_DOCKER_PASSWORD }}
-          secret-id: ${{ secrets.SECRET_ID }}
-          secret-key: ${{ secrets.SECRET_KEY }}
-          bucket: ${{ secrets.BUCKET }}
-          host: ${{ secrets.HOST }}
-
   docker_linux_amd64:
     name: Docker Linux amd64
     needs: [plan, native_linux_amd64]
-    if: needs.plan.outputs.publish == 'true' && needs.plan.outputs.channel == 'release'
+    if: needs.plan.outputs.build_native == 'true'
     runs-on: ${{ matrix.runner }}
     env: &docker_linux_env
       ZRLOG_EXPECTED_VERSION: ${{ needs.plan.outputs.version }}
+      ZRLOG_EXPECTED_SOURCE_COMMIT: ${{ needs.plan.outputs.source_commit }}
+      ZRLOG_CHANNEL: ${{ needs.plan.outputs.channel }}
+      NATIVE_ARTIFACT_ID: ${{ join(needs.*.outputs.package_artifact_id, ',') }}
+    outputs:
+      native_input_id: ${{ steps.native_input.outputs.artifact-id }}
+      digest_id: ${{ steps.digest.outputs.artifact-id }}
     strategy:
       matrix:
         include:
@@ -279,79 +246,78 @@ jobs:
         with:
           ref: ${{ needs.plan.outputs.source_commit }}
 
-      - name: Resolve the package from the completed Native job
+      - name: Download the exact completed Native package
+        uses: actions/download-artifact@v8
+        with:
+          artifact-ids: ${{ env.NATIVE_ARTIFACT_ID }}
+          path: .native-package
+          merge-multiple: true
+      - name: Verify the actual Native package and prepare Docker context
         id: native
         env:
-          ZRLOG_NATIVE_METADATA_OUTPUT: .docker-metadata/native-image-input.json
-          ZRLOG_EXPECTED_SOURCE_COMMIT: ${{ needs.plan.outputs.source_commit }}
-          ZRLOG_EXPECTED_VERSION: ${{ needs.plan.outputs.version }}
-          ZRLOG_NATIVE_RESOLVE_ATTEMPTS: '6'
-          ZRLOG_NATIVE_RESOLVE_RETRY_SECONDS: '10'
           NATIVE_PLATFORM: Linux-${{ matrix.arch }}
-        run: |
-          mkdir -p .docker-metadata
-          bash docker/resolve-native-package.sh release "$NATIVE_PLATFORM"
+        run: python3 docker/prepare-workflow-package.py .native-package .prepared-native
       - name: Preserve validated Native build identity
+        id: native_input
         uses: actions/upload-artifact@v7
         with:
           name: docker-native-input-${{ matrix.arch }}-${{ github.run_attempt }}
-          path: .docker-metadata/native-image-input.json
+          path: |
+            .prepared-native/native-image-input.json
+            .prepared-native/native.sha256
           if-no-files-found: error
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
 
       - name: Login to Docker Hub
+        if: needs.plan.outputs.publish == 'true'
         uses: docker/login-action@v4.6.0
         with:
           username: zrlog
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Login to Aliyun Docker Hub
+        if: needs.plan.outputs.publish == 'true'
         uses: docker/login-action@v4.6.0
         with:
           registry: registry.cn-chengdu.aliyuncs.com
           username: 90xchun
           password: ${{ secrets.ALIYUN_DOCKER_PASSWORD }}
 
-      - name: Build and push immutable Linux image to Docker Hub
+      - name: Build Linux image for publication or archive
         id: push_dockerhub
         uses: docker/build-push-action@v7
         with:
-          context: ./docker
-          file: ./docker/Dockerfile
+          context: .prepared-native/package
+          file: docker/Dockerfile.package
           platforms: ${{ matrix.platform }}
-          provenance: mode=max
-          sbom: true
+          provenance: ${{ needs.plan.outputs.publish == 'true' && 'mode=max' || 'false' }}
+          sbom: ${{ needs.plan.outputs.publish == 'true' }}
+          tags: ${{ needs.plan.outputs.publish != 'true' && format('zrlog/zrlog:{0}-{1}', steps.native.outputs.image_tag, matrix.arch) || '' }}
           build-args: |
-            ZRLOG_CHANNEL=release
-            ZRLOG_NATIVE_ZIP_URL=${{ steps.native.outputs.url }}
-            ZRLOG_NATIVE_ZIP_SHA256=${{ steps.native.outputs.sha256 }}
             ZRLOG_EXPECTED_VERSION=${{ env.ZRLOG_EXPECTED_VERSION }}
             ZRLOG_SOURCE_COMMIT=${{ needs.plan.outputs.source_commit }}
-            CACHE_BUST=${{ github.run_id }}-${{ github.run_attempt }}
           outputs: >-
-            type=image,name=${{ env.DOCKERHUB_IMAGE }},push-by-digest=true,name-canonical=true,push=true
+            ${{ needs.plan.outputs.publish == 'true' && format('type=image,name={0},push-by-digest=true,name-canonical=true,push=true', env.DOCKERHUB_IMAGE) || 'type=docker,dest=.prepared-native/image.tar' }}
 
       - name: Build and push immutable Linux image to Aliyun
+        if: needs.plan.outputs.publish == 'true'
         id: push_aliyun
         uses: docker/build-push-action@v7
         with:
-          context: ./docker
-          file: ./docker/Dockerfile
+          context: .prepared-native/package
+          file: docker/Dockerfile.package
           platforms: ${{ matrix.platform }}
           provenance: false
           sbom: false
           build-args: |
-            ZRLOG_CHANNEL=release
-            ZRLOG_NATIVE_ZIP_URL=${{ steps.native.outputs.url }}
-            ZRLOG_NATIVE_ZIP_SHA256=${{ steps.native.outputs.sha256 }}
             ZRLOG_EXPECTED_VERSION=${{ env.ZRLOG_EXPECTED_VERSION }}
             ZRLOG_SOURCE_COMMIT=${{ needs.plan.outputs.source_commit }}
-            CACHE_BUST=${{ github.run_id }}-${{ github.run_attempt }}
           outputs: >-
             type=image,name=${{ env.ALIYUN_IMAGE }},push-by-digest=true,name-canonical=true,push=true
 
       - name: Resolve and compare Linux image digests
+        if: needs.plan.outputs.publish == 'true'
         id: image
         env:
           ARCH: ${{ matrix.arch }}
@@ -380,13 +346,14 @@ jobs:
           echo "digest=${dockerhub_image_digest}" >> "${GITHUB_OUTPUT}"
 
       - name: Verify pushed Linux image
+        if: needs.plan.outputs.publish == 'true'
         env:
           IMAGE_DIGEST: ${{ steps.image.outputs.digest }}
           EXPECTED_COMMIT: ${{ needs.plan.outputs.source_commit }}
           PLATFORM: ${{ matrix.platform }}
         run: |
           : "${IMAGE_DIGEST:?image digest is required}"
-          build_id=$(jq -r .buildId .docker-metadata/native-image-input.json)
+          build_id=$(jq -r .buildId .prepared-native/native-image-input.json)
           for repository in "${DOCKERHUB_IMAGE}" "${ALIYUN_IMAGE}"; do
             reference="${repository}@${IMAGE_DIGEST}"
             docker pull --platform "${PLATFORM}" "${reference}"
@@ -395,31 +362,58 @@ jobs:
             [[ "${version_output}" == "zrlog version:${ZRLOG_EXPECTED_VERSION} - ${build_id} "* ]]
             docker image inspect "${reference}" | jq -e --arg version "${ZRLOG_EXPECTED_VERSION}" --arg commit "${EXPECTED_COMMIT}" \
               '.[0].Config.Labels | .["org.opencontainers.image.version"] == $version and .["org.opencontainers.image.revision"] == $commit'
+            expected_sha=$(cut -d ' ' -f 1 .prepared-native/native.sha256)
+            actual_sha=$(docker run --rm --platform "$PLATFORM" --entrypoint sha256sum "$reference" /opt/zrlog/zrlog | cut -d ' ' -f 1)
+            [[ $actual_sha == "$expected_sha" ]]
           done
 
       - name: Export Linux image digest
+        if: needs.plan.outputs.publish == 'true'
         env:
           IMAGE_DIGEST: ${{ steps.image.outputs.digest }}
+          DOCKERHUB_INDEX_DIGEST: ${{ steps.push_dockerhub.outputs.digest }}
         run: |
           : "${IMAGE_DIGEST:?image digest is required}"
           mkdir -p /tmp/digests
-          touch "/tmp/digests/${IMAGE_DIGEST#sha256:}"
+          printf '%s\n' "$DOCKERHUB_INDEX_DIGEST" > "/tmp/digests/${IMAGE_DIGEST#sha256:}"
 
       - name: Upload Linux image digest
+        id: digest
+        if: needs.plan.outputs.publish == 'true'
         uses: actions/upload-artifact@v7
         with:
           name: linux-digest-${{ matrix.arch }}-${{ github.run_attempt }}
           path: /tmp/digests/*
           if-no-files-found: error
-          retention-days: 1
+          retention-days: 14
+
+      - name: Record archived Linux image checksum
+        if: needs.plan.outputs.publish != 'true'
+        run: sha256sum .prepared-native/image.tar > .prepared-native/image.sha256
+      - name: Preserve Linux image archive and Native inputs
+        uses: actions/upload-artifact@v7
+        with:
+          name: docker-linux-${{ matrix.arch }}-${{ needs.plan.outputs.channel }}-${{ github.run_attempt }}
+          path: |
+            .prepared-native/image.tar
+            .prepared-native/image.sha256
+            .prepared-native/native-image-input.json
+            .prepared-native/build.json
+            .prepared-native/native.sha256
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
 
 
   docker_linux_arm64:
     name: Docker Linux arm64
     needs: [plan, native_linux_arm64]
-    if: needs.plan.outputs.publish == 'true' && needs.plan.outputs.channel == 'release'
+    if: needs.plan.outputs.build_native == 'true' && needs.plan.outputs.full_platforms == 'true'
     runs-on: ${{ matrix.runner }}
     env: *docker_linux_env
+    outputs:
+      native_input_id: ${{ steps.native_input.outputs.artifact-id }}
+      digest_id: ${{ steps.digest.outputs.artifact-id }}
     strategy:
       matrix:
         include:
@@ -427,28 +421,34 @@ jobs:
     steps: *docker_linux_steps
 
   docker_linux_manifest:
-    name: Publish Linux multi-architecture manifest
+    name: Publish Linux image manifest
     needs:
       - plan
       - docker_linux_amd64
       - docker_linux_arm64
     runs-on: ubuntu-22.04
-    if: needs.plan.outputs.publish == 'true' && needs.plan.outputs.channel == 'release'
+    if: >-
+      !cancelled() && needs.plan.outputs.publish == 'true' &&
+      needs.docker_linux_amd64.result == 'success' &&
+      (needs.docker_linux_arm64.result == 'success' ||
+       (needs.plan.outputs.full_platforms != 'true' && needs.docker_linux_arm64.result == 'skipped'))
     env:
-      DOCKER_TAG_VERSION: ${{ needs.plan.outputs.version }}
+      CHANNEL: ${{ needs.plan.outputs.channel }}
+      FULL_PLATFORMS: ${{ needs.plan.outputs.full_platforms }}
     steps:
       - uses: actions/checkout@v7
         with:
           ref: ${{ needs.plan.outputs.source_commit }}
       - uses: actions/download-artifact@v8
         with:
-          name: docker-native-input-amd64-${{ github.run_attempt }}
+          artifact-ids: ${{ needs.docker_linux_amd64.outputs.native_input_id }}
+          merge-multiple: true
           path: .docker-metadata
       - name: Download Linux image digests
         uses: actions/download-artifact@v8
         with:
           path: /tmp/digests
-          pattern: linux-digest-*-${{ github.run_attempt }}
+          artifact-ids: ${{ needs.plan.outputs.full_platforms == 'true' && format('{0},{1}', needs.docker_linux_amd64.outputs.digest_id, needs.docker_linux_arm64.outputs.digest_id) || needs.docker_linux_amd64.outputs.digest_id }}
           merge-multiple: true
 
       - name: Set up Docker Buildx
@@ -473,9 +473,25 @@ jobs:
         id: manifest
         run: |
           set -euo pipefail
+          version=$(jq -er .version .docker-metadata/native-image-input.json)
+          if [[ $CHANNEL == preview ]]; then
+            DOCKER_TAG_VERSION=$(bash docker/preview-image-tag.sh .docker-metadata/native-image-input.json)
+            alias=preview
+          else
+            DOCKER_TAG_VERSION=$version
+            alias=latest
+          fi
+          echo "DOCKER_TAG_VERSION=$DOCKER_TAG_VERSION" >> "$GITHUB_ENV"
+          echo "DOCKER_ALIAS=$alias" >> "$GITHUB_ENV"
+          expected_count=1
+          expected_platforms='["linux/amd64"]'
+          if [[ $FULL_PLATFORMS == true ]]; then
+            expected_count=2
+            expected_platforms='["linux/amd64","linux/arm64"]'
+          fi
           mapfile -t digest_files < <(find /tmp/digests -maxdepth 1 -type f -printf '%f\n' | sort)
-          if [[ "${#digest_files[@]}" -ne 2 ]]; then
-            echo "Expected two Linux image digests, found ${#digest_files[@]}" >&2
+          if [[ "${#digest_files[@]}" -ne "$expected_count" ]]; then
+            echo "Unexpected number of Linux image digests: ${#digest_files[@]}" >&2
             exit 1
           fi
 
@@ -483,7 +499,9 @@ jobs:
           aliyun_sources=()
           for digest_file in "${digest_files[@]}"; do
             digest="sha256:${digest_file}"
-            dockerhub_source="${DOCKERHUB_IMAGE}@${digest}"
+            hub_digest=$(cat "/tmp/digests/$digest_file")
+            [[ $hub_digest =~ ^sha256:[0-9a-f]{64}$ ]]
+            dockerhub_source="${DOCKERHUB_IMAGE}@${hub_digest}"
             aliyun_source="${ALIYUN_IMAGE}@${digest}"
             docker buildx imagetools inspect "${dockerhub_source}" >/dev/null
             docker buildx imagetools inspect "${aliyun_source}" >/dev/null
@@ -491,22 +509,30 @@ jobs:
             aliyun_sources+=("${aliyun_source}")
           done
 
-          docker buildx imagetools create \
-            --tag "${DOCKERHUB_IMAGE}:${DOCKER_TAG_VERSION}" \
-            --tag "${DOCKERHUB_IMAGE}:latest" \
-            "${dockerhub_sources[@]}"
-          docker buildx imagetools create \
-            --tag "${ALIYUN_IMAGE}:${DOCKER_TAG_VERSION}" \
-            --tag "${ALIYUN_IMAGE}:latest" \
-            "${aliyun_sources[@]}"
+          # Protect immutable version/buildId tags in both channels on reruns.
+          publish_index() {
+            local repository=$1
+            shift
+            local reference="$repository:$DOCKER_TAG_VERSION"
+            if docker buildx imagetools inspect "$reference" --raw > /tmp/existing-index.json 2> /tmp/inspect-error; then
+              existing=$(jq -c '[.manifests[] | select(.platform.os == "linux") | .digest] | sort' /tmp/existing-index.json)
+              expected=$(printf '%s\n' "${digest_files[@]}" | jq -Rsc 'split("\n")[:-1] | map("sha256:" + .) | sort')
+              [[ $existing == "$expected" ]] || { echo "Immutable image already differs: $reference" >&2; return 1; }
+            else
+              grep -Eqi 'not found|manifest unknown' /tmp/inspect-error || { cat /tmp/inspect-error >&2; return 1; }
+              docker buildx imagetools create --tag "$reference" "$@"
+            fi
+          }
+          publish_index "$DOCKERHUB_IMAGE" "${dockerhub_sources[@]}"
+          publish_index "$ALIYUN_IMAGE" "${aliyun_sources[@]}"
 
           validate_manifest() {
             local image="$1"
-            docker buildx imagetools inspect "${image}" --raw | jq -e '
+            docker buildx imagetools inspect "${image}" --raw | jq -e --argjson expected "$expected_platforms" '
               ([.manifests[]
                 | select(.platform.os == "linux")
                 | "\(.platform.os)/\(.platform.architecture)"] | sort)
-              == ["linux/amd64", "linux/arm64"]
+              == $expected
             ' >/dev/null
           }
           validate_manifest "${DOCKERHUB_IMAGE}:${DOCKER_TAG_VERSION}"
@@ -553,11 +579,13 @@ jobs:
           DOCKERHUB_REF: ${{ steps.manifest.outputs.dockerhub }}
           ALIYUN_REF: ${{ steps.manifest.outputs.aliyun }}
         run: |
+          platforms=(--platform linux/amd64)
+          [[ $FULL_PLATFORMS != true ]] || platforms+=(--platform linux/arm64)
           bash docker/collect-image-manifest.sh \
             --native-metadata .docker-metadata/native-image-input.json \
-            --channel release --tag "${DOCKER_TAG_VERSION}" \
+            --channel "$CHANNEL" --tag "${DOCKER_TAG_VERSION}" \
             --image "${DOCKERHUB_REF}" --image "${ALIYUN_REF}" \
-            --platform linux/amd64 --platform linux/arm64 \
+            "${platforms[@]}" \
             --output .docker-metadata/last.docker-image.version.json
       - name: Publish Docker update metadata after image verification
         env:
@@ -569,38 +597,57 @@ jobs:
           bash docker/publish-image-manifest.sh .docker-metadata/last.docker-image.version.json
 
 
+      - name: Advance verified channel aliases
+        run: |
+          for repository in "$DOCKERHUB_IMAGE" "$ALIYUN_IMAGE"; do
+            digest=$(docker buildx imagetools inspect "$repository:$DOCKER_TAG_VERSION" --format '{{.Manifest.Digest}}')
+            docker buildx imagetools create --tag "$repository:$DOCKER_ALIAS" "$repository@$digest"
+            [[ $(docker buildx imagetools inspect "$repository:$DOCKER_ALIAS" --format '{{.Manifest.Digest}}') == "$digest" ]]
+          done
+      - name: Preserve image publication metadata
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: docker-linux-publication-${{ github.run_attempt }}
+          path: .docker-metadata/*.json
+          if-no-files-found: warn
+          include-hidden-files: true
+
   docker_windows:
     name: Build Windows image (windows/amd64)
     needs: [plan, native_windows]
-    if: needs.plan.outputs.publish == 'true' && needs.plan.outputs.channel == 'release'
+    if: needs.plan.outputs.build_native == 'true' && needs.plan.outputs.full_platforms == 'true'
     runs-on: windows-2022
     env:
-      DOCKER_TAG_VERSION: ${{ needs.plan.outputs.version }}
       ZRLOG_EXPECTED_VERSION: ${{ needs.plan.outputs.version }}
-      CACHE_BUST: ${{ github.run_id }}-${{ github.run_attempt }}
+      ZRLOG_EXPECTED_SOURCE_COMMIT: ${{ needs.plan.outputs.source_commit }}
+      ZRLOG_CHANNEL: ${{ needs.plan.outputs.channel }}
+      NATIVE_PLATFORM: Windows-x86_64
     steps:
       - name: Checkout
         uses: actions/checkout@v7
         with:
           ref: ${{ needs.plan.outputs.source_commit }}
 
-      - name: Resolve the package from the completed Windows Native job
+      - name: Download the exact completed Windows Native package
+        uses: actions/download-artifact@v8
+        with:
+          artifact-ids: ${{ needs.native_windows.outputs.package_artifact_id }}
+          path: .native-package
+          merge-multiple: true
+      - name: Verify the actual Native package and prepare Docker context
         id: native
         shell: bash
-        env:
-          ZRLOG_EXPECTED_SOURCE_COMMIT: ${{ needs.plan.outputs.source_commit }}
-          ZRLOG_EXPECTED_VERSION: ${{ needs.plan.outputs.version }}
-          ZRLOG_NATIVE_RESOLVE_ATTEMPTS: '6'
-          ZRLOG_NATIVE_RESOLVE_RETRY_SECONDS: '10'
-        run: bash docker/resolve-native-package.sh release Windows-x86_64
-
+        run: python3 docker/prepare-workflow-package.py .native-package .prepared-native
       - name: Login to Docker Hub
+        if: needs.plan.outputs.publish == 'true'
         uses: docker/login-action@v4.6.0
         with:
           username: zrlog
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Login to Aliyun Docker Hub
+        if: needs.plan.outputs.publish == 'true'
         uses: docker/login-action@v4.6.0
         with:
           registry: registry.cn-chengdu.aliyuncs.com
@@ -609,28 +656,30 @@ jobs:
 
       - name: Build Windows image
         env:
-          ZRLOG_NATIVE_ZIP_URL: ${{ steps.native.outputs.url }}
-          ZRLOG_NATIVE_ZIP_SHA256: ${{ steps.native.outputs.sha256 }}
+          IMAGE_TAG: ${{ steps.native.outputs.image_tag }}-windows-ltsc2022
+          IMAGE_ALIAS: ${{ needs.plan.outputs.channel == 'preview' && 'preview-windows-ltsc2022' || 'windows-ltsc2022' }}
         shell: pwsh
         run: |
-          docker build --file docker/Dockerfile.windows `
-            --build-arg "ZRLOG_CHANNEL=release" `
-            --build-arg "ZRLOG_NATIVE_ZIP_URL=$env:ZRLOG_NATIVE_ZIP_URL" `
-            --build-arg "ZRLOG_NATIVE_ZIP_SHA256=$env:ZRLOG_NATIVE_ZIP_SHA256" `
+          docker build --file docker/Dockerfile.windows.package `
             --build-arg "ZRLOG_EXPECTED_VERSION=$env:ZRLOG_EXPECTED_VERSION" `
-            --build-arg "CACHE_BUST=$env:CACHE_BUST" `
-            --tag "${env:DOCKERHUB_IMAGE}:${env:DOCKER_TAG_VERSION}-windows-ltsc2022" `
-            --tag "${env:DOCKERHUB_IMAGE}:windows-ltsc2022" `
-            --tag "${env:ALIYUN_IMAGE}:${env:DOCKER_TAG_VERSION}-windows-ltsc2022" `
-            --tag "${env:ALIYUN_IMAGE}:windows-ltsc2022" `
-            ./docker
+            --build-arg "ZRLOG_SOURCE_COMMIT=$env:ZRLOG_EXPECTED_SOURCE_COMMIT" `
+            --tag "${env:DOCKERHUB_IMAGE}:${env:IMAGE_TAG}" `
+            --tag "${env:DOCKERHUB_IMAGE}:${env:IMAGE_ALIAS}" `
+            --tag "${env:ALIYUN_IMAGE}:${env:IMAGE_TAG}" `
+            --tag "${env:ALIYUN_IMAGE}:${env:IMAGE_ALIAS}" `
+            .prepared-native/package
+          if ($LASTEXITCODE -ne 0) { throw 'Windows Docker build failed' }
+          "IMAGE_TAG=$env:IMAGE_TAG" >> $env:GITHUB_ENV
+          "IMAGE_ALIAS=$env:IMAGE_ALIAS" >> $env:GITHUB_ENV
 
       - name: Verify Windows image
+        env:
+          EXPECTED_BUILD_ID: ${{ steps.native.outputs.build_id }}
         shell: pwsh
         run: |
           $output = docker run --rm `
             --entrypoint "C:/opt/zrlog/zrlog.exe" `
-            "${env:DOCKERHUB_IMAGE}:${env:DOCKER_TAG_VERSION}-windows-ltsc2022" `
+            "${env:DOCKERHUB_IMAGE}:${env:IMAGE_TAG}" `
             --version 2>&1
           $exitCode = $LASTEXITCODE
           $output | ForEach-Object { Write-Host $_ }
@@ -638,12 +687,32 @@ jobs:
             throw "zrlog.exe --version exited with code ${exitCode}"
           }
           $versionOutput = ($output -join [Environment]::NewLine).Trim().Replace(" version: ", " version:")
-          $expectedPrefix = "zrlog.exe version:$env:ZRLOG_EXPECTED_VERSION - "
+          $expectedPrefix = "zrlog.exe version:$env:ZRLOG_EXPECTED_VERSION - $env:EXPECTED_BUILD_ID "
           if (-not $versionOutput.StartsWith($expectedPrefix, [StringComparison]::Ordinal)) {
             throw "zrlog.exe --version did not report expected version $env:ZRLOG_EXPECTED_VERSION"
           }
+          $image = "${env:DOCKERHUB_IMAGE}:${env:IMAGE_TAG}"
+          $inspect = docker image inspect $image | ConvertFrom-Json
+          if ($LASTEXITCODE -ne 0) { throw 'Windows Docker inspect failed' }
+          if ($inspect[0].Config.Labels.'org.opencontainers.image.version' -ne $env:ZRLOG_EXPECTED_VERSION -or
+              $inspect[0].Config.Labels.'org.opencontainers.image.revision' -ne $env:ZRLOG_EXPECTED_SOURCE_COMMIT) {
+            throw 'Windows image source labels differ from its Native package'
+          }
+          $container = docker create $image
+          if ($LASTEXITCODE -ne 0) { throw 'Windows Docker create failed' }
+          try {
+            docker cp "${container}:C:/opt/zrlog/zrlog.exe" .prepared-native/image-zrlog.exe
+            if ($LASTEXITCODE -ne 0) { throw 'Windows Docker copy failed' }
+            $expectedHash = ((Get-Content .prepared-native/native.sha256) -split ' ')[0]
+            if ((Get-FileHash .prepared-native/image-zrlog.exe -Algorithm SHA256).Hash.ToLowerInvariant() -ne $expectedHash) {
+              throw 'Windows image executable differs from its Native package'
+            }
+          } finally {
+            docker rm $container | Out-Null
+          }
 
       - name: Push Windows image
+        if: needs.plan.outputs.publish == 'true'
         id: push
         shell: pwsh
         run: |
@@ -660,17 +729,41 @@ jobs:
             return $digestMatches[-1].Matches[0].Groups[1].Value
           }
 
-          $dockerHubVersionTag = "${env:DOCKERHUB_IMAGE}:${env:DOCKER_TAG_VERSION}-windows-ltsc2022"
+          $dockerHubVersionTag = "${env:DOCKERHUB_IMAGE}:${env:IMAGE_TAG}"
           $dockerHubDigest = Push-Image $dockerHubVersionTag
-          Push-Image "${env:DOCKERHUB_IMAGE}:windows-ltsc2022" | Out-Null
-          $aliyunDigest = Push-Image "${env:ALIYUN_IMAGE}:${env:DOCKER_TAG_VERSION}-windows-ltsc2022"
-          Push-Image "${env:ALIYUN_IMAGE}:windows-ltsc2022" | Out-Null
+          Push-Image "${env:DOCKERHUB_IMAGE}:${env:IMAGE_ALIAS}" | Out-Null
+          $aliyunDigest = Push-Image "${env:ALIYUN_IMAGE}:${env:IMAGE_TAG}"
+          Push-Image "${env:ALIYUN_IMAGE}:${env:IMAGE_ALIAS}" | Out-Null
           if ($dockerHubDigest -ne $aliyunDigest) {
             throw "Windows image digest differs between registries"
           }
           "dockerhub=${env:DOCKERHUB_IMAGE}@${dockerHubDigest}" >> $env:GITHUB_OUTPUT
 
       - uses: sigstore/cosign-installer@v3
+        if: needs.plan.outputs.publish == 'true'
 
       - name: Sign canonical Windows image
+        if: needs.plan.outputs.publish == 'true'
         run: cosign sign --yes "${{ steps.push.outputs.dockerhub }}"
+
+      - name: Export Windows image archive
+        if: needs.plan.outputs.publish != 'true'
+        shell: pwsh
+        run: |
+          docker save --output .prepared-native/image.tar "${env:DOCKERHUB_IMAGE}:${env:IMAGE_TAG}"
+          if ($LASTEXITCODE -ne 0) { throw 'Windows Docker save failed' }
+          $hash = (Get-FileHash .prepared-native/image.tar -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$hash  image.tar" | Set-Content .prepared-native/image.sha256
+      - name: Preserve Windows image archive and Native inputs
+        uses: actions/upload-artifact@v7
+        with:
+          name: docker-windows-amd64-${{ needs.plan.outputs.channel }}-${{ github.run_attempt }}
+          path: |
+            .prepared-native/image.tar
+            .prepared-native/image.sha256
+            .prepared-native/native-image-input.json
+            .prepared-native/build.json
+            .prepared-native/native.sha256
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
