@@ -22,7 +22,7 @@ def record(root: Path, env: dict[str, str]) -> dict:
         with package.open('rb') as stream:
             for block in iter(lambda: stream.read(1024 * 1024), b''):
                 digest.update(block)
-        artifacts.append(dict(path=str(package.relative_to(root / '.package-output')),
+        artifacts.append(dict(path=package.relative_to(root / '.package-output').as_posix(),
                               size=package.stat().st_size, sha256=digest.hexdigest()))
     java = subprocess.run(['java', '-version'], check=True, capture_output=True, text=True)
     return dict(sourceCommit=source, packageType=env['PACKAGE_TYPE'], channel=channel,

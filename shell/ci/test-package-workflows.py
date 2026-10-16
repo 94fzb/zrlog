@@ -141,6 +141,7 @@ class PackageWorkflowContract(unittest.TestCase):
                 record = RECORD.record(root, env)
                 self.assertEqual(sha, record['sourceCommit'])
                 self.assertEqual('effective JDK 11.0.x', record['javaVersion'])
+                self.assertEqual('release/zrlog-4.0.0-abcdef0-release.zip', record['artifacts'][0]['path'])
                 self.assertEqual(hashlib.sha256(package.read_bytes()).hexdigest(), record['artifacts'][0]['sha256'])
                 env['EXPECTED_COMMIT'] = 'b' * 40
                 with self.assertRaisesRegex(ValueError, 'source differs'):
