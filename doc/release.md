@@ -51,7 +51,9 @@ AI 不执行 tag、Maven 发布、`release` 分支推进、Release 附件上传�
 ## 主工程构建
 
 固定 CI/CD 推进 `release` 分支后，现有 GitHub Actions 继续负责 Java、Native、DEB、
-FaaS 和 Docker 制品构建。相关入口包括：
+FaaS 和 Docker 制品构建。Java/Native/DEB/FaaS 的入口调用统一的
+`.github/workflows/build-package.yml`，正式构建固定完整平台矩阵；日常预览默认 Linux amd64，
+手动构建通过 `full_platforms=true` 开启完整矩阵，见[构建说明](build.md#统一打包工作流)。相关入口包括：
 
 - `.github/workflows/java-build-release-package-zip.yml`
 - `.github/workflows/native-build-release-package-zip.yml`

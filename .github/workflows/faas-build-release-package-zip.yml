@@ -1,54 +1,23 @@
 name: build faas release package
 on:
   push:
-    branches:
-      - release
+    branches: [release]
 permissions:
   contents: read
   id-token: write
   attestations: write
 jobs:
   build:
-    name: ZrLog on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    env:
-      ARTIFACT_SERVICE_URL: ${{ vars.ARTIFACT_SERVICE_URL }}
+    uses: ./.github/workflows/build-package.yml
+    with:
+      package_type: faas
+      source_commit: ${{ github.sha }}
+      channel: release
+      full_platforms: true
+      publish: true
+    secrets:
+      SECRET_ID: ${{ secrets.SECRET_ID }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      BUCKET: ${{ secrets.BUCKET }}
+      HOST: ${{ secrets.HOST }}
       ARTIFACT_SERVICE_TOKEN: ${{ secrets.ARTIFACT_SERVICE_TOKEN }}
-    concurrency:
-      group: deploy-release-on-${{ matrix.os }}-faas   # 同一个 group 的任务会排队执行
-      cancel-in-progress: false # 不取消前一个任务，而是等待
-    strategy:
-      matrix:
-        os: [ ubuntu-22.04,ubuntu-24.04-arm ]
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-      - uses: graalvm/setup-graalvm@v1
-        with:
-          java-version: '25'
-          distribution: 'graalvm' # See 'Options' for all available distributions
-          cache: 'maven'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          native-image-job-reports: 'true'
-      - uses: anchore/sbom-action/download-syft@v0
-      - uses: sigstore/cosign-installer@v3
-
-      - name: Build binary
-        run: |
-          mkdir -p /tmp/download
-          bash -e shell/native/build-final-native.sh release /tmp/download faas
-      - name: Attest release artifact
-        uses: actions/attest-build-provenance@v4
-        with:
-          subject-path: /tmp/download/release/zrlog-*-release-*-faas.zip
-      - name: Generate release trust metadata
-        run: |
-          python3 shell/release/generate_trust_metadata.py \
-            --artifact-dir /tmp/download/release \
-            --source-commit "${GITHUB_SHA}" \
-            --source-repository "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
-            --workflow-url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
-      - name: Upload release artifacts
-        run: |
-          bash -e shell/upload-bin.sh ${{ secrets.SECRET_ID }} ${{ secrets.SECRET_KEY }} ${{ secrets.BUCKET }} /tmp/download release ${{ secrets.HOST }}

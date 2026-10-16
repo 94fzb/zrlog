@@ -1,42 +1,37 @@
 name: build faas preview package
 on:
   push:
-    branches:
-      - master
-  workflow_dispatch:
+    branches: [master]
   repository_dispatch:
-    types:
-      - zrlog-admin-web-preview-updated
+    types: [zrlog-admin-web-preview-updated]
+  workflow_dispatch:
+    inputs:
+      full_platforms:
+        description: Build every supported platform instead of Linux amd64 only
+        type: boolean
+        default: false
+      channel:
+        description: Package mode (manual builds only archive Actions artifacts)
+        type: choice
+        options: [preview, release]
+        default: preview
+permissions:
+  contents: read
+  actions: read
 jobs:
   build:
-    name: ZrLog on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    env:
-      ZRLOG_BUILD_ID: ${{ github.event.client_payload.build_id || '' }}
-      ZRLOG_BUILD_TIME: ${{ github.event.client_payload.build_time || '' }}
-      ARTIFACT_SERVICE_URL: ${{ vars.ARTIFACT_SERVICE_URL }}
+    uses: ./.github/workflows/build-package.yml
+    with:
+      package_type: faas
+      source_commit: ${{ github.sha }}
+      channel: ${{ github.event_name == 'workflow_dispatch' && inputs.channel || 'preview' }}
+      full_platforms: ${{ github.event_name == 'workflow_dispatch' && inputs.full_platforms || false }}
+      publish: ${{ github.event_name != 'workflow_dispatch' }}
+      build_id: ${{ github.event.client_payload.build_id || '' }}
+      build_time: ${{ github.event.client_payload.build_time || '' }}
+    secrets:
+      SECRET_ID: ${{ github.event_name != 'workflow_dispatch' && secrets.SECRET_ID || '' }}
+      SECRET_KEY: ${{ github.event_name != 'workflow_dispatch' && secrets.SECRET_KEY || '' }}
+      BUCKET: ${{ github.event_name != 'workflow_dispatch' && secrets.BUCKET || '' }}
+      HOST: ${{ github.event_name != 'workflow_dispatch' && secrets.HOST || '' }}
       ARTIFACT_SERVICE_TOKEN: ${{ secrets.ARTIFACT_SERVICE_TOKEN }}
-    concurrency:
-      group: deploy-preview-on-${{ matrix.os }}-faas   # 同一个 group 的任务会排队执行
-      cancel-in-progress: true # 预览版本，取消前一个任务
-    strategy:
-      matrix:
-        os: [ ubuntu-22.04 ]
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-          ref: ${{ github.event_name == 'push' && github.sha || 'refs/heads/master' }}
-      - uses: graalvm/setup-graalvm@v1
-        with:
-          java-version: '25'
-          distribution: 'graalvm' # See 'Options' for all available distributions
-          cache: 'maven'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          native-image-job-reports: 'true'
-
-      - name: Build and upload binary
-        run: |
-          mkdir -p /tmp/download
-          bash -e shell/native/build-final-native.sh preview /tmp/download faas
-          bash -e shell/upload-bin.sh ${{ secrets.SECRET_ID }} ${{ secrets.SECRET_KEY }} ${{ secrets.BUCKET }} /tmp/download preview ${{ secrets.HOST }}

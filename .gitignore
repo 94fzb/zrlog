@@ -58,3 +58,6 @@ conf/sqlite-db.properties
 /zrlog-web/src/main/resources/pure-deps.json
 .codex
 /docker/.env
+/.package-output/
+/.package-evidence/
+/.native-preview-docker/

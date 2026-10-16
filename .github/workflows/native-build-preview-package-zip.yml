@@ -1,72 +1,44 @@
 name: build native preview package and docker image
 on:
   push:
-    branches:
-      - master
-  workflow_dispatch:
+    branches: [master]
   repository_dispatch:
-    types:
-      - zrlog-admin-web-preview-updated
+    types: [zrlog-admin-web-preview-updated]
+  workflow_dispatch:
+    inputs:
+      full_platforms:
+        description: Build every supported platform instead of Linux amd64 only
+        type: boolean
+        default: false
+      channel:
+        description: Package mode (manual builds only archive Actions artifacts)
+        type: choice
+        options: [preview, release]
+        default: preview
 permissions:
   contents: read
   actions: read
 jobs:
   build:
-    name: ZrLog on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    outputs:
-      docker_artifact_id: ${{ steps.docker_artifact.outputs.artifact-id }}
-    env:
-      ZRLOG_BUILD_ID: ${{ github.event.client_payload.build_id || '' }}
-      ZRLOG_BUILD_TIME: ${{ github.event.client_payload.build_time || '' }}
-    concurrency:
-      group: deploy-preview-on-${{ matrix.os }}-native   # 同一个 group 的任务会排队执行
-      cancel-in-progress: true # 预览版本，取消前一个任务
-    strategy:
-      matrix:
-        os: [ ubuntu-22.04 ]
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-          ref: ${{ github.event_name == 'push' && github.sha || 'refs/heads/master' }}
-      - uses: graalvm/setup-graalvm@v1
-        with:
-          java-version: ${{ runner.os == 'macOS' && runner.arch == 'X64' && '25.0.1' || '25' }}
-          distribution: 'graalvm' # See 'Options' for all available distributions
-          cache: 'maven'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          native-image-job-reports: 'true'
-
-      - name: Build and upload binary
-        run: |
-          mkdir -p /tmp/download
-          bash -e shell/native/build-final-native.sh preview /tmp/download zip
-          bash -e shell/upload-bin.sh ${{ secrets.SECRET_ID }} ${{ secrets.SECRET_KEY }} ${{ secrets.BUCKET }} /tmp/download preview ${{ secrets.HOST }}
-
-      # Docker handoff is optional for Native packaging: its failure must not fail this job.
-      - name: Capture Native package for Docker
-        id: docker_snapshot
-        continue-on-error: true
-        run: |
-          mkdir -p /tmp/native-preview-docker/preview /tmp/native-preview-docker/evidence
-          cp /tmp/download/preview/zrlog-Linux-amd64.zip /tmp/download/preview/last.Linux-amd64.version.json /tmp/native-preview-docker/preview/
-          cp zrlog-web/src/main/resources/build.properties /tmp/native-preview-docker/evidence/
-
-      - name: Preserve Native package for Docker recovery
-        id: docker_artifact
-        if: steps.docker_snapshot.outcome == 'success'
-        continue-on-error: true
-        uses: actions/upload-artifact@v7
-        with:
-          name: native-preview-docker-${{ github.run_attempt }}
-          path: /tmp/native-preview-docker
-          if-no-files-found: error
-          retention-days: 30
+    uses: ./.github/workflows/build-package.yml
+    with:
+      package_type: native
+      source_commit: ${{ github.sha }}
+      channel: ${{ github.event_name == 'workflow_dispatch' && inputs.channel || 'preview' }}
+      full_platforms: ${{ github.event_name == 'workflow_dispatch' && inputs.full_platforms || false }}
+      publish: ${{ github.event_name != 'workflow_dispatch' }}
+      build_id: ${{ github.event.client_payload.build_id || '' }}
+      build_time: ${{ github.event.client_payload.build_time || '' }}
+    secrets:
+      SECRET_ID: ${{ github.event_name != 'workflow_dispatch' && secrets.SECRET_ID || '' }}
+      SECRET_KEY: ${{ github.event_name != 'workflow_dispatch' && secrets.SECRET_KEY || '' }}
+      BUCKET: ${{ github.event_name != 'workflow_dispatch' && secrets.BUCKET || '' }}
+      HOST: ${{ github.event_name != 'workflow_dispatch' && secrets.HOST || '' }}
 
   docker:
     name: Publish preview Docker image
     needs: build
+    if: github.event_name != 'workflow_dispatch'
     runs-on: ubuntu-latest
     concurrency:
       group: docker-preview-publish

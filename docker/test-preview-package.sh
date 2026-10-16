@@ -79,10 +79,12 @@ jq -n '{repository:{full_name:"94fzb/zrlog"},head_repository:{full_name:"94fzb/z
 jq -n '[{name:"ZrLog on ubuntu-22.04",conclusion:"success",run_attempt:1},
   {name:"Publish preview Docker image",conclusion:"failure",run_attempt:2},
   {name:"ZrLog on ubuntu-22.04",conclusion:"failure",run_attempt:3},
-  {name:"ZrLog on ubuntu-22.04",conclusion:"success",run_attempt:4}]' > "$tmp/jobs.json"
+  {name:"build / native on ubuntu-22.04",conclusion:"success",run_attempt:4},
+  {name:"build / java on ubuntu-22.04",conclusion:"success",run_attempt:5}]' > "$tmp/jobs.json"
 jq -n '[{id:11,name:"native-preview-docker-1",expired:false},
   {id:33,name:"native-preview-docker-3",expired:false},
   {id:44,name:"native-preview-docker-4",expired:false},
+  {id:55,name:"native-preview-docker-5",expired:false},
   {id:99,name:"native-preview-docker-99",expired:false},
   {id:100,name:"unrelated-100",expired:false}]' > "$tmp/artifacts.json"
 cat > "$tmp/bin/gh" <<'MOCK'
@@ -111,6 +113,7 @@ cmp "$tmp/payload/zrlog" "$tmp/recovered/package/zrlog"
 recover 11 > /dev/null
 [[ $(cat "$tmp/selected") == repos/94fzb/zrlog/actions/artifacts/11/zip ]]
 reject recover 33
+reject recover 55
 reject recover 99
 reject recover 100
 reject recover 777

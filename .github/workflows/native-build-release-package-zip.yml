@@ -1,56 +1,22 @@
 name: build native release package
 on:
   push:
-    branches:
-      - release
+    branches: [release]
 permissions:
   contents: read
   id-token: write
   attestations: write
 jobs:
   build:
-    name: ZrLog on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    concurrency:
-      group: deploy-release-on-${{ matrix.os }}-native   # 同一个 group 的任务会排队执行
-      cancel-in-progress: false # 不取消前一个任务，而是等待
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ ubuntu-22.04,ubuntu-24.04-arm,macos-15-intel,macos-14,windows-2022 ]
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-      - uses: graalvm/setup-graalvm@v1
-        with:
-          # 25.0.1 is the last GraalVM release for macOS Intel.
-          java-version: ${{ runner.os == 'macOS' && runner.arch == 'X64' && '25.0.1' || '25' }}
-          distribution: 'graalvm' # See 'Options' for all available distributions
-          cache: 'maven'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          native-image-job-reports: 'true'
-      - uses: anchore/sbom-action/download-syft@v0
-      - uses: sigstore/cosign-installer@v3
-
-      - name: Build binary
-        shell: bash
-        run: |
-          mkdir -p .release-output
-          bash -e shell/native/build-final-native.sh release .release-output zip
-      - name: Attest release artifact
-        uses: actions/attest-build-provenance@v4
-        with:
-          subject-path: ${{ github.workspace }}/.release-output/release/zrlog-*-release-*.zip
-      - name: Generate release trust metadata
-        shell: bash
-        run: |
-          python3 shell/release/generate_trust_metadata.py \
-            --artifact-dir .release-output/release \
-            --source-commit "${GITHUB_SHA}" \
-            --source-repository "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
-            --workflow-url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
-      - name: Upload release artifacts
-        shell: bash
-        run: |
-          bash -e shell/upload-bin.sh ${{ secrets.SECRET_ID }} ${{ secrets.SECRET_KEY }} ${{ secrets.BUCKET }} .release-output release ${{ secrets.HOST }}
+    uses: ./.github/workflows/build-package.yml
+    with:
+      package_type: native
+      source_commit: ${{ github.sha }}
+      channel: release
+      full_platforms: true
+      publish: true
+    secrets:
+      SECRET_ID: ${{ secrets.SECRET_ID }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      BUCKET: ${{ secrets.BUCKET }}
+      HOST: ${{ secrets.HOST }}

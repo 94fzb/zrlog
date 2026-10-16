@@ -37,7 +37,7 @@ trust='zrlog-X.Y.Z-abcdef0-release-trust'
 
 cosign verify-blob \
   --bundle "${trust}/${artifact}.sigstore.json" \
-  --certificate-identity-regexp '^https://github\.com/94fzb/zrlog/\.github/workflows/(java-build-release-package-zip|native-build-release-package-zip|faas-build-release-package-zip|deb-build-release-deb)\.yml@refs/heads/release$' \
+  --certificate-identity-regexp '^https://github\.com/94fzb/zrlog/\.github/workflows/build-package\.yml@refs/heads/release$' \
   --certificate-oidc-issuer 'https://token.actions.githubusercontent.com' \
   "${artifact}"
 
@@ -48,6 +48,9 @@ jq '{artifact, source, build, evidence}' "${trust}/${artifact}.provenance.json"
 
 `.provenance.json` 中的 `artifact.sha256` 必须等于安装包摘要，`source.commit` 必须等于 Release
 tag 指向的完整提交，记录的 SBOM 摘要也必须与实际 SBOM 文件一致。
+
+统一打包工作流后的构建签名使用 `build-package.yml@refs/heads/release` 身份。
+旧包仍按其已批准订单中的原构建身份验证，不改写历史签名或放宽为任意工作流。
 
 ## 验证 Docker 镜像
 
