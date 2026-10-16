@@ -400,7 +400,7 @@ jobs:
 
       - name: Record archived Linux image checksum
         if: needs.plan.outputs.publish != 'true'
-        run: sha256sum .prepared-native/image.tar > .prepared-native/image.sha256
+        run: (cd .prepared-native && sha256sum image.tar > image.sha256)
       - name: Preserve Linux image archive and Native inputs
         uses: actions/upload-artifact@v7
         with:
