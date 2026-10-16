@@ -172,6 +172,17 @@ jobs:
           include-hidden-files: true
           if-no-files-found: error
           retention-days: 14
+      - name: Preserve Native compiler diagnostics on failure
+        if: failure() && matrix.package_type != 'java'
+        uses: actions/upload-artifact@v7
+        with:
+          name: native-diagnostics-${{ matrix.package_type }}-${{ matrix.os }}-${{ github.run_attempt }}
+          path: |
+            package/target/svm_err_*.md
+            package/target/reports
+            package/target/native/agent-output
+          if-no-files-found: warn
+          retention-days: 14
 
   native_linux_arm64:
     name: ${{ matrix.package_type }} on ${{ matrix.os }}

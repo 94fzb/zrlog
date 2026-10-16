@@ -40,7 +40,7 @@ def prepare(artifact: Path, output: Path, env: dict) -> dict:
     repository = f"{env['GITHUB_SERVER_URL']}/{env['GITHUB_REPOSITORY']}"
     workflow = f"{repository}/actions/runs/{env['GITHUB_RUN_ID']}"
     index_file = artifact / '.package-evidence/build.json'
-    index = json.loads(index_file.read_text())
+    index = json.loads(index_file.read_text(encoding='utf-8'))
     runner_os, runner_arch, executable, magic = PLATFORMS[platform]
     require(index['sourceCommit'] == commit and index['channel'] == channel
             and index['packageType'] == 'native' and index['workflow'] == workflow
@@ -49,7 +49,7 @@ def prepare(artifact: Path, output: Path, env: dict) -> dict:
             'Native index does not match the requested source, run, channel or platform')
     directory = artifact / '.package-output' / channel
     metadata_file = directory / f'last.{platform}.version.json'
-    metadata = json.loads(metadata_file.read_text())
+    metadata = json.loads(metadata_file.read_text(encoding='utf-8'))
     build_id = metadata['buildId']
     require(re.fullmatch(r'[0-9A-Za-z][0-9A-Za-z._-]{0,127}', version)
             and re.fullmatch(r'[0-9A-Za-z][0-9A-Za-z._-]{0,127}', build_id), 'Invalid package identity')
