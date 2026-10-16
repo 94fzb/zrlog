@@ -80,11 +80,13 @@ jq -n '[{name:"ZrLog on ubuntu-22.04",conclusion:"success",run_attempt:1},
   {name:"Publish preview Docker image",conclusion:"failure",run_attempt:2},
   {name:"ZrLog on ubuntu-22.04",conclusion:"failure",run_attempt:3},
   {name:"build / native on ubuntu-22.04",conclusion:"success",run_attempt:4},
-  {name:"build / java on ubuntu-22.04",conclusion:"success",run_attempt:5}]' > "$tmp/jobs.json"
+  {name:"build / java on ubuntu-22.04",conclusion:"success",run_attempt:5},
+  {name:"native on ubuntu-22.04",conclusion:"success",run_attempt:6}]' > "$tmp/jobs.json"
 jq -n '[{id:11,name:"native-preview-docker-1",expired:false},
   {id:33,name:"native-preview-docker-3",expired:false},
   {id:44,name:"native-preview-docker-4",expired:false},
   {id:55,name:"native-preview-docker-5",expired:false},
+  {id:66,name:"native-preview-docker-6",expired:false},
   {id:99,name:"native-preview-docker-99",expired:false},
   {id:100,name:"unrelated-100",expired:false}]' > "$tmp/artifacts.json"
 cat > "$tmp/bin/gh" <<'MOCK'
@@ -109,6 +111,11 @@ recover() { bash "$script_dir/download-preview-package.sh" 123 "$tmp/recovered" 
 recover 44 > /dev/null
 [[ $(cat "$tmp/selected") == repos/94fzb/zrlog/actions/artifacts/44/zip ]]
 cmp "$tmp/payload/zrlog" "$tmp/recovered/package/zrlog"
+# The consolidated entry remains recoverable with the exact Native job artifact.
+jq '.path=".github/workflows/build-package.yml"' "$tmp/run.json" > "$tmp/run-new.json"
+mv "$tmp/run-new.json" "$tmp/run.json"
+recover 66 > /dev/null
+[[ $(cat "$tmp/selected") == repos/94fzb/zrlog/actions/artifacts/66/zip ]]
 # Re-run failed Docker jobs use the exact old artifact ID, not the new run_attempt.
 recover 11 > /dev/null
 [[ $(cat "$tmp/selected") == repos/94fzb/zrlog/actions/artifacts/11/zip ]]

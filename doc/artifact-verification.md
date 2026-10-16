@@ -58,7 +58,7 @@ tag 指向的完整提交，记录的 SBOM 摘要也必须与实际 SBOM 文件�
 
 ```shell
 cosign verify \
-  --certificate-identity-regexp '^https://github\.com/94fzb/zrlog/\.github/workflows/docker-release-publish\.yml@refs/heads/release$' \
+  --certificate-identity-regexp '^https://github\.com/94fzb/zrlog/\.github/workflows/build-package\.yml@refs/heads/release$' \
   --certificate-oidc-issuer 'https://token.actions.githubusercontent.com' \
   'zrlog/zrlog@sha256:<digest>'
 ```

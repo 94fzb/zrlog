@@ -88,7 +88,7 @@ updater 会先下载并校验所选仓库的镜像，再替换 `zrlog` 容器；
 `dl.zrlog.com` 只保存 Docker 更新清单 JSON，记录版本、各镜像仓库的 digest 和已验证平台，
 不保存 Docker 镜像或镜像 TAR。镜像本体由 Docker Hub 与阿里云分发。
 
-`native-build-preview-package-zip.yml` 在 `master` 提交、后台预览更新通知或手动运行时，
+`build-package.yml` 在 `master` 提交、依赖预览更新通知或手动运行时，
 先沿用原有 Native ZIP 构建和上传步骤，再由独立 Docker job 自动发布镜像。
 发布步骤封装在 `.github/actions/publish-preview-docker/action.yml`，不再提供独立的预览
 Docker workflow。Java、DEB、FaaS 和正式版工作流各自运行。
@@ -145,3 +145,7 @@ docker run --name zrlog `
 正式发布的 Linux 和 Windows 镜像 digest 均使用 Cosign 签名；Linux 镜像同时生成 SBOM
 和 provenance。生产部署建议固定 digest，并按[发布制品验证文档](https://github.com/94fzb/zrlog/blob/master/doc/artifact-verification.md)
 验证发布身份。
+
+正式 Docker 也由 `build-package.yml` 调度：Linux amd64/arm64 和 Windows 各自等待对应的
+Native 组包 job，Linux 镜像再汇总多架构 manifest；Windows LTSC 2022 的双仓库推送和签名保留。
+手动包构建只归档实际包，不触发这些镜像发布 job。

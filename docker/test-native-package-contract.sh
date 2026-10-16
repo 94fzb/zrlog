@@ -284,7 +284,7 @@ if grep -Fq "ZRLOG_CHANNEL -notmatch '^[A-Za-z0-9._-]+$'" "${windowsDockerfile}"
   fail "Windows Dockerfile still accepts unsupported Native package channels"
 fi
 
-for workflow in docker-release-publish.yml; do
+for workflow in build-package.yml; do
   workflowPath="${SCRIPT_DIR}/../.github/workflows/${workflow}"
   grep -Fq 'ZRLOG_EXPECTED_SOURCE_COMMIT:' "${workflowPath}"
   grep -Fq 'ZRLOG_EXPECTED_VERSION:' "${workflowPath}"
@@ -305,6 +305,6 @@ for workflow in docker-release-publish.yml; do
 done
 
 grep -Fq 'zrlog version:${ZRLOG_EXPECTED_VERSION} - ' \
-  "${SCRIPT_DIR}/../.github/workflows/docker-release-publish.yml"
+  "${SCRIPT_DIR}/../.github/workflows/build-package.yml"
 
 echo "native Docker package contract ok"

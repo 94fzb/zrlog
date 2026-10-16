@@ -11,13 +11,11 @@ on:
       - docker/.env.example
       - docker/resolve-native-package.sh
       - docker/test-native-package-contract.sh
-      - .github/workflows/native-build-preview-package-zip.yml
       - .github/workflows/build-package.yml
       - .github/actions/publish-preview-docker/**
       - docker/*preview*.sh
       - docker/Dockerfile.package
       - docker/*image*.sh
-      - .github/workflows/docker-release-publish.yml
       - .github/workflows/docker-compose-validate.yml
   push:
     branches:
@@ -31,13 +29,11 @@ on:
       - docker/.env.example
       - docker/resolve-native-package.sh
       - docker/test-native-package-contract.sh
-      - .github/workflows/native-build-preview-package-zip.yml
       - .github/workflows/build-package.yml
       - .github/actions/publish-preview-docker/**
       - docker/*preview*.sh
       - docker/Dockerfile.package
       - docker/*image*.sh
-      - .github/workflows/docker-release-publish.yml
       - .github/workflows/docker-compose-validate.yml
 
 permissions:
