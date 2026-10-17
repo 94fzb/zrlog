@@ -21,7 +21,7 @@ jobs:
           bash shell/docker/test-image-manifest.sh
           python3 shell/release/test_update_sources.py
           bash shell/docker/test-native-package-contract.sh
-          python3 docker/test-linux-image-assembly.py
+          python3 shell/docker/test-linux-image-assembly.py
   oci-roundtrip:
     runs-on: ubuntu-22.04
     timeout-minutes: 20
@@ -30,9 +30,9 @@ jobs:
       - uses: docker/setup-qemu-action@v4
       - uses: docker/setup-buildx-action@v4
       - name: Check pinned OCI tooling
-        run: bash docker/skopeo.sh --version
+        run: bash shell/docker/skopeo.sh --version
       - name: Verify OCI archive and index publication against isolated registries
-        run: bash docker/test-linux-image-roundtrip.sh
+        run: bash shell/docker/test-linux-image-roundtrip.sh
   verify-producer-images:
     if: github.event_name == 'workflow_dispatch' && inputs.producer_run_id != ''
     permissions:
@@ -70,7 +70,7 @@ jobs:
       - name: Reassemble and copy the actual image bytes to isolated registries
         env:
           PRODUCER_RUN_ID: ${{ inputs.producer_run_id }}
-        run: bash docker/verify-producer-images.sh
+        run: bash shell/docker/verify-producer-images.sh
       - name: Download all actual application package archives
         uses: actions/download-artifact@v8
         with:

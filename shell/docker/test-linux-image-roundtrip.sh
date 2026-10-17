@@ -37,9 +37,9 @@ for arch in amd64 arm64; do
     '{sourceCommit:$sourceCommit,workflow:$workflow,channel:"preview",packageType:"native",runnerOs:"Linux",runnerArch:$runnerArch}' \
     > "$directory/build.json"
   sha256sum "$temporary/context/zrlog" > "$directory/native.sha256"
-  bash docker/verify-linux-image.sh "$directory" "linux/$arch" "zrlog/oci-fixture:$arch"
+  bash shell/docker/verify-linux-image.sh "$directory" "linux/$arch" "zrlog/oci-fixture:$arch"
 done
-python3 docker/assemble-linux-images.py --inputs "$temporary/inputs" --output "$temporary/assembly" \
+python3 shell/docker/assemble-linux-images.py --inputs "$temporary/inputs" --output "$temporary/assembly" \
   --platform linux/amd64 --platform linux/arm64
 docker run -d --name "$registry" -p 5000:5000 registry:2
 export DOCKERHUB_IMAGE=localhost:5000/fixture/hub ALIYUN_IMAGE=localhost:5000/fixture/aliyun
@@ -49,13 +49,13 @@ for attempt in {1..20}; do
   [[ $attempt -lt 20 ]]
   sleep 1
 done
-bash docker/publish-assembled-linux-images.sh "$temporary/assembly"
+bash shell/docker/publish-assembled-linux-images.sh "$temporary/assembly"
 # A retry must reuse both indexes without replacing an immutable runtime.
-bash docker/publish-assembled-linux-images.sh "$temporary/assembly"
+bash shell/docker/publish-assembled-linux-images.sh "$temporary/assembly"
 jq '.inputs[0].runtime.digest = ("sha256:" + ("0" * 64))' \
   "$temporary/assembly/image-assembly.json" > "$temporary/changed.json"
 mv "$temporary/changed.json" "$temporary/assembly/image-assembly.json"
-if bash docker/publish-assembled-linux-images.sh "$temporary/assembly"; then
+if bash shell/docker/publish-assembled-linux-images.sh "$temporary/assembly"; then
   echo 'A conflicting immutable image was accepted' >&2
   exit 1
 fi

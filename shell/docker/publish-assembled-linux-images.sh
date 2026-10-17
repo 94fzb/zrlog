@@ -7,7 +7,7 @@ report=$directory/image-assembly.json
 jq -e '.distributionMetadataEligible == true' "$report" >/dev/null
 version=$(jq -er .version "$report")
 if [[ $CHANNEL == preview ]]; then
-  tag=$(bash docker/preview-image-tag.sh "$directory/native-image-input.json")
+  tag=$(bash shell/docker/preview-image-tag.sh "$directory/native-image-input.json")
   alias=preview
 else
   tag=$version
@@ -30,15 +30,15 @@ for role in dockerhub aliyun; do
   archive=$directory/$(jq -er --arg role "$role" '.images[] | select(.role == $role) | .archive' "$report")
   archive_sha=$(jq -er --arg role "$role" '.images[] | select(.role == $role) | .sha256' "$report")
   [[ $(sha256sum "$archive" | cut -d ' ' -f 1) == "$archive_sha" ]]
-  if bash docker/skopeo.sh inspect --tls-verify="$tls_verify" --raw "docker://$reference" > "$tmp/existing.json" 2> "$tmp/error"; then
+  if bash shell/docker/skopeo.sh inspect --tls-verify="$tls_verify" --raw "docker://$reference" > "$tmp/existing.json" 2> "$tmp/error"; then
     [[ $(platform_digests "$tmp/existing.json") == "$expected" ]] || {
       echo "Immutable image already differs: $reference" >&2; exit 1;
     }
   else
     grep -Eqi 'not found|manifest unknown' "$tmp/error" || { cat "$tmp/error" >&2; exit 1; }
-    bash docker/skopeo.sh copy --all --preserve-digests --dest-tls-verify="$tls_verify" \
+    bash shell/docker/skopeo.sh copy --all --preserve-digests --dest-tls-verify="$tls_verify" \
       "oci-archive:$archive" "docker://$reference"
-    bash docker/skopeo.sh inspect --tls-verify="$tls_verify" --raw "docker://$reference" > "$tmp/existing.json"
+    bash shell/docker/skopeo.sh inspect --tls-verify="$tls_verify" --raw "docker://$reference" > "$tmp/existing.json"
     expected_digest=$(jq -er --arg role "$role" '.images[] | select(.role == $role) | .digest' "$report")
     [[ sha256:$(sha256sum "$tmp/existing.json" | cut -d ' ' -f 1) == "$expected_digest" ]]
   fi
