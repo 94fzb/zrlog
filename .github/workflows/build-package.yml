@@ -29,10 +29,11 @@ permissions:
   id-token: write
   attestations: write
 
-# Serialize channel publications, including image manifests. Manual runs are isolated.
+# Keep the latest preview or equivalent manual build on each ref. Release
+# publications stay serialized; different archive channels/matrices remain independent.
 concurrency:
-  group: application-packages-${{ github.event_name != 'workflow_dispatch' && github.ref_name || github.run_id }}
-  cancel-in-progress: false
+  group: application-packages-${{ github.ref }}-${{ github.event_name == 'workflow_dispatch' && format('archive-{0}-{1}-{2}', inputs.channel, inputs.package_type, inputs.full_platforms) || 'publish' }}
+  cancel-in-progress: ${{ github.event_name == 'workflow_dispatch' || github.ref_name != 'release' }}
 
 env:
   DOCKERHUB_IMAGE: zrlog/zrlog
