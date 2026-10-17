@@ -71,6 +71,22 @@ jobs:
         env:
           PRODUCER_RUN_ID: ${{ inputs.producer_run_id }}
         run: bash docker/verify-producer-images.sh
+      - name: Download all actual application package archives
+        uses: actions/download-artifact@v8
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.producer_run_id }}
+          pattern: package-*
+          path: .producer-packages
+      - name: Verify the complete package matrix and actual archive bytes
+        env:
+          PRODUCER_RUN_ID: ${{ inputs.producer_run_id }}
+        run: |
+          source_commit=$(jq -er .head_sha producer-run.json)
+          channel=$(jq -er .channel .producer-verification/image-assembly.json)
+          python3 shell/ci/verify-package-archives.py --inputs .producer-packages \
+            --source "$source_commit" --producer-run "$PRODUCER_RUN_ID" --channel "$channel" \
+            --output .producer-verification/package-verification.json
       - name: Preserve producer and verification identities
         if: always()
         uses: actions/upload-artifact@v7
