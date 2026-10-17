@@ -29,6 +29,8 @@ jobs:
           python-version: '3.12'
       - run: python3 -m pip install PyYAML==6.0.2
       - name: Check platform and publication contracts
-        run: python3 shell/ci/test-package-workflows.py
+        run: |
+          python3 shell/ci/test-package-workflows.py
+          python3 shell/ci/test-package-archives.py
       - name: Check GitHub Actions syntax
         run: docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:1.7.12 -color

@@ -32,6 +32,7 @@ jobs:
           python3 shell/release/test_update_sources.py
           bash shell/docker/test-native-package-contract.sh
           python3 shell/docker/test-linux-image-assembly.py
+          python3 shell/ci/test-package-archives.py
   oci-roundtrip:
     if: inputs.faas_producer_run_id == ''
     runs-on: ubuntu-22.04
@@ -166,9 +167,13 @@ jobs:
         run: |
           source_commit=$(jq -er .head_sha producer-run.json)
           channel=$(jq -er .channel .producer-verification/image-assembly.json)
+          publication_args=()
+          if [[ $(jq -er .event producer-run.json) != workflow_dispatch ]]; then
+            publication_args+=(--published)
+          fi
           python3 shell/ci/verify-package-archives.py --inputs .producer-packages \
             --source "$source_commit" --producer-run "$PRODUCER_RUN_ID" --channel "$channel" \
-            --output .producer-verification/package-verification.json
+            --output .producer-verification/package-verification.json "${publication_args[@]}"
       - name: Preserve producer and verification identities
         if: always()
         uses: actions/upload-artifact@v7

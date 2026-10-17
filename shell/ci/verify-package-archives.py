@@ -7,6 +7,7 @@ from pathlib import Path
 import struct
 import subprocess
 import zipfile
+from urllib.parse import urlparse
 
 
 def stream_sha(source):
@@ -21,7 +22,23 @@ def sha(path):
         return stream_sha(source)
 
 
-def verify_package(root, source_commit, producer_run, channel):
+def verify_trust_sidecars(file, source_commit, workflow):
+    checksum = sha(file)
+    assert file.with_name(file.name + '.sha256').read_text().split() == [checksum, file.name]
+    provenance = json.loads(file.with_name(file.name + '.provenance.json').read_text())
+    assert provenance['artifact'] == dict(name=file.name, size=file.stat().st_size, sha256=checksum)
+    assert provenance['source'] == dict(repository='https://github.com/94fzb/zrlog', commit=source_commit)
+    assert provenance['build']['workflow'] == workflow
+    sbom = file.with_name(file.name + '.sbom.cdx.json')
+    assert provenance['evidence']['sbom']['name'] == sbom.name
+    assert provenance['evidence']['sbom']['sha256'] == sha(sbom)
+    assert json.loads(sbom.read_text())['bomFormat'] == 'CycloneDX'
+    bundle = file.with_name(file.name + '.sigstore.json')
+    assert provenance['evidence']['signatureBundle'] == bundle.name
+    assert isinstance(json.loads(bundle.read_text()), dict) and bundle.stat().st_size > 0
+
+
+def verify_package(root, source_commit, producer_run, channel, published=False):
     index=json.loads((root/'.package-evidence/build.json').read_text())
     assert index['sourceCommit']==source_commit and index['workflow']==f'https://github.com/94fzb/zrlog/actions/runs/{producer_run}'
     assert index['channel']==channel and int(index['runAttempt'])>0
@@ -32,7 +49,12 @@ def verify_package(root, source_commit, producer_run, channel):
     assert metadata['buildWorkflow']==index['workflow'] and metadata['checksumAlgorithm']=='sha256'
     assert metadata['type']==('预览版本' if channel=='preview' else '正式版本')
     result={k:index[k] for k in ['sourceCommit','workflow','channel','packageType','runnerOs','runnerArch','javaVersion','requestedJava']}
-    result['packages']=[];assert not list(root.rglob('*.sigstore.json'))
+    result['packages']=[]
+    if not published:
+        assert not list(root.rglob('*.sigstore.json')), 'Manual archive must not contain signing outputs'
+    versioned_names = {Path(urlparse(metadata[key]).path).name
+                       for key in ['zipDownloadUrl', 'warDownloadUrl'] if key in metadata}
+    assert versioned_names and versioned_names <= {Path(entry['path']).name for entry in index['artifacts']}
     for entry in index['artifacts']:
         relative=entry['path'];assert '\\' not in relative
         file=base/relative;assert file.is_relative_to(base) and '..' not in Path(relative).parts
@@ -40,6 +62,10 @@ def verify_package(root, source_commit, producer_run, channel):
         prefix='war' if file.suffix=='.war' else 'zip'
         assert metadata[prefix+'Sha256']==value and metadata[prefix+'FileSize']==file.stat().st_size
         item=dict(name=file.name,sha256=value,size=file.stat().st_size)
+        if published and file.name in versioned_names:
+            verify_trust_sidecars(file, source_commit, index['workflow'])
+            item['trustSidecarsMatchActualBytes'] = True
+            item['signatureBundlePresent'] = True
         if file.suffix in {'.zip','.war'}:
             with zipfile.ZipFile(file) as archive:
                 assert archive.testzip() is None
@@ -69,14 +95,16 @@ def verify_package(root, source_commit, producer_run, channel):
             item.update(debArchitecture=arch,debPackageVersion=version)
         result['packages'].append(item)
     result['updateJsonMatchesActualBytes']=True
+    result['publicationMode'] = 'published' if published else 'archive'
+    result['signatureVerificationPerformed'] = False
     return result
 
 
 
-def verify(inputs, source, producer, channel):
+def verify(inputs, source, producer, channel, published=False):
     records = []
     for path in sorted(inputs.rglob('.package-evidence/build.json')):
-        records.append(verify_package(path.parent.parent, source, producer, channel))
+        records.append(verify_package(path.parent.parent, source, producer, channel, published))
     expected = {
         'java': {('Linux', 'X64')},
         'native': {('Linux', 'X64'), ('Linux', 'ARM64'), ('Windows', 'X64'), ('macOS', 'X64'), ('macOS', 'ARM64')},
@@ -100,7 +128,8 @@ if __name__ == '__main__':
     parser.add_argument('--producer-run', required=True)
     parser.add_argument('--channel', required=True, choices=['preview', 'release'])
     parser.add_argument('--output', required=True, type=Path)
+    parser.add_argument('--published', action='store_true', help='Require trust sidecars from an automatic publishing producer')
     args = parser.parse_args()
-    result = verify(args.inputs, args.source, args.producer_run, args.channel)
+    result = verify(args.inputs, args.source, args.producer_run, args.channel, args.published)
     args.output.write_text(json.dumps(result, indent=2, ensure_ascii=False) + '\n')
     print('Verified all ten actual application package archives')
