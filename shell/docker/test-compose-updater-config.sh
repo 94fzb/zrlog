@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Validate actual Compose rendering without contacting or changing a Docker Engine.
 set -euo pipefail
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 compose=(docker compose)
 if [[ -n ${ZRLOG_COMPOSE_COMMAND:-} ]]; then compose=("$ZRLOG_COMPOSE_COMMAND"); fi
 root=$(mktemp -d)

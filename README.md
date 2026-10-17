@@ -35,16 +35,9 @@ ZrLog 是一款基于 Java 的开源博客系统。它提供文章、分类、�
 6. **部署形态**: 推荐 Native/Zip + SQLite 或 Docker Compose + MySQL；AWS Lambda + Cloudflare D1 作为高级路径，并支持 WAR 容器部署。
 7. **运维能力**: 支持数据库定时备份和在线升级。
 
-### 快速开始（开发者启动）
-
-- 在 IDE 中运行 `com.zrlog.web.Application` 的 `main()` 方法进行调试。
-- 通过 Maven 脚本启动（不依赖 IDE）：
-    - Windows 环境执行 `bin\mvn-run.cmd`
-    - Unix 平台执行 `sh bin/mvn-run.sh`
-
 ### 开发规范
 
-面向 AI Agent 和跨仓库开发的主工程入口见 [AGENTS.md](AGENTS.md)。涉及 `zrlog-base`、`zrlog-admin-web`、`zrlog-blog-web`、`zrlog-install-web` 的联动时，先确认对应仓库边界，再回到本仓库做集成和打包验证。
+工程维护与验证约定见 [AGENTS.md](AGENTS.md)。
 
 ### 程序安装与部署
 
@@ -68,10 +61,6 @@ ZrLog 是一款基于 Java 的开源博客系统。它提供文章、分类、�
   - WAR 是其他支持形态，适合已有 Tomcat / Jetty 与外部数据库的部署流程。
   - Docker 部署请确认 `/opt/zrlog/conf` 已挂载到持久化目录；`db.properties` 和 `install.lock` 会写入该目录。
   - 安装完成后进入后台开始创建第一篇文章。
-
-- **开发者启动**
-
-  本地调试优先使用 IDE 运行 `com.zrlog.web.Application`，或使用上方 Maven 脚本启动。
 
 ### 变更日志
 

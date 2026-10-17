@@ -267,7 +267,7 @@ jobs:
         id: native
         env:
           NATIVE_PLATFORM: Linux-${{ matrix.arch }}
-        run: python3 docker/prepare-workflow-package.py .native-package .prepared-native
+        run: python3 shell/docker/prepare-workflow-package.py .native-package .prepared-native
       - name: Preserve validated Native build identity
         id: native_input
         uses: actions/upload-artifact@v7
@@ -486,7 +486,7 @@ jobs:
           set -euo pipefail
           version=$(jq -er .version .docker-metadata/native-image-input.json)
           if [[ $CHANNEL == preview ]]; then
-            DOCKER_TAG_VERSION=$(bash docker/preview-image-tag.sh .docker-metadata/native-image-input.json)
+            DOCKER_TAG_VERSION=$(bash shell/docker/preview-image-tag.sh .docker-metadata/native-image-input.json)
             alias=preview
           else
             DOCKER_TAG_VERSION=$version
@@ -592,7 +592,7 @@ jobs:
         run: |
           platforms=(--platform linux/amd64)
           [[ $FULL_PLATFORMS != true ]] || platforms+=(--platform linux/arm64)
-          bash docker/collect-image-manifest.sh \
+          bash shell/docker/collect-image-manifest.sh \
             --native-metadata .docker-metadata/native-image-input.json \
             --channel "$CHANNEL" --tag "${DOCKER_TAG_VERSION}" \
             --image "${DOCKERHUB_REF}" --image "${ALIYUN_REF}" \
@@ -605,7 +605,7 @@ jobs:
           ZRLOG_S3_BUCKET: ${{ secrets.BUCKET }}
           ZRLOG_S3_ENDPOINT: ${{ secrets.HOST }}
         run: |
-          bash docker/publish-image-manifest.sh .docker-metadata/last.docker-image.version.json
+          bash shell/docker/publish-image-manifest.sh .docker-metadata/last.docker-image.version.json
 
 
       - name: Advance verified channel aliases
@@ -649,7 +649,7 @@ jobs:
       - name: Verify the actual Native package and prepare Docker context
         id: native
         shell: bash
-        run: python3 docker/prepare-workflow-package.py .native-package .prepared-native
+        run: python3 shell/docker/prepare-workflow-package.py .native-package .prepared-native
       - name: Login to Docker Hub
         if: needs.plan.outputs.publish == 'true'
         uses: docker/login-action@v4.6.0

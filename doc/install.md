@@ -4,7 +4,6 @@
 - 推荐路径：个人或本机使用 Native/Zip + SQLite；服务器使用 Docker Compose + MySQL。
 - 高级路径：使用 Linux FaaS 包部署 AWS Lambda + Cloudflare D1。
 - 其他支持形态：在已有 Servlet 容器和外部数据库时部署 WAR。
-- 开发者启动：在 IDE 中运行 `com.zrlog.web.Application`，或使用 `bin/mvn-run.sh` / `bin\mvn-run.cmd`。
 
 安装页会检查配置目录、数据库连接和安装锁文件，并在提交安装后显示实际执行进度。
 

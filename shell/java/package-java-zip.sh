@@ -4,7 +4,7 @@ set -e
 rm -rf lib
 rm -rf zrlog.*
 rm -rf conf/plugins/*
-# Ordinary JDK packages must not bundle Polyglot; see doc/build.md.
+# Ordinary JDK packages must not bundle Polyglot; checked by test-java-package-contract.sh.
 source shell/lib/updater-modules.sh
 updaterSelectRuntime java-zip
 bash -e bin/add-build-info.sh "${1}" java zip

@@ -7,7 +7,8 @@ unset GITHUB_OUTPUT ZRLOG_EXPECTED_SOURCE_COMMIT ZRLOG_EXPECTED_VERSION \
   ZRLOG_NATIVE_RESOLVE_ATTEMPTS ZRLOG_NATIVE_RESOLVE_RETRY_SECONDS
 
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-resolver="${SCRIPT_DIR}/resolve-native-package.sh"
+REPO_ROOT=$(cd "${SCRIPT_DIR}/../.." && pwd)
+resolver="${REPO_ROOT}/docker/resolve-native-package.sh"
 fixtureDir=$(mktemp -d)
 trap 'rm -rf "${fixtureDir}"' EXIT
 
@@ -265,10 +266,10 @@ expectFailure "Resolver accepted output injection through a manifest URL" \
   "${resolver}" release Linux-amd64 "file://${injectedManifest}"
 [[ ! -s "${githubOutput}" ]] || fail "Rejected manifest data modified GITHUB_OUTPUT"
 
-grep -Fq 'sha256sum --check --strict' "${SCRIPT_DIR}/Dockerfile"
-grep -Fq 'ARG ZRLOG_NATIVE_MIRROR_BASE_URL=' "${SCRIPT_DIR}/Dockerfile"
-grep -Fq 'ZRLOG_NATIVE_MIRROR_BASE_URL="${ZRLOG_NATIVE_MIRROR_BASE_URL}"' "${SCRIPT_DIR}/Dockerfile"
-windowsDockerfile="${SCRIPT_DIR}/Dockerfile.windows"
+grep -Fq 'sha256sum --check --strict' "${REPO_ROOT}/docker/Dockerfile"
+grep -Fq 'ARG ZRLOG_NATIVE_MIRROR_BASE_URL=' "${REPO_ROOT}/docker/Dockerfile"
+grep -Fq 'ZRLOG_NATIVE_MIRROR_BASE_URL="${ZRLOG_NATIVE_MIRROR_BASE_URL}"' "${REPO_ROOT}/docker/Dockerfile"
+windowsDockerfile="${REPO_ROOT}/docker/Dockerfile.windows"
 grep -Fq 'ARG ZRLOG_NATIVE_MIRROR_BASE_URL=' "${windowsDockerfile}"
 grep -Fq 'Get-FileHash -LiteralPath $archive -Algorithm SHA256' "${windowsDockerfile}"
 grep -Fq "ZRLOG_CHANNEL -cnotin @('preview', 'release')" "${windowsDockerfile}"
@@ -284,7 +285,7 @@ if grep -Fq "ZRLOG_CHANNEL -notmatch '^[A-Za-z0-9._-]+$'" "${windowsDockerfile}"
   fail "Windows Dockerfile still accepts unsupported Native package channels"
 fi
 
-workflowPath="${SCRIPT_DIR}/../.github/workflows/build-package.yml"
+workflowPath="${REPO_ROOT}/.github/workflows/build-package.yml"
 grep -Fq 'prepare-workflow-package.py' "${workflowPath}"
 grep -Fq 'artifact-ids:' "${workflowPath}"
 grep -Fq 'file: docker/Dockerfile.package' "${workflowPath}"

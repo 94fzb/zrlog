@@ -9,25 +9,13 @@
 trust 压缩包为每个安装包保存 `.sha256`、CycloneDX `.sbom.cdx.json`、Sigstore
 `.sigstore.json` 和 `.provenance.json`。签名使用 GitHub Actions OIDC 短期身份，不依赖长期私钥。
 
-## 验证 Release 清单
+## 准备验证
 
-先下载需要的安装包、`SHA256SUMS`、签名 bundle 和 trust 压缩包，再安装
-[Cosign](https://docs.sigstore.dev/cosign/system_config/installation/)：
+先下载需要的安装包、`SHA256SUMS` 和 trust 压缩包，再安装
+[Cosign](https://docs.sigstore.dev/cosign/system_config/installation/)。
+每个安装包使用下述固定构建工作流身份验证，不能只比较校验值。
 
-```shell
-cosign verify-blob \
-  --bundle SHA256SUMS.sigstore.json \
-  --certificate-identity-regexp '^https://github\.com/zrlog/zrlog-ops/\.github/workflows/release-order-merged\.yml@refs/heads/main$' \
-  --certificate-oidc-issuer 'https://token.actions.githubusercontent.com' \
-  SHA256SUMS
-
-sha256sum --check --ignore-missing SHA256SUMS
-```
-
-macOS 可用 `shasum -a 256 <安装包>`，再与 `SHA256SUMS` 对应行人工比较。
-不要只执行 checksum 而跳过 Sigstore 验证，否则无法确认 checksum 的发布者身份。
-
-## 验证单个构建
+## 验证安装包签名
 
 解压 trust 文件后，以 Java ZIP 为例：
 
@@ -50,7 +38,18 @@ jq '{artifact, source, build, evidence}' "${trust}/${artifact}.provenance.json"
 tag 指向的完整提交，记录的 SBOM 摘要也必须与实际 SBOM 文件一致。
 
 统一打包工作流后的构建签名使用 `build-package.yml@refs/heads/release` 身份。
-旧包仍按其已批准订单中的原构建身份验证，不改写历史签名或放宽为任意工作流。
+旧包按其发布时的构建工作流身份验证，不改写历史签名或放宽为任意工作流。
+
+## 核对汇总清单
+
+完成安装包签名验证后，可用汇总清单检查已下载文件的完整性：
+
+```shell
+sha256sum --check --ignore-missing SHA256SUMS
+```
+
+macOS 可用 `shasum -a 256 <安装包>`，再与 `SHA256SUMS` 对应行人工比较。
+汇总校验值用于完整性核对；安装包发布者身份以上述固定工作流的 Sigstore 验证为准。
 
 ## 验证 Docker 镜像
 

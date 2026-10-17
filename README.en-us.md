@@ -35,12 +35,9 @@ ZrLog is an open-source blog system built with Java. It provides article, catego
 6. **Deployment Options**: Use Native/Zip + SQLite or Docker Compose + MySQL as the recommended paths; AWS Lambda + Cloudflare D1 is the advanced path, and WAR container deployment remains supported.
 7. **Operations**: Use scheduled database backups and online updates.
 
-### Quick Start (Developer Startup)
+### Development
 
-- Run `com.zrlog.web.Application`'s `main()` method from your IDE for local debugging.
-- Start with Maven scripts when not using an IDE:
-    - Windows users execute `bin\mvn-run.cmd`
-    - Unix/macOS execute `sh bin/mvn-run.sh`
+See [AGENTS.md](AGENTS.md) for development and verification conventions.
 
 ### Installation & Deployment
 
@@ -64,10 +61,6 @@ ZrLog is an open-source blog system built with Java. It provides article, catego
   - WAR remains supported for deployments with an existing Tomcat / Jetty container and external database.
   - For Docker, make sure `/opt/zrlog/conf` is mounted to persistent storage; `db.properties` and `install.lock` are written there.
   - After installation, enter admin and create your first article.
-
-- **Developer startup**
-
-  Use your IDE to run `com.zrlog.web.Application`, or use the Maven scripts above.
 
 ### Changelog
 
