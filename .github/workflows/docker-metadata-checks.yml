@@ -16,3 +16,17 @@ jobs:
           bash docker/test-image-manifest.sh
           python3 shell/release/test_update_sources.py
           bash docker/test-native-package-contract.sh
+          python3 docker/test-linux-image-assembly.py
+  oci-roundtrip:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: docker/setup-qemu-action@v4
+      - uses: docker/setup-buildx-action@v4
+      - name: Install OCI tooling
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y skopeo
+      - name: Verify OCI archive and index publication against isolated registries
+        run: bash docker/test-linux-image-roundtrip.sh

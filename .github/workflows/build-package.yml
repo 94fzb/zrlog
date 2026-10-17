@@ -245,8 +245,7 @@ jobs:
       ZRLOG_CHANNEL: ${{ needs.plan.outputs.channel }}
       NATIVE_ARTIFACT_ID: ${{ join(needs.*.outputs.package_artifact_id, ',') }}
     outputs:
-      native_input_id: ${{ steps.native_input.outputs.artifact-id }}
-      digest_id: ${{ steps.digest.outputs.artifact-id }}
+      image_artifact_id: ${{ steps.image_artifact.outputs.artifact-id }}
     strategy:
       matrix:
         include:
@@ -256,7 +255,6 @@ jobs:
         uses: actions/checkout@v7
         with:
           ref: ${{ needs.plan.outputs.source_commit }}
-
       - name: Download the exact completed Native package
         uses: actions/download-artifact@v8
         with:
@@ -268,153 +266,45 @@ jobs:
         env:
           NATIVE_PLATFORM: Linux-${{ matrix.arch }}
         run: python3 docker/prepare-workflow-package.py .native-package .prepared-native
-      - name: Preserve validated Native build identity
-        id: native_input
-        uses: actions/upload-artifact@v7
-        with:
-          name: docker-native-input-${{ matrix.arch }}-${{ github.run_attempt }}
-          path: |
-            .prepared-native/native-image-input.json
-            .prepared-native/native.sha256
-          if-no-files-found: error
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
-
-      - name: Login to Docker Hub
-        if: needs.plan.outputs.publish == 'true'
-        uses: docker/login-action@v4.6.0
-        with:
-          username: zrlog
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Login to Aliyun Docker Hub
-        if: needs.plan.outputs.publish == 'true'
-        uses: docker/login-action@v4.6.0
-        with:
-          registry: registry.cn-chengdu.aliyuncs.com
-          username: 90xchun
-          password: ${{ secrets.ALIYUN_DOCKER_PASSWORD }}
-
-      - name: Build Linux image for publication or archive
-        id: push_dockerhub
-        uses: docker/build-push-action@v7
-        with:
-          context: .prepared-native/package
-          file: docker/Dockerfile.package
-          platforms: ${{ matrix.platform }}
-          provenance: ${{ needs.plan.outputs.publish == 'true' && 'mode=max' || 'false' }}
-          sbom: ${{ needs.plan.outputs.publish == 'true' }}
-          tags: ${{ needs.plan.outputs.publish != 'true' && format('zrlog/zrlog:{0}-{1}', steps.native.outputs.image_tag, matrix.arch) || '' }}
-          build-args: |
-            ZRLOG_EXPECTED_VERSION=${{ env.ZRLOG_EXPECTED_VERSION }}
-            ZRLOG_SOURCE_COMMIT=${{ needs.plan.outputs.source_commit }}
-          outputs: >-
-            ${{ needs.plan.outputs.publish == 'true' && format('type=image,name={0},push-by-digest=true,name-canonical=true,push=true', env.DOCKERHUB_IMAGE) || 'type=docker,dest=.prepared-native/image.tar' }}
-
-      - name: Build and push immutable Linux image to Aliyun
-        if: needs.plan.outputs.publish == 'true'
-        id: push_aliyun
-        uses: docker/build-push-action@v7
-        with:
-          context: .prepared-native/package
-          file: docker/Dockerfile.package
-          platforms: ${{ matrix.platform }}
-          provenance: false
-          sbom: false
-          build-args: |
-            ZRLOG_EXPECTED_VERSION=${{ env.ZRLOG_EXPECTED_VERSION }}
-            ZRLOG_SOURCE_COMMIT=${{ needs.plan.outputs.source_commit }}
-          outputs: >-
-            type=image,name=${{ env.ALIYUN_IMAGE }},push-by-digest=true,name-canonical=true,push=true
-
-      - name: Resolve and compare Linux image digests
-        if: needs.plan.outputs.publish == 'true'
-        id: image
-        env:
-          ARCH: ${{ matrix.arch }}
-          DOCKERHUB_OUTPUT_DIGEST: ${{ steps.push_dockerhub.outputs.digest }}
-          ALIYUN_DIGEST: ${{ steps.push_aliyun.outputs.digest }}
+      - name: Install OCI archive tooling
         run: |
-          set -euo pipefail
-          : "${DOCKERHUB_OUTPUT_DIGEST:?Docker Hub output digest is required}"
-          : "${ALIYUN_DIGEST:?Aliyun image digest is required}"
-
-          dockerhub_manifest=$(docker buildx imagetools inspect \
-            "${DOCKERHUB_IMAGE}@${DOCKERHUB_OUTPUT_DIGEST}" --raw)
-          dockerhub_image_digest=$(jq -r --arg arch "${ARCH}" '
-            [.manifests[]?
-              | select(.platform.os == "linux" and .platform.architecture == $arch)
-              | .digest]
-            | if length == 1 then .[0] else empty end
-          ' <<<"${dockerhub_manifest}")
-          if [[ -z "${dockerhub_image_digest}" ]]; then
-            dockerhub_image_digest="${DOCKERHUB_OUTPUT_DIGEST}"
-          fi
-          if [[ "${dockerhub_image_digest}" != "${ALIYUN_DIGEST}" ]]; then
-            echo "Linux image digest differs between registries" >&2
-            exit 1
-          fi
-          echo "digest=${dockerhub_image_digest}" >> "${GITHUB_OUTPUT}"
-
-      - name: Verify pushed Linux image
-        if: needs.plan.outputs.publish == 'true'
+          sudo apt-get update -qq
+          sudo apt-get install -y skopeo
+      - name: Build Linux image with provenance and SBOM
+        uses: docker/build-push-action@v7
+        with:
+          context: .prepared-native/package
+          file: docker/Dockerfile.package
+          platforms: ${{ matrix.platform }}
+          provenance: mode=max
+          sbom: true
+          build-args: |
+            ZRLOG_EXPECTED_VERSION=${{ env.ZRLOG_EXPECTED_VERSION }}
+            ZRLOG_SOURCE_COMMIT=${{ needs.plan.outputs.source_commit }}
+          outputs: type=oci,dest=.prepared-native/image.oci.tar
+      - name: Verify the archived Linux image and Native executable
         env:
-          IMAGE_DIGEST: ${{ steps.image.outputs.digest }}
-          EXPECTED_COMMIT: ${{ needs.plan.outputs.source_commit }}
           PLATFORM: ${{ matrix.platform }}
-        run: |
-          : "${IMAGE_DIGEST:?image digest is required}"
-          build_id=$(jq -r .buildId .prepared-native/native-image-input.json)
-          for repository in "${DOCKERHUB_IMAGE}" "${ALIYUN_IMAGE}"; do
-            reference="${repository}@${IMAGE_DIGEST}"
-            docker pull --platform "${PLATFORM}" "${reference}"
-            version_output=$(docker run --rm --platform "${PLATFORM}" --entrypoint /opt/zrlog/zrlog "${reference}" --version)
-            version_output="${version_output/ version: / version:}"
-            [[ "${version_output}" == "zrlog version:${ZRLOG_EXPECTED_VERSION} - ${build_id} "* ]]
-            docker image inspect "${reference}" | jq -e --arg version "${ZRLOG_EXPECTED_VERSION}" --arg commit "${EXPECTED_COMMIT}" \
-              '.[0].Config.Labels | .["org.opencontainers.image.version"] == $version and .["org.opencontainers.image.revision"] == $commit'
-            expected_sha=$(cut -d ' ' -f 1 .prepared-native/native.sha256)
-            actual_sha=$(docker run --rm --platform "$PLATFORM" --entrypoint sha256sum "$reference" /opt/zrlog/zrlog | cut -d ' ' -f 1)
-            [[ $actual_sha == "$expected_sha" ]]
-          done
-
-      - name: Export Linux image digest
-        if: needs.plan.outputs.publish == 'true'
-        env:
-          IMAGE_DIGEST: ${{ steps.image.outputs.digest }}
-          DOCKERHUB_INDEX_DIGEST: ${{ steps.push_dockerhub.outputs.digest }}
-        run: |
-          : "${IMAGE_DIGEST:?image digest is required}"
-          mkdir -p /tmp/digests
-          printf '%s\n' "$DOCKERHUB_INDEX_DIGEST" > "/tmp/digests/${IMAGE_DIGEST#sha256:}"
-
-      - name: Upload Linux image digest
-        id: digest
-        if: needs.plan.outputs.publish == 'true'
-        uses: actions/upload-artifact@v7
-        with:
-          name: linux-digest-${{ matrix.arch }}-${{ github.run_attempt }}
-          path: /tmp/digests/*
-          if-no-files-found: error
-          retention-days: 14
-
-      - name: Record archived Linux image checksum
-        if: needs.plan.outputs.publish != 'true'
-        run: (cd .prepared-native && sha256sum image.tar > image.sha256)
+          IMAGE_TAG: ${{ steps.native.outputs.image_tag }}-${{ matrix.arch }}
+        run: bash docker/verify-linux-image.sh .prepared-native "$PLATFORM" "zrlog/zrlog:$IMAGE_TAG"
       - name: Preserve Linux image archive and Native inputs
+        id: image_artifact
         uses: actions/upload-artifact@v7
         with:
           name: docker-linux-${{ matrix.arch }}-${{ needs.plan.outputs.channel }}-${{ github.run_attempt }}
           path: |
             .prepared-native/image.tar
+            .prepared-native/image.oci.tar
             .prepared-native/image.sha256
+            .prepared-native/image-verification.json
             .prepared-native/native-image-input.json
             .prepared-native/build.json
             .prepared-native/native.sha256
           if-no-files-found: error
           compression-level: 0
           retention-days: 14
-
 
   docker_linux_arm64:
     name: Docker Linux arm64
@@ -423,8 +313,7 @@ jobs:
     runs-on: ${{ matrix.runner }}
     env: *docker_linux_env
     outputs:
-      native_input_id: ${{ steps.native_input.outputs.artifact-id }}
-      digest_id: ${{ steps.digest.outputs.artifact-id }}
+      image_artifact_id: ${{ steps.image_artifact.outputs.artifact-id }}
     strategy:
       matrix:
         include:
@@ -432,160 +321,66 @@ jobs:
     steps: *docker_linux_steps
 
   docker_linux_manifest:
-    name: Publish Linux image manifest
-    needs:
-      - plan
-      - docker_linux_amd64
-      - docker_linux_arm64
+    name: Assemble and verify Linux image manifests
+    needs: [plan, docker_linux_amd64, docker_linux_arm64]
     runs-on: ubuntu-22.04
     if: >-
-      !cancelled() && needs.plan.outputs.publish == 'true' &&
-      needs.docker_linux_amd64.result == 'success' &&
+      !cancelled() && needs.docker_linux_amd64.result == 'success' &&
       (needs.docker_linux_arm64.result == 'success' ||
        (needs.plan.outputs.full_platforms != 'true' && needs.docker_linux_arm64.result == 'skipped'))
     env:
       CHANNEL: ${{ needs.plan.outputs.channel }}
       FULL_PLATFORMS: ${{ needs.plan.outputs.full_platforms }}
+      ZRLOG_CHANNEL: ${{ needs.plan.outputs.channel }}
+      ZRLOG_EXPECTED_VERSION: ${{ needs.plan.outputs.version }}
+      ZRLOG_EXPECTED_SOURCE_COMMIT: ${{ needs.plan.outputs.source_commit }}
     steps:
       - uses: actions/checkout@v7
         with:
           ref: ${{ needs.plan.outputs.source_commit }}
-      - uses: actions/download-artifact@v8
-        with:
-          artifact-ids: ${{ needs.docker_linux_amd64.outputs.native_input_id }}
-          merge-multiple: true
-          path: .docker-metadata
-      - name: Download Linux image digests
+      - name: Download the exact Linux image archives
         uses: actions/download-artifact@v8
         with:
-          path: /tmp/digests
-          artifact-ids: ${{ needs.plan.outputs.full_platforms == 'true' && format('{0},{1}', needs.docker_linux_amd64.outputs.digest_id, needs.docker_linux_arm64.outputs.digest_id) || needs.docker_linux_amd64.outputs.digest_id }}
-          merge-multiple: true
-
+          path: .docker-inputs
+          artifact-ids: ${{ needs.plan.outputs.full_platforms == 'true' && format('{0},{1}', needs.docker_linux_amd64.outputs.image_artifact_id, needs.docker_linux_arm64.outputs.image_artifact_id) || needs.docker_linux_amd64.outputs.image_artifact_id }}
+      - name: Assemble and verify the selected Linux platforms
+        run: |
+          platforms=(--platform linux/amd64)
+          [[ $FULL_PLATFORMS != true ]] || platforms+=(--platform linux/arm64)
+          python3 docker/assemble-linux-images.py --inputs .docker-inputs --output .docker-metadata "${platforms[@]}"
+          (cd .docker-metadata && sha256sum linux-*.oci.tar > image-assembly.sha256)
       - name: Set up Docker Buildx
+        if: needs.plan.outputs.publish == 'true'
         uses: docker/setup-buildx-action@v4
-
+      - name: Install OCI publication tooling
+        if: needs.plan.outputs.publish == 'true'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y skopeo
       - uses: sigstore/cosign-installer@v3
-
+        if: needs.plan.outputs.publish == 'true'
       - name: Login to Docker Hub
+        if: needs.plan.outputs.publish == 'true'
         uses: docker/login-action@v4.6.0
         with:
           username: zrlog
           password: ${{ secrets.DOCKER_PASSWORD }}
-
       - name: Login to Aliyun Docker Hub
+        if: needs.plan.outputs.publish == 'true'
         uses: docker/login-action@v4.6.0
         with:
           registry: registry.cn-chengdu.aliyuncs.com
           username: 90xchun
           password: ${{ secrets.ALIYUN_DOCKER_PASSWORD }}
-
-      - name: Create and verify Linux manifests
+      - name: Publish and recheck the assembled immutable images
+        if: needs.plan.outputs.publish == 'true'
         id: manifest
-        run: |
-          set -euo pipefail
-          version=$(jq -er .version .docker-metadata/native-image-input.json)
-          if [[ $CHANNEL == preview ]]; then
-            DOCKER_TAG_VERSION=$(bash docker/preview-image-tag.sh .docker-metadata/native-image-input.json)
-            alias=preview
-          else
-            DOCKER_TAG_VERSION=$version
-            alias=latest
-          fi
-          echo "DOCKER_TAG_VERSION=$DOCKER_TAG_VERSION" >> "$GITHUB_ENV"
-          echo "DOCKER_ALIAS=$alias" >> "$GITHUB_ENV"
-          expected_count=1
-          expected_platforms='["linux/amd64"]'
-          if [[ $FULL_PLATFORMS == true ]]; then
-            expected_count=2
-            expected_platforms='["linux/amd64","linux/arm64"]'
-          fi
-          mapfile -t digest_files < <(find /tmp/digests -maxdepth 1 -type f -printf '%f\n' | sort)
-          if [[ "${#digest_files[@]}" -ne "$expected_count" ]]; then
-            echo "Unexpected number of Linux image digests: ${#digest_files[@]}" >&2
-            exit 1
-          fi
-
-          dockerhub_sources=()
-          aliyun_sources=()
-          for digest_file in "${digest_files[@]}"; do
-            digest="sha256:${digest_file}"
-            hub_digest=$(cat "/tmp/digests/$digest_file")
-            [[ $hub_digest =~ ^sha256:[0-9a-f]{64}$ ]]
-            dockerhub_source="${DOCKERHUB_IMAGE}@${hub_digest}"
-            aliyun_source="${ALIYUN_IMAGE}@${digest}"
-            docker buildx imagetools inspect "${dockerhub_source}" >/dev/null
-            docker buildx imagetools inspect "${aliyun_source}" >/dev/null
-            dockerhub_sources+=("${dockerhub_source}")
-            aliyun_sources+=("${aliyun_source}")
-          done
-
-          # Protect immutable version/buildId tags in both channels on reruns.
-          publish_index() {
-            local repository=$1
-            shift
-            local reference="$repository:$DOCKER_TAG_VERSION"
-            if docker buildx imagetools inspect "$reference" --raw > /tmp/existing-index.json 2> /tmp/inspect-error; then
-              existing=$(jq -c '[.manifests[] | select(.platform.os == "linux") | .digest] | sort' /tmp/existing-index.json)
-              expected=$(printf '%s\n' "${digest_files[@]}" | jq -Rsc 'split("\n")[:-1] | map("sha256:" + .) | sort')
-              [[ $existing == "$expected" ]] || { echo "Immutable image already differs: $reference" >&2; return 1; }
-            else
-              grep -Eqi 'not found|manifest unknown' /tmp/inspect-error || { cat /tmp/inspect-error >&2; return 1; }
-              docker buildx imagetools create --tag "$reference" "$@"
-            fi
-          }
-          publish_index "$DOCKERHUB_IMAGE" "${dockerhub_sources[@]}"
-          publish_index "$ALIYUN_IMAGE" "${aliyun_sources[@]}"
-
-          validate_manifest() {
-            local image="$1"
-            docker buildx imagetools inspect "${image}" --raw | jq -e --argjson expected "$expected_platforms" '
-              ([.manifests[]
-                | select(.platform.os == "linux")
-                | "\(.platform.os)/\(.platform.architecture)"] | sort)
-              == $expected
-            ' >/dev/null
-          }
-          validate_manifest "${DOCKERHUB_IMAGE}:${DOCKER_TAG_VERSION}"
-          validate_manifest "${ALIYUN_IMAGE}:${DOCKER_TAG_VERSION}"
-
-          platform_digests() {
-            local image="$1"
-            docker buildx imagetools inspect "${image}" --raw | jq -cS '
-              [.manifests[]
-                | select(.platform.os == "linux")
-                | {
-                    platform: "\(.platform.os)/\(.platform.architecture)",
-                    digest: .digest
-                  }]
-              | sort_by(.platform)
-            '
-          }
-          dockerhub_platforms=$(platform_digests "${DOCKERHUB_IMAGE}:${DOCKER_TAG_VERSION}")
-          aliyun_platforms=$(platform_digests "${ALIYUN_IMAGE}:${DOCKER_TAG_VERSION}")
-          if [[ "${dockerhub_platforms}" != "${aliyun_platforms}" ]]; then
-            echo "Linux platform digests differ between registries" >&2
-            exit 1
-          fi
-
-          dockerhub_digest=$(docker buildx imagetools inspect \
-            "${DOCKERHUB_IMAGE}:${DOCKER_TAG_VERSION}" --format '{{.Manifest.Digest}}')
-          aliyun_digest=$(docker buildx imagetools inspect \
-            "${ALIYUN_IMAGE}:${DOCKER_TAG_VERSION}" --format '{{.Manifest.Digest}}')
-          echo "Docker Hub manifest: ${DOCKERHUB_IMAGE}@${dockerhub_digest}"
-          echo "Aliyun manifest: ${ALIYUN_IMAGE}@${aliyun_digest}"
-          echo "dockerhub=${DOCKERHUB_IMAGE}@${dockerhub_digest}" >> "${GITHUB_OUTPUT}"
-          echo "aliyun=${ALIYUN_IMAGE}@${aliyun_digest}" >> "${GITHUB_OUTPUT}"
-
-      - name: Inspect published Linux image
-        run: |
-          docker buildx imagetools inspect "${DOCKERHUB_IMAGE}:${DOCKER_TAG_VERSION}"
-          docker buildx imagetools inspect "${ALIYUN_IMAGE}:${DOCKER_TAG_VERSION}"
-
+        run: bash docker/publish-assembled-linux-images.sh .docker-metadata
       - name: Sign canonical Docker image
+        if: needs.plan.outputs.publish == 'true'
         run: cosign sign --yes "${{ steps.manifest.outputs.dockerhub }}"
-
       - name: Generate Docker update metadata
+        if: needs.plan.outputs.publish == 'true'
         env:
           DOCKERHUB_REF: ${{ steps.manifest.outputs.dockerhub }}
           ALIYUN_REF: ${{ steps.manifest.outputs.aliyun }}
@@ -596,33 +391,33 @@ jobs:
             --native-metadata .docker-metadata/native-image-input.json \
             --channel "$CHANNEL" --tag "${DOCKER_TAG_VERSION}" \
             --image "${DOCKERHUB_REF}" --image "${ALIYUN_REF}" \
-            "${platforms[@]}" \
-            --output .docker-metadata/last.docker-image.version.json
+            "${platforms[@]}" --output .docker-metadata/last.docker-image.version.json
       - name: Publish Docker update metadata after image verification
+        if: needs.plan.outputs.publish == 'true'
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.SECRET_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET_KEY }}
           ZRLOG_S3_BUCKET: ${{ secrets.BUCKET }}
           ZRLOG_S3_ENDPOINT: ${{ secrets.HOST }}
-        run: |
-          bash docker/publish-image-manifest.sh .docker-metadata/last.docker-image.version.json
-
-
+        run: bash docker/publish-image-manifest.sh .docker-metadata/last.docker-image.version.json
       - name: Advance verified channel aliases
+        if: needs.plan.outputs.publish == 'true'
         run: |
           for repository in "$DOCKERHUB_IMAGE" "$ALIYUN_IMAGE"; do
             digest=$(docker buildx imagetools inspect "$repository:$DOCKER_TAG_VERSION" --format '{{.Manifest.Digest}}')
             docker buildx imagetools create --tag "$repository:$DOCKER_ALIAS" "$repository@$digest"
             [[ $(docker buildx imagetools inspect "$repository:$DOCKER_ALIAS" --format '{{.Manifest.Digest}}') == "$digest" ]]
           done
-      - name: Preserve image publication metadata
+      - name: Preserve image assembly and publication evidence
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: docker-linux-publication-${{ github.run_attempt }}
-          path: .docker-metadata/*.json
+          name: docker-linux-assembly-${{ github.run_attempt }}
+          path: .docker-metadata
           if-no-files-found: warn
+          compression-level: 0
           include-hidden-files: true
+          retention-days: 14
 
   docker_windows:
     name: Build Windows image (windows/amd64)

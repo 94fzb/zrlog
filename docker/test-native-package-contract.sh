@@ -292,7 +292,8 @@ grep -Fq -- '--file docker/Dockerfile.windows.package' "${workflowPath}"
 grep -Fq -- '--build-arg "ZRLOG_EXPECTED_VERSION=$env:ZRLOG_EXPECTED_VERSION"' "${workflowPath}"
 grep -Fq -- '--build-arg "ZRLOG_SOURCE_COMMIT=$env:ZRLOG_EXPECTED_SOURCE_COMMIT"' "${workflowPath}"
 grep -Fq 'version:$env:ZRLOG_EXPECTED_VERSION - ' "${workflowPath}"
-grep -Fq 'zrlog version:${ZRLOG_EXPECTED_VERSION} - ' "${workflowPath}"
+grep -Fq 'verify-linux-image.sh' "${workflowPath}"
+grep -Fq 'zrlog version:$ZRLOG_EXPECTED_VERSION - ' "${SCRIPT_DIR}/verify-linux-image.sh"
 if grep -Fq 'resolve-native-package.sh' "${workflowPath}"; then
   fail "Workflow re-downloads a mutable channel package instead of its exact Native artifact"
 fi

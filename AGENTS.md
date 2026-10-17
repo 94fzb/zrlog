@@ -50,6 +50,9 @@ mvn -q -DskipTests package
 手动参数 `full_platforms=true` 开启完整矩阵；正式发布固定完整矩阵。各包类型和平台并行，Docker job 只等待对应 Native 平台；预览与正式共用相同 job、脚本、工具链、Dockerfile 和证明步骤，不按渠道删减包类型。Windows 镜像同时支持两个渠道，手动构建也归档所选平台镜像。不得在 Ops 或验收工作流另写
 工具链与打包步骤。验收消费已归档的实际包并核对 source/producer/SHA-256，不能把另一次组包当作相同制品。
 
+Linux OCI 导出、程序摘要校验和索引组装在所有模式下执行；不得用 `publish` 跳过这些步骤。
+只有对外复制、签名和公开入口更新受发布条件控制。SNAPSHOT 的正式组包演练不得生成 GA 更新清单。
+
 ## 边界规则
 
 - **运行时边界：普通 JDK ZIP、WAR 不运行 Polyglot/GraalJS，也不携带 Hexo 主题。** 两类 Java 包的 `zrlog-polyglot-template-scope` 必须为 `provided`；只有 Native 构建使用 `compile` 并启用这些能力。
