@@ -122,6 +122,15 @@ class PackageWorkflowContract(unittest.TestCase):
         self.assertTrue(any(step.get('name') == 'Sign canonical Windows image' for step in windows['steps']))
         self.assertNotIn('docker_preview', SHARED['jobs'])
         self.assertIs(SHARED['jobs']['docker_linux_amd64']['steps'], SHARED['jobs']['docker_linux_arm64']['steps'])
+        aggregate = SHARED['jobs']['docker_linux_manifest']
+        self.assertNotIn('publish', aggregate['if'])
+        self.assertTrue(any('assemble-linux-images.py' in step.get('run', '') and 'if' not in step
+                            for step in aggregate['steps']))
+        build = next(step for step in SHARED['jobs']['docker_linux_amd64']['steps']
+                     if step.get('uses', '').startswith('docker/build-push-action@'))
+        self.assertEqual('mode=max', build['with']['provenance'])
+        self.assertIs(True, build['with']['sbom'])
+        self.assertEqual('type=oci,dest=.prepared-native/image.oci.tar', build['with']['outputs'])
         for job_id in expected:
             steps = SHARED['jobs'][job_id]['steps']
             self.assertTrue(any(step.get('with', {}).get('artifact-ids') for step in steps))

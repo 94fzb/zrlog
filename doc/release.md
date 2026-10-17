@@ -73,6 +73,11 @@ Windows LTSC 2022 镜像继续在两个仓库发布和签名。Docker release/pr
 `update-package-sources.yml` 逐项下载并校验 GitHub/dl 的包，验证字节一致后才补充
 `zipSources`/`warSources`；保留原 URL 字段，失败不切换到未经验证的来源。
 
+Linux 手动归档和自动发布共用 OCI 导出、程序摘要检查与索引组装；汇总 job 不受
+`publish` 开关控制。正式发布复制已校验归档并保留 digest，对外推送、签名、更新 JSON
+及别名推进才受发布条件控制。SNAPSHOT 的正式组包演练只记录工程组装证据，不能代替
+GA 身份、无 SNAPSHOT 依赖门禁或正式发布成功。
+
 updater 构建和发布入口为独立仓库的 `build-publish.yml`，不再由本工程调度。
 其安装包使用 GitHub Release 与 `dl.zrlog.com/updater/{channel}/`；应用的更新元数据
 仍使用 `dl.zrlog.com/{channel}/`。两者版本和发布生命周期独立，镜像仓库名保持兼容。

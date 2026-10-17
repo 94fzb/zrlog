@@ -26,7 +26,8 @@ Java、Native ZIP、DEB、FaaS 和 Docker 的预览、候选与正式构建只�
   Native ZIP 包含 Linux amd64/arm64、macOS Intel/ARM、Windows；DEB/FaaS 包含 Linux 两架构。
 - 手动 `channel=release` 使用正式组包命令，实际包及 JSON 只归档到 Actions。
   手动运行同样构建所选 Native 平台的 Docker 镜像并归档 TAR、来源和 SHA-256，
-  不签名、不上传下载站、不推送镜像；FaaS 二进制压缩仍需原制品服务配置。
+  Linux 镜像也执行版本、源码标签、程序摘要及完整架构索引校验，不签名、不上传下载站、
+  不推送镜像；FaaS 二进制压缩仍需原制品服务配置。
 - `release` 分支 push 固定全部包类型、完整平台，执行正式签名、包上传及镜像发布。
 
 例如，按固定工程分支检查所有 Native 平台：
@@ -50,8 +51,15 @@ Java、Native、DEB、FaaS 及所选平台并行构建。Docker 通过同一 wor
 所有 Docker 平台均支持预览和正式渠道。Docker 按 Native job 输出的 artifact ID 下载本次
 实际归档，核对 source、producer run、渠道、平台、索引、更新 JSON、大小与 SHA-256，
 从已校验 ZIP 提取可执行文件作为同一套 Dockerfile 的输入，不重新编译或重新下载通道包。
-发布时验证包与镜像中的可执行文件相同，再双仓库发布和签名；Linux 镜像成功后汇总
-所选架构的 manifest 和更新 JSON。Windows 使用 LTSC 2022 独立标签，预览不覆盖正式标签。
+Linux 镜像在所有模式下先生成同一 OCI 归档，保留 BuildKit provenance 与 SBOM；从归档加载
+运行镜像，校验版本、源码标签和可执行文件 SHA-256。各平台成功后，汇总 job 在所有模式下
+校验 OCI blob 摘要、来源及完整平台集合，生成 Docker Hub（含证明）和阿里云（运行镜像）
+两份 OCI 索引归档；两个索引的运行镜像 digest 必须相同。`image-assembly.json` 记录各输入
+Native ZIP、可执行文件与 OCI 归档摘要，以及输出索引摘要。发布只复制这些已校验的 OCI
+归档，要求保留 digest，不重新构建镜像；之后回读远端索引、签名、生成更新 JSON 并推进别名。
+手动 `release` 模式使用 SNAPSHOT 时仍完成上述组装检查，但明确记录
+`distributionMetadataEligible=false`，不生成可被误认为 GA 的 Docker 更新 JSON。
+Windows 使用 LTSC 2022 独立标签，预览不覆盖正式标签。
 
 ### 更新元数据配置
 
