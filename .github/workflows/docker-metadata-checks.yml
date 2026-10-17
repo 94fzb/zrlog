@@ -8,10 +8,20 @@ on:
         description: Optional completed package run whose actual Linux OCI archives should be verified
         type: string
         default: ''
+      faas_producer_run_id:
+        description: Diagnostic only, completed manual FaaS run to check both actual archives
+        type: string
+        default: ''
+      faas_channel:
+        description: Expected channel of the diagnostic FaaS producer
+        type: choice
+        options: [preview, release]
+        default: preview
 permissions:
   contents: read
 jobs:
   metadata:
+    if: inputs.faas_producer_run_id == ''
     runs-on: ubuntu-22.04
     timeout-minutes: 10
     steps:
@@ -23,6 +33,7 @@ jobs:
           bash shell/docker/test-native-package-contract.sh
           python3 shell/docker/test-linux-image-assembly.py
   oci-roundtrip:
+    if: inputs.faas_producer_run_id == ''
     runs-on: ubuntu-22.04
     timeout-minutes: 20
     steps:
@@ -33,6 +44,71 @@ jobs:
         run: bash shell/docker/skopeo.sh --version
       - name: Verify OCI archive and index publication against isolated registries
         run: bash shell/docker/test-linux-image-roundtrip.sh
+  verify-faas-producer:
+    if: github.event_name == 'workflow_dispatch' && inputs.faas_producer_run_id != ''
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+      - name: Require a successful manual package producer
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PRODUCER_RUN_ID: ${{ inputs.faas_producer_run_id }}
+        run: |
+          [[ $PRODUCER_RUN_ID =~ ^[0-9]+$ ]]
+          gh api --method GET "repos/$GITHUB_REPOSITORY/actions/runs/$PRODUCER_RUN_ID" > producer-run.json
+          jq -e --arg repository "$GITHUB_REPOSITORY" '
+            .status == "completed" and .conclusion == "success" and
+            .event == "workflow_dispatch" and .path == ".github/workflows/build-package.yml" and
+            .repository.full_name == $repository and (.head_sha | test("^[0-9a-f]{40}$"))
+          ' producer-run.json
+      - name: Download the original FaaS package archives
+        uses: actions/download-artifact@v8
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.faas_producer_run_id }}
+          pattern: package-faas-*
+          path: .producer-packages
+      - name: Reuse the actual archive verifier for both FaaS architectures
+        env:
+          PRODUCER_RUN_ID: ${{ inputs.faas_producer_run_id }}
+          EXPECTED_CHANNEL: ${{ inputs.faas_channel }}
+        run: |
+          python3 - <<'PY'
+          import importlib.util, json, os, subprocess
+          from pathlib import Path
+          spec = importlib.util.spec_from_file_location('verifier', 'shell/ci/verify-package-archives.py')
+          verifier = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(verifier)
+          run = json.loads(Path('producer-run.json').read_text())
+          channel = os.environ['EXPECTED_CHANNEL']
+          assert channel in {'preview', 'release'}
+          records = [verifier.verify_package(p.parent.parent, run['head_sha'], run['id'], channel)
+                     for p in sorted(Path('.producer-packages').rglob('.package-evidence/build.json'))]
+          assert len(records) == 2
+          assert {(r['packageType'], r['runnerOs'], r['runnerArch']) for r in records} == {
+              ('faas', 'Linux', 'X64'), ('faas', 'Linux', 'ARM64')}
+          report = dict(producerRun=run['id'], sourceCommit=run['head_sha'], channel=channel,
+                        toolingCommit=subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),
+                        verificationWorkflow=os.environ['GITHUB_SERVER_URL'] + '/' + os.environ['GITHUB_REPOSITORY']
+                            + '/actions/runs/' + os.environ['GITHUB_RUN_ID'],
+                        allFaasArchiveBytesAndMetadataMatch=True, packages=records,
+                        qualification='Targeted two-architecture FaaS archive check only. No compilation, installation or publication; not a ten-package complete-platform producer check.')
+          Path('faas-package-verification.json').write_text(json.dumps(report, indent=2) + '\n')
+          PY
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: verified-faas-producer-${{ inputs.faas_producer_run_id }}
+          path: |
+            producer-run.json
+            faas-package-verification.json
+          if-no-files-found: error
   verify-producer-images:
     if: github.event_name == 'workflow_dispatch' && inputs.producer_run_id != ''
     permissions:
