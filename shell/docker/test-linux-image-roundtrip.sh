@@ -1,14 +1,20 @@
 #!/usr/bin/env bash
 # Runner-only integration fixture: real OCI export, executable checks and isolated registries.
 set -euo pipefail
+export ZRLOG_CHANNEL=${ZRLOG_CHANNEL:-preview}
+export CHANNEL=$ZRLOG_CHANNEL
+case "$ZRLOG_CHANNEL" in
+  preview) export ZRLOG_EXPECTED_VERSION=4.0.0-SNAPSHOT; version_type=预览版本 ;;
+  release) export ZRLOG_EXPECTED_VERSION=4.0.0; version_type=正式版本 ;;
+  *) echo "Unsupported fixture channel: $ZRLOG_CHANNEL" >&2; exit 1 ;;
+esac
 temporary=$(mktemp -d "$PWD/.oci-roundtrip.XXXXXX")
-registry=zrlog-oci-roundtrip-$GITHUB_RUN_ID
+registry=zrlog-oci-roundtrip-$GITHUB_RUN_ID-$ZRLOG_CHANNEL
 cleanup() {
   docker rm -f "$registry" >/dev/null 2>&1 || true
   rm -rf "$temporary"
 }
 trap cleanup EXIT
-export ZRLOG_EXPECTED_VERSION=4.0.0-SNAPSHOT ZRLOG_CHANNEL=preview CHANNEL=preview
 export ZRLOG_EXPECTED_SOURCE_COMMIT=$GITHUB_SHA
 build_id=${GITHUB_SHA:0:7}
 mkdir -p "$temporary/context"
@@ -27,14 +33,16 @@ for arch in amd64 arm64; do
     --build-arg "VERSION=$ZRLOG_EXPECTED_VERSION" --build-arg "COMMIT=$GITHUB_SHA" \
     --output "type=oci,dest=$directory/image.oci.tar" "$temporary/context"
   jq -n --arg sourceCommit "$GITHUB_SHA" --arg buildId "$build_id" \
+    --arg version "$ZRLOG_EXPECTED_VERSION" --arg type "$version_type" \
     --arg workflow "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
-    '{sourceCommit:$sourceCommit,version:"4.0.0-SNAPSHOT",buildId:$buildId,buildWorkflow:$workflow,type:"预览版本",zipSha256:("0" * 64)}' \
+    '{sourceCommit:$sourceCommit,version:$version,buildId:$buildId,buildWorkflow:$workflow,type:$type,zipSha256:("0" * 64)}' \
     > "$directory/native-image-input.json"
   runner_arch=X64
   [[ $arch != arm64 ]] || runner_arch=ARM64
   jq -n --arg sourceCommit "$GITHUB_SHA" --arg runnerArch "$runner_arch" \
+    --arg channel "$ZRLOG_CHANNEL" \
     --arg workflow "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
-    '{sourceCommit:$sourceCommit,workflow:$workflow,channel:"preview",packageType:"native",runnerOs:"Linux",runnerArch:$runnerArch}' \
+    '{sourceCommit:$sourceCommit,workflow:$workflow,channel:$channel,packageType:"native",runnerOs:"Linux",runnerArch:$runnerArch}' \
     > "$directory/build.json"
   sha256sum "$temporary/context/zrlog" > "$directory/native.sha256"
   bash shell/docker/verify-linux-image.sh "$directory" "linux/$arch" "zrlog/oci-fixture:$arch"

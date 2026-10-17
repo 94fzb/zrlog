@@ -36,6 +36,12 @@ jobs:
     if: inputs.faas_producer_run_id == ''
     runs-on: ubuntu-22.04
     timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        channel: [preview, release]
+    env:
+      ZRLOG_CHANNEL: ${{ matrix.channel }}
     steps:
       - uses: actions/checkout@v7
       - uses: docker/setup-qemu-action@v4
