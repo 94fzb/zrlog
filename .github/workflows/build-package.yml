@@ -114,12 +114,21 @@ jobs:
         if: needs.plan.outputs.publish == 'true'
       - uses: sigstore/cosign-installer@v3
         if: needs.plan.outputs.publish == 'true'
+      - name: Checkout the pinned artifact processing client
+        if: matrix.package_type == 'faas'
+        uses: actions/checkout@v7
+        with:
+          repository: zrlog/zrlog-process-artifact
+          ref: 35779ff51c65741c6f869bd1dc531b8f9bc3fd75
+          path: .build-tools/process-artifact
+          persist-credentials: false
       - name: Build application package
         env:
           PACKAGE_TYPE: ${{ matrix.package_type }}
           CHANNEL: ${{ needs.plan.outputs.channel }}
           ARTIFACT_SERVICE_URL: ${{ matrix.package_type == 'faas' && vars.ARTIFACT_SERVICE_URL || '' }}
           ARTIFACT_SERVICE_TOKEN: ${{ matrix.package_type == 'faas' && secrets.ARTIFACT_SERVICE_TOKEN || '' }}
+          ARTIFACT_PROCESS_SCRIPT: ${{ github.workspace }}/.build-tools/process-artifact/scripts/process-artifact.sh
         run: |
           mkdir -p .package-output
           case "$PACKAGE_TYPE" in
