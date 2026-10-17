@@ -36,7 +36,9 @@ for role in dockerhub aliyun; do
     }
   else
     grep -Eqi 'not found|manifest unknown' "$tmp/error" || { cat "$tmp/error" >&2; exit 1; }
-    skopeo copy --all --preserve-digests --dest-tls-verify="$tls_verify" \
+    # Ubuntu 22.04's Skopeo lacks --preserve-digests. Require exact raw index
+    # equality after copying; its content hashes bind every manifest and layer.
+    skopeo copy --all --dest-tls-verify="$tls_verify" \
       "oci-archive:$archive" "docker://$reference"
     skopeo inspect --tls-verify="$tls_verify" --raw "docker://$reference" > "$tmp/existing.json"
     expected_digest=$(jq -er --arg role "$role" '.images[] | select(.role == $role) | .digest' "$report")
