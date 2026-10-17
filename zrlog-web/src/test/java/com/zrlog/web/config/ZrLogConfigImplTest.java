@@ -3,7 +3,7 @@ package com.zrlog.web.config;
 import com.hibegin.http.server.WebServerBuilder;
 import com.zrlog.common.Constants;
 import com.zrlog.common.TokenService;
-import com.zrlog.web.support.InMemoryZrLogDatabase;
+import com.zrlog.web.support.InstalledTestSite;
 import com.zrlog.web.inteceptor.DefaultInterceptor;
 import org.junit.Rule;
 import org.junit.Test;
@@ -52,6 +52,8 @@ public class ZrLogConfigImplTest {
             try {
                 Constants.zrLogConfig = config;
                 assertTrue(config.isInstalled());
+                assertTrue(new File(rootPath, "conf/install.lock").isFile());
+                assertEquals("Installed H2 Site", config.getCacheService().getPublicWebSiteInfo().getTitle());
                 assertTrue(config.getDataSource() != null);
                 assertTrue(config.getCacheService() != null);
                 assertEquals(Long.valueOf(3600L), config.getCacheService().getPublicWebSiteInfo().getSession_timeout());
@@ -111,7 +113,7 @@ public class ZrLogConfigImplTest {
         String previousRootPath = System.getProperty("sws.root.path");
         String previousEnv = System.getProperty("env");
         File rootPath = temporaryFolder.newFolder("zrlog-web-installed");
-        try (InMemoryZrLogDatabase ignored = InMemoryZrLogDatabase.open(rootPath)) {
+        try (InstalledTestSite ignored = InstalledTestSite.open(rootPath)) {
             System.setProperty("sws.root.path", rootPath.getAbsolutePath());
             System.setProperty("env", "junit-test");
             runnable.run(rootPath);

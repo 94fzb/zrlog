@@ -1,30 +1,16 @@
 package com.zrlog.web.config;
 
-import com.hibegin.common.util.LoggerUtil;
 import com.zrlog.admin.web.token.AdminTokenService;
 import com.zrlog.common.Updater;
 import com.zrlog.common.ZrLogConfig;
 import com.zrlog.web.WebSetup;
 import com.zrlog.web.WebSetupContext;
-import com.zrlog.web.WebSetupProvider;
+import com.zrlog.web.WebSetupLoader;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.ServiceLoader;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class SetupConfig {
-
-    protected static final Logger LOGGER = LoggerUtil.getLogger(SetupConfig.class);
 
     public AdminTokenService buildAdminTokenService(long sessionTimeout) {
         return new AdminTokenService(sessionTimeout);
@@ -32,122 +18,8 @@ public class SetupConfig {
 
     public SetupConfig(ZrLogConfig zrLogConfig, File dbPropertiesFile,
                        File installLockFile, String contextPath,
-                       List<WebSetup> webSetups,
-                       Updater updater) {
-        Set<String> disableModules = parseDisableModules();
-        boolean strictWebSetup = strictWebSetup();
-        WebSetupContext webSetupContext = new WebSetupContext(zrLogConfig, dbPropertiesFile, installLockFile, contextPath, updater);
-        List<WebSetupProvider> webSetupProviders = loadWebSetupProviders(strictWebSetup);
-        LOGGER.info("Discovered web modules: " + names(webSetupProviders));
-        if (strictWebSetup) {
-            LOGGER.info("Web setup strict mode enabled");
-        }
-        if (!disableModules.isEmpty()) {
-            LOGGER.info("Disabled web modules: " + disableModules);
-        }
-        List<String> loadedModules = new ArrayList<>();
-        for (WebSetupProvider webSetupProvider : webSetupProviders) {
-            String name = providerName(webSetupProvider);
-            if (disableModules.contains(name)) {
-                LOGGER.info("Skip disabled web module: " + name);
-                continue;
-            }
-            try {
-                WebSetup webSetup = webSetupProvider.create(webSetupContext);
-                if (Objects.nonNull(webSetup)) {
-                    webSetups.add(webSetup);
-                    loadedModules.add(name);
-                } else {
-                    handleSetupFailure(strictWebSetup,
-                            "Skip web module " + name + ", provider returned null WebSetup", null);
-                }
-            } catch (Throwable e) {
-                handleSetupFailure(strictWebSetup, "Setup web module " + name + " failed", e);
-            }
-        }
-        LOGGER.info("Loaded web modules: " + loadedModules);
-    }
-
-    static Set<String> parseDisableModules(String disableModulesEnv) {
-        String value = Objects.requireNonNullElse(disableModulesEnv, "");
-        return Arrays.stream(value.split(","))
-                .map(String::trim)
-                .filter(e -> !e.isEmpty())
-                .collect(Collectors.toSet());
-    }
-
-    private static Set<String> parseDisableModules() {
-        return parseDisableModules(System.getenv("DISABLE_MODULES"));
-    }
-
-    static List<WebSetupProvider> normalizeWebSetupProviders(List<WebSetupProvider> discoveredProviders) {
-        return normalizeWebSetupProviders(discoveredProviders, false);
-    }
-
-    static List<WebSetupProvider> normalizeWebSetupProviders(List<WebSetupProvider> discoveredProviders, boolean strictWebSetup) {
-        Map<String, WebSetupProvider> webSetupProviderMap = new LinkedHashMap<>();
-        discoveredProviders.stream()
-                .sorted(Comparator.comparingInt(WebSetupProvider::order).thenComparing(SetupConfig::providerName))
-                .forEach(webSetupProvider -> {
-                    String name = providerName(webSetupProvider);
-                    if (name.isEmpty()) {
-                        handleSetupFailure(strictWebSetup,
-                                "Skip unnamed web module provider: " + webSetupProvider.getClass().getName(), null);
-                        return;
-                    }
-                    if (webSetupProviderMap.containsKey(name)) {
-                        handleSetupFailure(strictWebSetup,
-                                "Skip duplicated web module provider " + webSetupProvider.getClass().getName()
-                                        + ", module name: " + name + ", used provider: " + webSetupProviderMap.get(name).getClass().getName(),
-                                null);
-                        return;
-                    }
-                    webSetupProviderMap.put(name, webSetupProvider);
-                });
-        return new ArrayList<>(webSetupProviderMap.values());
-    }
-
-    private static List<WebSetupProvider> loadWebSetupProviders(boolean strictWebSetup) {
-        List<WebSetupProvider> discoveredProviders = new ArrayList<>();
-        ServiceLoader.load(WebSetupProvider.class).stream().forEach(provider -> {
-            try {
-                discoveredProviders.add(provider.get());
-            } catch (Throwable e) {
-                handleSetupFailure(strictWebSetup, "Load web module provider " + provider.type().getName() + " failed", e);
-            }
-        });
-        return normalizeWebSetupProviders(discoveredProviders, strictWebSetup);
-    }
-
-    static boolean parseStrictMode(String value) {
-        String flag = Objects.requireNonNullElse(value, "").trim();
-        return "true".equalsIgnoreCase(flag) || "1".equals(flag) || "yes".equalsIgnoreCase(flag);
-    }
-
-    private static boolean strictWebSetup() {
-        return parseStrictMode(System.getenv("WEB_SETUP_STRICT"));
-    }
-
-    private static void handleSetupFailure(boolean strictWebSetup, String message, Throwable e) {
-        if (strictWebSetup) {
-            throw new IllegalStateException(message, e);
-        }
-        if (Objects.nonNull(e)) {
-            LOGGER.log(Level.WARNING, message, e);
-            return;
-        }
-        LOGGER.warning(message);
-    }
-
-    private static List<String> names(List<WebSetupProvider> webSetupProviders) {
-        List<String> names = new ArrayList<>();
-        for (WebSetupProvider webSetupProvider : webSetupProviders) {
-            names.add(providerName(webSetupProvider));
-        }
-        return names;
-    }
-
-    private static String providerName(WebSetupProvider webSetupProvider) {
-        return Objects.requireNonNullElse(webSetupProvider.name(), "").trim();
+                       List<WebSetup> webSetups, Updater updater) {
+        webSetups.addAll(WebSetupLoader.load(new WebSetupContext(
+                zrLogConfig, dbPropertiesFile, installLockFile, contextPath, updater)));
     }
 }

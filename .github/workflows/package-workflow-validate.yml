@@ -1,0 +1,36 @@
+name: Validate package workflows
+on:
+  pull_request:
+    paths:
+      - .github/workflows/*build*.yml
+      - .github/workflows/package-workflow-validate.yml
+      - shell/ci/**
+      - shell/native/**
+      - shell/lib/release-manifest.sh
+      - package/pom.xml
+  push:
+    branches: [master]
+    paths:
+      - .github/workflows/*build*.yml
+      - .github/workflows/package-workflow-validate.yml
+      - shell/ci/**
+      - shell/native/**
+      - shell/lib/release-manifest.sh
+      - package/pom.xml
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - run: python3 -m pip install PyYAML==6.0.2
+      - name: Check platform and publication contracts
+        run: |
+          python3 shell/ci/test-package-workflows.py
+          python3 shell/ci/test-package-archives.py
+      - name: Check GitHub Actions syntax
+        run: docker run --rm -v "$PWD:/repo" -w /repo rhysd/actionlint:1.7.12 -color

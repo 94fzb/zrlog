@@ -3,15 +3,17 @@ name: validate docker compose
 on:
   pull_request:
     paths:
-      - docker/docker-compose.yml
-      - docker/.env.example
+      - docker/**
+      - shell/docker/**
+      - .github/workflows/build-package.yml
       - .github/workflows/docker-compose-validate.yml
   push:
     branches:
       - master
     paths:
-      - docker/docker-compose.yml
-      - docker/.env.example
+      - docker/**
+      - shell/docker/**
+      - .github/workflows/build-package.yml
       - .github/workflows/docker-compose-validate.yml
 
 permissions:
@@ -25,7 +27,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      - name: Verify Native package pinning contract
+        run: bash shell/docker/test-native-package-contract.sh
+
+      - name: Verify Native preview Docker recovery
+        run: bash shell/docker/test-preview-package.sh
+
+      - name: Verify exact workflow package inputs for all Docker platforms
+        run: python3 shell/docker/test-workflow-package.py
+
+      - name: Verify Docker image metadata
+        run: bash shell/docker/test-image-manifest.sh
+
       - name: Validate configuration
-        env:
-          MYSQL_PASSWORD: compose-validation-password
-        run: docker compose --file docker/docker-compose.yml config --quiet
+        run: bash shell/docker/test-compose-updater-config.sh

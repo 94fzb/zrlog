@@ -34,7 +34,7 @@ public class ZrLogInstallConfigTest {
         assertFalse(installConfig.isWarMode());
         assertNull(installConfig.getLastVersionInfo());
         assertFalse(installConfig.getUpgradeAction().isSupported());
-        assertEquals(Constants.DEFAULT_TEMPLATE_PATH, installConfig.defaultTemplatePath());
+        assertEquals(Constants.getDefaultTemplatePath(), installConfig.defaultTemplatePath());
         assertEquals(String.valueOf(UpgradeVersionHandler.SQL_VERSION), installConfig.getZrLogSqlVersion());
         assertEquals(Constants.MYSQL_JDBC_PARAMS,
                 installConfig.getJdbcUrlQueryStr("mysql", Collections.emptyMap()));

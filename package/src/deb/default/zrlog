@@ -1,0 +1,3 @@
+# Optional first-install protection. Leave empty for the default, token-free setup.
+# Use a URL-safe random value, for example: openssl rand -hex 24
+# ZRLOG_INSTALL_TOKEN='replace-with-a-random-value'
