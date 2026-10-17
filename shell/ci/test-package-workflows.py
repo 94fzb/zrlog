@@ -38,7 +38,7 @@ def platforms(settings):
     if settings['build_native']:
         targets.append(dict(package_type='native', os='ubuntu-22.04', java='25'))
         if settings['full_platforms']:
-            for job in ['native_linux_arm64', 'native_windows']:
+            for job in ['native_linux_arm64', 'native_windows', 'native_macos_intel', 'native_macos_arm64']:
                 targets.extend(SHARED['jobs'][job]['strategy']['matrix']['include'])
     return targets
 
@@ -60,10 +60,13 @@ class PackageWorkflowContract(unittest.TestCase):
             'deb': {'ubuntu-22.04', 'ubuntu-24.04-arm'},
             'faas': {'ubuntu-22.04', 'ubuntu-24.04-arm'},
         }
-        for kind, runners in expected.items():
-            targets = platforms(plan(kind, True, 'release'))
-            self.assertEqual(runners, {x['os'] for x in targets})
-            self.assertEqual({kind}, {x['package_type'] for x in targets})
+        for channel in ['preview', 'release']:
+            for kind, runners in expected.items():
+                with self.subTest(channel=channel, kind=kind):
+                    targets = platforms(plan(kind, True, channel))
+                    self.assertEqual(runners, {x['os'] for x in targets})
+                    self.assertEqual(len(runners), len(targets))
+                    self.assertEqual({kind}, {x['package_type'] for x in targets})
         self.assertEqual(10, len(platforms(plan(full=True))))
         intel = next(x for x in platforms(plan('native', True)) if x['os'] == 'macos-15-intel')
         self.assertEqual('25.0.1', intel['java'])
@@ -98,7 +101,7 @@ class PackageWorkflowContract(unittest.TestCase):
         reference = SHARED['jobs']['native_linux_amd64']['steps']
         self.assertEqual('${{ matrix.package_type }} on ${{ matrix.os }}',
                          SHARED['jobs']['native_linux_amd64']['name'])
-        for job in ['native_linux_arm64', 'native_windows', 'packages']:
+        for job in ['native_linux_arm64', 'native_windows', 'native_macos_intel', 'native_macos_arm64', 'packages']:
             self.assertIs(reference, SHARED['jobs'][job]['steps'])
         for step in reference:
             self.assertNotIn('channel', step.get('if', ''), 'Channel must not select a different package pipeline')
@@ -118,6 +121,10 @@ class PackageWorkflowContract(unittest.TestCase):
             self.assertEqual(['plan'], [SHARED['jobs'][native]['needs']])
         self.assertEqual({'plan', 'docker_linux_amd64', 'docker_linux_arm64'},
                          set(SHARED['jobs']['docker_linux_manifest']['needs']))
+        for job_id in ['native_macos_intel', 'native_macos_arm64']:
+            job = SHARED['jobs'][job_id]
+            self.assertEqual('plan', job['needs'])
+            self.assertEqual(SHARED['jobs']['native_windows']['if'], job['if'])
         windows = SHARED['jobs']['docker_windows']
         self.assertEqual('windows-2022', windows['runs-on'])
         self.assertTrue(any(step.get('name') == 'Push Windows image' for step in windows['steps']))

@@ -30,8 +30,8 @@ def plan(env: dict[str, str]) -> dict:
     if kind not in {'all', 'java', 'native', 'deb', 'faas'} or channel not in {'preview', 'release'}:
         raise ValueError('Unsupported package type or channel')
     kinds = {'java', 'native', 'deb', 'faas'} if kind == 'all' else {kind}
-    # Docker platforms have separate Native jobs so each image can start as soon
-    # as its own package succeeds. The remaining packages share one matrix.
+    # Native platforms have explicit jobs; each Docker image waits for its own
+    # Linux or Windows Native package. Java, DEB and FaaS share this matrix.
     packages = []
     for package_type in ['java', 'deb', 'faas']:
         if package_type not in kinds:
@@ -40,11 +40,6 @@ def plan(env: dict[str, str]) -> dict:
         if full and package_type != 'java':
             targets.append(('ubuntu-24.04-arm', '25'))
         packages.extend(dict(package_type=package_type, os=runner, java=java) for runner, java in targets)
-    if full and 'native' in kinds:
-        packages.extend([
-            dict(package_type='native', os='macos-15-intel', java='25.0.1'),
-            dict(package_type='native', os='macos-14', java='25'),
-        ])
     return dict(matrix={'include': packages}, has_packages=bool(packages),
                 build_native='native' in kinds, channel=channel, publish=publish,
                 full_platforms=full, source_commit=source)
