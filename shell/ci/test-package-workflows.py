@@ -127,6 +127,13 @@ class PackageWorkflowContract(unittest.TestCase):
         self.assertFalse(list(WORKFLOWS.glob('*-build-preview-*.yml')))
         self.assertFalse(list(WORKFLOWS.glob('*-build-release-*.yml')))
         self.assertFalse((WORKFLOWS / 'docker-release-publish.yml').exists())
+        for workflow in WORKFLOWS.glob('*.yml'):
+            if workflow.name == 'build-package.yml':
+                continue
+            text = workflow.read_text()
+            for builder in ['build-final-java.sh', 'build-final-native.sh']:
+                self.assertNotIn(builder, text,
+                                 f'{workflow.name} must consume archived packages instead of building another candidate')
 
     def test_each_docker_platform_waits_for_its_own_native_package(self):
         expected = {'docker_linux_amd64': 'native_linux_amd64',
