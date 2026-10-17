@@ -11,37 +11,6 @@ on:
 permissions:
   contents: read
 jobs:
-  artifact-service-probe:
-    if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-22.04
-    timeout-minutes: 3
-    steps:
-      - name: Probe documented and configured FaaS service HTTPS endpoints
-        env:
-          CONFIGURED_URL: ${{ vars.ARTIFACT_SERVICE_URL }}
-        run: |
-          python3 - <<'PY'
-          import json, os, subprocess
-          from pathlib import Path
-          urls = list(dict.fromkeys([os.environ['CONFIGURED_URL'], 'https://artifact.zrlog.com/artifact']))
-          records = []
-          for index, base in enumerate(urls):
-              output = Path(f'health-{index}.txt')
-              result = subprocess.run(['curl', '--silent', '--show-error', '--max-time', '25',
-                                       '--user-agent', 'ZrLog-Build-Verification/1.0',
-                                       '--output', str(output), '--write-out', '%{http_code}',
-                                       base.rstrip('/') + '/health'], capture_output=True, text=True)
-              record = dict(url=base, curlExitCode=result.returncode, httpStatus=result.stdout,
-                            error=result.stderr.strip(), body=output.read_text() if output.exists() else None)
-              records.append(record)
-              print(json.dumps(record))
-          Path('service-probe.json').write_text(json.dumps(dict(records=records,
-              qualification='Unauthenticated HTTPS health GET only; no TLS bypass, uploads, processing jobs or publication'), indent=2) + '\n')
-          PY
-      - uses: actions/upload-artifact@v7
-        with:
-          name: faas-service-https-probe
-          path: service-probe.json
   metadata:
     runs-on: ubuntu-22.04
     timeout-minutes: 10

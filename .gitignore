@@ -60,5 +60,6 @@ conf/sqlite-db.properties
 /docker/.env
 /.package-output/
 /.package-evidence/
+/.build-tools/
 /.native-preview-docker/
 lib/*.pom

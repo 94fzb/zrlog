@@ -7,6 +7,13 @@ syncPath=${2}
 echo "current ${PWD}"
 source shell/lib/release-manifest.sh
 buildSubType=${3:-zip}
+if [[ "$(uname)" == "Linux" && "${buildSubType}" == "faas" ]]; then
+  : "${ARTIFACT_PROCESS_SCRIPT:?Set ARTIFACT_PROCESS_SCRIPT to the pinned zrlog-process-artifact scripts/process-artifact.sh}"
+  if [[ ! -f "${ARTIFACT_PROCESS_SCRIPT}" ]]; then
+    echo "Artifact processing client does not exist: ${ARTIFACT_PROCESS_SCRIPT}" >&2
+    exit 1
+  fi
+fi
 packageExt="zip"
 # 判断操作系统类型
 if [[ ${buildSubType} == "deb" ]]; then
@@ -47,7 +54,7 @@ function writeZipVersionJson() {
 }
 #faas
 if [[ "$(uname)" == "Linux" && "${buildSubType}" == "faas" ]]; then
-  bash -e .github/actions/process-artifact/process-artifact.sh \
+  bash -e "${ARTIFACT_PROCESS_SCRIPT}" \
     zrlog zrlog "${version}" "${fileArch}"
   bash -e shell/native/package-${buildSubType}-${packageExt}.sh "${fileArch}"
   zipFileName=${runMode}/zrlog-${version}-${buildId}-${runMode}-${fileArch}-${buildSubType}.${packageExt}
