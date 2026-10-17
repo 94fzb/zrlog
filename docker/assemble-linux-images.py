@@ -152,19 +152,30 @@ def write_archive(output, descriptors, blobs):
         mediaType=INDEX, digest=index_digest, size=len(index),
         annotations={'org.opencontainers.image.ref.name': 'zrlog'})])
     with tarfile.open(output, 'w') as target:
-        def add(name, data):
+        def header(name, mode):
             info = tarfile.TarInfo(name)
+            # Skopeo 1.4 extracts archives as the runner user and honors TAR
+            # ownership, including implicitly created parent directories.
+            info.uid, info.gid = os.getuid(), os.getgid()
+            info.mode = mode
+            return info
+
+        for name in ['blobs', 'blobs/sha256']:
+            info = header(name, 0o755)
+            info.type = tarfile.DIRTYPE
+            target.addfile(info)
+
+        def add(name, data):
+            info = header(name, 0o644)
             info.size = len(data)
-            info.mode = 0o644
             target.addfile(info, io.BytesIO(data))
         add('oci-layout', encode({'imageLayoutVersion': '1.0.0'}))
         add('index.json', encode(root))
         add('blobs/sha256/' + index_digest[7:], index)
         for value, (archive, member) in sorted(blobs.items()):
             if value != index_digest:
-                info = tarfile.TarInfo('blobs/sha256/' + value[7:])
+                info = header('blobs/sha256/' + value[7:], 0o644)
                 info.size = member.size
-                info.mode = 0o644
                 with archive.tar.extractfile(member) as source:
                     target.addfile(info, source)
     return index_digest
