@@ -59,6 +59,9 @@ Native ZIP、可执行文件与 OCI 归档摘要，以及输出索引摘要。�
 归档，要求保留 digest，不重新构建镜像；之后回读远端索引、签名、生成更新 JSON 并推进别名。
 手动 `release` 模式使用 SNAPSHOT 时仍完成上述组装检查，但明确记录
 `distributionMetadataEligible=false`，不生成可被误认为 GA 的 Docker 更新 JSON。
+OCI 复制统一使用 `docker/skopeo.sh` 固定的多架构 Skopeo 容器摘要，支持 BuildKit 证明层；
+不使用不同 runner 发行版中功能不同的系统 Skopeo。归档成员使用当前 runner UID/GID，
+保证复制器能以普通用户解包；这不改变索引、manifest 或 layer digest。
 Windows 使用 LTSC 2022 独立标签，预览不覆盖正式标签。
 
 ### 更新元数据配置

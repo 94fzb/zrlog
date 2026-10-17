@@ -91,6 +91,8 @@ class LinuxImageAssemblyTest(unittest.TestCase):
         with ExitStack() as stack:
             for image in report['images']:
                 archive = ASSEMBLY.Archive(self.root / 'result' / image['archive'], stack)
+                for member in archive.tar.getmembers():
+                    self.assertEqual((os.getuid(), os.getgid()), (member.uid, member.gid))
                 manifests = archive.manifests()
                 self.assertEqual(4 if image['role'] == 'dockerhub' else 2, len(manifests))
                 self.assertEqual(expected, {desc['digest'] for desc, _ in manifests

@@ -5,7 +5,7 @@ directory=$1
 platform=$2
 image=$3
 architecture=${platform#linux/}
-skopeo copy --override-os linux --override-arch "$architecture" \
+bash docker/skopeo.sh copy --override-os linux --override-arch "$architecture" \
   "oci-archive:$directory/image.oci.tar" "docker-archive:$directory/image.tar:$image"
 docker load --input "$directory/image.tar"
 build_id=$(jq -er .buildId "$directory/native-image-input.json")

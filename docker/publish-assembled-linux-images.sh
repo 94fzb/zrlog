@@ -30,17 +30,15 @@ for role in dockerhub aliyun; do
   archive=$directory/$(jq -er --arg role "$role" '.images[] | select(.role == $role) | .archive' "$report")
   archive_sha=$(jq -er --arg role "$role" '.images[] | select(.role == $role) | .sha256' "$report")
   [[ $(sha256sum "$archive" | cut -d ' ' -f 1) == "$archive_sha" ]]
-  if skopeo inspect --tls-verify="$tls_verify" --raw "docker://$reference" > "$tmp/existing.json" 2> "$tmp/error"; then
+  if bash docker/skopeo.sh inspect --tls-verify="$tls_verify" --raw "docker://$reference" > "$tmp/existing.json" 2> "$tmp/error"; then
     [[ $(platform_digests "$tmp/existing.json") == "$expected" ]] || {
       echo "Immutable image already differs: $reference" >&2; exit 1;
     }
   else
     grep -Eqi 'not found|manifest unknown' "$tmp/error" || { cat "$tmp/error" >&2; exit 1; }
-    # Ubuntu 22.04's Skopeo lacks --preserve-digests. Require exact raw index
-    # equality after copying; its content hashes bind every manifest and layer.
-    skopeo copy --all --dest-tls-verify="$tls_verify" \
+    bash docker/skopeo.sh copy --all --preserve-digests --dest-tls-verify="$tls_verify" \
       "oci-archive:$archive" "docker://$reference"
-    skopeo inspect --tls-verify="$tls_verify" --raw "docker://$reference" > "$tmp/existing.json"
+    bash docker/skopeo.sh inspect --tls-verify="$tls_verify" --raw "docker://$reference" > "$tmp/existing.json"
     expected_digest=$(jq -er --arg role "$role" '.images[] | select(.role == $role) | .digest' "$report")
     [[ sha256:$(sha256sum "$tmp/existing.json" | cut -d ' ' -f 1) == "$expected_digest" ]]
   fi
