@@ -42,6 +42,8 @@
 修改 `zrlog-web` 行为时至少运行 `./mvnw -q -U -pl zrlog-web -am test`。修改打包、依赖范围、release 脚本或启动 classpath 时，需要检查真实产物结构，不能只依赖 Maven 编译通过。Docker 离线契约与 Compose 配置检查脚本在 `shell/docker/`；工作流契约检查为 `python3 shell/ci/test-package-workflows.py`。
 
 预览、候选、正式包和 Docker 只有一个入口 `.github/workflows/build-package.yml`，渠道共用构建与证明步骤。
+所有触发默认构建全部包类型和支持平台，分支只选择预览/正式渠道，不缩减打包矩阵。
+手动排查可显式选择包类型或设置 `full_platforms=false`；未显式选择时按完整矩阵处理。
 平台矩阵以该工作流为准，失败恢复重跑对应 job。
 不得另写工具链与打包步骤；验收消费已归档的实际包并核对 source/producer/SHA-256。
 
