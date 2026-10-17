@@ -69,7 +69,7 @@ jobs:
     needs: plan
     if: needs.plan.outputs.build_native == 'true'
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 180
+    timeout-minutes: 360
     defaults: &package_defaults
       run:
         shell: bash
@@ -129,7 +129,7 @@ jobs:
           esac
       - name: Process FaaS native artifact
         if: matrix.package_type == 'faas'
-        uses: zrlog/zrlog-process-artifact@d9e0ab9fdcba76c9fb24eb5b09f43218dfecca1a # v1.0.0
+        uses: zrlog/zrlog-process-artifact@5b539f9a93403c981b9e36554ffb8d3d3e7e8b33 # v1.0.1
         with:
           artifact-file: zrlog
           artifact-name: zrlog
@@ -138,7 +138,7 @@ jobs:
           service-url: ${{ vars.ARTIFACT_SERVICE_URL }}
           service-token: ${{ secrets.ARTIFACT_SERVICE_TOKEN }}
           # Include queue time when full preview/release matrices share the worker.
-          process-timeout-seconds: '7200'
+          process-timeout-seconds: '14400'
       - name: Finish FaaS package after processing
         if: matrix.package_type == 'faas'
         env:
@@ -207,7 +207,7 @@ jobs:
     needs: plan
     if: needs.plan.outputs.build_native == 'true' && needs.plan.outputs.full_platforms == 'true'
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 180
+    timeout-minutes: 360
     defaults: *package_defaults
     concurrency: *package_concurrency
     strategy:
@@ -225,7 +225,7 @@ jobs:
     needs: plan
     if: needs.plan.outputs.build_native == 'true' && needs.plan.outputs.full_platforms == 'true'
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 180
+    timeout-minutes: 360
     defaults: *package_defaults
     concurrency: *package_concurrency
     strategy:
@@ -243,7 +243,7 @@ jobs:
     needs: plan
     if: needs.plan.outputs.build_native == 'true' && needs.plan.outputs.full_platforms == 'true'
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 180
+    timeout-minutes: 360
     defaults: *package_defaults
     concurrency: *package_concurrency
     strategy:
@@ -259,7 +259,7 @@ jobs:
     needs: plan
     if: needs.plan.outputs.build_native == 'true' && needs.plan.outputs.full_platforms == 'true'
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 180
+    timeout-minutes: 360
     defaults: *package_defaults
     concurrency: *package_concurrency
     strategy:
@@ -275,7 +275,7 @@ jobs:
     needs: plan
     if: needs.plan.outputs.has_packages == 'true'
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 180
+    timeout-minutes: 360
     defaults: *package_defaults
     concurrency: *package_concurrency
     strategy:

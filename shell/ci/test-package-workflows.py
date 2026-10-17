@@ -186,7 +186,7 @@ class PackageWorkflowContract(unittest.TestCase):
             self.assertEqual('${{ steps.build_package.outputs.' + key + ' }}', action['with'][key])
         self.assertEqual('${{ vars.ARTIFACT_SERVICE_URL }}', action['with']['service-url'])
         self.assertEqual('${{ secrets.ARTIFACT_SERVICE_TOKEN }}', action['with']['service-token'])
-        self.assertEqual('7200', action['with']['process-timeout-seconds'])
+        self.assertEqual('14400', action['with']['process-timeout-seconds'])
         self.assertGreater(SHARED['jobs']['packages']['timeout-minutes'] * 60,
                            int(action['with']['process-timeout-seconds']))
         for step in [action, finish]:
