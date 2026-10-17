@@ -3,6 +3,11 @@ on:
   pull_request:
     paths: ['docker/**', 'shell/docker/**', '.github/workflows/docker-*.yml', 'shell/release/*sources*']
   workflow_dispatch:
+    inputs:
+      producer_run_id:
+        description: Optional completed package run whose actual Linux OCI archives should be verified
+        type: string
+        default: ''
 permissions:
   contents: read
 jobs:
@@ -16,3 +21,80 @@ jobs:
           bash shell/docker/test-image-manifest.sh
           python3 shell/release/test_update_sources.py
           bash shell/docker/test-native-package-contract.sh
+          python3 docker/test-linux-image-assembly.py
+  oci-roundtrip:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: docker/setup-qemu-action@v4
+      - uses: docker/setup-buildx-action@v4
+      - name: Check pinned OCI tooling
+        run: bash docker/skopeo.sh --version
+      - name: Verify OCI archive and index publication against isolated registries
+        run: bash docker/test-linux-image-roundtrip.sh
+  verify-producer-images:
+    if: github.event_name == 'workflow_dispatch' && inputs.producer_run_id != ''
+    permissions:
+      contents: read
+      actions: read
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    services:
+      registry:
+        image: registry:2
+        ports: ['5000:5000']
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+      - name: Pin the completed package producer
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PRODUCER_RUN_ID: ${{ inputs.producer_run_id }}
+        run: |
+          [[ $PRODUCER_RUN_ID =~ ^[0-9]+$ ]]
+          gh api --method GET "repos/$GITHUB_REPOSITORY/actions/runs/$PRODUCER_RUN_ID" > producer-run.json
+          jq -e --arg repository "$GITHUB_REPOSITORY" '
+            .status == "completed" and .conclusion == "success" and
+            .path == ".github/workflows/build-package.yml" and
+            .repository.full_name == $repository and (.head_sha | test("^[0-9a-f]{40}$"))
+          ' producer-run.json
+      - name: Download the actual producer image archives
+        uses: actions/download-artifact@v8
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.producer_run_id }}
+          pattern: docker-linux-*
+          path: .producer-images
+      - name: Reassemble and copy the actual image bytes to isolated registries
+        env:
+          PRODUCER_RUN_ID: ${{ inputs.producer_run_id }}
+        run: bash docker/verify-producer-images.sh
+      - name: Download all actual application package archives
+        uses: actions/download-artifact@v8
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.producer_run_id }}
+          pattern: package-*
+          path: .producer-packages
+      - name: Verify the complete package matrix and actual archive bytes
+        env:
+          PRODUCER_RUN_ID: ${{ inputs.producer_run_id }}
+        run: |
+          source_commit=$(jq -er .head_sha producer-run.json)
+          channel=$(jq -er .channel .producer-verification/image-assembly.json)
+          python3 shell/ci/verify-package-archives.py --inputs .producer-packages \
+            --source "$source_commit" --producer-run "$PRODUCER_RUN_ID" --channel "$channel" \
+            --output .producer-verification/package-verification.json
+      - name: Preserve producer and verification identities
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: verified-image-producer-${{ inputs.producer_run_id }}
+          path: |
+            producer-run.json
+            .producer-verification/*.json
+            .producer-verification/*.sha256
+          include-hidden-files: true
+          if-no-files-found: error

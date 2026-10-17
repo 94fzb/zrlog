@@ -104,3 +104,19 @@ docker run --name zrlog `
 两个渠道发布的 Linux 和 Windows 镜像 digest 均使用 Cosign 签名；Linux 镜像同时生成 SBOM
 和 provenance。生产部署建议固定 digest，并按[发布制品验证文档](https://github.com/94fzb/zrlog/blob/master/doc/artifact-verification.md)
 验证发布身份。
+
+Docker 统一由 `build-package.yml` 调度：Linux amd64/arm64 和 Windows 各自等待对应的
+Native 组包 job，Linux 镜像再汇总多架构 manifest；Windows LTSC 2022 的双仓库推送和签名保留。
+手动构建同样生成所选平台镜像，归档 TAR、Native 来源与 SHA-256；不登录仓库、不推送、不签名。
+Linux 所有模式都输出带 provenance/SBOM 的 OCI 归档并加载核对实际程序，汇总 job 始终校验
+所选架构、来源与 blob 摘要，生成 `linux-dockerhub.oci.tar`、`linux-aliyun.oci.tar` 和
+`image-assembly.json`。发布从同一归档复制并保留 digest；两个仓库的运行镜像 digest 相同，
+Docker Hub 索引额外保留 BuildKit 证明。SNAPSHOT 的 `release` 工程演练不生成正式更新清单。
+可用 `python3 docker/test-linux-image-assembly.py` 运行 OCI 夹具回归；runner 的
+`bash docker/test-linux-image-roundtrip.sh` 使用独立本地 registry 验证实际工具链复制、
+幂等与不可变标签冲突，不写外部镜像仓库。
+
+对已完成的完整平台工程 run，可手动运行 `docker-metadata-checks.yml` 并传
+`producer_run_id`。检查消费该 run 的真实 OCI 归档，用当前工具重新验证 blob 与来源、
+组装索引并复制到 runner 隔离 registry，要求新旧索引 digest 相同；记录原包来源和当前
+验证 workflow/tooling commit，不重新编译应用，也不向外部仓库发布。

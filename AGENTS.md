@@ -45,6 +45,9 @@
 平台矩阵以该工作流为准，失败恢复重跑对应 job。
 不得另写工具链与打包步骤；验收消费已归档的实际包并核对 source/producer/SHA-256。
 
+Linux OCI 导出、程序摘要校验和索引组装在所有模式下执行；不得用 `publish` 跳过这些步骤。
+只有对外复制、签名和公开入口更新受发布条件控制。SNAPSHOT 的正式组包演练不得生成 GA 更新清单。
+
 ## 边界规则
 
 - **运行时边界：普通 JDK ZIP、WAR 不运行 Polyglot/GraalJS，也不携带 Hexo 主题。** 两类 Java 包的 `zrlog-polyglot-template-scope` 必须为 `provided`；只有 Native 构建使用 `compile` 并启用这些能力。
