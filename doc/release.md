@@ -51,18 +51,31 @@ AI 不执行 tag、Maven 发布、`release` 分支推进、Release 附件上传�
 ## 主工程构建
 
 固定 CI/CD 推进 `release` 分支后，现有 GitHub Actions 继续负责 Java、Native、DEB、
-FaaS 和 Docker 制品构建。相关入口包括：
+FaaS 和 Docker 制品构建。Java/Native/DEB/FaaS 与 Docker 使用唯一入口
+`.github/workflows/build-package.yml`，正式构建固定完整平台矩阵；日常预览默认 Linux amd64，
+手动构建通过 `full_platforms=true` 开启完整矩阵，见[构建说明](build.md#统一打包工作流)。相关文件包括：
 
-- `.github/workflows/java-build-release-package-zip.yml`
-- `.github/workflows/native-build-release-package-zip.yml`
-- `.github/workflows/deb-build-release-deb.yml`
-- `.github/workflows/faas-build-release-package-zip.yml`
+- `.github/workflows/build-package.yml`
 - `bin/add-build-info.sh`
 - `shell/java/build-final-java.sh`
 - `shell/native/build-final-native.sh`
 
 构建产生的 `build.properties` 和 `last*.version.json` 仍由正式构建链生成和校验，不能在
 开发工作区中作为手工发版依据。
+
+[zrlog-updater](https://github.com/zrlog/zrlog-updater) 独立维护 Docker 升级服务端、Native
+ZIP 与 Docker Hub/阿里云镜像，使用自己的版本和源提交。本工程只维护应用镜像、应用
+升级清单与 Compose 接入；应用 Release Order 不再生成或附带 updater 安装包。
+
+Docker job 通过 `needs` 等待对应的 Linux amd64、Linux arm64 或 Windows Native 包成功；
+Windows LTSC 2022 镜像继续在两个仓库发布和签名。Docker release/preview 在镜像验证后分别读取各仓库实际 digest，先写不可变镜像
+清单，再条件更新 `last.docker-image.version.json`。GitHub 正式 Release 公开后，
+`update-package-sources.yml` 逐项下载并校验 GitHub/dl 的包，验证字节一致后才补充
+`zipSources`/`warSources`；保留原 URL 字段，失败不切换到未经验证的来源。
+
+updater 构建和发布入口为独立仓库的 `build-publish.yml`，不再由本工程调度。
+其安装包使用 GitHub Release 与 `dl.zrlog.com/updater/{channel}/`；应用的更新元数据
+仍使用 `dl.zrlog.com/{channel}/`。两者版本和发布生命周期独立，镜像仓库名保持兼容。
 
 ## 禁止的旧流程
 

@@ -58,6 +58,19 @@ class GenerateTrustMetadataTest(unittest.TestCase):
             self.assertEqual("a" * 40, provenance["source"]["commit"])
             self.assertEqual("CycloneDX JSON", provenance["evidence"]["sbom"]["format"])
 
+    def test_preview_and_release_use_the_same_artifact_selection_rule(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            for channel in ["preview", "release"]:
+                for suffix in [".zip", ".war", "-Linux-arm64.deb", "-Windows-x86_64.zip"]:
+                    (directory / f"zrlog-4.0.0-abcdef0-{channel}{suffix}").write_bytes(b"package")
+            for alias in ["zrlog.zip", "zrlog.war", "zrlog-Linux-amd64.zip", "zrlog-Linux-arm64.deb"]:
+                (directory / alias).write_bytes(b"alias")
+            for channel in ["preview", "release"]:
+                artifacts = MODULE.release_artifacts(directory, channel)
+                self.assertEqual(4, len(artifacts))
+                self.assertTrue(all(f"-{channel}" in artifact.name for artifact in artifacts))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -22,7 +22,7 @@ function projectVersion() {
 version=$(projectVersion)
 : "${version:?project version is required}"
 # https://dl.zrlog.com mirror folder
-mirrorWebSite=https://dl.zrlog.com/
+mirrorWebSite="${ZRLOG_MIRROR_WEBSITE:-https://dl.zrlog.com/}"
 runMode=${1:-dev}
 runtimeType="${ZRLOG_RUNTIME_TYPE:-}"
 packageType="${ZRLOG_PACKAGE_TYPE:-}"
@@ -43,6 +43,12 @@ runModeDesc="\\u5F00\\u53D1\\u7248\\u672C"
 fi
 
 Date="${ZRLOG_BUILD_TIME:-$(git log -1 --format=%cd --date=format:'%Y-%m-%d %H:%M:%S%z' | sed "s/\([+-]\)\([0-9][0-9]\)\([0-9][0-9]\)/\1\2:\3/")}"
+Date="${Date/T/ }"
+buildTimePattern='^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}(Z|[+-][0-9]{2}:[0-9]{2})$'
+if [[ ! "${Date}" =~ ${buildTimePattern} ]]; then
+    printf 'Invalid build time: %s (expected yyyy-MM-dd HH:mm:ssXXX)\n' "${Date}" >&2
+    exit 1
+fi
 defaultBuildId="$(git rev-parse --short HEAD)"
 buildId="${ZRLOG_BUILD_ID:-$defaultBuildId}"
 sourceCommit="${ZRLOG_SOURCE_COMMIT:-$(git rev-parse HEAD)}"
@@ -89,9 +95,12 @@ else
     updateVersionJsonFilename="last.version.json"
 fi
 
+updateVersionJsonFilename="${ZRLOG_UPDATE_VERSION_JSON_FILENAME:-$updateVersionJsonFilename}"
+dockerUpdateVersionJsonFilename="${ZRLOG_DOCKER_UPDATE_VERSION_JSON_FILENAME:-last.docker-image.version.json}"
+
 mkdir -p zrlog-web/src/main/resources/
-printf "version=%s\nrunMode=%s\nrunModeDesc=%s\nbuildId=%s\nbuildTime=%s\nmirrorWebSite=%s\nfileArch=%s\nruntimeType=%s\npackageType=%s\nupdateVersionJsonFilename=%s\nsourceCommit=%s\nsourceRepository=%s\nbuildWorkflow=%s\n" \
-  "$version" "$runMode" "$runModeDesc" "$buildId" "$Date" "$mirrorWebSite" "$fileArch" "$runtimeType" "$packageType" "$updateVersionJsonFilename" \
+printf "version=%s\nrunMode=%s\nrunModeDesc=%s\nbuildId=%s\nbuildTime=%s\nmirrorWebSite=%s\nfileArch=%s\nruntimeType=%s\npackageType=%s\nupdateVersionJsonFilename=%s\ndockerUpdateVersionJsonFilename=%s\nsourceCommit=%s\nsourceRepository=%s\nbuildWorkflow=%s\n" \
+  "$version" "$runMode" "$runModeDesc" "$buildId" "$Date" "$mirrorWebSite" "$fileArch" "$runtimeType" "$packageType" "$updateVersionJsonFilename" "$dockerUpdateVersionJsonFilename" \
   "$sourceCommit" "$sourceRepository" "$buildWorkflow" \
   > zrlog-web/src/main/resources/build.properties
 

@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+case "${1:-}" in
+  remove|purge) systemctl daemon-reload || true ;;
+esac
+if [ "${1:-}" = purge ]; then
+  rm -f /var/lib/zrlog/upgrade-request/release.request /var/lib/zrlog/upgrade-request/preview.request
+  rm -f /var/lib/zrlog-updater/status.json /var/lib/zrlog-updater/install.lock /var/cache/zrlog-updater/update.deb
+  rmdir /var/lib/zrlog/upgrade-request /var/lib/zrlog-updater /var/cache/zrlog-updater 2>/dev/null || true
+fi

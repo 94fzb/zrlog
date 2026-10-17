@@ -17,6 +17,13 @@ ZrLog 通过多个独立仓库维护核心模块。本仓库（`zrlog`）负责�
 
 ### 日常开发流程
 
+内置主题由 `zrlog-extensions/zrlog-template-*` 的独立 Maven JAR 提供。博客工程只引入 default；
+WWW 由本工程的 `zrlog-web/pom.xml` 以 runtime 依赖组装；四款 Hexo 主题的 scope 使用
+`${zrlog-polyglot-template-scope}`，与 Polyglot 引擎一起受打包 profile 控制。
+`com.hibegin:zrlog-template-spi:1.0.0` 使用 Java ServiceLoader 注册主题和默认项；安装器通过
+`Constants.getDefaultTemplatePath()` 选择默认主题。主题 JAR 自带 Native Image 资源和构造器注册，
+主工程无需维护主题路径白名单。新主题先发布 SPI/资源制品，再验证博客与主工程；主题版本不随核心版本改号。
+
 本仓库主要负责产出发行包并加载相关 Web 模块。涉及功能迭代时，按下面流程处理：
 
 1. **核心逻辑变更**: 判断需要修改的业务边界（例如管理后台接口、前台渲染逻辑等），前往上述对应的子仓库修改相应的源码。
@@ -26,6 +33,8 @@ ZrLog 通过多个独立仓库维护核心模块。本仓库（`zrlog`）负责�
 
 > **提示：本地调试技巧**
 > 可以从各子模块的 `Application` 入口独立运行联调。涉及多个模块时，可先在模块仓库执行 `./mvnw clean install`，将 SNAPSHOT 安装到本地 Maven 仓库，再回到本仓库验证。
+
+Web 模块通过 base 中的 `WebSetupLoader` 统一发现 `WebSetupProvider`。主工程加载全部 Provider；admin 独立开发入口仅选择 `admin` 和 `admin-*`。两者共享 `DISABLE_MODULES`（逗号分隔的精确模块名）及 `WEB_SETUP_STRICT` 规则，模块的路由和插件仍由 `WebSetup` 提供。
 
 ### 开发文档与资源体系
 

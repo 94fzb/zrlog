@@ -8,8 +8,8 @@ import com.zrlog.common.Constants;
 import com.zrlog.common.Updater;
 import com.zrlog.common.UpdaterTypeEnum;
 import com.zrlog.common.ZrLogConfig;
-import com.zrlog.common.updater.UpdateVersionTimerTask;
-import com.zrlog.common.updater.handle.FaasUpdateVersionHandler;
+import com.zrlog.business.updater.UpdateVersionTimerTask;
+import com.zrlog.common.adapter.UpdaterHosts;
 import com.zrlog.common.vo.Version;
 import com.zrlog.install.business.response.InstallUpgradeResult;
 import com.zrlog.install.business.response.LastVersionInfo;
@@ -91,7 +91,7 @@ public class ZrLogInstallConfig extends DefaultInstallConfig {
 
     @Override
     public String defaultTemplatePath() {
-        return Constants.DEFAULT_TEMPLATE_PATH;
+        return Constants.getDefaultTemplatePath();
     }
 
     @Override
@@ -121,7 +121,7 @@ public class ZrLogInstallConfig extends DefaultInstallConfig {
             public boolean isSupported() {
                 return !zrLogConfig.isInstalled() && Objects.nonNull(updater)
                         && !ZrLogUtil.isDockerMode() && !ZrLogUtil.isSystemServiceMode()
-                        && (!EnvKit.isFaaSMode() || FaasUpdateVersionHandler.isOnlineUpgradeSupported());
+                        && (!EnvKit.isFaaSMode() || UpdaterHosts.onlineUpgradeSupported(UpdaterTypeEnum.FAAS));
             }
 
             @Override

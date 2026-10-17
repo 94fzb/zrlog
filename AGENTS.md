@@ -46,9 +46,18 @@ mvn -q -DskipTests package
 
 修改 `zrlog-web` 行为时至少运行 `mvn -q -pl zrlog-web -am test`。修改打包、依赖范围、release 脚本或启动 classpath 时，需要检查真实产物结构，不能只依赖 Maven 编译通过。
 
+预览、候选、正式包和 Docker 只有一个入口 `.github/workflows/build-package.yml`。日常开发只构建 Linux amd64，
+手动参数 `full_platforms=true` 开启完整矩阵；正式发布固定完整矩阵。各包类型和平台并行，Docker job 只等待对应 Native 平台；预览与正式共用相同 job、脚本、工具链、Dockerfile 和证明步骤，不按渠道删减包类型。Windows 镜像同时支持两个渠道，手动构建也归档所选平台镜像。不得在 Ops 或验收工作流另写
+工具链与打包步骤。验收消费已归档的实际包并核对 source/producer/SHA-256，不能把另一次组包当作相同制品。
+
 ## 边界规则
 
+- **运行时边界：普通 JDK ZIP、WAR 不运行 Polyglot/GraalJS，也不携带 Hexo 主题。** 两类 Java 包的 `zrlog-polyglot-template-scope` 必须为 `provided`；只有 Native 构建使用 `compile` 并启用这些能力。
+- JDK 版本升级、主题 SPI/JAR 拆分、Markdown 功能或包校验调整，都不是改变上述边界的理由。不得为通过测试改成 `runtime`、添加直接运行时依赖或要求 Java 包包含 `MarkdownJsRenderer`。
+- 改变运行时边界必须有用户明确的新要求，并同步更新 [构建边界](doc/build.md) 与 `shell/java/test-java-package-contract.sh`。普通 JDK 中依赖 Polyglot 的功能必须处理引擎缺席，不能通过打包脚本隐式开启。
+
 - `zrlog` 只做集成和打包，不拥有 admin/blog/install/base 的业务模型。
+- updater 相关逻辑和专项测试由 `zrlog-updater` 维护；本工程只提供环境读取和宿主适配。WAR/ZIP/deb 专项装配验收使用 updater 的 `scripts/test-application-host.sh` 与本工程产物 classpath；包内 Provider/文案/兼容入口验收使用其 `scripts/test-application-package.sh`。本工程保留通用启动、Servlet、安装集成测试及包结构检查。
 - 修改内部依赖版本前，先确认对应子工程已经构建或发布了目标版本。
 - 正式 release ref 不能依赖 `SNAPSHOT`；开发和预览集成可以使用本地或远端 snapshot。
 - 变更模块 classpath、依赖 scope、package 配置或启动参数时，要验证最终包内 `lib/`、manifest、启动日志和模块发现结果。
@@ -73,3 +82,7 @@ mvn -q -DskipTests package
 | 更新内部模块版本 | 根 `pom.xml` 的依赖和 dependencyManagement |
 | 修改构建元数据 | `bin/`、`shell/`、`doc/build_system_info.md` |
 | 安装体验集成验证 | `zrlog-ops/acceptance/zrlog-preview-package-install.yaml` |
+
+## 共享测试标准
+
+遵守 `zrlog-base/docs/test-support.md`。通用测试工具仅以 test scope 引入。已安装站点的启动测试使用真实 InstallService 生成临时配置、锁文件和默认数据，不手写 install.lock。最终 ZIP/WAR、starter 不得包含 `zrlog-test-support` 或 `*-tests.jar`。

@@ -1,21 +1,24 @@
 package com.zrlog.web;
 
 import com.hibegin.common.util.EnvKit;
+import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.common.util.ParseArgsUtil;
+import com.hibegin.http.server.SimpleWebServer;
 import com.hibegin.http.server.WebServerBuilder;
 import com.hibegin.http.server.util.PathUtil;
 import com.hibegin.lambda.LambdaApplication;
 import com.zrlog.common.Constants;
 import com.zrlog.common.Updater;
 import com.zrlog.common.exception.NotImplementException;
-import com.zrlog.common.updater.ZipUpdater;
+import com.zrlog.common.UpdaterTypeEnum;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.ZrLogBaseNativeImageUtils;
 import com.zrlog.web.config.ZrLogConfigImpl;
-import com.zrlog.web.util.UpdaterUtils;
 
 import java.io.File;
 import java.util.Objects;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
 
 import static com.zrlog.common.Constants.getZrLogHome;
 
@@ -49,7 +52,8 @@ public class Application {
         } else {
             exitCode = startWithExitCode(args);
         }
-        if (exitCode != 0) {
+        boolean debCommand = args.length > 0 && "upgrade".equals(args[0]) && "deb".equals(BlogBuildInfoUtil.getPackageType());
+        if (exitCode != 0 || debCommand) {
             System.exit(exitCode);
         }
     }
@@ -71,10 +75,10 @@ public class Application {
             return 0;
         }
         if (commandLine.getCommand() == ApplicationCommandLine.Command.UPGRADE) {
-            return ApplicationUpgradeRunner.run(UpdaterUtils.getUpdater(serveArgs, null), commandLine.isPreview());
+            return ApplicationUpgradeRunner.run(ApplicationUpdaterFactory.create(serveArgs, null), commandLine.isPreview(), commandLine.isJson());
         }
         ApplicationStartupOptions options = ApplicationStartupOptions.parse(serveArgs);
-        webServerBuilder(options.getPort(), options.getContextPath(), UpdaterUtils.getUpdater(serveArgs, null)).start();
+        webServerBuilder(options.getPort(), options.getContextPath(), ApplicationUpdaterFactory.create(serveArgs, null)).start();
         return 0;
     }
 
@@ -91,17 +95,17 @@ public class Application {
             return 2;
         }
         String[] serveArgs = commandLine.getServeArgs();
-        ApplicationStartupOptions options = ApplicationStartupOptions.parse(serveArgs);
         File execFile = new File(ZrLogBaseNativeImageUtils.getExecFile());
         if (ParseArgsUtil.justTips(serveArgs, execFile.getName(), BlogBuildInfoUtil.getVersionInfoFull())) {
             return 0;
         }
         if (commandLine.getCommand() == ApplicationCommandLine.Command.UPGRADE) {
-            return ApplicationUpgradeRunner.run(UpdaterUtils.getUpdater(serveArgs, execFile), commandLine.isPreview());
+            return ApplicationUpgradeRunner.run(ApplicationUpdaterFactory.create(serveArgs, execFile), commandLine.isPreview(), commandLine.isJson());
         }
+        ApplicationStartupOptions options = ApplicationStartupOptions.parse(serveArgs);
         if (EnvKit.isFaaSMode()) {
             WebServerBuilder webServerBuilder = webServerBuilder(options.getPort(), options.getContextPath(),
-                    UpdaterUtils.getUpdater(serveArgs, execFile));
+                    ApplicationUpdaterFactory.create(serveArgs, execFile));
             webServerBuilder.startInBackground();
             if (EnvKit.isLambda()) {
                 LambdaApplication.startHandle(Constants.zrLogConfig);
@@ -110,7 +114,7 @@ public class Application {
             throw new NotImplementException();
         }
         WebServerBuilder webServerBuilder = webServerBuilder(options.getPort(), options.getContextPath(),
-                UpdaterUtils.getUpdater(serveArgs, execFile));
+                ApplicationUpdaterFactory.create(serveArgs, execFile));
         webServerBuilder.start();
         return 0;
     }
@@ -120,8 +124,12 @@ public class Application {
         Constants.zrLogConfig = zrLogConfig;
         WebServerBuilder builder = new WebServerBuilder.Builder().config(zrLogConfig).build();
         zrLogConfig.setServerBuilder(builder);
+        zrLogConfig.getServerConfig().addCreateSuccessHandle(() -> {
+            detachFileHandlerFromWebServerShutdownLogger();
+            return null;
+        });
         zrLogConfig.getServerConfig().addCreateErrorHandle(() -> {
-            if (updater instanceof ZipUpdater) {
+            if (updater != null && updater.getType() == UpdaterTypeEnum.ZIP) {
                 Thread.sleep(1000);
                 builder.start();
                 return null;
@@ -130,5 +138,12 @@ public class Application {
             return null;
         });
         return builder;
+    }
+
+    static void detachFileHandlerFromWebServerShutdownLogger() {
+        FileHandler fileHandler = LoggerUtil.getFileHandler();
+        if (Objects.nonNull(fileHandler)) {
+            Logger.getLogger(SimpleWebServer.class.getName()).removeHandler(fileHandler);
+        }
     }
 }

@@ -3,15 +3,43 @@ name: validate docker compose
 on:
   pull_request:
     paths:
+      - docker/Dockerfile
+      - docker/Dockerfile.windows
+      - docker/Dockerfile.windows.package
+      - docker/prepare-workflow-package.py
+      - docker/test-workflow-package.py
       - docker/docker-compose.yml
+      - docker/docker-compose.updater.yml
+      - docker/test-compose-updater-config.sh
       - docker/.env.example
+      - docker/resolve-native-package.sh
+      - docker/test-native-package-contract.sh
+      - .github/workflows/build-package.yml
+      - .github/actions/publish-preview-docker/**
+      - docker/*preview*.sh
+      - docker/Dockerfile.package
+      - docker/*image*.sh
       - .github/workflows/docker-compose-validate.yml
   push:
     branches:
       - master
     paths:
+      - docker/Dockerfile
+      - docker/Dockerfile.windows
+      - docker/Dockerfile.windows.package
+      - docker/prepare-workflow-package.py
+      - docker/test-workflow-package.py
       - docker/docker-compose.yml
+      - docker/docker-compose.updater.yml
+      - docker/test-compose-updater-config.sh
       - docker/.env.example
+      - docker/resolve-native-package.sh
+      - docker/test-native-package-contract.sh
+      - .github/workflows/build-package.yml
+      - .github/actions/publish-preview-docker/**
+      - docker/*preview*.sh
+      - docker/Dockerfile.package
+      - docker/*image*.sh
       - .github/workflows/docker-compose-validate.yml
 
 permissions:
@@ -25,7 +53,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      - name: Verify Native package pinning contract
+        run: bash docker/test-native-package-contract.sh
+
+      - name: Verify Native preview Docker recovery
+        run: bash docker/test-preview-package.sh
+
+      - name: Verify exact workflow package inputs for all Docker platforms
+        run: python3 docker/test-workflow-package.py
+
+      - name: Verify Docker image metadata
+        run: bash docker/test-image-manifest.sh
+
       - name: Validate configuration
-        env:
-          MYSQL_PASSWORD: compose-validation-password
-        run: docker compose --file docker/docker-compose.yml config --quiet
+        run: bash docker/test-compose-updater-config.sh

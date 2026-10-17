@@ -25,7 +25,12 @@ else
 fi
 
 setcap cap_net_bind_service=+ep "/usr/bin/${SERVICE_USER}"
+install -d -o zrlog -g zrlog -m 0750 /var/lib/zrlog/upgrade-request
+install -d -o root -g root -m 0755 /var/lib/zrlog-updater
+install -d -o root -g root -m 0700 /var/cache/zrlog-updater
 systemctl daemon-reload
-service zrlog restart
+systemctl enable zrlog.service zrlog-upgrade@release.path zrlog-upgrade@preview.path
+systemctl start zrlog-upgrade@release.path zrlog-upgrade@preview.path
+systemctl restart zrlog.service
 update-rc.d zrlog defaults
 exit 0

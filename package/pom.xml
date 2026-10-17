@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.hibegin</groupId>
         <artifactId>zrlog-web-parent</artifactId>
-        <version>3.9.2</version>
+        <version>4.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>package</artifactId>
@@ -14,14 +14,14 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <imageName>zrlog</imageName>
-        <native.maven.plugin.version>0.11.2</native.maven.plugin.version>
+        <native.maven.plugin.version>1.1.14</native.maven.plugin.version>
         <libOutputPath>lib</libOutputPath>
         <native.target>../</native.target>
         <packageName>zrlog</packageName>
         <architecture>all</architecture>
         <packageType>jar</packageType>
         <gitCommitId>0000000</gitCommitId>
-        <tomcat.version>10.1.55</tomcat.version>
+        <tomcat.version>10.1.59</tomcat.version>
     </properties>
 
     <dependencies>
@@ -61,7 +61,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.6.4</version>
                 <executions>
                     <execution>
                         <id>java-agent</id>
@@ -104,6 +104,20 @@
 
 
     <profiles>
+        <!-- GraalVM 25.0.1 is the last macOS Intel build. Keep its known-good
+             Native Build Tools / metadata pair from ZrLog 3.9.2 isolated here. -->
+        <profile>
+            <id>native-macos-intel-compat</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                    <arch>x86_64</arch>
+                </os>
+            </activation>
+            <properties>
+                <native.maven.plugin.version>0.11.2</native.maven.plugin.version>
+            </properties>
+        </profile>
         <profile>
             <id>war</id>
             <build>
@@ -362,7 +376,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-compiler-plugin</artifactId>
-                        <version>3.15.0</version>
+                        <version>3.16.0</version>
                         <configuration>
                             <source>${java.version}</source>
                             <target>${java.version}</target>
@@ -409,9 +423,6 @@
                                     <overWriteIfNewer>true</overWriteIfNewer>
                                     <useBaseVersion>false</useBaseVersion>
                                     <includeScope>runtime</includeScope>
-                                    <excludeArtifactIds>
-                                        zrlog-polyglot-template
-                                    </excludeArtifactIds>
                                 </configuration>
                             </execution>
                         </executions>
@@ -456,6 +467,7 @@
                                 </manifest>
                                 <manifestEntries>
                                     <Class-Path>.</Class-Path>
+                                    <Enable-Native-Access>ALL-UNNAMED</Enable-Native-Access>
                                 </manifestEntries>
                             </archive>
                             <outputDirectory>../</outputDirectory>
@@ -491,13 +503,25 @@
                                     <controlDir>${basedir}/src/deb/control</controlDir>
                                     <dataSet>
                                         <data>
+                                            <src>${basedir}/src/deb/systemd</src>
+                                            <type>directory</type>
+                                            <mapper>
+                                                <type>perm</type>
+                                                <prefix>/lib/systemd/system</prefix>
+                                                <user>root</user>
+                                                <group>root</group>
+                                                <filemode>644</filemode>
+                                                <dirmode>755</dirmode>
+                                            </mapper>
+                                        </data>
+                                        <data>
                                             <src>${native.target}/zrlog</src>
                                             <type>file</type>
                                             <mapper>
                                                 <type>perm</type>
                                                 <prefix>/usr/bin</prefix>
-                                                <user>zrlog</user>
-                                                <group>zrlog</group>
+                                                <user>root</user>
+                                                <group>root</group>
                                                 <filemode>755</filemode>
                                             </mapper>
                                         </data>
@@ -507,9 +531,21 @@
                                             <mapper>
                                                 <type>perm</type>
                                                 <prefix>/etc/init.d</prefix>
-                                                <user>zrlog</user>
-                                                <group>zrlog</group>
+                                                <user>root</user>
+                                                <group>root</group>
                                                 <filemode>755</filemode>
+                                            </mapper>
+                                        </data>
+                                        <data>
+                                            <src>${basedir}/src/deb/default</src>
+                                            <type>directory</type>
+                                            <mapper>
+                                                <type>perm</type>
+                                                <prefix>/etc/default</prefix>
+                                                <user>root</user>
+                                                <group>root</group>
+                                                <filemode>640</filemode>
+                                                <dirmode>755</dirmode>
                                             </mapper>
                                         </data>
                                         <data>

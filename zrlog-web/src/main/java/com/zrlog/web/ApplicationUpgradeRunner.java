@@ -3,7 +3,7 @@ package com.zrlog.web;
 import com.zrlog.business.rest.response.UpgradeProcessResponse;
 import com.zrlog.business.service.UpgradeService;
 import com.zrlog.common.Updater;
-import com.zrlog.common.updater.UpdateVersionTimerTask;
+import com.zrlog.business.updater.UpdateVersionTimerTask;
 import com.zrlog.common.vo.Version;
 import com.zrlog.util.I18nUtil;
 
@@ -16,9 +16,18 @@ final class ApplicationUpgradeRunner {
     }
 
     static int run(Updater updater, boolean preview) {
+        return run(updater, preview, false);
+    }
+
+    static int run(Updater updater, boolean preview, boolean json) {
         if (updater == null) {
             System.err.println("The current package does not provide an updater");
             return 1;
+        }
+        com.zrlog.updater.spi.ApplicationUpdater implementation = com.zrlog.common.adapter.UpdaterHosts.unwrap(updater);
+        if (implementation instanceof com.zrlog.updater.spi.SystemPackageUpdater) {
+            try { return ((com.zrlog.updater.spi.SystemPackageUpdater) implementation).install(preview ? "preview" : "release", json); }
+            catch (Exception e) { System.err.println("deb update failed: " + e.getMessage()); return 1; }
         }
         UpdateVersionTimerTask versionTask = new UpdateVersionTimerTask(preview, I18nUtil.getCurrentLocale());
         versionTask.run();
