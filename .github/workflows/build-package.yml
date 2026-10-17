@@ -137,6 +137,8 @@ jobs:
           artifact-architecture: ${{ steps.build_package.outputs.artifact-architecture }}
           service-url: ${{ vars.ARTIFACT_SERVICE_URL }}
           service-token: ${{ secrets.ARTIFACT_SERVICE_TOKEN }}
+          # Include queue time when full preview/release matrices share the worker.
+          process-timeout-seconds: '3600'
       - name: Finish FaaS package after processing
         if: matrix.package_type == 'faas'
         env:
