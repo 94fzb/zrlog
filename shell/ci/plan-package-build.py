@@ -22,11 +22,11 @@ def plan(env: dict[str, str]) -> dict:
             raise ValueError('Publication requires the matching trusted branch and event')
         kind = 'all'
         channel = 'release' if ref == 'refs/heads/release' else 'preview'
-        full = channel == 'release'
+        full = True
     else:
         kind = env.get('PACKAGE_TYPE', 'all')
         channel = env.get('CHANNEL', 'preview')
-        full = env.get('FULL_PLATFORMS', 'false') == 'true'
+        full = env.get('FULL_PLATFORMS', 'true') == 'true'
     if kind not in {'all', 'java', 'native', 'deb', 'faas'} or channel not in {'preview', 'release'}:
         raise ValueError('Unsupported package type or channel')
     kinds = {'java', 'native', 'deb', 'faas'} if kind == 'all' else {kind}

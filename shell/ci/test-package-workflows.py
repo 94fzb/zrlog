@@ -25,10 +25,12 @@ RECORD = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(RECORD)
 
 
-def plan(kind='all', full=False, channel='preview', event='workflow_dispatch', **overrides):
-    env = dict(PACKAGE_TYPE=kind, CHANNEL=channel, FULL_PLATFORMS=str(full).lower(),
+def plan(kind='all', full=None, channel='preview', event='workflow_dispatch', **overrides):
+    env = dict(PACKAGE_TYPE=kind, CHANNEL=channel,
                GITHUB_REPOSITORY='94fzb/zrlog', GITHUB_REF='refs/heads/master',
                GITHUB_EVENT_NAME=event, GITHUB_SHA='a' * 40)
+    if full is not None:
+        env['FULL_PLATFORMS'] = str(full).lower()
     env.update(overrides)
     return PLANNER.plan(env)
 
@@ -44,14 +46,27 @@ def platforms(settings):
 
 
 class PackageWorkflowContract(unittest.TestCase):
-    def test_daily_builds_all_formats_on_linux_amd64_only(self):
-        for event in ['push', 'repository_dispatch']:
-            settings = plan(event=event)
-            self.assertEqual('preview', settings['channel'])
-            self.assertTrue(settings['publish'])
-            targets = platforms(settings)
-            self.assertEqual({'java', 'native', 'deb', 'faas'}, {x['package_type'] for x in targets})
-            self.assertEqual(['ubuntu-22.04'] * 4, [x['os'] for x in targets])
+    def test_automatic_builds_use_the_same_full_matrix_on_both_branches(self):
+        expected = platforms(plan())
+        for event, ref, channel in [('push', 'master', 'preview'),
+                                    ('push', 'release', 'release'),
+                                    ('repository_dispatch', 'master', 'preview')]:
+            with self.subTest(event=event, ref=ref):
+                settings = plan('java', False, 'release', event=event,
+                                GITHUB_REF=f'refs/heads/{ref}')
+                self.assertEqual(channel, settings['channel'])
+                self.assertTrue(settings['publish'])
+                self.assertTrue(settings['full_platforms'])
+                self.assertEqual(expected, platforms(settings))
+
+    def test_manual_defaults_build_all_formats_and_platforms_without_publication(self):
+        expected = platforms(plan(full=True))
+        for channel in ['preview', 'release']:
+            with self.subTest(channel=channel):
+                settings = plan(channel=channel)
+                self.assertFalse(settings['publish'])
+                self.assertTrue(settings['full_platforms'])
+                self.assertEqual(expected, platforms(settings))
 
     def test_manual_full_matrix_preserves_every_release_platform(self):
         expected = {
@@ -97,7 +112,11 @@ class PackageWorkflowContract(unittest.TestCase):
         trigger = SHARED.get('on', SHARED.get(True))
         self.assertEqual(['master', 'release'], trigger['push']['branches'])
         self.assertNotIn('workflow_call', trigger)
-        self.assertIs(False, trigger['workflow_dispatch']['inputs']['full_platforms']['default'])
+        self.assertEqual('all', trigger['workflow_dispatch']['inputs']['package_type']['default'])
+        self.assertIs(True, trigger['workflow_dispatch']['inputs']['full_platforms']['default'])
+        plan_env = next(step['env'] for step in SHARED['jobs']['plan']['steps'] if step.get('id') == 'plan')
+        self.assertEqual("${{ github.event_name != 'workflow_dispatch' || inputs.full_platforms }}",
+                         plan_env['FULL_PLATFORMS'])
         reference = SHARED['jobs']['native_linux_amd64']['steps']
         self.assertEqual('${{ matrix.package_type }} on ${{ matrix.os }}',
                          SHARED['jobs']['native_linux_amd64']['name'])
@@ -167,6 +186,9 @@ class PackageWorkflowContract(unittest.TestCase):
             self.assertEqual('${{ steps.build_package.outputs.' + key + ' }}', action['with'][key])
         self.assertEqual('${{ vars.ARTIFACT_SERVICE_URL }}', action['with']['service-url'])
         self.assertEqual('${{ secrets.ARTIFACT_SERVICE_TOKEN }}', action['with']['service-token'])
+        self.assertEqual('7200', action['with']['process-timeout-seconds'])
+        self.assertGreater(SHARED['jobs']['packages']['timeout-minutes'] * 60,
+                           int(action['with']['process-timeout-seconds']))
         for step in [action, finish]:
             self.assertEqual("matrix.package_type == 'faas'", step['if'])
         for step in [build, action, finish, record]:

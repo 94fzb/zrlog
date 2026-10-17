@@ -14,9 +14,9 @@ on:
         options: [all, java, native, deb, faas]
         default: all
       full_platforms:
-        description: Build every supported platform instead of Linux amd64 only
+        description: Build every supported platform (disable only for a targeted manual build)
         type: boolean
-        default: false
+        default: true
       channel:
         description: Package mode (manual builds only archive Actions artifacts)
         type: choice
@@ -61,7 +61,7 @@ jobs:
         env:
           PACKAGE_TYPE: ${{ inputs.package_type || 'all' }}
           CHANNEL: ${{ inputs.channel || 'preview' }}
-          FULL_PLATFORMS: ${{ inputs.full_platforms || false }}
+          FULL_PLATFORMS: ${{ github.event_name != 'workflow_dispatch' || inputs.full_platforms }}
         run: python3 shell/ci/plan-package-build.py
 
   native_linux_amd64:
@@ -138,7 +138,7 @@ jobs:
           service-url: ${{ vars.ARTIFACT_SERVICE_URL }}
           service-token: ${{ secrets.ARTIFACT_SERVICE_TOKEN }}
           # Include queue time when full preview/release matrices share the worker.
-          process-timeout-seconds: '3600'
+          process-timeout-seconds: '7200'
       - name: Finish FaaS package after processing
         if: matrix.package_type == 'faas'
         env:
