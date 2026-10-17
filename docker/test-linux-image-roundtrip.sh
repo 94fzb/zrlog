@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Runner-only integration fixture: real OCI export, executable checks and isolated registries.
 set -euo pipefail
-temporary=$(mktemp -d)
+temporary=$(mktemp -d "$PWD/.oci-roundtrip.XXXXXX")
 registry=zrlog-oci-roundtrip-$GITHUB_RUN_ID
 cleanup() {
   docker rm -f "$registry" >/dev/null 2>&1 || true

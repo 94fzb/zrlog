@@ -268,10 +268,8 @@ jobs:
         run: python3 docker/prepare-workflow-package.py .native-package .prepared-native
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
-      - name: Install OCI archive tooling
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y skopeo
+      - name: Check pinned OCI archive tooling
+        run: bash docker/skopeo.sh --version
       - name: Build Linux image with provenance and SBOM
         uses: docker/build-push-action@v7
         with:
@@ -352,11 +350,9 @@ jobs:
       - name: Set up Docker Buildx
         if: needs.plan.outputs.publish == 'true'
         uses: docker/setup-buildx-action@v4
-      - name: Install OCI publication tooling
+      - name: Check pinned OCI publication tooling
         if: needs.plan.outputs.publish == 'true'
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y skopeo
+        run: bash docker/skopeo.sh --version
       - uses: sigstore/cosign-installer@v3
         if: needs.plan.outputs.publish == 'true'
       - name: Login to Docker Hub
