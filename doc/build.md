@@ -198,7 +198,7 @@ GitHub 仓库需要配置：
 
 ```text
 Variable:
-  ARTIFACT_SERVICE_URL=https://webdav.zrlog.com/artifact
+  ARTIFACT_SERVICE_URL=https://artifact.zrlog.com/artifact
 
 Secret:
   ARTIFACT_SERVICE_TOKEN=<zrlog-artifact-service 的 ARTIFACT_API_TOKEN>
