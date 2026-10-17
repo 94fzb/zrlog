@@ -155,3 +155,8 @@ Docker Hub 索引额外保留 BuildKit 证明。SNAPSHOT 的 `release` 工程演
 可用 `python3 docker/test-linux-image-assembly.py` 运行 OCI 夹具回归；runner 的
 `bash docker/test-linux-image-roundtrip.sh` 使用独立本地 registry 验证实际工具链复制、
 幂等与不可变标签冲突，不写外部镜像仓库。
+
+对已完成的完整平台工程 run，可手动运行 `docker-metadata-checks.yml` 并传
+`producer_run_id`。检查消费该 run 的真实 OCI 归档，用当前工具重新验证 blob 与来源、
+组装索引并复制到 runner 隔离 registry，要求新旧索引 digest 相同；记录原包来源和当前
+验证 workflow/tooling commit，不重新编译应用，也不向外部仓库发布。
