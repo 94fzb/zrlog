@@ -50,6 +50,7 @@ ZrLog 是一款基于 Java 的开源博客系统。它提供文章、分类、�
   启动后访问 `http://localhost:8080/install`。安装页会检查配置目录、数据库连接和安装锁文件，并在安装过程中显示实际执行进度。
   安装令牌默认关闭，以减少首次使用步骤；安装完成后，`install.lock` 会阻止重复安装。未安装实例若直接暴露到公网，仍可能被他人抢先初始化；公网或无人值守部署应在启动前显式设置 `ZRLOG_INSTALL_TOKEN`。不同发布形态的配置方式见[安装说明](doc/install.md#首次安装保护)。
   需要同时启动 MySQL 时，参见 [Docker Compose 部署说明](doc/docker-compose.md)。
+  对外请求需要 HTTP 代理时，参见 [HTTP 代理配置](doc/http-proxy.md)，可在首次连接 WebAPI 数据库前配置。
 
 - **推荐与高级部署**
 

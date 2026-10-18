@@ -74,6 +74,7 @@ public class Application {
         if (ParseArgsUtil.justTips(serveArgs, "zrlog", BlogBuildInfoUtil.getVersionInfoFull())) {
             return 0;
         }
+        com.zrlog.util.NetworkProxy.initialize();
         if (commandLine.getCommand() == ApplicationCommandLine.Command.UPGRADE) {
             return ApplicationUpgradeRunner.run(ApplicationUpdaterFactory.create(serveArgs, null), commandLine.isPreview(), commandLine.isJson());
         }
@@ -99,6 +100,7 @@ public class Application {
         if (ParseArgsUtil.justTips(serveArgs, execFile.getName(), BlogBuildInfoUtil.getVersionInfoFull())) {
             return 0;
         }
+        com.zrlog.util.NetworkProxy.initialize();
         if (commandLine.getCommand() == ApplicationCommandLine.Command.UPGRADE) {
             return ApplicationUpgradeRunner.run(ApplicationUpdaterFactory.create(serveArgs, execFile), commandLine.isPreview(), commandLine.isJson());
         }
