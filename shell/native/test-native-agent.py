@@ -3,6 +3,7 @@
 import os
 from pathlib import Path
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -39,6 +40,8 @@ def main():
         environment["ZRLOG_HTTP_PORT_FILE"] = str(root / "existing.port")
         options = [f"-Dsws.{name}.path={root / name}" for name in ["conf", "static", "cache", "temp", "log"]]
         options.append(f"-Dsws.root.path={root}")
+        runtime_directory = root / "agent runtimes"
+        options.append(f"-Dzrlog.native.agent.workDirectory={runtime_directory}")
         fixture = repository / "shell/native/tests/com/zrlog/web/GraalvmAgentRuntimeContract.java"
         run([str(java.with_name("javac")), "-cp", classpath, "-d", str(root), str(fixture)], root, environment)
         run([str(java), *options, "-cp", str(root) + os.pathsep + classpath,
@@ -47,7 +50,10 @@ def main():
         output = run(command, root, environment)
         assert "Loaded web modules: [admin," in output and "install, blog]" in output, output
         installed = re.search(r"Native agent installed disposable H2 site at (.+)", output)
-        assert installed and not Path(installed.group(1).strip()).exists(), output
+        assert installed and Path(installed.group(1).strip()).parent == runtime_directory, output
+        # The exited child has released all log handles and background writers, including on Windows.
+        shutil.rmtree(runtime_directory)
+        assert not runtime_directory.exists()
         for name, value in [("DB_PROPERTIES", "driverClass=existing.database.must.not.be.loaded"),
                             ("DB_PROPERTIES_FILE_NAME", str(conf / "db.properties")),
                             ("INSTALL_LOCK_FILE_NAME", str(conf / "install.lock"))]:

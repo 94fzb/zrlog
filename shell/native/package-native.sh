@@ -17,7 +17,11 @@ if [[ "${ZRLOG_PACKAGE_TYPE:-zip}" != "faas" ]]; then
   nativeProfiles="${nativeProfiles},native-sqlite"
 fi
 ./mvnw "${zrlogUpdaterMavenArgs[@]}" -Dproject.build.outputTimestamp=2013-01-01T00:00:00Z -Dmaven.test.skip=false -DskipTests=false clean install -U
-./mvnw "${zrlogUpdaterMavenArgs[@]}" -Dproject.build.outputTimestamp=2013-01-01T00:00:00Z -Dmaven.test.skip=false -DskipTests=false -Djakarta-scope='provided' -Dzrlog-polyglot-template-scope='compile' "${nativeBuildArgs[@]}" -P"${nativeProfiles}" -Dagent exec:exec@java-agent -U -f package/pom.xml
+(
+  # Wait for the tracing JVM to release log files and background writers before removing its site.
+  trap 'rm -rf -- package/target/native-agent-runtime' EXIT
+  ./mvnw "${zrlogUpdaterMavenArgs[@]}" -Dproject.build.outputTimestamp=2013-01-01T00:00:00Z -Dmaven.test.skip=false -DskipTests=false -Djakarta-scope='provided' -Dzrlog-polyglot-template-scope='compile' "${nativeBuildArgs[@]}" -P"${nativeProfiles}" -Dagent exec:exec@java-agent -U -f package/pom.xml
+)
 ./mvnw "${zrlogUpdaterMavenArgs[@]}" -Dproject.build.outputTimestamp=2013-01-01T00:00:00Z -Dmaven.test.skip=false -DskipTests=false -Djakarta-scope='provided' -Dzrlog-polyglot-template-scope='compile' "${nativeBuildArgs[@]}" -P"${nativeProfiles}" package -U -f package/pom.xml
 if [ -f 'package/target/zrlog.exe' ];
 then

@@ -6,6 +6,8 @@ import com.zrlog.util.DbUtils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.channels.FileChannel;
+import java.nio.file.StandardOpenOption;
 
 /** Runs in a separate JVM so the agent's global paths and DAO cannot affect other tests. */
 public class GraalvmAgentRuntimeContract {
@@ -14,8 +16,12 @@ public class GraalvmAgentRuntimeContract {
         String previousUrl = null;
         for (int attempt = 0; attempt < 2; attempt++) {
             Path root;
-            try (GraalvmAgentRuntime ignored = GraalvmAgentRuntime.install()) {
-                root = Path.of(PathUtil.getRootPath());
+            GraalvmAgentRuntime runtime = GraalvmAgentRuntime.install();
+            root = Path.of(PathUtil.getRootPath());
+            Path log = root.resolve("log/held-open.log");
+            try (FileChannel heldLog = FileChannel.open(log, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+                 var lock = heldLog.lock();
+                 GraalvmAgentRuntime ignored = runtime) {
                 check(!root.equals(Path.of(args[0])), "Agent reused the existing site");
                 check(Files.isRegularFile(root.resolve("conf/install.lock")), "Installer did not create install.lock");
                 var properties = DbUtils.getDbProp(root.resolve("conf/db.properties").toFile());
@@ -32,7 +38,7 @@ public class GraalvmAgentRuntimeContract {
                             "Installer did not create the default article");
                 }
             }
-            check(!Files.exists(root), "Agent did not remove its temporary directory");
+            check(Files.isDirectory(root), "Runtime directory was removed before the tracing process exited");
         }
         System.out.println("Native agent installation contract passed");
     }

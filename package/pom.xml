@@ -78,6 +78,7 @@
                             </environmentVariables>
                             <arguments>
                                 <argument>--enable-preview</argument>
+                                <argument>-Dzrlog.native.agent.workDirectory=${project.build.directory}/native-agent-runtime</argument>
                                 <argument>-classpath</argument>
                                 <classpath/>
                                 <argument>com.zrlog.web.GraalvmAgentApplication</argument>

@@ -18,22 +18,17 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Comparator;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
 
 /** A disposable installed site used only by the Native Image tracing agent. */
 final class GraalvmAgentRuntime implements AutoCloseable {
 
     private static final Logger LOGGER = Logger.getLogger(GraalvmAgentRuntime.class.getName());
-    private final Path root;
     private final InMemoryDatabase database;
-    private boolean closed;
 
-    private GraalvmAgentRuntime(Path root, InMemoryDatabase database) {
-        this.root = root;
+    private GraalvmAgentRuntime(InMemoryDatabase database) {
         this.database = database;
     }
 
@@ -42,7 +37,10 @@ final class GraalvmAgentRuntime implements AutoCloseable {
         requireEnvironment("DB_PROPERTIES", "");
         requireEnvironment("DB_PROPERTIES_FILE_NAME", "db.properties");
         requireEnvironment("INSTALL_LOCK_FILE_NAME", "install.lock");
-        Path root = Files.createTempDirectory("zrlog-native-agent-");
+        Path workDirectory = Path.of(System.getProperty("zrlog.native.agent.workDirectory",
+                System.getProperty("java.io.tmpdir")));
+        Files.createDirectories(workDirectory);
+        Path root = Files.createTempDirectory(workDirectory, "zrlog-native-agent-");
         InMemoryDatabase database = null;
         try {
             System.setProperty("sws.root.path", root.toString());
@@ -89,17 +87,12 @@ final class GraalvmAgentRuntime implements AutoCloseable {
             }
             database = InMemoryDatabase.open(properties, true);
             LOGGER.info("Native agent installed disposable H2 site at " + root);
-            return new GraalvmAgentRuntime(root, database);
+            return new GraalvmAgentRuntime(database);
         } catch (Exception e) {
             try {
                 if (database != null) {
                     database.close();
                 }
-            } catch (Exception cleanupError) {
-                e.addSuppressed(cleanupError);
-            }
-            try {
-                delete(root);
             } catch (Exception cleanupError) {
                 e.addSuppressed(cleanupError);
             }
@@ -114,24 +107,9 @@ final class GraalvmAgentRuntime implements AutoCloseable {
         }
     }
 
-    private static void delete(Path root) throws Exception {
-        try (Stream<Path> paths = Files.walk(root)) {
-            for (Path path : paths.sorted(Comparator.reverseOrder()).toArray(Path[]::new)) {
-                Files.deleteIfExists(path);
-            }
-        }
-    }
-
     @Override
-    public synchronized void close() throws Exception {
-        if (closed) {
-            return;
-        }
-        try {
-            database.close();
-        } finally {
-            delete(root);
-            closed = true;
-        }
+    public void close() {
+        // A running logger or plugin may still hold files; only the parent process can remove the site safely.
+        database.close();
     }
 }
