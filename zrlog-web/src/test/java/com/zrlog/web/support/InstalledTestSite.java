@@ -6,12 +6,11 @@ import com.zrlog.install.business.service.InstallService;
 import com.zrlog.install.business.vo.InstallConfigVO;
 import com.zrlog.install.business.vo.InstallDatabaseConfig;
 import com.zrlog.install.business.vo.InstallSiteConfig;
-import com.zrlog.install.web.InstallConstants;
 import com.zrlog.install.web.InstallAction;
+import com.zrlog.install.web.InstallConstants;
 import com.zrlog.install.web.config.DefaultInstallAction;
 import com.zrlog.install.web.config.DefaultInstallConfig;
 import com.zrlog.test.support.MemoryRuntime;
-
 import java.io.File;
 import java.util.Map;
 import java.util.UUID;
@@ -21,7 +20,7 @@ public final class InstalledTestSite implements AutoCloseable {
 
     private final InMemoryDatabase database;
 
-    private InstalledTestSite(File root) throws Exception {
+    private InstalledTestSite(File root, InstallAction action) throws Exception {
         String name = "zrlog_web_" + UUID.randomUUID();
         var properties = InMemoryDatabase.h2Properties(name);
         InstallDatabaseConfig db = new InstallDatabaseConfig();
@@ -46,6 +45,7 @@ public final class InstalledTestSite implements AutoCloseable {
             @Override public File getDbPropertiesFile() { return new File(root, "conf/db.properties"); }
             @Override public String defaultTemplatePath() { return Constants.getDefaultTemplatePath(); }
             @Override public InstallAction getAction() {
+                if (action != null) return action;
                 return new DefaultInstallAction() {
                     @Override public File getLockFile() { return new File(root, "conf/install.lock"); }
                 };
@@ -63,7 +63,11 @@ public final class InstalledTestSite implements AutoCloseable {
         database = InMemoryDatabase.open(MemoryRuntime.readDatabaseProperties(root.toPath()), true);
     }
 
-    public static InstalledTestSite open(File root) throws Exception { return new InstalledTestSite(root); }
+    public static InstalledTestSite open(File root) throws Exception { return new InstalledTestSite(root, null); }
+
+    public static InstalledTestSite open(File root, InstallAction action) throws Exception {
+        return new InstalledTestSite(root, action);
+    }
 
     @Override public void close() { database.close(); }
 }

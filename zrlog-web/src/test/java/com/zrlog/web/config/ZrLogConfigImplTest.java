@@ -1,16 +1,15 @@
 package com.zrlog.web.config;
 
 import com.hibegin.http.server.WebServerBuilder;
+import com.zrlog.common.CacheService;
 import com.zrlog.common.Constants;
 import com.zrlog.common.TokenService;
-import com.zrlog.web.support.InstalledTestSite;
 import com.zrlog.web.inteceptor.DefaultInterceptor;
+import com.zrlog.web.support.InstalledTestSite;
+import java.io.File;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-
-import java.io.File;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
@@ -36,12 +35,20 @@ public class ZrLogConfigImplTest {
     }
 
     @Test
-    public void shouldCreateBasePluginsOutsideTestModeWithoutDatabase() throws Exception {
-        withRuntime("junit-test", () -> {
+    public void shouldCreateSharedPluginsInTheServiceModuleAfterInstallation() throws Exception {
+        withInstalledDatabaseRuntime(rootPath -> {
             ZrLogConfigImpl config = new ZrLogConfigImpl(19084, null, "/blog");
-            System.clearProperty("env");
-
-            assertEquals(2, config.getBasePluginList().size());
+            try {
+                Constants.zrLogConfig = config;
+                System.clearProperty("env");
+                assertTrue(config.getBasePluginList().isEmpty());
+                var plugins = config.getWebSetup(com.zrlog.business.web.ServiceWebSetup.class).getPlugins();
+                assertEquals(2, plugins.size());
+                assertTrue(plugins.stream().anyMatch(com.zrlog.business.plugin.CacheManagerPlugin.class::isInstance));
+                assertTrue(plugins.stream().anyMatch(com.zrlog.business.plugin.PluginCorePluginImpl.class::isInstance));
+            } finally {
+                config.stop();
+            }
         });
     }
 
@@ -53,10 +60,10 @@ public class ZrLogConfigImplTest {
                 Constants.zrLogConfig = config;
                 assertTrue(config.isInstalled());
                 assertTrue(new File(rootPath, "conf/install.lock").isFile());
-                assertEquals("Installed H2 Site", config.getCacheService().getPublicWebSiteInfo().getTitle());
+                assertEquals("Installed H2 Site", config.getServerConfig().getBindings().build().get(CacheService.class).getPublicWebSiteInfo().getTitle());
                 assertTrue(config.getDataSource() != null);
-                assertTrue(config.getCacheService() != null);
-                assertEquals(Long.valueOf(3600L), config.getCacheService().getPublicWebSiteInfo().getSession_timeout());
+                assertTrue(config.getServerConfig().getBindings().build().get(CacheService.class) != null);
+                assertEquals(Long.valueOf(3600L), config.getServerConfig().getBindings().build().get(CacheService.class).getPublicWebSiteInfo().getSession_timeout());
 
                 TokenService tokenService = config.getTokenService();
                 assertTrue(tokenService != null);
