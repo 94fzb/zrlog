@@ -29,6 +29,8 @@ import com.zrlog.admin.plugin.rest.response.UploadServiceResponseEntity;
 import com.zrlog.admin.util.BackendServerUrl;
 import com.zrlog.admin.util.SystemInfoUtils;
 import com.zrlog.admin.web.AdminUiWebSetup;
+import com.zrlog.admin.web.AdminWebSetup;
+import com.zrlog.admin.web.di.account.AccountComponent;
 import com.zrlog.admin.web.controller.api.AccountSessionController;
 import com.zrlog.admin.web.controller.api.AdminController;
 import com.zrlog.admin.web.controller.api.AdminSystemController;
@@ -262,6 +264,12 @@ public class CacheInjectionIntegrationTest {
                         ApplicationContext context =
                                 new ApplicationContext(config.getServerConfig());
                         context.init();
+                        var bindings = config.getServerConfig().getBindings().build();
+                        TokenService beforeInstallTokens = bindings.get(TokenService.class);
+                        assertSame(beforeInstallTokens, bindings.get(AccountComponent.class).tokens());
+                        assertNull(config.getDataSource());
+                        assertNull(beforeInstallTokens.getAdminTokenVO(
+                                sessionRequest(config, "/admin", "", new Cookie[0])));
                         AdminLoginInterceptor loginInterceptor =
                                 (AdminLoginInterceptor)
                                         context.getInterceptors().stream()
@@ -312,6 +320,11 @@ public class CacheInjectionIntegrationTest {
                                         root,
                                         new ZrLogInstallAction(
                                                 config, new File(root, "conf/install.lock")))) {
+                            assertSame(beforeInstallTokens, config.getTokenService());
+                            bindings.get(CacheService.class).getPublicWebSiteInfo()
+                                    .setSession_timeout(31L);
+                            config.getWebSetup(AdminWebSetup.class)
+                                    .onDatabaseReady((DataSourceWrapper) config.getDataSource());
                             SessionResponse response = new SessionResponse();
                             assertThrows(
                                     AdminAuthException.class,
@@ -376,6 +389,8 @@ public class CacheInjectionIntegrationTest {
                                             .get(CacheService.class)
                                             .getPublicWebSiteInfo();
                             var identity = tokens.getAdminTokenVO(authenticated);
+                            assertEquals(31 * 60000L,
+                                    identity.getExpiresAt() - identity.getCreatedDate());
                             var secureResponse = new SessionResponse();
                             site.setGenerator_html_status(true);
                             tokens.setAdminToken(
