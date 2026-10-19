@@ -1,8 +1,8 @@
 package com.zrlog.web.setup.install;
 
 import com.hibegin.common.util.EnvKit;
+import com.zrlog.business.di.ServiceComponent;
 import com.zrlog.business.rest.response.UpgradeProcessResponse;
-import com.zrlog.business.service.UpgradeService;
 import com.zrlog.business.updater.UpdateVersionTimerTask;
 import com.zrlog.business.version.UpgradeVersionHandler;
 import com.zrlog.common.Constants;
@@ -119,16 +119,28 @@ public class ZrLogInstallConfig extends DefaultInstallConfig {
         return new InstallUpgradeAction() {
             @Override
             public boolean isSupported() {
-                return !zrLogConfig.isInstalled() && Objects.nonNull(updater)
-                        && !ZrLogUtil.isDockerMode() && !ZrLogUtil.isSystemServiceMode()
-                        && (!EnvKit.isFaaSMode() || UpdaterHosts.onlineUpgradeSupported(UpdaterTypeEnum.FAAS, updater));
+                return !zrLogConfig.isInstalled()
+                        && Objects.nonNull(updater)
+                        && !ZrLogUtil.isDockerMode()
+                        && !ZrLogUtil.isSystemServiceMode()
+                        && (!EnvKit.isFaaSMode()
+                                || UpdaterHosts.onlineUpgradeSupported(
+                                        UpdaterTypeEnum.FAAS, updater));
             }
 
             @Override
-            public InstallUpgradeResult upgrade(ProgressListener progressListener) throws Exception {
-                UpgradeProcessResponse response = new UpgradeService(updater, new com.zrlog.business.service.UpgradeNoticeService(zrLogConfig::isInstalled)).doUpgrade(lastVersion, updater,
-                        progressListener::onProgress, I18nUtil.getBackend());
-                return new InstallUpgradeResult(Boolean.TRUE.equals(response.getFinish()), response.getMessage());
+            public InstallUpgradeResult upgrade(ProgressListener progressListener)
+                    throws Exception {
+                UpgradeProcessResponse response =
+                        ServiceComponent.forUninstalledApplication(updater)
+                                .upgrades()
+                                .doUpgrade(
+                                        lastVersion,
+                                        updater,
+                                        progressListener::onProgress,
+                                        I18nUtil.getBackend());
+                return new InstallUpgradeResult(
+                        Boolean.TRUE.equals(response.getFinish()), response.getMessage());
             }
         };
     }

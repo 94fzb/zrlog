@@ -5,12 +5,13 @@ import com.hibegin.common.dao.InMemoryDatabase;
 import com.hibegin.http.server.util.PathUtil;
 import com.zrlog.business.version.UpgradeVersionHandler;
 import com.zrlog.common.Constants;
-import com.zrlog.install.business.service.InstallService;
+import com.zrlog.install.business.service.InstallProgressListener;
 import com.zrlog.install.business.vo.InstallConfigVO;
 import com.zrlog.install.business.vo.InstallDatabaseConfig;
 import com.zrlog.install.web.InstallAction;
 import com.zrlog.install.web.config.DefaultInstallAction;
 import com.zrlog.install.web.config.DefaultInstallConfig;
+import com.zrlog.install.web.di.DaggerInstallComponent;
 
 import java.io.File;
 import java.io.InputStreamReader;
@@ -75,7 +76,8 @@ final class GraalvmAgentRuntime implements AutoCloseable {
                     };
                 }
             };
-            if (!new InstallService(config, request).install()) {
+            if (!DaggerInstallComponent.factory().create(config).installers()
+                    .create(request, InstallProgressListener.NONE, config.getAcceptLanguage()).install()) {
                 throw new IllegalStateException("Install native agent memory database failed");
             }
             database = InMemoryDatabase.open(properties, true);
