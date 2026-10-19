@@ -8,7 +8,6 @@ import com.hibegin.http.server.api.HttpResponse;
 import com.hibegin.http.server.di.SwsBindings;
 import com.hibegin.http.server.web.Controller;
 import com.hibegin.http.server.web.cookie.Cookie;
-import com.zrlog.admin.business.AdminConstants;
 import com.zrlog.admin.business.rest.base.AdminWebSiteInfo;
 import com.zrlog.admin.business.service.MessageCenterService;
 import com.zrlog.admin.business.service.UploadService;
@@ -169,7 +168,6 @@ public class CacheInjectionIntegrationTest {
                             loginBody, new Cookie[0]);
                     AccountSessionController login = (AccountSessionController) Controller.buildController(
                             AccountSessionController.class.getMethod("login"), loginRequest, response.response());
-                    AdminConstants.adminResource = null;
                     var loginData = login.login().getData();
                     assertEquals("admin", loginData.getUserName());
                     assertEquals(config.getWebSetup(com.zrlog.admin.business.service.AdminResourceProvider.class)
@@ -389,7 +387,6 @@ public class CacheInjectionIntegrationTest {
         withRuntime(root -> {
             ZrLogConfigImpl config = config();
             var previousLanguage = com.zrlog.util.I18nUtil.threadLocal.get();
-            var previousResources = com.zrlog.admin.business.AdminConstants.adminResource;
             try {
                 var context = new ApplicationContext(config.getServerConfig());
                 context.init();
@@ -399,7 +396,6 @@ public class CacheInjectionIntegrationTest {
                 var pages = services.get(com.zrlog.admin.business.service.AdminPageDataFactory.class);
                 try (InstalledTestSite ignored = InstalledTestSite.open(root,
                         new ZrLogInstallAction(config, new File(root, "conf/install.lock")))) {
-                    com.zrlog.admin.business.AdminConstants.adminResource = null;
                     com.zrlog.util.I18nUtil.removeI18n();
                     var site = services.get(CacheService.class).getPublicWebSiteInfo();
                     site.setTitle("Installed application");
@@ -438,7 +434,6 @@ public class CacheInjectionIntegrationTest {
                 }
             } finally {
                 config.stop();
-                com.zrlog.admin.business.AdminConstants.adminResource = previousResources;
                 if (previousLanguage == null) com.zrlog.util.I18nUtil.removeI18n();
                 else com.zrlog.util.I18nUtil.threadLocal.set(previousLanguage);
             }
@@ -703,7 +698,6 @@ public class CacheInjectionIntegrationTest {
     private void withRuntime(RuntimeTest test) throws Exception {
         String oldRoot = System.getProperty("sws.root.path");
         String oldEnv = System.getProperty("env");
-        var oldResource = AdminConstants.adminResource;
         var oldDataSource = DAO.getDefaultDataSource();
         File root = temporaryFolder.newFolder();
         try {
@@ -711,7 +705,6 @@ public class CacheInjectionIntegrationTest {
             System.setProperty("env", "junit-test");
             test.run(root);
         } finally {
-            AdminConstants.adminResource = oldResource;
             DAO.setDs(oldDataSource);
             restore("sws.root.path", oldRoot);
             restore("env", oldEnv);
