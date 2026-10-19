@@ -48,7 +48,10 @@ def main():
              "com.zrlog.web.GraalvmAgentRuntimeContract", str(root)], root, environment)
         command = [str(java), *options, "-cp", classpath, "com.zrlog.web.GraalvmAgentApplication", "--contextPath=/agent"]
         output = run(command, root, environment)
-        assert "Loaded web modules: [admin," in output and "install, blog]" in output, output
+        loaded = re.search(r"Loaded web modules: \[([^\]]+)\]", output)
+        assert loaded, output
+        assert {"data", "services", "admin", "install", "blog"}.issubset(
+            set(loaded.group(1).split(", "))), output
         installed = re.search(r"Native agent installed disposable H2 site at (.+)", output)
         assert installed and Path(installed.group(1).strip()).parent == runtime_directory, output
         # The exited child has released all log handles and background writers, including on Windows.

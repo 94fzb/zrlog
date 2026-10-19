@@ -4,7 +4,6 @@ import jakarta.servlet.FilterConfig;
 import jakarta.servlet.GenericFilter;
 import jakarta.servlet.ServletContext;
 import com.hibegin.http.server.config.AbstractServerConfig;
-import com.zrlog.common.Constants;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -29,7 +28,6 @@ public class ZrLogSwsServletFilterTest {
         ZrLogSwsServletFilter filter = new ZrLogSwsServletFilter();
         String previousRunMode = System.getProperty("sws.run.mode");
         String previousEnv = System.getProperty("env");
-        Object previousConfig = Constants.zrLogConfig;
         try {
             System.setProperty("sws.run.mode", "dev");
             System.setProperty("env", "junit-test");
@@ -38,10 +36,8 @@ public class ZrLogSwsServletFilterTest {
             AbstractServerConfig config = filter.getServerConfig();
 
             assertNotNull(config);
-            assertEquals("/blog", Constants.zrLogConfig.getServerConfig().getContextPath());
-            assertEquals(config, Constants.zrLogConfig);
+            assertEquals("/blog", config.getServerConfig().getContextPath());
         } finally {
-            Constants.zrLogConfig = (com.zrlog.common.ZrLogConfig) previousConfig;
             restoreProperty("env", previousEnv);
             restoreProperty("sws.run.mode", previousRunMode);
         }
@@ -52,14 +48,13 @@ public class ZrLogSwsServletFilterTest {
         File webapps = temporaryFolder.newFolder("init-webapps");
         File blog = new File(webapps, "blog");
         assertTrue(blog.mkdirs());
-        ZrLogSwsServletFilter filter = new ZrLogSwsServletFilter();
+        TestFilter filter = new TestFilter();
         String previousRunMode = System.getProperty("sws.run.mode");
         String previousEnv = System.getProperty("env");
         String previousRootPath = System.getProperty("sws.root.path");
         String previousConfPath = System.getProperty("sws.conf.path");
         String previousLogPath = System.getProperty("sws.log.path");
         String previousTempPath = System.getProperty("sws.temp.path");
-        Object previousConfig = Constants.zrLogConfig;
         try {
             System.setProperty("sws.run.mode", "dev");
             System.setProperty("env", "junit-test");
@@ -67,10 +62,17 @@ public class ZrLogSwsServletFilterTest {
 
             filter.init();
 
-            assertNotNull(Constants.zrLogConfig);
-            assertEquals("/blog", Constants.zrLogConfig.getServerConfig().getContextPath());
+            AbstractServerConfig config = filter.configuredRuntime();
+            assertNotNull(config);
+            assertEquals("/blog", config.getServerConfig().getContextPath());
+            TestFilter second = new TestFilter();
+            setFilterConfig(second, filterConfig("/second", blog.getAbsolutePath()));
+            second.init();
+            org.junit.Assert.assertNotSame(config, second.configuredRuntime());
+            org.junit.Assert.assertSame(config, filter.configuredRuntime());
+            assertEquals("/blog", filter.configuredRuntime().getServerConfig().getContextPath());
+            assertEquals("/second", second.configuredRuntime().getServerConfig().getContextPath());
         } finally {
-            Constants.zrLogConfig = (com.zrlog.common.ZrLogConfig) previousConfig;
             restoreProperty("env", previousEnv);
             restoreProperty("sws.run.mode", previousRunMode);
             restoreProperty("sws.root.path", previousRootPath);
@@ -84,6 +86,12 @@ public class ZrLogSwsServletFilterTest {
         Field field = GenericFilter.class.getDeclaredField("config");
         field.setAccessible(true);
         field.set(filter, filterConfig);
+    }
+
+    private static class TestFilter extends ZrLogSwsServletFilter {
+        AbstractServerConfig configuredRuntime() {
+            return serverConfig;
+        }
     }
 
     private static void restoreProperty(String key, String value) {

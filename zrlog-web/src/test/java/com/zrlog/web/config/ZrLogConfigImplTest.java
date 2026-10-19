@@ -2,7 +2,6 @@ package com.zrlog.web.config;
 
 import com.hibegin.http.server.WebServerBuilder;
 import com.zrlog.common.CacheService;
-import com.zrlog.common.Constants;
 import com.zrlog.common.TokenService;
 import com.zrlog.web.inteceptor.DefaultInterceptor;
 import com.zrlog.web.support.InstalledTestSite;
@@ -39,7 +38,6 @@ public class ZrLogConfigImplTest {
         withInstalledDatabaseRuntime(rootPath -> {
             ZrLogConfigImpl config = new ZrLogConfigImpl(19084, null, "/blog");
             try {
-                Constants.zrLogConfig = config;
                 System.clearProperty("env");
                 assertTrue(config.getBasePluginList().isEmpty());
                 var plugins = config.getWebSetup(com.zrlog.business.web.ServiceWebSetup.class).getPlugins();
@@ -57,7 +55,6 @@ public class ZrLogConfigImplTest {
         withInstalledDatabaseRuntime(rootPath -> {
             ZrLogConfigImpl config = new ZrLogConfigImpl(19085, null, "");
             try {
-                Constants.zrLogConfig = config;
                 assertTrue(config.isInstalled());
                 assertTrue(new File(rootPath, "conf/install.lock").isFile());
                 assertEquals("Installed H2 Site", config.getServerConfig().getBindings().build().get(CacheService.class).getPublicWebSiteInfo().getTitle());
@@ -112,7 +109,6 @@ public class ZrLogConfigImplTest {
         } finally {
             restoreProperty("env", previousEnv);
             restoreProperty("sws.root.path", previousRootPath);
-            Constants.zrLogConfig = null;
         }
     }
 
@@ -127,7 +123,6 @@ public class ZrLogConfigImplTest {
         } finally {
             restoreProperty("env", previousEnv);
             restoreProperty("sws.root.path", previousRootPath);
-            Constants.zrLogConfig = null;
         }
     }
 

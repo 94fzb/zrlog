@@ -5,7 +5,7 @@ import com.hibegin.common.util.ObjectUtil;
 import com.hibegin.http.server.PortDetector;
 import com.hibegin.http.server.config.AbstractServerConfig;
 import com.hibegin.http.server.web.SwsServletFilter;
-import com.zrlog.common.Constants;
+import com.zrlog.common.ZrLogConfig;
 import com.zrlog.common.Updater;
 import com.zrlog.util.ArgsParser;
 import com.zrlog.web.ApplicationUpdaterFactory;
@@ -34,8 +34,7 @@ public class ZrLogSwsServletFilter extends SwsServletFilter {
         String[] runtimeArgs = ManagementFactory.getRuntimeMXBean().getInputArguments().toArray(new String[0]);
         Integer port = ObjectUtil.requireNonNullElse(PortDetector.detectHttpPort(), ArgsParser.getPort(runtimeArgs));
         String contextPath = getFilterConfig().getServletContext().getContextPath();
-        Constants.zrLogConfig = new ZrLogConfigImpl(port, getUpdater(), contextPath);
-        return Constants.zrLogConfig;
+        return new ZrLogConfigImpl(port, getUpdater(), contextPath);
     }
 
     Updater getUpdater() {
@@ -48,6 +47,6 @@ public class ZrLogSwsServletFilter extends SwsServletFilter {
     @Override
     public void init() {
         super.init();
-        Constants.zrLogConfig.startPlugins(!EnvKit.isFaaSMode());
+        ((ZrLogConfig) serverConfig).startPlugins(!EnvKit.isFaaSMode());
     }
 }

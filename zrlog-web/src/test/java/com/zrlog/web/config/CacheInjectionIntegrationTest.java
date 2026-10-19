@@ -35,7 +35,6 @@ import com.zrlog.business.service.CacheRefreshService;
 import com.zrlog.business.service.UpgradeNoticeService;
 import com.zrlog.business.updater.UpdateVersionInfoPlugin;
 import com.zrlog.common.CacheService;
-import com.zrlog.common.Constants;
 import com.zrlog.common.TokenService;
 import com.zrlog.common.cache.vo.BaseDataInitVO;
 import com.zrlog.common.exception.ArgsException;
@@ -72,7 +71,6 @@ public class CacheInjectionIntegrationTest {
         withRuntime(root -> {
             ZrLogConfigImpl config = config();
             try {
-                Constants.zrLogConfig = config;
                 new ApplicationContext(config.getServerConfig()).init();
                 SwsBindings.Container services = config.getServerConfig().getBindings().build();
                 assertNull(config.getDataSource());
@@ -104,7 +102,6 @@ public class CacheInjectionIntegrationTest {
                                 }
                                 return method.getReturnType() == boolean.class ? true : null;
                             }));
-                    Constants.zrLogConfig = null;
                     services.get(CacheRefreshService.class)
                             .updateCacheSynchronouslyOrThrow(request(config, "/api/admin/refreshCache"), Collections.emptyList());
                     BaseDataInitVO refreshed = blogController(config).index().getData();
@@ -124,12 +121,10 @@ public class CacheInjectionIntegrationTest {
             try (InstalledTestSite ignored = InstalledTestSite.open(root)) {
                 ZrLogConfigImpl config = config();
                 try {
-                    Constants.zrLogConfig = config;
                     assertSame(config.getServerConfig().getBindings().build().get(CacheService.class).getInitData(), blogController(config).index().getData());
                     assertEquals("Installed H2 Site", blogController(config).index().getData().getWebSite().getTitle());
                     assertNotNull(config.getTokenService());
-                    // Controller dispatch and its cache dependency must not resolve through the global bridge.
-                    Constants.zrLogConfig = null;
+                    // Controller dispatch must reuse this application's cache instance.
                     assertSame(config.getServerConfig().getBindings().build().get(CacheService.class).getInitData(), blogController(config).index().getData());
                 } finally {
                     config.stop();
@@ -162,7 +157,6 @@ public class CacheInjectionIntegrationTest {
                         sessionRequest(config, "/api/admin/user", "", new Cookie[0]), beforeInstall.response()));
                 try (InstalledTestSite ignored = InstalledTestSite.open(root,
                         new ZrLogInstallAction(config, new File(root, "conf/install.lock")))) {
-                    Constants.zrLogConfig = null;
                     SessionResponse response = new SessionResponse();
                     assertThrows(com.zrlog.admin.business.exception.AdminAuthException.class,
                             () -> adminInterceptor.doInterceptor(sessionRequest(config, "/api/admin/user", "", new Cookie[0]), response.response()));
@@ -250,7 +244,6 @@ public class CacheInjectionIntegrationTest {
                         new ZrLogInstallAction(config, new File(root, "conf/install.lock")))) {
                     AtomicReference<String> forwarded = new AtomicReference<>();
                     config.getAllPlugins().add(plugin("first-token", forwarded));
-                    Constants.zrLogConfig = null;
                     tokens.validate(firstToken);
                     HttpResponse response = new SessionResponse().response();
                     assertFalse(blog.doInterceptor(sessionRequest(config, "/plugin/comment/index", "", new Cookie[0]), response));
@@ -301,7 +294,6 @@ public class CacheInjectionIntegrationTest {
                 notices.sync(future);
                 try (InstalledTestSite ignored = InstalledTestSite.open(root,
                         new ZrLogInstallAction(config, new File(root, "conf/install.lock")))) {
-                    Constants.zrLogConfig = null;
                     assertFalse(notices.getNotice().getUpgrade());
                     notices.sync(future);
                     var controller = (UpgradeController) Controller.buildController(
@@ -341,7 +333,6 @@ public class CacheInjectionIntegrationTest {
                         .findFirst().orElseThrow().getValue());
                 try (InstalledTestSite ignored = InstalledTestSite.open(root,
                         new ZrLogInstallAction(config, new File(root, "conf/install.lock")))) {
-                    Constants.zrLogConfig = null;
                     var controller = (AdminSystemController) Controller.buildController(
                             AdminSystemController.class.getMethod("index"), request, new SessionResponse().response());
                     var result = controller.index().getData();
@@ -372,7 +363,6 @@ public class CacheInjectionIntegrationTest {
                 var oauth = services.get(com.zrlog.admin.business.service.OAuthService.class);
                 try (InstalledTestSite ignored = InstalledTestSite.open(root,
                         new ZrLogInstallAction(config, new File(root, "conf/install.lock")))) {
-                    Constants.zrLogConfig = null;
                     config.getServerConfig().setContextPath("/blog");
                     services.get(CacheService.class).getPublicWebSiteInfo().setHost("blog.example");
                     assertEquals("https://blog.example/blog", backend.configured());
@@ -410,7 +400,6 @@ public class CacheInjectionIntegrationTest {
                 var pages = services.get(com.zrlog.admin.business.service.AdminPageDataFactory.class);
                 try (InstalledTestSite ignored = InstalledTestSite.open(root,
                         new ZrLogInstallAction(config, new File(root, "conf/install.lock")))) {
-                    Constants.zrLogConfig = null;
                     com.zrlog.admin.business.AdminConstants.adminResource = null;
                     com.zrlog.util.I18nUtil.removeI18n();
                     var site = services.get(CacheService.class).getPublicWebSiteInfo();
@@ -469,7 +458,6 @@ public class CacheInjectionIntegrationTest {
                 var common = services.get(com.zrlog.business.service.CommonService.class);
                 try (InstalledTestSite ignored = InstalledTestSite.open(root,
                         new ZrLogInstallAction(config, new File(root, "conf/install.lock")))) {
-                    Constants.zrLogConfig = null;
                     var site = services.get(CacheService.class).getPublicWebSiteInfo();
                     site.setTitle("Public installed site");
                     site.setHost("blog.example");
@@ -537,7 +525,6 @@ public class CacheInjectionIntegrationTest {
                 try (InstalledTestSite ignored = InstalledTestSite.open(root,
                         new ZrLogInstallAction(config, new File(root, "conf/install.lock")))) {
                     config.getAllPlugins().add(plugin("static-test", new AtomicReference<>()));
-                    Constants.zrLogConfig = null;
                     var site = config.getServerConfig().getBindings().build().get(CacheService.class).getPublicWebSiteInfo();
                     site.setHost("static.example");
                     site.setGenerator_html_status(true);
@@ -579,7 +566,6 @@ public class CacheInjectionIntegrationTest {
                 var passkeys = services.get(com.zrlog.admin.business.service.PasskeyService.class);
                 try (InstalledTestSite ignored = InstalledTestSite.open(root,
                         new ZrLogInstallAction(config, new File(root, "conf/install.lock")))) {
-                    Constants.zrLogConfig = null;
                     var site = services.get(CacheService.class).getPublicWebSiteInfo();
                     site.setHost("localhost:18080");
                     HttpRequest original = sessionRequest(config, "/api/admin/passkey/authentication/options", "", new Cookie[0],
@@ -718,7 +704,6 @@ public class CacheInjectionIntegrationTest {
     private void withRuntime(RuntimeTest test) throws Exception {
         String oldRoot = System.getProperty("sws.root.path");
         String oldEnv = System.getProperty("env");
-        var oldConfig = Constants.zrLogConfig;
         var oldInstall = InstallConstants.installConfig;
         var oldResource = AdminConstants.adminResource;
         var oldDataSource = DAO.getDefaultDataSource();
@@ -726,10 +711,8 @@ public class CacheInjectionIntegrationTest {
         try {
             System.setProperty("sws.root.path", root.getAbsolutePath());
             System.setProperty("env", "junit-test");
-            Constants.zrLogConfig = null;
             test.run(root);
         } finally {
-            Constants.zrLogConfig = oldConfig;
             InstallConstants.installConfig = oldInstall;
             AdminConstants.adminResource = oldResource;
             DAO.setDs(oldDataSource);
