@@ -9,7 +9,6 @@ import com.zrlog.install.business.service.InstallService;
 import com.zrlog.install.business.vo.InstallConfigVO;
 import com.zrlog.install.business.vo.InstallDatabaseConfig;
 import com.zrlog.install.web.InstallAction;
-import com.zrlog.install.web.InstallConstants;
 import com.zrlog.install.web.config.DefaultInstallAction;
 import com.zrlog.install.web.config.DefaultInstallConfig;
 
@@ -76,14 +75,8 @@ final class GraalvmAgentRuntime implements AutoCloseable {
                     };
                 }
             };
-            var previousConfig = InstallConstants.installConfig;
-            try {
-                InstallConstants.installConfig = config;
-                if (!new InstallService(config, request).install()) {
-                    throw new IllegalStateException("Install native agent memory database failed");
-                }
-            } finally {
-                InstallConstants.installConfig = previousConfig;
+            if (!new InstallService(config, request).install()) {
+                throw new IllegalStateException("Install native agent memory database failed");
             }
             database = InMemoryDatabase.open(properties, true);
             LOGGER.info("Native agent installed disposable H2 site at " + root);

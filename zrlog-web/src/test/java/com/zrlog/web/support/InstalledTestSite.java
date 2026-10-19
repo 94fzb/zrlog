@@ -7,7 +7,6 @@ import com.zrlog.install.business.vo.InstallConfigVO;
 import com.zrlog.install.business.vo.InstallDatabaseConfig;
 import com.zrlog.install.business.vo.InstallSiteConfig;
 import com.zrlog.install.web.InstallAction;
-import com.zrlog.install.web.InstallConstants;
 import com.zrlog.install.web.config.DefaultInstallAction;
 import com.zrlog.install.web.config.DefaultInstallConfig;
 import com.zrlog.test.support.MemoryRuntime;
@@ -51,14 +50,8 @@ public final class InstalledTestSite implements AutoCloseable {
                 };
             }
         };
-        var previousConfig = InstallConstants.installConfig;
-        try {
-            InstallConstants.installConfig = config;
-            if (!new InstallService(config, request).install()) {
-                throw new IllegalStateException("Install test site failed");
-            }
-        } finally {
-            InstallConstants.installConfig = previousConfig;
+        if (!new InstallService(config, request).install()) {
+            throw new IllegalStateException("Install test site failed");
         }
         database = InMemoryDatabase.open(MemoryRuntime.readDatabaseProperties(root.toPath()), true);
     }

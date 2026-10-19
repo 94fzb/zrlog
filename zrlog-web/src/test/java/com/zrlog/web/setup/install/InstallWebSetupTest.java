@@ -6,8 +6,6 @@ import com.hibegin.http.server.api.HttpResponse;
 import com.zrlog.common.UpdaterTypeEnum;
 import com.zrlog.install.business.response.InstallApiResponses;
 import com.zrlog.install.exception.InvalidInstallRequestException;
-import com.zrlog.install.web.InstallConstants;
-import org.junit.After;
 import org.junit.Test;
 
 import java.io.File;
@@ -27,11 +25,6 @@ import static org.junit.Assert.assertTrue;
 
 public class InstallWebSetupTest {
 
-    @After
-    public void tearDown() {
-        InstallConstants.installConfig = null;
-    }
-
     @Test
     public void shouldRegisterInstallConfigAndRouterWhenSetupRuns() throws Exception {
         TestUpdater updater = new TestUpdater(UpdaterTypeEnum.ZIP);
@@ -41,8 +34,9 @@ public class InstallWebSetupTest {
 
         new InstallWebSetup(config, dbPropertiesFile, installLockFile, updater).setup();
 
-        assertNotNull(InstallConstants.installConfig);
-        assertSame(installLockFile, InstallConstants.installConfig.getAction().getLockFile());
+        var installConfig = config.getServerConfig().getBindings().build()
+                .get(com.zrlog.install.web.config.InstallConfig.class);
+        assertSame(installLockFile, installConfig.getAction().getLockFile());
     }
 
     @Test

@@ -39,7 +39,6 @@ import com.zrlog.common.TokenService;
 import com.zrlog.common.cache.vo.BaseDataInitVO;
 import com.zrlog.common.exception.ArgsException;
 import com.zrlog.common.vo.Version;
-import com.zrlog.install.web.InstallConstants;
 import com.zrlog.web.WebSiteInfoProvider;
 import com.zrlog.web.inteceptor.InstallStatusInterceptor;
 import com.zrlog.web.setup.install.ZrLogInstallAction;
@@ -704,7 +703,6 @@ public class CacheInjectionIntegrationTest {
     private void withRuntime(RuntimeTest test) throws Exception {
         String oldRoot = System.getProperty("sws.root.path");
         String oldEnv = System.getProperty("env");
-        var oldInstall = InstallConstants.installConfig;
         var oldResource = AdminConstants.adminResource;
         var oldDataSource = DAO.getDefaultDataSource();
         File root = temporaryFolder.newFolder();
@@ -713,7 +711,6 @@ public class CacheInjectionIntegrationTest {
             System.setProperty("env", "junit-test");
             test.run(root);
         } finally {
-            InstallConstants.installConfig = oldInstall;
             AdminConstants.adminResource = oldResource;
             DAO.setDs(oldDataSource);
             restore("sws.root.path", oldRoot);
