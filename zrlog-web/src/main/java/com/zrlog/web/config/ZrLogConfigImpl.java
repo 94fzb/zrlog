@@ -3,36 +3,24 @@ package com.zrlog.web.config;
 import com.hibegin.http.server.SimpleWebServer;
 import com.hibegin.http.server.WebServerBuilder;
 import com.mysql.cj.jdbc.AbandonedConnectionCleanupThread;
-import com.zrlog.common.TokenService;
 import com.zrlog.common.Updater;
 import com.zrlog.common.ZrLogConfig;
-import com.zrlog.common.vo.PublicWebSiteInfo;
 import com.zrlog.plugin.Plugins;
-import com.zrlog.web.WebSiteInfoProvider;
 import com.zrlog.web.inteceptor.DefaultInterceptor;
+
 import java.util.Objects;
 import java.util.logging.Level;
 
 public class ZrLogConfigImpl extends ZrLogConfig {
 
     private static final String MYSQL_CLEANUP_THREAD_CLASS_NAME = "com.mysql.cj.jdbc.AbandonedConnectionCleanupThread";
-    private final SetupConfig setupConfig;
     private WebServerBuilder serverBuilder;
 
     public ZrLogConfigImpl(Integer port, Updater updater, String contextPath) {
         super(port, updater, contextPath);
-        this.setupConfig = new SetupConfig(this, dbPropertiesFile, installLockFile, contextPath, webSetups, updater);
+        new SetupConfig(this, dbPropertiesFile, installLockFile, contextPath, webSetups, updater);
         initializeWebSetups();
         serverConfig.getInterceptors().add(DefaultInterceptor.class);
-    }
-
-    @Override
-    protected TokenService initTokenService() {
-        if (!isInstalled()) {
-            return null;
-        }
-        PublicWebSiteInfo publicWebSiteInfo = getWebSetup(WebSiteInfoProvider.class).getPublicWebSiteInfo();
-        return setupConfig.buildAdminTokenService(publicWebSiteInfo.getSession_timeout());
     }
 
     @Override

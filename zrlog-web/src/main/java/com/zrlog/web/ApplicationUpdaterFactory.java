@@ -4,8 +4,8 @@ import com.hibegin.common.util.EnvKit;
 import com.zrlog.common.Constants;
 import com.zrlog.common.Updater;
 import com.zrlog.common.adapter.UpdaterHosts;
-import com.zrlog.updater.common.UpdaterUtils;
 import com.zrlog.updater.common.UpdaterRuntime;
+import com.zrlog.updater.common.UpdaterUtils;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.ZrLogUtil;
 
@@ -19,11 +19,13 @@ public final class ApplicationUpdaterFactory {
         UpdaterRuntime runtime = new UpdaterRuntime(ZrLogUtil.isDockerMode(), EnvKit.isFaaSMode(),
                 BlogBuildInfoUtil.getPackageType(), EnvKit.isNativeImage(),
                 System.getProperty("java.class.path", ""), new File(Constants.getZrLogHome()));
-        return UpdaterHosts.adapt(UpdaterUtils.create(runtime, UpdaterHosts.builder(args, executable).build()));
+        UpdaterHosts.ApplicationHost host = UpdaterHosts.application(args, executable);
+        return host.adapt(UpdaterUtils.create(runtime, host.context()));
     }
 
     public static Updater createWar(File executable) {
         UpdaterRuntime runtime = UpdaterRuntime.servlet(new File(Constants.getZrLogHome()));
-        return UpdaterHosts.adapt(UpdaterUtils.create(runtime, UpdaterHosts.builder(new String[0], executable).build()));
+        UpdaterHosts.ApplicationHost host = UpdaterHosts.application(new String[0], executable);
+        return host.adapt(UpdaterUtils.create(runtime, host.context()));
     }
 }

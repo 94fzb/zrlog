@@ -2,8 +2,8 @@ package com.zrlog.web;
 
 import com.zrlog.business.rest.response.UpgradeProcessResponse;
 import com.zrlog.business.service.UpgradeService;
-import com.zrlog.common.Updater;
 import com.zrlog.business.updater.UpdateVersionTimerTask;
+import com.zrlog.common.Updater;
 import com.zrlog.common.vo.Version;
 import com.zrlog.util.I18nUtil;
 
@@ -37,7 +37,7 @@ final class ApplicationUpgradeRunner {
             return 1;
         }
         Map<String, Object> backend = I18nUtil.getBackend();
-        UpgradeProcessResponse response = new UpgradeService().doUpgrade(version, updater, (event, data) -> {
+        UpgradeProcessResponse response = new UpgradeService(updater, new com.zrlog.business.service.UpgradeNoticeService(() -> false)).doUpgrade(version, updater, (event, data) -> {
             String detail = Objects.nonNull(data.getDetail()) ? " " + data.getDetail() : "";
             System.out.println("[" + data.getStage() + "/" + data.getStatus() + "] " + data.getMessage() + detail);
         }, backend);
