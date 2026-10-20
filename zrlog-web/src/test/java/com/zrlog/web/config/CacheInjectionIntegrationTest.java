@@ -30,6 +30,7 @@ import com.zrlog.admin.util.BackendServerUrl;
 import com.zrlog.admin.util.SystemInfoUtils;
 import com.zrlog.admin.web.AdminUiWebSetup;
 import com.zrlog.admin.web.AdminWebSetup;
+import com.zrlog.admin.web.audit.AdminAuditContexts;
 import com.zrlog.admin.web.controller.api.AccountSessionController;
 import com.zrlog.admin.web.controller.api.AdminController;
 import com.zrlog.admin.web.controller.api.AdminSystemController;
@@ -189,7 +190,8 @@ public class CacheInjectionIntegrationTest {
                             services.get(WebSiteSettingsService.class)
                                     .update(
                                             new SiteTitle("Changed by admin"),
-                                            request(config, "/api/admin/website"));
+                                            AdminAuditContexts.from(
+                                                    request(config, "/api/admin/website"), 1));
                             BlogApiCacheController second = blogController(config);
                             assertNotSame(first, second);
                             assertSame(before, second.index().getData());
@@ -423,11 +425,11 @@ public class CacheInjectionIntegrationTest {
                                     .get(WebSiteSettingsService.class)
                                     .updateAdmin(
                                             settings,
-                                            sessionRequest(
+                                            AdminAuditContexts.from(sessionRequest(
                                                     config,
                                                     "/api/admin/website/admin",
                                                     "",
-                                                    new Cookie[0]));
+                                                    new Cookie[0]), 1));
                             AccountSessionController nextLogin =
                                     (AccountSessionController)
                                             Controller.buildController(
@@ -775,7 +777,7 @@ public class CacheInjectionIntegrationTest {
                                     "Installed application", manifest.manifest().getShort_name());
                             site.setTitle("Renamed application");
                             assertTrue(
-                                    pages.response(null, "", "/admin/unknown")
+                                    pages.response(null, null, "", "/admin/unknown")
                                             .getDocumentTitle()
                                             .contains("Renamed application"));
                         }
