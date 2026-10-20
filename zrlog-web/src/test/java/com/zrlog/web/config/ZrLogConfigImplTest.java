@@ -5,19 +5,26 @@ import com.zrlog.common.CacheService;
 import com.zrlog.common.TokenService;
 import com.zrlog.web.inteceptor.DefaultInterceptor;
 import com.zrlog.web.support.InstalledTestSite;
-import java.io.File;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+
+import static org.junit.Assert.*;
 
 public class ZrLogConfigImplTest {
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+    private static void restoreProperty(String key, String value) {
+        if (value == null) {
+            System.clearProperty(key);
+        } else {
+            System.setProperty(key, value);
+        }
+    }
 
     @Test
     public void shouldConfigureCoreServerDefaultsWithoutInstalledDatabase() throws Exception {
@@ -123,14 +130,6 @@ public class ZrLogConfigImplTest {
         } finally {
             restoreProperty("env", previousEnv);
             restoreProperty("sws.root.path", previousRootPath);
-        }
-    }
-
-    private static void restoreProperty(String key, String value) {
-        if (value == null) {
-            System.clearProperty(key);
-        } else {
-            System.setProperty(key, value);
         }
     }
 

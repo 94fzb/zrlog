@@ -14,7 +14,8 @@
         <module>package</module>
     </modules>
     <name>zrlog</name>
-    <description>ZrLog 是一款基于 Java 的开源博客系统。它提供文章、分类、标签、评论、主题、插件、静态化和在线升级等功能，内置 Markdown 编辑器，管理界面基于 React 和 Ant Design 构建。
+    <description>ZrLog 是一款基于 Java 的开源博客系统。它提供文章、分类、标签、评论、主题、插件、静态化和在线升级等功能，内置
+        Markdown 编辑器，管理界面基于 React 和 Ant Design 构建。
     </description>
     <url>https://www.zrlog.com</url>
 
@@ -104,14 +105,41 @@
     <dependencies>
         <!-- Package scripts select runtime providers; all implementations remain available to tests. -->
         <dependency>
-            <groupId>com.hibegin</groupId><artifactId>zrlog-updater-zip</artifactId>
-            <version>${zrlog-updater.version}</version><scope>${zrlog-updater-zip-scope}</scope>
+            <groupId>com.hibegin</groupId>
+            <artifactId>zrlog-updater-zip</artifactId>
+            <version>${zrlog-updater.version}</version>
+            <scope>${zrlog-updater-zip-scope}</scope>
         </dependency>
-        <dependency><groupId>com.hibegin</groupId><artifactId>zrlog-updater-native</artifactId><version>${zrlog-updater.version}</version><scope>${zrlog-updater-native-scope}</scope></dependency>
-        <dependency><groupId>com.hibegin</groupId><artifactId>zrlog-updater-war</artifactId><version>${zrlog-updater.version}</version><scope>${zrlog-updater-war-scope}</scope></dependency>
-        <dependency><groupId>com.hibegin</groupId><artifactId>zrlog-updater-faas</artifactId><version>${zrlog-updater.version}</version><scope>${zrlog-updater-faas-scope}</scope></dependency>
-        <dependency><groupId>com.hibegin</groupId><artifactId>zrlog-updater-docker</artifactId><version>${zrlog-updater.version}</version><scope>${zrlog-updater-docker-scope}</scope></dependency>
-        <dependency><groupId>com.hibegin</groupId><artifactId>zrlog-updater-deb</artifactId><version>${zrlog-updater.version}</version><scope>${zrlog-updater-deb-scope}</scope></dependency>
+        <dependency>
+            <groupId>com.hibegin</groupId>
+            <artifactId>zrlog-updater-native</artifactId>
+            <version>${zrlog-updater.version}</version>
+            <scope>${zrlog-updater-native-scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.hibegin</groupId>
+            <artifactId>zrlog-updater-war</artifactId>
+            <version>${zrlog-updater.version}</version>
+            <scope>${zrlog-updater-war-scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.hibegin</groupId>
+            <artifactId>zrlog-updater-faas</artifactId>
+            <version>${zrlog-updater.version}</version>
+            <scope>${zrlog-updater-faas-scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.hibegin</groupId>
+            <artifactId>zrlog-updater-docker</artifactId>
+            <version>${zrlog-updater.version}</version>
+            <scope>${zrlog-updater-docker-scope}</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.hibegin</groupId>
+            <artifactId>zrlog-updater-deb</artifactId>
+            <version>${zrlog-updater.version}</version>
+            <scope>${zrlog-updater-deb-scope}</scope>
+        </dependency>
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>

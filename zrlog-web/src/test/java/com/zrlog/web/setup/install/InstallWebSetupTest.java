@@ -17,13 +17,26 @@ import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class InstallWebSetupTest {
+
+    private static HttpRequest request(String uri) {
+        return (HttpRequest) Proxy.newProxyInstance(
+                InstallWebSetupTest.class.getClassLoader(), new Class[]{HttpRequest.class},
+                (proxy, method, args) -> "getUri".equals(method.getName()) ? uri : null);
+    }
+
+    private static HttpResponse response(AtomicReference<Object> rendered) {
+        return (HttpResponse) Proxy.newProxyInstance(
+                InstallWebSetupTest.class.getClassLoader(), new Class[]{HttpResponse.class},
+                (proxy, method, args) -> {
+                    if ("renderJson".equals(method.getName())) {
+                        rendered.set(args[0]);
+                    }
+                    return null;
+                });
+    }
 
     @Test
     public void shouldRegisterInstallConfigAndRouterWhenSetupRuns() throws Exception {
@@ -104,22 +117,5 @@ public class InstallWebSetupTest {
                     request("/api/installx"), response(new AtomicReference<>()), fallbackError);
             assertSame(fallbackError, fallbackThrowables.get(status).get());
         }
-    }
-
-    private static HttpRequest request(String uri) {
-        return (HttpRequest) Proxy.newProxyInstance(
-                InstallWebSetupTest.class.getClassLoader(), new Class[]{HttpRequest.class},
-                (proxy, method, args) -> "getUri".equals(method.getName()) ? uri : null);
-    }
-
-    private static HttpResponse response(AtomicReference<Object> rendered) {
-        return (HttpResponse) Proxy.newProxyInstance(
-                InstallWebSetupTest.class.getClassLoader(), new Class[]{HttpResponse.class},
-                (proxy, method, args) -> {
-                    if ("renderJson".equals(method.getName())) {
-                        rendered.set(args[0]);
-                    }
-                    return null;
-                });
     }
 }

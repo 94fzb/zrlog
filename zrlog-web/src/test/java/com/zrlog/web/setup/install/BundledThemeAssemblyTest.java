@@ -12,7 +12,9 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
-/** Checks the application dependency assembly, including independently published resource JARs. */
+/**
+ * Checks the application dependency assembly, including independently published resource JARs.
+ */
 public class BundledThemeAssemblyTest {
     @Test
     public void applicationIncludesDefaultAndOptionalThemesWithReadableMetadata() {

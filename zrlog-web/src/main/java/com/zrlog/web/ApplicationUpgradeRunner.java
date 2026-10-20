@@ -33,7 +33,9 @@ final class ApplicationUpgradeRunner {
                 return ((SystemPackageUpdater) implementation)
                         .install(preview ? "preview" : "release", json);
             } catch (Exception e) {
-                System.err.println("deb update failed: " + e.getMessage()); return 1; }
+                System.err.println("deb update failed: " + e.getMessage());
+                return 1;
+            }
         }
         UpdateVersionTimerTask versionTask = new UpdateVersionTimerTask(preview, I18nUtil.getCurrentLocale());
         versionTask.run();

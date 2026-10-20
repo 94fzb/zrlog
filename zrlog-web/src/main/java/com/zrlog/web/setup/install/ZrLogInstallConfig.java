@@ -43,15 +43,6 @@ public class ZrLogInstallConfig extends DefaultInstallConfig {
         this.installAction = new ZrLogInstallAction(zrLogConfig, lockFile);
     }
 
-    private Version prefetchVersion() {
-        if (zrLogConfig.isInstalled() || zrLogConfig.isTest()) {
-            return null;
-        }
-        UpdateVersionTimerTask versionTimerTask = new UpdateVersionTimerTask(!BlogBuildInfoUtil.isRelease(), Constants.DEFAULT_LANGUAGE);
-        versionTimerTask.run();
-        return versionTimerTask.getVersion();
-    }
-
     static LastVersionInfo toLastVersionInfo(Updater updater, Version lastVersion) {
         LastVersionInfo lastVersionInfo = new LastVersionInfo();
         if (Objects.isNull(lastVersion)) {
@@ -72,6 +63,15 @@ public class ZrLogInstallConfig extends DefaultInstallConfig {
         }
         lastVersionInfo.setChangeLog(lastVersion.getChangeLog());
         return lastVersionInfo;
+    }
+
+    private Version prefetchVersion() {
+        if (zrLogConfig.isInstalled() || zrLogConfig.isTest()) {
+            return null;
+        }
+        UpdateVersionTimerTask versionTimerTask = new UpdateVersionTimerTask(!BlogBuildInfoUtil.isRelease(), Constants.DEFAULT_LANGUAGE);
+        versionTimerTask.run();
+        return versionTimerTask.getVersion();
     }
 
     @Override
@@ -124,8 +124,8 @@ public class ZrLogInstallConfig extends DefaultInstallConfig {
                         && !ZrLogUtil.isDockerMode()
                         && !ZrLogUtil.isSystemServiceMode()
                         && (!EnvKit.isFaaSMode()
-                                || UpdaterHosts.onlineUpgradeSupported(
-                                        UpdaterTypeEnum.FAAS, updater));
+                        || UpdaterHosts.onlineUpgradeSupported(
+                        UpdaterTypeEnum.FAAS, updater));
             }
 
             @Override

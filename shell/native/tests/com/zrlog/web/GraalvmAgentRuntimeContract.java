@@ -9,7 +9,9 @@ import java.nio.file.Path;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
 
-/** Runs in a separate JVM so the agent's global paths and DAO cannot affect other tests. */
+/**
+ * Runs in a separate JVM so the agent's global paths and DAO cannot affect other tests.
+ */
 public class GraalvmAgentRuntimeContract {
 
     public static void main(String[] args) throws Exception {

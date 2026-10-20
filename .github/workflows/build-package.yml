@@ -3,15 +3,15 @@ run-name: Build application packages (${{ github.sha }})
 
 on:
   push:
-    branches: [master, release]
+    branches: [ master, release ]
   repository_dispatch:
-    types: [zrlog-admin-web-preview-updated]
+    types: [ zrlog-admin-web-preview-updated ]
   workflow_dispatch:
     inputs:
       package_type:
         description: Package types to build
         type: choice
-        options: [all, java, native, deb, faas]
+        options: [ all, java, native, deb, faas ]
         default: all
       full_platforms:
         description: Build every supported platform (disable only for a targeted manual build)
@@ -20,7 +20,7 @@ on:
       channel:
         description: Package mode (manual builds only archive Actions artifacts)
         type: choice
-        options: [preview, release]
+        options: [ preview, release ]
         default: preview
 
 permissions:
@@ -80,7 +80,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - {package_type: native, os: ubuntu-22.04, java: '25'}
+          - { package_type: native, os: ubuntu-22.04, java: '25' }
     outputs:
       package_artifact_id: ${{ steps.package_artifact.outputs.artifact-id }}
     env: &package_env
@@ -214,7 +214,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - {package_type: native, os: ubuntu-24.04-arm, java: '25'}
+          - { package_type: native, os: ubuntu-24.04-arm, java: '25' }
     outputs:
       package_artifact_id: ${{ steps.package_artifact.outputs.artifact-id }}
     env: *package_env
@@ -232,7 +232,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - {package_type: native, os: windows-2022, java: '25'}
+          - { package_type: native, os: windows-2022, java: '25' }
     outputs:
       package_artifact_id: ${{ steps.package_artifact.outputs.artifact-id }}
     env: *package_env
@@ -250,7 +250,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - {package_type: native, os: macos-15-intel, java: '25.0.1'}
+          - { package_type: native, os: macos-15-intel, java: '25.0.1' }
     env: *package_env
     steps: *package_steps
 
@@ -266,7 +266,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - {package_type: native, os: macos-15, java: '25'}
+          - { package_type: native, os: macos-15, java: '25' }
     env: *package_env
     steps: *package_steps
 
@@ -286,7 +286,7 @@ jobs:
 
   docker_linux_amd64:
     name: Docker Linux amd64
-    needs: [plan, native_linux_amd64]
+    needs: [ plan, native_linux_amd64 ]
     if: needs.plan.outputs.build_native == 'true'
     runs-on: ${{ matrix.runner }}
     env: &docker_linux_env
@@ -299,7 +299,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - {runner: ubuntu-22.04, platform: linux/amd64, arch: amd64}
+          - { runner: ubuntu-22.04, platform: linux/amd64, arch: amd64 }
     steps: &docker_linux_steps
       - name: Checkout
         uses: actions/checkout@v7
@@ -356,7 +356,7 @@ jobs:
 
   docker_linux_arm64:
     name: Docker Linux arm64
-    needs: [plan, native_linux_arm64]
+    needs: [ plan, native_linux_arm64 ]
     if: needs.plan.outputs.build_native == 'true' && needs.plan.outputs.full_platforms == 'true'
     runs-on: ${{ matrix.runner }}
     env: *docker_linux_env
@@ -365,12 +365,12 @@ jobs:
     strategy:
       matrix:
         include:
-          - {runner: ubuntu-24.04-arm, platform: linux/arm64, arch: arm64}
+          - { runner: ubuntu-24.04-arm, platform: linux/arm64, arch: arm64 }
     steps: *docker_linux_steps
 
   docker_linux_manifest:
     name: Assemble and verify Linux image manifests
-    needs: [plan, docker_linux_amd64, docker_linux_arm64]
+    needs: [ plan, docker_linux_amd64, docker_linux_arm64 ]
     runs-on: ubuntu-22.04
     if: >-
       !cancelled() && needs.docker_linux_amd64.result == 'success' &&
@@ -467,7 +467,7 @@ jobs:
 
   docker_windows:
     name: Build Windows image (windows/amd64)
-    needs: [plan, native_windows]
+    needs: [ plan, native_windows ]
     if: needs.plan.outputs.build_native == 'true' && needs.plan.outputs.full_platforms == 'true'
     runs-on: windows-2022
     env:

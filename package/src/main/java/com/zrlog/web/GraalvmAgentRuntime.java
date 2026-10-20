@@ -22,7 +22,9 @@ import java.util.Properties;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-/** A disposable installed site used only by the Native Image tracing agent. */
+/**
+ * A disposable installed site used only by the Native Image tracing agent.
+ */
 final class GraalvmAgentRuntime implements AutoCloseable {
 
     private static final Logger LOGGER = Logger.getLogger(GraalvmAgentRuntime.class.getName());
@@ -67,12 +69,28 @@ final class GraalvmAgentRuntime implements AutoCloseable {
             db.setDbName(name);
             request.setDbConfig(db);
             var config = new DefaultInstallConfig() {
-                @Override public File getDbPropertiesFile() { return root.resolve("conf/db.properties").toFile(); }
-                @Override public String defaultTemplatePath() { return Constants.getDefaultTemplatePath(); }
-                @Override public String getZrLogSqlVersion() { return String.valueOf(UpgradeVersionHandler.SQL_VERSION); }
-                @Override public InstallAction getAction() {
+                @Override
+                public File getDbPropertiesFile() {
+                    return root.resolve("conf/db.properties").toFile();
+                }
+
+                @Override
+                public String defaultTemplatePath() {
+                    return Constants.getDefaultTemplatePath();
+                }
+
+                @Override
+                public String getZrLogSqlVersion() {
+                    return String.valueOf(UpgradeVersionHandler.SQL_VERSION);
+                }
+
+                @Override
+                public InstallAction getAction() {
                     return new DefaultInstallAction() {
-                        @Override public File getLockFile() { return root.resolve("conf/install.lock").toFile(); }
+                        @Override
+                        public File getLockFile() {
+                            return root.resolve("conf/install.lock").toFile();
+                        }
                     };
                 }
             };

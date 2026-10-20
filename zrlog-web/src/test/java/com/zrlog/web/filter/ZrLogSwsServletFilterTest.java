@@ -1,9 +1,9 @@
 package com.zrlog.web.filter;
 
+import com.hibegin.http.server.config.AbstractServerConfig;
 import jakarta.servlet.FilterConfig;
 import jakarta.servlet.GenericFilter;
 import jakarta.servlet.ServletContext;
-import com.hibegin.http.server.config.AbstractServerConfig;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -12,14 +12,59 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class ZrLogSwsServletFilterTest {
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+    private static void setFilterConfig(GenericFilter filter, FilterConfig filterConfig) throws Exception {
+        Field field = GenericFilter.class.getDeclaredField("config");
+        field.setAccessible(true);
+        field.set(filter, filterConfig);
+    }
+
+    private static void restoreProperty(String key, String value) {
+        if (value == null) {
+            System.clearProperty(key);
+        } else {
+            System.setProperty(key, value);
+        }
+    }
+
+    private static FilterConfig filterConfig(String contextPath, String realPath) {
+        ServletContext servletContext = (ServletContext) Proxy.newProxyInstance(
+                ZrLogSwsServletFilterTest.class.getClassLoader(),
+                new Class[]{ServletContext.class},
+                (proxy, method, args) -> {
+                    if ("getContextPath".equals(method.getName())) {
+                        return contextPath;
+                    }
+                    if ("getRealPath".equals(method.getName())) {
+                        return realPath;
+                    }
+                    if ("toString".equals(method.getName())) {
+                        return "ServletContextProxy";
+                    }
+                    return null;
+                });
+        return (FilterConfig) Proxy.newProxyInstance(
+                ZrLogSwsServletFilterTest.class.getClassLoader(),
+                new Class[]{FilterConfig.class},
+                (proxy, method, args) -> {
+                    if ("getServletContext".equals(method.getName())) {
+                        return servletContext;
+                    }
+                    if ("getFilterName".equals(method.getName())) {
+                        return "zrlog";
+                    }
+                    if ("toString".equals(method.getName())) {
+                        return "FilterConfigProxy";
+                    }
+                    return null;
+                });
+    }
 
     @Test
     public void shouldBuildServerConfigFromServletContext() throws Exception {
@@ -82,56 +127,9 @@ public class ZrLogSwsServletFilterTest {
         }
     }
 
-    private static void setFilterConfig(GenericFilter filter, FilterConfig filterConfig) throws Exception {
-        Field field = GenericFilter.class.getDeclaredField("config");
-        field.setAccessible(true);
-        field.set(filter, filterConfig);
-    }
-
     private static class TestFilter extends ZrLogSwsServletFilter {
         AbstractServerConfig configuredRuntime() {
             return serverConfig;
         }
-    }
-
-    private static void restoreProperty(String key, String value) {
-        if (value == null) {
-            System.clearProperty(key);
-        } else {
-            System.setProperty(key, value);
-        }
-    }
-
-    private static FilterConfig filterConfig(String contextPath, String realPath) {
-        ServletContext servletContext = (ServletContext) Proxy.newProxyInstance(
-                ZrLogSwsServletFilterTest.class.getClassLoader(),
-                new Class[]{ServletContext.class},
-                (proxy, method, args) -> {
-                    if ("getContextPath".equals(method.getName())) {
-                        return contextPath;
-                    }
-                    if ("getRealPath".equals(method.getName())) {
-                        return realPath;
-                    }
-                    if ("toString".equals(method.getName())) {
-                        return "ServletContextProxy";
-                    }
-                    return null;
-                });
-        return (FilterConfig) Proxy.newProxyInstance(
-                ZrLogSwsServletFilterTest.class.getClassLoader(),
-                new Class[]{FilterConfig.class},
-                (proxy, method, args) -> {
-                    if ("getServletContext".equals(method.getName())) {
-                        return servletContext;
-                    }
-                    if ("getFilterName".equals(method.getName())) {
-                        return "zrlog";
-                    }
-                    if ("toString".equals(method.getName())) {
-                        return "FilterConfigProxy";
-                    }
-                    return null;
-                });
     }
 }

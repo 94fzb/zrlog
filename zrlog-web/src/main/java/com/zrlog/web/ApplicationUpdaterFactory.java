@@ -11,9 +11,12 @@ import com.zrlog.util.ZrLogUtil;
 
 import java.io.File;
 
-/** Supplies the application's runtime identity and host adapter to updater-common. */
+/**
+ * Supplies the application's runtime identity and host adapter to updater-common.
+ */
 public final class ApplicationUpdaterFactory {
-    private ApplicationUpdaterFactory() { }
+    private ApplicationUpdaterFactory() {
+    }
 
     public static Updater create(String[] args, File executable) {
         UpdaterRuntime runtime = new UpdaterRuntime(ZrLogUtil.isDockerMode(), EnvKit.isFaaSMode(),

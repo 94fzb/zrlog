@@ -1,7 +1,5 @@
 package com.zrlog.web.config;
 
-import static org.junit.Assert.*;
-
 import com.hibegin.common.dao.DAO;
 import com.hibegin.common.dao.DataSourceWrapper;
 import com.hibegin.common.util.SecurityUtils;
@@ -16,28 +14,14 @@ import com.hibegin.http.server.web.cookie.Cookie;
 import com.zrlog.admin.business.exception.AdminAuthException;
 import com.zrlog.admin.business.exception.PasskeyVerificationException;
 import com.zrlog.admin.business.rest.base.AdminWebSiteInfo;
-import com.zrlog.admin.business.service.AdminDashboardService;
-import com.zrlog.admin.business.service.AdminPageDataFactory;
-import com.zrlog.admin.business.service.AdminResourceProvider;
-import com.zrlog.admin.business.service.AdminResourceService;
-import com.zrlog.admin.business.service.MessageCenterService;
-import com.zrlog.admin.business.service.OAuthService;
-import com.zrlog.admin.business.service.PasskeyService;
-import com.zrlog.admin.business.service.UploadService;
-import com.zrlog.admin.business.service.WebSiteSettingsService;
+import com.zrlog.admin.business.service.*;
 import com.zrlog.admin.plugin.rest.response.UploadServiceResponseEntity;
 import com.zrlog.admin.util.BackendServerUrl;
 import com.zrlog.admin.util.SystemInfoUtils;
 import com.zrlog.admin.web.AdminUiWebSetup;
 import com.zrlog.admin.web.AdminWebSetup;
 import com.zrlog.admin.web.audit.AdminAuditContexts;
-import com.zrlog.admin.web.controller.api.AccountSessionController;
-import com.zrlog.admin.web.controller.api.AdminController;
-import com.zrlog.admin.web.controller.api.AdminSystemController;
-import com.zrlog.admin.web.controller.api.AdminTagController;
-import com.zrlog.admin.web.controller.api.PluginUploadController;
-import com.zrlog.admin.web.controller.api.TypeController;
-import com.zrlog.admin.web.controller.api.UpgradeController;
+import com.zrlog.admin.web.controller.api.*;
 import com.zrlog.admin.web.controller.page.AdminManifestController;
 import com.zrlog.admin.web.controller.page.AdminPageController;
 import com.zrlog.admin.web.di.account.AccountComponent;
@@ -76,7 +60,6 @@ import com.zrlog.web.inteceptor.InstallStatusInterceptor;
 import com.zrlog.web.inteceptor.MyI18nInterceptor;
 import com.zrlog.web.setup.install.ZrLogInstallAction;
 import com.zrlog.web.support.InstalledTestSite;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -85,18 +68,20 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.lang.reflect.Proxy;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static org.junit.Assert.*;
 
 public class CacheInjectionIntegrationTest {
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+    private static void restore(String key, String value) {
+        if (value == null) System.clearProperty(key);
+        else System.setProperty(key, value);
+    }
 
     @Test
     public void daggerDashboardBecomesAvailableAfterInstallationAndControllersKeepSeparateRequests()
@@ -114,10 +99,10 @@ public class CacheInjectionIntegrationTest {
                                 () -> services.get(AdminDashboardService.class));
 
                         try (InstalledTestSite ignored =
-                                InstalledTestSite.open(
-                                        root,
-                                        new ZrLogInstallAction(
-                                                config, new File(root, "conf/install.lock")))) {
+                                     InstalledTestSite.open(
+                                             root,
+                                             new ZrLogInstallAction(
+                                                     config, new File(root, "conf/install.lock")))) {
                             AdminDashboardService dashboard =
                                     services.get(AdminDashboardService.class);
                             WebsiteKvService settings =
@@ -172,10 +157,10 @@ public class CacheInjectionIntegrationTest {
                                 () -> services.get(CacheService.class));
 
                         try (InstalledTestSite ignored =
-                                InstalledTestSite.open(
-                                        root,
-                                        new ZrLogInstallAction(
-                                                config, new File(root, "conf/install.lock")))) {
+                                     InstalledTestSite.open(
+                                             root,
+                                             new ZrLogInstallAction(
+                                                     config, new File(root, "conf/install.lock")))) {
                             assertTrue(config.isInstalled());
                             CacheService cache = services.get(CacheService.class);
                             assertSame(
@@ -210,7 +195,7 @@ public class CacheInjectionIntegrationTest {
                                             (PluginCorePlugin)
                                                     Proxy.newProxyInstance(
                                                             getClass().getClassLoader(),
-                                                            new Class[] {PluginCorePlugin.class},
+                                                            new Class[]{PluginCorePlugin.class},
                                                             (proxy, method, args) -> {
                                                                 if (method.getName()
                                                                         .equals("refreshCache")) {
@@ -218,7 +203,7 @@ public class CacheInjectionIntegrationTest {
                                                                             (String) args[0]);
                                                                 }
                                                                 return method.getReturnType()
-                                                                                == boolean.class
+                                                                        == boolean.class
                                                                         ? true
                                                                         : null;
                                                             }));
@@ -318,10 +303,10 @@ public class CacheInjectionIntegrationTest {
                                                         new Cookie[0]),
                                                 beforeInstall.response()));
                         try (InstalledTestSite ignored =
-                                InstalledTestSite.open(
-                                        root,
-                                        new ZrLogInstallAction(
-                                                config, new File(root, "conf/install.lock")))) {
+                                     InstalledTestSite.open(
+                                             root,
+                                             new ZrLogInstallAction(
+                                                     config, new File(root, "conf/install.lock")))) {
                             assertSame(beforeInstallTokens, config.getTokenService());
                             bindings.get(CacheService.class).getPublicWebSiteInfo()
                                     .setSession_timeout(31L);
@@ -382,7 +367,7 @@ public class CacheInjectionIntegrationTest {
                             Cookie firstCookie = response.cookies.get(0);
                             HttpRequest authenticated =
                                     sessionRequest(
-                                            config, "/admin/login", "", new Cookie[] {firstCookie});
+                                            config, "/admin/login", "", new Cookie[]{firstCookie});
                             assertNotNull(tokens.getAdminTokenVO(authenticated));
                             var site =
                                     config.getServerConfig()
@@ -449,7 +434,7 @@ public class CacheInjectionIntegrationTest {
                                                     config,
                                                     "/admin",
                                                     "",
-                                                    new Cookie[] {nextCookie}));
+                                                    new Cookie[]{nextCookie}));
                             assertNotNull(token);
                             assertEquals(
                                     17 * 60000L, token.getExpiresAt() - token.getCreatedDate());
@@ -462,7 +447,7 @@ public class CacheInjectionIntegrationTest {
                                                             config,
                                                             "/admin/logout",
                                                             "",
-                                                            new Cookie[] {nextCookie}),
+                                                            new Cookie[]{nextCookie}),
                                                     response.response());
                             logout.logout();
                             assertEquals(
@@ -594,10 +579,10 @@ public class CacheInjectionIntegrationTest {
                                         .orElseThrow()
                                         .getValue());
                         try (InstalledTestSite ignored =
-                                InstalledTestSite.open(
-                                        root,
-                                        new ZrLogInstallAction(
-                                                config, new File(root, "conf/install.lock")))) {
+                                     InstalledTestSite.open(
+                                             root,
+                                             new ZrLogInstallAction(
+                                                     config, new File(root, "conf/install.lock")))) {
                             var controller =
                                     (AdminSystemController)
                                             Controller.buildController(
@@ -645,10 +630,10 @@ public class CacheInjectionIntegrationTest {
                         var backend = services.get(BackendServerUrl.class);
                         var oauth = services.get(OAuthService.class);
                         try (InstalledTestSite ignored =
-                                InstalledTestSite.open(
-                                        root,
-                                        new ZrLogInstallAction(
-                                                config, new File(root, "conf/install.lock")))) {
+                                     InstalledTestSite.open(
+                                             root,
+                                             new ZrLogInstallAction(
+                                                     config, new File(root, "conf/install.lock")))) {
                             config.getServerConfig().setContextPath("/blog");
                             services.get(CacheService.class)
                                     .getPublicWebSiteInfo()
@@ -711,10 +696,10 @@ public class CacheInjectionIntegrationTest {
                         var services = config.getServerConfig().getBindings().build();
                         var pages = services.get(AdminPageDataFactory.class);
                         try (InstalledTestSite ignored =
-                                InstalledTestSite.open(
-                                        root,
-                                        new ZrLogInstallAction(
-                                                config, new File(root, "conf/install.lock")))) {
+                                     InstalledTestSite.open(
+                                             root,
+                                             new ZrLogInstallAction(
+                                                     config, new File(root, "conf/install.lock")))) {
                             I18nUtil.removeI18n();
                             var site = services.get(CacheService.class).getPublicWebSiteInfo();
                             site.setTitle("Installed application");
@@ -801,10 +786,10 @@ public class CacheInjectionIntegrationTest {
                         var services = config.getServerConfig().getBindings().build();
                         var common = services.get(CommonService.class);
                         try (InstalledTestSite ignored =
-                                InstalledTestSite.open(
-                                        root,
-                                        new ZrLogInstallAction(
-                                                config, new File(root, "conf/install.lock")))) {
+                                     InstalledTestSite.open(
+                                             root,
+                                             new ZrLogInstallAction(
+                                                     config, new File(root, "conf/install.lock")))) {
                             var site = services.get(CacheService.class).getPublicWebSiteInfo();
                             site.setTitle("Public installed site");
                             site.setHost("blog.example");
@@ -893,10 +878,10 @@ public class CacheInjectionIntegrationTest {
                         assertEquals(2, publishers.size());
                         assertTrue(publishers.stream().allMatch(StaticSitePlugin::isDisabled));
                         try (InstalledTestSite ignored =
-                                InstalledTestSite.open(
-                                        root,
-                                        new ZrLogInstallAction(
-                                                config, new File(root, "conf/install.lock")))) {
+                                     InstalledTestSite.open(
+                                             root,
+                                             new ZrLogInstallAction(
+                                                     config, new File(root, "conf/install.lock")))) {
                             config.getAllPlugins()
                                     .add(plugin("static-test", new AtomicReference<>()));
                             var site =
@@ -922,8 +907,8 @@ public class CacheInjectionIntegrationTest {
                                                         state ->
                                                                 state
                                                                         == StaticSitePlugin
-                                                                                .HandleState
-                                                                                .HANDLED));
+                                                                        .HandleState
+                                                                        .HANDLED));
                             }
                             var blog =
                                     publishers.stream()
@@ -959,10 +944,10 @@ public class CacheInjectionIntegrationTest {
                         var services = config.getServerConfig().getBindings().build();
                         var passkeys = services.get(PasskeyService.class);
                         try (InstalledTestSite ignored =
-                                InstalledTestSite.open(
-                                        root,
-                                        new ZrLogInstallAction(
-                                                config, new File(root, "conf/install.lock")))) {
+                                     InstalledTestSite.open(
+                                             root,
+                                             new ZrLogInstallAction(
+                                                     config, new File(root, "conf/install.lock")))) {
                             var site = services.get(CacheService.class).getPublicWebSiteInfo();
                             site.setHost("localhost:18080");
                             HttpRequest original =
@@ -1029,7 +1014,10 @@ public class CacheInjectionIntegrationTest {
     private UpdateVersionInfoPlugin updatePlugin(
             UpgradeNoticeService notices, Version version, DataSourceWrapper testDataSource) {
         return new UpdateVersionInfoPlugin(notices, () -> "en_US", null, new WebsiteKvService(testDataSource)) {
-            @Override public Version getLastVersion(boolean fetch) { return version; }
+            @Override
+            public Version getLastVersion(boolean fetch) {
+                return version;
+            }
         };
     }
 
@@ -1037,7 +1025,7 @@ public class CacheInjectionIntegrationTest {
         return (PluginCorePlugin)
                 Proxy.newProxyInstance(
                         getClass().getClassLoader(),
-                        new Class[] {PluginCorePlugin.class},
+                        new Class[]{PluginCorePlugin.class},
                         (proxy, method, args) -> {
                             switch (method.getName()) {
                                 case "getToken":
@@ -1048,8 +1036,8 @@ public class CacheInjectionIntegrationTest {
                                             (java.net.http.HttpResponse<java.io.InputStream>)
                                                     Proxy.newProxyInstance(
                                                             getClass().getClassLoader(),
-                                                            new Class[] {
-                                                                java.net.http.HttpResponse.class
+                                                            new Class[]{
+                                                                    java.net.http.HttpResponse.class
                                                             },
                                                             (p, m, a) -> {
                                                                 if (m.getName()
@@ -1075,7 +1063,7 @@ public class CacheInjectionIntegrationTest {
                                     UploadServiceResponseEntity uploaded =
                                             new UploadServiceResponseEntity();
                                     uploaded.setUrl("https://files.example/cover.png");
-                                    return new UploadServiceResponseEntity[] {uploaded};
+                                    return new UploadServiceResponseEntity[]{uploaded};
                                 default:
                                     return method.getReturnType() == boolean.class ? false : null;
                             }
@@ -1093,44 +1081,44 @@ public class CacheInjectionIntegrationTest {
         return (HttpRequest) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{HttpRequest.class},
                 (proxy, method, args) -> {
                     switch (method.getName()) {
-                        case "getServerConfig": return config.getServerConfig();
-                        case "getRequestConfig": return config.getRequestConfig();
-                        case "getContextPath": return config.getServerConfig().getContextPath();
-                        case "getUri": return uri;
-                        case "getMethod": return body.isEmpty() ? HttpMethod.GET : HttpMethod.POST;
-                        case "getInputStream": return input;
-                        case "getCookies": return cookies;
-                        case "getHeader": return headers.get(args[0]);
-                        case "getHeaderMap": return headers;
-                        case "getParamMap": return Collections.emptyMap();
-                        case "getAttr": return attributes;
-                        case "getRemoteAddr": return "127.0.0.1";
-                        case "getScheme": return "http";
-                        default: return null;
+                        case "getServerConfig":
+                            return config.getServerConfig();
+                        case "getRequestConfig":
+                            return config.getRequestConfig();
+                        case "getContextPath":
+                            return config.getServerConfig().getContextPath();
+                        case "getUri":
+                            return uri;
+                        case "getMethod":
+                            return body.isEmpty() ? HttpMethod.GET : HttpMethod.POST;
+                        case "getInputStream":
+                            return input;
+                        case "getCookies":
+                            return cookies;
+                        case "getHeader":
+                            return headers.get(args[0]);
+                        case "getHeaderMap":
+                            return headers;
+                        case "getParamMap":
+                            return Collections.emptyMap();
+                        case "getAttr":
+                            return attributes;
+                        case "getRemoteAddr":
+                            return "127.0.0.1";
+                        case "getScheme":
+                            return "http";
+                        default:
+                            return null;
                     }
                 });
-    }
-
-    private static final class SessionResponse {
-        private final List<Cookie> cookies = new ArrayList<>();
-        private String redirect;
-        private Object json;
-
-        HttpResponse response() {
-            return (HttpResponse) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{HttpResponse.class},
-                    (proxy, method, args) -> {
-                        if (method.getName().equals("addCookie")) cookies.add((Cookie) args[0]);
-                        if (method.getName().equals("redirect")) redirect = args[0].toString();
-                        if (method.getName().equals("renderJson")) json = args[0];
-                        return null;
-                    });
-        }
     }
 
     private ZrLogConfigImpl config() {
         return new ZrLogConfigImpl(19088, null, "") {
             // Exercise the real installation callback without starting background plugins in this test.
-            @Override public void startPlugins(boolean async) { }
+            @Override
+            public void startPlugins(boolean async) {
+            }
         };
     }
 
@@ -1143,15 +1131,24 @@ public class CacheInjectionIntegrationTest {
         return (HttpRequest) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{HttpRequest.class},
                 (proxy, method, args) -> {
                     switch (method.getName()) {
-                        case "getServerConfig": return config.getServerConfig();
-                        case "getContextPath": return config.getServerConfig().getContextPath();
-                        case "getUri": return uri;
-                        case "decodeParamMap": return Collections.emptyMap();
-                        case "getParaToInt": return args.length > 1 ? args[1] : null;
-                        case "getParaToStr": return args.length > 1 ? args[1] : null;
-                        case "getHeaderMap": return Collections.emptyMap();
-                        case "getRemoteAddr": return "127.0.0.1";
-                        default: return null;
+                        case "getServerConfig":
+                            return config.getServerConfig();
+                        case "getContextPath":
+                            return config.getServerConfig().getContextPath();
+                        case "getUri":
+                            return uri;
+                        case "decodeParamMap":
+                            return Collections.emptyMap();
+                        case "getParaToInt":
+                            return args.length > 1 ? args[1] : null;
+                        case "getParaToStr":
+                            return args.length > 1 ? args[1] : null;
+                        case "getHeaderMap":
+                            return Collections.emptyMap();
+                        case "getRemoteAddr":
+                            return "127.0.0.1";
+                        default:
+                            return null;
                     }
                 });
     }
@@ -1176,16 +1173,35 @@ public class CacheInjectionIntegrationTest {
         }
     }
 
-    private static void restore(String key, String value) {
-        if (value == null) System.clearProperty(key);
-        else System.setProperty(key, value);
+    private interface RuntimeTest {
+        void run(File root) throws Exception;
+    }
+
+    private static final class SessionResponse {
+        private final List<Cookie> cookies = new ArrayList<>();
+        private String redirect;
+        private Object json;
+
+        HttpResponse response() {
+            return (HttpResponse) Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{HttpResponse.class},
+                    (proxy, method, args) -> {
+                        if (method.getName().equals("addCookie")) cookies.add((Cookie) args[0]);
+                        if (method.getName().equals("redirect")) redirect = args[0].toString();
+                        if (method.getName().equals("renderJson")) json = args[0];
+                        return null;
+                    });
+        }
     }
 
     public static final class SiteTitle {
         private final String title;
-        SiteTitle(String title) { this.title = title; }
-        public String getTitle() { return title; }
-    }
 
-    private interface RuntimeTest { void run(File root) throws Exception; }
+        SiteTitle(String title) {
+            this.title = title;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+    }
 }

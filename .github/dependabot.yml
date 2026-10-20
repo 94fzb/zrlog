@@ -9,9 +9,9 @@ updates:
     ignore:
       # Tomcat 11 requires Java 17; Java distributions still target Java 11.
       - dependency-name: org.apache.tomcat.embed:tomcat-embed-core
-        update-types: ["version-update:semver-major"]
+        update-types: [ "version-update:semver-major" ]
       - dependency-name: org.apache.tomcat.embed:tomcat-embed-jasper
-        update-types: ["version-update:semver-major"]
+        update-types: [ "version-update:semver-major" ]
   - package-ecosystem: github-actions
     directory: /
     schedule:

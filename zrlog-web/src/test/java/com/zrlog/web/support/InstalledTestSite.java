@@ -10,11 +10,14 @@ import com.zrlog.install.web.InstallAction;
 import com.zrlog.install.web.config.DefaultInstallAction;
 import com.zrlog.install.web.config.DefaultInstallConfig;
 import com.zrlog.test.support.MemoryRuntime;
+
 import java.io.File;
 import java.util.Map;
 import java.util.UUID;
 
-/** Starts configuration tests from real installer output instead of synthetic lock/config files. */
+/**
+ * Starts configuration tests from real installer output instead of synthetic lock/config files.
+ */
 public final class InstalledTestSite implements AutoCloseable {
 
     private final InMemoryDatabase database;
@@ -41,12 +44,24 @@ public final class InstalledTestSite implements AutoCloseable {
         request.setAppendWebsite(Map.of("host", "localhost:19085", "session_timeout", "3600",
                 "language", Constants.DEFAULT_LANGUAGE));
         var config = new DefaultInstallConfig() {
-            @Override public File getDbPropertiesFile() { return new File(root, "conf/db.properties"); }
-            @Override public String defaultTemplatePath() { return Constants.getDefaultTemplatePath(); }
-            @Override public InstallAction getAction() {
+            @Override
+            public File getDbPropertiesFile() {
+                return new File(root, "conf/db.properties");
+            }
+
+            @Override
+            public String defaultTemplatePath() {
+                return Constants.getDefaultTemplatePath();
+            }
+
+            @Override
+            public InstallAction getAction() {
                 if (action != null) return action;
                 return new DefaultInstallAction() {
-                    @Override public File getLockFile() { return new File(root, "conf/install.lock"); }
+                    @Override
+                    public File getLockFile() {
+                        return new File(root, "conf/install.lock");
+                    }
                 };
             }
         };
@@ -56,11 +71,16 @@ public final class InstalledTestSite implements AutoCloseable {
         database = InMemoryDatabase.open(MemoryRuntime.readDatabaseProperties(root.toPath()), true);
     }
 
-    public static InstalledTestSite open(File root) throws Exception { return new InstalledTestSite(root, null); }
+    public static InstalledTestSite open(File root) throws Exception {
+        return new InstalledTestSite(root, null);
+    }
 
     public static InstalledTestSite open(File root, InstallAction action) throws Exception {
         return new InstalledTestSite(root, action);
     }
 
-    @Override public void close() { database.close(); }
+    @Override
+    public void close() {
+        database.close();
+    }
 }

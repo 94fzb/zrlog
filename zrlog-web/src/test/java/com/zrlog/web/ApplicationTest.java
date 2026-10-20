@@ -13,16 +13,20 @@ import java.util.Arrays;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class ApplicationTest {
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+    private static void restoreProperty(String key, String value) {
+        if (value == null) {
+            System.clearProperty(key);
+        } else {
+            System.setProperty(key, value);
+        }
+    }
 
     @Test
     public void shouldBuildWebServerWithoutStartingIt() throws Exception {
@@ -100,14 +104,6 @@ public class ApplicationTest {
         } finally {
             restoreProperty("env", previousEnv);
             restoreProperty("sws.root.path", previousRootPath);
-        }
-    }
-
-    private static void restoreProperty(String key, String value) {
-        if (value == null) {
-            System.clearProperty(key);
-        } else {
-            System.setProperty(key, value);
         }
     }
 

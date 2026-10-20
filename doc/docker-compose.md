@@ -36,13 +36,13 @@ docker compose ps
 
 MySQL 健康后 ZrLog 才会启动。访问 [http://localhost:8080/install](http://localhost:8080/install)，并使用以下数据库参数完成首次安装：
 
-| 参数 | 值 |
-| --- | --- |
-| 主机 | `mysql` |
-| 端口 | `3306` |
+| 参数  | 值                                     |
+|-----|---------------------------------------|
+| 主机  | `mysql`                               |
+| 端口  | `3306`                                |
 | 数据库 | `.env` 中的 `MYSQL_DATABASE`，默认 `zrlog` |
-| 用户名 | `.env` 中的 `MYSQL_USER`，默认 `zrlog` |
-| 密码 | `.env` 中的 `MYSQL_PASSWORD` |
+| 用户名 | `.env` 中的 `MYSQL_USER`，默认 `zrlog`     |
+| 密码  | `.env` 中的 `MYSQL_PASSWORD`            |
 
 ## 后台升级
 
