@@ -30,7 +30,6 @@ import com.zrlog.admin.util.BackendServerUrl;
 import com.zrlog.admin.util.SystemInfoUtils;
 import com.zrlog.admin.web.AdminUiWebSetup;
 import com.zrlog.admin.web.AdminWebSetup;
-import com.zrlog.admin.web.di.account.AccountComponent;
 import com.zrlog.admin.web.controller.api.AccountSessionController;
 import com.zrlog.admin.web.controller.api.AdminController;
 import com.zrlog.admin.web.controller.api.AdminSystemController;
@@ -40,6 +39,7 @@ import com.zrlog.admin.web.controller.api.TypeController;
 import com.zrlog.admin.web.controller.api.UpgradeController;
 import com.zrlog.admin.web.controller.page.AdminManifestController;
 import com.zrlog.admin.web.controller.page.AdminPageController;
+import com.zrlog.admin.web.di.account.AccountComponent;
 import com.zrlog.admin.web.interceptor.AdminInterceptor;
 import com.zrlog.admin.web.interceptor.AdminLoginInterceptor;
 import com.zrlog.admin.web.interceptor.AdminPluginInterceptor;
@@ -556,14 +556,14 @@ public class CacheInjectionIntegrationTest {
                             .stream().anyMatch(notice -> "server.system.version-update".equals(notice.getTaskKey())));
 
                     notices.clearStoredUpgradeNotice();
-                    config.getAllPlugins().add(updatePlugin(notices, future));
+                    config.getAllPlugins().add(updatePlugin(notices, future, (DataSourceWrapper) config.getDataSource()));
                     assertEquals("future-application-version", controller.notice().getData().getVersion().getBuildId());
                     config.getAllPlugins().clear();
                     var replacement = new Version();
                     replacement.setVersion("100.0.0");
                     replacement.setBuildId("replacement-version");
                     replacement.setBuildDate(future.getBuildDate());
-                    config.getAllPlugins().add(updatePlugin(notices, replacement));
+                    config.getAllPlugins().add(updatePlugin(notices, replacement, (DataSourceWrapper) config.getDataSource()));
                     assertEquals("replacement-version", controller.notice().getData().getVersion().getBuildId());
                 }
             } finally {
@@ -840,7 +840,7 @@ public class CacheInjectionIntegrationTest {
                             assertFalse(types.isEmpty());
                             assertTrue(types.get(0).getUrl().startsWith("//renamed.example/sort/"));
                             assertTrue(types.get(0).getUrl().endsWith(".html"));
-                            new Tag().set("text", "injected").set("count", 1).save();
+                            new Tag((DataSourceWrapper) config.getDataSource()).set("text", "injected").set("count", 1).save();
                             var tags =
                                     (AdminTagController)
                                             Controller.buildController(
@@ -1025,8 +1025,8 @@ public class CacheInjectionIntegrationTest {
     }
 
     private UpdateVersionInfoPlugin updatePlugin(
-            UpgradeNoticeService notices, Version version) {
-        return new UpdateVersionInfoPlugin(notices, () -> "en_US", null) {
+            UpgradeNoticeService notices, Version version, DataSourceWrapper testDataSource) {
+        return new UpdateVersionInfoPlugin(notices, () -> "en_US", null, new WebsiteKvService(testDataSource)) {
             @Override public Version getLastVersion(boolean fetch) { return version; }
         };
     }
