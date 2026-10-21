@@ -1,7 +1,7 @@
 name: verify release package download sources
 on:
   release:
-    types: [published]
+    types: [ published ]
 permissions:
   contents: read
 concurrency:

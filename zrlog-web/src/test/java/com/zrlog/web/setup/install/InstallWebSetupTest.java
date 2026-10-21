@@ -6,8 +6,6 @@ import com.hibegin.http.server.api.HttpResponse;
 import com.zrlog.common.UpdaterTypeEnum;
 import com.zrlog.install.business.response.InstallApiResponses;
 import com.zrlog.install.exception.InvalidInstallRequestException;
-import com.zrlog.install.web.InstallConstants;
-import org.junit.After;
 import org.junit.Test;
 
 import java.io.File;
@@ -19,17 +17,25 @@ import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class InstallWebSetupTest {
 
-    @After
-    public void tearDown() {
-        InstallConstants.installConfig = null;
+    private static HttpRequest request(String uri) {
+        return (HttpRequest) Proxy.newProxyInstance(
+                InstallWebSetupTest.class.getClassLoader(), new Class[]{HttpRequest.class},
+                (proxy, method, args) -> "getUri".equals(method.getName()) ? uri : null);
+    }
+
+    private static HttpResponse response(AtomicReference<Object> rendered) {
+        return (HttpResponse) Proxy.newProxyInstance(
+                InstallWebSetupTest.class.getClassLoader(), new Class[]{HttpResponse.class},
+                (proxy, method, args) -> {
+                    if ("renderJson".equals(method.getName())) {
+                        rendered.set(args[0]);
+                    }
+                    return null;
+                });
     }
 
     @Test
@@ -41,8 +47,9 @@ public class InstallWebSetupTest {
 
         new InstallWebSetup(config, dbPropertiesFile, installLockFile, updater).setup();
 
-        assertNotNull(InstallConstants.installConfig);
-        assertSame(installLockFile, InstallConstants.installConfig.getAction().getLockFile());
+        var installConfig = config.getServerConfig().getBindings().build()
+                .get(com.zrlog.install.web.config.InstallConfig.class);
+        assertSame(installLockFile, installConfig.getAction().getLockFile());
     }
 
     @Test
@@ -110,22 +117,5 @@ public class InstallWebSetupTest {
                     request("/api/installx"), response(new AtomicReference<>()), fallbackError);
             assertSame(fallbackError, fallbackThrowables.get(status).get());
         }
-    }
-
-    private static HttpRequest request(String uri) {
-        return (HttpRequest) Proxy.newProxyInstance(
-                InstallWebSetupTest.class.getClassLoader(), new Class[]{HttpRequest.class},
-                (proxy, method, args) -> "getUri".equals(method.getName()) ? uri : null);
-    }
-
-    private static HttpResponse response(AtomicReference<Object> rendered) {
-        return (HttpResponse) Proxy.newProxyInstance(
-                InstallWebSetupTest.class.getClassLoader(), new Class[]{HttpResponse.class},
-                (proxy, method, args) -> {
-                    if ("renderJson".equals(method.getName())) {
-                        rendered.set(args[0]);
-                    }
-                    return null;
-                });
     }
 }

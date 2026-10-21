@@ -1,0 +1,17 @@
+{
+  "configMsg": {
+    "title": "ZrLog Native Agent",
+    "second_title": "Disposable build site",
+    "username": "admin",
+    "password": "native-agent-only",
+    "email": "native-agent@example.com",
+    "secretKey": "zrlog-native-agent-disposable-site"
+  },
+  "appendWebsite": {
+    "host": "localhost",
+    "language": "zh_CN",
+    "session_timeout": "3600",
+    "generator_html_status": "false"
+  },
+  "contextPath": ""
+}

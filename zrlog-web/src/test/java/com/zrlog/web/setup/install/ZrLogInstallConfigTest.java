@@ -12,13 +12,24 @@ import java.io.File;
 import java.util.Collections;
 import java.util.Date;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class ZrLogInstallConfigTest {
+
+    private static LastVersionInfo lastVersionInfo(Updater updater, Version version) throws Exception {
+        return ZrLogInstallConfig.toLastVersionInfo(updater, version);
+    }
+
+    private static Version upgradableVersion() {
+        Version version = new Version();
+        version.setBuildId("future-build");
+        version.setBuildDate(new Date(System.currentTimeMillis() + 86400000L));
+        version.setVersion("999.0.0");
+        version.setZipDownloadUrl("https://example.com/zrlog.zip");
+        version.setWarDownloadUrl("https://example.com/zrlog.war");
+        version.setChangeLog("changes");
+        return version;
+    }
 
     @Test
     public void shouldExposeInstalledConfigDefaultsWithoutVersionPrefetch() throws Exception {
@@ -97,20 +108,5 @@ public class ZrLogInstallConfigTest {
 
         assertFalse(info.getLatestVersion());
         assertEquals("https://example.com/zrlog.war", info.getDownloadUrl());
-    }
-
-    private static LastVersionInfo lastVersionInfo(Updater updater, Version version) throws Exception {
-        return ZrLogInstallConfig.toLastVersionInfo(updater, version);
-    }
-
-    private static Version upgradableVersion() {
-        Version version = new Version();
-        version.setBuildId("future-build");
-        version.setBuildDate(new Date(System.currentTimeMillis() + 86400000L));
-        version.setVersion("999.0.0");
-        version.setZipDownloadUrl("https://example.com/zrlog.zip");
-        version.setWarDownloadUrl("https://example.com/zrlog.war");
-        version.setChangeLog("changes");
-        return version;
     }
 }

@@ -1,14 +1,14 @@
 package com.zrlog.web.setup.install;
 
 import com.hibegin.common.util.EnvKit;
+import com.zrlog.business.di.ServiceComponent;
 import com.zrlog.business.rest.response.UpgradeProcessResponse;
-import com.zrlog.business.service.UpgradeService;
+import com.zrlog.business.updater.UpdateVersionTimerTask;
 import com.zrlog.business.version.UpgradeVersionHandler;
 import com.zrlog.common.Constants;
 import com.zrlog.common.Updater;
 import com.zrlog.common.UpdaterTypeEnum;
 import com.zrlog.common.ZrLogConfig;
-import com.zrlog.business.updater.UpdateVersionTimerTask;
 import com.zrlog.common.adapter.UpdaterHosts;
 import com.zrlog.common.vo.Version;
 import com.zrlog.install.business.response.InstallUpgradeResult;
@@ -43,15 +43,6 @@ public class ZrLogInstallConfig extends DefaultInstallConfig {
         this.installAction = new ZrLogInstallAction(zrLogConfig, lockFile);
     }
 
-    private Version prefetchVersion() {
-        if (zrLogConfig.isInstalled() || zrLogConfig.isTest()) {
-            return null;
-        }
-        UpdateVersionTimerTask versionTimerTask = new UpdateVersionTimerTask(!BlogBuildInfoUtil.isRelease(), Constants.DEFAULT_LANGUAGE);
-        versionTimerTask.run();
-        return versionTimerTask.getVersion();
-    }
-
     static LastVersionInfo toLastVersionInfo(Updater updater, Version lastVersion) {
         LastVersionInfo lastVersionInfo = new LastVersionInfo();
         if (Objects.isNull(lastVersion)) {
@@ -72,6 +63,15 @@ public class ZrLogInstallConfig extends DefaultInstallConfig {
         }
         lastVersionInfo.setChangeLog(lastVersion.getChangeLog());
         return lastVersionInfo;
+    }
+
+    private Version prefetchVersion() {
+        if (zrLogConfig.isInstalled() || zrLogConfig.isTest()) {
+            return null;
+        }
+        UpdateVersionTimerTask versionTimerTask = new UpdateVersionTimerTask(!BlogBuildInfoUtil.isRelease(), Constants.DEFAULT_LANGUAGE);
+        versionTimerTask.run();
+        return versionTimerTask.getVersion();
     }
 
     @Override
@@ -119,16 +119,28 @@ public class ZrLogInstallConfig extends DefaultInstallConfig {
         return new InstallUpgradeAction() {
             @Override
             public boolean isSupported() {
-                return !zrLogConfig.isInstalled() && Objects.nonNull(updater)
-                        && !ZrLogUtil.isDockerMode() && !ZrLogUtil.isSystemServiceMode()
-                        && (!EnvKit.isFaaSMode() || UpdaterHosts.onlineUpgradeSupported(UpdaterTypeEnum.FAAS));
+                return !zrLogConfig.isInstalled()
+                        && Objects.nonNull(updater)
+                        && !ZrLogUtil.isDockerMode()
+                        && !ZrLogUtil.isSystemServiceMode()
+                        && (!EnvKit.isFaaSMode()
+                        || UpdaterHosts.onlineUpgradeSupported(
+                        UpdaterTypeEnum.FAAS, updater));
             }
 
             @Override
-            public InstallUpgradeResult upgrade(ProgressListener progressListener) throws Exception {
-                UpgradeProcessResponse response = new UpgradeService().doUpgrade(lastVersion, updater,
-                        progressListener::onProgress, I18nUtil.getBackend());
-                return new InstallUpgradeResult(Boolean.TRUE.equals(response.getFinish()), response.getMessage());
+            public InstallUpgradeResult upgrade(ProgressListener progressListener)
+                    throws Exception {
+                UpgradeProcessResponse response =
+                        ServiceComponent.forUninstalledApplication(updater)
+                                .upgrades()
+                                .doUpgrade(
+                                        lastVersion,
+                                        updater,
+                                        progressListener::onProgress,
+                                        I18nUtil.getBackend());
+                return new InstallUpgradeResult(
+                        Boolean.TRUE.equals(response.getFinish()), response.getMessage());
             }
         };
     }

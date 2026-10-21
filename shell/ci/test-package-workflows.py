@@ -71,7 +71,7 @@ class PackageWorkflowContract(unittest.TestCase):
     def test_manual_full_matrix_preserves_every_release_platform(self):
         expected = {
             'java': {'ubuntu-22.04'},
-            'native': {'ubuntu-22.04', 'ubuntu-24.04-arm', 'macos-15-intel', 'macos-14', 'windows-2022'},
+            'native': {'ubuntu-22.04', 'ubuntu-24.04-arm', 'macos-15-intel', 'macos-15', 'windows-2022'},
             'deb': {'ubuntu-22.04', 'ubuntu-24.04-arm'},
             'faas': {'ubuntu-22.04', 'ubuntu-24.04-arm'},
         }

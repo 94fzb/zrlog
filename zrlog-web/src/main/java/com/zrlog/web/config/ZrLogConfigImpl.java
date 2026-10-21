@@ -1,19 +1,11 @@
 package com.zrlog.web.config;
 
-import com.hibegin.common.dao.DataSourceWrapper;
 import com.hibegin.http.server.SimpleWebServer;
 import com.hibegin.http.server.WebServerBuilder;
 import com.mysql.cj.jdbc.AbandonedConnectionCleanupThread;
-import com.zrlog.business.plugin.CacheManagerPlugin;
-import com.zrlog.business.plugin.PluginCorePluginImpl;
-import com.zrlog.business.service.DbUpgradeService;
-import com.zrlog.common.TokenService;
 import com.zrlog.common.Updater;
 import com.zrlog.common.ZrLogConfig;
-import com.zrlog.common.vo.PublicWebSiteInfo;
-import com.zrlog.data.cache.CacheServiceImpl;
 import com.zrlog.plugin.Plugins;
-import com.zrlog.web.WebSetup;
 import com.zrlog.web.inteceptor.DefaultInterceptor;
 
 import java.util.Objects;
@@ -22,51 +14,18 @@ import java.util.logging.Level;
 public class ZrLogConfigImpl extends ZrLogConfig {
 
     private static final String MYSQL_CLEANUP_THREAD_CLASS_NAME = "com.mysql.cj.jdbc.AbandonedConnectionCleanupThread";
-    private final SetupConfig setupConfig;
     private WebServerBuilder serverBuilder;
 
     public ZrLogConfigImpl(Integer port, Updater updater, String contextPath) {
         super(port, updater, contextPath);
-        this.setupConfig = new SetupConfig(this, dbPropertiesFile, installLockFile, contextPath, webSetups, updater);
-        this.webSetups.forEach(WebSetup::setup);
+        new SetupConfig(this, dbPropertiesFile, installLockFile, contextPath, webSetups, updater);
+        initializeWebSetups();
         serverConfig.getInterceptors().add(DefaultInterceptor.class);
     }
 
     @Override
-    public DataSourceWrapper configDatabase() throws Exception {
-        this.dataSource = super.configDatabase();
-        if (Objects.nonNull(dataSource)) {
-            this.cacheService = new CacheServiceImpl();
-            long currentSqlVersion = this.cacheService.getCurrentSqlVersion();
-            if (currentSqlVersion >= 0) {
-                new DbUpgradeService(this.dataSource, currentSqlVersion).tryDoUpgrade();
-            }
-        }
-        return dataSource;
-    }
-
-    @Override
-    protected TokenService initTokenService() {
-        if (Objects.isNull(cacheService)) {
-            return null;
-        }
-        PublicWebSiteInfo publicWebSiteInfo = this.cacheService.getPublicWebSiteInfo();
-        return setupConfig.buildAdminTokenService(publicWebSiteInfo.getSession_timeout());
-    }
-
-    @Override
     public Plugins getBasePluginList() {
-        Plugins plugins = new Plugins();
-        if (isTest()) {
-            return plugins;
-        }
-        try {
-            plugins.add(new PluginCorePluginImpl(dbPropertiesFile, serverConfig.getContextPath()));
-            plugins.add(new CacheManagerPlugin(this));
-        } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Configure base plugins failed", e);
-        }
-        return plugins;
+        return new Plugins();
     }
 
     public void setServerBuilder(WebServerBuilder serverBuilder) {
@@ -108,9 +67,15 @@ public class ZrLogConfigImpl extends ZrLogConfig {
     }
 
     @Override
-    public void stop() {
+    protected void beforeStop() {
+        if (serverBuilder != null && serverBuilder.getWebServer() != null) {
+            serverBuilder.getWebServer().stopAccepting("by stop");
+        }
+    }
+
+    @Override
+    protected void afterStop() {
         try {
-            super.stop();
             shutdownMySqlCleanupThread();
         } finally {
             destroyWebServer();

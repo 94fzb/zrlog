@@ -9,7 +9,7 @@ on:
       - shell/lib/release-manifest.sh
       - package/pom.xml
   push:
-    branches: [master]
+    branches: [ master ]
     paths:
       - .github/workflows/*build*.yml
       - .github/workflows/package-workflow-validate.yml

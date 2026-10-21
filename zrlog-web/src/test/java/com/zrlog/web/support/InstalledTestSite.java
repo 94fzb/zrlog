@@ -6,7 +6,6 @@ import com.zrlog.install.business.service.InstallService;
 import com.zrlog.install.business.vo.InstallConfigVO;
 import com.zrlog.install.business.vo.InstallDatabaseConfig;
 import com.zrlog.install.business.vo.InstallSiteConfig;
-import com.zrlog.install.web.InstallConstants;
 import com.zrlog.install.web.InstallAction;
 import com.zrlog.install.web.config.DefaultInstallAction;
 import com.zrlog.install.web.config.DefaultInstallConfig;
@@ -16,12 +15,14 @@ import java.io.File;
 import java.util.Map;
 import java.util.UUID;
 
-/** Starts configuration tests from real installer output instead of synthetic lock/config files. */
+/**
+ * Starts configuration tests from real installer output instead of synthetic lock/config files.
+ */
 public final class InstalledTestSite implements AutoCloseable {
 
     private final InMemoryDatabase database;
 
-    private InstalledTestSite(File root) throws Exception {
+    private InstalledTestSite(File root, InstallAction action) throws Exception {
         String name = "zrlog_web_" + UUID.randomUUID();
         var properties = InMemoryDatabase.h2Properties(name);
         InstallDatabaseConfig db = new InstallDatabaseConfig();
@@ -43,27 +44,43 @@ public final class InstalledTestSite implements AutoCloseable {
         request.setAppendWebsite(Map.of("host", "localhost:19085", "session_timeout", "3600",
                 "language", Constants.DEFAULT_LANGUAGE));
         var config = new DefaultInstallConfig() {
-            @Override public File getDbPropertiesFile() { return new File(root, "conf/db.properties"); }
-            @Override public String defaultTemplatePath() { return Constants.getDefaultTemplatePath(); }
-            @Override public InstallAction getAction() {
+            @Override
+            public File getDbPropertiesFile() {
+                return new File(root, "conf/db.properties");
+            }
+
+            @Override
+            public String defaultTemplatePath() {
+                return Constants.getDefaultTemplatePath();
+            }
+
+            @Override
+            public InstallAction getAction() {
+                if (action != null) return action;
                 return new DefaultInstallAction() {
-                    @Override public File getLockFile() { return new File(root, "conf/install.lock"); }
+                    @Override
+                    public File getLockFile() {
+                        return new File(root, "conf/install.lock");
+                    }
                 };
             }
         };
-        var previousConfig = InstallConstants.installConfig;
-        try {
-            InstallConstants.installConfig = config;
-            if (!new InstallService(config, request).install()) {
-                throw new IllegalStateException("Install test site failed");
-            }
-        } finally {
-            InstallConstants.installConfig = previousConfig;
+        if (!new InstallService(config, request).install()) {
+            throw new IllegalStateException("Install test site failed");
         }
         database = InMemoryDatabase.open(MemoryRuntime.readDatabaseProperties(root.toPath()), true);
     }
 
-    public static InstalledTestSite open(File root) throws Exception { return new InstalledTestSite(root); }
+    public static InstalledTestSite open(File root) throws Exception {
+        return new InstalledTestSite(root, null);
+    }
 
-    @Override public void close() { database.close(); }
+    public static InstalledTestSite open(File root, InstallAction action) throws Exception {
+        return new InstalledTestSite(root, action);
+    }
+
+    @Override
+    public void close() {
+        database.close();
+    }
 }

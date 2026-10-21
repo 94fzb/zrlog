@@ -75,22 +75,22 @@ class TestZrLogConfig extends ZrLogConfig {
         return installed;
     }
 
-    void setAskConfig(boolean askConfig) {
-        this.askConfig = askConfig;
-    }
-
     @Override
     public boolean isAskConfig() {
         return askConfig;
     }
 
-    void setMissingConfig(boolean missingConfig) {
-        this.missingConfig = missingConfig;
+    void setAskConfig(boolean askConfig) {
+        this.askConfig = askConfig;
     }
 
     @Override
     public boolean isMissingConfig() {
         return missingConfig;
+    }
+
+    void setMissingConfig(boolean missingConfig) {
+        this.missingConfig = missingConfig;
     }
 
     void setFailConfigDatabase(boolean failConfigDatabase) {

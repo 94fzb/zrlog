@@ -29,7 +29,7 @@ services:
     tmpfs:
       - /tmp:size=64m,mode=1777
     healthcheck:
-      test: ["CMD", "/usr/local/bin/zrlog-updater", "--healthcheck"]
+      test: [ "CMD", "/usr/local/bin/zrlog-updater", "--healthcheck" ]
       interval: 30s
       timeout: 5s
       retries: 3

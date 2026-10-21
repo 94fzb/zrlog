@@ -1,7 +1,7 @@
 name: Docker metadata checks
 on:
   pull_request:
-    paths: ['docker/**', 'shell/docker/**', '.github/workflows/docker-*.yml', 'shell/release/*sources*']
+    paths: [ 'docker/**', 'shell/docker/**', '.github/workflows/docker-*.yml', 'shell/release/*sources*' ]
   workflow_dispatch:
     inputs:
       producer_run_id:
@@ -15,7 +15,7 @@ on:
       faas_channel:
         description: Expected channel of the diagnostic FaaS producer
         type: choice
-        options: [preview, release]
+        options: [ preview, release ]
         default: preview
 permissions:
   contents: read
@@ -40,7 +40,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        channel: [preview, release]
+        channel: [ preview, release ]
     env:
       ZRLOG_CHANNEL: ${{ matrix.channel }}
     steps:
@@ -126,7 +126,7 @@ jobs:
     services:
       registry:
         image: registry:2
-        ports: ['5000:5000']
+        ports: [ '5000:5000' ]
     steps:
       - uses: actions/checkout@v7
         with:

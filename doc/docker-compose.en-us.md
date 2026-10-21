@@ -1,7 +1,8 @@
 # Docker Compose Deployment
 
 The repository's [`docker/docker-compose.yml`](../docker/docker-compose.yml) starts ZrLog, MySQL 8.4,
-and the independent [updater service](https://github.com/zrlog/zrlog-updater). No overlay is needed for this default file.
+and the independent [updater service](https://github.com/zrlog/zrlog-updater). No overlay is needed for this default
+file.
 
 ## Start the stack
 
@@ -15,7 +16,8 @@ Maintain deployment values in `.env`; the YAML references variables without dupl
 Keep every setting from the example and fill in these empty values:
 
 - `MYSQL_PASSWORD`: a randomly generated database password.
-- `COMPOSE_PROJECT_NAME`: for a new site, you may use `zrlog`; existing sites must keep their original project name and volumes.
+- `COMPOSE_PROJECT_NAME`: for a new site, you may use `zrlog`; existing sites must keep their original project name and
+  volumes.
 - `ZRLOG_DEPLOYMENT_DIR`: the absolute host path containing `.env` and the Compose file.
 - `ZRLOG_UPDATER_TOKEN`: at least 32 random characters; generate one with `openssl rand -hex 32`.
 
@@ -34,15 +36,16 @@ an upgrade. Subsequent starts therefore use the upgraded image. Avoid overriding
 `export ZRLOG_IMAGE=...`, which can make manual starts and the updater use different configurations.
 Keep the real `.env`, containing passwords and tokens, on the deployment host; commit only `.env.example`.
 
-ZrLog starts after MySQL becomes healthy. Visit [http://localhost:8080/install](http://localhost:8080/install) and use these database settings for the initial installation:
+ZrLog starts after MySQL becomes healthy. Visit [http://localhost:8080/install](http://localhost:8080/install) and use
+these database settings for the initial installation:
 
-| Setting | Value |
-| --- | --- |
-| Host | `mysql` |
-| Port | `3306` |
+| Setting  | Value                                             |
+|----------|---------------------------------------------------|
+| Host     | `mysql`                                           |
+| Port     | `3306`                                            |
 | Database | `MYSQL_DATABASE` from `.env`; defaults to `zrlog` |
-| Username | `MYSQL_USER` from `.env`; defaults to `zrlog` |
-| Password | `MYSQL_PASSWORD` from `.env` |
+| Username | `MYSQL_USER` from `.env`; defaults to `zrlog`     |
+| Password | `MYSQL_PASSWORD` from `.env`                      |
 
 ## Upgrades from the admin UI
 
@@ -60,7 +63,8 @@ Set `ZRLOG_COMPOSE_FILES=docker-compose.yml,docker-compose.updater.yml` and star
 
 ## Health checks
 
-Compose checks all three services. The updater probe checks its own HTTP service. The MySQL probe verifies that the database process accepts
+Compose checks all three services. The updater probe checks its own HTTP service. The MySQL probe verifies that the
+database process accepts
 connections. The ZrLog probe calls `/api/public/version` to verify that the HTTP service is alive. The
 version endpoint does not query the database, so it is a liveness check rather than database readiness.
 

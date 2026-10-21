@@ -8,15 +8,10 @@ import java.util.List;
 
 final class ApplicationCommandLine {
 
-    enum Command {
-        SERVE, UPGRADE
-    }
-
     private final Command command;
     private final String[] serveArgs;
     private final boolean preview;
     private boolean nonInteractive, json;
-
     private ApplicationCommandLine(Command command, String[] serveArgs, boolean preview) {
         this.command = command;
         this.serveArgs = serveArgs;
@@ -39,8 +34,14 @@ final class ApplicationCommandLine {
         boolean nonInteractive = false, json = false;
         List<String> serveArgs = new ArrayList<>();
         for (String value : values) {
-            if (command == Command.UPGRADE && "--non-interactive".equals(value)) { nonInteractive = true; continue; }
-            if (command == Command.UPGRADE && "--json".equals(value)) { json = true; continue; }
+            if (command == Command.UPGRADE && "--non-interactive".equals(value)) {
+                nonInteractive = true;
+                continue;
+            }
+            if (command == Command.UPGRADE && "--json".equals(value)) {
+                json = true;
+                continue;
+            }
             if (command == Command.UPGRADE && value.startsWith("--channel=")) {
                 String channel = value.substring("--channel=".length());
                 if (!"release".equals(channel) && !"preview".equals(channel)) {
@@ -52,7 +53,8 @@ final class ApplicationCommandLine {
             serveArgs.add(value);
         }
         ApplicationCommandLine parsed = new ApplicationCommandLine(command, serveArgs.toArray(new String[0]), preview);
-        parsed.nonInteractive = nonInteractive; parsed.json = json;
+        parsed.nonInteractive = nonInteractive;
+        parsed.json = json;
         return parsed;
     }
 
@@ -67,6 +69,16 @@ final class ApplicationCommandLine {
     boolean isPreview() {
         return preview;
     }
-    boolean isNonInteractive() { return nonInteractive; }
-    boolean isJson() { return json; }
+
+    boolean isNonInteractive() {
+        return nonInteractive;
+    }
+
+    boolean isJson() {
+        return json;
+    }
+
+    enum Command {
+        SERVE, UPGRADE
+    }
 }

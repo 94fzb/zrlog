@@ -2,7 +2,6 @@ package com.zrlog.web;
 
 import com.hibegin.http.server.WebServerBuilder;
 import com.hibegin.http.server.util.NativeImageUtils;
-import com.hibegin.http.server.util.PathUtil;
 import com.hibegin.lambda.rest.ApiGatewayHttp;
 import com.hibegin.lambda.rest.ApiGatewayRequestContext;
 import com.hibegin.lambda.rest.LambdaApiGatewayRequest;
@@ -11,6 +10,7 @@ import com.zrlog.common.Constants;
 import com.zrlog.common.ZrLogConfig;
 import com.zrlog.util.ArgsParser;
 import com.zrlog.util.BlogBuildInfoUtil;
+import com.zrlog.web.config.ZrLogConfigImpl;
 
 import java.util.Arrays;
 import java.util.List;
@@ -37,10 +37,11 @@ public class GraalvmAgentApplication {
     public static void main(String[] args) throws Exception {
         ZrLogConfig.nativeImageAgent = true;
         BlogBuildInfoUtil.getBlogProp();
-        PathUtil.setRootPath(System.getProperty("user.dir").replace("\\", "/").replace("/package/target", ""));
-        registerLambdaJsonTypes();
-        logWebSetupProviders();
-        startWebServer(args);
+        try (GraalvmAgentRuntime runtime = GraalvmAgentRuntime.install()) {
+            registerLambdaJsonTypes();
+            logWebSetupProviders();
+            startWebServer(args);
+        }
     }
 
     private static void logWebSetupProviders() {
@@ -51,9 +52,13 @@ public class GraalvmAgentApplication {
     }
 
     private static void startWebServer(String[] args) {
-        WebServerBuilder webServerBuilder = Application.webServerBuilder(0, ArgsParser.getContextPath(args), null);
-        Constants.zrLogConfig.getServerConfig().addCreateSuccessHandle(() -> {
+        ZrLogConfigImpl config = new ZrLogConfigImpl(0, null, ArgsParser.getContextPath(args));
+        WebServerBuilder webServerBuilder = Application.webServerBuilder(config);
+        config.getServerConfig().setDisableSavePidFile(true);
+        config.getServerConfig().setServerPortFilePathEnvKey(null);
+        config.getServerConfig().addCreateSuccessHandle(() -> {
             // Agent sampling is complete; application shutdown hooks can wait on runtime services indefinitely.
+            // The caller removes the disposable site after this process releases all files and worker threads.
             Runtime.getRuntime().halt(0);
             return null;
         });

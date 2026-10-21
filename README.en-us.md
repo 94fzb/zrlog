@@ -2,7 +2,9 @@
 
 [Chinese](README.md) | [English](README.en-us.md)
 
-ZrLog is an open-source blog system built with Java. It provides article, category, tag, comment, theme, plugin, static page generation, and online update features. It includes a Markdown editor, and its admin UI is built with React and Ant Design.
+ZrLog is an open-source blog system built with Java. It provides article, category, tag, comment, theme, plugin, static
+page generation, and online update features. It includes a Markdown editor, and its admin UI is built with React and Ant
+Design.
 
 ### Homepage
 
@@ -11,28 +13,37 @@ ZrLog is an open-source blog system built with Java. It provides article, catego
 ### Previews
 
 #### Article Detail Page
+
 ![](https://www.zrlog.com/assets/screenprint/post-detail.png?v=2)
 
 #### Article Edit Page
+
 ![](https://www.zrlog.com/assets/screenprint/article-edit-light.png?v=2)
 
 #### Article Edit Page [Dark Mode]
+
 ![](https://www.zrlog.com/assets/screenprint/article-edit-dark.png?v=2)
 
 #### Article Edit Page [PWA Full Screen]
+
 ![](https://www.zrlog.com/assets/screenprint/article-edit-light-pwa-full-screen.png?v=2)
 
 #### Article Edit Page [PWA Full Screen - Settings]
+
 ![](https://www.zrlog.com/assets/screenprint/article-edit-light-pwa-full-screen-setting.png?v=2)
 
 ### Features
 
 1. **Content Management**: Manage articles, categories, tags, and comments.
-2. **Plugin Extensions**: Extend features through plugins ([How to write a plugin](https://blog.zrlog.com/zrlog-plugin-dev.html)) and connect third-party comment services.
-3. **Themes**: Customize and switch blog themes ([How to create a custom theme](https://blog.zrlog.com/make-theme-for-zrlog.html)).
+2. **Plugin Extensions**: Extend features through
+   plugins ([How to write a plugin](https://blog.zrlog.com/zrlog-plugin-dev.html)) and connect third-party comment
+   services.
+3. **Themes**: Customize and switch blog
+   themes ([How to create a custom theme](https://blog.zrlog.com/make-theme-for-zrlog.html)).
 4. **Article Editing**: Use the built-in Markdown editor for common writing and preview workflows.
 5. **Access Optimization**: Generate static pages and cache shared public data.
-6. **Deployment Options**: Use Native/Zip + SQLite or Docker Compose + MySQL as the recommended paths; AWS Lambda + Cloudflare D1 is the advanced path, and WAR container deployment remains supported.
+6. **Deployment Options**: Use Native/Zip + SQLite or Docker Compose + MySQL as the recommended paths; AWS Lambda +
+   Cloudflare D1 is the advanced path, and WAR container deployment remains supported.
 7. **Operations**: Use scheduled database backups and online updates.
 
 ### Development
@@ -47,20 +58,29 @@ See [AGENTS.md](AGENTS.md) for development and verification conventions.
   ```bash
   docker run -p 8080:8080 -v $(pwd)/conf:/opt/zrlog/conf zrlog/zrlog
   ```
-  Then visit `http://localhost:8080/install`. The installer checks config paths, database connectivity, and the install lock, then shows installation progress while it runs.
-  The installation token is disabled by default to keep first-time setup simple. After a successful setup, `install.lock` prevents another installation. An uninstalled instance exposed directly to the public Internet can still be initialized by someone else; set `ZRLOG_INSTALL_TOKEN` explicitly before startup for public or unattended deployments. See the [installation guide](doc/install.md#首次安装保护) for deployment-specific configuration.
+  Then visit `http://localhost:8080/install`. The installer checks config paths, database connectivity, and the install
+  lock, then shows installation progress while it runs.
+  The installation token is disabled by default to keep first-time setup simple. After a successful setup,
+  `install.lock` prevents another installation. An uninstalled instance exposed directly to the public Internet can
+  still be initialized by someone else; set `ZRLOG_INSTALL_TOKEN` explicitly before startup for public or unattended
+  deployments. See the [installation guide](doc/install.md#首次安装保护) for deployment-specific configuration.
   To start ZrLog together with MySQL, follow the [Docker Compose guide](doc/docker-compose.en-us.md).
 
 - **Recommended and advanced deployment**
 
-  - Recommended for personal or local use: Native/Zip + SQLite. Native Image packages include the runtime; Zip requires JDK `>= 11`.
-  - Recommended for servers: Docker Compose + MySQL. The official Compose configuration includes MySQL, health checks, and persistent volumes.
-  - Advanced path: AWS Lambda + Cloudflare D1. Use a Linux FaaS package and connect to D1 through WebApi.
-  - For Zip packages, download the [latest package](https://www.zrlog.com/download), extract it, and run `bin/start.sh` or `bin/start.bat` on Windows.
-  - Before installation, upgrade from the installer or run `./zrlog upgrade` for Native Image and `java -jar zrlog-starter.jar upgrade` for Zip packages. `upgrade` is a subcommand, not `--upgrade`.
-  - WAR remains supported for deployments with an existing Tomcat / Jetty container and external database.
-  - For Docker, make sure `/opt/zrlog/conf` is mounted to persistent storage; `db.properties` and `install.lock` are written there.
-  - After installation, enter admin and create your first article.
+    - Recommended for personal or local use: Native/Zip + SQLite. Native Image packages include the runtime; Zip
+      requires JDK `>= 11`.
+    - Recommended for servers: Docker Compose + MySQL. The official Compose configuration includes MySQL, health checks,
+      and persistent volumes.
+    - Advanced path: AWS Lambda + Cloudflare D1. Use a Linux FaaS package and connect to D1 through WebApi.
+    - For Zip packages, download the [latest package](https://www.zrlog.com/download), extract it, and run
+      `bin/start.sh` or `bin/start.bat` on Windows.
+    - Before installation, upgrade from the installer or run `./zrlog upgrade` for Native Image and
+      `java -jar zrlog-starter.jar upgrade` for Zip packages. `upgrade` is a subcommand, not `--upgrade`.
+    - WAR remains supported for deployments with an existing Tomcat / Jetty container and external database.
+    - For Docker, make sure `/opt/zrlog/conf` is mounted to persistent storage; `db.properties` and `install.lock` are
+      written there.
+    - After installation, enter admin and create your first article.
 
 ### Changelog
 
@@ -82,9 +102,12 @@ See [AGENTS.md](AGENTS.md) for development and verification conventions.
 ### FAQ
 
 #### Docker setup still fails after entering the correct database information
-- Check container networking, the database address, and mounted directories first. More troubleshooting steps are available in the [FAQ](https://blog.zrlog.com/faq-collect.html).
+
+- Check container networking, the database address, and mounted directories first. More troubleshooting steps are
+  available in the [FAQ](https://blog.zrlog.com/faq-collect.html).
 
 #### Other questions
+
 See the [FAQ](https://blog.zrlog.com/faq-collect.html).
 
 ### Open-Source Acknowledgments

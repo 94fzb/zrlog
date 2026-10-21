@@ -7,10 +7,9 @@ import com.hibegin.http.server.SimpleWebServer;
 import com.hibegin.http.server.WebServerBuilder;
 import com.hibegin.http.server.util.PathUtil;
 import com.hibegin.lambda.LambdaApplication;
-import com.zrlog.common.Constants;
 import com.zrlog.common.Updater;
-import com.zrlog.common.exception.NotImplementException;
 import com.zrlog.common.UpdaterTypeEnum;
+import com.zrlog.common.exception.NotImplementException;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.ZrLogBaseNativeImageUtils;
 import com.zrlog.web.config.ZrLogConfigImpl;
@@ -74,6 +73,7 @@ public class Application {
         if (ParseArgsUtil.justTips(serveArgs, "zrlog", BlogBuildInfoUtil.getVersionInfoFull())) {
             return 0;
         }
+        com.zrlog.util.NetworkProxy.initialize();
         if (commandLine.getCommand() == ApplicationCommandLine.Command.UPGRADE) {
             return ApplicationUpgradeRunner.run(ApplicationUpdaterFactory.create(serveArgs, null), commandLine.isPreview(), commandLine.isJson());
         }
@@ -99,16 +99,18 @@ public class Application {
         if (ParseArgsUtil.justTips(serveArgs, execFile.getName(), BlogBuildInfoUtil.getVersionInfoFull())) {
             return 0;
         }
+        com.zrlog.util.NetworkProxy.initialize();
         if (commandLine.getCommand() == ApplicationCommandLine.Command.UPGRADE) {
             return ApplicationUpgradeRunner.run(ApplicationUpdaterFactory.create(serveArgs, execFile), commandLine.isPreview(), commandLine.isJson());
         }
         ApplicationStartupOptions options = ApplicationStartupOptions.parse(serveArgs);
         if (EnvKit.isFaaSMode()) {
-            WebServerBuilder webServerBuilder = webServerBuilder(options.getPort(), options.getContextPath(),
-                    ApplicationUpdaterFactory.create(serveArgs, execFile));
+            ZrLogConfigImpl config = new ZrLogConfigImpl(options.getPort(),
+                    ApplicationUpdaterFactory.create(serveArgs, execFile), options.getContextPath());
+            WebServerBuilder webServerBuilder = webServerBuilder(config);
             webServerBuilder.startInBackground();
             if (EnvKit.isLambda()) {
-                LambdaApplication.startHandle(Constants.zrLogConfig);
+                LambdaApplication.startHandle(config);
                 return 0;
             }
             throw new NotImplementException();
@@ -120,8 +122,10 @@ public class Application {
     }
 
     public static WebServerBuilder webServerBuilder(int port, String contextPath, Updater updater) {
-        ZrLogConfigImpl zrLogConfig = new ZrLogConfigImpl(port, updater, contextPath);
-        Constants.zrLogConfig = zrLogConfig;
+        return webServerBuilder(new ZrLogConfigImpl(port, updater, contextPath));
+    }
+
+    public static WebServerBuilder webServerBuilder(ZrLogConfigImpl zrLogConfig) {
         WebServerBuilder builder = new WebServerBuilder.Builder().config(zrLogConfig).build();
         zrLogConfig.setServerBuilder(builder);
         zrLogConfig.getServerConfig().addCreateSuccessHandle(() -> {
@@ -129,6 +133,7 @@ public class Application {
             return null;
         });
         zrLogConfig.getServerConfig().addCreateErrorHandle(() -> {
+            Updater updater = zrLogConfig.getUpdater();
             if (updater != null && updater.getType() == UpdaterTypeEnum.ZIP) {
                 Thread.sleep(1000);
                 builder.start();

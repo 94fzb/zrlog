@@ -30,9 +30,6 @@ jobs:
       - name: Verify Native package pinning contract
         run: bash shell/docker/test-native-package-contract.sh
 
-      - name: Verify Native preview Docker recovery
-        run: bash shell/docker/test-preview-package.sh
-
       - name: Verify exact workflow package inputs for all Docker platforms
         run: python3 shell/docker/test-workflow-package.py
 

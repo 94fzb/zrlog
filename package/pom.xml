@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>com.hibegin</groupId>
@@ -71,8 +71,16 @@
                         <configuration>
                             <executable>java</executable>
                             <workingDirectory>${project.build.directory}</workingDirectory>
+                            <environmentVariables>
+                                <DB_PROPERTIES></DB_PROPERTIES>
+                                <DB_PROPERTIES_FILE_NAME>db.properties</DB_PROPERTIES_FILE_NAME>
+                                <INSTALL_LOCK_FILE_NAME>install.lock</INSTALL_LOCK_FILE_NAME>
+                            </environmentVariables>
                             <arguments>
                                 <argument>--enable-preview</argument>
+                                <argument>
+                                    -Dzrlog.native.agent.workDirectory=${project.build.directory}/native-agent-runtime
+                                </argument>
                                 <argument>-classpath</argument>
                                 <classpath/>
                                 <argument>com.zrlog.web.GraalvmAgentApplication</argument>
@@ -104,6 +112,22 @@
 
 
     <profiles>
+        <profile>
+            <id>native-agent</id>
+            <!-- The tracing run uses H2; final Java and Native packages do not. -->
+            <activation>
+                <property>
+                    <name>agent</name>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.h2database</groupId>
+                    <artifactId>h2</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
+            </dependencies>
+        </profile>
         <!-- GraalVM 25.0.1 is the last macOS Intel build. Keep its known-good
              Native Build Tools / metadata pair from ZrLog 3.9.2 isolated here. -->
         <profile>

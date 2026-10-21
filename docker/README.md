@@ -11,13 +11,13 @@
 
 ## 镜像标签
 
-| 标签 | 平台 | 发布范围 |
-| --- | --- | --- |
-| `latest`, `X.Y.Z` | `linux/amd64` | 所有当前正式版本 |
-| `latest`, `X.Y.Z` | `linux/arm64` | 从 v3.9.0 开始 |
-| `windows-ltsc2022`, `X.Y.Z-windows-ltsc2022` | `windows/amd64` | 从 v3.9.0 开始 |
-| `preview`, `<version>-<buildId>` | `linux/amd64` | 日常预览版本；全平台构建也支持 ARM64 |
-| `preview-windows-ltsc2022`, `<version>-<buildId>-windows-ltsc2022` | `windows/amd64` | Windows 预览镜像 |
+| 标签                                                                 | 平台              | 发布范围                  |
+|--------------------------------------------------------------------|-----------------|-----------------------|
+| `latest`, `X.Y.Z`                                                  | `linux/amd64`   | 所有当前正式版本              |
+| `latest`, `X.Y.Z`                                                  | `linux/arm64`   | 从 v3.9.0 开始           |
+| `windows-ltsc2022`, `X.Y.Z-windows-ltsc2022`                       | `windows/amd64` | 从 v3.9.0 开始           |
+| `preview`, `<version>-<buildId>`                                   | `linux/amd64`   | 日常预览版本；全平台构建也支持 ARM64 |
+| `preview-windows-ltsc2022`, `<version>-<buildId>-windows-ltsc2022` | `windows/amd64` | Windows 预览镜像          |
 
 `latest` 始终指向最新的 Linux 正式版，不包含 Windows 镜像。v3.8.x 及更早版本只有
 Linux AMD64；从 v3.9.0 开始，Linux 标签同时包含 AMD64 和 ARM64。Windows 镜像使用
@@ -102,5 +102,6 @@ docker run --name zrlog `
 ## 制品验证
 
 两个渠道发布的 Linux 和 Windows 镜像 digest 均使用 Cosign 签名；Linux 镜像同时生成 SBOM
-和 provenance。生产部署建议固定 digest，并按[发布制品验证文档](https://github.com/94fzb/zrlog/blob/master/doc/artifact-verification.md)
+和 provenance。生产部署建议固定
+digest，并按[发布制品验证文档](https://github.com/94fzb/zrlog/blob/master/doc/artifact-verification.md)
 验证发布身份。
