@@ -13,6 +13,10 @@ jobs:
   coverage:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        java: ['11', '21']
     permissions:
       contents: read
 
@@ -24,7 +28,7 @@ jobs:
         uses: actions/setup-java@v6
         with:
           distribution: temurin
-          java-version: '11'
+          java-version: ${{ matrix.java }}
           cache: maven
 
       - name: Run tests and generate coverage
@@ -128,6 +132,6 @@ jobs:
       - name: Upload JaCoCo HTML report
         uses: actions/upload-artifact@v7
         with:
-          name: jacoco-html-report
+          name: jacoco-html-report-java-${{ matrix.java }}
           path: '**/target/site/jacoco'
           if-no-files-found: warn
