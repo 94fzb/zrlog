@@ -8,6 +8,11 @@ on:
     branches:
       - master
   workflow_dispatch:
+    inputs:
+      base_ref:
+        description: 'Optional exact zrlog-base commit for source integration checks (no publishing)'
+        type: string
+        default: ''
 
 jobs:
   coverage:
@@ -24,6 +29,46 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v7
 
+      - name: Validate base candidate commit
+        if: inputs.base_ref != ''
+        env:
+          BASE_REF: ${{ inputs.base_ref }}
+        run: '[[ "$BASE_REF" =~ ^[0-9a-f]{40}$ ]]'
+
+      - name: Checkout base candidate
+        if: inputs.base_ref != ''
+        uses: actions/checkout@v7
+        with:
+          repository: zrlog/zrlog-base
+          ref: ${{ inputs.base_ref }}
+          path: .base-candidate
+          persist-credentials: false
+
+      - name: Set up JDK for multi-release base
+        if: inputs.base_ref != ''
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Test and install exact base candidate
+        if: inputs.base_ref != ''
+        env:
+          BASE_REF: ${{ inputs.base_ref }}
+        run: |
+          set -euo pipefail
+          test "$(git -C .base-candidate rev-parse HEAD)" = "$BASE_REF"
+          .base-candidate/mvnw -B -ntp -f .base-candidate/pom.xml \
+            -Dmaven.repo.local="$RUNNER_TEMP/base-candidate-m2" test install
+          find "$RUNNER_TEMP/base-candidate-m2/com/hibegin" -path '*/4.0.1-SNAPSHOT/*.jar' \
+            -name 'zrlog-*.jar' -print0 | sort -z | xargs -0 sha256sum > "$RUNNER_TEMP/base-candidate.sha256"
+          {
+            echo "Application source: $(git rev-parse HEAD)"
+            echo "Base source: $BASE_REF (built on JDK 21)"
+            echo 'Source integration only; no snapshot or release uploaded.'
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Set up JDK
         uses: actions/setup-java@v6
         with:
@@ -32,7 +77,19 @@ jobs:
           cache: maven
 
       - name: Run tests and generate coverage
-        run: ./mvnw -q -U -f zrlog-web/pom.xml jacoco:prepare-agent test jacoco:report
+        env:
+          BASE_REF: ${{ inputs.base_ref }}
+        run: |
+          if [ -n "$BASE_REF" ]; then
+            ./mvnw -q -nsu -f zrlog-web/pom.xml -Dmaven.repo.local="$RUNNER_TEMP/base-candidate-m2" \
+              jacoco:prepare-agent test jacoco:report
+          else
+            ./mvnw -q -U -f zrlog-web/pom.xml jacoco:prepare-agent test jacoco:report
+          fi
+
+      - name: Verify candidate dependencies were preserved
+        if: inputs.base_ref != ''
+        run: sha256sum --check "$RUNNER_TEMP/base-candidate.sha256"
 
       - name: Summarize JaCoCo coverage
         shell: bash
