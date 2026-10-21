@@ -57,8 +57,10 @@ public class GraalvmAgentApplication {
         config.getServerConfig().setDisableSavePidFile(true);
         config.getServerConfig().setServerPortFilePathEnvKey(null);
         config.getServerConfig().addCreateSuccessHandle(() -> {
-            // Agent sampling is complete; application shutdown hooks can wait on runtime services indefinitely.
-            // The caller removes the disposable site after this process releases all files and worker threads.
+            // Stop owned services before halting the tracing JVM: halt skips shutdown hooks,
+            // so a plugin child would otherwise retain the disposable site's files on Windows.
+            config.stop();
+            // The caller removes the site after this process releases its remaining logger handles.
             Runtime.getRuntime().halt(0);
             return null;
         });
