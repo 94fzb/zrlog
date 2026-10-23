@@ -110,6 +110,25 @@ jobs:
           cache: maven
           github-token: ${{ github.token }}
           native-image-job-reports: 'true'
+      - name: Checkout pinned base cohesion changes
+        if: github.event_name == 'workflow_dispatch' && github.ref_name == 'codex/service-cohesion-native-20261023' && matrix.package_type == 'native' && matrix.os == 'ubuntu-22.04'
+        uses: actions/checkout@v7
+        with:
+          repository: zrlog/zrlog-base
+          ref: c21ba49e02534480116055acdbeed41edd570169
+          path: .cohesion-sources/base
+          persist-credentials: false
+      - name: Checkout pinned admin cohesion changes
+        if: github.event_name == 'workflow_dispatch' && github.ref_name == 'codex/service-cohesion-native-20261023' && matrix.package_type == 'native' && matrix.os == 'ubuntu-22.04'
+        uses: actions/checkout@v7
+        with:
+          repository: zrlog/zrlog-admin-web
+          ref: c5664d847cf550fc2f8a65d8cbf668c415bb7136
+          path: .cohesion-sources/admin
+          persist-credentials: false
+      - name: Prepare exact source-built cohesion inputs
+        if: github.event_name == 'workflow_dispatch' && github.ref_name == 'codex/service-cohesion-native-20261023' && matrix.package_type == 'native' && matrix.os == 'ubuntu-22.04'
+        run: bash shell/ci/cohesion-validation/prepare-inputs.sh
       - uses: anchore/sbom-action/download-syft@v0
         if: needs.plan.outputs.publish == 'true'
       - uses: sigstore/cosign-installer@v3
@@ -151,6 +170,20 @@ jobs:
           EXPECTED_COMMIT: ${{ github.sha }}
           REQUESTED_JAVA: ${{ matrix.java }}
         run: python3 shell/ci/record-package-build.py
+      - name: Verify Native cohesion inputs and runtime
+        if: github.event_name == 'workflow_dispatch' && github.ref_name == 'codex/service-cohesion-native-20261023' && matrix.package_type == 'native' && matrix.os == 'ubuntu-22.04'
+        run: |
+          python3 shell/ci/cohesion-validation/inputs.py verify
+          python3 shell/ci/cohesion-validation/package-smoke.py native .package-output/preview/zrlog-Linux-amd64.zip .package-evidence/cohesion
+      - name: Preserve cohesion validation evidence
+        if: always() && github.event_name == 'workflow_dispatch' && github.ref_name == 'codex/service-cohesion-native-20261023' && matrix.package_type == 'native' && matrix.os == 'ubuntu-22.04'
+        uses: actions/upload-artifact@v7
+        with:
+          name: cohesion-native-evidence-${{ github.run_attempt }}
+          path: .package-evidence/cohesion
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 14
       - name: Attest channel artifacts
         if: needs.plan.outputs.publish == 'true'
         uses: actions/attest-build-provenance@v4

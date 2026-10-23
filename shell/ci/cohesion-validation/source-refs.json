@@ -1,0 +1,12 @@
+{
+  "base": {
+    "repository": "zrlog/zrlog-base",
+    "branch": "codex/service-cohesion-20261023",
+    "commit": "c21ba49e02534480116055acdbeed41edd570169"
+  },
+  "admin": {
+    "repository": "zrlog/zrlog-admin-web",
+    "branch": "codex/service-cohesion-20261023",
+    "commit": "c5664d847cf550fc2f8a65d8cbf668c415bb7136"
+  }
+}

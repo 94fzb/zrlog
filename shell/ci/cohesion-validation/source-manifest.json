@@ -1,0 +1,46 @@
+{
+  "admin": {
+    "head": "f110a32ffbcb16ccf61bb0e1479ea7fb89740b43",
+    "files": {
+      "zrlog-admin-ai/src/main/java/com/zrlog/admin/business/ai/service/AIChatAccessPolicy.java": "99b4db8ce7d43ad2ca32c8ef43bbc276de946dd153a3c696116f736164ad614b",
+      "zrlog-admin-ai/src/main/java/com/zrlog/admin/business/ai/service/AIChatModelClient.java": "2304e971eb9aee671b48271610d4836c8c218d5c78619ec0a2d61b1ca03ed8a5",
+      "zrlog-admin-ai/src/main/java/com/zrlog/admin/business/ai/service/AIChatRunExecutor.java": "b3a0641277da1f328133ba79cde065e72b2f53af8000868ee000a5d6acce9430",
+      "zrlog-admin-ai/src/main/java/com/zrlog/admin/business/ai/service/AIChatService.java": "0f607d44b1dd49c2627cf2f45a21fb8c392d8394bf96b32fa8371e0a4baf5fd5",
+      "zrlog-admin-ai/src/main/java/com/zrlog/admin/business/ai/service/AIChatSseWriter.java": "7b6680632dae7ad450f5ff9169b96124c901539d95415e9220861fbe3b0c6093",
+      "zrlog-admin-ai/src/main/java/com/zrlog/admin/business/ai/service/AIReferenceService.java": "c516240025f54b185962cc4f0c5e660dd7ad3f4a09a9f0974e6dd06ec2a53878",
+      "zrlog-admin-ai/src/main/java/com/zrlog/admin/business/ai/service/AIService.java": "d61baeb90e31b6f0ef2529093fbaf0b3f25794dcfe27a196e2820a5d936fab86",
+      "zrlog-admin-ai/src/test/java/com/zrlog/admin/business/ai/service/AIApprovalTest.java": "3cde05bb09bb802b9fc0af6c769d1b653859783829ecb91f9a6363dd603a7486",
+      "zrlog-admin-ai/src/test/java/com/zrlog/admin/business/ai/service/AIChatConversationTest.java": "1ef5952fb9ca054868d10041468245e34cf10bd0de7d132229a248afbe940165",
+      "zrlog-admin-ai/src/test/java/com/zrlog/admin/business/ai/service/AIChatServiceTest.java": "83c38261956d4100487bde3ce05a58129ff62d92ecbdb6a70633764824cd5273",
+      "zrlog-admin-ai/src/test/java/com/zrlog/admin/business/ai/service/AIExplicitActorBoundaryTest.java": "fe6872ed872661194b64e26285326d1655850f262d6cfc1f146f95adab156f86",
+      "zrlog-admin-ai/src/test/java/com/zrlog/admin/business/ai/service/AIFileInputTest.java": "976bb6a4ad65084e5e043530a25fca24e01ce820f1c2ca1dc250b48ff3f2ece9",
+      "zrlog-admin-ai/src/test/java/com/zrlog/admin/business/ai/service/AIReferenceServiceTest.java": "0176bd6492feaac419f78f34acc3bcac2f3044fd4e9da98b9ded1ce6492eda2a",
+      "zrlog-admin-ai/src/test/java/com/zrlog/admin/business/ai/service/AIServiceDependencies.java": "86a75d46cf3ced77e40b65295ee9b9b9f3ad720be6cc60457c2fd12278ae9bf5",
+      "zrlog-admin-ai/src/test/java/com/zrlog/admin/business/ai/service/AIWritingToolsTest.java": "5695fb597b5f918225916947071c72acffa1f5b3a0620516ab576aa8a7b7cdc3",
+      "zrlog-admin-web-api/src/main/java/com/zrlog/admin/business/service/AdminDashboardService.java": "f56f12506cb1966792b014d63d442dbf081b4806fcaa1b920f0e30447b2ecdfe",
+      "zrlog-admin-web-api/src/main/java/com/zrlog/admin/business/service/DashboardLayoutPolicy.java": "8c9646c80cf67d049cd1c67c86837ea23f379c6adfa545c07c98a55c92430c3b",
+      "zrlog-admin-web-api/src/main/java/com/zrlog/admin/business/service/DashboardPluginLoader.java": "ff2dbd81e0272212e4c4ed01543726a99639738b967b8838fd4b95ffc3405e99",
+      "zrlog-admin-web-api/src/main/java/com/zrlog/admin/business/service/TemplateCatalog.java": "4985cdba865be30196b4b3ce78c05ae30031c993cc33a2a18254b8ee0e14f866",
+      "zrlog-admin-web-api/src/main/java/com/zrlog/admin/business/service/TemplatePackageInstaller.java": "38ed989f703497ef50d29efcb32598963e4d8075c793808ef21ee85dcbd2a4ef",
+      "zrlog-admin-web-api/src/main/java/com/zrlog/admin/business/service/TemplateService.java": "1f9a7abe1778ed54ae2ed82e046cbd5fa0a928f651ab5b4210d1c1807c6c1e1f",
+      "zrlog-admin-web-api/src/main/java/com/zrlog/admin/business/service/TemplateSettingsService.java": "f3199b7ee08be2b849a0220588705d99eb5e263102d9ceb669522ca734c50b1b",
+      "zrlog-admin-web-api/src/main/java/com/zrlog/admin/web/controller/api/TemplateController.java": "b0cf3b14b44f5b61985bc08c8c9ce7602b5aaba8e5550372dd365aecf54088cd",
+      "zrlog-admin-web/src/test/java/com/zrlog/admin/business/ai/service/AIChatAssemblyTest.java": "81a6a85845300b2e8ad110dd519cb018cc9571ab0b97e4c3bc962ede93273921",
+      "zrlog-admin-web/src/test/java/com/zrlog/admin/business/ai/service/AIChatToolParityTest.java": "6bb5f6f22489ab8e79dac7b05e56a42f0fe6ee922818016fe4c804e2df6bc2aa",
+      "zrlog-admin-web/src/test/java/com/zrlog/admin/business/service/AdminDashboardServiceTest.java": "f9b8bf8b1039d0258c1fe9d5690982c5c1bf677258821cc8c8eacdc42ffa7f2a",
+      "zrlog-admin-web/src/test/java/com/zrlog/admin/business/service/TemplateServiceTest.java": "5a56025887c62d40fbe46f2dce4b56d3e30b71d644eeaced65e5a39131d5edc2",
+      "zrlog-admin-web/src/test/java/com/zrlog/admin/web/controller/api/AdminArticleControllerDatabaseTest.java": "7f5a1793f1558b21e35565fa44f9a8a186e172e5c310b93b57c0035660b5e781",
+      "zrlog-admin-web/src/test/java/com/zrlog/admin/web/controller/api/AdminControllerDelegationTest.java": "24ad34ba573962517c9119671dd680fee83c6dc09ea00eb0a616eec63bee314d",
+      "zrlog-admin-web/src/test/java/com/zrlog/admin/web/controller/api/TemplateControllerTest.java": "46737c0ed4862f9409603c0f0c844b2d3001d40c33cf68120b7124dbcc6a0ad2"
+    },
+    "tracked_patch_sha256": "0bc2727a4bfa6f4f30502f23730d524da7aeb2fe1ac719adfa5f82e98b9936e6"
+  },
+  "base": {
+    "head": "30cccb54e8ac20d811e936871acf48eaea68c1fb",
+    "files": {
+      "zrlog-service/src/main/java/com/zrlog/business/util/PluginCoreArtifactValidator.java": "da25faa8a4d1bde9fefd8420ae32970b0563be68a65ac6781db595bfbd5952e8",
+      "zrlog-service/src/main/java/com/zrlog/business/util/PluginCoreUtils.java": "9e126fea179acdb9fd109b26eb7569193cc3267c287048e035fc98ee23c74d37"
+    },
+    "tracked_patch_sha256": "ffa1aabbe75eff2fdf451de610f8355cd70e13d5cf5b02421d6dd2924a1b9640"
+  }
+}
