@@ -31,7 +31,7 @@
         <lambda-scope>compile</lambda-scope>
         <zrlog-polyglot-template-scope>provided</zrlog-polyglot-template-scope>
         <servlet-api.version>6.1.0</servlet-api.version>
-        <zrlog-install-web.version>4.0.1-SNAPSHOT</zrlog-install-web.version>
+        <zrlog-install-web.version>4.0.1</zrlog-install-web.version>
         <zrlog-blog-web.version>4.0.1-SNAPSHOT</zrlog-blog-web.version>
         <zrlog-updater.version>4.0.1</zrlog-updater.version>
         <zrlog-updater-zip-scope>runtime</zrlog-updater-zip-scope>
