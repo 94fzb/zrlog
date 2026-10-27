@@ -490,10 +490,10 @@ public class CacheInjectionIntegrationTest {
                     assertEquals("/comment/manifest.json", forwarded.get());
 
                     PluginUploadController upload = (PluginUploadController) Controller.buildController(
-                            PluginUploadController.class.getMethod("upload"),
-                            sessionRequest(config, "/api/admin/plugin/upload", "", new Cookie[0]), response);
-                    upload.upload();
-                    assertEquals("/api/upload", forwarded.get());
+                            PluginUploadController.class.getMethod("install"),
+                            sessionRequest(config, "/api/admin/plugins/install", "", new Cookie[0]), response);
+                    upload.install();
+                    assertEquals("/api/install", forwarded.get());
                     ArticleController article = (ArticleController) Controller.buildController(
                             ArticleController.class.getMethod("addComment"),
                             sessionRequest(config, "/addComment", "", new Cookie[0]), response);
@@ -508,8 +508,8 @@ public class CacheInjectionIntegrationTest {
                     assertThrows(ArgsException.class, () -> tokens.validate(firstToken));
                     tokens.validate(sessionRequest(config, "/api/admin/refreshCache", "", new Cookie[0],
                             Map.of("X-Plugin-Token", "second-token")));
-                    upload.upload();
-                    assertEquals("/api/upload", replacementForwarded.get());
+                    upload.install();
+                    assertEquals("/api/install", replacementForwarded.get());
                 }
             } finally {
                 config.stop();

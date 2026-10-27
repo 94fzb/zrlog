@@ -20,6 +20,7 @@
     <url>https://www.zrlog.com</url>
 
     <properties>
+        <sws.version>4.1.17</sws.version>
         <java.version>11</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
