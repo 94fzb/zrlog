@@ -13,6 +13,7 @@ urls=(
   "rss-${arch}.bin"
   "comment-${arch}.bin"
   "article-arranger-${arch}.bin"
+  "importer-${arch}.bin"
   "mail-${arch}.bin"
   "statistics-${arch}.bin"
   "reminder-${arch}.bin"
