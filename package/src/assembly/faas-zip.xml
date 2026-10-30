@@ -12,9 +12,17 @@
         <fileSet>
             <directory>../</directory>
             <outputDirectory>/</outputDirectory>
+            <fileMode>0755</fileMode>
             <includes>
                 <include>zrlog</include>
                 <include>bootstrap</include>
+                <include>conf/plugins/**/*.bin</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>../</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes>
                 <include>conf/plugins/</include>
                 <include>static/include/templates/*.zip</include>
                 <!-- Documentation -->
@@ -24,6 +32,9 @@
                 <include>README.en-us.md</include>
                 <include>README.md</include>
             </includes>
+            <excludes>
+                <exclude>conf/plugins/**/*.bin</exclude>
+            </excludes>
         </fileSet>
     </fileSets>
 </assembly>
