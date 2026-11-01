@@ -407,13 +407,13 @@ jobs:
         if: needs.plan.outputs.publish == 'true'
       - name: Login to Docker Hub
         if: needs.plan.outputs.publish == 'true'
-        uses: docker/login-action@v4.6.0
+        uses: docker/login-action@v4.7.0
         with:
           username: zrlog
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Login to Aliyun Docker Hub
         if: needs.plan.outputs.publish == 'true'
-        uses: docker/login-action@v4.6.0
+        uses: docker/login-action@v4.7.0
         with:
           registry: registry.cn-chengdu.aliyuncs.com
           username: 90xchun
@@ -506,14 +506,14 @@ jobs:
           }
       - name: Login to Docker Hub
         if: needs.plan.outputs.publish == 'true'
-        uses: docker/login-action@v4.6.0
+        uses: docker/login-action@v4.7.0
         with:
           username: zrlog
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Login to Aliyun Docker Hub
         if: needs.plan.outputs.publish == 'true'
-        uses: docker/login-action@v4.6.0
+        uses: docker/login-action@v4.7.0
         with:
           registry: registry.cn-chengdu.aliyuncs.com
           username: 90xchun
