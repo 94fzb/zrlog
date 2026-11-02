@@ -101,5 +101,5 @@ Linux OCI 导出、程序摘要校验和索引组装在所有模式下执行；�
 
 ## 共享测试标准
 
-遵守 `zrlog-base/docs/test-support.md`。通用测试工具仅以 test scope 引入。已安装站点的启动测试使用真实 InstallService
+通用测试工具由 `zrlog-test-support` 提供，仅以 test scope 引入。已安装站点的启动测试使用真实 InstallService
 生成临时配置、锁文件和默认数据，不手写 install.lock。最终 ZIP/WAR、starter 不得包含 `zrlog-test-support` 或 `*-tests.jar`。
