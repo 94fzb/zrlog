@@ -52,8 +52,8 @@ import com.zrlog.common.cache.vo.BaseDataInitVO;
 import com.zrlog.common.exception.ArgsException;
 import com.zrlog.common.vo.I18nVO;
 import com.zrlog.common.vo.Version;
-import com.zrlog.model.Tag;
-import com.zrlog.model.WebSite;
+import com.zrlog.data.repository.TagRepository;
+import com.zrlog.data.repository.WebSiteRepository;
 import com.zrlog.util.I18nUtil;
 import com.zrlog.web.WebSiteInfoProvider;
 import com.zrlog.web.inteceptor.InstallStatusInterceptor;
@@ -185,7 +185,7 @@ public class CacheInjectionIntegrationTest {
                                     second.index().getData().getWebSite().getTitle());
                             assertEquals(
                                     "Changed by admin",
-                                    new WebSite((DataSourceWrapper) config.getDataSource())
+                                    new WebSiteRepository((DataSourceWrapper) config.getDataSource())
                                             .getStringValueByName("title"));
                             config.configDatabase();
                             assertSame(cache, services.get(CacheService.class));
@@ -643,7 +643,7 @@ public class CacheInjectionIntegrationTest {
                                     "https://blog.example/blog/oauth/token",
                                     oauth.metadata().token_endpoint);
                             assertTrue(oauth.isMcpEnabled());
-                            new WebSite((DataSourceWrapper) config.getDataSource())
+                            new WebSiteRepository((DataSourceWrapper) config.getDataSource())
                                     .updateByKV(
                                             "backend_server_url", "https://api.example/proxy/blog");
                             assertEquals("https://api.example/proxy/blog", oauth.issuer());
@@ -666,7 +666,7 @@ public class CacheInjectionIntegrationTest {
                                                             Map.of(
                                                                     "Origin",
                                                                     "https://attacker.example"))));
-                            new WebSite((DataSourceWrapper) config.getDataSource())
+                            new WebSiteRepository((DataSourceWrapper) config.getDataSource())
                                     .updateByKV("backend_server_url", "");
                             services.get(CacheService.class).getPublicWebSiteInfo().setHost("");
                             config.getServerConfig().setPort(19123);
@@ -738,7 +738,7 @@ public class CacheInjectionIntegrationTest {
                                     "Scheduled maintenance",
                                     json.get("systemNotification").getAsString());
                             site.setHost("public.example");
-                            new WebSite((DataSourceWrapper) config.getDataSource())
+                            new WebSiteRepository((DataSourceWrapper) config.getDataSource())
                                     .updateByKV(
                                             "admin_static_resource_base_url",
                                             "https://cdn.example");
@@ -827,7 +827,10 @@ public class CacheInjectionIntegrationTest {
                             assertFalse(types.isEmpty());
                             assertTrue(types.get(0).getUrl().startsWith("//renamed.example/sort/"));
                             assertTrue(types.get(0).getUrl().endsWith(".html"));
-                            new Tag((DataSourceWrapper) config.getDataSource()).set("text", "injected").set("count", 1).save();
+                            var injectedTag = new com.zrlog.model.Tag();
+                            injectedTag.setText("injected");
+                            injectedTag.setCount(1);
+                            new TagRepository((DataSourceWrapper) config.getDataSource()).insert(injectedTag);
                             var tags =
                                     (AdminTagController)
                                             Controller.buildController(
