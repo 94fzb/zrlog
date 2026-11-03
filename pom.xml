@@ -282,6 +282,52 @@
     </build>
     <profiles>
         <profile>
+            <id>java-format</id>
+            <activation>
+                <jdk>[21,)</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.diffplug.spotless</groupId>
+                        <artifactId>spotless-maven-plugin</artifactId>
+                        <version>3.11.0</version>
+                        <inherited>false</inherited>
+                        <configuration>
+                            <encoding>UTF-8</encoding>
+                            <lineEndings>UNIX</lineEndings>
+                            <java>
+                                <includes>
+                                    <include>zrlog-*/src/main/java*/**/*.java</include>
+                                    <include>zrlog-*/src/test/java/**/*.java</include>
+                                    <include>package/src/main/java*/**/*.java</include>
+                                    <include>shell/**/*.java</include>
+                                </includes>
+                                <googleJavaFormat>
+                                    <version>1.33.0</version>
+                                    <style>AOSP</style>
+                                    <reflowLongStrings>false</reflowLongStrings>
+                                </googleJavaFormat>
+                                <importOrder/>
+                                <removeUnusedImports/>
+                                <trimTrailingWhitespace/>
+                                <endWithNewline/>
+                            </java>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>check-java-format</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>ci</id>
             <properties>
                 <maven.test.skip>false</maven.test.skip>

@@ -1,18 +1,18 @@
 package com.zrlog.web.setup.install;
 
+import static org.junit.Assert.*;
+
 import com.hibegin.common.util.EnvKit;
 import com.zrlog.common.UpdaterTypeEnum;
-import org.junit.Test;
-
 import java.io.File;
-
-import static org.junit.Assert.*;
+import org.junit.Test;
 
 public class ZrLogInstallActionTest {
 
     @Test
     public void shouldExposeInstallStateAndLockFile() throws Exception {
-        TestZrLogConfig config = TestZrLogConfig.installedConfig(new TestUpdater(UpdaterTypeEnum.ZIP));
+        TestZrLogConfig config =
+                TestZrLogConfig.installedConfig(new TestUpdater(UpdaterTypeEnum.ZIP));
         File installLockFile = File.createTempFile("zrlog-install", ".lock");
 
         ZrLogInstallAction action = new ZrLogInstallAction(config, installLockFile);
@@ -23,8 +23,10 @@ public class ZrLogInstallActionTest {
 
     @Test
     public void shouldConfigureDatabaseAndStartPluginsAfterInstallSuccess() throws Exception {
-        TestZrLogConfig config = TestZrLogConfig.installedConfig(new TestUpdater(UpdaterTypeEnum.ZIP));
-        ZrLogInstallAction action = new ZrLogInstallAction(config, File.createTempFile("zrlog-install", ".lock"));
+        TestZrLogConfig config =
+                TestZrLogConfig.installedConfig(new TestUpdater(UpdaterTypeEnum.ZIP));
+        ZrLogInstallAction action =
+                new ZrLogInstallAction(config, File.createTempFile("zrlog-install", ".lock"));
 
         action.installSuccess();
 
@@ -35,9 +37,11 @@ public class ZrLogInstallActionTest {
 
     @Test(expected = IllegalStateException.class)
     public void shouldWrapStartupFailureAfterInstallSuccess() throws Exception {
-        TestZrLogConfig config = TestZrLogConfig.installedConfig(new TestUpdater(UpdaterTypeEnum.ZIP));
+        TestZrLogConfig config =
+                TestZrLogConfig.installedConfig(new TestUpdater(UpdaterTypeEnum.ZIP));
         config.setFailConfigDatabase(true);
 
-        new ZrLogInstallAction(config, File.createTempFile("zrlog-install", ".lock")).installSuccess();
+        new ZrLogInstallAction(config, File.createTempFile("zrlog-install", ".lock"))
+                .installSuccess();
     }
 }

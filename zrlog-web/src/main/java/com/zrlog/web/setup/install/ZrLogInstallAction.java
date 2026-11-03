@@ -3,7 +3,6 @@ package com.zrlog.web.setup.install;
 import com.hibegin.common.util.EnvKit;
 import com.zrlog.common.ZrLogConfig;
 import com.zrlog.install.web.config.DefaultInstallAction;
-
 import java.io.File;
 
 public class ZrLogInstallAction extends DefaultInstallAction {

@@ -1,14 +1,13 @@
 package com.zrlog.web.setup.install;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import com.zrlog.common.UpdaterTypeEnum;
 import com.zrlog.web.WebSetup;
 import com.zrlog.web.WebSetupContext;
-import org.junit.Test;
-
 import java.io.File;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 public class InstallWebSetupProviderTest {
 
@@ -28,7 +27,10 @@ public class InstallWebSetupProviderTest {
         File dbPropertiesFile = File.createTempFile("zrlog-db", ".properties");
         File installLockFile = File.createTempFile("zrlog-install", ".lock");
 
-        WebSetup setup = provider.create(new WebSetupContext(config, dbPropertiesFile, installLockFile, "/blog", updater));
+        WebSetup setup =
+                provider.create(
+                        new WebSetupContext(
+                                config, dbPropertiesFile, installLockFile, "/blog", updater));
 
         assertTrue(setup instanceof InstallWebSetup);
     }

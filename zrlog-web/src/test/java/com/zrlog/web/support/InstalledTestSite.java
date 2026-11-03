@@ -10,14 +10,11 @@ import com.zrlog.install.web.InstallAction;
 import com.zrlog.install.web.config.DefaultInstallAction;
 import com.zrlog.install.web.config.DefaultInstallConfig;
 import com.zrlog.test.support.MemoryRuntime;
-
 import java.io.File;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * Starts configuration tests from real installer output instead of synthetic lock/config files.
- */
+/** Starts configuration tests from real installer output instead of synthetic lock/config files. */
 public final class InstalledTestSite implements AutoCloseable {
 
     private final InMemoryDatabase database;
@@ -41,30 +38,37 @@ public final class InstalledTestSite implements AutoCloseable {
         InstallConfigVO request = new InstallConfigVO();
         request.setDbConfig(db);
         request.setConfigMsg(site);
-        request.setAppendWebsite(Map.of("host", "localhost:19085", "session_timeout", "3600",
-                "language", Constants.DEFAULT_LANGUAGE));
-        var config = new DefaultInstallConfig() {
-            @Override
-            public File getDbPropertiesFile() {
-                return new File(root, "conf/db.properties");
-            }
-
-            @Override
-            public String defaultTemplatePath() {
-                return Constants.getDefaultTemplatePath();
-            }
-
-            @Override
-            public InstallAction getAction() {
-                if (action != null) return action;
-                return new DefaultInstallAction() {
+        request.setAppendWebsite(
+                Map.of(
+                        "host",
+                        "localhost:19085",
+                        "session_timeout",
+                        "3600",
+                        "language",
+                        Constants.DEFAULT_LANGUAGE));
+        var config =
+                new DefaultInstallConfig() {
                     @Override
-                    public File getLockFile() {
-                        return new File(root, "conf/install.lock");
+                    public File getDbPropertiesFile() {
+                        return new File(root, "conf/db.properties");
+                    }
+
+                    @Override
+                    public String defaultTemplatePath() {
+                        return Constants.getDefaultTemplatePath();
+                    }
+
+                    @Override
+                    public InstallAction getAction() {
+                        if (action != null) return action;
+                        return new DefaultInstallAction() {
+                            @Override
+                            public File getLockFile() {
+                                return new File(root, "conf/install.lock");
+                            }
+                        };
                     }
                 };
-            }
-        };
         if (!new InstallService(config, request).install()) {
             throw new IllegalStateException("Install test site failed");
         }

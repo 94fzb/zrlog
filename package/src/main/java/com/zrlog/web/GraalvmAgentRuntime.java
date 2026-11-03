@@ -12,7 +12,6 @@ import com.zrlog.install.web.InstallAction;
 import com.zrlog.install.web.config.DefaultInstallAction;
 import com.zrlog.install.web.config.DefaultInstallConfig;
 import com.zrlog.install.web.di.DaggerInstallComponent;
-
 import java.io.File;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -22,9 +21,7 @@ import java.util.Properties;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-/**
- * A disposable installed site used only by the Native Image tracing agent.
- */
+/** A disposable installed site used only by the Native Image tracing agent. */
 final class GraalvmAgentRuntime implements AutoCloseable {
 
     private static final Logger LOGGER = Logger.getLogger(GraalvmAgentRuntime.class.getName());
@@ -39,24 +36,34 @@ final class GraalvmAgentRuntime implements AutoCloseable {
         requireEnvironment("DB_PROPERTIES", "");
         requireEnvironment("DB_PROPERTIES_FILE_NAME", "db.properties");
         requireEnvironment("INSTALL_LOCK_FILE_NAME", "install.lock");
-        Path workDirectory = Path.of(System.getProperty("zrlog.native.agent.workDirectory",
-                System.getProperty("java.io.tmpdir")));
+        Path workDirectory =
+                Path.of(
+                        System.getProperty(
+                                "zrlog.native.agent.workDirectory",
+                                System.getProperty("java.io.tmpdir")));
         Files.createDirectories(workDirectory);
         Path root = Files.createTempDirectory(workDirectory, "zrlog-native-agent-");
         InMemoryDatabase database = null;
         try {
             System.setProperty("sws.root.path", root.toString());
             PathUtil.setRootPath(root.toString());
-            for (String directory : new String[]{"conf", "static", "cache", "temp", "log"}) {
+            for (String directory : new String[] {"conf", "static", "cache", "temp", "log"}) {
                 Path path = Files.createDirectories(root.resolve(directory));
                 System.setProperty("sws." + directory + ".path", path.toString());
             }
             InstallConfigVO request;
-            try (var input = GraalvmAgentRuntime.class.getResourceAsStream("/native-agent/default-install.json")) {
+            try (var input =
+                    GraalvmAgentRuntime.class.getResourceAsStream(
+                            "/native-agent/default-install.json")) {
                 if (input == null) {
-                    throw new IllegalStateException("Missing native agent default install configuration");
+                    throw new IllegalStateException(
+                            "Missing native agent default install configuration");
                 }
-                request = new Gson().fromJson(new InputStreamReader(input, StandardCharsets.UTF_8), InstallConfigVO.class);
+                request =
+                        new Gson()
+                                .fromJson(
+                                        new InputStreamReader(input, StandardCharsets.UTF_8),
+                                        InstallConfigVO.class);
             }
             String name = "zrlog_native_agent_" + UUID.randomUUID();
             Properties properties = InMemoryDatabase.h2Properties(name);
@@ -68,34 +75,38 @@ final class GraalvmAgentRuntime implements AutoCloseable {
             db.setDbType("h2");
             db.setDbName(name);
             request.setDbConfig(db);
-            var config = new DefaultInstallConfig() {
-                @Override
-                public File getDbPropertiesFile() {
-                    return root.resolve("conf/db.properties").toFile();
-                }
-
-                @Override
-                public String defaultTemplatePath() {
-                    return Constants.getDefaultTemplatePath();
-                }
-
-                @Override
-                public String getZrLogSqlVersion() {
-                    return String.valueOf(UpgradeVersionHandler.SQL_VERSION);
-                }
-
-                @Override
-                public InstallAction getAction() {
-                    return new DefaultInstallAction() {
+            var config =
+                    new DefaultInstallConfig() {
                         @Override
-                        public File getLockFile() {
-                            return root.resolve("conf/install.lock").toFile();
+                        public File getDbPropertiesFile() {
+                            return root.resolve("conf/db.properties").toFile();
+                        }
+
+                        @Override
+                        public String defaultTemplatePath() {
+                            return Constants.getDefaultTemplatePath();
+                        }
+
+                        @Override
+                        public String getZrLogSqlVersion() {
+                            return String.valueOf(UpgradeVersionHandler.SQL_VERSION);
+                        }
+
+                        @Override
+                        public InstallAction getAction() {
+                            return new DefaultInstallAction() {
+                                @Override
+                                public File getLockFile() {
+                                    return root.resolve("conf/install.lock").toFile();
+                                }
+                            };
                         }
                     };
-                }
-            };
-            if (!DaggerInstallComponent.factory().create(config).installers()
-                    .create(request, InstallProgressListener.NONE, config.getAcceptLanguage()).install()) {
+            if (!DaggerInstallComponent.factory()
+                    .create(config)
+                    .installers()
+                    .create(request, InstallProgressListener.NONE, config.getAcceptLanguage())
+                    .install()) {
                 throw new IllegalStateException("Install native agent memory database failed");
             }
             database = InMemoryDatabase.open(properties, true);
@@ -116,13 +127,17 @@ final class GraalvmAgentRuntime implements AutoCloseable {
     private static void requireEnvironment(String name, String expected) {
         String value = System.getenv(name);
         if (value != null && !value.equals(expected)) {
-            throw new IllegalStateException("Native agent requires an isolated " + name + "; use exec:exec@java-agent -Dagent");
+            throw new IllegalStateException(
+                    "Native agent requires an isolated "
+                            + name
+                            + "; use exec:exec@java-agent -Dagent");
         }
     }
 
     @Override
     public void close() {
-        // A running logger or plugin may still hold files; only the parent process can remove the site safely.
+        // A running logger or plugin may still hold files; only the parent process can remove the
+        // site safely.
         database.close();
     }
 }

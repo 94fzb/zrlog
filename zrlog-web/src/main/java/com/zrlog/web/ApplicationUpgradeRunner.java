@@ -9,14 +9,12 @@ import com.zrlog.common.vo.Version;
 import com.zrlog.updater.spi.ApplicationUpdater;
 import com.zrlog.updater.spi.SystemPackageUpdater;
 import com.zrlog.util.I18nUtil;
-
 import java.util.Map;
 import java.util.Objects;
 
 final class ApplicationUpgradeRunner {
 
-    private ApplicationUpgradeRunner() {
-    }
+    private ApplicationUpgradeRunner() {}
 
     static int run(Updater updater, boolean preview) {
         return run(updater, preview, false);
@@ -37,7 +35,8 @@ final class ApplicationUpgradeRunner {
                 return 1;
             }
         }
-        UpdateVersionTimerTask versionTask = new UpdateVersionTimerTask(preview, I18nUtil.getCurrentLocale());
+        UpdateVersionTimerTask versionTask =
+                new UpdateVersionTimerTask(preview, I18nUtil.getCurrentLocale());
         versionTask.run();
         Version version = versionTask.getVersion();
         if (version == null) {

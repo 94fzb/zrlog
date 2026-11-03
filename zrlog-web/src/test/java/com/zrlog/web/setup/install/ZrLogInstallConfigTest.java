@@ -1,22 +1,22 @@
 package com.zrlog.web.setup.install;
 
+import static org.junit.Assert.*;
+
 import com.zrlog.business.version.UpgradeVersionHandler;
 import com.zrlog.common.Constants;
 import com.zrlog.common.Updater;
 import com.zrlog.common.UpdaterTypeEnum;
 import com.zrlog.common.vo.Version;
 import com.zrlog.install.business.response.LastVersionInfo;
-import org.junit.Test;
-
 import java.io.File;
 import java.util.Collections;
 import java.util.Date;
-
-import static org.junit.Assert.*;
+import org.junit.Test;
 
 public class ZrLogInstallConfigTest {
 
-    private static LastVersionInfo lastVersionInfo(Updater updater, Version version) throws Exception {
+    private static LastVersionInfo lastVersionInfo(Updater updater, Version version)
+            throws Exception {
         return ZrLogInstallConfig.toLastVersionInfo(updater, version);
     }
 
@@ -38,7 +38,8 @@ public class ZrLogInstallConfigTest {
         File dbPropertiesFile = File.createTempFile("zrlog-db", ".properties");
         File installLockFile = File.createTempFile("zrlog-install", ".lock");
 
-        ZrLogInstallConfig installConfig = new ZrLogInstallConfig(config, dbPropertiesFile, installLockFile, updater);
+        ZrLogInstallConfig installConfig =
+                new ZrLogInstallConfig(config, dbPropertiesFile, installLockFile, updater);
 
         assertSame(dbPropertiesFile, installConfig.getDbPropertiesFile());
         assertSame(installLockFile, installConfig.getAction().getLockFile());
@@ -46,34 +47,43 @@ public class ZrLogInstallConfigTest {
         assertNull(installConfig.getLastVersionInfo());
         assertFalse(installConfig.getUpgradeAction().isSupported());
         assertEquals(Constants.getDefaultTemplatePath(), installConfig.defaultTemplatePath());
-        assertEquals(String.valueOf(UpgradeVersionHandler.SQL_VERSION), installConfig.getZrLogSqlVersion());
-        assertEquals(Constants.MYSQL_JDBC_PARAMS,
+        assertEquals(
+                String.valueOf(UpgradeVersionHandler.SQL_VERSION),
+                installConfig.getZrLogSqlVersion());
+        assertEquals(
+                Constants.MYSQL_JDBC_PARAMS,
                 installConfig.getJdbcUrlQueryStr("mysql", Collections.emptyMap()));
         assertEquals("", installConfig.getJdbcUrlQueryStr("postgresql", Collections.emptyMap()));
     }
 
     @Test
     public void shouldDetectWarUpdaterMode() throws Exception {
-        TestZrLogConfig config = TestZrLogConfig.installedConfig(new TestUpdater(UpdaterTypeEnum.WAR));
+        TestZrLogConfig config =
+                TestZrLogConfig.installedConfig(new TestUpdater(UpdaterTypeEnum.WAR));
 
-        ZrLogInstallConfig installConfig = new ZrLogInstallConfig(config,
-                File.createTempFile("zrlog-db", ".properties"),
-                File.createTempFile("zrlog-install", ".lock"),
-                new TestUpdater(UpdaterTypeEnum.WAR));
+        ZrLogInstallConfig installConfig =
+                new ZrLogInstallConfig(
+                        config,
+                        File.createTempFile("zrlog-db", ".properties"),
+                        File.createTempFile("zrlog-install", ".lock"),
+                        new TestUpdater(UpdaterTypeEnum.WAR));
 
         assertTrue(installConfig.isWarMode());
     }
 
     @Test
     public void shouldDelegateAskAndMissingConfigFlags() throws Exception {
-        TestZrLogConfig config = TestZrLogConfig.installedConfig(new TestUpdater(UpdaterTypeEnum.ZIP));
+        TestZrLogConfig config =
+                TestZrLogConfig.installedConfig(new TestUpdater(UpdaterTypeEnum.ZIP));
         config.setAskConfig(true);
         config.setMissingConfig(true);
 
-        ZrLogInstallConfig installConfig = new ZrLogInstallConfig(config,
-                File.createTempFile("zrlog-db", ".properties"),
-                File.createTempFile("zrlog-install", ".lock"),
-                null);
+        ZrLogInstallConfig installConfig =
+                new ZrLogInstallConfig(
+                        config,
+                        File.createTempFile("zrlog-db", ".properties"),
+                        File.createTempFile("zrlog-install", ".lock"),
+                        null);
 
         assertTrue(installConfig.isAskConfig());
         assertTrue(installConfig.isMissingConfig());

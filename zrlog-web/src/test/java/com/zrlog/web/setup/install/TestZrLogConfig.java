@@ -7,7 +7,6 @@ import com.zrlog.common.Updater;
 import com.zrlog.common.ZrLogConfig;
 import com.zrlog.plugin.IPlugin;
 import com.zrlog.plugin.Plugins;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;

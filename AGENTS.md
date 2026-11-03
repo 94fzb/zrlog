@@ -35,10 +35,15 @@
 常用命令：
 
 ```bash
+./mvnw -q spotless:apply
+./mvnw -q spotless:check
 ./mvnw -q -DskipTests compile
 ./mvnw -q -U -pl zrlog-web -am test
 ./mvnw -q -DskipTests package
 ```
+
+Java 源码统一使用 Google Java Format AOSP 四空格风格。格式化命令在仓库根目录使用 JDK 21+ 执行；
+`java-format` profile 会自动启用并在 `validate` 阶段检查格式，CI 的 Java Format 工作流使用 JDK 21 独立检查。
 
 修改 `zrlog-web` 行为时至少运行 `./mvnw -q -U -pl zrlog-web -am test`。修改打包、依赖范围、release 脚本或启动 classpath
 时，需要检查真实产物结构，不能只依赖 Maven 编译通过。Docker 离线契约与 Compose 配置检查脚本在 `shell/docker/`；工作流契约检查为

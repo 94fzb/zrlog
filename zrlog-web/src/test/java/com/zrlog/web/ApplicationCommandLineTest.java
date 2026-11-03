@@ -1,13 +1,17 @@
 package com.zrlog.web;
 
-import org.junit.Test;
-
 import static org.junit.Assert.*;
+
+import org.junit.Test;
 
 public class ApplicationCommandLineTest {
     @Test
     public void shouldKeepDebOptionsOutOfServerArguments() {
-        ApplicationCommandLine command = ApplicationCommandLine.parse(new String[]{"upgrade", "--channel=release", "--non-interactive", "--json"});
+        ApplicationCommandLine command =
+                ApplicationCommandLine.parse(
+                        new String[] {
+                            "upgrade", "--channel=release", "--non-interactive", "--json"
+                        });
         assertTrue(command.isNonInteractive());
         assertTrue(command.isJson());
         assertArrayEquals(new String[0], command.getServeArgs());
@@ -15,28 +19,31 @@ public class ApplicationCommandLineTest {
 
     @Test
     public void shouldParseUpgradeAndRemoveOneShotArgumentsFromServeArgs() {
-        ApplicationCommandLine commandLine = ApplicationCommandLine.parse(new String[]{
-                "upgrade", "--channel=preview", "--port=19080", "--contextPath=/blog"
-        });
+        ApplicationCommandLine commandLine =
+                ApplicationCommandLine.parse(
+                        new String[] {
+                            "upgrade", "--channel=preview", "--port=19080", "--contextPath=/blog"
+                        });
 
         assertEquals(ApplicationCommandLine.Command.UPGRADE, commandLine.getCommand());
         assertTrue(commandLine.isPreview());
-        assertArrayEquals(new String[]{"--port=19080", "--contextPath=/blog"}, commandLine.getServeArgs());
+        assertArrayEquals(
+                new String[] {"--port=19080", "--contextPath=/blog"}, commandLine.getServeArgs());
     }
 
     @Test
     public void shouldSupportExplicitServeCommand() {
-        ApplicationCommandLine commandLine = ApplicationCommandLine.parse(new String[]{"serve", "--port=19081"});
+        ApplicationCommandLine commandLine =
+                ApplicationCommandLine.parse(new String[] {"serve", "--port=19081"});
 
         assertEquals(ApplicationCommandLine.Command.SERVE, commandLine.getCommand());
-        assertArrayEquals(new String[]{"--port=19081"}, commandLine.getServeArgs());
+        assertArrayEquals(new String[] {"--port=19081"}, commandLine.getServeArgs());
     }
 
     @Test
     public void shouldUseReleaseChannelWhenRequested() {
-        ApplicationCommandLine commandLine = ApplicationCommandLine.parse(new String[]{
-                "upgrade", "--channel=release"
-        });
+        ApplicationCommandLine commandLine =
+                ApplicationCommandLine.parse(new String[] {"upgrade", "--channel=release"});
 
         assertFalse(commandLine.isPreview());
         assertArrayEquals(new String[0], commandLine.getServeArgs());
@@ -44,9 +51,11 @@ public class ApplicationCommandLineTest {
 
     @Test
     public void shouldRejectUpgradeOptionAndUnknownChannel() {
-        assertThrows(IllegalArgumentException.class,
-                () -> ApplicationCommandLine.parse(new String[]{"--upgrade"}));
-        assertThrows(IllegalArgumentException.class,
-                () -> ApplicationCommandLine.parse(new String[]{"upgrade", "--channel=nightly"}));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> ApplicationCommandLine.parse(new String[] {"--upgrade"}));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> ApplicationCommandLine.parse(new String[] {"upgrade", "--channel=nightly"}));
     }
 }

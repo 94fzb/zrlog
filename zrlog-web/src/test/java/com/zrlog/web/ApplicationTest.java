@@ -1,24 +1,22 @@
 package com.zrlog.web;
 
+import static org.junit.Assert.*;
+
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.http.server.SimpleWebServer;
 import com.hibegin.http.server.WebServerBuilder;
 import com.zrlog.web.config.ZrLogConfigImpl;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
-
-import static org.junit.Assert.*;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 public class ApplicationTest {
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @Rule public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     private static void restoreProperty(String key, String value) {
         if (value == null) {
@@ -30,16 +28,17 @@ public class ApplicationTest {
 
     @Test
     public void shouldBuildWebServerWithoutStartingIt() throws Exception {
-        withTestRuntime(() -> {
-            ZrLogConfigImpl config = new ZrLogConfigImpl(19082, null, "/site");
-            WebServerBuilder builder = Application.webServerBuilder(config);
+        withTestRuntime(
+                () -> {
+                    ZrLogConfigImpl config = new ZrLogConfigImpl(19082, null, "/site");
+                    WebServerBuilder builder = Application.webServerBuilder(config);
 
-            assertNotNull(builder);
-            assertNull(builder.getWebServer());
-            assertEquals(Integer.valueOf(19082), config.getServerConfig().getPort());
-            assertEquals("/site", config.getServerConfig().getContextPath());
-            assertTrue(config.getServerConfig().getOnCreateErrorHandles().size() > 0);
-        });
+                    assertNotNull(builder);
+                    assertNull(builder.getWebServer());
+                    assertEquals(Integer.valueOf(19082), config.getServerConfig().getPort());
+                    assertEquals("/site", config.getServerConfig().getContextPath());
+                    assertTrue(config.getServerConfig().getOnCreateErrorHandles().size() > 0);
+                });
     }
 
     @Test
@@ -64,22 +63,22 @@ public class ApplicationTest {
 
     @Test(timeout = 5000)
     public void shouldReturnImmediatelyForVersionStartArgument() {
-        Application.start(new String[]{"--version"});
+        Application.start(new String[] {"--version"});
     }
 
     @Test
     public void shouldRejectUpgradeOptionWithoutStartingServer() {
-        assertEquals(2, Application.startWithExitCode(new String[]{"--upgrade"}));
+        assertEquals(2, Application.startWithExitCode(new String[] {"--upgrade"}));
     }
 
     @Test(timeout = 5000)
     public void shouldReturnImmediatelyForVersionMainArgument() throws Exception {
-        Application.main(new String[]{"--version"});
+        Application.main(new String[] {"--version"});
     }
 
     @Test(timeout = 5000)
     public void shouldReturnImmediatelyForNativeVersionArgument() throws Exception {
-        Application.nativeStart(new String[]{"--version"});
+        Application.nativeStart(new String[] {"--version"});
     }
 
     @Test
@@ -98,7 +97,8 @@ public class ApplicationTest {
         String previousRootPath = System.getProperty("sws.root.path");
         String previousEnv = System.getProperty("env");
         try {
-            System.setProperty("sws.root.path", temporaryFolder.newFolder("zrlog-web-app").getAbsolutePath());
+            System.setProperty(
+                    "sws.root.path", temporaryFolder.newFolder("zrlog-web-app").getAbsolutePath());
             System.setProperty("env", "junit-test");
             runnable.run();
         } finally {

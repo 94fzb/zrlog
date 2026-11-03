@@ -1,7 +1,6 @@
 package com.zrlog.web;
 
 import com.zrlog.util.BlogBuildInfoUtil;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -12,6 +11,7 @@ final class ApplicationCommandLine {
     private final String[] serveArgs;
     private final boolean preview;
     private boolean nonInteractive, json;
+
     private ApplicationCommandLine(Command command, String[] serveArgs, boolean preview) {
         this.command = command;
         this.serveArgs = serveArgs;
@@ -52,7 +52,8 @@ final class ApplicationCommandLine {
             }
             serveArgs.add(value);
         }
-        ApplicationCommandLine parsed = new ApplicationCommandLine(command, serveArgs.toArray(new String[0]), preview);
+        ApplicationCommandLine parsed =
+                new ApplicationCommandLine(command, serveArgs.toArray(new String[0]), preview);
         parsed.nonInteractive = nonInteractive;
         parsed.json = json;
         return parsed;
@@ -79,6 +80,7 @@ final class ApplicationCommandLine {
     }
 
     enum Command {
-        SERVE, UPGRADE
+        SERVE,
+        UPGRADE
     }
 }

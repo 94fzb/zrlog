@@ -18,7 +18,10 @@ public class InstallWebSetupProvider implements WebSetupProvider {
 
     @Override
     public WebSetup create(WebSetupContext context) {
-        return new InstallWebSetup(context.getZrLogConfig(), context.getDbPropertiesFile(),
-                context.getInstallLockFile(), context.getUpdater());
+        return new InstallWebSetup(
+                context.getZrLogConfig(),
+                context.getDbPropertiesFile(),
+                context.getInstallLockFile(),
+                context.getUpdater());
     }
 }

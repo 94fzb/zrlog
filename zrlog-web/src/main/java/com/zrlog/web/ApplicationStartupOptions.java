@@ -13,7 +13,8 @@ class ApplicationStartupOptions {
     }
 
     static ApplicationStartupOptions parse(String[] args) {
-        return new ApplicationStartupOptions(ArgsParser.getPort(args), ArgsParser.getContextPath(args));
+        return new ApplicationStartupOptions(
+                ArgsParser.getPort(args), ArgsParser.getContextPath(args));
     }
 
     int getPort() {

@@ -7,13 +7,13 @@ import com.zrlog.common.Updater;
 import com.zrlog.common.ZrLogConfig;
 import com.zrlog.plugin.Plugins;
 import com.zrlog.web.inteceptor.DefaultInterceptor;
-
 import java.util.Objects;
 import java.util.logging.Level;
 
 public class ZrLogConfigImpl extends ZrLogConfig {
 
-    private static final String MYSQL_CLEANUP_THREAD_CLASS_NAME = "com.mysql.cj.jdbc.AbandonedConnectionCleanupThread";
+    private static final String MYSQL_CLEANUP_THREAD_CLASS_NAME =
+            "com.mysql.cj.jdbc.AbandonedConnectionCleanupThread";
     private WebServerBuilder serverBuilder;
 
     public ZrLogConfigImpl(Integer port, Updater updater, String contextPath) {
@@ -34,7 +34,8 @@ public class ZrLogConfigImpl extends ZrLogConfig {
 
     private boolean isMySqlCleanupThreadAvailable() {
         try {
-            Class.forName(MYSQL_CLEANUP_THREAD_CLASS_NAME, false, ZrLogConfigImpl.class.getClassLoader());
+            Class.forName(
+                    MYSQL_CLEANUP_THREAD_CLASS_NAME, false, ZrLogConfigImpl.class.getClassLoader());
             return true;
         } catch (ClassNotFoundException | LinkageError e) {
             return false;

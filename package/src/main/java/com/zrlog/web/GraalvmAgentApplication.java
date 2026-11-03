@@ -11,16 +11,13 @@ import com.zrlog.common.ZrLogConfig;
 import com.zrlog.util.ArgsParser;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.web.config.ZrLogConfigImpl;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-/**
- * 该类仅提供基础的 graalvm native image agent 运行依赖反射扫描等功能，不作为实际的启动入口
- */
+/** 该类仅提供基础的 graalvm native image agent 运行依赖反射扫描等功能，不作为实际的启动入口 */
 public class GraalvmAgentApplication {
 
     private static final Logger LOGGER = Logger.getLogger(GraalvmAgentApplication.class.getName());
@@ -30,8 +27,12 @@ public class GraalvmAgentApplication {
     }
 
     private static void registerLambdaJsonTypes() {
-        NativeImageUtils.gsonNativeAgentByClazz(Arrays.asList(LambdaApiGatewayRequest.class, ApiGatewayHttp.class,
-                ApiGatewayRequestContext.class, LambdaApiGatewayResponse.class));
+        NativeImageUtils.gsonNativeAgentByClazz(
+                Arrays.asList(
+                        LambdaApiGatewayRequest.class,
+                        ApiGatewayHttp.class,
+                        ApiGatewayRequestContext.class,
+                        LambdaApiGatewayResponse.class));
     }
 
     public static void main(String[] args) throws Exception {
@@ -45,9 +46,10 @@ public class GraalvmAgentApplication {
     }
 
     private static void logWebSetupProviders() {
-        List<String> providerNames = ServiceLoader.load(WebSetupProvider.class).stream()
-                .map(provider -> provider.type().getName())
-                .collect(Collectors.toList());
+        List<String> providerNames =
+                ServiceLoader.load(WebSetupProvider.class).stream()
+                        .map(provider -> provider.type().getName())
+                        .collect(Collectors.toList());
         LOGGER.info("WebSetup SPI providers: " + providerNames);
     }
 
@@ -56,14 +58,19 @@ public class GraalvmAgentApplication {
         WebServerBuilder webServerBuilder = Application.webServerBuilder(config);
         config.getServerConfig().setDisableSavePidFile(true);
         config.getServerConfig().setServerPortFilePathEnvKey(null);
-        config.getServerConfig().addCreateSuccessHandle(() -> {
-            // Stop owned services before halting the tracing JVM: halt skips shutdown hooks,
-            // so a plugin child would otherwise retain the disposable site's files on Windows.
-            config.stop();
-            // The caller removes the site after this process releases its remaining logger handles.
-            Runtime.getRuntime().halt(0);
-            return null;
-        });
+        config.getServerConfig()
+                .addCreateSuccessHandle(
+                        () -> {
+                            // Stop owned services before halting the tracing JVM: halt skips
+                            // shutdown hooks,
+                            // so a plugin child would otherwise retain the disposable site's files
+                            // on Windows.
+                            config.stop();
+                            // The caller removes the site after this process releases its remaining
+                            // logger handles.
+                            Runtime.getRuntime().halt(0);
+                            return null;
+                        });
         webServerBuilder.start();
     }
 }

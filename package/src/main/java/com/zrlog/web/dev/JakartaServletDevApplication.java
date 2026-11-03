@@ -2,15 +2,11 @@ package com.zrlog.web.dev;
 
 import com.zrlog.common.Constants;
 import com.zrlog.util.ArgsParser;
+import java.io.File;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
 
-import java.io.File;
-
-/**
- * 以标准 web 能运行的程序（Servlet，仅 war 包）
- * 该文件不打包进入生产环境，仅开发调试用
- */
+/** 以标准 web 能运行的程序（Servlet，仅 war 包） 该文件不打包进入生产环境，仅开发调试用 */
 public class JakartaServletDevApplication {
 
     static {

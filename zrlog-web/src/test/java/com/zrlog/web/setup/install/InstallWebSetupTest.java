@@ -1,13 +1,13 @@
 package com.zrlog.web.setup.install;
 
+import static org.junit.Assert.*;
+
 import com.hibegin.common.util.LoggerUtil;
 import com.hibegin.http.server.api.HttpRequest;
 import com.hibegin.http.server.api.HttpResponse;
 import com.zrlog.common.UpdaterTypeEnum;
 import com.zrlog.install.business.response.InstallApiResponses;
 import com.zrlog.install.exception.InvalidInstallRequestException;
-import org.junit.Test;
-
 import java.io.File;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
@@ -16,26 +16,29 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-
-import static org.junit.Assert.*;
+import org.junit.Test;
 
 public class InstallWebSetupTest {
 
     private static HttpRequest request(String uri) {
-        return (HttpRequest) Proxy.newProxyInstance(
-                InstallWebSetupTest.class.getClassLoader(), new Class[]{HttpRequest.class},
-                (proxy, method, args) -> "getUri".equals(method.getName()) ? uri : null);
+        return (HttpRequest)
+                Proxy.newProxyInstance(
+                        InstallWebSetupTest.class.getClassLoader(),
+                        new Class[] {HttpRequest.class},
+                        (proxy, method, args) -> "getUri".equals(method.getName()) ? uri : null);
     }
 
     private static HttpResponse response(AtomicReference<Object> rendered) {
-        return (HttpResponse) Proxy.newProxyInstance(
-                InstallWebSetupTest.class.getClassLoader(), new Class[]{HttpResponse.class},
-                (proxy, method, args) -> {
-                    if ("renderJson".equals(method.getName())) {
-                        rendered.set(args[0]);
-                    }
-                    return null;
-                });
+        return (HttpResponse)
+                Proxy.newProxyInstance(
+                        InstallWebSetupTest.class.getClassLoader(),
+                        new Class[] {HttpResponse.class},
+                        (proxy, method, args) -> {
+                            if ("renderJson".equals(method.getName())) {
+                                rendered.set(args[0]);
+                            }
+                            return null;
+                        });
     }
 
     @Test
@@ -47,8 +50,11 @@ public class InstallWebSetupTest {
 
         new InstallWebSetup(config, dbPropertiesFile, installLockFile, updater).setup();
 
-        var installConfig = config.getServerConfig().getBindings().build()
-                .get(com.zrlog.install.web.config.InstallConfig.class);
+        var installConfig =
+                config.getServerConfig()
+                        .getBindings()
+                        .build()
+                        .get(com.zrlog.install.web.config.InstallConfig.class);
         assertSame(installLockFile, installConfig.getAction().getLockFile());
     }
 
@@ -60,20 +66,19 @@ public class InstallWebSetupTest {
         File installLockFile = new File(dbPropertiesFile.getParentFile(), "private-install.lock");
         Logger logger = LoggerUtil.getLogger(InstallWebSetup.class);
         AtomicReference<String> message = new AtomicReference<>();
-        Handler handler = new Handler() {
-            @Override
-            public void publish(LogRecord record) {
-                message.set(record.getMessage());
-            }
+        Handler handler =
+                new Handler() {
+                    @Override
+                    public void publish(LogRecord record) {
+                        message.set(record.getMessage());
+                    }
 
-            @Override
-            public void flush() {
-            }
+                    @Override
+                    public void flush() {}
 
-            @Override
-            public void close() {
-            }
-        };
+                    @Override
+                    public void close() {}
+                };
         logger.addHandler(handler);
         try {
             new InstallWebSetup(config, dbPropertiesFile, installLockFile, updater).setup();
@@ -91,30 +96,39 @@ public class InstallWebSetupTest {
         TestUpdater updater = new TestUpdater(UpdaterTypeEnum.ZIP);
         TestZrLogConfig config = TestZrLogConfig.notInstalledConfig(updater);
         Map<Integer, AtomicReference<Throwable>> fallbackThrowables = new HashMap<>();
-        for (int status : new int[]{400, 403, 500}) {
+        for (int status : new int[] {400, 403, 500}) {
             AtomicReference<Throwable> fallbackThrowable = new AtomicReference<>();
             fallbackThrowables.put(status, fallbackThrowable);
-            config.getServerConfig().addErrorHandle(status,
-                    (request, response, throwable) -> fallbackThrowable.set(throwable));
+            config.getServerConfig()
+                    .addErrorHandle(
+                            status,
+                            (request, response, throwable) -> fallbackThrowable.set(throwable));
         }
         File dbPropertiesFile = File.createTempFile("zrlog-db", ".properties");
         File installLockFile = new File(dbPropertiesFile.getParentFile(), "install.lock");
 
         new InstallWebSetup(config, dbPropertiesFile, installLockFile, updater).setup();
 
-        for (int status : new int[]{400, 403, 500}) {
+        for (int status : new int[] {400, 403, 500}) {
             AtomicReference<Object> rendered = new AtomicReference<>();
             String installUri = status == 400 ? "/api/install" : "/api/install/testDbConn";
-            config.getServerConfig().getErrorHandle(status).doHandle(
-                    request(installUri), response(rendered),
-                    new InvalidInstallRequestException("Invalid installation request"));
+            config.getServerConfig()
+                    .getErrorHandle(status)
+                    .doHandle(
+                            request(installUri),
+                            response(rendered),
+                            new InvalidInstallRequestException("Invalid installation request"));
             InstallApiResponses.Error error = (InstallApiResponses.Error) rendered.get();
             assertEquals(Integer.valueOf(9025), error.getError());
             assertEquals("INVALID_INSTALL_REQUEST", error.getCode());
 
             IllegalStateException fallbackError = new IllegalStateException("other API failure");
-            config.getServerConfig().getErrorHandle(status).doHandle(
-                    request("/api/installx"), response(new AtomicReference<>()), fallbackError);
+            config.getServerConfig()
+                    .getErrorHandle(status)
+                    .doHandle(
+                            request("/api/installx"),
+                            response(new AtomicReference<>()),
+                            fallbackError);
             assertSame(fallbackError, fallbackThrowables.get(status).get());
         }
     }

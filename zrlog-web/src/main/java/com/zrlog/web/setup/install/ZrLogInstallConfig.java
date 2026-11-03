@@ -19,7 +19,6 @@ import com.zrlog.install.web.config.DefaultInstallConfig;
 import com.zrlog.util.BlogBuildInfoUtil;
 import com.zrlog.util.I18nUtil;
 import com.zrlog.util.ZrLogUtil;
-
 import java.io.File;
 import java.util.Map;
 import java.util.Objects;
@@ -33,13 +32,16 @@ public class ZrLogInstallConfig extends DefaultInstallConfig {
     private final Updater updater;
     private final InstallAction installAction;
 
-    public ZrLogInstallConfig(ZrLogConfig zrLogConfig, File dbPropertiesFile, File lockFile, Updater updater) {
+    public ZrLogInstallConfig(
+            ZrLogConfig zrLogConfig, File dbPropertiesFile, File lockFile, Updater updater) {
         this.zrLogConfig = zrLogConfig;
         this.dbPropertiesFile = dbPropertiesFile;
         this.updater = updater;
         this.lastVersion = prefetchVersion();
-        this.lastVersionInfo = zrLogConfig.isInstalled() || zrLogConfig.isTest() ? null :
-                toLastVersionInfo(updater, lastVersion);
+        this.lastVersionInfo =
+                zrLogConfig.isInstalled() || zrLogConfig.isTest()
+                        ? null
+                        : toLastVersionInfo(updater, lastVersion);
         this.installAction = new ZrLogInstallAction(zrLogConfig, lockFile);
     }
 
@@ -49,8 +51,11 @@ public class ZrLogInstallConfig extends DefaultInstallConfig {
             lastVersionInfo.setLatestVersion(true);
             return lastVersionInfo;
         }
-        boolean upgradable = ZrLogUtil.greatThenCurrentVersion(lastVersion.getBuildId(),
-                lastVersion.getBuildDate(), lastVersion.getVersion());
+        boolean upgradable =
+                ZrLogUtil.greatThenCurrentVersion(
+                        lastVersion.getBuildId(),
+                        lastVersion.getBuildDate(),
+                        lastVersion.getVersion());
         lastVersionInfo.setLatestVersion(!upgradable);
         if (lastVersionInfo.getLatestVersion()) {
             return lastVersionInfo;
@@ -69,7 +74,9 @@ public class ZrLogInstallConfig extends DefaultInstallConfig {
         if (zrLogConfig.isInstalled() || zrLogConfig.isTest()) {
             return null;
         }
-        UpdateVersionTimerTask versionTimerTask = new UpdateVersionTimerTask(!BlogBuildInfoUtil.isRelease(), Constants.DEFAULT_LANGUAGE);
+        UpdateVersionTimerTask versionTimerTask =
+                new UpdateVersionTimerTask(
+                        !BlogBuildInfoUtil.isRelease(), Constants.DEFAULT_LANGUAGE);
         versionTimerTask.run();
         return versionTimerTask.getVersion();
     }
@@ -124,8 +131,8 @@ public class ZrLogInstallConfig extends DefaultInstallConfig {
                         && !ZrLogUtil.isDockerMode()
                         && !ZrLogUtil.isSystemServiceMode()
                         && (!EnvKit.isFaaSMode()
-                        || UpdaterHosts.onlineUpgradeSupported(
-                        UpdaterTypeEnum.FAAS, updater));
+                                || UpdaterHosts.onlineUpgradeSupported(
+                                        UpdaterTypeEnum.FAAS, updater));
             }
 
             @Override

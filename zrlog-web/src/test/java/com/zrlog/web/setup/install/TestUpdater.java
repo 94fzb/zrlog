@@ -3,7 +3,6 @@ package com.zrlog.web.setup.install;
 import com.zrlog.common.Updater;
 import com.zrlog.common.UpdaterTypeEnum;
 import com.zrlog.common.vo.Version;
-
 import java.io.File;
 
 class TestUpdater implements Updater {
@@ -15,8 +14,7 @@ class TestUpdater implements Updater {
     }
 
     @Override
-    public void restartProcessAsync(Version upgradeVersion) {
-    }
+    public void restartProcessAsync(Version upgradeVersion) {}
 
     @Override
     public String getUnzipPath() {

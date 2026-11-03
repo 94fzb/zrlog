@@ -10,13 +10,10 @@ import com.zrlog.common.ZrLogConfig;
 import com.zrlog.util.ArgsParser;
 import com.zrlog.web.ApplicationUpdaterFactory;
 import com.zrlog.web.config.ZrLogConfigImpl;
-
 import java.io.File;
 import java.lang.management.ManagementFactory;
 
-/**
- * 适配标准 Servlet 容器
- */
+/** 适配标准 Servlet 容器 */
 public class ZrLogSwsServletFilter extends SwsServletFilter {
 
     String getWarFile() {
@@ -31,8 +28,11 @@ public class ZrLogSwsServletFilter extends SwsServletFilter {
 
     @Override
     protected AbstractServerConfig getServerConfig() {
-        String[] runtimeArgs = ManagementFactory.getRuntimeMXBean().getInputArguments().toArray(new String[0]);
-        Integer port = ObjectUtil.requireNonNullElse(PortDetector.detectHttpPort(), ArgsParser.getPort(runtimeArgs));
+        String[] runtimeArgs =
+                ManagementFactory.getRuntimeMXBean().getInputArguments().toArray(new String[0]);
+        Integer port =
+                ObjectUtil.requireNonNullElse(
+                        PortDetector.detectHttpPort(), ArgsParser.getPort(runtimeArgs));
         String contextPath = getFilterConfig().getServletContext().getContextPath();
         return new ZrLogConfigImpl(port, getUpdater(), contextPath);
     }

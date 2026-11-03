@@ -1,17 +1,16 @@
 package com.zrlog.web;
 
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
 
 public class ApplicationStartupOptionsTest {
 
     @Test
     public void shouldParsePortAndContextPathFromArgs() {
-        ApplicationStartupOptions options = ApplicationStartupOptions.parse(new String[]{
-                "--port=19080",
-                "--contextPath=/blog"
-        });
+        ApplicationStartupOptions options =
+                ApplicationStartupOptions.parse(
+                        new String[] {"--port=19080", "--contextPath=/blog"});
 
         assertEquals(19080, options.getPort());
         assertEquals("/blog", options.getContextPath());
@@ -27,7 +26,11 @@ public class ApplicationStartupOptionsTest {
 
     @Test
     public void shouldParseIndependentStartupOptions() {
-        assertEquals(19081, ApplicationStartupOptions.parse(new String[]{"--port=19081"}).getPort());
-        assertEquals("/admin", ApplicationStartupOptions.parse(new String[]{"--contextPath=/admin"}).getContextPath());
+        assertEquals(
+                19081, ApplicationStartupOptions.parse(new String[] {"--port=19081"}).getPort());
+        assertEquals(
+                "/admin",
+                ApplicationStartupOptions.parse(new String[] {"--contextPath=/admin"})
+                        .getContextPath());
     }
 }
