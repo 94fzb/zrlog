@@ -1,0 +1,2 @@
+# Match the Java formatter on every checkout, including Windows.
+*.java text eol=lf
