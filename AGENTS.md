@@ -55,7 +55,7 @@ Java 源码统一使用 Google Java Format AOSP 四空格风格。格式化命�
 平台矩阵以该工作流为准，失败恢复重跑对应 job。
 不得另写工具链与打包步骤；验收消费已归档的实际包并核对 source/producer/SHA-256。
 
-FaaS 的 Native 制品处理客户端由 `zrlog/zrlog-process-artifact` 维护。工作流直接通过 `uses`
+FaaS 的 Native 制品处理客户端由 `zrlog/zrlog-build` 维护。工作流直接通过 `uses`
 调用固定完整提交的 Action，在 `build-final-native.sh` 的 `prepare` 与 `finish` 阶段之间处理制品；
 版本和架构来自本次编译的 build properties。默认本地完整构建通过 `ARTIFACT_PROCESS_SCRIPT` 提供客户端路径。
 主工程只保留处理前的编译和处理后的组包、清单及发布，不复制客户端或服务通用测试。

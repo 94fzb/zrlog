@@ -21,7 +21,7 @@ case "${buildPhase}" in
   *) echo "Unknown build phase: ${buildPhase}" >&2; exit 1 ;;
 esac
 if [[ "$(uname)" == "Linux" && "${buildSubType}" == "faas" && "${buildPhase}" == "all" ]]; then
-  : "${ARTIFACT_PROCESS_SCRIPT:?Set ARTIFACT_PROCESS_SCRIPT to the pinned zrlog-process-artifact scripts/process-artifact.sh}"
+  : "${ARTIFACT_PROCESS_SCRIPT:?Set ARTIFACT_PROCESS_SCRIPT to the pinned zrlog-build scripts/process-artifact.sh}"
   if [[ ! -f "${ARTIFACT_PROCESS_SCRIPT}" ]]; then
     echo "Artifact processing client does not exist: ${ARTIFACT_PROCESS_SCRIPT}" >&2
     exit 1

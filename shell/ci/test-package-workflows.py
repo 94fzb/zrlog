@@ -179,7 +179,7 @@ class PackageWorkflowContract(unittest.TestCase):
     def test_faas_action_runs_between_compile_and_final_package(self):
         steps = SHARED['jobs']['packages']['steps']
         build = next(step for step in steps if step.get('id') == 'build_package')
-        action = next(step for step in steps if step.get('uses', '').startswith('zrlog/zrlog-process-artifact@'))
+        action = next(step for step in steps if step.get('uses', '').startswith('zrlog/zrlog-build@'))
         finish = next(step for step in steps if 'faas finish' in step.get('run', ''))
         record = next(step for step in steps if 'record-package-build.py' in step.get('run', ''))
         self.assertLess(steps.index(build), steps.index(action))
@@ -202,7 +202,7 @@ class PackageWorkflowContract(unittest.TestCase):
             self.assertFalse(step.get('continue-on-error', False))
             self.assertNotIn('always()', step.get('if', ''))
         for step in steps:
-            self.assertNotIn('zrlog/zrlog-process-artifact', step.get('with', {}).get('repository', ''))
+            self.assertNotIn('zrlog/zrlog-build', step.get('with', {}).get('repository', ''))
             self.assertNotIn('ARTIFACT_PROCESS_SCRIPT', step.get('env', {}))
             self.assertNotIn('ARTIFACT_SERVICE_TOKEN', step.get('env', {}))
 

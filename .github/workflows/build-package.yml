@@ -129,7 +129,7 @@ jobs:
           esac
       - name: Process FaaS native artifact
         if: matrix.package_type == 'faas'
-        uses: zrlog/zrlog-process-artifact@5b539f9a93403c981b9e36554ffb8d3d3e7e8b33 # v1.0.1
+        uses: zrlog/zrlog-build@5b539f9a93403c981b9e36554ffb8d3d3e7e8b33 # v1.0.1
         with:
           artifact-file: zrlog
           artifact-name: zrlog
